@@ -1,6 +1,5 @@
 package org.elixir_lang.beam.chunk.debug_info
 
-import org.elixir_lang.beam.Beam
 import org.elixir_lang.beam.chunk.Atoms
 import org.elixir_lang.beam.psi.stubs.ModuleStub
 import org.elixir_lang.beam.type.VisibilityNameArity
@@ -10,7 +9,7 @@ import org.elixir_lang.type.Visibility
 import java.util.*
 
 object TypeDefinitions {
-    fun visibilityNameAritySortedSetByVisibility(parentStub: ModuleStub<*>, beam: Beam, atoms: Atoms): Map<Visibility,
+    fun visibilityNameAritySortedSetByVisibility(parentStub: ModuleStub<*>, atoms: Atoms): Map<Visibility,
             SortedSet<VisibilityNameArity>> =
         if (atoms.moduleName() == "erlang") {
             val sortedSet = TreeSet<VisibilityNameArity>()

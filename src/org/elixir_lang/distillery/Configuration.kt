@@ -25,10 +25,10 @@ import java.nio.file.Path
 import java.nio.file.Paths
 
 class Configuration(name: String, project: Project, configurationFactory: ConfigurationFactory) :
-        org.elixir_lang.run.Configuration(name, project, configurationFactory),
-        Debuggable<Configuration>,
-        RunConfigurationWithSuppressedDefaultRunAction,
-        RunConfigurationWithSuppressedDefaultDebugAction {
+    org.elixir_lang.run.Configuration(name, project, configurationFactory),
+    Debuggable<Configuration>,
+    RunConfigurationWithSuppressedDefaultRunAction,
+    RunConfigurationWithSuppressedDefaultDebugAction {
     override val cookie: String?
         get() = vmArgsPath?.let(::vmArgsPathToCookie)
 
@@ -47,7 +47,7 @@ class Configuration(name: String, project: Project, configurationFactory: Config
         val envs: MutableMap<String, String> = mutableMapOf()
         envs.putAll(this.envs)
         envs.compute(ERL_OPTS) { _, current ->
-            val erlArgumentList=  listOfNotNull(current) + Modules.erlArgumentList()
+            val erlArgumentList = listOfNotNull(current) + Modules.erlArgumentList()
 
             erlArgumentList.joinToString(" ")
         }
@@ -67,7 +67,7 @@ class Configuration(name: String, project: Project, configurationFactory: Config
 
     var wantsPTY: Boolean = false
     val pty
-      get() = wantsPTY || needsPTY
+        get() = wantsPTY || needsPTY
 
     var releaseCLIPath: String?
         get() = ExternalizablePath.localPathValue(releaseCLIURL)
@@ -93,7 +93,7 @@ class Configuration(name: String, project: Project, configurationFactory: Config
             if (erlArguments.isNullOrBlank()) {
                 _envs.remove(ERL_OPTS)
             } else {
-                _envs[ERL_OPTS] = erlArguments!!
+                _envs[ERL_OPTS] = erlArguments
             }
         }
 
@@ -103,7 +103,7 @@ class Configuration(name: String, project: Project, configurationFactory: Config
             if (extraArguments.isNullOrBlank()) {
                 _envs.remove(EXTRA_OPTS)
             } else {
-                _envs[EXTRA_OPTS] = extraArguments!!
+                _envs[EXTRA_OPTS] = extraArguments
             }
         }
 
@@ -123,7 +123,7 @@ class Configuration(name: String, project: Project, configurationFactory: Config
             if (logDirectory.isNullOrBlank()) {
                 _envs.remove(RUNNER_LOG_DIR)
             } else {
-                _envs[RUNNER_LOG_DIR] = logDirectory!!
+                _envs[RUNNER_LOG_DIR] = logDirectory
             }
         }
 
@@ -143,7 +143,7 @@ class Configuration(name: String, project: Project, configurationFactory: Config
             if (sysConfigPath.isNullOrBlank()) {
                 _envs.remove(SYS_CONFIG_PATH)
             } else {
-                _envs[SYS_CONFIG_PATH] = sysConfigPath!!
+                _envs[SYS_CONFIG_PATH] = sysConfigPath
             }
         }
 
@@ -153,7 +153,7 @@ class Configuration(name: String, project: Project, configurationFactory: Config
             if (releaseConfigDirectory.isNullOrBlank()) {
                 _envs.remove(RELEASE_CONFIG_DIR)
             } else {
-                _envs[RELEASE_CONFIG_DIR] = releaseConfigDirectory!!
+                _envs[RELEASE_CONFIG_DIR] = releaseConfigDirectory
             }
         }
 
@@ -163,17 +163,17 @@ class Configuration(name: String, project: Project, configurationFactory: Config
             if (pipeDirectory.isNullOrBlank()) {
                 _envs.remove(PIPE_DIR)
             } else {
-                _envs[PIPE_DIR] = pipeDirectory!!
+                _envs[PIPE_DIR] = pipeDirectory
             }
         }
 
     fun commandLine(): GeneralCommandLine {
         val workingDirectory = ensureWorkingDirectory()
         val commandLine = Distillery.commandLine(
-                pty = pty,
-                environment = envs,
-                workingDirectory = workingDirectory,
-                exePath = releaseCLIPath!!
+            pty = pty,
+            environment = envs,
+            workingDirectory = workingDirectory,
+            exePath = releaseCLIPath!!
         )
         commandLine.addParameters(releaseCLIArgumentList)
 
@@ -181,13 +181,16 @@ class Configuration(name: String, project: Project, configurationFactory: Config
     }
 
     override fun getConfigurationEditor(): SettingsEditor<out RunConfiguration> =
-            SettingsEditorGroup<Configuration>().apply {
-                this.addEditor("Configuration", org.elixir_lang.distillery.configuration.Editor())
-                this.addEditor("Interpreted Modules", org.elixir_lang.debugger.configuration.interpreted_modules.Editor<Configuration>())
-            }
+        SettingsEditorGroup<Configuration>().apply {
+            this.addEditor("Configuration", org.elixir_lang.distillery.configuration.Editor())
+            this.addEditor(
+                "Interpreted Modules",
+                org.elixir_lang.debugger.configuration.interpreted_modules.Editor<Configuration>()
+            )
+        }
 
     override fun getState(executor: Executor, environment: ExecutionEnvironment): State =
-            State(environment, this)
+        State(environment, this)
 
     override fun readExternal(element: Element) {
         super.readExternal(element)
@@ -218,7 +221,7 @@ class Configuration(name: String, project: Project, configurationFactory: Config
     }
 
     private val needsPTY
-            get() = releaseCLIArgumentList.needsPTY
+        get() = releaseCLIArgumentList.needsPTY
 
     private var releaseCLIURL: String? = null
 
@@ -227,17 +230,17 @@ class Configuration(name: String, project: Project, configurationFactory: Config
             val releasesPath = Paths.get(it).parent.parent.resolve("releases")
 
             releasesPath
-                    .resolve("start_erl.data")
-                    .toGroupValue(START_ERL_DATA_REGEX, START_ERL_DATA_REGEX_RELEASE_INDEX)
-                    ?.let { release ->
-                        val vmArgsPath = releasesPath.resolve(release).resolve("vm.args")
+                .resolve("start_erl.data")
+                .toGroupValue(START_ERL_DATA_REGEX, START_ERL_DATA_REGEX_RELEASE_INDEX)
+                ?.let { release ->
+                    val vmArgsPath = releasesPath.resolve(release).resolve("vm.args")
 
-                        if (vmArgsPath.exists()) {
-                            vmArgsPath.toString()
-                        } else {
-                            null
-                        }
+                    if (vmArgsPath.exists()) {
+                        vmArgsPath.toString()
+                    } else {
+                        null
                     }
+                }
         }
 }
 
@@ -275,24 +278,24 @@ private fun vmArgsPathToNodeName(vmArgsPath: String): String? = pathToGroupValue
 private fun Path.toGroupValue(regex: Regex, groupIndex: Int): String? = toFile().toGroupValue(regex, groupIndex)
 
 private fun pathToGroupValue(path: String, regex: Regex, groupIndex: Int): String? =
-        File(path).toGroupValue(regex, groupIndex)
+    File(path).toGroupValue(regex, groupIndex)
 
 private fun File.toGroupValue(regex: Regex, groupIndex: Int): String? =
-        if (exists()) {
-            bufferedReader()
-                    .lineSequence()
-                    .mapNotNull { line ->
-                        regex
-                                .matchEntire(line)
-                                ?.let { it.groupValues[groupIndex] }
-                    }
-                    .firstOrNull()
-        } else {
-            null
-        }
+    if (exists()) {
+        bufferedReader()
+            .lineSequence()
+            .mapNotNull { line ->
+                regex
+                    .matchEntire(line)
+                    ?.let { it.groupValues[groupIndex] }
+            }
+            .firstOrNull()
+    } else {
+        null
+    }
 
 private fun Element.writeExternalWantsPTY(childName: String, wantsPTY: Boolean) =
-        ensureChild(childName).setAttribute(WANTS_PTY, wantsPTY.toString())
+    ensureChild(childName).setAttribute(WANTS_PTY, wantsPTY.toString())
 
 private fun Element.readExternalWantsPTY(childName: String): Boolean =
-        getChild(childName)?.getAttributeValue(WANTS_PTY)?.toBoolean() ?: false
+    getChild(childName)?.getAttributeValue(WANTS_PTY)?.toBoolean() ?: false

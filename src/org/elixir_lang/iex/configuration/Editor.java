@@ -6,7 +6,6 @@ import com.intellij.openapi.options.SettingsEditor;
 import org.elixir_lang.iex.Configuration;
 import org.elixir_lang.iex.configuration.editor.ParametersPanel;
 import org.elixir_lang.module.ElixirModuleType;
-import org.elixir_lang.sdk.ProcessOutput;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -19,11 +18,6 @@ public final class Editor extends SettingsEditor<Configuration> {
 
     public Editor() {
         runInModuleCheckBox.addActionListener(e -> modulesComboBox.setEnabled(runInModuleCheckBox.isSelected()));
-
-        boolean richIde = !ProcessOutput.isSmallIde();
-
-        modulesComboBox.setVisible(richIde);
-        runInModuleCheckBox.setVisible(richIde);
     }
 
     @Override
@@ -32,14 +26,8 @@ public final class Editor extends SettingsEditor<Configuration> {
     }
 
     public void reset(@NotNull Configuration configuration) {
-        final Module module;
-
-        if (!ProcessOutput.isSmallIde()) {
-            modulesComboBox.fillModules(configuration.getProject(), ElixirModuleType.getInstance());
-            module = configuration.getConfigurationModule().getModule();
-        } else {
-            module = null;
-        }
+        modulesComboBox.fillModules(configuration.getProject(), ElixirModuleType.getInstance());
+        final Module module = configuration.getConfigurationModule().getModule();
 
         if (module != null) {
             setRunInModuleSelected(true);

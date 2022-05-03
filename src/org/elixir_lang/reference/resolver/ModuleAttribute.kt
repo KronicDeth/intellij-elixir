@@ -17,7 +17,6 @@ import org.elixir_lang.psi.scope.module_attribute.implemetation.Protocol
 import org.elixir_lang.psi.stub.index.ModularName
 import org.elixir_lang.psi.stub.index.QuoteModuleAttributeName
 import org.elixir_lang.reference.ModuleAttribute
-import org.elixir_lang.sdk.elixir.Type.Companion.mostSpecificSdk
 
 object ModuleAttribute : ResolveCache.PolyVariantResolver<ModuleAttribute> {
     override fun resolve(moduleAttribute: ModuleAttribute, incompleteCode: Boolean): Array<ResolveResult> {
@@ -28,9 +27,9 @@ object ModuleAttribute : ResolveCache.PolyVariantResolver<ModuleAttribute> {
 
         if (validProtocolResult != ThreeState.UNSURE) {
             validProtocolResult
-                    .toBoolean()
-                    .let { validResult -> Protocol.resolveResultOrderedSet(validResult, element) }
-                    .let { resolveResultOrderedSet.addAll(it) }
+                .toBoolean()
+                .let { validResult -> Protocol.resolveResultOrderedSet(validResult, element) }
+                .let { resolveResultOrderedSet.addAll(it) }
         }
 
         if (resolveResultOrderedSet.keepProcessing(incompleteCode)) {
@@ -38,38 +37,47 @@ object ModuleAttribute : ResolveCache.PolyVariantResolver<ModuleAttribute> {
 
             if (validForResult != ThreeState.UNSURE) {
                 validForResult
-                        .toBoolean()
-                        .let { validResult -> For.resolveResultOrderedSet(validResult, element) }
-                        .let { resolveResultOrderedSet.addAll(it) }
+                    .toBoolean()
+                    .let { validResult -> For.resolveResultOrderedSet(validResult, element) }
+                    .let { resolveResultOrderedSet.addAll(it) }
             }
 
             if (resolveResultOrderedSet.keepProcessing(incompleteCode)) {
-                resolveResultOrderedSet.addAll(MultiResolve.resolveResultOrderedSet(moduleAttribute.value, moduleAttribute.element))
+                resolveResultOrderedSet.addAll(
+                    MultiResolve.resolveResultOrderedSet(
+                        moduleAttribute.value,
+                        moduleAttribute.element
+                    )
+                )
             }
 
             if (resolveResultOrderedSet.keepProcessing(incompleteCode)) {
                 resolveResultOrderedSet.addAll(nameInAnyQuote(element, moduleAttribute.value, incompleteCode))
                 // no need to recheck `keepProcessing` since `nameInAnyQuote` is always invalid results
-                resolveResultOrderedSet.addAll(nameInElixirModuleErl(element, moduleAttribute.value, incompleteCode))
+                resolveResultOrderedSet.addAll(nameInElixirModuleErl(element, moduleAttribute.value))
             }
         }
 
         return resolveResultOrderedSet.toList().toTypedArray()
     }
 
-    private fun validResult(moduleAttribute: ModuleAttribute,
-                            moduleAttributeName: String): ThreeState =
-            moduleAttribute.value.let { value ->
-                when {
-                    value == moduleAttributeName -> ThreeState.YES
-                    moduleAttributeName.startsWith(value) -> ThreeState.NO
-                    else -> ThreeState.UNSURE
-                }
+    private fun validResult(
+        moduleAttribute: ModuleAttribute,
+        moduleAttributeName: String
+    ): ThreeState =
+        moduleAttribute.value.let { value ->
+            when {
+                value == moduleAttributeName -> ThreeState.YES
+                moduleAttributeName.startsWith(value) -> ThreeState.NO
+                else -> ThreeState.UNSURE
             }
+        }
 
-    private fun nameInAnyQuote(element: PsiElement,
-                               name: String,
-                               incompleteCode: Boolean): ResolveResultOrderedSet {
+    private fun nameInAnyQuote(
+        element: PsiElement,
+        name: String,
+        incompleteCode: Boolean
+    ): ResolveResultOrderedSet {
         val project = element.project
         val keys = mutableListOf<String>()
         val stubIndex = StubIndex.getInstance()
@@ -87,26 +95,41 @@ object ModuleAttribute : ResolveCache.PolyVariantResolver<ModuleAttribute> {
         // results are never valid because this doesn't prove the parent `quote` is included at the `element` site.
         val validResult = false
 
-        for (key in  keys) {
+        for (key in keys) {
             stubIndex
-                    .processElements(QuoteModuleAttributeName.KEY, key, project, scope, NamedElement::class.java) { namedElement ->
-                        val namedElementName = namedElement.name
+                .processElements(
+                    QuoteModuleAttributeName.KEY,
+                    key,
+                    project,
+                    scope,
+                    NamedElement::class.java
+                ) { namedElement ->
+                    val namedElementName = namedElement.name
 
-                        if (namedElementName != null && namedElementName.startsWith(name)) {
-                            resolveResultOrderedSet.add(namedElement, namedElementName, validResult, emptySet())
-                        }
-
-                        true
+                    if (namedElementName != null && namedElementName.startsWith(name)) {
+                        resolveResultOrderedSet.add(namedElement, namedElementName, validResult, emptySet())
                     }
+
+                    true
+                }
         }
 
         return resolveResultOrderedSet
     }
 
-    private val ELIXIR_MODULE_ERL_NAMES = arrayOf("after_compile", "before_compile", "behaviour", "compile", "derive", "dialyzer", "external_resource",  "on_definition")
+    private val ELIXIR_MODULE_ERL_NAMES = arrayOf(
+        "after_compile",
+        "before_compile",
+        "behaviour",
+        "compile",
+        "derive",
+        "dialyzer",
+        "external_resource",
+        "on_definition"
+    )
     private val ELIXIR_MODULE_ERL_MODULE_ATTRIBUTES = ELIXIR_MODULE_ERL_NAMES.map { "@${it}" }
 
-    private fun nameInElixirModuleErl(element: PsiElement, name: String, incompleteCode: Boolean): ResolveResultOrderedSet {
+    private fun nameInElixirModuleErl(element: PsiElement, name: String): ResolveResultOrderedSet {
         val resolveResultOrderedSet = ResolveResultOrderedSet()
         val matchedModuleAttributes = ELIXIR_MODULE_ERL_MODULE_ATTRIBUTES.filter { it.startsWith(name) }
 
@@ -115,37 +138,48 @@ object ModuleAttribute : ResolveCache.PolyVariantResolver<ModuleAttribute> {
             val scope = GlobalSearchScope.allScope(project)
 
             StubIndex
-                    .getInstance()
-                    .processElements(ModularName.KEY, ":elixir_module", project, scope, NamedElement::class.java) { namedElement ->
-                        if (namedElement is ModuleImpl<*>) {
-                            namedElement
-                                    .stub
-                                    ?.childrenStubs
-                                    ?.filterIsInstance<CallDefinitionStubImpl<*>>()
-                                    ?.filter { it.name == "build" && it.callDefinitionClauseHeadArity() == 3 }
-                                    ?.forEach { callDefinitionStubImpl ->
-                                        val navigationElement = callDefinitionStubImpl.psi.navigationElement
-                                        val text = navigationElement.text
+                .getInstance()
+                .processElements(
+                    ModularName.KEY,
+                    ":elixir_module",
+                    project,
+                    scope,
+                    NamedElement::class.java
+                ) { namedElement ->
+                    if (namedElement is ModuleImpl<*>) {
+                        namedElement
+                            .stub
+                            ?.childrenStubs
+                            ?.filterIsInstance<CallDefinitionStubImpl<*>>()
+                            ?.filter { it.name == "build" && it.callDefinitionClauseHeadArity() == 3 }
+                            ?.forEach { callDefinitionStubImpl ->
+                                val navigationElement = callDefinitionStubImpl.psi.navigationElement
+                                val text = navigationElement.text
 
-                                        matchedModuleAttributes.forEach { matchedModuleAttribute ->
-                                            val matchedName = matchedModuleAttribute.substring(1, matchedModuleAttribute.length)
-                                            val atomString = ":${matchedName}"
-                                            val index = text.indexOf(atomString)
+                                matchedModuleAttributes.forEach { matchedModuleAttribute ->
+                                    val matchedName = matchedModuleAttribute.substring(1, matchedModuleAttribute.length)
+                                    val atomString = ":${matchedName}"
+                                    val index = text.indexOf(atomString)
 
-                                            if (index != -1) {
-                                                navigationElement
-                                                        .findElementAt(index)
-                                                        ?.parent?.let { it as? ElixirAtom }
-                                                        ?.let { deriveAtom ->
-                                                            resolveResultOrderedSet.add(deriveAtom, deriveAtom.text, true, emptySet())
-                                                        }
+                                    if (index != -1) {
+                                        navigationElement
+                                            .findElementAt(index)
+                                            ?.parent?.let { it as? ElixirAtom }
+                                            ?.let { deriveAtom ->
+                                                resolveResultOrderedSet.add(
+                                                    deriveAtom,
+                                                    deriveAtom.text,
+                                                    true,
+                                                    emptySet()
+                                                )
                                             }
-                                        }
                                     }
-                        }
-
-                        true
+                                }
+                            }
                     }
+
+                    true
+                }
         }
 
         return resolveResultOrderedSet

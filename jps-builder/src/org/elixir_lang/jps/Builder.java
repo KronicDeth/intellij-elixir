@@ -6,7 +6,6 @@ import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.io.FileUtilRt;
 import com.intellij.util.CommonProcessors;
 import com.intellij.util.containers.ContainerUtil;
-import gnu.trove.THashSet;
 import org.elixir_lang.jps.builder.ExecutionException;
 import org.elixir_lang.jps.builder.GeneralCommandLine;
 import org.elixir_lang.jps.builder.ProcessAdapter;
@@ -90,12 +89,12 @@ public class Builder extends TargetBuilder<SourceRootDescriptor, Target> {
                                            CompileContext context,
                                            JpsModule module,
                                            CompilerOptions compilerOptions,
-                                           Collection<File> filesToCompile) throws ProjectBuildException {
+                                           Set<String> absolutePathsToCompile) throws ProjectBuildException {
 
         // ensure compile output directory
         File outputDirectory = getBuildOutputDirectory(module, target.isTests(), context);
 
-        runElixirc(target, context, compilerOptions, filesToCompile, outputDirectory);
+        runElixirc(target, context, compilerOptions, absolutePathsToCompile, outputDirectory);
     }
 
     private static void doBuildWithMix(Target target,
@@ -140,9 +139,9 @@ public class Builder extends TargetBuilder<SourceRootDescriptor, Target> {
     private static void runElixirc(Target target,
                                    CompileContext context,
                                    CompilerOptions compilerOptions,
-                                   Collection<File> files,
+                                   Set<String> absolutePaths,
                                    File outputDirectory) throws ProjectBuildException {
-        GeneralCommandLine commandLine = getElixircCommandLine(target, context, compilerOptions, files, outputDirectory);
+        GeneralCommandLine commandLine = getElixircCommandLine(target, context, compilerOptions, absolutePaths, outputDirectory);
 
         run(commandLine, context, ElIXIRC_NAME, compilerOptions);
     }
@@ -150,9 +149,8 @@ public class Builder extends TargetBuilder<SourceRootDescriptor, Target> {
     private static GeneralCommandLine getElixircCommandLine(Target target,
                                                             CompileContext context,
                                                             CompilerOptions compilerOptions,
-                                                            Collection<File> files,
+                                                            Set<String> absolutePaths,
                                                             File outputDirectory) throws ProjectBuildException {
-
         GeneralCommandLine commandLine = new GeneralCommandLine();
 
         // get executable
@@ -160,7 +158,7 @@ public class Builder extends TargetBuilder<SourceRootDescriptor, Target> {
         JpsSdk<SdkProperties> sdk = BuilderUtil.getSdk(context, module);
         File executable = Elixir.getByteCodeCompilerExecutable(sdk.getHomePath());
 
-        List<String> compileFilePaths = getCompileFilePaths(module, target, context, files);
+        List<String> compileFilePaths = getCompileFilePaths(module, target, context, absolutePaths);
 
         commandLine.withWorkDirectory(outputDirectory);
         commandLine.setExePath(executable.getAbsolutePath());
@@ -175,14 +173,16 @@ public class Builder extends TargetBuilder<SourceRootDescriptor, Target> {
     private static List<String> getCompileFilePaths(@NotNull JpsModule module,
                                                     @NotNull Target target,
                                                     @NotNull CompileContext context,
-                                                    Collection<File> files) {
+                                                    Set<String> absolutePaths) {
         // make
         if (context.getScope().isBuildIncrementally(target.getTargetType())) {
             return getCompileFilePathsDefault(module, target);
         }
 
+        List<String> absolutePathList = new ArrayList<>(absolutePaths);
+
         // force build files
-        return ContainerUtil.map(files, File::getAbsolutePath);
+        return absolutePathList;
     }
 
     @NotNull
@@ -204,7 +204,9 @@ public class Builder extends TargetBuilder<SourceRootDescriptor, Target> {
             FileUtil.processFilesRecursively(root.getFile(), exFilesCollector);
         }
 
-        return ContainerUtil.map(exFilesCollector.getResults(), File::getAbsolutePath);
+        Collection<File> fileCollection = exFilesCollector.getResults();
+
+        return ContainerUtil.map(fileCollection, File::getAbsolutePath);
     }
 
     private static void addDependentModuleCodePath(@NotNull GeneralCommandLine commandLine,
@@ -438,11 +440,11 @@ public class Builder extends TargetBuilder<SourceRootDescriptor, Target> {
         try {
             commandLine = mixCommandLine(sdk, module, contentRootPath, task, compilerOptions);
         } catch (AccessDeniedException |
-                ErlangSdkNameMissing |
-                FileNotFoundException |
-                LibraryNotFound |
-                MissingHomePath |
-                MissingSdkProperties exception) {
+                 ErlangSdkNameMissing |
+                 FileNotFoundException |
+                 LibraryNotFound |
+                 MissingHomePath |
+                 MissingSdkProperties exception) {
             throw new ProjectBuildException(
                     "Couldn't construct command line for mix: " + exception.getMessage(),
                     exception
@@ -486,17 +488,18 @@ public class Builder extends TargetBuilder<SourceRootDescriptor, Target> {
                       @NotNull BuildOutputConsumer outputConsumer,
                       @NotNull CompileContext context) throws ProjectBuildException, IOException {
         LOGGER.info(target.getPresentableName());
-        final Set<File> filesToCompile = new THashSet<>(FileUtil.FILE_HASHING_STRATEGY);
+
+        final Set<String> absolutePathsToCompile = com.intellij.util.containers.CollectionFactory.createFilePathSet();
 
         holder.processDirtyFiles((target1, file, root) -> {
             boolean isAcceptFile = target1.isTests() ? ELIXIR_TEST_SOURCE_FILTER.accept(file) : ELIXIR_SOURCE_FILTER.accept(file);
             if (isAcceptFile && ourCompilableModuleTypes.contains(target1.getModule().getModuleType())) {
-                filesToCompile.add(file);
+                absolutePathsToCompile.add(file.getAbsolutePath());
             }
             return true;
         });
 
-        if (filesToCompile.isEmpty() && !holder.hasRemovedFiles()) return;
+        if (absolutePathsToCompile.isEmpty() && !holder.hasRemovedFiles()) return;
 
         JpsModule module = target.getModule();
         JpsProject project = module.getProject();
@@ -507,7 +510,7 @@ public class Builder extends TargetBuilder<SourceRootDescriptor, Target> {
         } else {
             // elixirc can not compile tests now.
             if (!target.isTests()) {
-                doBuildWithElixirc(target, context, module, compilerOptions, filesToCompile);
+                doBuildWithElixirc(target, context, module, compilerOptions, absolutePathsToCompile);
             }
         }
     }

@@ -10,7 +10,6 @@ import org.elixir_lang.beam.psi.impl.ModuleImpl
 import org.elixir_lang.psi.AtOperation
 import org.elixir_lang.psi.QualifiableAlias
 import org.elixir_lang.psi.call.Call
-import org.elixir_lang.psi.outerMostQualifiableAlias
 
 class UsageTargetProvider : com.intellij.usages.UsageTargetProvider {
     override fun getTargets(editor: Editor, file: PsiFile): Array<UsageTarget>? {
@@ -26,7 +25,7 @@ class UsageTargetProvider : com.intellij.usages.UsageTargetProvider {
     override fun getTargets(psiElement: PsiElement): Array<UsageTarget>? =
         when (psiElement) {
             is AtOperation, is Call, is ModuleImpl<*>, is QualifiableAlias ->
-                PsiElement2UsageTargetAdapter(psiElement).let { arrayOf<UsageTarget>(it) }
+                arrayOf(PsiElement2UsageTargetAdapter(psiElement, true))
             else ->
                 null
         }

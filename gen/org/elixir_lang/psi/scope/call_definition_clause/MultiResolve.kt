@@ -83,7 +83,7 @@ private constructor(
                                 val modularResolveResults = resolveResults(nameInDefiningModule, resolvedPrimaryArity, incompleteCode, modular)
 
                                 for (modularResultResult in modularResolveResults) {
-                                    modularResultResult.element?.let { it as Call }?.let { call ->
+                                    modularResultResult.element.let { it as Call }.let { call ->
                                         addToResolveResults(call, nameInDefiningModule, modularResultResult.isValidResult, state)
                                     }
                                 }

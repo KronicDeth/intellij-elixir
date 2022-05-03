@@ -4,7 +4,6 @@ import com.intellij.ide.structureView.StructureViewTreeElement
 import com.intellij.ide.util.treeView.smartTree.TreeElement
 import com.intellij.navigation.ItemPresentation
 import com.intellij.navigation.NavigationItem
-import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveState
 import org.elixir_lang.call.Visibility
 import org.elixir_lang.navigation.item_presentation.NameArity
@@ -134,15 +133,6 @@ class CallDefinition(val modular: Modular, private val time: Timed.Time, private
         headList.add(callDefinitionHead)
     }
 
-    /**
-     * The clause that matches the `arguments`.
-     *
-     * @param arguments the arguments the clause's arguments must match
-     * @return `null` if no clauses match or if more than one clause match
-     */
-    fun matchingClause(arguments: Array<PsiElement>): CallDefinitionClause? =
-        matchingClauseList(arguments)?.singleOrNull()
-
     fun name(): String = name
 
     /**
@@ -219,16 +209,6 @@ class CallDefinition(val modular: Modular, private val time: Timed.Time, private
             null
         }
     }
-
-    /**
-     * All clauses that match the `arguments`.
-     *
-     * @param arguments the arguments the clauses' arguments must match
-     * @return `null` if no clauses match; multiple clauses if the types of arguments cannot be inferred and
-     * simpler, relaxed matching has to be used.
-     */
-    private fun matchingClauseList(arguments: Array<PsiElement>): List<CallDefinitionClause>? =
-        clauseList.filter { it.isMatch(arguments) }
 
     companion object {
         /**

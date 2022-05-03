@@ -12,7 +12,7 @@ import java.nio.charset.Charset
 object ParentImpl {
     @JvmStatic
     fun addChildTextCodePoints(codePointList: MutableList<Int>?, child: ASTNode): MutableList<Int> =
-            addStringCodePoints(codePointList, child.text)
+        addStringCodePoints(codePointList, child.text)
 
     fun elixirCharList(codePointList: List<Int>): OtpErlangObject =
         elixirCodePointList(codePointList).let { elixirCharList(it) }
@@ -55,7 +55,11 @@ object ParentImpl {
     // Parent methods
 
     @JvmStatic
-    fun addEscapedCharacterCodePoints(parent: Quote, maybeCodePointList: MutableList<Int>?, child: ASTNode): List<Int> {
+    fun addEscapedCharacterCodePoints(
+        @Suppress("UNUSED_PARAMETER") parent: Quote,
+        maybeCodePointList: MutableList<Int>?,
+        child: ASTNode
+    ): List<Int> {
         val escapedCharacterCodePoint = child.psi.let { it as ElixirEscapedCharacter }.codePoint()
 
         val codePointList = ensureCodePointList(maybeCodePointList)
@@ -74,7 +78,7 @@ object ParentImpl {
 
             if (childText == "\\" + terminator) {
                 String(
-                        charArrayOf(terminator)
+                    charArrayOf(terminator)
                 )
             } else {
                 childText
@@ -87,8 +91,10 @@ object ParentImpl {
     }
 
     @JvmStatic
-    fun addEscapedEOL(parent: Parent,
-                      maybeCodePointList: MutableList<Int>?): List<Int> {
+    fun addEscapedEOL(
+        parent: Parent,
+        maybeCodePointList: MutableList<Int>?
+    ): List<Int> {
         val codePointList: MutableList<Int> = ensureCodePointList(maybeCodePointList)
 
         if (parent is Sigil) {
@@ -101,7 +107,7 @@ object ParentImpl {
     }
 
     @JvmStatic
-    fun addEscapedTerminator(parent: Parent, maybeCodePointList: MutableList<Int>?, child: ASTNode): List<Int> {
+    fun addEscapedTerminator(maybeCodePointList: MutableList<Int>?, child: ASTNode): List<Int> {
         val codePointList: MutableList<Int> = ensureCodePointList(maybeCodePointList)
 
         for (codePoint in codePoints(child.psi.lastChild.text)) {
@@ -112,14 +118,18 @@ object ParentImpl {
     }
 
     @JvmStatic
-    fun addFragmentCodePoints(parent: Parent, codePointList: MutableList<Int>?, child: ASTNode): List<Int> =
-            addChildTextCodePoints(codePointList, child)
+    fun addFragmentCodePoints(codePointList: MutableList<Int>?, child: ASTNode): List<Int> =
+        addChildTextCodePoints(codePointList, child)
 
     @JvmStatic
-    fun addHexadecimalEscapeSequenceCodePoints(parent: Quote, maybeCodePointList: MutableList<Int>?, child: ASTNode): List<Int> {
+    fun addHexadecimalEscapeSequenceCodePoints(
+        @Suppress("UNUSED_PARAMETER") parent: Quote,
+        maybeCodePointList: MutableList<Int>?,
+        child: ASTNode
+    ): List<Int> {
         val hexadecimalEscapeSequenceCodePoint = child
-                .psi.let { it as ElixirQuoteHexadecimalEscapeSequence }
-                .codePoint()
+            .psi.let { it as ElixirQuoteHexadecimalEscapeSequence }
+            .codePoint()
 
         val codePointList = ensureCodePointList(maybeCodePointList)
         codePointList.add(hexadecimalEscapeSequenceCodePoint)
@@ -128,51 +138,63 @@ object ParentImpl {
     }
 
     @JvmStatic
-    fun addHexadecimalEscapeSequenceCodePoints(parent: Sigil, codePointList: MutableList<Int>?, child: ASTNode): List<Int> =
-            addChildTextCodePoints(codePointList, child)
+    fun addHexadecimalEscapeSequenceCodePoints(
+        @Suppress("UNUSED_PARAMETER") parent: Sigil,
+        codePointList: MutableList<Int>?,
+        child: ASTNode
+    ): List<Int> =
+        addChildTextCodePoints(codePointList, child)
 
     @Contract(pure = true)
     @JvmStatic
-    fun quoteBinary(elixirLine: ElixirLine, metadata: OtpErlangList, argumentList: List<OtpErlangObject>): OtpErlangObject =
-            if (elixirLine.isCharList) {
-                // See https://github.com/elixir-lang/elixir/commit/e89e9d874bf803379d729a3bae185052a5323a85
-                quotedFunctionCall(
-                        "Elixir.List",
-                        "to_charlist",
-                        metadata,
-                        OtpErlangList(argumentList.toTypedArray())
-                )
-            } else {
-                quoteBinary(metadata, argumentList)
-            }
+    fun quoteBinary(
+        elixirLine: ElixirLine,
+        metadata: OtpErlangList,
+        argumentList: List<OtpErlangObject>
+    ): OtpErlangObject =
+        if (elixirLine.isCharList) {
+            // See https://github.com/elixir-lang/elixir/commit/e89e9d874bf803379d729a3bae185052a5323a85
+            quotedFunctionCall(
+                "Elixir.List",
+                "to_charlist",
+                metadata,
+                OtpErlangList(argumentList.toTypedArray())
+            )
+        } else {
+            quoteBinary(metadata, argumentList)
+        }
 
     @Contract(pure = true)
     @JvmStatic
-    fun quoteBinary(elixirHeredoc: ElixirHeredoc, metadata: OtpErlangList, argumentList: List<OtpErlangObject>): OtpErlangObject =
-            if (elixirHeredoc.isCharList) {
-                // See https://github.com/elixir-lang/elixir/commit/e89e9d874bf803379d729a3bae185052a5323a85
-                quotedFunctionCall(
-                        "Elixir.List",
-                        "to_charlist",
-                        metadata,
-                        OtpErlangList(argumentList.toTypedArray())
-                )
-            } else {
-                quoteBinary(metadata, argumentList)
-            }
+    fun quoteBinary(
+        elixirHeredoc: ElixirHeredoc,
+        metadata: OtpErlangList,
+        argumentList: List<OtpErlangObject>
+    ): OtpErlangObject =
+        if (elixirHeredoc.isCharList) {
+            // See https://github.com/elixir-lang/elixir/commit/e89e9d874bf803379d729a3bae185052a5323a85
+            quotedFunctionCall(
+                "Elixir.List",
+                "to_charlist",
+                metadata,
+                OtpErlangList(argumentList.toTypedArray())
+            )
+        } else {
+            quoteBinary(metadata, argumentList)
+        }
 
     @Contract(pure = true)
     @JvmStatic
     fun quoteBinary(metadata: OtpErlangList, argumentList: List<OtpErlangObject>): OtpErlangObject =
-            quotedFunctionCall("<<>>", metadata, *argumentList.toTypedArray())
+        quotedFunctionCall("<<>>", metadata, *argumentList.toTypedArray())
 
     @Contract(pure = true)
     @JvmStatic
     fun quoteEmpty(quote: Quote): OtpErlangObject =
         if (quote.isCharList) {
             OtpErlangList()
-    } else {
-           quoteEmpty()
+        } else {
+            quoteEmpty()
         }
 
     @Contract(pure = true)
@@ -182,75 +204,75 @@ object ParentImpl {
     // See https://github.com/elixir-lang/elixir/commit/e89e9d874bf803379d729a3bae185052a5323a85
     @JvmStatic
     fun quoteInterpolation(quote: Quote, interpolation: ElixirInterpolation): OtpErlangObject =
-            if (quote.isCharList) {
-                val quotedChildren = QuotableImpl.quote(interpolation.children)
-                val interpolationMetadata = metadata(interpolation)
+        if (quote.isCharList) {
+            val quotedChildren = QuotableImpl.quote(interpolation.children)
+            val interpolationMetadata = metadata(interpolation)
 
-                quotedFunctionCall(
-                        Module.prependElixirPrefix(Module.KERNEL),
-                        "to_string",
-                        interpolationMetadata,
-                        quotedChildren
-                )
-            } else {
-                val quotedChildren = QuotableImpl.quote(interpolation.children)
-                val interpolationMetadata = metadata(interpolation)
+            quotedFunctionCall(
+                Module.prependElixirPrefix(Module.KERNEL),
+                "to_string",
+                interpolationMetadata,
+                quotedChildren
+            )
+        } else {
+            val quotedChildren = QuotableImpl.quote(interpolation.children)
+            val interpolationMetadata = metadata(interpolation)
 
-                val quotedKernelToStringCall = quotedFunctionCall(
-                        Module.prependElixirPrefix(Module.KERNEL),
-                        "to_string",
-                        interpolationMetadata,
-                        quotedChildren
-                )
-                val quotedBinaryCall = QuotableImpl.quotedVariable(
-                        "binary",
-                        interpolationMetadata
-                )
+            val quotedKernelToStringCall = quotedFunctionCall(
+                Module.prependElixirPrefix(Module.KERNEL),
+                "to_string",
+                interpolationMetadata,
+                quotedChildren
+            )
+            val quotedBinaryCall = QuotableImpl.quotedVariable(
+                "binary",
+                interpolationMetadata
+            )
 
-                quotedFunctionCall(
-                        "::",
-                        interpolationMetadata,
-                        quotedKernelToStringCall,
-                        quotedBinaryCall
-                )
-            }
+            quotedFunctionCall(
+                "::",
+                interpolationMetadata,
+                quotedKernelToStringCall,
+                quotedBinaryCall
+            )
+        }
 
     /* "#{a}" is transformed to "<<Kernel.to_string(a) :: binary>>" in
      * `"\"\#{a}\"" |> Code.string_to_quoted |> Macro.to_string`, so interpolation has to be represented as a type call
      * (`:::`) to binary of a call of `Kernel.to_string`
      */
     @JvmStatic
-    fun quoteInterpolation(sigil: Sigil, interpolation: ElixirInterpolation): OtpErlangObject {
+    fun quoteInterpolation(interpolation: ElixirInterpolation): OtpErlangObject {
         val quotedChildren = QuotableImpl.quote(interpolation.children)
         val interpolationMetadata = metadata(interpolation)
 
         val quotedKernelToStringCall = quotedFunctionCall(
-                Module.prependElixirPrefix(Module.KERNEL),
-                "to_string",
-                interpolationMetadata,
-                quotedChildren
+            Module.prependElixirPrefix(Module.KERNEL),
+            "to_string",
+            interpolationMetadata,
+            quotedChildren
         )
         val quotedBinaryCall = QuotableImpl.quotedVariable(
-                "binary",
-                interpolationMetadata
+            "binary",
+            interpolationMetadata
         )
 
         return quotedFunctionCall(
-                "::",
-                interpolationMetadata,
-                quotedKernelToStringCall,
-                quotedBinaryCall
+            "::",
+            interpolationMetadata,
+            quotedKernelToStringCall,
+            quotedBinaryCall
         )
     }
 
     @Contract(pure = true)
     @JvmStatic
     fun quoteLiteral(quote: Quote, codePointList: List<Int>): OtpErlangObject =
-            if (quote.isCharList) {
-                elixirCharList(codePointList)
-            } else {
-                quoteLiteral(codePointList)
-            }
+        if (quote.isCharList) {
+            elixirCharList(codePointList)
+        } else {
+            quoteLiteral(codePointList)
+        }
 
     @Contract(pure = true)
     @JvmStatic
@@ -272,24 +294,24 @@ object ParentImpl {
      * @see https://stackoverflow.com/questions/1527856/how-can-i-iterate-through-the-unicode-codepoints-of-a-java-string/21791059#21791059
      */
     private fun codePoints(string: String): Iterable<Int> =
-            Iterable {
-                object : Iterator<Int> {
-                    internal var nextIndex = 0
+        Iterable {
+            object : Iterator<Int> {
+                internal var nextIndex = 0
 
-                    override fun hasNext(): Boolean {
-                        return nextIndex < string.length
-                    }
+                override fun hasNext(): Boolean {
+                    return nextIndex < string.length
+                }
 
-                    override fun next(): Int {
-                        val result = string.codePointAt(nextIndex)
-                        nextIndex += Character.charCount(result)
-                        return result
-                    }
+                override fun next(): Int {
+                    val result = string.codePointAt(nextIndex)
+                    nextIndex += Character.charCount(result)
+                    return result
                 }
             }
+        }
 
     private fun elixirCodePointList(codePointList: List<Int>): OtpErlangList =
-            codePointList.map { OtpErlangLong(it.toLong()) }.toTypedArray().let { OtpErlangList(it) }
+        codePointList.map { OtpErlangLong(it.toLong()) }.toTypedArray().let { OtpErlangList(it) }
 
     private fun ensureCodePointList(codePointList: MutableList<Int>?): MutableList<Int> =
         codePointList ?: mutableListOf()

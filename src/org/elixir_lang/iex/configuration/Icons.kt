@@ -4,5 +4,5 @@ import com.intellij.openapi.util.IconLoader
 
 object Icons {
     @JvmField
-    val TYPE = IconLoader.getIcon("/icons/run/iex.svg")
+    val TYPE = IconLoader.getIcon("/icons/run/iex.svg", Icons.javaClass)
 }

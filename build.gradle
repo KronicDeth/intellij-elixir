@@ -1,267 +1,267 @@
-
 plugins {
-  id 'org.jetbrains.intellij' version "1.2.1"
-  id "org.jetbrains.kotlin.jvm" version "1.5.10"
-  id 'de.undercouch.download' version "4.1.2"
+    id 'org.jetbrains.intellij' version "1.5.3"
+    id "org.jetbrains.kotlin.jvm" version "1.5.10"
+    id 'de.undercouch.download' version "4.1.2"
 }
 
 ext {
-  cachePath = "${rootDir}/cache"
+    cachePath = "${rootDir}/cache"
 
-  elixirPath = "${cachePath}/elixir-${elixirVersion}"
+    elixirPath = "${cachePath}/elixir-${elixirVersion}"
 
-  quoterVersion = "2.1.0"
+    quoterVersion = "2.1.0"
 
-  quoterUnzippedPath = "${cachePath}/elixir-${elixirVersion}-intellij_elixir-${quoterVersion}"
-  quoterReleasePath = "${quoterUnzippedPath}/_build/dev/rel/intellij_elixir"
-  quoterExe = "${quoterReleasePath}/bin/intellij_elixir"
-  quoterZipPath = "${cachePath}/intellij_elixir-${quoterVersion}.zip"
-  quoterZipRootPath = "${cachePath}/intellij_elixir-${quoterVersion}"
+    quoterUnzippedPath = "${cachePath}/elixir-${elixirVersion}-intellij_elixir-${quoterVersion}"
+    quoterReleasePath = "${quoterUnzippedPath}/_build/dev/rel/intellij_elixir"
+    quoterExe = "${quoterReleasePath}/bin/intellij_elixir"
+    quoterZipPath = "${cachePath}/intellij_elixir-${quoterVersion}.zip"
+    quoterZipRootPath = "${cachePath}/intellij_elixir-${quoterVersion}"
 
-  if (project.hasProperty("isRelease") && isRelease) {
-    versionSuffix = ""
-    channel = "default"
-  } else {
-    def date = new Date().format("yyyyMMddHHmmss", TimeZone.getTimeZone("UTC"))
-    versionSuffix = "-pre+$date"
-    channel = "canary"
-  }
+    if (project.hasProperty("isRelease") && isRelease) {
+        versionSuffix = ""
+        channel = "default"
+    } else {
+        def date = new Date().format("yyyyMMddHHmmss", TimeZone.getTimeZone("UTC"))
+        versionSuffix = "-pre+$date"
+        channel = "canary"
+    }
 
-  version "$baseVersion$versionSuffix"
+    version "$baseVersion$versionSuffix"
 }
 
 allprojects {
-  apply plugin: 'java'
-  sourceCompatibility = javaVersion
-  targetCompatibility = javaVersion
-  tasks.withType(JavaCompile) { options.encoding = 'UTF-8' }
+    apply plugin: 'java'
+    sourceCompatibility = javaVersion
+    targetCompatibility = javaVersion
+    tasks.withType(JavaCompile) { options.encoding = 'UTF-8' }
 }
 
 sourceSets {
-  main {
-    java.srcDirs 'src', 'gen'
-    resources.srcDirs 'resources'
-  }
-  test {
-    java.srcDir 'tests'
-  }
+    main {
+        java.srcDirs 'src', 'gen'
+        resources.srcDirs 'resources'
+    }
+    test {
+        java.srcDir 'tests'
+    }
 }
 
 allprojects {
-  apply plugin: 'org.jetbrains.intellij'
-  intellij {
-    plugins = [// needed for jps builder
-               "java",
-               // needed for documentation rendering
-               "markdown",
-               // always have IdeaVIM installed in sandbox
-               "IdeaVIM:1.8.1"]
-    pluginName.set('intellij-elixir')
-    version.set(ideaVersion)
-    downloadSources.set(Boolean.valueOf(sources))
-  }
-
-  patchPluginXml {
-    def stripTag = { text, tag -> text.replace("<${tag}>", "").replace("</${tag}>", "") }
-    def bodyInnerHTML = { path ->
-      stripTag(stripTag(file(path).text, "html"), "body")
+    apply plugin: 'org.jetbrains.intellij'
+    intellij {
+        plugins = [// needed for jps builder
+                   "java",
+                   // needed for documentation rendering
+                   "markdown",
+                   // always have IdeaVIM installed in sandbox
+                   "IdeaVIM:1.10.1"]
+        pluginName.set('intellij-elixir')
+        version.set(ideaVersion)
+        downloadSources.set(Boolean.valueOf(sources))
     }
 
-    changeNotes.set(bodyInnerHTML("resources/META-INF/changelog.html"))
-    pluginDescription.set(bodyInnerHTML("resources/META-INF/description.html"))
+    patchPluginXml {
+        def stripTag = { text, tag -> text.replace("<${tag}>", "").replace("</${tag}>", "") }
+        def bodyInnerHTML = { path ->
+            stripTag(stripTag(file(path).text, "html"), "body")
+        }
 
-    sinceBuild = "211.7628"
-  }
+        changeNotes.set(bodyInnerHTML("resources/META-INF/changelog.html"))
+        pluginDescription.set(bodyInnerHTML("resources/META-INF/description.html"))
 
-  publishPlugin {
-    distributionFile = provider {
-      System.getenv("ASSET_PATH")
+        sinceBuild = "221.5080"
+        untilBuild = "221.5080.*"
     }
-    token = provider {
-      System.getenv("JET_BRAINS_MARKETPLACE_TOKEN")
-    }
-    channels = publishChannels.split(',').toList()
-  }
 
-  runPluginVerifier {
-    ideVersions = ["2021.1.3", "2021.2.3", "2021.3", "2021.3.1"]
-  }
+    publishPlugin {
+        distributionFile = provider {
+            System.getenv("ASSET_PATH")
+        }
+        token = provider {
+            System.getenv("JET_BRAINS_MARKETPLACE_TOKEN")
+        }
+        channels = publishChannels.split(',').toList()
+    }
+
+    runPluginVerifier {
+        ideVersions = ["2022.1"]
+    }
 }
 
 apply plugin: "kotlin"
 
 //noinspection GroovyAssignabilityCheck,GrUnresolvedAccess
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
-  //noinspection GrUnresolvedAccess
-  kotlinOptions {
-    apiVersion = "1.3"
-    jvmTarget = "1.8"
-  }
+    //noinspection GrUnresolvedAccess
+    kotlinOptions {
+        apiVersion = "1.3"
+        jvmTarget = "11"
+    }
 }
 
 def compilationPackages = ['org/intellij/elixir/build/**', 'org/intellij/elixir/jps/**']
 
 test {
-  environment "ELIXIR_LANG_ELIXIR_PATH", elixirPath
-  environment "ELIXIR_EBIN_DIRECTORY", "${elixirPath}/lib/elixir/ebin/"
-  environment "ELIXIR_VERSION", elixirVersion
-  setScanForTestClasses(false)
-  include("**/Issue*.class")
-  include("**/*Test.class")
-  include("**/*TestCase.class")
-  useJUnit {
-    exclude compilationPackages
-  }
-  testLogging {
-    exceptionFormat = 'full'
-  }
+    environment "ELIXIR_LANG_ELIXIR_PATH", elixirPath
+    environment "ELIXIR_EBIN_DIRECTORY", "${elixirPath}/lib/elixir/ebin/"
+    environment "ELIXIR_VERSION", elixirVersion
+    setScanForTestClasses(false)
+    include("**/Issue*.class")
+    include("**/*Test.class")
+    include("**/*TestCase.class")
+    useJUnit {
+        exclude compilationPackages
+    }
+    testLogging {
+        exceptionFormat = 'full'
+    }
 }
 
 task testCompilation(type: Test, group: 'Verification', dependsOn: [classes, testClasses]) {
-  useJUnit {
-    include compilationPackages
-  }
-  testLogging {
-    exceptionFormat = 'full'
-  }
+    useJUnit {
+        include compilationPackages
+    }
+    testLogging {
+        exceptionFormat = 'full'
+    }
 }
 
 repositories {
-  maven { url 'https://maven-central.storage.googleapis.com' }
-  mavenCentral()
+    maven { url 'https://maven-central.storage.googleapis.com' }
+    mavenCentral()
 }
 
 dependencies {
-  implementation project('jps-builder')
-  implementation project('jps-shared')
-  implementation files('lib/OtpErlang.jar')
-  implementation group: 'commons-io', name: 'commons-io', version: '2.5'
+    implementation project('jps-builder')
+    implementation project('jps-shared')
+    implementation files('lib/OtpErlang.jar')
+    implementation group: 'commons-io', name: 'commons-io', version: '2.5'
 
-  testImplementation group: 'org.mockito', name: 'mockito-core', version: '2.2.9'
-  testImplementation group: 'org.objenesis', name: 'objenesis', version: '2.4'
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: '2.2.9'
+    testImplementation group: 'org.objenesis', name: 'objenesis', version: '2.4'
 }
 
 project(':jps-builder') {
-  dependencies {
-    implementation project(':jps-shared')
-  }
+    dependencies {
+        implementation project(':jps-shared')
+    }
 }
 
 apply plugin: 'idea'
 idea {
-  project {
-    jdkName = javaVersion
-    languageLevel = javaVersion
-  }
-  module {
-    generatedSourceDirs += file('gen')
-  }
+    project {
+        jdkName = javaVersion
+        languageLevel = javaVersion
+    }
+    module {
+        generatedSourceDirs += file('gen')
+    }
 }
 
 task getElixir {
-  doLast {
-    def folder = new File(elixirPath)
+    doLast {
+        def folder = new File(elixirPath)
 
-    if (!folder.isDirectory() || folder.list().size() == 0) {
-      download {
-        src "https://github.com/elixir-lang/elixir/archive/v${elixirVersion}.zip"
-        dest "${rootDir}/cache/Elixir.${elixirVersion}.zip"
-        overwrite false
-      }
+        if (!folder.isDirectory() || folder.list().size() == 0) {
+            download {
+                src "https://github.com/elixir-lang/elixir/archive/v${elixirVersion}.zip"
+                dest "${rootDir}/cache/Elixir.${elixirVersion}.zip"
+                overwrite false
+            }
+        }
+
+        def binFolder = new File("${elixirPath}/bin")
+        if (!binFolder.isDirectory() || folder.list().size() == 0) {
+            copy {
+                from zipTree("${rootDir}/cache/Elixir.${elixirVersion}.zip")
+                into "${rootDir}/cache/"
+            }
+
+            exec {
+                workingDir elixirPath
+                commandLine "make"
+            }
+        }
     }
-
-    def binFolder = new File("${elixirPath}/bin")
-    if (!binFolder.isDirectory() || folder.list().size() == 0) {
-      copy {
-        from zipTree("${rootDir}/cache/Elixir.${elixirVersion}.zip")
-        into "${rootDir}/cache/"
-      }
-
-      exec {
-        workingDir elixirPath
-        commandLine "make"
-      }
-    }
-  }
 }
 
 task getQuoter {
-  doLast {
-    download {
-      src "https://github.com/KronicDeth/intellij_elixir/archive/v${quoterVersion}.zip"
-      dest quoterZipPath
-      overwrite false
+    doLast {
+        download {
+            src "https://github.com/KronicDeth/intellij_elixir/archive/v${quoterVersion}.zip"
+            dest quoterZipPath
+            overwrite false
+        }
+
+        def folder = new File(quoterUnzippedPath)
+        if (!folder.isDirectory() || folder.list().size() == 0) {
+            copy {
+                from zipTree(quoterZipPath)
+                into cachePath
+            }
+
+            def quoterZipRootFile = new File(quoterZipRootPath)
+
+            quoterZipRootFile.renameTo(quoterUnzippedPath)
+        }
     }
-
-    def folder = new File(quoterUnzippedPath)
-    if (!folder.isDirectory() || folder.list().size() == 0) {
-      copy {
-        from zipTree(quoterZipPath)
-        into cachePath
-      }
-
-      def quoterZipRootFile = new File(quoterZipRootPath)
-
-      quoterZipRootFile.renameTo(quoterUnzippedPath)
-    }
-  }
 }
 
 task getQuoterDeps(dependsOn: getQuoter) {
-  doLast {
-    exec {
-      workingDir quoterUnzippedPath
-      executable "mix"
-      args "deps.get"
+    doLast {
+        exec {
+            workingDir quoterUnzippedPath
+            executable "mix"
+            args "deps.get"
+        }
     }
-  }
 }
 
 task releaseQuoter(dependsOn: getQuoterDeps) {
-  doLast {
-    def file = new File(quoterExe)
+    doLast {
+        def file = new File(quoterExe)
 
-    if (!file.canExecute()) {
-      exec {
-        workingDir quoterUnzippedPath
-        executable "mix"
-        args "release"
-      }
+        if (!file.canExecute()) {
+            exec {
+                workingDir quoterUnzippedPath
+                executable "mix"
+                args "release"
+            }
+        }
     }
-  }
 }
 
 compileJava {
 }
 
 compileTestJava {
-  dependsOn getElixir
-  dependsOn getQuoter
+    dependsOn getElixir
+    dependsOn getQuoter
 }
 
 task runQuoter(type: Exec, dependsOn: releaseQuoter) {
-  environment "RELEASE_COOKIE", "intellij_elixir"
-  environment "RELEASE_DISTRIBUTION", "name"
-  environment "RELEASE_NAME", "intellij_elixir@127.0.0.1"
-  executable quoterExe
-  args "daemon"
+    environment "RELEASE_COOKIE", "intellij_elixir"
+    environment "RELEASE_DISTRIBUTION", "name"
+    environment "RELEASE_NAME", "intellij_elixir@127.0.0.1"
+    executable quoterExe
+    args "daemon"
 }
 
 task stopQuoter(type: Exec, dependsOn: releaseQuoter) {
-  environment "RELEASE_COOKIE", "intellij_elixir"
-  environment "RELEASE_DISTRIBUTION", "name"
-  environment "RELEASE_NAME", "intellij_elixir@127.0.0.1"
-  executable quoterExe
-  args "stop"
+    environment "RELEASE_COOKIE", "intellij_elixir"
+    environment "RELEASE_DISTRIBUTION", "name"
+    environment "RELEASE_NAME", "intellij_elixir@127.0.0.1"
+    executable quoterExe
+    args "stop"
 }
 
 runIde {
-  jvmArgs "-Didea.ProcessCanceledException=disabled"
-  maxHeapSize = "7g"
+    jvmArgs "-Didea.ProcessCanceledException=disabled"
+    maxHeapSize = "7g"
 }
 
 test {
-  dependsOn runQuoter
-  finalizedBy stopQuoter
+    dependsOn runQuoter
+    finalizedBy stopQuoter
 }
 

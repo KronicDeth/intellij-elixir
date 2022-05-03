@@ -39,49 +39,47 @@ object CanonicallyNamedImpl {
 
 
     fun canonicalNameSet(stubBased: StubBased<*>): Set<String> =
-            if (isModular(stubBased)) {
-                val canonicalNameSuffixSet: Set<String> = if (Implementation.`is`(stubBased)) {
-                    val protocolName = Implementation.protocolName(stubBased) ?: "?"
-                    val prefix = "$protocolName."
+        if (isModular(stubBased)) {
+            val canonicalNameSuffixSet: Set<String> = if (Implementation.`is`(stubBased)) {
+                val protocolName = Implementation.protocolName(stubBased) ?: "?"
+                val prefix = "$protocolName."
 
-                    stubBased
-                            .let { Implementation.forNameElement(it) }
-                            ?.let { forNameCollection(it) }
-                            ?.map { "$prefix$it" }
-                            ?.toSet()
-                            ?:
-                            enclosingModularMacroCall(stubBased)
-                                    ?.let { enclosingModularMacroCall ->
-                                        if (enclosingModularMacroCall is StubBased<*> && Module.`is`(enclosingModularMacroCall)) {
-                                            canonicalNameSet(enclosingModularMacroCall as StubBased<*>)
-                                        } else {
-                                            null
-                                        }
-                                    }
-                                    ?.map { "$prefix$it" }
-                                    ?.toSet()
-                            ?:
-                            setOf("$prefix?")
-                } else if (Module.`is`(stubBased)) {
-                    setOf(Module.name(stubBased))
-                } else if (Protocol.`is`(stubBased)) {
-                    setOf(Module.name(stubBased))
-                } else {
-                    setOf("?")
-                }
-
-                enclosingModularMacroCall(stubBased)
-                        .let { it as? StubBased<*> }
-                        ?.let { enclosing ->
-                            enclosing
-                                    .canonicalNameSet()
-                                    .flatMap { canonicalNamePrefix ->
-                                        canonicalNameSuffixSet.map { canonicalNameSuffix ->
-                                            "$canonicalNamePrefix.$canonicalNameSuffix"
-                                        }
-                                    }.toSet()
-                        } ?: canonicalNameSuffixSet
+                stubBased
+                    .let { Implementation.forNameElement(it) }
+                    ?.let { forNameCollection(it) }
+                    ?.map { "$prefix$it" }
+                    ?.toSet()
+                    ?: enclosingModularMacroCall(stubBased)
+                        ?.let { enclosingModularMacroCall ->
+                            if (enclosingModularMacroCall is StubBased<*> && Module.`is`(enclosingModularMacroCall)) {
+                                canonicalNameSet(enclosingModularMacroCall)
+                            } else {
+                                null
+                            }
+                        }
+                        ?.map { "$prefix$it" }
+                        ?.toSet()
+                    ?: setOf("$prefix?")
+            } else if (Module.`is`(stubBased)) {
+                setOf(Module.name(stubBased))
+            } else if (Protocol.`is`(stubBased)) {
+                setOf(Module.name(stubBased))
             } else {
-                stubBased.name?.let { setOf(it) } ?: emptySet()
+                setOf("?")
             }
+
+            enclosingModularMacroCall(stubBased)
+                .let { it as? StubBased<*> }
+                ?.let { enclosing ->
+                    enclosing
+                        .canonicalNameSet()
+                        .flatMap { canonicalNamePrefix ->
+                            canonicalNameSuffixSet.map { canonicalNameSuffix ->
+                                "$canonicalNamePrefix.$canonicalNameSuffix"
+                            }
+                        }.toSet()
+                } ?: canonicalNameSuffixSet
+        } else {
+            stubBased.name?.let { setOf(it) } ?: emptySet()
+        }
 }

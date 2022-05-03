@@ -2,7 +2,6 @@ package org.elixir_lang.structure_view.element
 
 import com.intellij.ide.util.treeView.smartTree.TreeElement
 import com.intellij.navigation.ItemPresentation
-import com.intellij.psi.PsiElement
 import org.elixir_lang.call.Visibility
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.navigation.item_presentation.NameArity
@@ -23,7 +22,6 @@ import org.elixir_lang.psi.impl.call.macroChildCalls
 import org.elixir_lang.psi.impl.enclosingMacroCall
 import org.elixir_lang.structure_view.element.modular.*
 import org.jetbrains.annotations.Contract
-import java.util.*
 
 /**
  * Constructs a clause for `callDefinition`.
@@ -86,15 +84,6 @@ class CallDefinitionClause(val callDefinition: CallDefinition, call: Call) :
 
             treeElementList.toTypedArray()
         }
-
-    /**
-     * Whether this clause would match the given arguments and be called.
-     *
-     * @param arguments argument being passed to this clauses' function.
-     * @return `true` if arguments matches up-to the available information about the arguments; otherwise,
-     * `false`
-     */
-    fun isMatch(arguments: Array<PsiElement>): Boolean = false
 
     companion object {
         /**

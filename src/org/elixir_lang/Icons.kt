@@ -88,7 +88,7 @@ object Icons {
     val FIELD = AllIcons.Nodes.Field
 
     @JvmField
-    val FILE = IconLoader.getIcon("/icons/file/elixir.svg")
+    val FILE = IconLoader.getIcon("/icons/file/elixir.svg", Icons.javaClass)
 
 
     @JvmField
@@ -104,7 +104,7 @@ object Icons {
     val PARAMETER = AllIcons.Nodes.Parameter
 
     object Protocol {
-        val Structure = IconLoader.getIcon("/icons/protocol.svg")
+        val Structure = IconLoader.getIcon("/icons/protocol.svg", Icons.javaClass)
         val GoToImplementations: Icon = AllIcons.Gutter.ImplementedMethod
     }
 
@@ -113,7 +113,7 @@ object Icons {
         val Structure: Icon = AllIcons.Nodes.Interface
 
         @JvmField
-        val GoToProtocols: Icon = IconLoader.getIcon("/icons/go_to_protocols.svg")
+        val GoToProtocols: Icon = IconLoader.getIcon("/icons/go_to_protocols.svg", Icons.javaClass)
     }
 
     @JvmField
@@ -124,7 +124,7 @@ object Icons {
 
     // same icon as intellij-erlang to match their look and feel
     @JvmField
-    val TYPE = IconLoader.getIcon("/icons/type.png")
+    val TYPE = IconLoader.getIcon("/icons/type.png", Icons.javaClass)
 
     // MUST be after TYPE
     @JvmField
@@ -140,22 +140,22 @@ object Icons {
 
     object File {
         @JvmField
-        val APPLICATION = IconLoader.getIcon("/icons/file/elixir/application.svg")
+        val APPLICATION = IconLoader.getIcon("/icons/file/elixir/application.svg", Icons.javaClass)
 
         @JvmField
-        val GEN_EVENT = IconLoader.getIcon("/icons/file/elixir/gen-event.svg")
+        val GEN_EVENT = IconLoader.getIcon("/icons/file/elixir/gen-event.svg", Icons.javaClass)
 
         @JvmField
-        val GEN_SERVER = IconLoader.getIcon("/icons/file/elixir/gen-server.svg")
+        val GEN_SERVER = IconLoader.getIcon("/icons/file/elixir/gen-server.svg", Icons.javaClass)
 
         @JvmField
-        val SUPERVISOR = IconLoader.getIcon("/icons/file/elixir/supervisor.svg")
+        val SUPERVISOR = IconLoader.getIcon("/icons/file/elixir/supervisor.svg", Icons.javaClass)
     }
 
     @JvmField
-    val LANGUAGE = IconLoader.getIcon("/icons/language/elixir.svg")
+    val LANGUAGE = IconLoader.getIcon("/icons/language/elixir.svg", Icons.javaClass)
 
     @JvmField
-    val MODULE = IconLoader.getIcon("/icons/module/elixir.svg")
+    val MODULE = IconLoader.getIcon("/icons/module/elixir.svg", Icons.javaClass)
 }
 

@@ -32,49 +32,54 @@ object PsiNamedElementImpl {
     @Contract(pure = true)
     @JvmStatic
     fun getName(namedElement: NamedElement): String? =
-            if (namedElement is Call && RegisterAttribute.`is`(namedElement)) {
-                RegisterAttribute.name(namedElement)
-            } else if (namedElement is Call && PutAttribute.`is`(namedElement)) {
-                PutAttribute.name(namedElement)
+        if (namedElement is Call && RegisterAttribute.`is`(namedElement)) {
+            RegisterAttribute.name(namedElement)
+        } else if (namedElement is Call && PutAttribute.`is`(namedElement)) {
+            PutAttribute.name(namedElement)
+        } else {
+            val nameIdentifier = namedElement.nameIdentifier
+
+            if (nameIdentifier != null) {
+                val text = ApplicationManager.getApplication().runReadAction(Computable { nameIdentifier.text })
+                unquoteName(namedElement, text)
             } else {
-                val nameIdentifier = namedElement.nameIdentifier
+                if (namedElement is Call) {
+                    val call = namedElement as Call
 
-                if (nameIdentifier != null) {
-                    val text = ApplicationManager.getApplication().runReadAction(Computable { nameIdentifier.text })
-                    unquoteName(namedElement, text)
-                } else {
-                    if (namedElement is Call) {
-                        val call = namedElement as Call
-
-                        /* The name of the module defined by {@code defimpl PROTOCOL[ for: MODULE]} is derived by combining the
-                       PROTOCOL and MODULE name into PROTOCOL.MODULE.  Neither piece is really the "name" or
-                       "nameIdentifier" element of the implementation because changing the PROTOCOL make the implementation
-                       just for that different Protocol and changing the MODULE makes the implementation for a different
-                       MODULE.  If `for:` isn't given, it's really the enclosing {@code defmodule MODULE} whose name should
-                       be changed. */
-                        if (Implementation.`is`(call)) {
-                            Implementation.name(call)
-                        } else {
-                            null
-                        }
+                    /* The name of the module defined by {@code defimpl PROTOCOL[ for: MODULE]} is derived by combining the
+                   PROTOCOL and MODULE name into PROTOCOL.MODULE.  Neither piece is really the "name" or
+                   "nameIdentifier" element of the implementation because changing the PROTOCOL make the implementation
+                   just for that different Protocol and changing the MODULE makes the implementation for a different
+                   MODULE.  If `for:` isn't given, it's really the enclosing {@code defmodule MODULE} whose name should
+                   be changed. */
+                    if (Implementation.`is`(call)) {
+                        Implementation.name(call)
                     } else {
                         null
                     }
+                } else {
+                    null
                 }
             }
+        }
 
     @JvmStatic
-    fun setName(@Suppress("UNUSED_PARAMETER") element: PsiElement, @Suppress("UNUSED_PARAMETER") newName: String): PsiElement {
+    fun setName(
+        @Suppress("UNUSED_PARAMETER") element: PsiElement,
+        @Suppress("UNUSED_PARAMETER") newName: String
+    ): PsiElement {
         TODO("Rename not implemented")
     }
 
     @JvmStatic
-    fun setName(atUnqualifiedNoParenthesesCall: AtUnqualifiedNoParenthesesCall<*>,
-                newName: String): PsiElement {
+    fun setName(
+        atUnqualifiedNoParenthesesCall: AtUnqualifiedNoParenthesesCall<*>,
+        newName: String
+    ): PsiElement {
         val newAtUnqualifiedNoParenthesesCall = ElementFactory.createModuleAttributeDeclaration(
-                atUnqualifiedNoParenthesesCall.project,
-                newName,
-                "dummy_value"
+            atUnqualifiedNoParenthesesCall.project,
+            newName,
+            "dummy_value"
         )
 
         val nameNode = atUnqualifiedNoParenthesesCall.atIdentifier.node
@@ -87,13 +92,18 @@ object PsiNamedElementImpl {
     }
 
     @JvmStatic
-    fun setName(variable: ElixirVariable, newName: String): PsiElement {
+    fun setName(
+        @Suppress("UNUSED_PARAMETER") variable: ElixirVariable,
+        @Suppress("UNUSED_PARAMETER") newName: String
+    ): PsiElement {
         TODO("Rename not implemented")
     }
 
     @JvmStatic
-    fun setName(named: org.elixir_lang.psi.call.Named,
-                newName: String): PsiElement {
+    fun setName(
+        named: org.elixir_lang.psi.call.Named,
+        newName: String
+    ): PsiElement {
         val functionNameElement = named.functionNameElement()
         val newFunctionNameElementCall = ElementFactory.createUnqualifiedNoArgumentsCall(named.project, newName)
 
@@ -118,23 +128,23 @@ object PsiNamedElementImpl {
             val primaryArgument = primaryArguments[0]!!
 
             primaryArgument
-                    .let { it as? ElixirAccessExpression}
-                    ?.children
-                    ?.singleOrNull()
-                    ?.let { it as? ElixirAtom }
-                    ?.let { atom ->
-                        val body = atom.line?.body
+                .let { it as? ElixirAccessExpression }
+                ?.children
+                ?.singleOrNull()
+                ?.let { it as? ElixirAtom }
+                ?.let { atom ->
+                    val body = atom.line?.body
 
-                        if (body != null) {
-                            if (body.children.isEmpty()) {
-                               body.text
-                            } else {
-                               null
-                            }
+                    if (body != null) {
+                        if (body.children.isEmpty()) {
+                            body.text
                         } else {
-                            atom.node.lastChildNode.text
+                            null
                         }
-                    } ?: "${name}(${primaryArgument.text})"
+                    } else {
+                        atom.node.lastChildNode.text
+                    }
+                } ?: "${name}(${primaryArgument.text})"
         } else {
             null
         }

@@ -17,7 +17,6 @@ import org.elixir_lang.psi.impl.call.keywordArgument
 import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.structure_view.element.CallDefinitionClause.Companion.enclosingModular
 import org.elixir_lang.structure_view.element.modular.Modular
-import java.util.*
 
 class Delegation(private val modular: Modular, call: Call) : Element<Call?>(call) {
     private val childList: MutableList<TreeElement> = ArrayList()
@@ -40,7 +39,7 @@ class Delegation(private val modular: Modular, call: Call) : Element<Call?>(call
      */
     fun `as`(): String? = keywordArgumentText("as")
 
-    fun callDefinitionHeadCallList(): List<Call> = callDefinitionHeadCallList(navigationItem!!)!!
+    fun callDefinitionHeadCallList(): List<Call> = callDefinitionHeadCallList(navigationItem!!)
 
     fun definition(callDefinition: CallDefinition) = childList.add(callDefinition)
 
@@ -61,10 +60,10 @@ class Delegation(private val modular: Modular, call: Call) : Element<Call?>(call
         val location = parent.locatedPresentableText
 
         return Delegation(
-                location,
-                to(),
-                `as`(),
-                appendFirst()
+            location,
+            to(),
+            `as`(),
+            appendFirst()
         )
     }
 
@@ -86,7 +85,7 @@ class Delegation(private val modular: Modular, call: Call) : Element<Call?>(call
      * [Element.navigationItem]; `null` if the keyword argument does not exist.
      */
     private fun keywordArgumentText(keywordValueText: String): String? =
-            navigationItem!!.keywordArgument(keywordValueText)?.text
+        navigationItem!!.keywordArgument(keywordValueText)?.text
 
     companion object {
         @JvmStatic
@@ -114,20 +113,20 @@ class Delegation(private val modular: Modular, call: Call) : Element<Call?>(call
         fun filterCallDefinitionHeadCallList(vararg calls: Call): List<Call> =
             calls.filter { CallDefinitionHead.`is`(it) }
 
-        fun elementDescription(call: Call?, location: ElementDescriptionLocation): String? =
-                if (location === UsageViewTypeLocation.INSTANCE) {
-                    "delegation"
-                } else {
-                    null
-                }
+        fun elementDescription(location: ElementDescriptionLocation): String? =
+            if (location === UsageViewTypeLocation.INSTANCE) {
+                "delegation"
+            } else {
+                null
+            }
 
         @JvmStatic
         fun `is`(call: Call): Boolean = call.isCalling(Module.KERNEL, Function.DEFDELEGATE, 2)
 
         fun fromCall(call: Call): org.elixir_lang.structure_view.element.Delegation? =
-                enclosingModular(call)?.let { modular ->
-                    Delegation(modular, call)
-                }
+            enclosingModular(call)?.let { modular ->
+                Delegation(modular, call)
+            }
 
         fun nameIdentifier(call: Call): PsiElement? =
             call.finalArguments()?.get(0)?.let { it as? Call }?.functionNameElement()

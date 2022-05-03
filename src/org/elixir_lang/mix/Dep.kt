@@ -20,12 +20,12 @@ import java.nio.file.Paths
  */
 data class Dep(val application: String, val path: String, val type: Type = Type.LIBRARY) {
     fun virtualFile(project: Project): VirtualFile? =
-            ProjectRootManager
-                    .getInstance(project)
-                    .contentRootsFromAllModules
-                    .mapNotNull { it.findFileByRelativePath(path) }
-                    .firstOrNull()
-                    ?: VfsUtil.findFile(Paths.get(path), true)
+        ProjectRootManager
+            .getInstance(project)
+            .contentRootsFromAllModules
+            .mapNotNull { it.findFileByRelativePath(path) }
+            .firstOrNull()
+            ?: VfsUtil.findFile(Paths.get(path), true)
 
     enum class Type {
         LIBRARY,
@@ -52,7 +52,11 @@ data class Dep(val application: String, val path: String, val type: Type = Type.
                                     "in_umbrella" -> acc.copy(path = "apps/$name", type = Type.MODULE)
                                     "path" -> putPath(acc, keywordPair.keywordValue)
                                     else -> {
-                                        Logger.error(logger, "Don't know if Mix.Dep option `$key` is important for determining location of dependency", depsListElement)
+                                        Logger.error(
+                                            logger,
+                                            "Don't know if Mix.Dep option `$key` is important for determining location of dependency",
+                                            depsListElement
+                                        )
                                         acc
                                     }
                                 }
@@ -70,14 +74,14 @@ data class Dep(val application: String, val path: String, val type: Type = Type.
         private val logger by lazy { com.intellij.openapi.diagnostic.Logger.getInstance(Dep::class.java) }
 
         private fun name(nameElement: PsiElement): String? =
-                when (nameElement) {
-                    is ElixirAtom -> name(nameElement)
-                    else -> null
-                }
+            when (nameElement) {
+                is ElixirAtom -> name(nameElement)
+                else -> null
+            }
 
         private fun name(atom: ElixirAtom): String? =
-                atom.line?.let { name(it) }
-                        ?: atom.node.lastChildNode.text
+            atom.line?.let { name(it) }
+                ?: atom.node.lastChildNode.text
 
         private fun name(line: ElixirLine): String? {
             Logger.error(logger, "Don't know how to convert ${line.text} to dep name", line.parent)
@@ -102,59 +106,59 @@ data class Dep(val application: String, val path: String, val type: Type = Type.
         private fun putPath(dep: Dep, stringLine: ElixirLine): Dep = dep.copy(path = stringLine.body!!.text)
 
         private fun putPath(dep: Dep, call: Call): Dep =
-                call
-                        .reference?.let { it as? PsiPolyVariantReference }
-                        ?.multiResolve(false)
-                        ?.asSequence()?.filter(ResolveResult::isValidResult)?.mapNotNull(ResolveResult::getElement)
-                        ?.fold(dep) { dep, resolved ->
-                            putPathFromResolved(dep, resolved)
-                        }
-                        ?: dep
+            call
+                .reference?.let { it as? PsiPolyVariantReference }
+                ?.multiResolve(false)
+                ?.asSequence()?.filter(ResolveResult::isValidResult)?.mapNotNull(ResolveResult::getElement)
+                ?.fold(dep) { acc, resolved ->
+                    putPathFromResolved(acc, resolved)
+                }
+                ?: dep
 
         private fun putPathFromResolved(dep: Dep, resolved: PsiElement): Dep =
-                when (resolved) {
-                    is Call -> putPathFromResolved(dep, resolved)
-                    else -> dep
-                }
+            when (resolved) {
+                is Call -> putPathFromResolved(dep, resolved)
+                else -> dep
+            }
 
         private fun putPathFromResolved(dep: Dep, resolved: Call): Dep =
-                if (CallDefinitionClause.`is`(resolved)) {
-                    dep
-                } else {
-                    putPathFromVariable(dep, resolved)
-                }
+            if (CallDefinitionClause.`is`(resolved)) {
+                dep
+            } else {
+                putPathFromVariable(dep, resolved)
+            }
 
         private fun putPathFromVariable(dep: Dep, variable: Call): Dep =
-                when (val parent = variable.parent) {
-                    is Match -> {
-                        // variable = ..
-                        if (parent.leftOperand() == variable) {
-                            parent.rightOperand()?.let { value ->
-                                putPathFromValue(dep, value)
-                            } ?: dep
-                        }
-                        // ... = variable
-                        else {
-                            dep
-                        }
+            when (val parent = variable.parent) {
+                is Match -> {
+                    // variable = ..
+                    if (parent.leftOperand() == variable) {
+                        parent.rightOperand()?.let { value ->
+                            putPathFromValue(dep, value)
+                        } ?: dep
                     }
-                    else -> dep
+                    // ... = variable
+                    else {
+                        dep
+                    }
                 }
+                else -> dep
+            }
 
         private fun putPathFromValue(dep: Dep, value: PsiElement): Dep =
-                when (value) {
-                    is Call -> putPathFromValue(dep, value)
-                    else -> dep
-                }
+            when (value) {
+                is Call -> putPathFromValue(dep, value)
+                else -> dep
+            }
 
         private fun putPathFromValue(dep: Dep, value: Call): Dep =
-                if (value.isCalling("System", "get_env")) {
-                    // Getting environment variable in IDEs is unreliable because whether the local shell or not is
-                    // used is based on how the IDE was launched.
-                    dep
-                } else {
-                    dep
-                }
+            if (value.isCalling("System", "get_env")) {
+                // Getting environment variable in IDEs is unreliable because whether the local shell or not is
+                // used is based on how the IDE was launched.
+                dep
+            } else {
+                dep
+            }
     }
 }
 

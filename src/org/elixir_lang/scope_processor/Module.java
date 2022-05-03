@@ -2,12 +2,12 @@ package org.elixir_lang.scope_processor;
 
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.ResolveState;
-import com.intellij.psi.scope.BaseScopeProcessor;
+import com.intellij.psi.scope.PsiScopeProcessor;
 import org.elixir_lang.psi.QualifiableAlias;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class Module extends BaseScopeProcessor {
+public class Module implements PsiScopeProcessor {
     /*
      * Fields
      */
@@ -41,9 +41,7 @@ public class Module extends BaseScopeProcessor {
             QualifiableAlias qualifiableAlias = (QualifiableAlias) element;
             String qualifiableAliasFullyQualifiedName = qualifiableAlias.fullyQualifiedName();
 
-            if (qualifiableAlias.isModuleName() &&
-                    qualifiableAliasFullyQualifiedName != null &&
-                    qualifiableAliasFullyQualifiedName.equals(usage.fullyQualifiedName())) {
+            if (qualifiableAlias.isModuleName() && qualifiableAliasFullyQualifiedName.equals(usage.fullyQualifiedName())) {
                 declaration = qualifiableAlias;
                 keepProcessing = false;
             }

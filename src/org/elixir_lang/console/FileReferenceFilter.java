@@ -7,7 +7,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiFile;
 import com.intellij.psi.search.FilenameIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.ProjectScope;
@@ -195,14 +194,13 @@ public final class FileReferenceFilter implements Filter {
                                                                  @NotNull String basename,
                                                                  @NotNull GlobalSearchScope scope) {
         List<VirtualFile> suffixedVirtualFiles = new ArrayList<>();
-        PsiFile[] projectFilesWithBaseName = FilenameIndex.getFilesByName(myProject, basename, scope);
+        Collection<VirtualFile> projectFilesWithBaseName = FilenameIndex.getVirtualFilesByName(basename, scope);
 
-        for (PsiFile projectFileWithBaseName : projectFilesWithBaseName) {
-            VirtualFile virtualFile = projectFileWithBaseName.getVirtualFile();
-            String virtualFilePath = virtualFile.getPath();
+        for (VirtualFile projectFileWithBaseName : projectFilesWithBaseName) {
+            String virtualFilePath = projectFileWithBaseName.getPath();
 
             if (virtualFilePath.endsWith(path)) {
-                suffixedVirtualFiles.add(virtualFile);
+                suffixedVirtualFiles.add(projectFileWithBaseName);
             }
         }
 

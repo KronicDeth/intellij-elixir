@@ -17,7 +17,6 @@ import org.elixir_lang.psi.CallDefinitionClause.nameArityInterval
 import org.elixir_lang.psi.Module
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.CanonicallyNamed
-import org.elixir_lang.psi.call.name.Function.UNQUOTE
 import org.elixir_lang.psi.call.qualification.Qualified
 import org.elixir_lang.psi.impl.call.qualification.qualifiedToModulars
 import org.elixir_lang.psi.scope.CallDefinitionClause.Companion.MODULAR_CANONICAL_NAME
@@ -43,56 +42,60 @@ object Callable : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Cal
     }
 
     private fun expand(visitedElementSetResolveResultList: List<VisitedElementSetResolveResult>): List<PsiElementResolveResult> =
-            visitedElementSetResolveResultList
-                    .flatMap { visitedElementSetResolveResult ->
-                        val visitedElementSet = visitedElementSetResolveResult.visitedElementSet
-                        val validResult = visitedElementSetResolveResult.isValidResult
+        visitedElementSetResolveResultList
+            .flatMap { visitedElementSetResolveResult ->
+                val visitedElementSet = visitedElementSetResolveResult.visitedElementSet
+                val validResult = visitedElementSetResolveResult.isValidResult
 
-                        val pathResolveResultList =
-                                visitedElementSet
-                                        .filter { visitedElement ->
-                                            visitedElement.let { it as? Call }?.let { visitedCall ->
-                                                Delegation.`is`(visitedCall) || Import.`is`(visitedCall) || Use.`is`(visitedCall)
-                                            } ?: false
-                                        }
-                                        .map { PsiElementResolveResult(it, validResult) }
+                val pathResolveResultList =
+                    visitedElementSet
+                        .filter { visitedElement ->
+                            visitedElement.let { it as? Call }?.let { visitedCall ->
+                                Delegation.`is`(visitedCall) || Import.`is`(visitedCall) || Use.`is`(visitedCall)
+                            } ?: false
+                        }
+                        .map { PsiElementResolveResult(it, validResult) }
 
-                        val terminalResolveResult = PsiElementResolveResult(
-                                visitedElementSetResolveResult.element,
-                                visitedElementSetResolveResult.isValidResult
-                        )
+                val terminalResolveResult = PsiElementResolveResult(
+                    visitedElementSetResolveResult.element,
+                    visitedElementSetResolveResult.isValidResult
+                )
 
-                        listOf(terminalResolveResult) + pathResolveResultList
-                    }
-                    // deduplicate shared `defdelegate`, `import`, or `use`
-                    .groupBy { it.element }
-                    .map { (_element, resolveResults) -> resolveResults.first() }
+                listOf(terminalResolveResult) + pathResolveResultList
+            }
+            // deduplicate shared `defdelegate`, `import`, or `use`
+            .groupBy { it.element }
+            .map { (_, resolveResults) -> resolveResults.first() }
 
-    private fun resolvePreferred(element: Call,
-                                 resolvedPrimaryArity: Arity,
-                                 incompleteCode: Boolean): List<VisitedElementSetResolveResult> {
+    private fun resolvePreferred(
+        element: Call,
+        resolvedPrimaryArity: Arity,
+        incompleteCode: Boolean
+    ): List<VisitedElementSetResolveResult> {
         val all = resolveAll(element, resolvedPrimaryArity, incompleteCode)
 
         return org.elixir_lang.reference.Resolver.preferred(element, incompleteCode, all)
     }
 
     private fun resolveAll(element: Call, resolvedPrimaryArity: Arity, incompleteCode: Boolean) =
-            /* DO NOT use `getName()` as it will return the NameIdentifier's text, which for `defmodule` is the Alias,
-               not `defmodule` */
-            element
-                    .functionName()
-                    ?.let { name -> resolve(element, name, resolvedPrimaryArity, incompleteCode) }
-                    ?: emptyList()
+        /* DO NOT use `getName()` as it will return the NameIdentifier's text, which for `defmodule` is the Alias,
+           not `defmodule` */
+        element
+            .functionName()
+            ?.let { name -> resolve(element, name, resolvedPrimaryArity, incompleteCode) }
+            ?: emptyList()
 
     private fun resolve(element: Call, name: String, resolvedPrimaryArity: Arity, incompleteCode: Boolean) =
         resolveInScope(element, name, resolvedPrimaryArity, incompleteCode)
-                .takeIf { set -> set.any(ResolveResult::isValidResult) }
-                ?: nameArityInAnyModule(element, name, resolvedPrimaryArity, incompleteCode)
+            .takeIf { set -> set.any(ResolveResult::isValidResult) }
+            ?: nameArityInAnyModule(element, name, resolvedPrimaryArity, incompleteCode)
 
-    private fun resolveInScope(element: Call,
-                               name: String,
-                               resolvedPrimaryArity: Arity,
-                               incompleteCode: Boolean): List<VisitedElementSetResolveResult> =
+    private fun resolveInScope(
+        element: Call,
+        name: String,
+        resolvedPrimaryArity: Arity,
+        incompleteCode: Boolean
+    ): List<VisitedElementSetResolveResult> =
         try {
             if (element is Qualified) {
                 resolveQualified(element, name, resolvedPrimaryArity, incompleteCode)
@@ -105,40 +108,45 @@ object Callable : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Cal
             emptyList()
         }
 
-    private fun resolveUnqualified(element: Call,
-                                   name: String,
-                                   resolvedPrimaryArity: Arity,
-                                   incompleteCode: Boolean): List<VisitedElementSetResolveResult> {
+    private fun resolveUnqualified(
+        element: Call,
+        name: String,
+        resolvedPrimaryArity: Arity,
+        incompleteCode: Boolean
+    ): List<VisitedElementSetResolveResult> {
         val resolveResultList = mutableListOf<VisitedElementSetResolveResult>()
 
         // UnqualifiedNoArgumentsCall prevents `foo()` from being treated as a variable.
         // resolvedFinalArity prevents `|> foo` from being counted as 0-arity
         if (element is UnqualifiedNoArgumentsCall<*> && resolvedPrimaryArity == 0) {
             val variableResolveList = org.elixir_lang.psi.scope.variable.MultiResolve.resolveResultList(
-                    name,
-                    incompleteCode,
-                    element
+                name,
+                incompleteCode,
+                element
             )
 
             resolveResultList.addAll(variableResolveList)
         }
 
-        val callDefinitionClauseResolveResultList = org.elixir_lang.psi.scope.call_definition_clause.MultiResolve.resolveResults(
+        val callDefinitionClauseResolveResultList =
+            org.elixir_lang.psi.scope.call_definition_clause.MultiResolve.resolveResults(
                 name,
                 resolvedPrimaryArity,
                 incompleteCode,
                 element
-        )
+            )
 
         resolveResultList.addAll(callDefinitionClauseResolveResultList)
 
         return resolveResultList
     }
 
-    private fun resolveQualified(element: Qualified,
-                                 name: String,
-                                 arity: Arity,
-                                 incompleteCode: Boolean): List<VisitedElementSetResolveResult> {
+    private fun resolveQualified(
+        element: Qualified,
+        name: String,
+        arity: Arity,
+        incompleteCode: Boolean
+    ): List<VisitedElementSetResolveResult> {
         val modulars = element.qualifiedToModulars()
 
         return if (modulars.isNotEmpty()) {
@@ -146,10 +154,10 @@ object Callable : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Cal
 
             modulars.flatMap { modular ->
                 org.elixir_lang.psi.scope.call_definition_clause.MultiResolve.resolveResults(
-                        resolvableName,
-                        arity,
-                        incompleteCode,
-                        modular
+                    resolvableName,
+                    arity,
+                    incompleteCode,
+                    modular
                 )
             }
         } else {
@@ -157,10 +165,12 @@ object Callable : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Cal
         }
     }
 
-    private fun nameArityInAnyModule(element: Call,
-                                     name: String,
-                                     arity: Arity,
-                                     incompleteCode: Boolean): List<VisitedElementSetResolveResult> {
+    private fun nameArityInAnyModule(
+        element: Call,
+        name: String,
+        arity: Arity,
+        incompleteCode: Boolean
+    ): List<VisitedElementSetResolveResult> {
         val project = element.project
         val resolveResults = mutableListOf<VisitedElementSetResolveResult>()
 
@@ -182,27 +192,46 @@ object Callable : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Cal
 
             for (key in keys) {
                 stubIndex
-                        .processElements(AllName.KEY, key, project, scope, NamedElement::class.java) { namedElement ->
-                            if (namedElement is Call) {
-                                if (CallDefinitionClause.`is`(namedElement)) {
-                                    if (incompleteCode ||
-                                            nameArityInterval(namedElement, resolveState(namedElement, key))
-                                                    ?.arityInterval?.contains(arity) == true) {
-                                        resolveResults.add(VisitedElementSetResolveResult(namedElement, validResult, emptySet()))
-                                    }
-                                } else if (Callback.`is`(namedElement)) {
-                                    if (incompleteCode ||
-                                            Callback
-                                                    .headCall(namedElement as AtUnqualifiedNoParenthesesCall<*>)
-                                                    ?.let { CallDefinitionHead.nameArityInterval(it, resolveState(namedElement, key)) }
-                                                    ?.arityInterval?.contains(arity) == true) {
-                                        resolveResults.add(VisitedElementSetResolveResult(namedElement, validResult, emptySet()))
-                                    }
+                    .processElements(AllName.KEY, key, project, scope, NamedElement::class.java) { namedElement ->
+                        if (namedElement is Call) {
+                            if (CallDefinitionClause.`is`(namedElement)) {
+                                if (incompleteCode ||
+                                    nameArityInterval(namedElement, resolveState(namedElement, key))
+                                        ?.arityInterval?.contains(arity) == true
+                                ) {
+                                    resolveResults.add(
+                                        VisitedElementSetResolveResult(
+                                            namedElement,
+                                            validResult,
+                                            emptySet()
+                                        )
+                                    )
+                                }
+                            } else if (Callback.`is`(namedElement)) {
+                                if (incompleteCode ||
+                                    Callback
+                                        .headCall(namedElement as AtUnqualifiedNoParenthesesCall<*>)
+                                        ?.let {
+                                            CallDefinitionHead.nameArityInterval(
+                                                it,
+                                                resolveState(namedElement, key)
+                                            )
+                                        }
+                                        ?.arityInterval?.contains(arity) == true
+                                ) {
+                                    resolveResults.add(
+                                        VisitedElementSetResolveResult(
+                                            namedElement,
+                                            validResult,
+                                            emptySet()
+                                        )
+                                    )
                                 }
                             }
-
-                            true
                         }
+
+                        true
+                    }
             }
         }
 

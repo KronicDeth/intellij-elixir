@@ -36,7 +36,7 @@ object Protocol {
     }
 
     fun processImplementations(defprotocol: ModuleImpl<*>, consumer: Processor<in PsiElement>) {
-        processImplementations(defprotocol.project, defprotocol.name!!, consumer)
+        processImplementations(defprotocol.project, defprotocol.name, consumer)
     }
 
     private fun processImplementations(project: Project, name: String, consumer: Processor<in PsiElement>) {

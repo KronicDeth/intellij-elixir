@@ -24,43 +24,49 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
-import com.intellij.util.containers.ContainerUtil
 import org.elixir_lang.ElixirLanguage
 import org.elixir_lang.credo.Annotator
 import org.elixir_lang.jps.builder.ParametersList
 import org.elixir_lang.mix.MissingSdk
-
 import java.nio.file.Paths
 import java.util.*
 
 
-private fun put(pathSetByWorkingDirectory: MutableMap<String, MutableSet<String>>,
-                workingDirectorySet: Set<String>) {
+private fun put(
+    pathSetByWorkingDirectory: MutableMap<String, MutableSet<String>>,
+    workingDirectorySet: Set<String>
+) {
     for (workingDirectory in workingDirectorySet) {
         put(pathSetByWorkingDirectory, workingDirectory, workingDirectory)
     }
 }
 
-private fun put(pathSetByWorkingDirectory: MutableMap<String, MutableSet<String>>,
-                workingDirectorySet: Set<String>,
-                path: String) {
+private fun put(
+    pathSetByWorkingDirectory: MutableMap<String, MutableSet<String>>,
+    workingDirectorySet: Set<String>,
+    path: String
+) {
     for (workingDirectory in workingDirectorySet) {
         put(pathSetByWorkingDirectory, workingDirectory, path)
     }
 }
 
-private fun put(pathSetByWorkingDirectory: MutableMap<String, MutableSet<String>>,
-                workingDirectory: String,
-                path: String) {
+private fun put(
+    pathSetByWorkingDirectory: MutableMap<String, MutableSet<String>>,
+    workingDirectory: String,
+    path: String
+) {
     pathSetByWorkingDirectory
-            .computeIfAbsent(workingDirectory) { mutableSetOf() }
-            .add(path)
+        .computeIfAbsent(workingDirectory) { mutableSetOf() }
+        .add(path)
 }
 
-private fun generalCommandLine(workingDirectoryGeneralCommandLine: GeneralCommandLine,
-                               module: Module,
-                               mixParametersList: ParametersList): GeneralCommandLine =
-        TODO()
+private fun generalCommandLine(
+    @Suppress("UNUSED_PARAMETER") workingDirectoryGeneralCommandLine: GeneralCommandLine,
+    @Suppress("UNUSED_PARAMETER") module: Module,
+    @Suppress("UNUSED_PARAMETER") mixParametersList: ParametersList
+): GeneralCommandLine =
+    TODO()
 //        MixRunningStateUtil.commandLine(
 //                workingDirectoryGeneralCommandLine,
 //                module,
@@ -68,12 +74,14 @@ private fun generalCommandLine(workingDirectoryGeneralCommandLine: GeneralComman
 //                mixParametersList
 //        )
 
-private fun runInspection(module: Module,
-                          workingDirectory: String,
-                          pathSet: Set<String>): List<Annotator.Issue> {
+private fun runInspection(
+    module: Module,
+    workingDirectory: String,
+    pathSet: Set<String>
+): List<Annotator.Issue> {
     return try {
         val processOutput = ExecUtil.execAndGetOutput(
-                generalCommandLine(workingDirectory, module, pathSet)
+            generalCommandLine(workingDirectory, module, pathSet)
         )
 
         Annotator.lineListToIssueList(processOutput.stdoutLines)
@@ -84,30 +92,36 @@ private fun runInspection(module: Module,
     }
 }
 
-private fun runInspection(project: Project,
-                          workingDirectory: String,
-                          pathSet: Set<String>): List<Annotator.Issue> =
-        LocalFileSystem.getInstance().findFileByPath(workingDirectory)?.let { virtualFile ->
-            ModuleUtilCore.findModuleForFile(virtualFile, project)?.let { module ->
-                runInspection(module, workingDirectory, pathSet)
-            }
-        } ?: emptyList()
+private fun runInspection(
+    project: Project,
+    workingDirectory: String,
+    pathSet: Set<String>
+): List<Annotator.Issue> =
+    LocalFileSystem.getInstance().findFileByPath(workingDirectory)?.let { virtualFile ->
+        ModuleUtilCore.findModuleForFile(virtualFile, project)?.let { module ->
+            runInspection(module, workingDirectory, pathSet)
+        }
+    } ?: emptyList()
 
-private fun generalCommandLine(workingDirectory: String,
-                               module: Module,
-                               mixParametersList: ParametersList): GeneralCommandLine =
-        generalCommandLine(
-                GeneralCommandLine().withCharset(Charsets.UTF_8).apply {
-                    withWorkDirectory(workingDirectory)
-                },
-                module,
-                mixParametersList
-        )
+private fun generalCommandLine(
+    workingDirectory: String,
+    module: Module,
+    mixParametersList: ParametersList
+): GeneralCommandLine =
+    generalCommandLine(
+        GeneralCommandLine().withCharset(Charsets.UTF_8).apply {
+            withWorkDirectory(workingDirectory)
+        },
+        module,
+        mixParametersList
+    )
 
-private fun generalCommandLine(workingDirectory: String,
-                               module: Module,
-                               pathSet: Set<String>): GeneralCommandLine =
-        generalCommandLine(workingDirectory, module, mixParameterList(pathSet))
+private fun generalCommandLine(
+    workingDirectory: String,
+    module: Module,
+    pathSet: Set<String>
+): GeneralCommandLine =
+    generalCommandLine(workingDirectory, module, mixParameterList(pathSet))
 
 private fun mixParametersList(): ParametersList = ParametersList().apply {
     add("credo")
@@ -127,14 +141,14 @@ private fun mixParameterList(pathSet: Set<String>): ParametersList {
 
 private fun workingDirectorySet(module: Module): Set<String> {
     val moduleRootWorkingDirectorySet =
-            ModuleRootManager
-                    .getInstance(module)
-                    .contentRoots
-                    .filter { virtualFile ->
-                        virtualFile.findChild("mix.exs") != null
-                    }
-                    .map(VirtualFile::getPath)
-                    .toHashSet()
+        ModuleRootManager
+            .getInstance(module)
+            .contentRoots
+            .filter { virtualFile ->
+                virtualFile.findChild("mix.exs") != null
+            }
+            .map(VirtualFile::getPath)
+            .toHashSet()
 
     return if (moduleRootWorkingDirectorySet.isEmpty()) {
         workingDirectorySet(module.project)
@@ -162,8 +176,10 @@ private fun annotator(): Annotator {
 }
 
 // See ExternalAnnotatorInspectionVisitor#toLocalQuickFixes
-private fun convertToProblemDescriptors(annotations: List<Annotation>,
-                                        file: PsiFile): Array<ProblemDescriptor> {
+private fun convertToProblemDescriptors(
+    annotations: List<Annotation>,
+    file: PsiFile
+): Array<ProblemDescriptor> {
     if (annotations.isEmpty()) {
         return ProblemDescriptor.EMPTY_ARRAY
     }
@@ -191,14 +207,16 @@ private fun convertToProblemDescriptors(annotations: List<Annotation>,
         }
 
         val quickFixes = toLocalQuickFixes(annotation.quickFixes, quickFixMappingCache)
-        val descriptor = ProblemDescriptorBase(startElement,
-                endElement,
-                annotation.message,
-                quickFixes,
-                ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
-                annotation.isAfterEndOfLine, null,
-                true,
-                false)
+        val descriptor = ProblemDescriptorBase(
+            startElement,
+            endElement,
+            annotation.message,
+            quickFixes,
+            ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
+            annotation.isAfterEndOfLine, null,
+            true,
+            false
+        )
         problems.add(descriptor)
     }
 
@@ -207,8 +225,8 @@ private fun convertToProblemDescriptors(annotations: List<Annotation>,
 
 // See ExternalAnnotatorInspectionVisitor#toLocalQuickFixes
 private fun toLocalQuickFixes(
-        quickFixInfoList: List<Annotation.QuickFixInfo>?,
-        localQuickFixByIntentionAction: IdentityHashMap<IntentionAction, LocalQuickFix>
+    quickFixInfoList: List<Annotation.QuickFixInfo>?,
+    localQuickFixByIntentionAction: IdentityHashMap<IntentionAction, LocalQuickFix>
 ): Array<LocalQuickFix> = quickFixInfoList.orEmpty().map { quickFixInfo ->
     val intentionAction = quickFixInfo.quickFix
 
@@ -221,31 +239,35 @@ private fun toLocalQuickFixes(
     }
 }.toTypedArray()
 
-private fun addProblemElement(problemDescriptionsProcessor: ProblemDescriptionsProcessor,
-                              localFileSystem: LocalFileSystem,
-                              psiManager: PsiManager,
-                              refManager: RefManager,
-                              externalAnnotator: ExternalAnnotator<PsiFile, List<Annotator.Issue>>,
-                              fullPath: String,
-                              issueList: List<Annotator.Issue>) {
+private fun addProblemElement(
+    problemDescriptionsProcessor: ProblemDescriptionsProcessor,
+    localFileSystem: LocalFileSystem,
+    psiManager: PsiManager,
+    refManager: RefManager,
+    externalAnnotator: ExternalAnnotator<PsiFile, List<Annotator.Issue>>,
+    fullPath: String,
+    issueList: List<Annotator.Issue>
+) {
     val virtualFile = localFileSystem.findFileByPath(fullPath)
 
     addProblemElement(
-            problemDescriptionsProcessor,
-            psiManager,
-            refManager,
-            externalAnnotator,
-            virtualFile,
-            issueList
+        problemDescriptionsProcessor,
+        psiManager,
+        refManager,
+        externalAnnotator,
+        virtualFile,
+        issueList
     )
 }
 
-private fun addProblemElement(problemDescriptionsProcessor: ProblemDescriptionsProcessor,
-                              psiManager: PsiManager,
-                              refManager: RefManager,
-                              externalAnnotator: ExternalAnnotator<PsiFile, List<Annotator.Issue>>,
-                              virtualFile: VirtualFile?,
-                              issueList: List<Annotator.Issue>) {
+private fun addProblemElement(
+    problemDescriptionsProcessor: ProblemDescriptionsProcessor,
+    psiManager: PsiManager,
+    refManager: RefManager,
+    externalAnnotator: ExternalAnnotator<PsiFile, List<Annotator.Issue>>,
+    virtualFile: VirtualFile?,
+    issueList: List<Annotator.Issue>
+) {
     if (virtualFile != null) {
         val psiFile = psiManager.findFile(virtualFile)
 
@@ -253,11 +275,13 @@ private fun addProblemElement(problemDescriptionsProcessor: ProblemDescriptionsP
     }
 }
 
-private fun addProblemElement(problemDescriptionsProcessor: ProblemDescriptionsProcessor,
-                              refManager: RefManager,
-                              externalAnnotator: ExternalAnnotator<PsiFile, List<Annotator.Issue>>,
-                              psiFile: PsiFile?,
-                              issueList: List<Annotator.Issue>) {
+private fun addProblemElement(
+    problemDescriptionsProcessor: ProblemDescriptionsProcessor,
+    refManager: RefManager,
+    externalAnnotator: ExternalAnnotator<PsiFile, List<Annotator.Issue>>,
+    psiFile: PsiFile?,
+    issueList: List<Annotator.Issue>
+) {
     if (psiFile != null) {
         val problemDescriptors = problemDescriptors(externalAnnotator, psiFile, issueList)
         val refElement = refManager.getReference(psiFile)
@@ -266,17 +290,17 @@ private fun addProblemElement(problemDescriptionsProcessor: ProblemDescriptionsP
 }
 
 private fun problemDescriptors(
-        externalAnnotator: ExternalAnnotator<PsiFile, List<Annotator.Issue>>,
-        psiFile: PsiFile,
-        issueList: List<Annotator.Issue>
+    externalAnnotator: ExternalAnnotator<PsiFile, List<Annotator.Issue>>,
+    psiFile: PsiFile,
+    issueList: List<Annotator.Issue>
 ): Array<ProblemDescriptor> =
-        ReadAction.compute<Array<ProblemDescriptor>, RuntimeException> {
-            val annotationSession = AnnotationSession(psiFile)
-            val annotationHolder = AnnotationHolderImpl(annotationSession, true)
-            externalAnnotator.apply(psiFile, issueList, annotationHolder)
+    ReadAction.compute<Array<ProblemDescriptor>, RuntimeException> {
+        val annotationSession = AnnotationSession(psiFile)
+        val annotationHolder = AnnotationHolderImpl(annotationSession, true)
+        externalAnnotator.apply(psiFile, issueList, annotationHolder)
 
-            convertToProblemDescriptors(annotationHolder, psiFile)
-        }
+        convertToProblemDescriptors(annotationHolder, psiFile)
+    }
 
 class Global : GlobalInspectionTool() {
     private fun pathSetByWorkingDirectory(globalContext: GlobalInspectionContext): Map<String, Set<String>> {
@@ -317,9 +341,9 @@ class Global : GlobalInspectionTool() {
                             }
 
                             put(
-                                    pathSetByWorkingDirectory,
-                                    workingDirectorySet,
-                                    refEntity.psiElement.containingFile.virtualFile.path
+                                pathSetByWorkingDirectory,
+                                workingDirectorySet,
+                                refEntity.psiElement.containingFile.virtualFile.path
                             )
                         }
                     }
@@ -330,10 +354,12 @@ class Global : GlobalInspectionTool() {
         return pathSetByWorkingDirectory
     }
 
-    override fun runInspection(scope: AnalysisScope,
-                               manager: InspectionManager,
-                               globalContext: GlobalInspectionContext,
-                               problemDescriptionsProcessor: ProblemDescriptionsProcessor) {
+    override fun runInspection(
+        scope: AnalysisScope,
+        manager: InspectionManager,
+        globalContext: GlobalInspectionContext,
+        problemDescriptionsProcessor: ProblemDescriptionsProcessor
+    ) {
         val pathSetByWorkingDirectory = pathSetByWorkingDirectory(globalContext)
         val issueListByFullPath = mutableMapOf<String, MutableList<Annotator.Issue>>()
 
@@ -353,13 +379,13 @@ class Global : GlobalInspectionTool() {
 
         for ((key, value) in issueListByFullPath) {
             addProblemElement(
-                    problemDescriptionsProcessor,
-                    localFileSystem,
-                    psiManager,
-                    refManager,
-                    externalAnnotator,
-                    key,
-                    value
+                problemDescriptionsProcessor,
+                localFileSystem,
+                psiManager,
+                refManager,
+                externalAnnotator,
+                key,
+                value
             )
         }
     }

@@ -7,12 +7,12 @@ import org.elixir_lang.facet.SdksService
 import org.elixir_lang.sdk.elixir.Type
 import javax.swing.ComboBoxModel
 
-class Model:
-        CollectionListModel<Sdk?>(
-                SdksService.getInstance()?.projectJdkImplList(Type::class.java) ?: mutableListOf(),
-                false
-        ),
-        ComboBoxModel<Sdk?> {
+class Model :
+    CollectionListModel<Sdk?>(
+        SdksService.getInstance()?.projectJdkImplList(Type::class.java) ?: mutableListOf(),
+        false
+    ),
+    ComboBoxModel<Sdk?> {
     override fun getElementIndex(item: Sdk?): Int {
         return if (item != null) {
             internalList.indexOfFirst { it?.name == item.name }
@@ -26,18 +26,15 @@ class Model:
         SdksService.getInstance()?.apply {
             getModel().addListener(object : SdkModel.Listener {
                 override fun beforeSdkRemove(sdk: Sdk) {
-                    sdk?.let {
-                        remove(it)
-                    }
+                    remove(sdk)
                 }
 
                 override fun sdkAdded(sdk: Sdk) {
-                    sdk?.let {
-                        if (it.sdkType is Type) {
-                            add(sdk)
-                        }
+                    if (sdk.sdkType is Type) {
+                        add(sdk)
                     }
                 }
+
                 override fun sdkChanged(sdk: Sdk, previousName: String) {
                     val previousIndex = internalList.indexOfFirst { indexSdk ->
                         indexSdk?.name == previousName

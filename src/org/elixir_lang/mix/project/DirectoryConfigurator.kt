@@ -1,11 +1,10 @@
 package org.elixir_lang.mix.project
 
+import com.intellij.configurationStore.StoreUtil
 import com.intellij.facet.FacetManager
 import com.intellij.facet.FacetType
 import com.intellij.facet.impl.FacetUtil.addFacet
-import com.intellij.openapi.components.ComponentManager
-import com.intellij.openapi.components.impl.stores.IComponentStore
-import com.intellij.openapi.components.stateStore
+import com.intellij.ide.impl.OpenProjectTask
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.progress.ProgressIndicator
@@ -18,7 +17,6 @@ import com.intellij.openapi.util.Ref
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.platform.PlatformProjectOpenProcessor.Companion.runDirectoryProjectConfigurators
-import com.intellij.platform.ProjectBaseDirectory
 import com.intellij.projectImport.ProjectAttachProcessor
 import com.intellij.util.PlatformUtils
 import com.intellij.util.io.exists
@@ -33,7 +31,12 @@ import java.nio.file.Paths
  * Used in Small IDEs like Rubymine that don't support [OpenProcessor].
  */
 class DirectoryConfigurator : com.intellij.platform.DirectoryProjectConfigurator {
-    override fun configureProject(project: Project, baseDir: VirtualFile, moduleRef: Ref<Module>) {
+    override fun configureProject(
+        project: Project,
+        baseDir: VirtualFile,
+        moduleRef: Ref<Module>,
+        isProjectCreatedWithWizard: Boolean
+    ) {
         var foundOtpApps: List<OtpApp> = emptyList()
 
         ProgressManager.getInstance().run(object : Task.Modal(project, "Scanning Mix Projects", true) {
@@ -61,11 +64,12 @@ class DirectoryConfigurator : com.intellij.platform.DirectoryProjectConfigurator
                 addFolders(modifiableRootModel, otpApp.root)
             }
 
-            ProgressManager.getInstance().run(object : Task.Modal(project, "Scanning dependencies for Libraries", true) {
-                override fun run(indicator: ProgressIndicator) {
-                    DepsWatcher(project).syncLibraries(indicator)
-                }
-            })
+            ProgressManager.getInstance()
+                .run(object : Task.Modal(project, "Scanning dependencies for Libraries", true) {
+                    override fun run(indicator: ProgressIndicator) {
+                        DepsWatcher(project).syncLibraries(indicator)
+                    }
+                })
         }
     }
 
@@ -74,7 +78,11 @@ class DirectoryConfigurator : com.intellij.platform.DirectoryProjectConfigurator
             newProject(otpApp)?.let { otpAppProject ->
                 attachToProject(rootProject, Paths.get(otpApp.root.path))
 
-                ProgressManager.getInstance().run(object : Task.Modal(otpAppProject, "Scanning mix.exs to connect libraries for newly attached project for OTP app ${otpApp.name}", true) {
+                ProgressManager.getInstance().run(object : Task.Modal(
+                    otpAppProject,
+                    "Scanning mix.exs to connect libraries for newly attached project for OTP app ${otpApp.name}",
+                    true
+                ) {
                     override fun run(progressIndicator: ProgressIndicator) {
                         for (module in ModuleManager.getInstance(otpAppProject).modules) {
                             if (progressIndicator.isCanceled) {
@@ -98,16 +106,24 @@ class DirectoryConfigurator : com.intellij.platform.DirectoryProjectConfigurator
         return if (projectDir.exists()) {
             null
         } else {
-            val projectManager = ProjectManagerEx.getInstanceEx()
+            val path = otpApp.root.path.let { Paths.get(it) }
 
-            projectManager.newProject(otpApp.name, otpApp.root.path, false, false)?.let { project ->
-                ProjectBaseDirectory.getInstance(project).setBaseDir(otpApp.root)
-                runDirectoryProjectConfigurators(Paths.get(otpApp.root.path), project, false)
+            ProjectManagerEx
+                .getInstanceEx()
+                .newProject(
+                    path, OpenProjectTask(
+                        isNewProject = true,
+                        useDefaultProjectAsTemplate = false,
+                        projectName = otpApp.name
+                    )
+                )
+                ?.let { project ->
+                    runDirectoryProjectConfigurators(path, project, false)
 
-                saveSettings(project)
+                    StoreUtil.saveSettings(project, true)
 
-                project
-            }
+                    project
+                }
         }
     }
 
@@ -115,18 +131,6 @@ class DirectoryConfigurator : com.intellij.platform.DirectoryProjectConfigurator
         for (processor in ProjectAttachProcessor.EP_NAME.extensionList) {
             if (processor.attachToProject(project, baseDir, null)) {
                 break
-            }
-        }
-    }
-
-    companion object {
-        fun saveSettings(project: Project) {
-            try {
-                val storeUtil = Class.forName("com.intellij.configurationStore.StoreUtil")
-                storeUtil.getDeclaredMethod("saveSettings", ComponentManager::class.java, Boolean::class.javaPrimitiveType).invoke(null, project, true)
-            } catch (_: ClassNotFoundException) {
-                val storeUtil = Class.forName("com.intellij.openapi.components.impl.stores.StoreUtil")
-                storeUtil.getDeclaredMethod("save", IComponentStore::class.java, Project::class.java, Boolean::class.javaPrimitiveType).invoke(null, project.stateStore, project, true)
             }
         }
     }

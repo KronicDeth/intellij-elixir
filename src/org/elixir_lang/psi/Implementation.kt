@@ -22,6 +22,7 @@ object Implementation {
         return call.isCallingMacro(org.elixir_lang.psi.call.name.Module.KERNEL, Function.DEFIMPL, 2) ||
                 call.isCallingMacro(org.elixir_lang.psi.call.name.Module.KERNEL, Function.DEFIMPL, 3)
     }
+
     /**
      * @return `null` if protocol or module for the implementation cannot be derived or if the `for` argument is a
      * list.
@@ -40,17 +41,17 @@ object Implementation {
     }
 
     fun elementDescription(location: ElementDescriptionLocation): String? =
-            if (location === UsageViewTypeLocation.INSTANCE) {
-                "implementation"
-            } else {
-                null
-            }
+        if (location === UsageViewTypeLocation.INSTANCE) {
+            "implementation"
+        } else {
+            null
+        }
 
     private fun forNameCollection(forNameElement: ElixirAccessExpression): Collection<String> =
-            forNameCollection(forNameElement.children)
+        forNameCollection(forNameElement.children)
 
     private fun forNameCollection(forNameElement: ElixirList): Collection<String> =
-            forNameCollection(forNameElement.children)
+        forNameCollection(forNameElement.children)
 
     fun forNameCollection(forNameElement: PsiElement): Collection<String>? = when (forNameElement) {
         is ElixirAccessExpression -> forNameCollection(forNameElement)
@@ -61,13 +62,13 @@ object Implementation {
     }
 
     private fun forNameCollection(children: Array<PsiElement>): Collection<String> =
-            children.flatMap { child -> forNameCollection(child) ?: emptyList() }
+        children.flatMap { child -> forNameCollection(child) ?: emptyList() }
 
     private fun forNameCollection(forNameElement: PsiNamedElement): Collection<String>? =
-            forNameElement.name?.let { listOf(it) }
+        forNameElement.name?.let { listOf(it) }
 
     private fun forNameCollection(forNameElement: QualifiableAlias): Collection<String>? =
-            forNameElement.name?.let { listOf(it) }
+        forNameElement.name?.let { listOf(it) }
 
     fun forNameCollection(enclosingModular: Modular?, call: Call): Collection<String>? {
         val forNameElement = forNameElement(call)
@@ -75,37 +76,37 @@ object Implementation {
             forNameElement != null -> forNameCollection(forNameElement)
             enclosingModular != null -> {
                 enclosingModular
-                        .presentation
-                        .let { it as org.elixir_lang.navigation.item_presentation.Parent }
-                        .locatedPresentableText
-                        .let { listOf(it) }
+                    .presentation
+                    .let { it as org.elixir_lang.navigation.item_presentation.Parent }
+                    .locatedPresentableText
+                    .let { listOf(it) }
             }
             else -> null
         }
     }
 
     fun forNameElement(call: Call): PsiElement? =
-            call.finalArguments()?.lastOrNull()?.let { it as? QuotableKeywordList }?.keywordValue(Function.FOR)
+        call.finalArguments()?.lastOrNull()?.let { it as? QuotableKeywordList }?.keywordValue(Function.FOR)
 
     fun processProtocols(defimpl: Call, consumer: Processor<in PsiElement>) {
         protocolName(defimpl)?.let { protocolName ->
             val project = defimpl.project
 
             StubIndex
-                    .getInstance()
-                    .processElements(
-                            ModularName.KEY,
-                            protocolName,
-                            project,
-                            GlobalSearchScope.everythingScope(project),
-                            NamedElement::class.java,
-                            consumer
-                    )
+                .getInstance()
+                .processElements(
+                    ModularName.KEY,
+                    protocolName,
+                    project,
+                    GlobalSearchScope.everythingScope(project),
+                    NamedElement::class.java,
+                    consumer
+                )
         }
     }
 
     @JvmStatic
-    fun protocolName(call: Call): String? = protocolNameElement(call)?.let { protocolName(it)  }
+    fun protocolName(call: Call): String? = protocolNameElement(call)?.let { protocolName(it) }
 
     fun protocolNameElement(call: Call): QualifiableAlias? {
         val finalArguments = call.finalArguments()
@@ -121,6 +122,6 @@ object Implementation {
         }
     }
 
-    private fun protocolName(qualifiableAlias: QualifiableAlias): String? =
-            qualifiableAlias.fullyQualifiedName()?.replace("Elixir.", "")
+    private fun protocolName(qualifiableAlias: QualifiableAlias): String =
+        qualifiableAlias.fullyQualifiedName().replace("Elixir.", "")
 }

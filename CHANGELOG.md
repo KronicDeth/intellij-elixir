@@ -256,6 +256,28 @@
 
 </details>
 
+## v13.0.0
+
+### Incompatible Changes
+
+* [#2594](https://github.com/KronicDeth/intellij-elixir/pull/2594) - [@KronicDeth](https://github.com/KronicDeth)
+  * Drop support for IDEEs before 2022.1.
+
+### Enhancements
+
+* [#2594](https://github.com/KronicDeth/intellij-elixir/pull/2594) - [@KronicDeth](https://github.com/KronicDeth)
+  * Support 2022.1 IDEs
+    * Update IntelliJ Plugin Gradle to 1.5.3.
+    * Set untilBuild explicitly
+    * Target JVM Version 11
+
+### Bug Fixes
+
+* [#2594](https://github.com/KronicDeth/intellij-elixir/pull/2594) - [@KronicDeth](https://github.com/KronicDeth)
+  * Fix (some) plugin verifier warnings
+    * Fix (some) deprecation warnings.
+    * Use fewer Internal APIs.
+
 ## v12.2.1
 
 ### Bug Fixes
@@ -1798,7 +1820,7 @@
   * Ignore the `incompleteCode` flag and instead always use the criteria used when `incompleteCode` was set.
 
     | name prefix | exact name | ResolveResult | valid |
-                              |-------------|------------|---------------|-------|
+                                                  |-------------|------------|---------------|-------|
     | ❌           | N/A        | ❌             | N/A   |
     | ✅           | ❌          | ✅             | ❌     |
     | ✅           | ✅          | ✅             | ✅     |
@@ -2053,7 +2075,7 @@
     for non-Go projects, so it is also excluded. How the support appears in each non-IntelliJ IDEA is shown below:
 
     | IDE            | Works? |                                                                                                                                                                                                                                                                                                                                                                    |
-                               |:---------------|:-------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+                                                   |:---------------|:-------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
     | Android Studio | YES    | Android Studio is built on top of IntelliJ, so it has full multi-Module support. It is not Small IDE.                                                                                                                                                                                                                                                             |
     | CLion          | NO     | No Attach to Project support to multiple module support.                                                                                                                                                                                                                                                                                                           |
     | DataGrip       | No     | DataGrip doesn't have a Project View and doesn't support Attach to Project. You can still run tests if you directly open the file.                                                                                                                                                                                                                                |
@@ -2310,7 +2332,8 @@
     failed run with a single test with the compilation error as the failure message.
 * [#1308](https://github.com/KronicDeth/intellij-elixir/pull/1308) - [@KronicDeth](https://github.com/KronicDeth)
   * Don't treat redefinition of `defmodule` macro as module definition (as occurs
-    in [@bitwalker](https://github.com/bitwalker)'s [distillery](https://github.com/bitwalker/distillery)'s `Mix.Tasks.Release.Init.MixMock`
+    in [@bitwalker](https://github.com/bitwalker)'s [distillery](https://github.com/bitwalker/distillery)'
+    s `Mix.Tasks.Release.Init.MixMock`
     * Bump `AllName` `VERSION` to re-index and drop bad call definition head
       from [#1301](https://github.com/KronicDeth/intellij-elixir/issues/1301).
 * [#1310](https://github.com/KronicDeth/intellij-elixir/pull/1310) - Don't log compilation errors as test failures
@@ -2507,7 +2530,7 @@
     additions.
 
     | number |        name        |         Added         |
-                               |:-------|:-------------------|:----------------------|
+                                                   |:-------|:-------------------|:----------------------|
     | `160`  | `build_stacktrace` | Before OTP 21 release |
     | `161`  | `raw_raise`        | Now                   |
     | `162`  | `get_hd`           | Now                   |
@@ -2751,7 +2774,7 @@
       The `Atom`/`AtU8` tab shows a table with the columns
 
       | Column     | Description                                                                                                           | Source  |
-                                                |:-----------|:----------------------------------------------------------------------------------------------------------------------|:--------|
+                                                                              |:-----------|:----------------------------------------------------------------------------------------------------------------------|:--------|
       | Index      | Which is 1-based to match Erlang convention. In the `Code` chunk, `atom(0)` is reserved to always translate to `nil` | Derived |
       | Byte Count | The byte count for the atom's bytes                                                                                   | Raw     |
       | Characters | From encoding the bytes as LATIN-1 for `Atom` chunk or UTF-8 for `AtU8` chunk                                         | Derived |
@@ -2766,7 +2789,7 @@
       The `Attr` tab shows a table with the columns
 
       | Column | Description                                                                                                      | Source |
-                                                |:-------|:-----------------------------------------------------------------------------------------------------------------|:-------|
+                                                                              |:-------|:-----------------------------------------------------------------------------------------------------------------|:-------|
       | Key    | Attribute name                                                                                                   | Raw    |
       | Value  | Attribute value. **Note: The value always appears as a list as read from the binary format. I don't
       know why.** | Raw    |
@@ -2780,7 +2803,7 @@
       The `CInf` tab shows a table with the columns
 
       | Column | Description     | Source |
-                                                |:-------|:----------------|:-------|
+                                                                              |:-------|:----------------|:-------|
       | Key    | Option name     | Raw    |
       | Value  | Inspected value | Raw    |
 
@@ -2972,7 +2995,7 @@
   * Support for https://github.com/elixir-lang/elixir/commit/23c7542d95683a497a7b93071b9ccbbeb9e45d2f
 
     | Version  | Struct               | Started Event     | Finished Event     | `%ExUnit.Test{}` field |
-                              |----------|----------------------|-------------------|--------------------|------------------------|
+                                                  |----------|----------------------|-------------------|--------------------|------------------------|
     | < 1.6.0  | `%ExUnit.TestCase{}` | `:case_started`   | `:case_finished`   | `case`                 |
     | > = 1.6.0 | `%ExUnit.TestCase{}` | `:module_started` | `:module_finished` | `module`               |
 
