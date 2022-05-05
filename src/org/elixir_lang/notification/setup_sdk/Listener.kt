@@ -6,7 +6,6 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleType
 import com.intellij.openapi.project.Project
-import org.elixir_lang.module.ElixirModuleType
 import org.elixir_lang.notification.setup_sdk.Provider.Companion.showFacetSettings
 import org.elixir_lang.notification.setup_sdk.Provider.Companion.showModuleSettings
 
@@ -16,7 +15,9 @@ import org.elixir_lang.notification.setup_sdk.Provider.Companion.showModuleSetti
  */
 class Action(private val project: Project, private val module: Module) : NotificationAction("Configure Elixir SDK") {
     override fun actionPerformed(e: AnActionEvent, notification: Notification) {
-        if (ModuleType.`is`(module, ElixirModuleType.getInstance())) {
+        // CANNOT use ModuleType.is(module, ElixirModuleType.getInstance()) as ElixirModuleType depends on
+        // JavaModuleBuilder and so only available in IntelliJ
+        if (ModuleType.get(module).id == "ELIXIR_MODULE") {
             showModuleSettings(project, module)
         } else {
             showFacetSettings(project)
