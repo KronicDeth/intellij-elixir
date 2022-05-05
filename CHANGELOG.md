@@ -4,255 +4,259 @@
 
 <details>
 
-* [v12.2.1](#v1221)
-  * [Bug Fixes](#bug-fixes)
-* [v12.2.0](#v1220)
+* [v13.0.0](#v1300)
+  * [Incompatible Changes](#incompatible-changes)
   * [Enhancements](#enhancements)
+  * [Bug Fixes](#bug-fixes)
+* [v12.2.1](#v1221)
   * [Bug Fixes](#bug-fixes-1)
-* [v12.1.0](#v1210)
+* [v12.2.0](#v1220)
   * [Enhancements](#enhancements-1)
   * [Bug Fixes](#bug-fixes-2)
-* [v12.0.1](#v1201)
+* [v12.1.0](#v1210)
+  * [Enhancements](#enhancements-2)
   * [Bug Fixes](#bug-fixes-3)
+* [v12.0.1](#v1201)
+  * [Bug Fixes](#bug-fixes-4)
 * [v12.0.0](#v1200)
   * [Breaking Changes](#breaking-changes)
-  * [Enhancements](#enhancements-2)
-  * [Bug Fixes](#bug-fixes-4)
-* [v11.13.0](#v11130)
-  * [Bug Fixes](#bug-fixes-5)
   * [Enhancements](#enhancements-3)
-* [v11.12.0](#v11120)
+  * [Bug Fixes](#bug-fixes-5)
+* [v11.13.0](#v11130)
   * [Bug Fixes](#bug-fixes-6)
   * [Enhancements](#enhancements-4)
-* [v11.11.0](#v11110)
-  * [Enhancements](#enhancements-5)
+* [v11.12.0](#v11120)
   * [Bug Fixes](#bug-fixes-7)
-* [v11.10.0](#v11100)
+  * [Enhancements](#enhancements-5)
+* [v11.11.0](#v11110)
   * [Enhancements](#enhancements-6)
   * [Bug Fixes](#bug-fixes-8)
-* [v11.9.2](#v1192)
-  * [Bug Fixes](#bug-fixes-9)
-* [v11.9.1](#v1191)
-  * [Bug Fixes](#bug-fixes-10)
-* [v11.9.0](#v1190)
+* [v11.10.0](#v11100)
   * [Enhancements](#enhancements-7)
+  * [Bug Fixes](#bug-fixes-9)
+* [v11.9.2](#v1192)
+  * [Bug Fixes](#bug-fixes-10)
+* [v11.9.1](#v1191)
   * [Bug Fixes](#bug-fixes-11)
-* [v11.8.1](#v1181)
-  * [Bug Fixes](#bug-fixes-12)
-* [v11.8.0](#v1180)
+* [v11.9.0](#v1190)
   * [Enhancements](#enhancements-8)
+  * [Bug Fixes](#bug-fixes-12)
+* [v11.8.1](#v1181)
   * [Bug Fixes](#bug-fixes-13)
-* [v11.7.0](#v1170)
+* [v11.8.0](#v1180)
   * [Enhancements](#enhancements-9)
   * [Bug Fixes](#bug-fixes-14)
-* [v11.6.1](#v1161)
-  * [Bug Fixes](#bug-fixes-15)
-* [v11.6.0](#v1160)
+* [v11.7.0](#v1170)
   * [Enhancements](#enhancements-10)
+  * [Bug Fixes](#bug-fixes-15)
+* [v11.6.1](#v1161)
   * [Bug Fixes](#bug-fixes-16)
-* [v11.5.0](#v1150)
+* [v11.6.0](#v1160)
   * [Enhancements](#enhancements-11)
   * [Bug Fixes](#bug-fixes-17)
-* [v11.4.0](#v1140)
+* [v11.5.0](#v1150)
   * [Enhancements](#enhancements-12)
-* [v11.3.0](#v1130)
-  * [Enhancements](#enhancements-13)
   * [Bug Fixes](#bug-fixes-18)
-* [v11.2.0](#v1120)
+* [v11.4.0](#v1140)
+  * [Enhancements](#enhancements-13)
+* [v11.3.0](#v1130)
   * [Enhancements](#enhancements-14)
   * [Bug Fixes](#bug-fixes-19)
-* [v11.1.0](#v1110)
+* [v11.2.0](#v1120)
   * [Enhancements](#enhancements-15)
   * [Bug Fixes](#bug-fixes-20)
-* [v11.0.1](#v1101)
-  * [Bug Fixes](#bug-fixes-21)
-* [v11.0.0](#v1100)
+* [v11.1.0](#v1110)
   * [Enhancements](#enhancements-16)
+  * [Bug Fixes](#bug-fixes-21)
+* [v11.0.1](#v1101)
   * [Bug Fixes](#bug-fixes-22)
-  * [Incompatible Changes](#incompatible-changes)
-* [v10.6.0](#v1060)
+* [v11.0.0](#v1100)
   * [Enhancements](#enhancements-17)
   * [Bug Fixes](#bug-fixes-23)
-* [v10.5.1](#v1051)
-  * [Bug Fixes](#bug-fixes-24)
-* [v10.5.0](#v1050)
+  * [Incompatible Changes](#incompatible-changes-1)
+* [v10.6.0](#v1060)
   * [Enhancements](#enhancements-18)
+  * [Bug Fixes](#bug-fixes-24)
+* [v10.5.1](#v1051)
   * [Bug Fixes](#bug-fixes-25)
-* [v10.4.0](#v1040)
+* [v10.5.0](#v1050)
   * [Enhancements](#enhancements-19)
   * [Bug Fixes](#bug-fixes-26)
-* [v10.3.0](#v1030)
+* [v10.4.0](#v1040)
   * [Enhancements](#enhancements-20)
   * [Bug Fixes](#bug-fixes-27)
-* [v10.2.0](#v1020)
+* [v10.3.0](#v1030)
   * [Enhancements](#enhancements-21)
   * [Bug Fixes](#bug-fixes-28)
-* [v10.1.0](#v1010)
+* [v10.2.0](#v1020)
   * [Enhancements](#enhancements-22)
   * [Bug Fixes](#bug-fixes-29)
-* [v10.0.1](#v1001)
-  * [Bug Fixes](#bug-fixes-30)
-* [v10.0.0](#v1000)
+* [v10.1.0](#v1010)
   * [Enhancements](#enhancements-23)
+  * [Bug Fixes](#bug-fixes-30)
+* [v10.0.1](#v1001)
   * [Bug Fixes](#bug-fixes-31)
-  * [Incompatible Changes](#incompatible-changes-1)
-* [v9.0.0](#v900)
+* [v10.0.0](#v1000)
   * [Enhancements](#enhancements-24)
   * [Bug Fixes](#bug-fixes-32)
-  * [Incompatible Changs](#incompatible-changs)
-* [v8.1.0](#v810)
+  * [Incompatible Changes](#incompatible-changes-2)
+* [v9.0.0](#v900)
   * [Enhancements](#enhancements-25)
   * [Bug Fixes](#bug-fixes-33)
-* [v8.0.0](#v800)
+  * [Incompatible Changs](#incompatible-changs)
+* [v8.1.0](#v810)
   * [Enhancements](#enhancements-26)
   * [Bug Fixes](#bug-fixes-34)
-  * [Incompatible Changes](#incompatible-changes-2)
-* [v7.5.0](#v750)
+* [v8.0.0](#v800)
   * [Enhancements](#enhancements-27)
   * [Bug Fixes](#bug-fixes-35)
-* [v7.4.0](#v740)
+  * [Incompatible Changes](#incompatible-changes-3)
+* [v7.5.0](#v750)
   * [Enhancements](#enhancements-28)
   * [Bug Fixes](#bug-fixes-36)
-* [v7.3.0](#v730)
+* [v7.4.0](#v740)
   * [Enhancements](#enhancements-29)
   * [Bug Fixes](#bug-fixes-37)
-* [v7.2.1](#v721)
-  * [Bug Fixes](#bug-fixes-38)
-* [v7.2.0](#v720)
+* [v7.3.0](#v730)
   * [Enhancements](#enhancements-30)
+  * [Bug Fixes](#bug-fixes-38)
+* [v7.2.1](#v721)
   * [Bug Fixes](#bug-fixes-39)
-* [v7.1.0](#v710)
+* [v7.2.0](#v720)
   * [Enhancements](#enhancements-31)
   * [Bug Fixes](#bug-fixes-40)
-* [v7.0.0](#v700)
+* [v7.1.0](#v710)
   * [Enhancements](#enhancements-32)
   * [Bug Fixes](#bug-fixes-41)
-* [Incompatible Changes](#incompatible-changes-3)
-* [v6.7.0](#v670)
+* [v7.0.0](#v700)
   * [Enhancements](#enhancements-33)
   * [Bug Fixes](#bug-fixes-42)
-* [v6.6.0](#v660)
+* [Incompatible Changes](#incompatible-changes-4)
+* [v6.7.0](#v670)
   * [Enhancements](#enhancements-34)
   * [Bug Fixes](#bug-fixes-43)
-* [v6.5.1](#v651)
-  * [Bug Fixes](#bug-fixes-44)
-* [v6.5.0](#v650)
+* [v6.6.0](#v660)
   * [Enhancements](#enhancements-35)
+  * [Bug Fixes](#bug-fixes-44)
+* [v6.5.1](#v651)
   * [Bug Fixes](#bug-fixes-45)
-* [v6.4.0](#v640)
+* [v6.5.0](#v650)
   * [Enhancements](#enhancements-36)
   * [Bug Fixes](#bug-fixes-46)
-* [v6.3.0](#v630)
+* [v6.4.0](#v640)
   * [Enhancements](#enhancements-37)
   * [Bug Fixes](#bug-fixes-47)
-* [v6.2.0](#v620)
+* [v6.3.0](#v630)
   * [Enhancements](#enhancements-38)
   * [Bug Fixes](#bug-fixes-48)
-* [v6.1.1](#v611)
-  * [Bug Fixes](#bug-fixes-49)
-* [v6.1.0](#v610)
+* [v6.2.0](#v620)
   * [Enhancements](#enhancements-39)
+  * [Bug Fixes](#bug-fixes-49)
+* [v6.1.1](#v611)
   * [Bug Fixes](#bug-fixes-50)
-* [v6.0.0](#v600)
+* [v6.1.0](#v610)
   * [Enhancements](#enhancements-40)
   * [Bug Fixes](#bug-fixes-51)
-  * [Incompatible Changes](#incompatible-changes-4)
-* [v5.1.0](#v510)
+* [v6.0.0](#v600)
   * [Enhancements](#enhancements-41)
   * [Bug Fixes](#bug-fixes-52)
-* [v5.0.0](#v500)
+  * [Incompatible Changes](#incompatible-changes-5)
+* [v5.1.0](#v510)
   * [Enhancements](#enhancements-42)
   * [Bug Fixes](#bug-fixes-53)
-  * [Incompatible Changes](#incompatible-changes-5)
-* [v4.7.0](#v470)
+* [v5.0.0](#v500)
   * [Enhancements](#enhancements-43)
   * [Bug Fixes](#bug-fixes-54)
-* [v4.6.0](#v460)
+  * [Incompatible Changes](#incompatible-changes-6)
+* [v4.7.0](#v470)
   * [Enhancements](#enhancements-44)
   * [Bug Fixes](#bug-fixes-55)
-* [v4.5.0](#v450)
+* [v4.6.0](#v460)
   * [Enhancements](#enhancements-45)
-* [v4.4.0](#v440)
-  * [Enhancements](#enhancements-46)
   * [Bug Fixes](#bug-fixes-56)
-* [v4.3.0](#v430)
+* [v4.5.0](#v450)
+  * [Enhancements](#enhancements-46)
+* [v4.4.0](#v440)
   * [Enhancements](#enhancements-47)
   * [Bug Fixes](#bug-fixes-57)
-* [v4.2.0](#v420)
+* [v4.3.0](#v430)
   * [Enhancements](#enhancements-48)
   * [Bug Fixes](#bug-fixes-58)
-* [v4.1.0](#v410)
+* [v4.2.0](#v420)
   * [Enhancements](#enhancements-49)
   * [Bug Fixes](#bug-fixes-59)
-* [v4.0.0](#v400)
+* [v4.1.0](#v410)
   * [Enhancements](#enhancements-50)
   * [Bug Fixes](#bug-fixes-60)
-  * [Incompatible Changes](#incompatible-changes-6)
-* [v3.0.1](#v301)
-  * [Bug Fixes](#bug-fixes-61)
-* [v3.0.0](#v300)
+* [v4.0.0](#v400)
   * [Enhancements](#enhancements-51)
-  * [Bug Fixes](#bug-fixes-62)
+  * [Bug Fixes](#bug-fixes-61)
   * [Incompatible Changes](#incompatible-changes-7)
+* [v3.0.1](#v301)
+  * [Bug Fixes](#bug-fixes-62)
+* [v3.0.0](#v300)
+  * [Enhancements](#enhancements-52)
+  * [Bug Fixes](#bug-fixes-63)
+  * [Incompatible Changes](#incompatible-changes-8)
 * [v2.2.0](#v220)
   * [Enhancement](#enhancement)
-  * [Bug Fixes](#bug-fixes-63)
+  * [Bug Fixes](#bug-fixes-64)
 * [v2.1.0](#v210)
   * [Enhancement](#enhancement-1)
-  * [Bug Fixes](#bug-fixes-64)
-* [v2.0.0](#v200)
-  * [Enhancements](#enhancements-52)
   * [Bug Fixes](#bug-fixes-65)
-  * [Incompatible Changes](#incompatible-changes-8)
-* [v1.2.1](#v121)
+* [v2.0.0](#v200)
   * [Enhancements](#enhancements-53)
   * [Bug Fixes](#bug-fixes-66)
-* [v1.2.0](#v120)
+  * [Incompatible Changes](#incompatible-changes-9)
+* [v1.2.1](#v121)
   * [Enhancements](#enhancements-54)
   * [Bug Fixes](#bug-fixes-67)
-* [v1.1.0](#v110)
+* [v1.2.0](#v120)
   * [Enhancements](#enhancements-55)
-* [v1.0.0](#v100)
-  * [Enhancements](#enhancements-56)
   * [Bug Fixes](#bug-fixes-68)
-  * [Incompatible Fixes](#incompatible-fixes)
-* [v0.3.5](#v035)
+* [v1.1.0](#v110)
+  * [Enhancements](#enhancements-56)
+* [v1.0.0](#v100)
   * [Enhancements](#enhancements-57)
   * [Bug Fixes](#bug-fixes-69)
-* [v0.3.4](#v034)
+  * [Incompatible Fixes](#incompatible-fixes)
+* [v0.3.5](#v035)
   * [Enhancements](#enhancements-58)
-* [v0.3.3](#v033)
-  * [Enhancements](#enhancements-59)
-* [v0.3.2](#v032)
   * [Bug Fixes](#bug-fixes-70)
-* [v0.3.1](#v031)
+* [v0.3.4](#v034)
+  * [Enhancements](#enhancements-59)
+* [v0.3.3](#v033)
   * [Enhancements](#enhancements-60)
-* [v0.3.0](#v030)
-  * [Enhancements](#enhancements-61)
-  * [Incompatible Changes](#incompatible-changes-9)
-* [v0.2.1](#v021)
-  * [Enhancements](#enhancements-62)
+* [v0.3.2](#v032)
   * [Bug Fixes](#bug-fixes-71)
-* [v0.2.0](#v020)
-  * [Enhancements](#enhancements-63)
+* [v0.3.1](#v031)
+  * [Enhancements](#enhancements-61)
+* [v0.3.0](#v030)
+  * [Enhancements](#enhancements-62)
   * [Incompatible Changes](#incompatible-changes-10)
-* [v0.1.4](#v014)
-  * [Enhancements](#enhancements-64)
+* [v0.2.1](#v021)
+  * [Enhancements](#enhancements-63)
   * [Bug Fixes](#bug-fixes-72)
-* [v0.1.3](#v013)
-  * [Bug Fixes](#bug-fixes-73)
-* [v0.1.2](#v012)
+* [v0.2.0](#v020)
+  * [Enhancements](#enhancements-64)
+  * [Incompatible Changes](#incompatible-changes-11)
+* [v0.1.4](#v014)
   * [Enhancements](#enhancements-65)
-* [v0.1.1](#v011)
+  * [Bug Fixes](#bug-fixes-73)
+* [v0.1.3](#v013)
   * [Bug Fixes](#bug-fixes-74)
-* [v0.1.0](#v010)
+* [v0.1.2](#v012)
   * [Enhancements](#enhancements-66)
+* [v0.1.1](#v011)
   * [Bug Fixes](#bug-fixes-75)
-* [v0.0.3](#v003)
+* [v0.1.0](#v010)
   * [Enhancements](#enhancements-67)
-* [v0.0.2](#v002)
-  * [Enhancements](#enhancements-68)
   * [Bug Fixes](#bug-fixes-76)
+* [v0.0.3](#v003)
+  * [Enhancements](#enhancements-68)
+* [v0.0.2](#v002)
+  * [Enhancements](#enhancements-69)
+  * [Bug Fixes](#bug-fixes-77)
 
 </details>
 
@@ -270,6 +274,8 @@
     * Update IntelliJ Plugin Gradle to 1.5.3.
     * Set untilBuild explicitly
     * Target JVM Version 11
+* [#2633](https://github.com/KronicDeth/intellij-elixir/pull/2633) - [@KronicDeth](https://github.com/KronicDeth)
+  * Expand `untilBuild` to cover PATCH releases of 2022.1.
 
 ### Bug Fixes
 
@@ -277,6 +283,12 @@
   * Fix (some) plugin verifier warnings
     * Fix (some) deprecation warnings.
     * Use fewer Internal APIs.
+* [#2633](https://github.com/KronicDeth/intellij-elixir/pull/2633) - [@KronicDeth](https://github.com/KronicDeth)
+  * Don't use ElixirModuleType to check if it is available.
+    It will not load in IDEs that lack `JavaModuleBuilder`, which is why I was hard coding the ran previously.
+  * Don't use `XmlSerializer` as equivalent of `DefaultJDOMExternalizer`
+    The `DefaultJDOMExternalizer` method calls weren't writing anything and the explicit attribute value accesses were,
+    so it is more correct to just remove the original deprecated calls.
 
 ## v12.2.1
 
@@ -497,51 +509,51 @@
       * derive
       * dialyzer
       * external_resource
-      * on_definition
+  * on_definition
     * Index module attributes Use the index to resolve module attributes when it can't be found directly by tree
       walking.
 
-      * Defined with `Module.put_attribute/3`
-      * Defined with `Module.register_attribute/3`
-      * Defined in `quote` blocks
-  * Resolve variables to variables in any `quote` blocks If a variable can't be resolved in the scope, try resolving it
-    to any variable declared at the top-level of a `quote` block. This helps with certain patterns of `quote`
-    blocks used in Ecto where a variable's declaration and usage are not in the same `quote` block.
-  * Simplify CallDefinitionClause resolver for modulars Due to the addition of skipping if the entrance is a child call,
-    the check for only following siblings is no longer needed. Additionally, that check caused a bug because
-    the `ElixirStabBody` skipped call definitions because they were new scopes.
-  * Resolve functions declared with `Mix.Generator.embed_template` and `embed_text`. Also, new system for tracking
-    resolves paths - `import`s, `defdelegate`, and `use` calls are added to the resolve results after the preferred
-    elements are chosen for source in the same module. This prevents only the `import` showing because the actual
-    declaration is in another module or the SDK.
-  * Record a call as visited in its `treeWalkUp` instead of requiring the caller to do it in the pass `ResolveState`
-    * Record `quoteCall` as visited in `QuoteMacro.treeWalkUp`
-    * Record `unquoteCall` as visited in `Unquote.treeWalkUp`
-    * Record `unlessCall` as visited in `Unless.treeWalkUp`
-    * Record `ifCall` as visited in `If.treeWalkUp`
-    * Record `importCall` as visited in `Import.treeWalkUp`
-    * Record `useCall` as visited in `Use.treeWalkUp`
-  * More macro specialized in Structure View
-    * `test`
-    * `describe`
-  * Resolve `Qualifer.unquote(variable)(...)` to any definition with correct arity in `Qualifier`.
-  * Only calculate `element.resolvedFinalArity` once in `resolvedQualified`
-  * Implementations and Protocols
-    * Redo icons
-    * Implementations Go To Protocol line markers
-    * Go to Super for calls to `defimpl` function/macro Goes to corresponding name/arity in the `defprotocol` that
-      the `defimpl` implements.
-    * Go to implementations line marker from defprotocol def
-    * Go to implementations line marker from defprotocol
-    * Go To Implementation from individual functions in defimpl
-    * Go To Implementation from defimpl Alias
-    * Resolve protocol function to `def` in defprotocol
-    * Resolve defp inside of defimpl Process declarations inside of implementation the same as modules.
-  * Stop `prependQualifiers` at top of file
-  * Walk the false and true (else) branch of unless in Modules or Quote
-  * Walk the true and false (else) branch of if in Modules or Quote
-  * Port `preferred` and `expand` system from `Callables` to `Modules`.
-  * Update CI build dependencies
+  * Defined with `Module.put_attribute/3`
+  * Defined with `Module.register_attribute/3`
+  * Defined in `quote` blocks
+* Resolve variables to variables in any `quote` blocks If a variable can't be resolved in the scope, try resolving it
+  to any variable declared at the top-level of a `quote` block. This helps with certain patterns of `quote`
+  blocks used in Ecto where a variable's declaration and usage are not in the same `quote` block.
+* Simplify CallDefinitionClause resolver for modulars Due to the addition of skipping if the entrance is a child call,
+  the check for only following siblings is no longer needed. Additionally, that check caused a bug because
+  the `ElixirStabBody` skipped call definitions because they were new scopes.
+* Resolve functions declared with `Mix.Generator.embed_template` and `embed_text`. Also, new system for tracking
+  resolves paths - `import`s, `defdelegate`, and `use` calls are added to the resolve results after the preferred
+  elements are chosen for source in the same module. This prevents only the `import` showing because the actual
+  declaration is in another module or the SDK.
+* Record a call as visited in its `treeWalkUp` instead of requiring the caller to do it in the pass `ResolveState`
+  * Record `quoteCall` as visited in `QuoteMacro.treeWalkUp`
+  * Record `unquoteCall` as visited in `Unquote.treeWalkUp`
+  * Record `unlessCall` as visited in `Unless.treeWalkUp`
+  * Record `ifCall` as visited in `If.treeWalkUp`
+  * Record `importCall` as visited in `Import.treeWalkUp`
+  * Record `useCall` as visited in `Use.treeWalkUp`
+* More macro specialized in Structure View
+  * `test`
+  * `describe`
+* Resolve `Qualifer.unquote(variable)(...)` to any definition with correct arity in `Qualifier`.
+* Only calculate `element.resolvedFinalArity` once in `resolvedQualified`
+* Implementations and Protocols
+  * Redo icons
+  * Implementations Go To Protocol line markers
+  * Go to Super for calls to `defimpl` function/macro Goes to corresponding name/arity in the `defprotocol` that
+    the `defimpl` implements.
+  * Go to implementations line marker from defprotocol def
+  * Go to implementations line marker from defprotocol
+  * Go To Implementation from individual functions in defimpl
+  * Go To Implementation from defimpl Alias
+  * Resolve protocol function to `def` in defprotocol
+  * Resolve defp inside of defimpl Process declarations inside of implementation the same as modules.
+* Stop `prependQualifiers` at top of file
+* Walk the false and true (else) branch of unless in Modules or Quote
+* Walk the true and false (else) branch of if in Modules or Quote
+* Port `preferred` and `expand` system from `Callables` to `Modules`.
+* Update CI build dependencies
 * [#2199](https://github.com/KronicDeth/intellij-elixir/pull/2199) - [@KronicDeth](https://github.com/KronicDeth)
   * Regression test for [#2198](https://github.com/KronicDeth/intellij-elixir/issues/2198).
 * [#2201](https://github.com/KronicDeth/intellij-elixir/pull/2201) - [@KronicDeth](https://github.com/KronicDeth)
@@ -1820,7 +1832,7 @@
   * Ignore the `incompleteCode` flag and instead always use the criteria used when `incompleteCode` was set.
 
     | name prefix | exact name | ResolveResult | valid |
-                                                  |-------------|------------|---------------|-------|
+                                                                              |-------------|------------|---------------|-------|
     | ❌           | N/A        | ❌             | N/A   |
     | ✅           | ❌          | ✅             | ❌     |
     | ✅           | ✅          | ✅             | ✅     |
@@ -2075,7 +2087,7 @@
     for non-Go projects, so it is also excluded. How the support appears in each non-IntelliJ IDEA is shown below:
 
     | IDE            | Works? |                                                                                                                                                                                                                                                                                                                                                                    |
-                                                   |:---------------|:-------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+                                                                               |:---------------|:-------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
     | Android Studio | YES    | Android Studio is built on top of IntelliJ, so it has full multi-Module support. It is not Small IDE.                                                                                                                                                                                                                                                             |
     | CLion          | NO     | No Attach to Project support to multiple module support.                                                                                                                                                                                                                                                                                                           |
     | DataGrip       | No     | DataGrip doesn't have a Project View and doesn't support Attach to Project. You can still run tests if you directly open the file.                                                                                                                                                                                                                                |
@@ -2530,7 +2542,7 @@
     additions.
 
     | number |        name        |         Added         |
-                                                   |:-------|:-------------------|:----------------------|
+                                                                               |:-------|:-------------------|:----------------------|
     | `160`  | `build_stacktrace` | Before OTP 21 release |
     | `161`  | `raw_raise`        | Now                   |
     | `162`  | `get_hd`           | Now                   |
@@ -2774,7 +2786,7 @@
       The `Atom`/`AtU8` tab shows a table with the columns
 
       | Column     | Description                                                                                                           | Source  |
-                                                                              |:-----------|:----------------------------------------------------------------------------------------------------------------------|:--------|
+                                                                                                                        |:-----------|:----------------------------------------------------------------------------------------------------------------------|:--------|
       | Index      | Which is 1-based to match Erlang convention. In the `Code` chunk, `atom(0)` is reserved to always translate to `nil` | Derived |
       | Byte Count | The byte count for the atom's bytes                                                                                   | Raw     |
       | Characters | From encoding the bytes as LATIN-1 for `Atom` chunk or UTF-8 for `AtU8` chunk                                         | Derived |
@@ -2789,7 +2801,7 @@
       The `Attr` tab shows a table with the columns
 
       | Column | Description                                                                                                      | Source |
-                                                                              |:-------|:-----------------------------------------------------------------------------------------------------------------|:-------|
+                                                                                                                        |:-------|:-----------------------------------------------------------------------------------------------------------------|:-------|
       | Key    | Attribute name                                                                                                   | Raw    |
       | Value  | Attribute value. **Note: The value always appears as a list as read from the binary format. I don't
       know why.** | Raw    |
@@ -2803,7 +2815,7 @@
       The `CInf` tab shows a table with the columns
 
       | Column | Description     | Source |
-                                                                              |:-------|:----------------|:-------|
+                                                                                                                        |:-------|:----------------|:-------|
       | Key    | Option name     | Raw    |
       | Value  | Inspected value | Raw    |
 
@@ -2995,7 +3007,7 @@
   * Support for https://github.com/elixir-lang/elixir/commit/23c7542d95683a497a7b93071b9ccbbeb9e45d2f
 
     | Version  | Struct               | Started Event     | Finished Event     | `%ExUnit.Test{}` field |
-                                                  |----------|----------------------|-------------------|--------------------|------------------------|
+                                                                              |----------|----------------------|-------------------|--------------------|------------------------|
     | < 1.6.0  | `%ExUnit.TestCase{}` | `:case_started`   | `:case_finished`   | `case`                 |
     | > = 1.6.0 | `%ExUnit.TestCase{}` | `:module_started` | `:module_finished` | `module`               |
 
