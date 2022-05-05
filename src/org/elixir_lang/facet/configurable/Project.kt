@@ -13,11 +13,12 @@ import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar
 import org.elixir_lang.Facet
 import org.elixir_lang.facet.Configurable
 import org.elixir_lang.facet.Type
-import org.elixir_lang.module.ElixirModuleType
 
 class Project(project: Project) : ModuleAwareProjectConfigurable<Configurable>(project, "Elixir", null) {
     override fun isSuitableForModule(module: Module): Boolean =
-        !ModuleType.`is`(module, ElixirModuleType.getInstance())
+    // CANNOT use ModuleType.is(module, ElixirModuleType.getInstance()) as ElixirModuleType depends on
+        // JavaModuleBuilder and so only available in IntelliJ
+        ModuleType.get(module).id == "ELIXIR_MODULE"
 
     override fun createModuleConfigurable(module: Module): Configurable {
         return object : Configurable(module) {

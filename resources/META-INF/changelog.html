@@ -18,6 +18,7 @@
           <li>Target JVM Version 11</li>
         </ul>
       </li>
+      <li>Expand <code class="notranslate">untilBuild</code> to cover PATCH releases of 2022.1.</li>
     </ul>
   </li>
   <li>
@@ -29,6 +30,10 @@
           <li>Use fewer Internal APIs.</li>
         </ul>
       </li>
+      <li>Don't use ElixirModuleType to check if it is available.<br>
+        It will not load in IDEs that lack <code class="notranslate">JavaModuleBuilder</code>, which is why I was hard coding the ran previously.</li>
+      <li>Don't use <code class="notranslate">XmlSerializer</code> as equivalent of <code class="notranslate">DefaultJDOMExternalizer</code><br>
+        The <code class="notranslate">DefaultJDOMExternalizer</code> method calls weren't writing anything and the explicit attribute value accesses were, so it is more correct to just remove the original deprecated calls.</li>
     </ul>
   </li>
 </ul>

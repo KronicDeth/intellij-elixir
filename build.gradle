@@ -70,7 +70,7 @@ allprojects {
         pluginDescription.set(bodyInnerHTML("resources/META-INF/description.html"))
 
         sinceBuild = "221.5080"
-        untilBuild = "221.5080.*"
+        untilBuild = "221.*"
     }
 
     publishPlugin {

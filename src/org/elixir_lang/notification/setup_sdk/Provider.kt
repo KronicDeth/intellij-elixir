@@ -16,7 +16,6 @@ import com.intellij.ui.EditorNotificationPanel
 import com.intellij.ui.EditorNotificationProvider
 import org.elixir_lang.ElixirFileType
 import org.elixir_lang.ElixirLanguage
-import org.elixir_lang.module.ElixirModuleType
 import org.elixir_lang.sdk.ProcessOutput
 import org.elixir_lang.sdk.elixir.Type
 import java.util.function.Function
@@ -112,7 +111,9 @@ class Provider : EditorNotificationProvider {
             val module = ModuleUtilCore.findModuleForPsiElement(psiFile)
 
             return if (module != null) {
-                if (ModuleType.`is`(module, ElixirModuleType.getInstance())) {
+                // CANNOT use ModuleType.is(module, ElixirModuleType.getInstance()) as ElixirModuleType depends on
+                // JavaModuleBuilder and so only available in IntelliJ
+                if (ModuleType.get(module).id == "ELIXIR_MODULE") {
                     createModulePanel(project, module)
                 } else {
                     createFacetPanel(project)
