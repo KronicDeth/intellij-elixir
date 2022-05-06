@@ -186,7 +186,7 @@ class ElixirDocumentationProvider : DocumentationProvider {
 
     private fun fetchDocs(element: PsiElement): FetchedDocs? =
         // If resolves to .beam file then fetch docs from the decompiled docs
-        if (element.containingFile.originalFile is BeamFileImpl) {
+        if (element.containingFile?.originalFile is BeamFileImpl) {
             BeamDocsHelper.fetchDocs(element)
         } else {
             SourceFileDocsHelper.fetchDocs(element)
