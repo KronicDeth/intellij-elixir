@@ -1,5 +1,7 @@
 package org.elixir_lang.jps;
 
+import com.intellij.notification.NotificationGroupManager;
+import com.intellij.notification.NotificationType;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.Version;
 import org.jetbrains.annotations.Contract;
@@ -7,10 +9,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.Consumer;
@@ -43,6 +42,12 @@ public class HomePath {
                         }
                     }
             );
+        } catch (NoSuchFileException noSuchFileException) {
+            NotificationGroupManager
+                    .getInstance()
+                    .getNotificationGroup("Elixir")
+                    .createNotification(noSuchFileException.getFile() + " does not exist, so its ebin paths cannot be enumerated.", NotificationType.ERROR)
+                    .notify();
         } catch (IOException ioException) {
             LOGGER.error(ioException);
         }
