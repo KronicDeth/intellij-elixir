@@ -113,7 +113,9 @@ object ProcessDeclarationsImpl {
             } ?: true
             // The `when` isn't finished being type, so its argument is the `def` like:
             // `@spec foo(bar) :: term() when\ndef foo(`
-            is Call -> true
+            is Call,
+                // Fixes #2577
+            is ElixirTuple -> true
             else -> {
                 Logger.error(
                     restrictions::class.java,
