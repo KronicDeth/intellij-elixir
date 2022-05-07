@@ -4,6 +4,7 @@
 
 <details>
 
+* [v13.0.1](#v1301)
 * [v13.0.0](#v1300)
   * [Incompatible Changes](#incompatible-changes)
   * [Enhancements](#enhancements)
@@ -259,6 +260,13 @@
   * [Bug Fixes](#bug-fixes-77)
 
 </details>
+
+## v13.0.1
+
+### Bug Fixes
+
+* [#2637](https://github.com/KronicDeth/intellij-elixir/pull/2637) - [@KronicDeth](https://github.com/KronicDeth)
+  * Protect from `null` `containingFile` when fetching docs.
 
 ## v13.0.0
 
@@ -1832,7 +1840,7 @@
   * Ignore the `incompleteCode` flag and instead always use the criteria used when `incompleteCode` was set.
 
     | name prefix | exact name | ResolveResult | valid |
-                                                                              |-------------|------------|---------------|-------|
+                                                                                                  |-------------|------------|---------------|-------|
     | ❌           | N/A        | ❌             | N/A   |
     | ✅           | ❌          | ✅             | ❌     |
     | ✅           | ✅          | ✅             | ✅     |
@@ -2087,7 +2095,7 @@
     for non-Go projects, so it is also excluded. How the support appears in each non-IntelliJ IDEA is shown below:
 
     | IDE            | Works? |                                                                                                                                                                                                                                                                                                                                                                    |
-                                                                               |:---------------|:-------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+                                                                                                   |:---------------|:-------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
     | Android Studio | YES    | Android Studio is built on top of IntelliJ, so it has full multi-Module support. It is not Small IDE.                                                                                                                                                                                                                                                             |
     | CLion          | NO     | No Attach to Project support to multiple module support.                                                                                                                                                                                                                                                                                                           |
     | DataGrip       | No     | DataGrip doesn't have a Project View and doesn't support Attach to Project. You can still run tests if you directly open the file.                                                                                                                                                                                                                                |
@@ -2542,7 +2550,7 @@
     additions.
 
     | number |        name        |         Added         |
-                                                                               |:-------|:-------------------|:----------------------|
+                                                                                                   |:-------|:-------------------|:----------------------|
     | `160`  | `build_stacktrace` | Before OTP 21 release |
     | `161`  | `raw_raise`        | Now                   |
     | `162`  | `get_hd`           | Now                   |
@@ -2786,7 +2794,7 @@
       The `Atom`/`AtU8` tab shows a table with the columns
 
       | Column     | Description                                                                                                           | Source  |
-                                                                                                                        |:-----------|:----------------------------------------------------------------------------------------------------------------------|:--------|
+                                                                                                                                                      |:-----------|:----------------------------------------------------------------------------------------------------------------------|:--------|
       | Index      | Which is 1-based to match Erlang convention. In the `Code` chunk, `atom(0)` is reserved to always translate to `nil` | Derived |
       | Byte Count | The byte count for the atom's bytes                                                                                   | Raw     |
       | Characters | From encoding the bytes as LATIN-1 for `Atom` chunk or UTF-8 for `AtU8` chunk                                         | Derived |
@@ -2801,7 +2809,7 @@
       The `Attr` tab shows a table with the columns
 
       | Column | Description                                                                                                      | Source |
-                                                                                                                        |:-------|:-----------------------------------------------------------------------------------------------------------------|:-------|
+                                                                                                                                                      |:-------|:-----------------------------------------------------------------------------------------------------------------|:-------|
       | Key    | Attribute name                                                                                                   | Raw    |
       | Value  | Attribute value. **Note: The value always appears as a list as read from the binary format. I don't
       know why.** | Raw    |
@@ -2815,7 +2823,7 @@
       The `CInf` tab shows a table with the columns
 
       | Column | Description     | Source |
-                                                                                                                        |:-------|:----------------|:-------|
+                                                                                                                                                      |:-------|:----------------|:-------|
       | Key    | Option name     | Raw    |
       | Value  | Inspected value | Raw    |
 
@@ -3007,7 +3015,7 @@
   * Support for https://github.com/elixir-lang/elixir/commit/23c7542d95683a497a7b93071b9ccbbeb9e45d2f
 
     | Version  | Struct               | Started Event     | Finished Event     | `%ExUnit.Test{}` field |
-                                                                              |----------|----------------------|-------------------|--------------------|------------------------|
+                                                                                                  |----------|----------------------|-------------------|--------------------|------------------------|
     | < 1.6.0  | `%ExUnit.TestCase{}` | `:case_started`   | `:case_finished`   | `case`                 |
     | > = 1.6.0 | `%ExUnit.TestCase{}` | `:module_started` | `:module_finished` | `module`               |
 
