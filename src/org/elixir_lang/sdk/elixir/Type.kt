@@ -23,6 +23,7 @@ import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.psi.PsiElement
+import com.intellij.serviceContainer.AlreadyDisposedException
 import com.intellij.util.system.CpuArch
 import gnu.trove.THashSet
 import org.apache.commons.io.FilenameUtils
@@ -527,12 +528,16 @@ ELIXIR_SDK_HOME
         fun mostSpecificSdk(psiElement: PsiElement): Sdk? {
             val project = psiElement.project
 
-            /* ModuleUtilCore.findModuleForPsiElement can fail with NullPointerException if the
-           ProjectFileIndex.SERVICE.getInstance(Project) returns {@code null}, so check that the ProjectFileIndex is
-           available first */
             return if (!project.isDisposed) {
+                /* ModuleUtilCore.findModuleForPsiElement can fail with NullPointerException if the
+                    ProjectFileIndex.SERVICE.getInstance(Project) returns {@code null}, so check that the
+                    ProjectFileIndex is available first */
                 if (ProjectFileIndex.SERVICE.getInstance(project) != null) {
-                    val module = ModuleUtilCore.findModuleForPsiElement(psiElement)
+                    val module = try {
+                        ModuleUtilCore.findModuleForPsiElement(psiElement)
+                    } catch (_: AlreadyDisposedException) {
+                        null
+                    }
 
                     if (module != null) {
                         mostSpecificSdk(module)
