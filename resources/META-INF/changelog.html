@@ -9,6 +9,11 @@
       <li>Show notification if $HOME_PATH/lib does not exist.<br>
         Instead of logging an error show a notification since it can and does happen and is not a bug to be fixed in the plugin, but a configuration change the user needs to do.</li>
       <li>Ignore tuples as type restrictions that occur during typing</li>
+      <li>Catch <code class="notranslate">AlreadyDisposedException</code> when trying to find module for PsiElement in <code class="notranslate">mostSpecificSdk</code>.
+        <ul dir="auto">
+          <li>Check if the project<code class="notranslate">is disposed before using it to get module for </code>PsiElement`.</li>
+        </ul>
+      </li>
     </ul>
   </li>
 </ul>
