@@ -1063,6 +1063,8 @@ class ModuleAttribute : Annotator, DumbAware {
             is ElixirBitString,
             is ElixirCharToken,
             is ElixirDecimalWholeNumber,
+                // Fixes #2583
+            is ElixirEmptyParentheses,
             is ElixirKeywordKey,  /* happens when :: is typed in `@spec` above function clause that uses `do:` */
             is ElixirNoParenthesesKeywords,
             is ElixirMatchedUnaryOperation,
