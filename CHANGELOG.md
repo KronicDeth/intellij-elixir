@@ -383,6 +383,8 @@
   * Regression test for #2446
 # [#2642](https://github.com/KronicDeth/intellij-elixir/pull/2642) - [@KronicDeth](https://github.com/KronicDeth)
   * Ignore `()` as a type parameter as it occurs during typing.
+* [#2643](https://github.com/KronicDeth/intellij-elixir/pull/2643) - [@KronicDeth](https://github.com/KronicDeth)
+  * Default the variable color if the specific type foreground is `null`.
 
 ### Bug Fixes
 
