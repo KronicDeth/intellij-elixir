@@ -84,7 +84,7 @@ public class Variable extends com.intellij.codeInsight.lookup.LookupElementRende
     @Contract(pure = true)
     @NotNull
     private Color color(@NotNull final PsiElement element) {
-        Color color = JBColor.foreground();
+        Color color = null;
 
         if (isIgnored(element)) {
             color = ElixirSyntaxHighlighter.IGNORED_VARIABLE.getDefaultAttributes().getForegroundColor();
@@ -101,6 +101,10 @@ public class Variable extends com.intellij.codeInsight.lookup.LookupElementRende
             } else if (isVariable(element)) {
                 color = ElixirSyntaxHighlighter.VARIABLE.getDefaultAttributes().getForegroundColor();
             }
+        }
+
+        if (color == null) {
+            color = JBColor.foreground();
         }
 
         return color;
