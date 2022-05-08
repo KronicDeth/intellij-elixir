@@ -381,6 +381,8 @@
     the `.beam` file for Issue #2386, I might as well add it as a regression test too.
 * [#2453](https://github.com/KronicDeth/intellij-elixir/pull/2453) - [@KronicDeth](https://github.com/KronicDeth)
   * Regression test for #2446
+# [#2642](https://github.com/KronicDeth/intellij-elixir/pull/2642) - [@KronicDeth](https://github.com/KronicDeth)
+  * Ignore `()` as a type parameter as it occurs during typing.
 
 ### Bug Fixes
 
