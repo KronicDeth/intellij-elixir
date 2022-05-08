@@ -385,6 +385,8 @@
   * Ignore `()` as a type parameter as it occurs during typing.
 * [#2643](https://github.com/KronicDeth/intellij-elixir/pull/2643) - [@KronicDeth](https://github.com/KronicDeth)
   * Default the variable color if the specific type foreground is `null`.
+* [#2644](https://github.com/KronicDeth/intellij-elixir/pull/2644) - [@KronicDeth](https://github.com/KronicDeth)
+  * Log unknown element for fetching docs from BEAM file.
 
 ### Bug Fixes
 
