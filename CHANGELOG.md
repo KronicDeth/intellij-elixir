@@ -381,12 +381,15 @@
     the `.beam` file for Issue #2386, I might as well add it as a regression test too.
 * [#2453](https://github.com/KronicDeth/intellij-elixir/pull/2453) - [@KronicDeth](https://github.com/KronicDeth)
   * Regression test for #2446
-# [#2642](https://github.com/KronicDeth/intellij-elixir/pull/2642) - [@KronicDeth](https://github.com/KronicDeth)
+* [#2642](https://github.com/KronicDeth/intellij-elixir/pull/2642) - [@KronicDeth](https://github.com/KronicDeth)
   * Ignore `()` as a type parameter as it occurs during typing.
 * [#2643](https://github.com/KronicDeth/intellij-elixir/pull/2643) - [@KronicDeth](https://github.com/KronicDeth)
   * Default the variable color if the specific type foreground is `null`.
 * [#2644](https://github.com/KronicDeth/intellij-elixir/pull/2644) - [@KronicDeth](https://github.com/KronicDeth)
   * Log unknown element for fetching docs from BEAM file.
+* [#2645](https://github.com/KronicDeth/intellij-elixir/pull/2645) - [@KronicDeth](https://github.com/KronicDeth)
+  * Look above `CallDefinitionImpl` for `Type` scope processing
+    It should go up to the `ModuleImpl` to find the `TypeDefinitionImpl`.
 
 ### Bug Fixes
 
