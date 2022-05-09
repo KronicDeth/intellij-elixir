@@ -7,6 +7,7 @@ import com.intellij.psi.scope.PsiScopeProcessor
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
 import com.intellij.psi.util.isAncestor
+import org.elixir_lang.beam.psi.impl.CallDefinitionImpl
 import org.elixir_lang.beam.psi.impl.ModuleImpl
 import org.elixir_lang.beam.psi.impl.TypeDefinitionImpl
 import org.elixir_lang.errorreport.Logger
@@ -42,9 +43,11 @@ abstract class Type : PsiScopeProcessor {
             is ElixirKeywordKey -> executeOnParameter(element, state)
             is ElixirNoParenthesesOneArgument, is ElixirAccessExpression -> executeOnChildren(element, state)
             is ElixirAtom, is ElixirFile, is ElixirList, is ElixirParentheticalStab, is ElixirTuple,
-            is WholeNumber -> false
+            is WholeNumber,
+            -> false
             is ModuleImpl<*> -> execute(element, state)
             is TypeDefinitionImpl<*> -> execute(element, state)
+            is CallDefinitionImpl<*> -> true
             else -> {
                 error("Don't know how process element as type", element)
 
@@ -100,7 +103,7 @@ abstract class Type : PsiScopeProcessor {
 
     private fun execute(
         atUnqualifiedNoParenthesesCall: AtUnqualifiedNoParenthesesCall<*>,
-        state: ResolveState
+        state: ResolveState,
     ): Boolean {
         val identifierName = atUnqualifiedNoParenthesesCall.atIdentifier.identifierName()
 
@@ -245,7 +248,8 @@ internal fun PsiElement.ancestorTypeSpec(): AtUnqualifiedNoParenthesesCall<*>? =
         is ElixirMapOperation, is ElixirMapArguments, is ElixirMapConstructionArguments,
         is ElixirAssociations, is ElixirAssociationsBase, is ElixirContainerAssociationOperation,
             // types
-        is Type, is Call -> parent.ancestorTypeSpec()
+        is Type, is Call,
+        -> parent.ancestorTypeSpec()
         // `fn` anonymous function type just uses parentheses and `->`, like `(type1, type2 -> type3)`
         is ElixirAnonymousFunction,
             // BitStrings use `::` like types, but cannot contain type parameters or declarations
@@ -266,7 +270,8 @@ internal fun PsiElement.ancestorTypeSpec(): AtUnqualifiedNoParenthesesCall<*>? =
             // types can't be defined at the file level and must be inside modules.
         is ElixirFile,
             // __MODULE__.* does not matter that it is in a type
-        is QualifiableAlias -> null
+        is QualifiableAlias,
+        -> null
         else -> {
             Logger.error(PsiElement::class.java, "Don't know how to find ancestorTypeSpec", this)
 
