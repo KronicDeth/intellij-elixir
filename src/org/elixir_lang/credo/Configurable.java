@@ -1,5 +1,6 @@
 package org.elixir_lang.credo;
 
+import com.intellij.execution.configuration.EnvironmentVariablesComponent;
 import com.intellij.openapi.options.SearchableConfigurable;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
@@ -10,7 +11,9 @@ import javax.swing.*;
 public class Configurable implements SearchableConfigurable {
     private static final String ID = "Credo";
     private JPanel panel;
-    private JCheckBox includeExplanationCheckBox;
+    private JTextField elixirArguments;
+    private JTextField erlArguments;
+    private EnvironmentVariablesComponent environmentVariablesComponent;
     private Service service;
 
     public Configurable(@NotNull Project project) {
@@ -23,12 +26,6 @@ public class Configurable implements SearchableConfigurable {
         return ID;
     }
 
-    // MUST be defined in 2016.3.7
-    @Nullable
-    public String getHelpTopic() {
-        return null;
-    }
-
     @Nullable
     @Override
     public JComponent createComponent() {
@@ -37,17 +34,23 @@ public class Configurable implements SearchableConfigurable {
 
     @Override
     public boolean isModified() {
-        return service.includeExplanation() != includeExplanationCheckBox.getModel().isSelected();
+        return !service.getElixirArguments().equals(elixirArguments.getText()) ||
+                !service.getErlArguments().equals(erlArguments.getText()) ||
+                !service.getEnvironmentVariableData().equals(environmentVariablesComponent.getEnvData());
     }
 
     @Override
     public void apply() {
-        service.includeExplanation(includeExplanationCheckBox.getModel().isSelected());
+        service.setElixirArguments(elixirArguments.getText());
+        service.setErlArguments(erlArguments.getText());
+        service.setEnvironmentVariableData(environmentVariablesComponent.getEnvData());
     }
 
     @Override
     public void reset() {
-        includeExplanationCheckBox.getModel().setSelected(service.includeExplanation());
+        elixirArguments.setText(service.getElixirArguments());
+        erlArguments.setText(service.getErlArguments());
+        environmentVariablesComponent.setEnvData(service.getEnvironmentVariableData());
     }
 
     @NotNull
