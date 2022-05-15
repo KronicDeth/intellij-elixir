@@ -20,6 +20,15 @@
       <li>Look above <code class="notranslate">CallDefinitionImpl</code> for <code class="notranslate">Type</code> scope processing<br>
         It should go up to the <code class="notranslate">ModuleImpl</code> to find the <code class="notranslate">TypeDefinitionImpl</code>.</li>
     </ul>
+    <ul dir="auto">
+      <li>Have Credo Global Inspection use standard <code class="notranslate">Mix.commandLine</code> used for Run Configurations.
+        <ul dir="auto">
+          <li>Allow environment variables to be set similar to Run Configurations for projects that require environment variables to be set for Mix tasks due to checks in their config.</li>
+          <li>No longer support Include Explanations as it takes too long to run.</li>
+          <li>Remove annotator until it can be re-implemented in performant manner using corrected environment and SDK from Global Inspection.</li>
+        </ul>
+      </li>
+    </ul>
   </li>
 </ul>
 <h1>v13.0.0</h1>

@@ -1523,37 +1523,11 @@ Using the menus
 
 ### Credo
 
-#### Annotator
-
-When enabled, if [`credo`](https://github.com/rrrene/credo) is not installed as a project dependency, nothing will happen, but if it is installed, `mix credo PATH` will be called on any files after updates have quieted.  Any `credo` check failures will show up as warning annotations
-
-![Warning Annotations](/screenshots/features/credo/external_annotator/Warning%20Annotations.png?raw=true "Warning Annotations")
-
-Individual check failures will show the explanation (from `mix credo PATH:LINE(:COLUMN)`) if you hover over the annotation
-
-![Explanation](/screenshots/features/credo/external_annotator/Explanation.png?raw=true "Credo Check Failure Explanation")
-
-You can hover over the explanation and click the embedded links to jump to the line (and column) where the failure occurred.
-
-##### Enable
-
-The [`credo`](https://github.com/rrrene/credo) annotator is disabled by default as numerous users find running `mix credo` in the background has a negative impact on their system performance.  If you like to try enabling the annotation, you can turn it on using the [configuration](#configuration).
-
-1. Preferences > Editor > Inspections > Elixir
-2. Check "Credo"
-
-##### Disable
-
-If you notice a degradation the in the responsiveness of the editor, it is recommended you disable the annotator again.
-
-1. Preferences > Editor > Inspections > Elixir
-2. Uncheck "Credo"
-
 #### Inspection
 
 ##### Batch Mode
 
-If you'd like to run the `mix credo` external annotator when it is disabled, you can run it using the inspection name.
+If you'd like to run `mix credo` use can run it as a global Inspection.
 
 1. Analyze > Run Inspection By Name... (⌥⇧⌘I)
 2. Type "Credo"

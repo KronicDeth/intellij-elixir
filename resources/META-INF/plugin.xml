@@ -1,280 +1,310 @@
 <idea-plugin version="2">
-  <id>org.elixir_lang</id>
-  <name>Elixir</name>
-  <vendor email="Kronic.Deth@gmail.com">Elle Imhoff</vendor>
+    <id>org.elixir_lang</id>
+    <name>Elixir</name>
+    <vendor email="Kronic.Deth@gmail.com">Elle Imhoff</vendor>
 
-  <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
-  <idea-version since-build="201.6668.113"/>
+    <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
+    <idea-version since-build="201.6668.113"/>
 
-  <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
-       on how to target different products -->
-  <depends>com.intellij.modules.lang</depends>
-  <!-- Needed for JPS builder -->
-  <depends optional="true">com.intellij.modules.java</depends>
-  <depends>org.intellij.plugins.markdown</depends>
-  <depends config-file="rich-platform-plugin.xml" optional="true">com.intellij.modules.java</depends>
+    <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
+         on how to target different products -->
+    <depends>com.intellij.modules.lang</depends>
+    <!-- Needed for JPS builder -->
+    <depends optional="true">com.intellij.modules.java</depends>
+    <depends>org.intellij.plugins.markdown</depends>
+    <depends config-file="rich-platform-plugin.xml" optional="true">com.intellij.modules.java</depends>
 
-  <extensionPoints>
-    <extensionPoint qualifiedName="org.elixir_lang.packageManager" interface="org.elixir_lang.PackageManager" dynamic="true"/>
-  </extensionPoints>
+    <extensionPoints>
+        <extensionPoint qualifiedName="org.elixir_lang.packageManager" interface="org.elixir_lang.PackageManager"
+                        dynamic="true"/>
+    </extensionPoints>
 
-  <extensions defaultExtensionNs="org.elixir_lang">
-    <packageManager implementation="org.elixir_lang.mix.PackageManager"/>
-  </extensions>
+    <extensions defaultExtensionNs="org.elixir_lang">
+        <packageManager implementation="org.elixir_lang.mix.PackageManager"/>
+    </extensions>
 
-  <extensions defaultExtensionNs="com.intellij">
-    <errorHandler implementation="org.elixir_lang.errorreport.Submitter"/>
+    <extensions defaultExtensionNs="com.intellij">
+        <errorHandler implementation="org.elixir_lang.errorreport.Submitter"/>
 
-    <!-- `openProjectProcessor` for Small IDEs -->
-    <directoryProjectConfigurator implementation="org.elixir_lang.mix.project.DirectoryConfigurator"/>
+        <!-- `openProjectProcessor` for Small IDEs -->
+        <directoryProjectConfigurator implementation="org.elixir_lang.mix.project.DirectoryConfigurator"/>
 
-    <!-- Elixir Module Structure -->
-    <sdkType implementation="org.elixir_lang.sdk.elixir.Type"/>
-    <sdkType implementation="org.elixir_lang.sdk.erlang.Type"/>
+        <!-- Elixir Module Structure -->
+        <sdkType implementation="org.elixir_lang.sdk.elixir.Type"/>
+        <sdkType implementation="org.elixir_lang.sdk.erlang.Type"/>
 
-    <moduleConfigurationEditorProvider implementation="org.elixir_lang.module.DefaultModuleEditorsProvider" order="first"/>
+        <moduleConfigurationEditorProvider implementation="org.elixir_lang.module.DefaultModuleEditorsProvider"
+                                           order="first"/>
 
-    <editorNotificationProvider implementation="org.elixir_lang.notification.setup_sdk.Provider"/>
-    <notificationGroup displayType="BALLOON" id="Elixir"/>
+        <editorNotificationProvider implementation="org.elixir_lang.notification.setup_sdk.Provider"/>
+        <notificationGroup displayType="BALLOON" id="Elixir"/>
 
-    <!-- Distillery -->
-    <configurationType implementation="org.elixir_lang.distillery.configuration.Type"/>
+        <!-- Distillery -->
+        <configurationType implementation="org.elixir_lang.distillery.configuration.Type"/>
 
-    <!-- Elixir -->
-    <configurationType implementation="org.elixir_lang.elixir.configuration.Type"/>
-    <programRunner implementation="org.elixir_lang.elixir.Runner"/>
+        <!-- Elixir -->
+        <configurationType implementation="org.elixir_lang.elixir.configuration.Type"/>
+        <programRunner implementation="org.elixir_lang.elixir.Runner"/>
 
-    <!-- IEx -->
-    <configurationType implementation="org.elixir_lang.iex.configuration.Type"/>
+        <!-- IEx -->
+        <configurationType implementation="org.elixir_lang.iex.configuration.Type"/>
 
-    <!-- iex -S mix -->
-    <configurationType implementation="org.elixir_lang.iex.mix.configuration.Type"/>
+        <!-- iex -S mix -->
+        <configurationType implementation="org.elixir_lang.iex.mix.configuration.Type"/>
 
-    <!-- EEX -->
-    <!--<braceMatcher filetype="EEx" implementationClass="org.elixir_lang.eex.BraceMatcher"/>-->
-    <fileType.fileViewProviderFactory filetype="EEx" implementationClass="org.elixir_lang.eex.file.view_provider.Factory"/>
-    <fileType name="Embedded Elixir" implementationClass="org.elixir_lang.eex.file.Type" fieldName="INSTANCE" language="EEx" extensions="eex"/>
-    <fileType name="Live Embedded Elixir" implementationClass="org.elixir_lang.leex.file.Type" fieldName="INSTANCE" language="EEx" extensions="leex"/>
-    <lang.fileViewProviderFactory language="EEx" implementationClass="org.elixir_lang.eex.file.view_provider.Factory"/>
-    <lang.parserDefinition language="EEx" implementationClass="org.elixir_lang.eex.ParserDefinition"/>
-    <!--<lang.psiStructureViewFactory language="EEx" implementationClass="org.elixir_lang.eex.PsiStructureViewFactory"/>-->
+        <!-- EEX -->
+        <!--<braceMatcher filetype="EEx" implementationClass="org.elixir_lang.eex.BraceMatcher"/>-->
+        <fileType.fileViewProviderFactory filetype="EEx"
+                                          implementationClass="org.elixir_lang.eex.file.view_provider.Factory"/>
+        <fileType name="Embedded Elixir" implementationClass="org.elixir_lang.eex.file.Type" fieldName="INSTANCE"
+                  language="EEx" extensions="eex"/>
+        <fileType name="Live Embedded Elixir" implementationClass="org.elixir_lang.leex.file.Type" fieldName="INSTANCE"
+                  language="EEx" extensions="leex"/>
+        <lang.fileViewProviderFactory language="EEx"
+                                      implementationClass="org.elixir_lang.eex.file.view_provider.Factory"/>
+        <lang.parserDefinition language="EEx" implementationClass="org.elixir_lang.eex.ParserDefinition"/>
+        <!--<lang.psiStructureViewFactory language="EEx" implementationClass="org.elixir_lang.eex.PsiStructureViewFactory"/>-->
 
-    <!-- Mix related extensions -->
-    <configurationType implementation="org.elixir_lang.mix.configuration.Type" />
+        <!-- Mix related extensions -->
+        <configurationType implementation="org.elixir_lang.mix.configuration.Type"/>
 
-    <library.type implementation="org.elixir_lang.mix.library.Type"/>
+        <library.type implementation="org.elixir_lang.mix.library.Type"/>
 
-    <!-- Testing -->
-    <configurationType implementation="org.elixir_lang.espec.configuration.Type" />
-    <runConfigurationProducer implementation="org.elixir_lang.espec.configuration.MixESpecRunConfigurationProducer" />
+        <!-- Testing -->
+        <configurationType implementation="org.elixir_lang.espec.configuration.Type"/>
+        <runConfigurationProducer
+                implementation="org.elixir_lang.espec.configuration.MixESpecRunConfigurationProducer"/>
 
-    <configurationType implementation="org.elixir_lang.exunit.configuration.Type" />
-    <runConfigurationProducer implementation="org.elixir_lang.exunit.configuration.MixExUnitRunConfigurationProducer" />
+        <configurationType implementation="org.elixir_lang.exunit.configuration.Type"/>
+        <runConfigurationProducer
+                implementation="org.elixir_lang.exunit.configuration.MixExUnitRunConfigurationProducer"/>
 
-    <testFinder implementation="org.elixir_lang.mix.TestFinder"/>
+        <testFinder implementation="org.elixir_lang.mix.TestFinder"/>
 
-    <colorSettingsPage implementation="org.elixir_lang.ElixirColorSettingsPage"/>
-    <fileType name="Elixir" implementationClass="org.elixir_lang.ElixirFileType" fieldName="INSTANCE" language="Elixir" extensions="ex"/>
-    <fileType name="Elixir Script" implementationClass="org.elixir_lang.ElixirScriptFileType" fieldName="INSTANCE" language="Elixir" extensions="exs"/>
+        <colorSettingsPage implementation="org.elixir_lang.ElixirColorSettingsPage"/>
+        <fileType name="Elixir" implementationClass="org.elixir_lang.ElixirFileType" fieldName="INSTANCE"
+                  language="Elixir" extensions="ex"/>
+        <fileType name="Elixir Script" implementationClass="org.elixir_lang.ElixirScriptFileType" fieldName="INSTANCE"
+                  language="Elixir" extensions="exs"/>
 
-    <!-- Facet -->
-    <applicationConfigurable id="language.elixir.sdks.elixir"
-                             parentId="language.elixir"
-                             provider="org.elixir_lang.facet.sdks.elixir.Provider"/>
-    <applicationConfigurable id="language.elixir.sdks.erlang"
-                             parentId="language.elixir"
-                             provider="org.elixir_lang.facet.sdks.erlang.Provider"/>
-    <applicationService serviceImplementation="org.elixir_lang.facet.SdksService"
-                        serviceInterface="org.elixir_lang.facet.SdksService"/>
-    <projectConfigurable id="language.elixir"
-                         parentId="language"
-                         provider="org.elixir_lang.facet.configurable.Provider"/>
+        <!-- Facet -->
+        <applicationConfigurable id="language.elixir.sdks.elixir"
+                                 parentId="language.elixir"
+                                 provider="org.elixir_lang.facet.sdks.elixir.Provider"/>
+        <applicationConfigurable id="language.elixir.sdks.erlang"
+                                 parentId="language.elixir"
+                                 provider="org.elixir_lang.facet.sdks.erlang.Provider"/>
+        <applicationService serviceImplementation="org.elixir_lang.facet.SdksService"
+                            serviceInterface="org.elixir_lang.facet.SdksService"/>
+        <projectConfigurable id="language.elixir"
+                             parentId="language"
+                             provider="org.elixir_lang.facet.configurable.Provider"/>
 
-    <facetType implementation="org.elixir_lang.facet.Type"/>
-    <framework.detector implementation="org.elixir_lang.FrameworkDetector"/>
+        <facetType implementation="org.elixir_lang.facet.Type"/>
+        <framework.detector implementation="org.elixir_lang.FrameworkDetector"/>
 
-    <!-- for template -->
-    <internalFileTemplate name="Elixir Module"/>
-    <internalFileTemplate name="Elixir Application"/>
-    <internalFileTemplate name="Elixir Supervisor"/>
-    <internalFileTemplate name="Elixir GenServer"/>
-    <internalFileTemplate name="Elixir GenEvent"/>
+        <!-- for template -->
+        <internalFileTemplate name="Elixir Module"/>
+        <internalFileTemplate name="Elixir Application"/>
+        <internalFileTemplate name="Elixir Supervisor"/>
+        <internalFileTemplate name="Elixir GenServer"/>
+        <internalFileTemplate name="Elixir GenEvent"/>
 
-    <!-- for liveTemplates -->
-    <defaultLiveTemplates file="liveTemplates/Elixir"/>
-    <liveTemplateContext implementation="org.elixir_lang.templates.ElixirContextType"/>
-    <!-- end liveTemplates -->
+        <!-- for liveTemplates -->
+        <defaultLiveTemplates file="liveTemplates/Elixir"/>
+        <liveTemplateContext implementation="org.elixir_lang.templates.ElixirContextType"/>
+        <!-- end liveTemplates -->
 
-    <additionalTextAttributes file="colorSchemes/ElixirDarcula.xml" scheme="Darcula"/>
-    <additionalTextAttributes file="colorSchemes/ElixirDefault.xml" scheme="Default"/>
+        <additionalTextAttributes file="colorSchemes/ElixirDarcula.xml" scheme="Darcula"/>
+        <additionalTextAttributes file="colorSchemes/ElixirDefault.xml" scheme="Default"/>
 
-    <annotator implementationClass="org.elixir_lang.annotator.Alias" language="Elixir"/>
-    <annotator implementationClass="org.elixir_lang.annotator.Atom" language="Elixir"/>
-    <annotator implementationClass="org.elixir_lang.annotator.Callable" language="Elixir"/>
-    <annotator implementationClass="org.elixir_lang.annotator.EscapeSequence" language="Elixir"/>
-    <annotator implementationClass="org.elixir_lang.annotator.Map" language="Elixir"/>
-    <annotator implementationClass="org.elixir_lang.annotator.ModuleAttribute" language="Elixir"/>
-    <annotator implementationClass="org.elixir_lang.annotator.Textual" language="Elixir"/>
+        <annotator implementationClass="org.elixir_lang.annotator.Alias" language="Elixir"/>
+        <annotator implementationClass="org.elixir_lang.annotator.Atom" language="Elixir"/>
+        <annotator implementationClass="org.elixir_lang.annotator.Callable" language="Elixir"/>
+        <annotator implementationClass="org.elixir_lang.annotator.EscapeSequence" language="Elixir"/>
+        <annotator implementationClass="org.elixir_lang.annotator.Map" language="Elixir"/>
+        <annotator implementationClass="org.elixir_lang.annotator.ModuleAttribute" language="Elixir"/>
+        <annotator implementationClass="org.elixir_lang.annotator.Textual" language="Elixir"/>
 
-    <!-- credo -->
-    <externalAnnotator implementationClass="org.elixir_lang.credo.Annotator" language="Elixir"/>
-    <globalInspection cleanupTool="true" displayName="Credo" enabledByDefault="false" groupName="Elixir"
-                      implementationClass="org.elixir_lang.credo.inspection_tool.Global" language="Elixir" level="WARNING"
-                      shortName="Credo"/>
-    // groupId/parentId "Errors" is Editor > Inspections
-    <projectConfigurable instance="org.elixir_lang.credo.Configurable" groupId="Errors" parentId="Errors"/>
-    <projectService serviceImplementation="org.elixir_lang.credo.Service"/>
+        <!-- credo -->
+        <globalInspection cleanupTool="false" displayName="Credo" enabledByDefault="false" groupName="Elixir"
+                          implementationClass="org.elixir_lang.credo.inspection_tool.Global" language="Elixir"
+                          level="WARNING"
+                          shortName="Credo"/>
+        // groupId/parentId "Errors" is Editor > Inspections
+        <projectConfigurable instance="org.elixir_lang.credo.Configurable" groupId="Errors" parentId="Errors"/>
+        <projectService serviceImplementation="org.elixir_lang.credo.Service"/>
 
-    <!-- <code>.beam</code> -->
-    <gotoRelatedProvider implementation="org.elixir_lang.goto_decompiled.Provider"/>
-    <fileEditorProvider implementation="org.elixir_lang.beam.file_editor.Provider"/>
-    <filetype.decompiler filetype="BEAM" implementationClass="org.elixir_lang.beam.Decompiler"/>
-    <fileType.fileViewProviderFactory filetype="BEAM" implementationClass="org.elixir_lang.beam.FileViewProviderFactory"/>
-    <filetype.stubBuilder filetype="BEAM" implementationClass="org.elixir_lang.beam.StubBuilder"/>
-    <fileType name="BEAM" implementationClass="org.elixir_lang.beam.FileType" fieldName="INSTANCE" language="BEAM" extensions="beam"/>
-    <structureViewBuilder key="BEAM" factoryClass="org.elixir_lang.beam.StructureViewBuilderProvider"/>
-    <stubElementTypeHolder class="org.elixir_lang.beam.psi.stubs.ModuleStubElementTypes"/>
-    <syntaxHighlighter key="BEAM" factoryClass="org.elixir_lang.ElixirSyntaxHighlighterFactory"/>
+        <!-- <code>.beam</code> -->
+        <gotoRelatedProvider implementation="org.elixir_lang.goto_decompiled.Provider"/>
+        <fileEditorProvider implementation="org.elixir_lang.beam.file_editor.Provider"/>
+        <filetype.decompiler filetype="BEAM" implementationClass="org.elixir_lang.beam.Decompiler"/>
+        <fileType.fileViewProviderFactory filetype="BEAM"
+                                          implementationClass="org.elixir_lang.beam.FileViewProviderFactory"/>
+        <filetype.stubBuilder filetype="BEAM" implementationClass="org.elixir_lang.beam.StubBuilder"/>
+        <fileType name="BEAM" implementationClass="org.elixir_lang.beam.FileType" fieldName="INSTANCE" language="BEAM"
+                  extensions="beam"/>
+        <structureViewBuilder key="BEAM" factoryClass="org.elixir_lang.beam.StructureViewBuilderProvider"/>
+        <stubElementTypeHolder class="org.elixir_lang.beam.psi.stubs.ModuleStubElementTypes"/>
+        <syntaxHighlighter key="BEAM" factoryClass="org.elixir_lang.ElixirSyntaxHighlighterFactory"/>
 
-    <!-- `.beam.asm` -->
-    <fileType name="BEAM Assembly" implementationClass="org.elixir_lang.beam.assembly.file.Type" fieldName="INSTANCE" language="BEAM.ASSEMBLY" extensions="beam.asm"/>
-    <lang.parserDefinition implementationClass="org.elixir_lang.beam.assembly.ParserDefinition" language="BEAM.ASSEMBLY"/>
-    <lang.syntaxHighlighterFactory implementationClass="org.elixir_lang.beam.assembly.syntax_highlighter.Factory" language="BEAM.ASSEMBLY"/>
+        <!-- `.beam.asm` -->
+        <fileType name="BEAM Assembly" implementationClass="org.elixir_lang.beam.assembly.file.Type"
+                  fieldName="INSTANCE" language="BEAM.ASSEMBLY" extensions="beam.asm"/>
+        <lang.parserDefinition implementationClass="org.elixir_lang.beam.assembly.ParserDefinition"
+                               language="BEAM.ASSEMBLY"/>
+        <lang.syntaxHighlighterFactory implementationClass="org.elixir_lang.beam.assembly.syntax_highlighter.Factory"
+                                       language="BEAM.ASSEMBLY"/>
 
-    <completion.contributor implementationClass="org.elixir_lang.code_insight.completion.contributor.CallDefinitionClause" language="Elixir"/>
+        <completion.contributor
+                implementationClass="org.elixir_lang.code_insight.completion.contributor.CallDefinitionClause"
+                language="Elixir"/>
 
-    <codeInsight.lineMarkerProvider implementationClass="org.elixir_lang.code_insight.line_marker_provider.CallDefinition" language="Elixir"/>
-    <codeInsight.parameterInfo implementationClass="org.elixir_lang.code_insight.ParameterInfo" language="Elixir" />
-    <elementDescriptionProvider implementation="org.elixir_lang.psi.ElementDescriptionProvider"/>
-    <gotoSymbolContributor implementation="org.elixir_lang.navigation.GotoSymbolContributor"/>
-    <lang.braceMatcher language="Elixir" implementationClass="org.elixir_lang.code_insight.highlighting.brace_matcher.NonTrivial"/>
-    <lang.commenter language="Elixir" implementationClass="org.elixir_lang.ElixirCommenter"/>
+        <codeInsight.lineMarkerProvider
+                implementationClass="org.elixir_lang.code_insight.line_marker_provider.CallDefinition"
+                language="Elixir"/>
+        <codeInsight.parameterInfo implementationClass="org.elixir_lang.code_insight.ParameterInfo" language="Elixir"/>
+        <elementDescriptionProvider implementation="org.elixir_lang.psi.ElementDescriptionProvider"/>
+        <gotoSymbolContributor implementation="org.elixir_lang.navigation.GotoSymbolContributor"/>
+        <lang.braceMatcher language="Elixir"
+                           implementationClass="org.elixir_lang.code_insight.highlighting.brace_matcher.NonTrivial"/>
+        <lang.commenter language="Elixir" implementationClass="org.elixir_lang.ElixirCommenter"/>
 
-    <!-- Find Usages -->
-    <findUsagesHandlerFactory implementation="org.elixir_lang.find_usages.handler.Factory" />
-    <lang.findUsagesProvider language="Elixir" implementationClass="org.elixir_lang.find_usages.Provider"/>
-    <readWriteAccessDetector implementation="org.elixir_lang.ReadWriteAccessDetector"/>
-    <referencesSearch implementation="org.elixir_lang.ReferencesSearch"/>
-    <targetElementEvaluator implementationClass="org.elixir_lang.TargetElementEvaluator" language="Elixir" />
-    <usageTargetProvider implementation="org.elixir_lang.UsageTargetProvider"/>
-    <usageTypeProvider implementation="org.elixir_lang.UsageTypeProvider"/>
+        <!-- Find Usages -->
+        <findUsagesHandlerFactory implementation="org.elixir_lang.find_usages.handler.Factory"/>
+        <lang.findUsagesProvider language="Elixir" implementationClass="org.elixir_lang.find_usages.Provider"/>
+        <readWriteAccessDetector implementation="org.elixir_lang.ReadWriteAccessDetector"/>
+        <referencesSearch implementation="org.elixir_lang.ReferencesSearch"/>
+        <targetElementEvaluator implementationClass="org.elixir_lang.TargetElementEvaluator" language="Elixir"/>
+        <usageTargetProvider implementation="org.elixir_lang.UsageTargetProvider"/>
+        <usageTypeProvider implementation="org.elixir_lang.UsageTypeProvider"/>
 
-    <!-- Go To Implementations -->
+        <!-- Go To Implementations -->
 
-    <stubIndex implementation="org.elixir_lang.psi.stub.index.ImplementedProtocolName"/>
-    <definitionsScopedSearch implementation="org.elixir_lang.DefinitionsScopedSearch"/>
-    <codeInsight.lineMarkerProvider language="Elixir" implementationClass="org.elixir_lang.code_insight.line_marker_provider.Protocol"/>
+        <stubIndex implementation="org.elixir_lang.psi.stub.index.ImplementedProtocolName"/>
+        <definitionsScopedSearch implementation="org.elixir_lang.DefinitionsScopedSearch"/>
+        <codeInsight.lineMarkerProvider language="Elixir"
+                                        implementationClass="org.elixir_lang.code_insight.line_marker_provider.Protocol"/>
 
-    <!-- Go To Super Methods -->
-    <codeInsight.gotoSuper language="Elixir" implementationClass="org.elixir_lang.code_insight.GotoSuper"/>
-    <codeInsight.lineMarkerProvider language="Elixir" implementationClass="org.elixir_lang.code_insight.line_marker_provider.Implementation"/>
+        <!-- Go To Super Methods -->
+        <codeInsight.gotoSuper language="Elixir" implementationClass="org.elixir_lang.code_insight.GotoSuper"/>
+        <codeInsight.lineMarkerProvider language="Elixir"
+                                        implementationClass="org.elixir_lang.code_insight.line_marker_provider.Implementation"/>
 
-    <!-- folding -->
-    <applicationService serviceInterface="org.elixir_lang.folding.ElixirFoldingSettings"
-                        serviceImplementation="org.elixir_lang.folding.ElixirFoldingSettings"/>
-    <codeFoldingOptionsProvider instance="org.elixir_lang.folding.OptionsProvider"/>
-    <lang.foldingBuilder language="Elixir" implementationClass="org.elixir_lang.folding.Builder"/>
+        <!-- folding -->
+        <applicationService serviceInterface="org.elixir_lang.folding.ElixirFoldingSettings"
+                            serviceImplementation="org.elixir_lang.folding.ElixirFoldingSettings"/>
+        <codeFoldingOptionsProvider instance="org.elixir_lang.folding.OptionsProvider"/>
+        <lang.foldingBuilder language="Elixir" implementationClass="org.elixir_lang.folding.Builder"/>
 
-    <!-- formatting -->
-    <codeStyleSettingsProvider implementation="org.elixir_lang.formatter.settings.CodeStyleSettingsProvider"/>
-    <lang.formatter language="Elixir" implementationClass="org.elixir_lang.formatting.ModelBuilder"/>
-    <lang.formatter language="EEx" implementationClass="com.intellij.psi.templateLanguages.SimpleTemplateLanguageFormattingModelBuilder"/>
-    <langCodeStyleSettingsProvider implementation="org.elixir_lang.formatter.settings.LanguageCodeStyleSettingsProvider"/>
+        <!-- formatting -->
+        <codeStyleSettingsProvider implementation="org.elixir_lang.formatter.settings.CodeStyleSettingsProvider"/>
+        <lang.formatter language="Elixir" implementationClass="org.elixir_lang.formatting.ModelBuilder"/>
+        <lang.formatter language="EEx"
+                        implementationClass="com.intellij.psi.templateLanguages.SimpleTemplateLanguageFormattingModelBuilder"/>
+        <langCodeStyleSettingsProvider
+                implementation="org.elixir_lang.formatter.settings.LanguageCodeStyleSettingsProvider"/>
 
-    <!-- test -->
-    <runLineMarkerContributor language="Elixir" implementationClass="org.elixir_lang.exunit.ExUnitLineMarkerProvider"/>
+        <!-- test -->
+        <runLineMarkerContributor language="Elixir"
+                                  implementationClass="org.elixir_lang.exunit.ExUnitLineMarkerProvider"/>
 
-    <lang.parserDefinition language="Elixir" implementationClass="org.elixir_lang.ElixirParserDefinition"/>
-    <lang.psiStructureViewFactory language="Elixir" implementationClass="org.elixir_lang.structure_view.Factory"/>
-    <lang.quoteHandler language="Elixir" implementationClass="org.elixir_lang.QuoteHandler"/>
-    <lang.syntaxHighlighterFactory key="Elixir" implementationClass="org.elixir_lang.ElixirSyntaxHighlighterFactory"/>
-    <localInspection displayName="Ambiguous nested calls" enabledByDefault="true" groupName="Elixir"
-                     implementationClass="org.elixir_lang.inspection.NoParenthesesManyStrict" language="Elixir"
-                     level="ERROR" shortName="NoParenthesesManyStrict"/>
-    <localInspection displayName="Ambiguous parentheses" enabledByDefault="true" groupName="Elixir"
-                     implementationClass="org.elixir_lang.inspection.NoParenthesesStrict" language="Elixir"
-                     level="ERROR" shortName="NoParenthesesStrict"/>
-    <localInspection displayName="Keywords Not At End" enabledByDefault="true"
-                     groupName="Elixir" implementationClass="org.elixir_lang.inspection.KeywordsNotAtEnd"
-                     language="Elixir" level="ERROR" shortName="KeywordsNotAtEnd"/>
-    <localInspection displayName="Keyword pair colon (:) used in type spec instead of type operator (::)"
-                     enabledByDefault="true" groupName="Elixir"
-                     implementationClass="org.elixir_lang.inspection.KeywordPairColonInsteadOfTypeOperator"
-                     language="Elixir" level="ERROR" shortName="KeywordPairColonInsteadOfTypeOperator"/>
-    <localInspection displayName="Match operator (=) used in type spec instead of type operator (::)"
-                     enabledByDefault="true" groupName="Elixir"
-                     implementationClass="org.elixir_lang.inspection.MatchOperatorInsteadOfTypeOperator"
-                     language="Elixir" level="ERROR" shortName="MatchOperatorInsteadOfTypeOperator"/>
-    <localInspection displayName="Elixir references" shortName="ElixirReferences" enabledByDefault="false"
-                     groupName="Elixir" implementationClass="org.elixir_lang.inspection.References"
-                     language="Elixir" level="ERROR" />
-    <spellchecker.support implementationClass="org.elixir_lang.spell_checking.Strategy" language="Elixir"/>
-    <spellchecker.bundledDictionaryProvider implementation="org.elixir_lang.spell_checking.BundledDictionaryProvider"/>
+        <lang.parserDefinition language="Elixir" implementationClass="org.elixir_lang.ElixirParserDefinition"/>
+        <lang.psiStructureViewFactory language="Elixir" implementationClass="org.elixir_lang.structure_view.Factory"/>
+        <lang.quoteHandler language="Elixir" implementationClass="org.elixir_lang.QuoteHandler"/>
+        <lang.syntaxHighlighterFactory key="Elixir"
+                                       implementationClass="org.elixir_lang.ElixirSyntaxHighlighterFactory"/>
+        <localInspection displayName="Ambiguous nested calls" enabledByDefault="true" groupName="Elixir"
+                         implementationClass="org.elixir_lang.inspection.NoParenthesesManyStrict" language="Elixir"
+                         level="ERROR" shortName="NoParenthesesManyStrict"/>
+        <localInspection displayName="Ambiguous parentheses" enabledByDefault="true" groupName="Elixir"
+                         implementationClass="org.elixir_lang.inspection.NoParenthesesStrict" language="Elixir"
+                         level="ERROR" shortName="NoParenthesesStrict"/>
+        <localInspection displayName="Keywords Not At End" enabledByDefault="true"
+                         groupName="Elixir" implementationClass="org.elixir_lang.inspection.KeywordsNotAtEnd"
+                         language="Elixir" level="ERROR" shortName="KeywordsNotAtEnd"/>
+        <localInspection displayName="Keyword pair colon (:) used in type spec instead of type operator (::)"
+                         enabledByDefault="true" groupName="Elixir"
+                         implementationClass="org.elixir_lang.inspection.KeywordPairColonInsteadOfTypeOperator"
+                         language="Elixir" level="ERROR" shortName="KeywordPairColonInsteadOfTypeOperator"/>
+        <localInspection displayName="Match operator (=) used in type spec instead of type operator (::)"
+                         enabledByDefault="true" groupName="Elixir"
+                         implementationClass="org.elixir_lang.inspection.MatchOperatorInsteadOfTypeOperator"
+                         language="Elixir" level="ERROR" shortName="MatchOperatorInsteadOfTypeOperator"/>
+        <localInspection displayName="Elixir references" shortName="ElixirReferences" enabledByDefault="false"
+                         groupName="Elixir" implementationClass="org.elixir_lang.inspection.References"
+                         language="Elixir" level="ERROR"/>
+        <spellchecker.support implementationClass="org.elixir_lang.spell_checking.Strategy" language="Elixir"/>
+        <spellchecker.bundledDictionaryProvider
+                implementation="org.elixir_lang.spell_checking.BundledDictionaryProvider"/>
 
-    <!-- module attribute refactoring -->
-    <renameHandler implementation="org.elixir_lang.refactoring.module_attribute.rename.Handler"/>
-    <renameInputValidator implementation="org.elixir_lang.refactoring.module_attribute.rename.InputValidator"/>
-    <renamePsiElementProcessor implementation="org.elixir_lang.refactoring.module_attribute.rename.Processor"/>
+        <!-- module attribute refactoring -->
+        <renameHandler implementation="org.elixir_lang.refactoring.module_attribute.rename.Handler"/>
+        <renameInputValidator implementation="org.elixir_lang.refactoring.module_attribute.rename.InputValidator"/>
+        <renamePsiElementProcessor implementation="org.elixir_lang.refactoring.module_attribute.rename.Processor"/>
 
-    <!-- variable refactoring -->
-    <renameHandler implementation="org.elixir_lang.refactoring.variable.rename.Handler"/>
-    <renameInputValidator implementation="org.elixir_lang.refactoring.variable.rename.InputValidator"/>
-    <renamePsiElementProcessor implementation="org.elixir_lang.refactoring.variable.rename.Processor"/>
+        <!-- variable refactoring -->
+        <renameHandler implementation="org.elixir_lang.refactoring.variable.rename.Handler"/>
+        <renameInputValidator implementation="org.elixir_lang.refactoring.variable.rename.InputValidator"/>
+        <renamePsiElementProcessor implementation="org.elixir_lang.refactoring.variable.rename.Processor"/>
 
-    <stubIndex implementation="org.elixir_lang.psi.stub.index.AllName"/>
-    <typedHandler implementation="org.elixir_lang.TypedHandler"/>
+        <stubIndex implementation="org.elixir_lang.psi.stub.index.AllName"/>
+        <typedHandler implementation="org.elixir_lang.TypedHandler"/>
 
-    <stubIndex implementation="org.elixir_lang.psi.stub.index.ModularName"/>
-    <gotoClassContributor implementation="org.elixir_lang.navigation.GotoClassContributor"/>
+        <stubIndex implementation="org.elixir_lang.psi.stub.index.ModularName"/>
+        <gotoClassContributor implementation="org.elixir_lang.navigation.GotoClassContributor"/>
 
-    <!-- `quote` blocks -->
-    <stubIndex implementation="org.elixir_lang.psi.stub.index.QuoteModuleAttributeName"/>
-    <stubIndex implementation="org.elixir_lang.psi.stub.index.QuoteVariableName"/>
+        <!-- `quote` blocks -->
+        <stubIndex implementation="org.elixir_lang.psi.stub.index.QuoteModuleAttributeName"/>
+        <stubIndex implementation="org.elixir_lang.psi.stub.index.QuoteVariableName"/>
 
-    <!-- debug -->
-    <fileBasedIndex implementation="org.elixir_lang.beam.chunk.lines.file_names.Index"/>
-    <programRunner implementation="org.elixir_lang.debugger.Runner"/>
-    <xdebugger.breakpointType implementation="org.elixir_lang.debugger.line_breakpoint.Type"/>
-    <xdebugger.settings implementation="org.elixir_lang.debugger.Settings"/>
+        <!-- debug -->
+        <fileBasedIndex implementation="org.elixir_lang.beam.chunk.lines.file_names.Index"/>
+        <programRunner implementation="org.elixir_lang.debugger.Runner"/>
+        <xdebugger.breakpointType implementation="org.elixir_lang.debugger.line_breakpoint.Type"/>
+        <xdebugger.settings implementation="org.elixir_lang.debugger.Settings"/>
 
-    <lang.documentationProvider implementationClass="org.elixir_lang.documentation.ElixirDocumentationProvider" language="Elixir"/>
+        <lang.documentationProvider implementationClass="org.elixir_lang.documentation.ElixirDocumentationProvider"
+                                    language="Elixir"/>
 
-     <!-- Dialyzer -->
-    <globalInspection displayName="Dialyzer based inspections (Elixir)" shortName="Dialyzer"
-                     enabledByDefault="true" groupName="Elixir" implementationClass="org.elixir_lang.dialyzer.inspection.Global"
-                      language="Elixir" level="ERROR"/>
-    <projectService serviceInterface="org.elixir_lang.dialyzer.service.DialyzerService"
-            serviceImplementation="org.elixir_lang.dialyzer.service.DialyzerServiceImpl"/>
-    <projectConfigurable instance="org.elixir_lang.dialyzer.service.Configurable" groupId="Errors" parentId="Errors"/>
-  </extensions>
+        <!-- Dialyzer -->
+        <globalInspection displayName="Dialyzer based inspections (Elixir)" shortName="Dialyzer"
+                          enabledByDefault="true" groupName="Elixir"
+                          implementationClass="org.elixir_lang.dialyzer.inspection.Global"
+                          language="Elixir" level="ERROR"/>
+        <projectService serviceInterface="org.elixir_lang.dialyzer.service.DialyzerService"
+                        serviceImplementation="org.elixir_lang.dialyzer.service.DialyzerServiceImpl"/>
+        <projectConfigurable instance="org.elixir_lang.dialyzer.service.Configurable" groupId="Errors"
+                             parentId="Errors"/>
+    </extensions>
 
-  <projectListeners>
-    <listener class="org.elixir_lang.DepsWatcher" topic="com.intellij.openapi.vfs.newvfs.BulkFileListener"/>
-    <listener class="org.elixir_lang.mix.Watcher" topic="com.intellij.openapi.vfs.newvfs.BulkFileListener"/>
-  </projectListeners>
+    <projectListeners>
+        <listener class="org.elixir_lang.DepsWatcher" topic="com.intellij.openapi.vfs.newvfs.BulkFileListener"/>
+        <listener class="org.elixir_lang.mix.Watcher" topic="com.intellij.openapi.vfs.newvfs.BulkFileListener"/>
+    </projectListeners>
 
-  <actions>
-    <group id="LangElixir.NewActions">
-      <separator/>
-      <action id="Elixir.NewFile" class="org.elixir_lang.create_module.Action"
-              text="Elixir File" description="Create new Elixir Module"/>
-      <separator/>
+    <actions>
+        <group id="LangElixir.NewActions">
+            <separator/>
+            <action id="Elixir.NewFile" class="org.elixir_lang.create_module.Action"
+                    text="Elixir File" description="Create new Elixir Module"/>
+            <separator/>
 
-      <!--suppress PluginXmlValidity -->
-      <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewXml" />
-    </group>
-    <group id="LangElixir.HelpActions">
-      <separator/>
-      <action id="Elixir.Help" class="org.elixir_lang.action.HelpAction" text="IntelliJ Elixir Help"/>
-      <separator/>
-      <add-to-group group-id="HelpMenu" anchor="before" relative-to-action="ProductivityGuide"/>
-    </group>
-    <group id="Internal.Elixir" popup="true" internal="true" compact="true" text="Elixir">
-      <action id="BEAM.BulkDecompilation" internal="true" class="BulkDecompilation"
-              text="BEAM Bulk Decompilation"
-              description="Decompiles all .beam files in the project, modules, and SDKs to check that all decompiled code is parsable as valid Elixir"/>
-      <add-to-group group-id="Internal" anchor="first"/>
-    </group>
-  </actions>
+            <!--suppress PluginXmlValidity -->
+            <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewXml"/>
+        </group>
+        <group id="LangElixir.HelpActions">
+            <separator/>
+            <action id="Elixir.Help" class="org.elixir_lang.action.HelpAction" text="IntelliJ Elixir Help"/>
+            <separator/>
+            <add-to-group group-id="HelpMenu" anchor="before" relative-to-action="ProductivityGuide"/>
+        </group>
+        <group id="Internal.Elixir" popup="true" internal="true" compact="true" text="Elixir">
+            <action id="BEAM.BulkDecompilation" internal="true" class="BulkDecompilation"
+                    text="BEAM Bulk Decompilation"
+                    description="Decompiles all .beam files in the project, modules, and SDKs to check that all decompiled code is parsable as valid Elixir"/>
+            <add-to-group group-id="Internal" anchor="first"/>
+        </group>
+    </actions>
 
 </idea-plugin>
