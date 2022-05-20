@@ -235,6 +235,8 @@ internal fun PsiElement.ancestorTypeSpec(): AtUnqualifiedNoParenthesesCall<*>? =
         is ElixirMatchedParenthesesArguments,
         is Pipe,
         is ElixirStructOperation,
+            // tuple after variable while typing
+        is ElixirMatchedQualifiedMultipleAliases,
         is ElixirNoParenthesesOneArgument,
         is ElixirNoParenthesesArguments,
         is ElixirNoParenthesesKeywords,
