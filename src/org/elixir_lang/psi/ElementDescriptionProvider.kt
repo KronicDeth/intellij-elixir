@@ -8,6 +8,7 @@ import com.intellij.usageView.UsageViewShortNameLocation
 import com.intellij.usageView.UsageViewTypeLocation
 import org.elixir_lang.annotator.Parameter
 import org.elixir_lang.beam.psi.impl.ModuleImpl
+import org.elixir_lang.beam.psi.impl.TypeDefinitionImpl
 import org.elixir_lang.find_usages.Provider
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function.ALIAS
@@ -37,6 +38,7 @@ class ElementDescriptionProvider : com.intellij.psi.ElementDescriptionProvider {
             is ElixirVariable -> getElementDescription(element, location)
             is MaybeModuleName -> getElementDescription(element, location)
             is ModuleImpl<*> -> getElementDescription(element, location)
+            is TypeDefinitionImpl<*> -> getElementDescription(element, location)
             else -> null
         }
 
@@ -143,6 +145,23 @@ class ElementDescriptionProvider : com.intellij.psi.ElementDescriptionProvider {
             UsageViewNodeTextLocation.INSTANCE -> "defmodule ${moduleImpl.name}"
             UsageViewLongNameLocation.INSTANCE, UsageViewShortNameLocation.INSTANCE -> moduleImpl.name
             UsageViewTypeLocation.INSTANCE -> "module"
+            else -> null
+        }
+
+    private fun getElementDescription(
+        typeDefinitionImpl: TypeDefinitionImpl<*>,
+        location: ElementDescriptionLocation
+    ): String? =
+        when (location) {
+            UsageViewNodeTextLocation.INSTANCE -> {
+                val moduleAttribute = typeDefinitionImpl.visibility.moduleAttribute
+                val name = typeDefinitionImpl.name
+                val parameters = (0 until typeDefinitionImpl.arity).joinToString(", ") { i -> "p${i}" }
+
+                "@$moduleAttribute $name(${parameters}) :: ..."
+            }
+            UsageViewLongNameLocation.INSTANCE, UsageViewShortNameLocation.INSTANCE -> typeDefinitionImpl.name
+            UsageViewTypeLocation.INSTANCE -> "type"
             else -> null
         }
 
