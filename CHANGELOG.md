@@ -285,6 +285,9 @@
     * Allow environment variables to be set similar to Run Configurations for projects that require environment variables to be set for Mix tasks due to checks in their config.
     * No longer support Include Explanations as it takes too long to run.
     * Remove annotator until it can be re-implemented in performant manner using corrected environment and SDK from Global Inspection.
+* [#2672](https://github.com/KronicDeth/intellij-elixir/pull/2672) - [@KronicDeth](https://github.com/KronicDeth)
+  * Look above `<variable>.<tuple>` for `ancestorTypeSpec`.
+    * Look above `<tuple>` after `<variable>.` for `ancestorTypeSpec`.
 
 ## v13.0.0
 
