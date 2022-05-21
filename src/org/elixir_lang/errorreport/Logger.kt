@@ -102,7 +102,9 @@ object Logger {
         val fileViewProvider = containingFile.viewProvider
         val document = fileViewProvider.document
         if (document != null) {
-            val virtualFile = containingFile.virtualFile
+            // Use `.originalFile.virtualFile` as only BEAM File will have virtual file and not decompiled.  For
+            // normal source files, `containingFile` and `containingFile.originalFile` are the same.
+            val virtualFile = containingFile.originalFile.virtualFile
             if (virtualFile != null) {
                 val path = virtualFile.path
                 val textRange = element.textRange
