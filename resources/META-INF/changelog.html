@@ -3,6 +3,24 @@
 <h1>v13.0.1</h1>
 <ul>
   <li>
+    <p>Enhancements</p>
+    <ul dir="auto">
+      <li>Improved error reporting
+        <ul dir="auto">
+          <li>Include 5 lines of context around error elements</li>
+          <li>Use <code class="notranslate">originalFile</code> when calculating path, so that <code class="notranslate">.beam</code> file path is used for decompiled files that don't have a <code class="notranslate">VirtualFile</code>.</li>
+          <li>Compact line references
+            <ul dir="auto">
+              <li>Only including ending line if it is different than starting line.</li>
+              <li>Add ending line as a range after starting line instead of a completely separate path and line.</li>
+            </ul>
+          </li>
+          <li>Put stacktrace in <code class="notranslate">&lt;details&gt;</code> with <code class="notranslate">&lt;summary&gt;</code></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>
     <p>Bug Fixes</p>
     <ul dir="auto">
       <li>Protect from <code class="notranslate">null</code> <code class="notranslate">containingFile</code> when fetching docs.</li>
@@ -19,8 +37,6 @@
       <li>Log unknown element for fetching docs from BEAM file</li>
       <li>Look above <code class="notranslate">CallDefinitionImpl</code> for <code class="notranslate">Type</code> scope processing<br>
         It should go up to the <code class="notranslate">ModuleImpl</code> to find the <code class="notranslate">TypeDefinitionImpl</code>.</li>
-    </ul>
-    <ul dir="auto">
       <li>Have Credo Global Inspection use standard <code class="notranslate">Mix.commandLine</code> used for Run Configurations.
         <ul dir="auto">
           <li>Allow environment variables to be set similar to Run Configurations for projects that require environment variables to be set for Mix tasks due to checks in their config.</li>
@@ -33,6 +49,20 @@
           <li>Look above <code class="notranslate">&lt;tuple&gt;</code> after <code class="notranslate">&lt;variable&gt;.</code> for <code class="notranslate">ancestorTypeSpec</code>.</li>
         </ul>
       </li>
+      <li>Fix Find Usages that resolve to compiled types.
+        <ul dir="auto">
+          <li>Add element description for <code class="notranslate">TypeDefinitionImpl</code>
+            <ul dir="auto">
+              <li>Node Text is <code class="notranslate">@&lt;module_attribte&gt; &lt;name&gt;(&lt;parameters&gt;) :: ...</code></li>
+              <li>Long Name and Short Name are just the <code class="notranslate">name</code></li>
+              <li>Type is <code class="notranslate">type</code></li>
+            </ul>
+          </li>
+          <li>Mirror <code class="notranslate">TypeDefinitionImpls</code> to types in decompiled source.<br>
+            Allow <code class="notranslate">TypeDefinitionImpl.getNavigation</code> to go to decompiled types.</li>
+        </ul>
+      </li>
+      <li>Allow types with atom keyword names to be highlight even though they are invalid names.</li>
     </ul>
   </li>
 </ul>

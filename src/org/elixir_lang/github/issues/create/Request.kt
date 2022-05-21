@@ -10,27 +10,30 @@ import com.intellij.openapi.extensions.PluginId
 import com.intellij.util.ExceptionUtil
 
 class Request private constructor(val title: String, val body: String) {
-    constructor(additionalInfo: String?, events: Array<IdeaLoggingEvent>) : this(title(additionalInfo, events), body(additionalInfo, events))
+    constructor(additionalInfo: String?, events: Array<IdeaLoggingEvent>) : this(
+        title(additionalInfo, events),
+        body(additionalInfo, events)
+    )
 
     companion object {
         private fun title(additionalInfo: String?, events: Array<IdeaLoggingEvent>): String =
-                additionalInfo?.lineSequence()?.first() ?: title(events)
+            additionalInfo?.lineSequence()?.first() ?: title(events)
 
         private fun title(events: Array<IdeaLoggingEvent>): String = title(events.first())
         private fun title(event: IdeaLoggingEvent): String = title(event.throwable)
         private fun title(throwable: Throwable): String {
             val lines = ExceptionUtil.getThrowableText(throwable).lineSequence()
             val message = lines
-                    .takeWhile { !it.startsWith("\tat ") }
-                    .joinToString()
-                    .removePrefix("java.lang.Throwable: ")
+                .takeWhile { !it.startsWith("\tat ") }
+                .joinToString()
+                .removePrefix("java.lang.Throwable: ")
             val location =
-                    lines
-                            .filter { it.startsWith("\tat ") }
-                            .filter { !it.startsWith("\tat org.elixir_lang.errorreport.Logger") }
-                            .filter { !it.startsWith("\tat com.intellij.openapi.diagnostic.Logger") }
-                            .first()
-                            .removePrefix("\t")
+                lines
+                    .filter { it.startsWith("\tat ") }
+                    .filter { !it.startsWith("\tat org.elixir_lang.errorreport.Logger") }
+                    .filter { !it.startsWith("\tat com.intellij.openapi.diagnostic.Logger") }
+                    .first()
+                    .removePrefix("\t")
 
             return "$message $location"
         }
@@ -54,19 +57,20 @@ class Request private constructor(val title: String, val body: String) {
 
         private fun pluginVersion(stringBuilder: StringBuilder) {
             stringBuilder
-                    .append("Plugin Version: ").append(PluginManagerCore.getPlugin(PluginId.getId("org.elixir_lang"))!!.version).append('\n')
+                .append("Plugin Version: ")
+                .append(PluginManagerCore.getPlugin(PluginId.getId("org.elixir_lang"))!!.version).append('\n')
         }
 
         private fun application(stringBuilder: StringBuilder) {
             stringBuilder.append("Application: ")
-                    .append(ApplicationNamesInfo.getInstance().fullProductNameWithEdition)
-                    .append(" (").append(ApplicationInfoEx.getInstance().fullVersion).append(")\n")
+                .append(ApplicationNamesInfo.getInstance().fullProductNameWithEdition)
+                .append(" (").append(ApplicationInfoEx.getInstance().fullVersion).append(")\n")
         }
 
         private fun operatingSystem(stringBuilder: StringBuilder) {
             stringBuilder.append("Operating System: ")
-                    .append(System.getProperty("os.name"))
-                    .append(" (").append(System.getProperty("os.version")) .append(")\n")
+                .append(System.getProperty("os.name"))
+                .append(" (").append(System.getProperty("os.version")).append(")\n")
         }
 
         private fun additionalInfo(stringBuilder: StringBuilder, level: Int, additionalInfo: String?) {
@@ -105,9 +109,10 @@ class Request private constructor(val title: String, val body: String) {
         }
 
         private fun attachments(stringBuilder: StringBuilder, level: Int, event: IdeaLoggingEvent) {
-            event.data?.let { it as? AbstractMessage }?.includedAttachments.takeUnless { it.isNullOrEmpty() }?.let { attachments ->
-                attachments(stringBuilder, level, attachments)
-            }
+            event.data?.let { it as? AbstractMessage }?.includedAttachments.takeUnless { it.isNullOrEmpty() }
+                ?.let { attachments ->
+                    attachments(stringBuilder, level, attachments)
+                }
         }
 
         private fun attachments(stringBuilder: StringBuilder, level: Int, attachmentList: List<Attachment>) {
@@ -120,10 +125,10 @@ class Request private constructor(val title: String, val body: String) {
         private fun attachment(stringBuilder: StringBuilder, level: Int, attachment: Attachment) {
             header(stringBuilder, level, "`" + attachment.path + "`")
             stringBuilder.append(
-                    "Please copy the contents of the above path into this report: files are too long to include in the " +
-                            "URL when opening the browser.  You can get the exact contents of that path when the error " +
-                            "occurred from the Attachments tab of the IDE Fatal Errors dialog that you had open before " +
-                            "clicking the button to submit this issue."
+                "Please copy the contents of the above path into this report: files are too long to include in the " +
+                        "URL when opening the browser.  You can get the exact contents of that path when the error " +
+                        "occurred from the Attachments tab of the IDE Fatal Errors dialog that you had open before " +
+                        "clicking the button to submit this issue."
             )
         }
 
@@ -155,7 +160,11 @@ class Request private constructor(val title: String, val body: String) {
         private fun stacktrace(stringBuilder: StringBuilder, level: Int, throwable: Throwable) {
             header(stringBuilder, level, "Stacktrace")
 
-            codeFence(stringBuilder)
+            stringBuilder
+                .append('\n')
+                .append("<details>\n")
+                .append('\n')
+
 
             val lines = ExceptionUtil.getThrowableText(throwable).lineSequence()
             val lastPluginLine = lines.indexOfLast { it.contains("at org.elixir_lang.") }
@@ -165,15 +174,30 @@ class Request private constructor(val title: String, val body: String) {
                 lines
             }
 
+            stringBuilder
+                .append("<summary>\n")
+                .append(filteredLines.first()).append('\n')
+                .append("</summary>\n")
+                .append('\n')
+
+            codeFence(stringBuilder)
+
             filteredLines.forEach { stringBuilder.append(it).append('\n') }
 
             codeFence(stringBuilder)
+
+            stringBuilder
+                .append('\n')
+                .append("</details>\n")
+                .append('\n')
         }
 
-        private fun textSection(stringBuilder: StringBuilder,
-                                level: Int,
-                                name: String,
-                                text: String?) {
+        private fun textSection(
+            stringBuilder: StringBuilder,
+            level: Int,
+            name: String,
+            text: String?
+        ) {
             if (text != null && text.isNotEmpty()) {
                 header(stringBuilder, level, name)
                 stringBuilder.append(text)

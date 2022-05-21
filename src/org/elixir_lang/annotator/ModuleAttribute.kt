@@ -205,7 +205,7 @@ class ModuleAttribute : Annotator, DumbAware {
                 /* Match is invalid.  It will be marked by MatchOperatorInsteadOfTypeOperator inspection as an error */
                 is Match, is Type -> {
                     val infix = grandChild as Infix
-                    val leftOperand: PsiElement? = infix.leftOperand()
+                    val leftOperand: PsiElement? = infix.leftOperand()?.stripAccessExpression()
                     var typeParameterNameSet: Set<String?> = emptySet<String>()
 
                     if (leftOperand is Call) {
@@ -218,10 +218,10 @@ class ModuleAttribute : Annotator, DumbAware {
                         } else if (leftOperand !is ElixirMatchedUnqualifiedNoArgumentsCall) {
                             cannotHighlightTypes(leftOperand)
                         }
-                    } else {
-                        if (leftOperand != null) {
-                            cannotHighlightTypes(leftOperand)
-                        }
+                    } else if (leftOperand is ElixirAtomKeyword) {
+                        highlightTypeName(leftOperand, annotationHolder)
+                    } else if (leftOperand != null) {
+                        cannotHighlightTypes(leftOperand)
                     }
 
                     val rightOperand: PsiElement? = infix.rightOperand()
@@ -359,14 +359,17 @@ class ModuleAttribute : Annotator, DumbAware {
     }
 
     private fun highlightTypeName(call: Call, annotationHolder: AnnotationHolder) {
-        call.functionNameElement()?.let { functionNameElement ->
-            Highlighter.highlight(
-                annotationHolder,
-                functionNameElement.textRange,
-                ElixirSyntaxHighlighter.TYPE
-            )
-            Unit
+        call.functionNameElement()?.let {
+            highlightTypeName(it, annotationHolder)
         }
+    }
+
+    private fun highlightTypeName(typeName: PsiElement, annotationHolder: AnnotationHolder) {
+        Highlighter.highlight(
+            annotationHolder,
+            typeName.textRange,
+            ElixirSyntaxHighlighter.TYPE
+        )
     }
 
     private fun highlightTypesAndTypeTypeParameterDeclarations(

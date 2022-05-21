@@ -30,7 +30,7 @@ public class Type implements ItemPresentation {
      */
 
     @Nullable
-    static PsiElement head(@NotNull Call type) {
+    public static PsiElement head(@NotNull Call type) {
         PsiElement head = null;
 
         if (type instanceof org.elixir_lang.psi.operation.Type) {
