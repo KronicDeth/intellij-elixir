@@ -309,6 +309,9 @@
     * Mirror `TypeDefinitionImpls` to types in decompiled source.
       Allow `TypeDefinitionImpl.getNavigation` to go to decompiled types.
   * Allow types with atom keyword names to be highlight even though they are invalid names. 
+* [#2674](https://github.com/KronicDeth/intellij-elixir/pull/2674) - [@KronicDeth](https://github.com/KronicDeth)
+  * Catch `RuntimeException` if `rootProvider` is already disposed.
+    Catching `AssertionError` used to be enough in #1359, but not anymore as of #2623.
 
 ## v13.0.0
 
