@@ -26,17 +26,17 @@ object Erl {
      * Keep in-sync with [org.elixir_lang.jps.Builder.sdkPropertiesToErlExePath]
      */
     private fun exePath(erlangSdk: Sdk): String =
-            erlangSdk.homePath?.let {
-                Erlang.homePathToErlExePath(it)
-            } ?: throw FileNotFoundException("Erlang SDK home path is not set")
+        erlangSdk.homePath?.let {
+            Erlang.homePathToErlExePath(it)
+        } ?: throw FileNotFoundException("Erlang SDK home path is not set")
 
     /**
      * Keep in-sync with [org.elixir_lang.jps.Builder.prependCodePaths]
      */
     private fun prependCodePaths(generalCommandLine: GeneralCommandLine, sdk: Sdk) {
         prependCodePaths(
-                generalCommandLine,
-                ebinDirectories(sdk)
+            generalCommandLine,
+            ebinDirectories(sdk)
         )
     }
 
@@ -47,6 +47,8 @@ object Erl {
             ebinDirectories = try {
                 sdk.rootProvider.getFiles(OrderRootType.CLASSES).map { it.canonicalPath!! }
             } catch (e: AssertionError) {
+                null
+            } catch (e: RuntimeException) {
                 null
             }
         } while (ebinDirectories == null)
