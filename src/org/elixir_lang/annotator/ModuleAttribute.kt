@@ -218,10 +218,10 @@ class ModuleAttribute : Annotator, DumbAware {
                         } else if (leftOperand !is ElixirMatchedUnqualifiedNoArgumentsCall) {
                             cannotHighlightTypes(leftOperand)
                         }
-                    } else {
-                        if (leftOperand != null) {
-                            cannotHighlightTypes(leftOperand)
-                        }
+                    } else if (leftOperand is ElixirAtomKeyword) {
+                        highlightTypeName(leftOperand, annotationHolder)
+                    } else if (leftOperand != null) {
+                        cannotHighlightTypes(leftOperand)
                     }
 
                     val rightOperand: PsiElement? = infix.rightOperand()
@@ -359,14 +359,17 @@ class ModuleAttribute : Annotator, DumbAware {
     }
 
     private fun highlightTypeName(call: Call, annotationHolder: AnnotationHolder) {
-        call.functionNameElement()?.let { functionNameElement ->
-            Highlighter.highlight(
-                annotationHolder,
-                functionNameElement.textRange,
-                ElixirSyntaxHighlighter.TYPE
-            )
-            Unit
+        call.functionNameElement()?.let {
+            highlightTypeName(it, annotationHolder)
         }
+    }
+
+    private fun highlightTypeName(typeName: PsiElement, annotationHolder: AnnotationHolder) {
+        Highlighter.highlight(
+            annotationHolder,
+            typeName.textRange,
+            ElixirSyntaxHighlighter.TYPE
+        )
     }
 
     private fun highlightTypesAndTypeTypeParameterDeclarations(
