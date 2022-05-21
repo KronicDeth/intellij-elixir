@@ -14,10 +14,14 @@ import org.elixir_lang.beam.psi.Module
 import org.elixir_lang.beam.psi.stubs.ModuleStub
 import org.elixir_lang.beam.psi.stubs.ModuleStubElementTypes
 import org.elixir_lang.psi.CallDefinitionClause
+import org.elixir_lang.psi.ElixirUnmatchedAtUnqualifiedNoParenthesesCall
 import org.elixir_lang.psi.Modular.callDefinitionClauseCallWhile
 import org.elixir_lang.psi.call.Call
+import org.elixir_lang.psi.impl.call.macroChildCallSequence
 import org.elixir_lang.psi.impl.getModuleName
 import org.elixir_lang.psi.putInitialVisitedElement
+import org.elixir_lang.structure_view.element.CallDefinitionHead
+import org.elixir_lang.structure_view.element.Type
 import org.jetbrains.annotations.Contract
 import org.jetbrains.annotations.NonNls
 
@@ -49,6 +53,30 @@ class ModuleImpl<T : ModuleStub<*>?>(private val stub: T) : ModuleElementImpl(),
 
     override fun setMirror(element: TreeElement) {
         setMirrorCheckingType(element, null)
+
+        val typeByArityByName = typeDefinitionByArityByName(element)
+
+        for (typeDefinitionStub in typeDefinitions()) {
+            val name = typeDefinitionStub.name
+            val typeByArity = typeByArityByName[name]
+
+            if (typeByArity != null) {
+                val arity = typeDefinitionStub.arity
+                val type = typeByArity[arity]
+
+                if (type != null) {
+                    (typeDefinitionStub as ModuleElementImpl).setMirror(SourceTreeToPsiMap.psiToTreeNotNull(type))
+                } else {
+                    LOGGER.error(
+                        "No decompiled source type with name/arity (${moduleName(element)}.${name}/${arity})"
+                    )
+                }
+            } else if (typeDefinitionStub.visibility in
+                arrayOf(org.elixir_lang.type.Visibility.PUBLIC, org.elixir_lang.type.Visibility.OPAQUE)
+            ) {
+                LOGGER.error("No decompiled source type with name (${moduleName(element)}.$name)")
+            }
+        }
 
         val callDefinitionClauseByArityByName = callDefinitionClauseByArityByName(element)
         val state = ResolveState.initial()
@@ -125,6 +153,38 @@ class ModuleImpl<T : ModuleStub<*>?>(private val stub: T) : ModuleElementImpl(),
 
     companion object {
         private val LOGGER = Logger.getInstance(ModuleImpl::class.java)
+
+        private fun typeDefinitionByArityByName(mirror: TreeElement): Map<String, Map<Int, Call>> {
+            val mirrorPsi = mirror.psi
+
+            return if (mirrorPsi is Call) {
+                val typeByArityByName = mutableMapOf<String, MutableMap<Int, Call>>()
+
+                val typeDefinitions = mirrorPsi.macroChildCallSequence()
+                    .filter { Type.`is`(it) }
+                    .filterIsInstance<ElixirUnmatchedAtUnqualifiedNoParenthesesCall>()
+
+                for (typeDefinition in typeDefinitions) {
+                    Type
+                        .type(typeDefinition)
+                        ?.let { org.elixir_lang.navigation.item_presentation.Type.head(it) }
+                        ?.let { CallDefinitionHead.nameArityInterval(it, ResolveState.initial()) }
+                        ?.let { nameArityInterval ->
+                            val typeByArity = typeByArityByName.getOrPut(nameArityInterval.name) {
+                                mutableMapOf()
+                            }
+
+                            nameArityInterval.arityInterval.closed().forEach { arity ->
+                                typeByArity[arity] = typeDefinition
+                            }
+                        }
+                }
+
+                typeByArityByName
+            } else {
+                emptyMap()
+            }
+        }
 
         @Contract(pure = true)
         private fun callDefinitionClauseByArityByName(mirror: TreeElement): Map<String, Map<Int, Call>> {
