@@ -113,13 +113,13 @@ object Logger {
 
                 excerptBuilder
                     .append('\n')
-                    .append("From: `").append(path).append(':').append(startingLine).append('`').append('\n')
+                    .append("From: `").append(path).append(':').append(startingLine)
 
                 if (endingLine != startingLine) {
-                    excerptBuilder
-                        .append("To: `").append(path).append(':').append(endingLine).append('`')
-                        .append('\n')
+                    excerptBuilder.append('-').append(endingLine)
                 }
+
+                excerptBuilder.append('`').append('\n')
 
                 excerptBuilder
                     .append('\n')
@@ -136,17 +136,17 @@ object Logger {
 
                 excerptBuilder
                     .append("```\n")
-                    .append(contextText)
-                    .append('\n')
+                    .append(contextText).append('\n')
                     .append("```\n")
                 excerptBuilder
                     .append('\n')
-                    .append("From: `").append(path).append(':').append(contextStartingLine).append('`').append('\n')
+                    .append("From: `").append(path).append(':').append(contextStartingLine)
 
                 if (contextEndingLine != contextStartingLine) {
-                    excerptBuilder
-                        .append("To: `").append(path).append(':').append(contextEndingLine).append('`')
+                    excerptBuilder.append('-').append(contextEndingLine)
                 }
+
+                excerptBuilder.append('`')
             }
         }
         return excerptBuilder.toString()
