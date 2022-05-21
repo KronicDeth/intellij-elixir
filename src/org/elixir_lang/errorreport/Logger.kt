@@ -110,11 +110,16 @@ object Logger {
                 val textRange = element.textRange
                 val startingLine = document.getLineNumber(textRange.startOffset)
                 val endingLine = document.getLineNumber(textRange.endOffset)
+
                 excerptBuilder
                     .append('\n')
                     .append("From: `").append(path).append(':').append(startingLine).append('`').append('\n')
-                    .append("To: `").append(path).append(':').append(endingLine).append('`')
-                    .append('\n')
+
+                if (endingLine != startingLine) {
+                    excerptBuilder
+                        .append("To: `").append(path).append(':').append(endingLine).append('`')
+                        .append('\n')
+                }
 
                 excerptBuilder
                     .append('\n')
@@ -137,7 +142,11 @@ object Logger {
                 excerptBuilder
                     .append('\n')
                     .append("From: `").append(path).append(':').append(contextStartingLine).append('`').append('\n')
-                    .append("To: `").append(path).append(':').append(contextEndingLine).append('`')
+
+                if (contextEndingLine != contextStartingLine) {
+                    excerptBuilder
+                        .append("To: `").append(path).append(':').append(contextEndingLine).append('`')
+                }
             }
         }
         return excerptBuilder.toString()
