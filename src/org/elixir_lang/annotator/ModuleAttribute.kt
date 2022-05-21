@@ -205,7 +205,7 @@ class ModuleAttribute : Annotator, DumbAware {
                 /* Match is invalid.  It will be marked by MatchOperatorInsteadOfTypeOperator inspection as an error */
                 is Match, is Type -> {
                     val infix = grandChild as Infix
-                    val leftOperand: PsiElement? = infix.leftOperand()
+                    val leftOperand: PsiElement? = infix.leftOperand()?.stripAccessExpression()
                     var typeParameterNameSet: Set<String?> = emptySet<String>()
 
                     if (leftOperand is Call) {
