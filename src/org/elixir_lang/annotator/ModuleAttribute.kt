@@ -319,6 +319,8 @@ class ModuleAttribute : Annotator, DumbAware {
                         ElixirSyntaxHighlighter.TYPE
                     )
                 }
+                // typing the parentheses before the relative name and before name like `@type String.()`
+                is DotCall<*> -> Unit
                 else -> {
                     cannotHighlightTypes(grandChild)
                 }
