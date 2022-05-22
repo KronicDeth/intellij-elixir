@@ -65,6 +65,13 @@
       <li>Allow types with atom keyword names to be highlight even though they are invalid names.</li>
       <li>Catch <code class="notranslate">RuntimeException</code> if <code class="notranslate">rootProvider</code> is already disposed.<br>
         Catching <code class="notranslate">AssertionError</code> used to be enough in <span class="reference"><svg class="octicon octicon-git-merge merged color-fg-done mr-1" title="Merged" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M5 3.254V3.25v.005a.75.75 0 110-.005v.004zm.45 1.9a2.25 2.25 0 10-1.95.218v5.256a2.25 2.25 0 101.5 0V7.123A5.735 5.735 0 009.25 9h1.378a2.251 2.251 0 100-1.5H9.25a4.25 4.25 0 01-3.8-2.346zM12.75 9a.75.75 0 100-1.5.75.75 0 000 1.5zm-8.5 4.5a.75.75 0 100-1.5.75.75 0 000 1.5z"></path></svg><a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="390489030" data-permission-text="Title is private" data-url="https://github.com/KronicDeth/intellij-elixir/issues/1359" data-hovercard-type="pull_request" data-hovercard-url="/KronicDeth/intellij-elixir/pull/1359/hovercard" href="https://github.com/KronicDeth/intellij-elixir/pull/1359"> Remove unused variables in Elixir debugger server<span class="issue-shorthand">&nbsp;#1359</span></a></span>, but not anymore as of <span class="reference"><svg class="octicon octicon-issue-opened open mr-1" title="Open" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M8 9.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"></path><path fill-rule="evenodd" d="M8 0a8 8 0 100 16A8 8 0 008 0zM1.5 8a6.5 6.5 0 1113 0 6.5 6.5 0 01-13 0z"></path></svg><a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="1221835398" data-permission-text="Title is private" data-url="https://github.com/KronicDeth/intellij-elixir/issues/2623" data-hovercard-type="issue" data-hovercard-url="/KronicDeth/intellij-elixir/issues/2623/hovercard" href="https://github.com/KronicDeth/intellij-elixir/issues/2623">com.intellij.openapi.util.TraceableDisposable$DisposalException: Already disposed<span class="issue-shorthand">&nbsp;#2623</span></a></span>.</li>
+      <li>Ignore invalid format that occur while user is typing when highlighting types
+        <ul dir="auto">
+          <li><code class="notranslate">@type name :: String.()</code></li>
+          <li><code class="notranslate">@type String.()</code></li>
+          <li><code class="notranslate">@type S</code></li>
+        </ul>
+      </li>
     </ul>
   </li>
 </ul>
