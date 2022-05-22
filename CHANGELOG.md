@@ -312,6 +312,11 @@
 * [#2674](https://github.com/KronicDeth/intellij-elixir/pull/2674) - [@KronicDeth](https://github.com/KronicDeth)
   * Catch `RuntimeException` if `rootProvider` is already disposed.
     Catching `AssertionError` used to be enough in #1359, but not anymore as of #2623.
+* [#2675](https://github.com/KronicDeth/intellij-elixir/pull/2675) - [@KronicDeth](https://github.com/KronicDeth)
+  * Ignore invalid format that occur while user is typing when highlighting types
+    * `@type name :: String.()`
+    * `@type String.()`
+    * `@type S`
 
 ## v13.0.0
 
