@@ -200,7 +200,7 @@ class ModuleAttribute : Annotator, DumbAware {
         val noParenthesesOneArgument: PsiElement = atUnqualifiedNoParenthesesCall.noParenthesesOneArgument
         val grandChildren = noParenthesesOneArgument.children
 
-        grandChildren.singleOrNull()?.let { grandChild ->
+        grandChildren.singleOrNull()?.stripAccessExpression()?.let { grandChild ->
             when (grandChild) {
                 /* Match is invalid.  It will be marked by MatchOperatorInsteadOfTypeOperator inspection as an error */
                 is Match, is Type -> {
@@ -319,7 +319,9 @@ class ModuleAttribute : Annotator, DumbAware {
                         ElixirSyntaxHighlighter.TYPE
                     )
                 }
-                // typing the parentheses before the relative name and before name like `@type String.()`
+                // typing like `@type S`
+                is QualifiableAlias,
+                    // typing the parentheses before the relative name and before name like `@type String.()`
                 is DotCall<*> -> Unit
                 else -> {
                     cannotHighlightTypes(grandChild)
