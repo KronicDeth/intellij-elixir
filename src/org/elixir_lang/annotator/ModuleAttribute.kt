@@ -1123,6 +1123,13 @@ class ModuleAttribute : Annotator, DumbAware {
                     )
                 }
             }
+            // while typing body with parentheses before relative name like in `@type name :: String.()`
+            is DotCall<*> -> highlightTypesAndTypeParameterUsages(
+                psiElement,
+                typeParameterNameSet,
+                annotationHolder,
+                typeTextAttributesKey
+            )
             else -> cannotHighlightTypes(psiElement)
         }
     }
@@ -1302,6 +1309,29 @@ class ModuleAttribute : Annotator, DumbAware {
             } else {
                 error("Cannot highlight types and type parameter usages", unqualifiedParenthesesCall)
             }
+        }
+    }
+
+    private fun highlightTypesAndTypeParameterUsages(
+        dotCall: DotCall<*>,
+        typeParameterNameSet: Set<String?>,
+        annotationHolder: AnnotationHolder,
+        textAttributesKey: TextAttributesKey,
+    ) {
+        highlightTypesAndTypeParameterUsages(
+            dotCall.firstChild,
+            typeParameterNameSet,
+            annotationHolder,
+            textAttributesKey
+        )
+
+        for (parenthesesArguments in dotCall.parenthesesArgumentsList) {
+            highlightTypesAndTypeParameterUsages(
+                parenthesesArguments.arguments(),
+                typeParameterNameSet,
+                annotationHolder,
+                textAttributesKey
+            )
         }
     }
 
