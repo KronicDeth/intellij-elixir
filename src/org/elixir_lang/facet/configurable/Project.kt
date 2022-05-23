@@ -18,7 +18,7 @@ class Project(project: Project) : ModuleAwareProjectConfigurable<Configurable>(p
     override fun isSuitableForModule(module: Module): Boolean =
     // CANNOT use ModuleType.is(module, ElixirModuleType.getInstance()) as ElixirModuleType depends on
         // JavaModuleBuilder and so only available in IntelliJ
-        ModuleType.get(module).id == "ELIXIR_MODULE"
+        ModuleType.get(module).id != "ELIXIR_MODULE"
 
     override fun createModuleConfigurable(module: Module): Configurable {
         return object : Configurable(module) {
