@@ -320,6 +320,9 @@
 * [#2676](https://github.com/KronicDeth/intellij-elixir/pull/2676) - [@KronicDeth](https://github.com/KronicDeth)
   * Restore Project configuration for Small IDEs.
     I dropped an `!` when converting from `equals` to `==` when fixing the deprecation warnings, which made the Project SDK selection _only_ be **HIDDEN** where it needed to be **SHOWN**.
+* [#2679](https://github.com/KronicDeth/intellij-elixir/pull/2679) - [@KronicDeth](https://github.com/KronicDeth)
+  * Catch `StackOverflowError` in `find_usages.Provider.getType()`.
+  * Element descriptions for `CallDefinitionImpl`
 
 ## v13.0.0
 
