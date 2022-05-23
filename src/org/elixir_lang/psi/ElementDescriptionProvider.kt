@@ -7,6 +7,7 @@ import com.intellij.usageView.UsageViewNodeTextLocation
 import com.intellij.usageView.UsageViewShortNameLocation
 import com.intellij.usageView.UsageViewTypeLocation
 import org.elixir_lang.annotator.Parameter
+import org.elixir_lang.beam.psi.impl.CallDefinitionImpl
 import org.elixir_lang.beam.psi.impl.ModuleImpl
 import org.elixir_lang.beam.psi.impl.TypeDefinitionImpl
 import org.elixir_lang.find_usages.Provider
@@ -39,6 +40,7 @@ class ElementDescriptionProvider : com.intellij.psi.ElementDescriptionProvider {
             is MaybeModuleName -> getElementDescription(element, location)
             is ModuleImpl<*> -> getElementDescription(element, location)
             is TypeDefinitionImpl<*> -> getElementDescription(element, location)
+            is CallDefinitionImpl<*> -> getElementDescription(element, location)
             else -> null
         }
 
@@ -162,6 +164,39 @@ class ElementDescriptionProvider : com.intellij.psi.ElementDescriptionProvider {
             }
             UsageViewLongNameLocation.INSTANCE, UsageViewShortNameLocation.INSTANCE -> typeDefinitionImpl.name
             UsageViewTypeLocation.INSTANCE -> "type"
+            else -> null
+        }
+
+    private fun getElementDescription(
+        callDefinitionImpl: CallDefinitionImpl<*>,
+        location: ElementDescriptionLocation
+    ): String? =
+        when (location) {
+            UsageViewNodeTextLocation.INSTANCE -> {
+                val macro = when (callDefinitionImpl.time) {
+                    Timed.Time.COMPILE -> if (callDefinitionImpl.isExported) {
+                        "defmacro"
+                    } else {
+                        "defmacrop"
+                    }
+                    Timed.Time.RUN -> if (callDefinitionImpl.isExported) {
+                        "def"
+                    } else {
+                        "defp"
+                    }
+                }
+                val name = callDefinitionImpl.name
+                val parameterCount = callDefinitionImpl.nameArityInterval.arityInterval.closed().last
+                val parameters = (0 until parameterCount).joinToString(", ") { i -> "p${i}" }
+
+                "$macro $name(${parameters}), do: ..."
+            }
+            UsageViewLongNameLocation.INSTANCE, UsageViewShortNameLocation.INSTANCE ->
+                callDefinitionImpl.nameArityInterval.toString()
+            UsageViewTypeLocation.INSTANCE -> when (callDefinitionImpl.time) {
+                Timed.Time.COMPILE -> "macro"
+                Timed.Time.RUN -> "function"
+            }
             else -> null
         }
 
