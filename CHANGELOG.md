@@ -323,6 +323,9 @@
 * [#2679](https://github.com/KronicDeth/intellij-elixir/pull/2679) - [@KronicDeth](https://github.com/KronicDeth)
   * Catch `StackOverflowError` in `find_usages.Provider.getType()`.
   * Element descriptions for `CallDefinitionImpl`
+* [#2680](https://github.com/KronicDeth/intellij-elixir/pull/2680) - [@KronicDeth](https://github.com/KronicDeth)
+* Highlight `CallDefinitionImpl` references as predefined if resolved `CallDefinitionImpl` is in `Kernel` or `Kernel.SpecialForms`.
+  Fixes highlighting `def` and other defined when using SDKs without source like Homebrew after the delayed-decompilation fixes from 12.2.1.  Now source-less (Homebrew) and SDKs with sources (ASDF) will both be able to highlight predefineds.
 
 ## v13.0.0
 
