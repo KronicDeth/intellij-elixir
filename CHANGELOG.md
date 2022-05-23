@@ -317,6 +317,9 @@
     * `@type name :: String.()`
     * `@type String.()`
     * `@type S`
+* [#2676](https://github.com/KronicDeth/intellij-elixir/pull/2676) - [@KronicDeth](https://github.com/KronicDeth)
+  * Restore Project configuration for Small IDEs.
+    I dropped an `!` when converting from `equals` to `==` when fixing the deprecation warnings, which made the Project SDK selection _only_ be **HIDDEN** where it needed to be **SHOWN**.
 
 ## v13.0.0
 
