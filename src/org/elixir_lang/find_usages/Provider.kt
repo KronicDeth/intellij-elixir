@@ -13,35 +13,35 @@ import com.intellij.usageView.UsageViewTypeLocation
 import org.elixir_lang.ElixirLexer
 import org.elixir_lang.ElixirParserDefinition
 import org.elixir_lang.beam.psi.impl.ModuleImpl
+import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.ElixirTypes.*
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.isOutermostQualifiableAlias
-import org.elixir_lang.reference.Callable
 
 private val IDENTIFIER_TOKEN_SET = TokenSet.create(
-        ALIAS_TOKEN,
-        AND_SYMBOL_OPERATOR,
-        AND_WORD_OPERATOR,
-        ARROW_OPERATOR,
-        COMPARISON_OPERATOR,
-        DIVISION_OPERATOR,
-        IDENTIFIER_TOKEN,
-        MINUS_OPERATOR,
-        MULTIPLICATION_OPERATOR,
-        NEGATE_OPERATOR,
-        NOT_OPERATOR,
-        NUMBER_OR_BADARITH_OPERATOR,
-        OR_SYMBOL_OPERATOR,
-        OR_WORD_OPERATOR,
-        PIPE_OPERATOR,
-        PLUS_OPERATOR,
-        POWER_OPERATOR,
-        RANGE_OPERATOR,
-        SIGN_OPERATOR,
-        THREE_OPERATOR,
-        TWO_OPERATOR,
-        UNARY_OPERATOR
+    ALIAS_TOKEN,
+    AND_SYMBOL_OPERATOR,
+    AND_WORD_OPERATOR,
+    ARROW_OPERATOR,
+    COMPARISON_OPERATOR,
+    DIVISION_OPERATOR,
+    IDENTIFIER_TOKEN,
+    MINUS_OPERATOR,
+    MULTIPLICATION_OPERATOR,
+    NEGATE_OPERATOR,
+    NOT_OPERATOR,
+    NUMBER_OR_BADARITH_OPERATOR,
+    OR_SYMBOL_OPERATOR,
+    OR_WORD_OPERATOR,
+    PIPE_OPERATOR,
+    PLUS_OPERATOR,
+    POWER_OPERATOR,
+    RANGE_OPERATOR,
+    SIGN_OPERATOR,
+    THREE_OPERATOR,
+    TWO_OPERATOR,
+    UNARY_OPERATOR
 )
 
 class Provider : com.intellij.lang.findUsages.FindUsagesProvider {
@@ -53,12 +53,12 @@ class Provider : com.intellij.lang.findUsages.FindUsagesProvider {
      * @return the word scanner implementation.
      */
     override fun getWordsScanner(): WordsScanner? =
-            DefaultWordsScanner(
-                    ElixirLexer(),
-                    IDENTIFIER_TOKEN_SET,
-                    ElixirParserDefinition.COMMENTS,
-                    ElixirParserDefinition.STRING_LITERALS
-            )
+        DefaultWordsScanner(
+            ElixirLexer(),
+            IDENTIFIER_TOKEN_SET,
+            ElixirParserDefinition.COMMENTS,
+            ElixirParserDefinition.STRING_LITERALS
+        )
 
     /**
      * Checks if it makes sense to search for usages of the specified element.
@@ -68,15 +68,15 @@ class Provider : com.intellij.lang.findUsages.FindUsagesProvider {
      * @see FindManager.canFindUsages
      */
     override fun canFindUsagesFor(psiElement: PsiElement): Boolean =
-            when (psiElement) {
-                is AtOperation, is ModuleImpl<*> -> true
-                is Call ->
-                    // Don't find usage for the `name` in `@name`.  `AtNonNumericOperation` above will instead
-                    // be used for all of `@name.
-                    !psiElement.isModuleAttributeNameElement()
-                is QualifiableAlias -> psiElement.isOutermostQualifiableAlias()
-                else -> false
-            }
+        when (psiElement) {
+            is AtOperation, is ModuleImpl<*> -> true
+            is Call ->
+                // Don't find usage for the `name` in `@name`.  `AtNonNumericOperation` above will instead
+                // be used for all of `@name.
+                !psiElement.isModuleAttributeNameElement()
+            is QualifiableAlias -> psiElement.isOutermostQualifiableAlias()
+            else -> false
+        }
 
     /**
      * Returns an expanded user-visible name of the specified element, shown in the "Find Usages"
@@ -87,7 +87,7 @@ class Provider : com.intellij.lang.findUsages.FindUsagesProvider {
      * @return the user-visible name.
      */
     override fun getDescriptiveName(element: PsiElement): String =
-            ElementDescriptionUtil.getElementDescription(element, UsageViewLongNameLocation.INSTANCE)
+        ElementDescriptionUtil.getElementDescription(element, UsageViewLongNameLocation.INSTANCE)
 
     /**
      * Returns the ID of the help topic which is shown when the specified element is selected
@@ -97,18 +97,18 @@ class Provider : com.intellij.lang.findUsages.FindUsagesProvider {
      * @return the help topic ID, or null if no help is available.
      */
     override fun getHelpId(psiElement: PsiElement): String? =
-            when (psiElement) {
-                is AtUnqualifiedNoParenthesesCall<*> ->
-                    com.intellij.lang.HelpID.FIND_OTHER_USAGES
-                is MaybeModuleName ->
-                    if (psiElement.isModuleName) {
-                        // TODO double check wording of help makes sense or if a special HelpID should be created for Modules
-                        HelpID.FIND_CLASS_USAGES
-                    } else {
-                        null
-                    }
-                else -> null
-            }
+        when (psiElement) {
+            is AtUnqualifiedNoParenthesesCall<*> ->
+                com.intellij.lang.HelpID.FIND_OTHER_USAGES
+            is MaybeModuleName ->
+                if (psiElement.isModuleName) {
+                    // TODO double check wording of help makes sense or if a special HelpID should be created for Modules
+                    HelpID.FIND_CLASS_USAGES
+                } else {
+                    null
+                }
+            else -> null
+        }
 
     /**
      * Returns the text representing the specified PSI element in the Find Usages tree.
@@ -118,11 +118,11 @@ class Provider : com.intellij.lang.findUsages.FindUsagesProvider {
      * @return the text representing the element.
      */
     override fun getNodeText(element: PsiElement, useFullName: Boolean): String =
-            if (useFullName) {
-                ElementDescriptionUtil.getElementDescription(element, UsageViewLongNameLocation.INSTANCE)
-            } else {
-                ElementDescriptionUtil.getElementDescription(element, UsageViewNodeTextLocation.INSTANCE)
-            }
+        if (useFullName) {
+            ElementDescriptionUtil.getElementDescription(element, UsageViewLongNameLocation.INSTANCE)
+        } else {
+            ElementDescriptionUtil.getElementDescription(element, UsageViewNodeTextLocation.INSTANCE)
+        }
 
     /**
      * Returns the user-visible type of the specified element, shown in the "Find Usages"
@@ -132,5 +132,11 @@ class Provider : com.intellij.lang.findUsages.FindUsagesProvider {
      * @return the type of the element.
      */
     override fun getType(element: PsiElement): String =
+        try {
             ElementDescriptionUtil.getElementDescription(element, UsageViewTypeLocation.INSTANCE)
+        } catch (e: StackOverflowError) {
+            Logger.error(Provider::class.java, "StackOverflow getting type for Find Usage", element)
+
+            "unknown_elixir_type"
+        }
 }
