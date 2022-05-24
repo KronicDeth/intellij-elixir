@@ -8,8 +8,6 @@ import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleType
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.Sdk
-import com.intellij.openapi.roots.ModuleRootModificationUtil
-import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar
 import org.elixir_lang.Facet
 import org.elixir_lang.facet.Configurable
 import org.elixir_lang.facet.Type
@@ -24,53 +22,19 @@ class Project(project: Project) : ModuleAwareProjectConfigurable<Configurable>(p
         return object : Configurable(module) {
             override fun applySdk(sdk: Sdk?) {
                 val facetManager = FacetManager.getInstance(module)
-                val facet = facetManager.getFacetByType(Facet.ID)
+                val facet = facetManager.getFacetByType(Facet.ID) ?: addFacet(facetManager)
 
-                if (facet == null) {
-                    ApplicationManager.getApplication().runWriteAction {
-                        addFacet(facetManager, sdk)
-
-                        if (sdk != null) {
-                            LibraryTablesRegistrar.getInstance().libraryTable.getLibraryByName(sdk.name)!!
-                                .let { library ->
-                                    ModuleRootModificationUtil.addDependency(module, library)
-                                }
-                        }
-                    }
-                } else {
-                    setFacetSdk(facet, sdk)
-
-                    ApplicationManager.getApplication().runWriteAction {
-                        if (sdk != null) {
-                            LibraryTablesRegistrar.getInstance().libraryTable.getLibraryByName(sdk.name)!!
-                                .let { library ->
-                                    ModuleRootModificationUtil.addDependency(module, library)
-                                }
-                        }
-                    }
+                ApplicationManager.getApplication().runWriteAction {
+                    facet.sdk = sdk
                 }
             }
 
-            override fun initSdk(): Sdk? = FacetManager.getInstance(module).getFacetByType(Facet.ID)?.configuration?.sdk
+            override fun initSdk(): Sdk? = Facet.sdk(module)
         }
     }
 
-    private fun setFacetSdk(facet: Facet, sdk: Sdk?) {
-        facet.apply {
-            configuration.sdk = sdk
-
-            module.apply {
-                if (!isDisposed) {
-                    project.messageBus.syncPublisher(FacetManager.FACETS_TOPIC).facetConfigurationChanged(facet)
-                }
-            }
-        }
-    }
-
-    private fun addFacet(facetManager: FacetManager, sdk: Sdk?) {
-        val facet = facetManager.addFacet(FacetType.findInstance(Type::class.java), FACET_NAME, null)
-        setFacetSdk(facet, sdk)
-    }
+    private fun addFacet(facetManager: FacetManager): Facet =
+        facetManager.addFacet(FacetType.findInstance(Type::class.java), FACET_NAME, null)
 
     companion object {
         const val FACET_NAME = "Elixir facet"

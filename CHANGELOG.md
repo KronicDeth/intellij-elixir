@@ -324,8 +324,13 @@
   * Catch `StackOverflowError` in `find_usages.Provider.getType()`.
   * Element descriptions for `CallDefinitionImpl`
 * [#2680](https://github.com/KronicDeth/intellij-elixir/pull/2680) - [@KronicDeth](https://github.com/KronicDeth)
-* Highlight `CallDefinitionImpl` references as predefined if resolved `CallDefinitionImpl` is in `Kernel` or `Kernel.SpecialForms`.
-  Fixes highlighting `def` and other defined when using SDKs without source like Homebrew after the delayed-decompilation fixes from 12.2.1.  Now source-less (Homebrew) and SDKs with sources (ASDF) will both be able to highlight predefineds.
+  * Highlight `CallDefinitionImpl` references as predefined if resolved `CallDefinitionImpl` is in `Kernel` or `Kernel.SpecialForms`.
+    Fixes highlighting `def` and other defined when using SDKs without source like Homebrew after the delayed-decompilation fixes from 12.2.1.  Now source-less (Homebrew) and SDKs with sources (ASDF) will both be able to highlight predefineds.
+* [#2681](https://github.com/KronicDeth/intellij-elixir/pull/2681) - [@KronicDeth](https://github.com/KronicDeth)
+  * No longer record the SDK name as an attribute of the Facet configuration, as it didn't write back changes.
+    * Instead detect the Elixir SDK by finding any of the libraries that have an Elixir SDK name in the module. (The Elixir SDK was already being added as a library to allow indexing the SDK.)
+  * Clear out any existing Elixir SDKs listed as module libraries before setting a new SDK.
+    This eliminates the duplicates that happened before. (It turns out the JetBrains API doesn't prevent duplicates. Oopsie.) It also ensures that no SDK is recorded if the SDK is deselected in the UI, which wouldn't happen before.
 
 ## v13.0.0
 

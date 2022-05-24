@@ -78,6 +78,13 @@
       <li>Element descriptions for <code class="notranslate">CallDefinitionImpl</code></li>
       <li>Highlight <code class="notranslate">CallDefinitionImpl</code> references as predefined if resolved <code class="notranslate">CallDefinitionImpl</code> is in <code class="notranslate">Kernel</code> or <code class="notranslate">Kernel.SpecialForms</code>.<br>
         Fixes highlighting <code class="notranslate">def</code> and other defined when using SDKs without source like Homebrew after the delayed-decompilation fixes from 12.2.1.  Now source-less (Homebrew) and SDKs with sources (ASDF) will both be able to highlight predefineds.</li>
+      <li>No longer record the SDK name as an attribute of the Facet configuration, as it didn't write back changes.
+        <ul dir="auto">
+          <li>Instead detect the Elixir SDK by finding any of the libraries that have an Elixir SDK name in the module. (The Elixir SDK was already being added as a library to allow indexing the SDK.)</li>
+        </ul>
+      </li>
+      <li>Clear out any existing Elixir SDKs listed as module libraries before setting a new SDK.<br>
+        This eliminates the duplicates that happened before. (It turns out the JetBrains API doesn't prevent duplicates. Oopsie.) It also ensures that no SDK is recorded if the SDK is deselected in the UI, which wouldn't happen before.</li>
     </ul>
   </li>
 </ul>

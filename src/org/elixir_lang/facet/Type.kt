@@ -3,38 +3,27 @@ package org.elixir_lang.facet
 import com.intellij.facet.FacetType
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleType
-import com.intellij.openapi.projectRoots.ProjectJdkTable
 import org.elixir_lang.Facet
 import org.elixir_lang.Icons
 import org.elixir_lang.module.ElixirModuleType
 import javax.swing.Icon
 
 class Type : FacetType<Facet, Configuration>(Facet.ID, ID, "Elixir") {
-    override fun createDefaultConfiguration(): Configuration {
-        val defaultConfiguration = Configuration()
-        val sdkList = ProjectJdkTable.getInstance().getSdksOfType(org.elixir_lang.sdk.elixir.Type.instance)
+    override fun createDefaultConfiguration(): Configuration = Configuration()
 
-        if (sdkList.size > 0) {
-            defaultConfiguration.sdk = sdkList[0]
-        }
+    override fun createFacet(
+        module: Module,
+        name: String,
+        configuration: Configuration,
+        underlyingFacet: com.intellij.facet.Facet<*>?
+    ): Facet = Facet(this, module, name, configuration, underlyingFacet)
 
-        return defaultConfiguration
-    }
-
-    override fun createFacet(module: Module,
-                             name: String,
-                             configuration: Configuration,
-                             underlyingFacet: com.intellij.facet.Facet<*>?): Facet {
-        return Facet(this, module, name, configuration, underlyingFacet)
-    }
-
-    override fun isSuitableModuleType(moduleType: ModuleType<*>): Boolean {
-        return moduleType.id != ElixirModuleType.MODULE_TYPE_ID
-    }
+    override fun isSuitableModuleType(moduleType: ModuleType<*>): Boolean =
+        moduleType.id != ElixirModuleType.MODULE_TYPE_ID
 
     override fun getIcon(): Icon = Icons.LANGUAGE
 
     companion object {
-        internal val ID = "Elixir"
+        internal const val ID = "Elixir"
     }
 }

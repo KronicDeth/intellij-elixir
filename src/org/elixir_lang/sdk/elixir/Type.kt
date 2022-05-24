@@ -507,8 +507,6 @@ ELIXIR_SDK_HOME
             }
         }
 
-        private fun facetSdk(facet: Facet): Sdk? = facet.configuration.sdk
-
         private fun moduleSdk(module: Module): Sdk? = sdk(ModuleRootManager.getInstance(module).sdk)
 
         private fun projectSdk(project: Project): Sdk? = sdk(ProjectRootManager.getInstance(project).projectSdk)
@@ -521,7 +519,7 @@ ELIXIR_SDK_HOME
 
         @JvmStatic
         fun mostSpecificSdk(module: Module): Sdk? =
-            FacetManager.getInstance(module).getFacetByType(Facet.ID)?.let { elixirFacet -> facetSdk(elixirFacet) }
+            FacetManager.getInstance(module).getFacetByType(Facet.ID)?.sdk
                 ?: moduleSdk(module)
                 ?: mostSpecificSdk(module.project)
 
