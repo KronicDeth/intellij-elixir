@@ -345,6 +345,9 @@
 * [#2687](https://github.com/KronicDeth/intellij-elixir/pull/2687) - [@KronicDeth](https://github.com/KronicDeth)
   * Handle disposed `Sdk.rootProvider` by reloading the `Sdk` when loading `ebinDirectories`
   * In IntelliJ 2022, the New Project dialog changed and it no longer automatically listed `ModuleType.getBuilder` `ModuleBuilder`s as potential project builders, so it looked like Elixir New Project support disappeared.  Fix this by implementing the `newProjectWizard.language` extension that was added to control the Language switching in the new New Project dialog. 
+* [#2688]](https://github.com/KronicDeth/intellij-elixir/pull/2688) - [@KronicDeth](https://github.com/KronicDeth)
+  * Remove references to `ElementClassHint` in BeamFileImpl that only work in IntelliJ.
+    `ElementClassHint` is part of the `processDeclaration` system used in Java and so was in the code because `BeamFileImpl` was original based on `ClassFileImpl`, but since the Elixir resolvers don't use the hint system at all, it can just be removed.
 
 ## v13.0.0
 
