@@ -106,6 +106,8 @@
         This eliminates the duplicates that happened before. (It turns out the JetBrains API doesn't prevent duplicates. Oopsie.) It also ensures that no SDK is recorded if the SDK is deselected in the UI, which wouldn't happen before.</li>
       <li>Handle disposed <code class="notranslate">Sdk.rootProvider</code> by reloading the <code class="notranslate">Sdk</code> when loading <code class="notranslate">ebinDirectories</code></li>
       <li>In IntelliJ 2022, the New Project dialog changed and it no longer automatically listed <code class="notranslate">ModuleType.getBuilder</code> <code class="notranslate">ModuleBuilder</code>s as potential project builders, so it looked like Elixir New Project support disappeared.  Fix this by implementing the <code class="notranslate">newProjectWizard.language</code> extension that was added to control the Language switching in the new New Project dialog.</li>
+      <li>Remove references to <code class="notranslate">ElementClassHint</code> in BeamFileImpl that only work in IntelliJ.<br>
+        <code class="notranslate">ElementClassHint</code> is part of the <code class="notranslate">processDeclaration</code> system used in Java and so was in the code because <code class="notranslate">BeamFileImpl</code> was original based on <code class="notranslate">ClassFileImpl</code>, but since the Elixir resolvers don't use the hint system at all, it can just be removed.</li>
     </ul>
   </li>
 </ul>
