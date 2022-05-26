@@ -5,6 +5,7 @@
 <idea-plugin version="2">
     <extensions defaultExtensionNs="com.intellij">
         <moduleType id="ELIXIR_MODULE" implementationClass="org.elixir_lang.module.ElixirModuleType"/>
+        <newProjectWizard.language implementation="org.elixir_lang.NewProjectWizard"/>
 
         <projectStructureDetector implementation="org.elixir_lang.module.ElixirProjectStructureDetector"/>
 
