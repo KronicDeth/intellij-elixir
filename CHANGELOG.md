@@ -275,6 +275,17 @@
       * Only including ending line if it is different than starting line.
       * Add ending line as a range after starting line instead of a completely separate path and line.
     * Put stacktrace in `<details>` with `<summary>`
+* [#2687](https://github.com/KronicDeth/intellij-elixir/pull/2687) - [@KronicDeth](https://github.com/KronicDeth)
+  * Update dependencies
+    * `gradle` to `7.4.2`
+    * `gradle-intellij-plugin` to `1.6.0`
+    * Set `-Xjvm-default=all` for Kotlin to allow `@JvmDefault` interfaces
+       * Needed for `LanguageNewProjectWizard` subclasses and associated implementations
+  * New Project > Language > Elixir includes all mix options
+    * `--app`
+    * `--module`
+    * `--sup`
+    * `--umbrella`     
 
 ### Bug Fixes
 
@@ -331,6 +342,9 @@
     * Instead detect the Elixir SDK by finding any of the libraries that have an Elixir SDK name in the module. (The Elixir SDK was already being added as a library to allow indexing the SDK.)
   * Clear out any existing Elixir SDKs listed as module libraries before setting a new SDK.
     This eliminates the duplicates that happened before. (It turns out the JetBrains API doesn't prevent duplicates. Oopsie.) It also ensures that no SDK is recorded if the SDK is deselected in the UI, which wouldn't happen before.
+* [#2687](https://github.com/KronicDeth/intellij-elixir/pull/2687) - [@KronicDeth](https://github.com/KronicDeth)
+  * Handle disposed `Sdk.rootProvider` by reloading the `Sdk` when loading `ebinDirectories`
+  * In IntelliJ 2022, the New Project dialog changed and it no longer automatically listed `ModuleType.getBuilder` `ModuleBuilder`s as potential project builders, so it looked like Elixir New Project support disappeared.  Fix this by implementing the `newProjectWizard.language` extension that was added to control the Language switching in the new New Project dialog. 
 
 ## v13.0.0
 

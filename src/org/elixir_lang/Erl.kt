@@ -1,6 +1,7 @@
 package org.elixir_lang
 
 import com.intellij.execution.configurations.GeneralCommandLine
+import com.intellij.openapi.projectRoots.ProjectJdkTable
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.roots.OrderRootType
 import org.elixir_lang.jps.sdk_type.Erlang
@@ -36,25 +37,10 @@ object Erl {
     private fun prependCodePaths(generalCommandLine: GeneralCommandLine, sdk: Sdk) {
         prependCodePaths(
             generalCommandLine,
-            ebinDirectories(sdk)
+            sdk.ebinDirectories()
         )
     }
 
-    private fun ebinDirectories(sdk: Sdk): kotlin.collections.List<String> {
-        var ebinDirectories: kotlin.collections.List<String>?
-
-        do {
-            ebinDirectories = try {
-                sdk.rootProvider.getFiles(OrderRootType.CLASSES).map { it.canonicalPath!! }
-            } catch (e: AssertionError) {
-                null
-            } catch (e: RuntimeException) {
-                null
-            }
-        } while (ebinDirectories == null)
-
-        return ebinDirectories
-    }
 
     /**
      * Keep in-sync with [org.elixir_lang.jps.Builder.setErl]
@@ -64,3 +50,12 @@ object Erl {
         prependCodePaths(commandLine, erlangSdk)
     }
 }
+
+fun Sdk.ebinDirectories(): kotlin.collections.List<String> =
+    try {
+        rootProvider.getFiles(OrderRootType.CLASSES).map { it.canonicalPath!! }
+    } catch (e: AssertionError) {
+        ProjectJdkTable.getInstance().findJdk(name)?.ebinDirectories().orEmpty()
+    } catch (e: RuntimeException) {
+        ProjectJdkTable.getInstance().findJdk(name)?.ebinDirectories().orEmpty()
+    }

@@ -18,6 +18,25 @@
           <li>Put stacktrace in <code class="notranslate">&lt;details&gt;</code> with <code class="notranslate">&lt;summary&gt;</code></li>
         </ul>
       </li>
+      <li>Update dependencies
+        <ul dir="auto">
+          <li><code class="notranslate">gradle</code> to <code class="notranslate">7.4.2</code></li>
+          <li><code class="notranslate">gradle-intellij-plugin</code> to <code class="notranslate">1.6.0</code></li>
+          <li>Set <code class="notranslate">-Xjvm-default=all</code> for Kotlin to allow <code class="notranslate">@JvmDefault</code> interfaces
+            <ul dir="auto">
+              <li>Needed for <code class="notranslate">LanguageNewProjectWizard</code> subclasses and associated implementations</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li>New Project &gt; Language &gt; Elixir includes all mix options
+        <ul dir="auto">
+          <li><code class="notranslate">--app</code></li>
+          <li><code class="notranslate">--module</code></li>
+          <li><code class="notranslate">--sup</code></li>
+          <li><code class="notranslate">--umbrella</code></li>
+        </ul>
+      </li>
     </ul>
   </li>
   <li>
@@ -85,6 +104,8 @@
       </li>
       <li>Clear out any existing Elixir SDKs listed as module libraries before setting a new SDK.<br>
         This eliminates the duplicates that happened before. (It turns out the JetBrains API doesn't prevent duplicates. Oopsie.) It also ensures that no SDK is recorded if the SDK is deselected in the UI, which wouldn't happen before.</li>
+      <li>Handle disposed <code class="notranslate">Sdk.rootProvider</code> by reloading the <code class="notranslate">Sdk</code> when loading <code class="notranslate">ebinDirectories</code></li>
+      <li>In IntelliJ 2022, the New Project dialog changed and it no longer automatically listed <code class="notranslate">ModuleType.getBuilder</code> <code class="notranslate">ModuleBuilder</code>s as potential project builders, so it looked like Elixir New Project support disappeared.  Fix this by implementing the <code class="notranslate">newProjectWizard.language</code> extension that was added to control the Language switching in the new New Project dialog.</li>
     </ul>
   </li>
 </ul>
