@@ -1,6 +1,6 @@
 <html>
 <body>
-<h1>v13.0.1</h1>
+<h1>v13.1.0</h1>
 <ul>
   <li>
     <p>Enhancements</p>
@@ -35,6 +35,21 @@
           <li><code class="notranslate">--module</code></li>
           <li><code class="notranslate">--sup</code></li>
           <li><code class="notranslate">--umbrella</code></li>
+        </ul>
+      </li>
+      <li>Add <code class="notranslate">mix format</code> external formatter.<br>
+        Requires project or module SDK be set in order to run.  If the SDK is not available, only the internal formatter will be used.  The internal formatter is still used for file subsection formatting and new line indenting as <code class="notranslate">mix format</code> works at the file-level.
+        <ul dir="auto">
+          <li>
+            <p dir="auto">Allow <code class="notranslate">mix format</code> external formatter to be disabled.</p>
+            <ol dir="auto">
+              <li>Preferences</li>
+              <li>Editor &gt; Code Style &gt; Elixir</li>
+              <li>Click the <code class="notranslate">mix format</code> tab</li>
+              <li>Expand the General group</li>
+              <li>Uncheck "Format files with <code class="notranslate">mix format</code>".</li>
+            </ol>
+          </li>
         </ul>
       </li>
     </ul>
@@ -108,6 +123,7 @@
       <li>In IntelliJ 2022, the New Project dialog changed and it no longer automatically listed <code class="notranslate">ModuleType.getBuilder</code> <code class="notranslate">ModuleBuilder</code>s as potential project builders, so it looked like Elixir New Project support disappeared.  Fix this by implementing the <code class="notranslate">newProjectWizard.language</code> extension that was added to control the Language switching in the new New Project dialog.</li>
       <li>Remove references to <code class="notranslate">ElementClassHint</code> in BeamFileImpl that only work in IntelliJ.<br>
         <code class="notranslate">ElementClassHint</code> is part of the <code class="notranslate">processDeclaration</code> system used in Java and so was in the code because <code class="notranslate">BeamFileImpl</code> was original based on <code class="notranslate">ClassFileImpl</code>, but since the Elixir resolvers don't use the hint system at all, it can just be removed.</li>
+      <li>Remove <code class="notranslate">CodeStyleSettingsProvider</code> because it is redundant with <code class="notranslate">LanguageCodeStyleSettingsProvider</code></li>
     </ul>
   </li>
 </ul>

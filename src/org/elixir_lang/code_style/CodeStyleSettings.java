@@ -10,6 +10,7 @@ public class CodeStyleSettings extends CustomCodeStyleSettings {
     public boolean ALIGN_TWO_OPERANDS = true;
     public boolean ALIGN_TYPE_DEFINITION_TO_RIGHT_OF_OPERATOR = true;
     public int ALIGN_UNMATCHED_CALL_DO_BLOCKS = UnmatchedCallDoBlockAlignment.LINE.value;
+    public boolean MIX_FORMAT = true;
     public boolean SPACE_AFTER_CAPTURE_OPERATOR = false;
     public boolean SPACE_AROUND_AND_OPERATORS = true;
     public boolean SPACE_AROUND_ARROW_OPERATORS = true;

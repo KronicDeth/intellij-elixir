@@ -1,21 +1,35 @@
 package org.elixir_lang.formatter.settings
 
+import com.intellij.application.options.CodeStyleAbstractConfigurable
+import com.intellij.application.options.CodeStyleAbstractPanel
 import com.intellij.application.options.IndentOptionsEditor
 import com.intellij.application.options.SmartIndentOptionsEditor
 import com.intellij.lang.Language
-import com.intellij.psi.codeStyle.CodeStyleSettingsCustomizable
-import com.intellij.psi.codeStyle.CodeStyleSettingsCustomizableOptions
-import com.intellij.psi.codeStyle.CommonCodeStyleSettings
+import com.intellij.psi.codeStyle.*
 import com.intellij.psi.codeStyle.LanguageCodeStyleSettingsProvider
 import org.elixir_lang.ElixirLanguage
 import org.elixir_lang.code_style.CodeStyleSettings
 
 class LanguageCodeStyleSettingsProvider : LanguageCodeStyleSettingsProvider() {
+    override fun createCustomSettings(settings: com.intellij.psi.codeStyle.CodeStyleSettings): CustomCodeStyleSettings =
+        CodeStyleSettings(settings)
+
+    override fun createConfigurable(
+        baseSettings: com.intellij.psi.codeStyle.CodeStyleSettings,
+        modelSettings: com.intellij.psi.codeStyle.CodeStyleSettings
+    ): CodeStyleConfigurable = object : CodeStyleAbstractConfigurable(baseSettings, modelSettings, "Elixir") {
+        override fun createPanel(settings: com.intellij.psi.codeStyle.CodeStyleSettings): CodeStyleAbstractPanel =
+            ElixirCodeStyleMainPanel(currentSettings, settings)
+    }
+
     override fun customizeSettings(consumer: CodeStyleSettingsCustomizable, settingsType: SettingsType) {
-        if (settingsType == SettingsType.SPACING_SETTINGS) {
-            customizeSpaceSettings(consumer)
-        } else if (settingsType == SettingsType.WRAPPING_AND_BRACES_SETTINGS) {
-            customizeWrappingAndBracesSettings(consumer)
+        when (settingsType) {
+            SettingsType.SPACING_SETTINGS -> customizeSpaceSettings(consumer)
+            SettingsType.WRAPPING_AND_BRACES_SETTINGS -> customizeWrappingAndBracesSettings(consumer)
+            SettingsType.LANGUAGE_SPECIFIC -> customizeLanguageSpecific(consumer)
+            SettingsType.BLANK_LINES_SETTINGS,
+            SettingsType.INDENT_SETTINGS,
+            SettingsType.COMMENTER_SETTINGS -> Unit
         }
     }
 
@@ -178,14 +192,24 @@ class LanguageCodeStyleSettingsProvider : LanguageCodeStyleSettingsProvider() {
         )
     }
 
+    private fun customizeLanguageSpecific(consumer: CodeStyleSettingsCustomizable) {
+        consumer.showCustomOption(
+            CodeStyleSettings::class.java,
+            "MIX_FORMAT",
+            "Format files with `mix format`",
+            "General"
+        )
+    }
+
     override fun getCodeSample(settingsType: SettingsType): String =
         when (settingsType) {
-            SettingsType.BLANK_LINES_SETTINGS -> "Blank Line Settings Code Sample"
             SettingsType.SPACING_SETTINGS -> SPACING_CODE_SAMPLE
             SettingsType.WRAPPING_AND_BRACES_SETTINGS -> WRAPPING_AND_BRACES_SETTINGS_CODE_SAMPLE
             SettingsType.INDENT_SETTINGS -> INDENT_CODE_SAMPLE
-            SettingsType.LANGUAGE_SPECIFIC -> "Language Specific Code Sample"
-            else -> TODO()
+            SettingsType.LANGUAGE_SPECIFIC ->
+                INDENT_CODE_SAMPLE + SPACING_CODE_SAMPLE + WRAPPING_AND_BRACES_SETTINGS_CODE_SAMPLE
+            SettingsType.BLANK_LINES_SETTINGS,
+            SettingsType.COMMENTER_SETTINGS -> TODO()
         }
 
     override fun customizeDefaults(

@@ -47,6 +47,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testAlignBooleanOperandsFalse() {
         myFixture.configureByFile("align_boolean_operands_true.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         temporaryCodeStyleSettings
                 .getCustomSettings(CodeStyleSettings.class)
@@ -59,6 +60,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testAlignBooleanOperandsTrue() {
         myFixture.configureByFile("align_boolean_operands_false.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         temporaryCodeStyleSettings
                 .getCustomSettings(CodeStyleSettings.class)
@@ -71,6 +73,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testAlignTwoOperandsFalse() {
         myFixture.configureByFile("align_two_operands_true.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         temporaryCodeStyleSettings
                 .getCustomSettings(CodeStyleSettings.class)
@@ -83,6 +86,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testAlignTwoOperandsTrue() {
         myFixture.configureByFile("align_two_operands_false.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         temporaryCodeStyleSettings
                 .getCustomSettings(CodeStyleSettings.class)
@@ -95,6 +99,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testAlignTypeDefinitionToRightOfOperatorFalse() {
         myFixture.configureByFile("align_type_definition_to_right_of_operator_true.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         temporaryCodeStyleSettings
                 .getCustomSettings(CodeStyleSettings.class)
@@ -107,6 +112,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testAlignTypeDefinitionToRightOfOperatorTrue() {
         myFixture.configureByFile("align_type_definition_to_right_of_operator_false.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         temporaryCodeStyleSettings
                 .getCustomSettings(CodeStyleSettings.class)
@@ -119,6 +125,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testAlignGuardsToRightOfWhenTrue() {
         myFixture.configureByFile("align_guards_to_right_of_when_false.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         // Not configurable
 
@@ -141,6 +148,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testAnonymousFunctionWithMultipleClausesChop() {
         myFixture.configureByFile("anonymous_function_with_multiple_clauses_chop_before.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         reformatFixture();
 
@@ -166,6 +174,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testNoParenthesesCallDoNotWrapUnlessKeywordsMultiline() {
         myFixture.configureByFile("no_parentheses_call_do_not_wrap_unless_keywords_multiline_before.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         reformatFixture();
 
@@ -174,6 +183,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testNoParenthesesCallMultipleArgumentsWithWrappedMap() {
         myFixture.configureByFile("no_parentheses_call_multiple_arguments_with_wrapped_map_before.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         reformatFixture();
 
@@ -186,6 +196,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testNoParenthesesCallPositionAndKeywordWrap() {
         myFixture.configureByFile("no_parentheses_call_positional_and_keyword_wrap_before.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         reformatFixture();
 
@@ -202,6 +213,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testNoSpaceAfterAtOperator() {
         myFixture.configureByFile("space_after_at_operator.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         reformatFixture();
 
@@ -287,6 +299,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testIndentWithoutOverrides() {
         myFixture.configureByFile("indent_without_override_before.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         reformatFixture();
 
@@ -295,6 +308,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testInterpolationCompact() {
         myFixture.configureByFile("interpolation_compact_before.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         temporaryCodeStyleSettings.setRightMargin(ElixirLanguage.INSTANCE, 120);
 
@@ -305,6 +319,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testWhenWrapsWithRightOperand() {
         myFixture.configureByFile("when_wraps_with_right_operand_before.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         reformatFixture();
 
@@ -313,6 +328,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testWithSpaceAroundAdditionOperators() {
         myFixture.configureByFile("without_space_around_addition_operators.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         temporaryCodeStyleSettings.getCommonSettings(ElixirLanguage.INSTANCE).SPACE_AROUND_ADDITIVE_OPERATORS = true;
 
@@ -323,6 +339,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testWithoutSpaceAroundAdditionOperators() {
         myFixture.configureByFile("with_space_around_addition_operators.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         temporaryCodeStyleSettings.getCommonSettings(ElixirLanguage.INSTANCE).SPACE_AROUND_ADDITIVE_OPERATORS = false;
 
@@ -333,6 +350,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testSpaceAfterAfterKeyword() {
         myFixture.configureByFile("incorrect_spaces_after_after_keyword.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         reformatFixture();
 
@@ -343,6 +361,7 @@ public class FormattingTest extends PlatformTestCase {
         myFixture.configureByFile("capture_right_operand_without_space_around_and_operators_before.ex");
 
         temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).SPACE_AROUND_AND_OPERATORS = false;
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         reformatFixture();
 
@@ -353,6 +372,7 @@ public class FormattingTest extends PlatformTestCase {
         myFixture.configureByFile("without_space_around_and_operators.ex");
 
         temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).SPACE_AROUND_AND_OPERATORS = true;
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         reformatFixture();
 
@@ -363,6 +383,7 @@ public class FormattingTest extends PlatformTestCase {
         myFixture.configureByFile("with_space_around_and_operators.ex");
 
         temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).SPACE_AROUND_AND_OPERATORS = false;
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         reformatFixture();
 
@@ -373,6 +394,7 @@ public class FormattingTest extends PlatformTestCase {
         myFixture.configureByFile("without_space_around_arrow_operators.ex");
 
         temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).SPACE_AROUND_ARROW_OPERATORS = true;
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         reformatFixture();
 
@@ -383,6 +405,7 @@ public class FormattingTest extends PlatformTestCase {
         myFixture.configureByFile("with_space_around_arrow_operators.ex");
 
         temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).SPACE_AROUND_ARROW_OPERATORS = false;
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         reformatFixture();
 
@@ -394,6 +417,7 @@ public class FormattingTest extends PlatformTestCase {
         myFixture.configureByFile("without_space_around_association_operator.ex");
 
         temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).SPACE_AROUND_ASSOCIATION_OPERATOR = true;
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         reformatFixture();
 
@@ -404,6 +428,7 @@ public class FormattingTest extends PlatformTestCase {
         myFixture.configureByFile("with_space_around_association_operator.ex");
 
         temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).SPACE_AROUND_ASSOCIATION_OPERATOR = false;
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         reformatFixture();
 
@@ -414,6 +439,7 @@ public class FormattingTest extends PlatformTestCase {
         myFixture.configureByFile("without_space_after_capture_operator.ex");
 
         temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).SPACE_AFTER_CAPTURE_OPERATOR = true;
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         reformatFixture();
 
@@ -424,6 +450,7 @@ public class FormattingTest extends PlatformTestCase {
         myFixture.configureByFile("with_space_after_capture_operator.ex");
 
         temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).SPACE_AFTER_CAPTURE_OPERATOR = false;
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         reformatFixture();
 
@@ -432,6 +459,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testSpaceAfterCatchKeyword() {
         myFixture.configureByFile("incorrect_spaces_after_catch_keyword.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         reformatFixture();
 
@@ -440,6 +468,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testWithSpaceWithinBits() {
         myFixture.configureByFile("without_space_within_bits.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).SPACE_WITHIN_BITS = true;
 
@@ -450,6 +479,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testWithoutSpaceWithinBits() {
         myFixture.configureByFile("with_space_within_bits.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).SPACE_WITHIN_BITS = false;
 
@@ -460,6 +490,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testWithSpaceWithinBrackets() {
         myFixture.configureByFile("without_space_within_brackets.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         temporaryCodeStyleSettings.getCommonSettings(ElixirLanguage.INSTANCE).SPACE_WITHIN_BRACKETS = true;
 
@@ -470,6 +501,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testWithoutSpaceWithinBrackets() {
         myFixture.configureByFile("with_space_within_brackets.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         temporaryCodeStyleSettings.getCommonSettings(ElixirLanguage.INSTANCE).SPACE_WITHIN_BRACKETS = false;
 
@@ -480,6 +512,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testWithSpaceAfterComma() {
         myFixture.configureByFile("without_space_after_comma.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         temporaryCodeStyleSettings.getCommonSettings(ElixirLanguage.INSTANCE).SPACE_AFTER_COMMA = true;
 
@@ -490,6 +523,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testWithoutSpaceAfterComma() {
         myFixture.configureByFile("with_space_after_comma.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         temporaryCodeStyleSettings.getCommonSettings(ElixirLanguage.INSTANCE).SPACE_AFTER_COMMA = false;
 
@@ -500,6 +534,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testWithSpaceBeforeComma() {
         myFixture.configureByFile("without_space_before_comma.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         temporaryCodeStyleSettings.getCommonSettings(ElixirLanguage.INSTANCE).SPACE_BEFORE_COMMA = true;
 
@@ -510,6 +545,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testWithoutSpaceBeforeComma() {
         myFixture.configureByFile("with_space_before_comma.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         temporaryCodeStyleSettings.getCommonSettings(ElixirLanguage.INSTANCE).SPACE_BEFORE_COMMA = false;
 
@@ -522,6 +558,7 @@ public class FormattingTest extends PlatformTestCase {
         myFixture.configureByFile("without_space_around_comparison_operators.ex");
 
         temporaryCodeStyleSettings.getCommonSettings(ElixirLanguage.INSTANCE).SPACE_AROUND_EQUALITY_OPERATORS = true;
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         reformatFixture();
 
@@ -532,6 +569,7 @@ public class FormattingTest extends PlatformTestCase {
         myFixture.configureByFile("with_space_around_comparison_operators.ex");
 
         temporaryCodeStyleSettings.getCommonSettings(ElixirLanguage.INSTANCE).SPACE_AROUND_EQUALITY_OPERATORS = false;
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         reformatFixture();
 
@@ -542,6 +580,7 @@ public class FormattingTest extends PlatformTestCase {
         myFixture.configureByFile("without_space_within_curly_braces.ex");
 
         temporaryCodeStyleSettings.getCommonSettings(ElixirLanguage.INSTANCE).SPACE_WITHIN_BRACES = true;
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         reformatFixture();
 
@@ -552,6 +591,7 @@ public class FormattingTest extends PlatformTestCase {
         myFixture.configureByFile("with_space_within_curly_braces.ex");
 
         temporaryCodeStyleSettings.getCommonSettings(ElixirLanguage.INSTANCE).SPACE_WITHIN_BRACES = false;
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         reformatFixture();
 
@@ -560,6 +600,8 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testNoSpaceAroundDotOperator() {
         myFixture.configureByFile("incorrect_spaces_around_dot_operator.ex");
+
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         reformatFixture();
 
@@ -583,6 +625,8 @@ public class FormattingTest extends PlatformTestCase {
     public void testPipelineMixedPosition() {
         myFixture.configureByFile("pipeline_mixed_position_before.ex");
 
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
+
         reformatFixture();
 
         myFixture.checkResultByFile("pipeline_mixed_position_after.ex");
@@ -590,6 +634,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testQuoteKeywords() {
         myFixture.configureByFile("quote_keywords_before.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         reformatFixture();
 
@@ -602,6 +647,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testIndentBeforeElseKeyword() {
         myFixture.configureByFile("incorrect_indent_before_else_keyword.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         reformatFixture();
 
@@ -610,6 +656,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testIndentAfterElseKeyword() {
         myFixture.configureByFile("incorrect_indent_after_else_keyword.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         reformatFixture();
 
@@ -618,6 +665,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testHeredocAlignment() {
         myFixture.configureByFile("heredoc_alignment_before.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         reformatFixture();
 
@@ -633,11 +681,12 @@ public class FormattingTest extends PlatformTestCase {
     }
 
     public void testHeredocBlankLines() {
-        assertFormatted( "heredoc_blank_lines.ex");
+        assertFormatted("heredoc_blank_lines.ex");
     }
 
     public void testWithSpaceAroundInMatchOperators() {
         myFixture.configureByFile("without_space_around_in_match_operators.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).SPACE_AROUND_IN_MATCH_OPERATORS = true;
 
@@ -648,6 +697,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testWithoutSpaceAroundInMatchOperators() {
         myFixture.configureByFile("with_space_around_in_match_operators.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).SPACE_AROUND_IN_MATCH_OPERATORS = false;
 
@@ -658,6 +708,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testSpaceAroundInOperator() {
         myFixture.configureByFile("incorrect_spaces_around_in_operator.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         reformatFixture();
 
@@ -666,6 +717,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testSpaceAfterKeywordPairColon() {
         myFixture.configureByFile("incorrect_spaces_after_keyword_pair_colon.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         reformatFixture();
 
@@ -686,6 +738,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testMapConstructionArgumentsKeywordsAllWrapIfAnyWraps() {
         myFixture.configureByFile("map_construction_arguments_keywords_all_wrap_if_any_wraps_before.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         reformatFixture();
 
@@ -694,6 +747,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testMapConstructionArgumentsAssociationsAllWrapIfAnyWraps() {
         myFixture.configureByFile("map_construction_arguments_associations_all_wrap_if_any_wraps_before.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         reformatFixture();
 
@@ -704,6 +758,7 @@ public class FormattingTest extends PlatformTestCase {
         myFixture.configureByFile(
                 "map_construction_arguments_associations_base_and_keywords_all_wrap_if_any_wraps_before.ex"
         );
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         reformatFixture();
 
@@ -718,6 +773,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testMapAndStructUpdateOneKeyPerLine() {
         myFixture.configureByFile("map_and_struct_update_one_key_per_line_before.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         reformatFixture();
 
@@ -742,6 +798,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testWithSpaceAroundMatchOperator() {
         myFixture.configureByFile("without_space_around_match_operator.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         temporaryCodeStyleSettings.getCommonSettings(ElixirLanguage.INSTANCE).SPACE_AROUND_ASSIGNMENT_OPERATORS = true;
 
@@ -752,6 +809,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testWithoutSpaceAroundMatchOperator() {
         myFixture.configureByFile("with_space_around_match_operator.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         temporaryCodeStyleSettings.getCommonSettings(ElixirLanguage.INSTANCE).SPACE_AROUND_ASSIGNMENT_OPERATORS = false;
 
@@ -762,6 +820,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testWithSpaceAroundMultiplicationOperators() {
         myFixture.configureByFile("without_space_around_multiplication_operators.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         temporaryCodeStyleSettings
                 .getCommonSettings(ElixirLanguage.INSTANCE)
@@ -774,6 +833,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testWithoutSpaceAroundMultiplicationOperators() {
         myFixture.configureByFile("with_space_around_multiplication_operators.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         temporaryCodeStyleSettings
                 .getCommonSettings(ElixirLanguage.INSTANCE)
@@ -786,6 +846,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testWithSpaceAroundOrOperators() {
         myFixture.configureByFile("without_space_around_or_operators.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).SPACE_AROUND_OR_OPERATORS = true;
 
@@ -796,6 +857,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testWithoutSpaceAroundOrOperators() {
         myFixture.configureByFile("with_space_around_or_operators.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).SPACE_AROUND_OR_OPERATORS = false;
 
@@ -806,6 +868,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testWithSpaceWithinParentheses() {
         myFixture.configureByFile("without_space_within_parentheses.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         temporaryCodeStyleSettings.getCommonSettings(ElixirLanguage.INSTANCE).SPACE_WITHIN_PARENTHESES = true;
 
@@ -816,6 +879,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testWithoutSpaceWithinParentheses() {
         myFixture.configureByFile("with_space_within_parentheses.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         temporaryCodeStyleSettings.getCommonSettings(ElixirLanguage.INSTANCE).SPACE_WITHIN_PARENTHESES = false;
 
@@ -826,6 +890,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testWithSpaceAroundPipeOperators() {
         myFixture.configureByFile("without_space_around_pipe_operator.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).SPACE_AROUND_PIPE_OPERATOR = true;
 
@@ -836,6 +901,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testWithoutSpaceAroundPipeOperators() {
         myFixture.configureByFile("with_space_around_pipe_operator.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).SPACE_AROUND_PIPE_OPERATOR = false;
 
@@ -846,6 +912,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testWithSpaceAroundRangeOperator() {
         myFixture.configureByFile("without_space_around_range_operator.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).SPACE_AROUND_RANGE_OPERATOR = true;
 
@@ -858,6 +925,7 @@ public class FormattingTest extends PlatformTestCase {
         myFixture.configureByFile("with_space_around_range_operator.ex");
 
         temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).SPACE_AROUND_RANGE_OPERATOR = false;
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         reformatFixture();
 
@@ -866,6 +934,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testWithSpaceAroundRelationalOperators() {
         myFixture.configureByFile("without_space_around_relational_operators.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         temporaryCodeStyleSettings.getCommonSettings(ElixirLanguage.INSTANCE).SPACE_AROUND_RELATIONAL_OPERATORS = true;
 
@@ -876,6 +945,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testWithoutSpaceAroundRelationalOperators() {
         myFixture.configureByFile("with_space_around_relational_operators.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         temporaryCodeStyleSettings.getCommonSettings(ElixirLanguage.INSTANCE).SPACE_AROUND_RELATIONAL_OPERATORS = false;
 
@@ -886,6 +956,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testSpaceAfterRescueKeyword() {
         myFixture.configureByFile("incorrect_spaces_after_rescue_keyword.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         reformatFixture();
 
@@ -894,6 +965,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testWithSpaceAroundStabOperator() {
         myFixture.configureByFile("without_space_around_stab_operator.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         temporaryCodeStyleSettings.getCommonSettings(ElixirLanguage.INSTANCE).SPACE_AROUND_LAMBDA_ARROW = true;
 
@@ -904,6 +976,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testWithoutSpaceAroundStabOperator() {
         myFixture.configureByFile("with_space_around_stab_operator.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         temporaryCodeStyleSettings.getCommonSettings(ElixirLanguage.INSTANCE).SPACE_AROUND_LAMBDA_ARROW = false;
 
@@ -914,6 +987,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testWithSpaceAroundThreeOperator() {
         myFixture.configureByFile("without_space_around_three_operator.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).SPACE_AROUND_THREE_OPERATOR = true;
 
@@ -924,6 +998,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testWithoutSpaceAroundThreeOperator() {
         myFixture.configureByFile("with_space_around_three_operator.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).SPACE_AROUND_THREE_OPERATOR = false;
 
@@ -934,6 +1009,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testWithSpaceAroundTwoOperator() {
         myFixture.configureByFile("without_space_around_two_operators.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).SPACE_AROUND_TWO_OPERATORS = true;
 
@@ -944,6 +1020,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testWithoutSpaceAroundTwoOperator() {
         myFixture.configureByFile("with_space_around_two_operators.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).SPACE_AROUND_TWO_OPERATORS = false;
 
@@ -954,6 +1031,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testWithSpaceAroundTypeOperator() {
         myFixture.configureByFile("without_space_around_type_operator.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).SPACE_AROUND_TYPE_OPERATOR = true;
 
@@ -964,6 +1042,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testWithoutSpaceAroundTypeOperator() {
         myFixture.configureByFile("with_space_around_type_operator.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).SPACE_AROUND_TYPE_OPERATOR = false;
 
@@ -974,6 +1053,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testWithSpaceAroundUnaryOperators() {
         myFixture.configureByFile("without_space_around_unary_operators.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         temporaryCodeStyleSettings.getCommonSettings(ElixirLanguage.INSTANCE).SPACE_AROUND_UNARY_OPERATOR = true;
 
@@ -984,6 +1064,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testWithoutSpaceAroundUnaryOperators() {
         myFixture.configureByFile("with_space_around_unary_operators.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         temporaryCodeStyleSettings.getCommonSettings(ElixirLanguage.INSTANCE).SPACE_AROUND_UNARY_OPERATOR = false;
 
@@ -994,6 +1075,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testSpaceAroundWhenOperators() {
         myFixture.configureByFile("incorrect_spaces_around_when_operator.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         reformatFixture();
 
@@ -1006,6 +1088,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testSingleSpaceNotOperator() {
         myFixture.configureByFile("multispace_not_operator.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         reformatFixture();
 
@@ -1018,6 +1101,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testStructKeysAreAligned() {
         myFixture.configureByFile("struct_keys_unaligned.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         reformatFixture();
 
@@ -1036,6 +1120,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testStructAllKeysWrap() {
         myFixture.configureByFile("struct_some_keys_wrap.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         reformatFixture();
 
@@ -1052,6 +1137,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testUnmatchedCallAlignDoBlockToCall() {
         myFixture.configureByFile("unmatched_call_align_do_block_to_line.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         temporaryCodeStyleSettings
                 .getCustomSettings(CodeStyleSettings.class)
@@ -1064,6 +1150,7 @@ public class FormattingTest extends PlatformTestCase {
 
     public void testUnmatchedCallAlignDoBlockToLine() {
         myFixture.configureByFile("unmatched_call_align_do_block_to_call.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
 
         temporaryCodeStyleSettings
                 .getCustomSettings(CodeStyleSettings.class)

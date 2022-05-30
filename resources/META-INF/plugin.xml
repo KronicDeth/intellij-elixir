@@ -198,12 +198,12 @@
         <lang.foldingBuilder language="Elixir" implementationClass="org.elixir_lang.folding.Builder"/>
 
         <!-- formatting -->
-        <codeStyleSettingsProvider implementation="org.elixir_lang.formatter.settings.CodeStyleSettingsProvider"/>
         <lang.formatter language="Elixir" implementationClass="org.elixir_lang.formatting.ModelBuilder"/>
         <lang.formatter language="EEx"
                         implementationClass="com.intellij.psi.templateLanguages.SimpleTemplateLanguageFormattingModelBuilder"/>
         <langCodeStyleSettingsProvider
                 implementation="org.elixir_lang.formatter.settings.LanguageCodeStyleSettingsProvider"/>
+        <externalFormatProcessor implementation="org.elixir_lang.formatter.MixFormatExternalFormatProcessor"/>
 
         <!-- test -->
         <runLineMarkerContributor language="Elixir"
