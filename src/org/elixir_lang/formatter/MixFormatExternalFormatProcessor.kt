@@ -1,5 +1,6 @@
 package org.elixir_lang.formatter
 
+import com.intellij.application.options.CodeStyle
 import com.intellij.execution.process.CapturingProcessHandler
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.command.CommandProcessor
@@ -11,6 +12,7 @@ import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiFile
 import com.intellij.psi.codeStyle.ExternalFormatProcessor
 import org.elixir_lang.Mix
+import org.elixir_lang.code_style.CodeStyleSettings
 import org.elixir_lang.psi.ElixirFile
 import org.elixir_lang.sdk.elixir.Type.Companion.mostSpecificSdk
 import java.util.concurrent.TimeUnit
@@ -18,9 +20,8 @@ import java.util.concurrent.TimeUnit
 @Suppress("UnstableApiUsage")
 @SuppressWarnings("UnstableApiUsage")
 class MixFormatExternalFormatProcessor : ExternalFormatProcessor {
-    override fun activeForFile(source: PsiFile): Boolean {
-        return source is ElixirFile
-    }
+    override fun activeForFile(source: PsiFile): Boolean =
+        source is ElixirFile && CodeStyle.getCustomSettings(source, CodeStyleSettings::class.java).MIX_FORMAT
 
     override fun getId(): String = javaClass.name
 

@@ -289,6 +289,13 @@
 * [#2578](https://github.com/KronicDeth/intellij-elixir/pull/2578) - [@yordis](https://github.com/yordis)
   * Add `mix format` external formatter.
     Requires project or module SDK be set in order to run.  If the SDK is not available, only the internal formatter will be used.  The internal formatter is still used for file subsection formatting and new line indenting as `mix format` works at the file-level.
+    * Allow `mix format` external formatter to be disabled.
+    
+      1. Preferences
+      2. Editor > Code Style > Elixir
+      3. Click the `mix format` tab
+      4. Expand the General group
+      5. Uncheck "Format files with `mix format`".
 
 ### Bug Fixes
 

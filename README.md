@@ -4258,6 +4258,16 @@ new lines use the internal formatter until the next full file format uses `mix f
 
 **NOTE: The module or project SDK *MUST* be set in order to run `mix format`.  If the SDK is not set, only the internal formatter will be run.**
 
+###### Disabling
+
+`mix format` can be disabled if you only want to use the Internal Formatter.
+
+1. Preferences
+2. Editor > Code Style > Elixir
+3. Click the `mix format` tab
+4. Expand the General group
+4. Uncheck "Format files with `mix format`".
+
 #### Format on Save
 
 To tun on format on save:
