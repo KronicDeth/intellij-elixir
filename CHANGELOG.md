@@ -351,6 +351,8 @@
 * [#2688]](https://github.com/KronicDeth/intellij-elixir/pull/2688) - [@KronicDeth](https://github.com/KronicDeth)
   * Remove references to `ElementClassHint` in BeamFileImpl that only work in IntelliJ.
     `ElementClassHint` is part of the `processDeclaration` system used in Java and so was in the code because `BeamFileImpl` was original based on `ClassFileImpl`, but since the Elixir resolvers don't use the hint system at all, it can just be removed.
+* [#2578](https://github.com/KronicDeth/intellij-elixir/pull/2578) - [@yordis](https://github.com/KronicDeth/intellij-elixir/pull/2578)
+  * Remove `CodeStyleSettingsProvider` because it is redundant with `LanguageCodeStyleSettingsProvider`
 
 ## v13.0.0
 

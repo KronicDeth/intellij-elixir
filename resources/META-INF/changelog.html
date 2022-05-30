@@ -110,6 +110,7 @@
       <li>In IntelliJ 2022, the New Project dialog changed and it no longer automatically listed <code class="notranslate">ModuleType.getBuilder</code> <code class="notranslate">ModuleBuilder</code>s as potential project builders, so it looked like Elixir New Project support disappeared.  Fix this by implementing the <code class="notranslate">newProjectWizard.language</code> extension that was added to control the Language switching in the new New Project dialog.</li>
       <li>Remove references to <code class="notranslate">ElementClassHint</code> in BeamFileImpl that only work in IntelliJ.<br>
         <code class="notranslate">ElementClassHint</code> is part of the <code class="notranslate">processDeclaration</code> system used in Java and so was in the code because <code class="notranslate">BeamFileImpl</code> was original based on <code class="notranslate">ClassFileImpl</code>, but since the Elixir resolvers don't use the hint system at all, it can just be removed.</li>
+      <li>Remove <code class="notranslate">CodeStyleSettingsProvider</code> because it is redundant with <code class="notranslate">LanguageCodeStyleSettingsProvider</code></li>
     </ul>
   </li>
 </ul>
