@@ -50,7 +50,7 @@ class Configuration(name: String, project: Project) :
 
         // Explicit MIX_ENV so that `intellij_elixir.debug` uses the test code paths
         val envs = mutableMapOf<String, String>()
-        envs.putAll(envs)
+        envs.putAll(this.envs)
         envs.putIfAbsent("MIX_ENV", "test")
         debugged.envs = envs
 
