@@ -7,7 +7,7 @@ defmodule IntelliJElixir.Debugger.Server do
 
   # *.hrl files are not included in all SDK installs, so need to inline definition here
 
-  cond  do
+  cond do
     Version.compare(System.version(), "1.7.0") == :lt ->
       # https://github.com/elixir-lang/elixir/blob/v1.5.0/lib/elixir/src/elixir.hrl#L7-L17
       Record.defrecordp(
@@ -22,6 +22,7 @@ defmodule IntelliJElixir.Debugger.Server do
         counter: %{},
         file: "nofile"
       )
+
     Version.compare(System.version(), "1.9.2") == :lt ->
       # https://github.com/elixir-lang/elixir/blob/v1.7.0/lib/elixir/src/elixir.hrl#L7-L16
       Record.defrecordp(
@@ -35,7 +36,8 @@ defmodule IntelliJElixir.Debugger.Server do
         counter: %{},
         stacktrace: false
       )
-    true ->
+
+    Version.compare(System.version(), "1.10.0") == :lt ->
       # https://github.com/elixir-lang/elixir/blob/v1.9.2/lib/elixir/src/elixir.hrl#L8-L18
       Record.defrecordp(
         :elixir_erl,
@@ -48,6 +50,19 @@ defmodule IntelliJElixir.Debugger.Server do
         counter: %{},
         expand_captures: false,
         stacktrace: false
+      )
+    true ->
+      # https://github.com/elixir-lang/elixir/blob/v1.10.0/lib/elixir/src/elixir.hrl#L8-L17
+      Record.defrecordp(
+        :elixir_erl,
+        context: nil,
+        extra: nil,
+        caller: false,
+        var_names: %{},
+        extra_guards: [],
+        counter: %{},
+        expand_captures: false,
+        stacktrace: nil
       )
   end
 
@@ -254,16 +269,8 @@ defmodule IntelliJElixir.Debugger.Server do
                 {elixir_variable_name, nil}
               end)
 
-            parsed_scope =
-              elixir_erl(
-                vars: vars(elixir_variable_tuples),
-                counter: counter(elixir_variable_tuples)
-              )
-
-            # https://github.com/elixir-lang/elixir/blob/8a971fcb44391bd8b16456666f3033b633c6ff77/lib/elixir/src/elixir.erl#L255
-            # Elixir 1.7+ has :elixir_env.with_vars, but can't use here for Elixir 1.6.5 compatibility, so use
-            # https://github.com/elixir-lang/elixir/blob/v1.6.5/lib/elixir/src/elixir.erl#L223
-            vars_env = %{env | vars: parsed_vars}
+            parsed_scope = parsed_scope(elixir_variable_tuples)
+            vars_env = elixir_env_with_vars(env, parsed_vars)
 
             # Elixir 1.7+ uses current_vars
             current_vars_env =
@@ -274,7 +281,7 @@ defmodule IntelliJElixir.Debugger.Server do
               end
 
             # https://github.com/elixir-lang/elixir/blob/8a971fcb44391bd8b16456666f3033b633c6ff77/lib/elixir/src/elixir.erl#L256
-            {erl, _new_env, _new_scope} = quoted_to_erl(quoted, current_vars_env, parsed_scope)
+            erl = quoted_to_erl(quoted, current_vars_env, parsed_scope)
 
             code =
               [:erl_pp.expr(erl), ?.]
@@ -335,10 +342,18 @@ defmodule IntelliJElixir.Debugger.Server do
     :int.meta(meta_pid, :bindings, level)
   end
 
-  defp counter(elixir_variable_tuples) when is_list(elixir_variable_tuples) do
-    Enum.into(elixir_variable_tuples, %{}, fn {elixir_variable_name, counter, _} ->
-      {elixir_variable_name, counter}
-    end)
+  if Version.compare(System.version(), "1.10.0") == :lt do
+    defp counter(elixir_variable_tuples) when is_list(elixir_variable_tuples) do
+      Enum.into(elixir_variable_tuples, %{}, fn {elixir_variable_name, counter, _} ->
+        {elixir_variable_name, counter}
+      end)
+    end
+  else
+    defp counter(elixir_variable_tuples) when is_list(elixir_variable_tuples) do
+      Enum.into(elixir_variable_tuples, %{}, fn {elixir_variable_name, counter, _} ->
+        {elixir_variable_name, counter - 1}
+      end)
+    end
   end
 
   defp elixir_module_name_to_erlang_module_name(":" <> erlang_module_name), do: erlang_module_name
@@ -389,17 +404,27 @@ defmodule IntelliJElixir.Debugger.Server do
   end
 
   # `:elixir.quoted_to_erl/3` became private in Elixir 1.8, so need to inline it here.
-  if Version.compare(System.version(), "1.8.0") == :lt do
-    defp quoted_to_erl(quoted, env, scope) do
-      :elixir.quoted_to_erl(quoted, env, scope)
-    end
-  else
-    defp quoted_to_erl(quoted, env, scope) do
-      {expanded, new_env} = :elixir_expand.expand(quoted, env)
-      {erl, new_scope} = :elixir_erl_pass.translate(expanded, scope)
+  cond do
+    Version.compare(System.version(), "1.8.0") == :lt ->
+      defp quoted_to_erl(quoted, env, scope) do
+        {erl, _, _} = :elixir.quoted_to_erl(quoted, env, scope)
 
-      {erl, new_env, new_scope}
-    end
+        erl
+      end
+    Version.compare(System.version(), "1.13.0") == :lt ->
+      defp quoted_to_erl(quoted, env, scope) do
+        {expanded, _} = :elixir_expand.expand(quoted, env)
+        {erl, _} = :elixir_erl_pass.translate(expanded, scope)
+
+        erl
+      end
+    true ->
+      defp quoted_to_erl(quoted, env, scope) do
+        {expanded, _, _} = :elixir_expand.expand(quoted, :elixir_env.env_to_ex(env), env)
+        {erl, _} = :elixir_erl_pass.translate(expanded, :erl_anno.new(env.line), scope)
+
+        erl
+      end
   end
 
   defp time_interpret(module) when is_atom(module) do
@@ -537,6 +562,33 @@ defmodule IntelliJElixir.Debugger.Server do
       Enum.into(elixir_variable_tuples, %{}, fn {elixir_variable_name, _counter, erlang_variable_name} ->
         {{elixir_variable_name, nil}, {0, erlang_variable_name}}
       end)
+    end
+  end
+
+  if Version.compare(System.version(), "1.7.0") == :lt do
+    defp elixir_env_with_vars(env, parsed_vars) do
+      # https://github.com/elixir-lang/elixir/blob/v1.6.5/lib/elixir/src/elixir.erl#L223
+      %{env | vars: parsed_vars}
+    end
+  else
+    defp elixir_env_with_vars(env, parsed_vars) do
+      :elixir_env.with_vars(env, parsed_vars)
+    end
+  end
+
+  if Version.compare(System.version(), "1.10.0") == :lt do
+    defp parsed_scope(elixir_variable_tuples) do
+      elixir_erl(
+        vars: vars(elixir_variable_tuples),
+        counter: counter(elixir_variable_tuples)
+      )
+    end
+  else
+    defp parsed_scope(elixir_variable_tuples) do
+      elixir_erl(
+        var_names: vars(elixir_variable_tuples),
+        counter: counter(elixir_variable_tuples)
+      )
     end
   end
 end
