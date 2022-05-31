@@ -124,6 +124,8 @@
       <li>Remove references to <code class="notranslate">ElementClassHint</code> in BeamFileImpl that only work in IntelliJ.<br>
         <code class="notranslate">ElementClassHint</code> is part of the <code class="notranslate">processDeclaration</code> system used in Java and so was in the code because <code class="notranslate">BeamFileImpl</code> was original based on <code class="notranslate">ClassFileImpl</code>, but since the Elixir resolvers don't use the hint system at all, it can just be removed.</li>
       <li>Remove <code class="notranslate">CodeStyleSettingsProvider</code> because it is redundant with <code class="notranslate">LanguageCodeStyleSettingsProvider</code></li>
+      <li>Restrict <code class="notranslate">UsageTargetProvider</code> to <code class="notranslate">ElixirFile</code>s<br>
+        Without this restriction, it tries to run when developing the plugin itself and breaks Kotlin syntax highlighting.</li>
     </ul>
   </li>
 </ul>

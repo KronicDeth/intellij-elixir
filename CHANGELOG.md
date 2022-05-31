@@ -360,6 +360,9 @@
     `ElementClassHint` is part of the `processDeclaration` system used in Java and so was in the code because `BeamFileImpl` was original based on `ClassFileImpl`, but since the Elixir resolvers don't use the hint system at all, it can just be removed.
 * [#2578](https://github.com/KronicDeth/intellij-elixir/pull/2578) - [@yordis](https://github.com/KronicDeth/intellij-elixir/pull/2578)
   * Remove `CodeStyleSettingsProvider` because it is redundant with `LanguageCodeStyleSettingsProvider`
+* [#2695](https://github.com/KronicDeth/intellij-elixir/pull/2695) - [@KronicDeth](https://github.com/KronicDeth)
+  * Restrict `UsageTargetProvider` to `ElixirFile`s
+    Without this restriction, it tries to run when developing the plugin itself and breaks Kotlin syntax highlighting.
 
 ## v13.0.0
 
