@@ -296,6 +296,8 @@
       3. Click the `mix format` tab
       4. Expand the General group
       5. Uncheck "Format files with `mix format`".
+* [#2697](https://github.com/KronicDeth/intellij-elixir/pull/2697) - [@KronicDeth](https://github.com/KronicDeth)
+  * Support Elixir 1.13.0 in debugger.
 
 ### Bug Fixes
 
@@ -363,6 +365,9 @@
 * [#2695](https://github.com/KronicDeth/intellij-elixir/pull/2695) - [@KronicDeth](https://github.com/KronicDeth)
   * Restrict `UsageTargetProvider` to `ElixirFile`s
     Without this restriction, it tries to run when developing the plugin itself and breaks Kotlin syntax highlighting.
+* [#2697](https://github.com/KronicDeth/intellij-elixir/pull/2697) - [@KronicDeth](https://github.com/KronicDeth)
+  * Fix environment not being passed to debug runs of ESpec and ExUnit Run Configurations.
+    The `env` from the `Configuration` was dropped because a local `env` was created to set `MIX_ENV` `true`.
 
 ## v13.0.0
 
