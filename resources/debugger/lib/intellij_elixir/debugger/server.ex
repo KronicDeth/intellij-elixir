@@ -7,7 +7,7 @@ defmodule IntelliJElixir.Debugger.Server do
 
   # *.hrl files are not included in all SDK installs, so need to inline definition here
 
-  cond  do
+  cond do
     Version.compare(System.version(), "1.7.0") == :lt ->
       # https://github.com/elixir-lang/elixir/blob/v1.5.0/lib/elixir/src/elixir.hrl#L7-L17
       Record.defrecordp(
@@ -22,6 +22,7 @@ defmodule IntelliJElixir.Debugger.Server do
         counter: %{},
         file: "nofile"
       )
+
     Version.compare(System.version(), "1.9.2") == :lt ->
       # https://github.com/elixir-lang/elixir/blob/v1.7.0/lib/elixir/src/elixir.hrl#L7-L16
       Record.defrecordp(
@@ -35,6 +36,7 @@ defmodule IntelliJElixir.Debugger.Server do
         counter: %{},
         stacktrace: false
       )
+
     true ->
       # https://github.com/elixir-lang/elixir/blob/v1.9.2/lib/elixir/src/elixir.hrl#L8-L18
       Record.defrecordp(
