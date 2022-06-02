@@ -25,7 +25,6 @@ import org.elixir_lang.module.ElixirModuleBuilder
 import org.elixir_lang.module.ElixirModuleType
 import org.elixir_lang.sdk.elixir.Type
 import java.io.IOException
-import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
@@ -103,7 +102,9 @@ class Step(parent: NewProjectWizardLanguageStep) : AbstractNewProjectWizardStep(
             }
 
             // delete the caller's created empty directory so that `mix new` can create it.
-            Files.delete(context.projectDirectory)
+            if (!context.projectDirectory.toFile().deleteRecursively()) {
+                throw IOException("Could not delete ${context.projectDirectory}")
+            }
 
             val processOutput = ProgressManager
                 .getInstance()
