@@ -1,5 +1,7 @@
 package org.elixir_lang.documentation
 
+import com.ericsson.otp.erlang.OtpErlangBinary
+import com.ericsson.otp.erlang.OtpErlangObject
 import com.intellij.lang.documentation.DocumentationMarkup
 import com.intellij.lang.documentation.DocumentationProvider
 import com.intellij.openapi.editor.Editor
@@ -12,6 +14,7 @@ import org.elixir_lang.beam.chunk.beam_documentation.docs.documented.Hidden
 import org.elixir_lang.beam.chunk.beam_documentation.docs.documented.MarkdownByLanguage
 import org.elixir_lang.beam.chunk.beam_documentation.docs.documented.None
 import org.elixir_lang.beam.psi.BeamFileImpl
+import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.CallDefinitionClause
 import org.elixir_lang.psi.ElixirIdentifier
 import org.elixir_lang.psi.QualifiableAlias
@@ -125,14 +128,12 @@ class ElixirDocumentationProvider : DocumentationProvider {
                     documentationHtml.append(DocumentationMarkup.SECTIONS_START)
 
                     if (deprecated != null) {
-                        TODO()
-
-//                        documentationHtml
-//                                .append(DocumentationMarkup.SECTION_HEADER_START)
-//                                .append("Deprecated")
-//                                .append(DocumentationMarkup.SECTION_SEPARATOR)
-//                                .append(html(deprecated))
-//                                .append(DocumentationMarkup.SECTION_END)
+                        documentationHtml
+                            .append(DocumentationMarkup.SECTION_HEADER_START)
+                            .append("Deprecated")
+                            .append(DocumentationMarkup.SECTION_SEPARATOR)
+                            .append(html(deprecated))
+                            .append(DocumentationMarkup.SECTION_END)
                     }
 
                     if (implsIsNotEmpty) {
@@ -175,6 +176,20 @@ class ElixirDocumentationProvider : DocumentationProvider {
 
         return documentationHtml.toString()
     }
+
+    private fun html(otpErlangObject: OtpErlangObject): String =
+        when (otpErlangObject) {
+            is OtpErlangBinary ->
+                otpErlangObject
+                    .binaryValue()
+                    .let { String(it, Charsets.UTF_8) }
+                    .let { html(it) }
+            else -> {
+                Logger.error(javaClass, "Don't know how to render deprecated metadata", otpErlangObject)
+
+                ""
+            }
+        }
 
     private fun html(markdownText: String): String {
         val flavour = GFMFlavourDescriptor()
