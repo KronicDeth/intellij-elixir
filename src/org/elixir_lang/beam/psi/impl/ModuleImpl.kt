@@ -8,6 +8,7 @@ import com.intellij.psi.ResolveState
 import com.intellij.psi.StubBasedPsiElement
 import com.intellij.psi.impl.source.SourceTreeToPsiMap
 import com.intellij.psi.impl.source.tree.TreeElement
+import com.intellij.psi.scope.PsiScopeProcessor
 import com.intellij.psi.stubs.IStubElementType
 import com.intellij.util.IncorrectOperationException
 import org.elixir_lang.beam.psi.Module
@@ -144,6 +145,14 @@ class ModuleImpl<T : ModuleStub<*>?>(private val stub: T) : ModuleElementImpl(),
         throw IncorrectOperationException("Cannot modify module name in Beam files")
 
     override fun getNavigationElement(): PsiElement = mirror
+
+    override fun processDeclarations(
+        processor: PsiScopeProcessor,
+        state: ResolveState,
+        lastParent: PsiElement?,
+        place: PsiElement
+    ): Boolean =
+        processor.execute(this, state)
 
     override fun getNode(): ASTNode? = null
 

@@ -273,6 +273,10 @@
     * Catch and log `IOException`s swallowed by Project Initialization Failed.
     * Recursively delete project directory before running `mix new`.
       Previously, the directory was only deleted if empty, but whether the `.idea` directory is written when `setupProject` is called differs between IDE versions, so to be safe, recursively delete.
+* [#2705](https://github.com/KronicDeth/intellij-elixir/pull/2705) - [@KronicDeth](https://github.com/KronicDeth)
+  * Fix Go To Definition for function in compiled modules.
+    When switching over to delayed decompilation, `ModuleImpl` did not have `processDeclaration` overloadded, so the `PsiScopeProcessor` was never called on it and so the `CallDefinitionClause` scope processor did not check the `ModuleImpl#callDefinitons`.
+  * Implement Deprecated metadata handling for docs from BEAM files.
 
 ## v13.1.0
 

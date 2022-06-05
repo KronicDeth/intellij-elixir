@@ -12,6 +12,9 @@
             Previously, the directory was only deleted if empty, but whether the <code class="notranslate">.idea</code> directory is written when <code class="notranslate">setupProject</code> is called differs between IDE versions, so to be safe, recursively delete.</li>
         </ul>
       </li>
+      <li>Fix Go To Definition for function in compiled modules.<br>
+        When switching over to delayed decompilation, <code class="notranslate">ModuleImpl</code> did not have <code class="notranslate">processDeclaration</code> overloadded, so the <code class="notranslate">PsiScopeProcessor</code> was never called on it and so the <code class="notranslate">CallDefinitionClause</code> scope processor did not check the <code class="notranslate">ModuleImpl#callDefinitons</code>.</li>
+      <li>Implement Deprecated metadata handling for docs from BEAM files.</li>
     </ul>
   </li>
 </ul>
