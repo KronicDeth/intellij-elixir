@@ -15,6 +15,7 @@
       <li>Fix Go To Definition for function in compiled modules.<br>
         When switching over to delayed decompilation, <code class="notranslate">ModuleImpl</code> did not have <code class="notranslate">processDeclaration</code> overloadded, so the <code class="notranslate">PsiScopeProcessor</code> was never called on it and so the <code class="notranslate">CallDefinitionClause</code> scope processor did not check the <code class="notranslate">ModuleImpl#callDefinitons</code>.</li>
       <li>Implement Deprecated metadata handling for docs from BEAM files.</li>
+      <li>Don't assume Elixir <code class="notranslate">SDK</code> <code class="notranslate">sdkAdditionalData</code> is non-<code class="notranslate">null</code>.</li>
     </ul>
   </li>
 </ul>
