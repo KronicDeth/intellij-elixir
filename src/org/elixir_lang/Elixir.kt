@@ -3,6 +3,7 @@ package org.elixir_lang
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.openapi.projectRoots.Sdk
 import org.elixir_lang.Erl.prependCodePaths
+import org.elixir_lang.sdk.erlang_dependent.MissingErlangSdk
 import org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData
 
 object Elixir {
@@ -30,7 +31,8 @@ object Elixir {
     }
 
     fun elixirSdkToEnsuredErlangSdk(elixirSdk: Sdk): Sdk =
-        elixirSdk.sdkAdditionalData.let { it as SdkAdditionalData }.ensureErlangSdk()
+        elixirSdk.sdkAdditionalData?.let { it as SdkAdditionalData }?.ensureErlangSdk()
+            ?: throw MissingErlangSdk(elixirSdk)
 
     /**
      * Adds `-pa ebinDirectory` for those in the `elixirSdk` that aren't in the `erlangSdk`
