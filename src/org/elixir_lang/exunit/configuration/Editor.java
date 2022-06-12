@@ -28,7 +28,7 @@ public final class Editor extends com.intellij.openapi.options.SettingsEditor<Co
     }
 
     public void reset(@NotNull Configuration configuration) {
-        modulesComboBox.fillModules(configuration.getProject(), ElixirModuleType.getInstance());
+        modulesComboBox.fillModules(configuration.getProject());
         final Module module = configuration.getConfigurationModule().getModule();
 
         if (module != null) {
