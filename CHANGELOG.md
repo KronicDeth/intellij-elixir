@@ -282,6 +282,8 @@
 * [#2711](https://github.com/KronicDeth/intellij-elixir/pull/2711) - [@KronicDeth](https://github.com/KronicDeth)
   * Don't restrict Run Configurations to Run in Modules to Elixir modules.
     The docs for `ModuleType` say the concept is meant to be deprecated, so don't enforce it and trying to load `ElixirModuleType` in RubyMine breaks as it tries to load `ElixirModuleBuilder` and therefore `JavaModuleBuilder`, which only works in IntelliJ.
+* [#2712](https://github.com/KronicDeth/intellij-elixir/pull/2712) - [@KronicDeth](https://github.com/KronicDeth)
+  * Add the facet in a write action in addition to setting the SDK.
 
 ## v13.1.0
 
