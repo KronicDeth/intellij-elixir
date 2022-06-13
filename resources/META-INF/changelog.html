@@ -18,6 +18,7 @@
       <li>Don't assume Elixir <code class="notranslate">SDK</code> <code class="notranslate">sdkAdditionalData</code> is non-<code class="notranslate">null</code>.</li>
       <li>Don't restrict Run Configurations to Run in Modules to Elixir modules.<br>
         The docs for <code class="notranslate">ModuleType</code> say the concept is meant to be deprecated, so don't enforce it and trying to load <code class="notranslate">ElixirModuleType</code> in RubyMine breaks as it tries to load <code class="notranslate">ElixirModuleBuilder</code> and therefore <code class="notranslate">JavaModuleBuilder</code>, which only works in IntelliJ.</li>
+      <li>Add the facet in a write action in addition to setting the SDK.</li>
     </ul>
   </li>
 </ul>

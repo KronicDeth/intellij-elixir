@@ -22,9 +22,9 @@ class Project(project: Project) : ModuleAwareProjectConfigurable<Configurable>(p
         return object : Configurable(module) {
             override fun applySdk(sdk: Sdk?) {
                 val facetManager = FacetManager.getInstance(module)
-                val facet = facetManager.getFacetByType(Facet.ID) ?: addFacet(facetManager)
 
                 ApplicationManager.getApplication().runWriteAction {
+                    val facet = facetManager.getFacetByType(Facet.ID) ?: addFacet(facetManager)
                     facet.sdk = sdk
                 }
             }
