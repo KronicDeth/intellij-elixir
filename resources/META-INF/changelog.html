@@ -19,6 +19,8 @@
       <li>Don't restrict Run Configurations to Run in Modules to Elixir modules.<br>
         The docs for <code class="notranslate">ModuleType</code> say the concept is meant to be deprecated, so don't enforce it and trying to load <code class="notranslate">ElixirModuleType</code> in RubyMine breaks as it tries to load <code class="notranslate">ElixirModuleBuilder</code> and therefore <code class="notranslate">JavaModuleBuilder</code>, which only works in IntelliJ.</li>
       <li>Add the facet in a write action in addition to setting the SDK.</li>
+      <li>Increase <code class="notranslate">SUSPECT_NAME_SET_SIZE</code> to <code class="notranslate">20</code>.<br>
+        Increased to cover the <code class="notranslate">15</code> <code class="notranslate">impl</code>s of <code class="notranslate">String.Chars</code> in the <code class="notranslate">geo</code> hex package.</li>
     </ul>
   </li>
 </ul>

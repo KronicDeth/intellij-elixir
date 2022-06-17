@@ -284,6 +284,9 @@
     The docs for `ModuleType` say the concept is meant to be deprecated, so don't enforce it and trying to load `ElixirModuleType` in RubyMine breaks as it tries to load `ElixirModuleBuilder` and therefore `JavaModuleBuilder`, which only works in IntelliJ.
 * [#2712](https://github.com/KronicDeth/intellij-elixir/pull/2712) - [@KronicDeth](https://github.com/KronicDeth)
   * Add the facet in a write action in addition to setting the SDK.
+* [#2717](https://github.com/KronicDeth/intellij-elixir/pull/2717) - [@KronicDeth](https://github.com/KronicDeth)
+  * Increase `SUSPECT_NAME_SET_SIZE` to `20`.
+    Increased to cover the `15` `impl`s of `String.Chars` in the `geo` hex package.
 
 ## v13.1.0
 
