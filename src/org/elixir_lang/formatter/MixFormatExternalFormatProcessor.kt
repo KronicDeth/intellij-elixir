@@ -1,6 +1,7 @@
 package org.elixir_lang.formatter
 
 import com.intellij.application.options.CodeStyle
+import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.process.CapturingProcessHandler
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.command.CommandProcessor
@@ -15,6 +16,7 @@ import org.elixir_lang.Mix
 import org.elixir_lang.code_style.CodeStyleSettings
 import org.elixir_lang.psi.ElixirFile
 import org.elixir_lang.sdk.elixir.Type.Companion.mostSpecificSdk
+import java.io.FileNotFoundException
 import java.util.concurrent.TimeUnit
 
 @Suppress("UnstableApiUsage")
@@ -78,12 +80,26 @@ class MixFormatExternalFormatProcessor : ExternalFormatProcessor {
                 }
                 ?.path
 
-        private fun format(workingDirectory: String, sdk: Sdk, unformattedText: String): String? {
-            val commandline = Mix.commandLine(emptyMap(), workingDirectory, sdk)
-            commandline.addParameter("format")
-            // `-` turns on stdin/stdout for text to format
-            commandline.addParameter("-")
-            val processHandler = CapturingProcessHandler(commandline)
+        private fun format(workingDirectory: String, sdk: Sdk, unformattedText: String): String? =
+            commandLine(workingDirectory, sdk)
+                ?.let { format(it, unformattedText) }
+
+        private fun commandLine(workingDirectory: String, sdk: Sdk): GeneralCommandLine? =
+            try {
+                val commandLine = Mix.commandLine(emptyMap(), workingDirectory, sdk)
+                commandLine.addParameter("format")
+                // `-` turns on stdin/stdout for text to format
+                commandLine.addParameter("-")
+
+                commandLine
+            } catch (fileNotFoundException: FileNotFoundException) {
+                LOGGER.info(fileNotFoundException)
+                
+                null
+            }
+
+        private fun format(commandLine: GeneralCommandLine, unformattedText: String): String? {
+            val processHandler = CapturingProcessHandler(commandLine)
             processHandler.processInput.use { stdin ->
                 stdin.write(unformattedText.toByteArray())
                 stdin.flush()

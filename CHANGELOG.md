@@ -287,6 +287,9 @@
 * [#2717](https://github.com/KronicDeth/intellij-elixir/pull/2717) - [@KronicDeth](https://github.com/KronicDeth)
   * Increase `SUSPECT_NAME_SET_SIZE` to `20`.
     Increased to cover the `15` `impl`s of `String.Chars` in the `geo` hex package.
+* [#2719](https://github.com/KronicDeth/intellij-elixir/pull/2719) - [@KronicDeth](https://github.com/KronicDeth)
+  * Log if `erl` binary is not found when trying to run `mix format`.
+    Log instead of letting it throw up the stack and cause an error report since the SDK not being set will be very common.
 
 ## v13.1.0
 
