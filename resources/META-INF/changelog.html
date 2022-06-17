@@ -21,6 +21,8 @@
       <li>Add the facet in a write action in addition to setting the SDK.</li>
       <li>Increase <code class="notranslate">SUSPECT_NAME_SET_SIZE</code> to <code class="notranslate">20</code>.<br>
         Increased to cover the <code class="notranslate">15</code> <code class="notranslate">impl</code>s of <code class="notranslate">String.Chars</code> in the <code class="notranslate">geo</code> hex package.</li>
+      <li>Log if <code class="notranslate">erl</code> binary is not found when trying to run <code class="notranslate">mix format</code>.<br>
+        Log instead of letting it throw up the stack and cause an error report since the SDK not being set will be very common.</li>
     </ul>
   </li>
 </ul>
