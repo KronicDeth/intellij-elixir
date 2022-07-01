@@ -5,24 +5,29 @@ import com.ericsson.otp.erlang.OtpErlangObject
 import com.intellij.lang.documentation.DocumentationMarkup
 import com.intellij.lang.documentation.DocumentationProvider
 import com.intellij.openapi.editor.Editor
-import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiFile
-import com.intellij.psi.PsiPolyVariantReference
-import com.intellij.psi.ResolveResult
+import com.intellij.openapi.util.TextRange
+import com.intellij.psi.*
 import com.intellij.psi.impl.source.tree.LeafPsiElement
+import com.intellij.psi.util.PsiTreeUtil
 import org.elixir_lang.beam.chunk.beam_documentation.docs.documented.Hidden
 import org.elixir_lang.beam.chunk.beam_documentation.docs.documented.MarkdownByLanguage
 import org.elixir_lang.beam.chunk.beam_documentation.docs.documented.None
 import org.elixir_lang.beam.psi.BeamFileImpl
 import org.elixir_lang.errorreport.Logger
-import org.elixir_lang.psi.CallDefinitionClause
-import org.elixir_lang.psi.ElixirIdentifier
-import org.elixir_lang.psi.QualifiableAlias
+import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
+import org.elixir_lang.psi.impl.call.macroChildCallSequence
+import org.elixir_lang.psi.impl.childExpressions
+import org.elixir_lang.psi.impl.identifierName
 import org.elixir_lang.psi.stub.type.call.Stub
+import org.elixir_lang.psi.stub.type.call.Stub.isModular
+import org.elixir_lang.reference.ModuleAttribute.Companion.isDocumentationName
 import org.intellij.markdown.flavours.gfm.GFMFlavourDescriptor
 import org.intellij.markdown.html.HtmlGenerator
 import org.intellij.markdown.parser.MarkdownParser
+import java.lang.Integer.max
+import java.lang.Integer.min
+import java.util.function.Consumer
 
 
 class ElixirDocumentationProvider : DocumentationProvider {
@@ -31,6 +36,97 @@ class ElixirDocumentationProvider : DocumentationProvider {
 
     override fun generateHoverDoc(element: PsiElement, originalElement: PsiElement?): String? =
         generateDoc(element, originalElement)
+
+    override fun generateRenderedDoc(comment: PsiDocCommentBase): String? =
+        comment
+            .let(::markdown)
+            ?.let(::html)
+
+    private fun markdown(comment: PsiDocCommentBase): String? =
+        when (comment) {
+            is Comment -> {
+                comment.moduleAttribute.moduleAttributeValue()?.let { quote ->
+                    when (quote) {
+                        is Heredoc -> {
+                            val prefixLength = quote.heredocPrefix.textLength
+
+                            quote.heredocLineList.joinToString("") { heredocLine ->
+                                val text = heredocLine.text
+                                val textLengthWithoutNewline = text.length - 1
+                                val startIndex = min(max(textLengthWithoutNewline, 0), prefixLength)
+
+                                heredocLine.text.substring(startIndex)
+                            }
+                        }
+                        is ElixirLine -> quote.body?.text
+                        else -> null
+                    }
+                }
+            }
+            else -> null
+        }
+
+
+    override fun collectDocComments(file: PsiFile, sink: Consumer<in PsiDocCommentBase>) {
+        file.let { it as? ElixirFile }?.let { collectDocComments(it, sink) }
+    }
+
+    private fun collectDocComments(file: ElixirFile, sink: Consumer<in PsiDocCommentBase>) {
+        file.childExpressions().forEach { collectDocComments(it, sink) }
+    }
+
+    private fun collectDocComments(element: PsiElement, sink: Consumer<in PsiDocCommentBase>) {
+        when (element) {
+            is Call -> collectDocComments(element, sink)
+            else -> {
+                Logger.error(javaClass, "Don't know how to collect doc comments", element)
+            }
+        }
+    }
+
+    private fun collectDocComments(element: AtUnqualifiedNoParenthesesCall<*>, sink: Consumer<in PsiDocCommentBase>) {
+        val identifierName = element.atIdentifier.identifierName()
+
+        if (isDocumentationName(identifierName)) {
+            sink.accept(Comment(element))
+        }
+    }
+
+    private fun collectDocComments(call: Call, sink: Consumer<in PsiDocCommentBase>) {
+        when {
+            call is AtUnqualifiedNoParenthesesCall<*> -> collectDocComments(call, sink)
+            isModular(call) -> {
+                call.macroChildCallSequence().forEach { child ->
+                    collectDocComments(child, sink)
+                }
+            }
+        }
+    }
+
+    override fun findDocComment(file: PsiFile, range: TextRange): PsiDocCommentBase? {
+        val moduleAttribute = PsiTreeUtil.getParentOfType(
+            file.findElementAt(range.startOffset),
+            AtUnqualifiedNoParenthesesCall::class.java,
+            false
+        )
+        return if (moduleAttribute == null || range != moduleAttribute.textRange) null else Comment(moduleAttribute)
+    }
+
+    override fun getDocumentationElementForLookupItem(
+        psiManager: PsiManager?,
+        `object`: Any?,
+        element: PsiElement?
+    ): PsiElement? {
+        return super.getDocumentationElementForLookupItem(psiManager, `object`, element)
+    }
+
+    override fun getDocumentationElementForLink(
+        psiManager: PsiManager?,
+        link: String?,
+        context: PsiElement?
+    ): PsiElement? {
+        return super.getDocumentationElementForLink(psiManager, link, context)
+    }
 
     override fun getCustomDocumentationElement(
         editor: Editor,
