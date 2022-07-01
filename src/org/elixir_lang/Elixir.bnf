@@ -336,8 +336,10 @@
     addEscapedTerminator
     addFragmentCodePoints
     addHexadecimalEscapeSequenceCodePoints
+    createLiteralTextEscaper
     getHeredocLineList
     indentation
+    isValidHost
     quote
     quoteBinary
     quoteEmpty
@@ -345,6 +347,7 @@
     quoteLiteral
     sigilDelimiter
     sigilName
+    updateText
   ]
 
   // Sigil Line
@@ -354,8 +357,10 @@
     addEscapedTerminator
     addFragmentCodePoints
     addHexadecimalEscapeSequenceCodePoints
+    createLiteralTextEscaper
     getBody
     indentation
+    isValidHost
     quote
     quoteBinary
     quoteEmpty
@@ -364,6 +369,7 @@
     sigilDelimiter
     sigilName
     terminator
+    updateText
   ]
 
   psiClassPrefix="Elixir"
@@ -702,13 +708,16 @@ heredoc ::= HEREDOC_PROMOTER EOL
                   addEscapedTerminator
                   addFragmentCodePoints
                   addHexadecimalEscapeSequenceCodePoints
+                  createLiteralTextEscaper
                   getHeredocLineList
                   isCharList
+                  isValidHost
                   quote
                   quoteBinary
                   quoteEmpty
                   quoteInterpolation
                   quoteLiteral
+                  updateText
               ]
               //noinspection BnfResolve
               pin = HEREDOC_PROMOTER
@@ -819,14 +828,17 @@ line ::= LINE_PROMOTER lineBody LINE_TERMINATOR
              addEscapedTerminator
              addFragmentCodePoints
              addHexadecimalEscapeSequenceCodePoints
+             createLiteralTextEscaper
              getBody
              isCharList
+             isValidHost
              quote
              quoteAsAtom
              quoteBinary
              quoteEmpty
              quoteInterpolation
              quoteLiteral
+             updateText
            ]
            //noinspection BnfResolve
            pin = LINE_PROMOTER

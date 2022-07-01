@@ -7,6 +7,8 @@ import com.intellij.psi.PsiElement;
 import com.ericsson.otp.erlang.OtpErlangList;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.LiteralTextEscaper;
+import com.intellij.psi.PsiLanguageInjectionHost;
 
 public interface ElixirLiteralSigilHeredoc extends Literal, SigilHeredoc {
 
@@ -29,9 +31,13 @@ public interface ElixirLiteralSigilHeredoc extends Literal, SigilHeredoc {
 
   @NotNull List<Integer> addHexadecimalEscapeSequenceCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode child);
 
+  @NotNull LiteralTextEscaper<? extends PsiLanguageInjectionHost> createLiteralTextEscaper();
+
   @NotNull List<? extends HeredocLine> getHeredocLineList();
 
   @NotNull Integer indentation();
+
+  boolean isValidHost();
 
   @NotNull OtpErlangObject quote();
 
@@ -48,5 +54,7 @@ public interface ElixirLiteralSigilHeredoc extends Literal, SigilHeredoc {
   @NotNull String sigilDelimiter();
 
   char sigilName();
+
+  PsiLanguageInjectionHost updateText(@NotNull String text);
 
 }

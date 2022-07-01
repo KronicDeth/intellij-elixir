@@ -12,6 +12,8 @@ import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.psi.*;
 import com.ericsson.otp.erlang.OtpErlangList;
 import com.ericsson.otp.erlang.OtpErlangObject;
+import com.intellij.psi.LiteralTextEscaper;
+import com.intellij.psi.PsiLanguageInjectionHost;
 
 public class ElixirInterpolatedSigilLineImpl extends ASTWrapperPsiElement implements ElixirInterpolatedSigilLine {
 
@@ -67,6 +69,11 @@ public class ElixirInterpolatedSigilLineImpl extends ASTWrapperPsiElement implem
   }
 
   @Override
+  public @NotNull LiteralTextEscaper<? extends PsiLanguageInjectionHost> createLiteralTextEscaper() {
+    return ElixirPsiImplUtil.createLiteralTextEscaper(this);
+  }
+
+  @Override
   public Body getBody() {
     return ElixirPsiImplUtil.getBody(this);
   }
@@ -74,6 +81,11 @@ public class ElixirInterpolatedSigilLineImpl extends ASTWrapperPsiElement implem
   @Override
   public @Nullable Integer indentation() {
     return ElixirPsiImplUtil.indentation(this);
+  }
+
+  @Override
+  public boolean isValidHost() {
+    return ElixirPsiImplUtil.isValidHost(this);
   }
 
   @Override
@@ -119,6 +131,11 @@ public class ElixirInterpolatedSigilLineImpl extends ASTWrapperPsiElement implem
   @Override
   public char terminator() {
     return ElixirPsiImplUtil.terminator(this);
+  }
+
+  @Override
+  public PsiLanguageInjectionHost updateText(@NotNull String text) {
+    return ElixirPsiImplUtil.updateText(this, text);
   }
 
 }

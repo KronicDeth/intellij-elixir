@@ -266,6 +266,7 @@
 
         <lang.documentationProvider implementationClass="org.elixir_lang.documentation.ElixirDocumentationProvider"
                                     language="Elixir"/>
+        <multiHostInjector implementation="org.elixir_lang.injection.markdown.Injector"/>
 
         <!-- Dialyzer -->
         <globalInspection displayName="Dialyzer based inspections (Elixir)" shortName="Dialyzer"

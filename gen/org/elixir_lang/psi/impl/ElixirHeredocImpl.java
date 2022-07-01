@@ -12,6 +12,8 @@ import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.psi.*;
 import com.ericsson.otp.erlang.OtpErlangList;
 import com.ericsson.otp.erlang.OtpErlangObject;
+import com.intellij.psi.LiteralTextEscaper;
+import com.intellij.psi.PsiLanguageInjectionHost;
 
 public class ElixirHeredocImpl extends ASTWrapperPsiElement implements ElixirHeredoc {
 
@@ -67,8 +69,18 @@ public class ElixirHeredocImpl extends ASTWrapperPsiElement implements ElixirHer
   }
 
   @Override
+  public @NotNull LiteralTextEscaper<? extends PsiLanguageInjectionHost> createLiteralTextEscaper() {
+    return ElixirPsiImplUtil.createLiteralTextEscaper(this);
+  }
+
+  @Override
   public boolean isCharList() {
     return ElixirPsiImplUtil.isCharList(this);
+  }
+
+  @Override
+  public boolean isValidHost() {
+    return ElixirPsiImplUtil.isValidHost(this);
   }
 
   @Override
@@ -94,6 +106,11 @@ public class ElixirHeredocImpl extends ASTWrapperPsiElement implements ElixirHer
   @Override
   public @NotNull OtpErlangObject quoteLiteral(List<Integer> codePointList) {
     return ElixirPsiImplUtil.quoteLiteral(this, codePointList);
+  }
+
+  @Override
+  public PsiLanguageInjectionHost updateText(@NotNull String text) {
+    return ElixirPsiImplUtil.updateText(this, text);
   }
 
 }
