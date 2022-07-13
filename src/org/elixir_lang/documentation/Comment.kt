@@ -8,17 +8,24 @@ import com.intellij.psi.tree.IElementType
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
 import org.elixir_lang.psi.ElixirTypes
+import org.elixir_lang.psi.impl.enclosingMacroCall
+import org.elixir_lang.psi.impl.identifierName
+import org.elixir_lang.psi.stub.type.call.Stub.isModular
 
 class Comment(val moduleAttribute: AtUnqualifiedNoParenthesesCall<*>) : FakePsiElement(), PsiDocCommentBase {
     override fun getParent(): PsiElement = moduleAttribute
 
     override fun getTokenType(): IElementType = ElixirTypes.COMMENT
 
-    override fun getOwner(): PsiElement? {
-        Logger.error(javaClass, "Don't know how to calculate owner", moduleAttribute)
+    override fun getOwner(): PsiElement? =
+        when (val identifierName = moduleAttribute.atIdentifier.identifierName()) {
+            "moduledoc" -> moduleAttribute.enclosingMacroCall().takeIf(::isModular)
+            else -> {
+                Logger.error(javaClass, "Don't know how to calculate owner", moduleAttribute)
 
-        return null
-    }
+                null
+            }
+        }
 
     override fun getTextRange(): TextRange = moduleAttribute.textRange
 }

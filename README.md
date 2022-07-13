@@ -2607,18 +2607,30 @@ rescue
 
 Documentation in `@moduledoc`, `@typedoc` or `@doc` module attribute values are marked as Markdown language, so that [the JetBrains supplied Markdown support](https://www.jetbrains.com/help/idea/markdown-reference.html) works in documentation.
 
+##### Toggling Editor to Rendered
+
+1. Start with the Editor
+   ![](screenshots/features/documentation/editor/Markdown%20Editor.png)
+2. Click the "Toggle Rendered View" button in the gutter next to the editor.
+   ![](screenshots/features/documentation/editor/Toggle%20Editor%20to%20Rendered%20View.png)
+3. Rendered View will be shown
+   ![](screenshots/features/documentation/rendered_view/HTML Rendered View.png)
+
 #### Rendered View
 
 Markdown documentation in `@moduledoc`, `@typedoc` or `@doc` can be toggled back and forth from the editable Markdown view and the rendered HTML view.
 
-##### Toggling Editor to Rendered
+##### Aliases link to Modules
 
-1. Start with the Editor
-   ![](screenshots/features/documentation/rendered_view/Markdown Editor.png)
-2. Click the "Toggle Rendered View" button in the gutter next to the editor.
-   ![](screenshots/features/documentation/rendered_view/Toggle Editor to Rendered View.png)
-3. Rendered View will be shown
-   ![](screenshots/features/documentation/rendered_view/HTML Rendered View.png)
+In the rendered view, aliases are clickable and navigatable.
+
+Clicking the links will show the documentation for module.
+
+![](screenshots/features/documentation/rendered_view/alias_link/Quick Documentation.png)
+
+Using Go To Definition (Cmd+Click) on the link will take you to the module definition.
+
+![](screenshots/features/documentation/rendered_view/alias_link/Go To Definition.png)
 
 ##### Toggling Rendered to Editor
 
@@ -2627,7 +2639,7 @@ Markdown documentation in `@moduledoc`, `@typedoc` or `@doc` can be toggled back
 2. Click the "Toggle Rendered View" button in the gutter next to the editor.
    ![](screenshots/features/documentation/rendered_view/Toggle Rendered View to Editor.png)
 3. Editor will be shown
-   ![](screenshots/features/documentation/rendered_view/Markdown Editor.png)
+   ![](screenshots/features/documentation/editor/Markdown%20Editor.png)
 
 #### Quick Documentation
 

@@ -5,9 +5,12 @@ import com.ericsson.otp.erlang.OtpErlangObject
 import com.intellij.lang.documentation.DocumentationMarkup
 import com.intellij.lang.documentation.DocumentationProvider
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.*
 import com.intellij.psi.impl.source.tree.LeafPsiElement
+import com.intellij.psi.search.GlobalSearchScope
+import com.intellij.psi.stubs.StubIndex
 import com.intellij.psi.util.PsiTreeUtil
 import org.elixir_lang.beam.chunk.beam_documentation.docs.documented.Hidden
 import org.elixir_lang.beam.chunk.beam_documentation.docs.documented.MarkdownByLanguage
@@ -19,10 +22,10 @@ import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.call.macroChildCallSequence
 import org.elixir_lang.psi.impl.childExpressions
 import org.elixir_lang.psi.impl.identifierName
+import org.elixir_lang.psi.stub.index.ModularName
 import org.elixir_lang.psi.stub.type.call.Stub
 import org.elixir_lang.psi.stub.type.call.Stub.isModular
 import org.elixir_lang.reference.ModuleAttribute.Companion.isDocumentationName
-import org.intellij.markdown.flavours.gfm.GFMFlavourDescriptor
 import org.intellij.markdown.html.HtmlGenerator
 import org.intellij.markdown.parser.MarkdownParser
 import java.lang.Integer.max
@@ -32,7 +35,7 @@ import java.util.function.Consumer
 
 class ElixirDocumentationProvider : DocumentationProvider {
     override fun generateDoc(element: PsiElement, originalElement: PsiElement?): String? =
-        fetchDocs(element)?.let { formatDocs(it) }
+        fetchDocs(element)?.let { formatDocs(element.project, it) }
 
     override fun generateHoverDoc(element: PsiElement, originalElement: PsiElement?): String? =
         generateDoc(element, originalElement)
@@ -40,7 +43,7 @@ class ElixirDocumentationProvider : DocumentationProvider {
     override fun generateRenderedDoc(comment: PsiDocCommentBase): String? =
         comment
             .let(::markdown)
-            ?.let(::html)
+            ?.let { html(comment.project, it) }
 
     private fun markdown(comment: PsiDocCommentBase): String? =
         when (comment) {
@@ -121,11 +124,30 @@ class ElixirDocumentationProvider : DocumentationProvider {
     }
 
     override fun getDocumentationElementForLink(
-        psiManager: PsiManager?,
-        link: String?,
-        context: PsiElement?
+        psiManager: PsiManager,
+        link: String,
+        context: PsiElement
     ): PsiElement? {
-        return super.getDocumentationElementForLink(psiManager, link, context)
+        val project = context.project
+        val globalSearchScope = GlobalSearchScope.allScope(project)
+
+        val modulars = StubIndex
+            .getElements(
+                ModularName.KEY,
+                link,
+                project,
+                globalSearchScope,
+                null,
+                NamedElement::class.java
+            )
+
+        return when (modulars.size) {
+            0 -> null
+            1 -> modulars.single()
+            else -> {
+                TODO()
+            }
+        }
     }
 
     override fun getCustomDocumentationElement(
@@ -170,7 +192,7 @@ class ElixirDocumentationProvider : DocumentationProvider {
         else -> null
     }
 
-    private fun formatDocs(fetchedDocs: FetchedDocs): String {
+    private fun formatDocs(project: Project, fetchedDocs: FetchedDocs): String {
         val documentationHtml = StringBuilder()
 
         documentationHtml.append(DocumentationMarkup.DEFINITION_START)
@@ -191,7 +213,7 @@ class ElixirDocumentationProvider : DocumentationProvider {
                 fetchedDocs.moduledoc.let { moduledoc ->
                     documentationHtml
                         .append(DocumentationMarkup.CONTENT_START)
-                        .append(html(moduledoc))
+                        .append(html(project, moduledoc))
                         .append(DocumentationMarkup.CONTENT_END)
                 }
             }
@@ -208,7 +230,7 @@ class ElixirDocumentationProvider : DocumentationProvider {
                             doc.formattedByLanguage.values.map { formatted ->
                                 documentationHtml
                                     .append(DocumentationMarkup.CONTENT_START)
-                                    .append(html(formatted))
+                                    .append(html(project, formatted))
                                     .append(DocumentationMarkup.CONTENT_END)
                             }
                     }
@@ -228,7 +250,7 @@ class ElixirDocumentationProvider : DocumentationProvider {
                             .append(DocumentationMarkup.SECTION_HEADER_START)
                             .append("Deprecated")
                             .append(DocumentationMarkup.SECTION_SEPARATOR)
-                            .append(html(deprecated))
+                            .append(html(project, deprecated))
                             .append(DocumentationMarkup.SECTION_END)
                     }
 
@@ -273,13 +295,13 @@ class ElixirDocumentationProvider : DocumentationProvider {
         return documentationHtml.toString()
     }
 
-    private fun html(otpErlangObject: OtpErlangObject): String =
+    private fun html(project: Project, otpErlangObject: OtpErlangObject): String =
         when (otpErlangObject) {
             is OtpErlangBinary ->
                 otpErlangObject
                     .binaryValue()
                     .let { String(it, Charsets.UTF_8) }
-                    .let { html(it) }
+                    .let { html(project, it) }
             else -> {
                 Logger.error(javaClass, "Don't know how to render deprecated metadata", otpErlangObject)
 
@@ -287,8 +309,8 @@ class ElixirDocumentationProvider : DocumentationProvider {
             }
         }
 
-    private fun html(markdownText: String): String {
-        val flavour = GFMFlavourDescriptor()
+    private fun html(project: Project, markdownText: String): String {
+        val flavour = MarkdownFlavourDescriptor(project)
         val parsedTree = MarkdownParser(flavour).buildMarkdownTreeFromString(markdownText)
 
         return HtmlGenerator(markdownText, parsedTree, flavour, false)
