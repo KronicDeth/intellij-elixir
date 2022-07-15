@@ -41,13 +41,14 @@ class Injector : MultiHostInjector {
 
                 registrar.doneInjecting()
             }
+            is ElixirAtomKeyword -> Unit
             else -> {
                 TODO()
             }
         }
     }
 
-    override fun elementsToInjectIn(): List<Class<out PsiElement?>?> =
+    override fun elementsToInjectIn(): List<Class<out PsiElement>> =
         listOf(AtUnqualifiedNoParenthesesCall::class.java)
 
     companion object {
