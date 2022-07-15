@@ -4,9 +4,11 @@ import com.intellij.lang.injection.MultiHostInjector
 import com.intellij.lang.injection.MultiHostRegistrar
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
+import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
 import org.elixir_lang.psi.ElixirAtomKeyword
 import org.elixir_lang.psi.Heredoc
+import org.elixir_lang.psi.QuotableKeywordPair
 import org.elixir_lang.reference.ModuleAttribute.Companion.DOCUMENTATION_NAME_SET
 import org.intellij.plugins.markdown.lang.MarkdownLanguage
 import java.lang.Integer.max
@@ -22,28 +24,40 @@ class Injector : MultiHostInjector {
             ?.let { getLanguagesToInjectInQuote(registrar, it) }
     }
 
-    private fun getLanguagesToInjectInQuote(registrar: MultiHostRegistrar, quote: PsiElement) {
-        when (quote) {
+    private fun getLanguagesToInjectInQuote(registrar: MultiHostRegistrar, documentation: PsiElement) {
+        when (documentation) {
             is Heredoc -> {
                 registrar.startInjecting(MarkdownLanguage.INSTANCE)
 
-                val prefixLength = quote.heredocPrefix.textLength
-                val quoteOffset = quote.textOffset
+                val prefixLength = documentation.heredocPrefix.textLength
+                val quoteOffset = documentation.textOffset
 
-                for (line in quote.heredocLineList) {
+                for (line in documentation.heredocLineList) {
                     val lineOffset = line.textOffset
                     val lineOffsetRelativeToQuote = lineOffset + prefixLength - quoteOffset
                     val lineMarkdownLength = max(line.textLength - prefixLength, 0)
                     val textRangeInQuote = TextRange.from(lineOffsetRelativeToQuote, lineMarkdownLength)
 
-                    registrar.addPlace(null, null, quote, textRangeInQuote)
+                    registrar.addPlace(null, null, documentation, textRangeInQuote)
                 }
 
                 registrar.doneInjecting()
             }
             is ElixirAtomKeyword -> Unit
+            is QuotableKeywordPair -> {
+                when (val key = documentation.keywordKey.text) {
+                    "since" -> Unit
+                    else -> {
+                        Logger.error(
+                            javaClass,
+                            "Do not known whether to inject Markdown in documentation key $key",
+                            documentation
+                        )
+                    }
+                }
+            }
             else -> {
-                TODO()
+                Logger.error(javaClass, "Do not know whether to inject Markdown in documentation", documentation)
             }
         }
     }
