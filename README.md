@@ -2607,6 +2607,18 @@ rescue
 
 Documentation in `@moduledoc`, `@typedoc` or `@doc` module attribute values are marked as Markdown language, so that [the JetBrains supplied Markdown support](https://www.jetbrains.com/help/idea/markdown-reference.html) works in documentation.
 
+##### Code Blocks
+
+Code in code blocks (indented 4 spaces) are marked as Elixir language, so all the normal language support works in code examples and doctests.
+
+This includes highlighting reads and writes of variables
+
+![](screenshots/features/documentation/editor/Variable Usage.png)
+
+and Go To Definition for calls
+
+![](screenshots/features/documentation/editor/Go To Definition.png)
+
 ##### Toggling Editor to Rendered
 
 1. Start with the Editor
