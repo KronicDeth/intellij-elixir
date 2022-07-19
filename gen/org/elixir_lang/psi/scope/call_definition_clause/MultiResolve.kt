@@ -91,6 +91,12 @@ private constructor(
                                             modularResultResult.isValidResult,
                                             state
                                         )
+                                        is CallDefinitionImpl<*> -> addToResolveResults(
+                                            modularResultResultElement,
+                                            nameInDefiningModule,
+                                            modularResultResult.isValidResult,
+                                            state
+                                        )
                                         else -> {
                                             Logger.error(javaClass,
                                                          "Don't know how to add resolve results for delegation",
