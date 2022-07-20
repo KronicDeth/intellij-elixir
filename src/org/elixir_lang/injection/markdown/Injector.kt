@@ -66,7 +66,13 @@ class Injector : MultiHostInjector {
                 val lineOffset = line.textOffset
                 val markdownOffsetRelativeToQuote = lineOffset + prefixLength - quoteOffset
                 val lineMarkdownTextLength = if (lineMarkdownText.startsWith(CODE_BLOCK_INDENT)) {
-                    CODE_BLOCK_INDENT_LENGTH
+                    val lineCodeText = lineMarkdownText.substring(CODE_BLOCK_INDENT_LENGTH)
+
+                    if (lineCodeText.startsWith(IEX_PROMPT)) {
+                        CODE_BLOCK_INDENT_LENGTH + IEX_PROMPT_LENGTH
+                    } else {
+                        CODE_BLOCK_INDENT_LENGTH
+                    }
                 } else {
                     lineMarkdownText.length
                 }
