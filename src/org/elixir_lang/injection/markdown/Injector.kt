@@ -70,6 +70,8 @@ class Injector : MultiHostInjector {
 
                     if (lineCodeText.startsWith(IEX_PROMPT)) {
                         CODE_BLOCK_INDENT_LENGTH + IEX_PROMPT_LENGTH
+                    } else if (lineCodeText.startsWith(EXCEPTION_PREFIX)) {
+                        lineMarkdownText.length
                     } else {
                         CODE_BLOCK_INDENT_LENGTH
                     }
@@ -109,21 +111,26 @@ class Injector : MultiHostInjector {
                     val lineCodeText = lineMarkdownText.substring(CODE_BLOCK_INDENT_LENGTH)
                     val codeOffsetRelativeToQuote = markdownOffsetRelativeToQuote + CODE_BLOCK_INDENT_LENGTH
 
-                    val (lineElixirText, elixirOffsetRelativeToQuote) = if (lineCodeText.startsWith(IEX_PROMPT)) {
-                        Pair(lineCodeText.substring(IEX_PROMPT_LENGTH), codeOffsetRelativeToQuote + IEX_PROMPT_LENGTH)
-                    } else {
-                        Pair(lineCodeText, codeOffsetRelativeToQuote)
+                    if (!lineCodeText.startsWith(EXCEPTION_PREFIX)) {
+                        val (lineElixirText, elixirOffsetRelativeToQuote) = if (lineCodeText.startsWith(IEX_PROMPT)) {
+                            Pair(
+                                lineCodeText.substring(IEX_PROMPT_LENGTH),
+                                codeOffsetRelativeToQuote + IEX_PROMPT_LENGTH
+                            )
+                        } else {
+                            Pair(lineCodeText, codeOffsetRelativeToQuote)
+                        }
+
+                        val textRangeInQuote = TextRange.from(elixirOffsetRelativeToQuote, lineElixirText.length)
+
+                        if (!inCodeBlock) {
+                            registrar.startInjecting(ElixirLanguage)
+
+                            inCodeBlock = true
+                        }
+
+                        registrar.addPlace(null, null, documentation, textRangeInQuote)
                     }
-
-                    val textRangeInQuote = TextRange.from(elixirOffsetRelativeToQuote, lineElixirText.length)
-
-                    if (!inCodeBlock) {
-                        registrar.startInjecting(ElixirLanguage)
-
-                        inCodeBlock = true
-                    }
-
-                    registrar.addPlace(null, null, documentation, textRangeInQuote)
                 } else if (lineMarkdownText.isNotBlank()) {
                     if (inCodeBlock) {
                         registrar.doneInjecting()
@@ -147,6 +154,7 @@ class Injector : MultiHostInjector {
         private const val CODE_BLOCK_INDENT_LENGTH = CODE_BLOCK_INDENT.length
         private const val IEX_PROMPT = "iex> "
         private const val IEX_PROMPT_LENGTH = IEX_PROMPT.length
+        private const val EXCEPTION_PREFIX = "** ("
 
         fun isValidHost(atUnqualifiedNoParenthesesCall: AtUnqualifiedNoParenthesesCall<*>): Boolean =
             atUnqualifiedNoParenthesesCall.atIdentifier.lastChild?.text in DOCUMENTATION_NAME_SET
