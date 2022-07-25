@@ -254,7 +254,9 @@ internal fun PsiElement.ancestorTypeSpec(): AtUnqualifiedNoParenthesesCall<*>? =
             // types
         is Type, is Call,
         -> parent.ancestorTypeSpec()
-        // `fn` anonymous function type just uses parentheses and `->`, like `(type1, type2 -> type3)`
+        // `@callback(unquote(spec))`
+        is AtOperation,
+            // `fn` anonymous function type just uses parentheses and `->`, like `(type1, type2 -> type3)`
         is ElixirAnonymousFunction,
             // BitStrings use `::` like types, but cannot contain type parameters or declarations
         is ElixirBitString,
