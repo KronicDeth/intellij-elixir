@@ -55,6 +55,7 @@ class Injector : MultiHostInjector {
         val prefixLength = documentation.heredocPrefix.textLength
         val quoteOffset = documentation.textOffset
         var listIndent = -1
+        var inException = false
 
         for (line in documentation.heredocLineList) {
             val lineTextLength = line.textLength
@@ -90,19 +91,34 @@ class Injector : MultiHostInjector {
 
                             when {
                                 lineCodeText.startsWith(IEX_PROMPT) -> {
+                                    inException = false
+
                                     CODE_BLOCK_INDENT_LENGTH + IEX_PROMPT_LENGTH
                                 }
                                 lineCodeText.startsWith(IEX_CONTINUATION) -> {
                                     CODE_BLOCK_INDENT_LENGTH + IEX_CONTINUATION_LENGTH
                                 }
-                                lineCodeText.startsWith(DEBUG_PREFIX) || lineCodeText.startsWith(EXCEPTION_PREFIX) -> {
+                                lineCodeText.startsWith(DEBUG_PREFIX) -> {
+                                    inException = false
+
+                                    lineMarkdownText.length
+                                }
+                                lineCodeText.startsWith(EXCEPTION_PREFIX) -> {
+                                    inException = true
+
                                     lineMarkdownText.length
                                 }
                                 else -> {
-                                    CODE_BLOCK_INDENT_LENGTH
+                                    if (inException) {
+                                        lineMarkdownText.length
+                                    } else {
+                                        CODE_BLOCK_INDENT_LENGTH
+                                    }
                                 }
                             }
                         } else {
+                            inException = false
+
                             lineMarkdownText.length
                         }
                     }
@@ -133,6 +149,7 @@ class Injector : MultiHostInjector {
         val quoteOffset = documentation.textOffset
         var inCodeBlock = false
         var listIndent = -1
+        var inException = false
 
         for (line in documentation.heredocLineList) {
             val lineTextLength = line.textLength
@@ -170,15 +187,23 @@ class Injector : MultiHostInjector {
                             val lineCodeText = lineMarkdownText.substring(CODE_BLOCK_INDENT_LENGTH)
                             val codeOffsetRelativeToQuote = markdownOffsetRelativeToQuote + CODE_BLOCK_INDENT_LENGTH
 
-                            if (!(lineCodeText.startsWith(DEBUG_PREFIX) || lineCodeText.startsWith(EXCEPTION_PREFIX))) {
+                            if (lineCodeText.startsWith(EXCEPTION_PREFIX)) {
+                                inException = true
+                            } else if (lineCodeText.startsWith(DEBUG_PREFIX)) {
+                                inException = false
+                            } else {
                                 val (lineElixirText, elixirOffsetRelativeToQuote) = when {
                                     lineCodeText.startsWith(IEX_PROMPT) -> {
+                                        inException = false
+
                                         Pair(
                                             lineCodeText.substring(IEX_PROMPT_LENGTH),
                                             codeOffsetRelativeToQuote + IEX_PROMPT_LENGTH
                                         )
                                     }
                                     lineCodeText.startsWith(IEX_CONTINUATION) -> {
+                                        inException = false
+
                                         Pair(
                                             lineCodeText.substring(IEX_CONTINUATION_LENGTH),
                                             codeOffsetRelativeToQuote + IEX_CONTINUATION_LENGTH
@@ -189,22 +214,25 @@ class Injector : MultiHostInjector {
                                     }
                                 }
 
-                                val textRangeInQuote =
-                                    TextRange.from(elixirOffsetRelativeToQuote, lineElixirText.length)
+                                if (!inException) {
+                                    val textRangeInQuote =
+                                        TextRange.from(elixirOffsetRelativeToQuote, lineElixirText.length)
 
-                                if (!inCodeBlock) {
-                                    registrar.startInjecting(ElixirLanguage)
+                                    if (!inCodeBlock) {
+                                        registrar.startInjecting(ElixirLanguage)
 
-                                    inCodeBlock = true
+                                        inCodeBlock = true
+                                    }
+
+                                    registrar.addPlace(null, null, documentation, textRangeInQuote)
                                 }
-
-                                registrar.addPlace(null, null, documentation, textRangeInQuote)
                             }
                         } else if (lineMarkdownText.isNotBlank()) {
                             if (inCodeBlock) {
                                 registrar.doneInjecting()
 
                                 inCodeBlock = false
+                                inException = false
                             }
                         }
                     }
