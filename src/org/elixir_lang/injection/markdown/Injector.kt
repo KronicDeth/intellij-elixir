@@ -32,6 +32,7 @@ class Injector : MultiHostInjector {
             is ElixirLine -> injectMarkdownInQuote(registrar, documentation)
             is QuotableKeywordPair -> {
                 when (val key = documentation.keywordKey.text) {
+                    "deprecated" -> getLanguagesToInjectInQuote(registrar, documentation.keywordValue)
                     "since" -> Unit
                     else -> {
                         Logger.error(
