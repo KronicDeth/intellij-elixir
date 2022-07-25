@@ -77,7 +77,7 @@ class Injector : MultiHostInjector {
                     if (listIndent > 0) {
                         val indentedMatcher = INDENTED_PATTERN.matcher(lineMarkdownText)
 
-                        if (indentedMatcher.matches() && indentedMatcher.group("indent").length < listIndent + 2) {
+                        if (indentedMatcher.matches() && indentedMatcher.group("indent").length < listIndent + 1) {
                             listIndent = -1
                         }
                     }
@@ -160,7 +160,7 @@ class Injector : MultiHostInjector {
                     if (listIndent > 0) {
                         val indentedMatcher = INDENTED_PATTERN.matcher(lineMarkdownText)
 
-                        if (indentedMatcher.matches() && indentedMatcher.group("indent").length < listIndent + 2) {
+                        if (indentedMatcher.matches() && indentedMatcher.group("indent").length < listIndent + 1) {
                             listIndent = -1
                         }
                     }
