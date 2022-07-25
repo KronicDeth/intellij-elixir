@@ -6,12 +6,10 @@ import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import org.elixir_lang.ElixirLanguage
 import org.elixir_lang.errorreport.Logger
-import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
-import org.elixir_lang.psi.ElixirAtomKeyword
-import org.elixir_lang.psi.Heredoc
-import org.elixir_lang.psi.QuotableKeywordPair
+import org.elixir_lang.psi.*
 import org.elixir_lang.reference.ModuleAttribute.Companion.DOCUMENTATION_NAME_SET
 import org.intellij.plugins.markdown.lang.MarkdownLanguage
+import java.util.regex.Pattern
 
 class Injector : MultiHostInjector {
     override fun getLanguagesToInject(registrar: MultiHostRegistrar, context: PsiElement) {
@@ -54,6 +52,7 @@ class Injector : MultiHostInjector {
 
         val prefixLength = documentation.heredocPrefix.textLength
         val quoteOffset = documentation.textOffset
+        var listIndent = -1
 
         for (line in documentation.heredocLineList) {
             val lineTextLength = line.textLength
@@ -65,25 +64,46 @@ class Injector : MultiHostInjector {
 
                 val lineOffset = line.textOffset
                 val markdownOffsetRelativeToQuote = lineOffset + prefixLength - quoteOffset
-                val lineMarkdownTextLength = if (lineMarkdownText.startsWith(CODE_BLOCK_INDENT)) {
-                    val lineCodeText = lineMarkdownText.substring(CODE_BLOCK_INDENT_LENGTH)
 
-                    when {
-                        lineCodeText.startsWith(IEX_PROMPT) -> {
-                            CODE_BLOCK_INDENT_LENGTH + IEX_PROMPT_LENGTH
-                        }
-                        lineCodeText.startsWith(IEX_CONTINUATION) -> {
-                            CODE_BLOCK_INDENT_LENGTH + IEX_CONTINUATION_LENGTH
-                        }
-                        lineCodeText.startsWith(EXCEPTION_PREFIX) -> {
-                            lineMarkdownText.length
-                        }
-                        else -> {
-                            CODE_BLOCK_INDENT_LENGTH
+                val listStartMatcher = LIST_START_PATTERN.matcher(lineMarkdownText)
+
+                val lineMarkdownTextLength = if (listStartMatcher.matches()) {
+                    listIndent = listStartMatcher.group("indent").length
+
+                    lineMarkdownText.length
+                } else {
+                    if (listIndent > 0) {
+                        val indentedMatcher = INDENTED_PATTERN.matcher(lineMarkdownText)
+
+                        if (indentedMatcher.matches() && indentedMatcher.group("indent").length < listIndent + 2) {
+                            listIndent = -1
                         }
                     }
-                } else {
-                    lineMarkdownText.length
+
+                    if (listIndent > 0) {
+                        lineMarkdownText.length
+                    } else {
+                        if (lineMarkdownText.startsWith(CODE_BLOCK_INDENT)) {
+                            val lineCodeText = lineMarkdownText.substring(CODE_BLOCK_INDENT_LENGTH)
+
+                            when {
+                                lineCodeText.startsWith(IEX_PROMPT) -> {
+                                    CODE_BLOCK_INDENT_LENGTH + IEX_PROMPT_LENGTH
+                                }
+                                lineCodeText.startsWith(IEX_CONTINUATION) -> {
+                                    CODE_BLOCK_INDENT_LENGTH + IEX_CONTINUATION_LENGTH
+                                }
+                                lineCodeText.startsWith(EXCEPTION_PREFIX) -> {
+                                    lineMarkdownText.length
+                                }
+                                else -> {
+                                    CODE_BLOCK_INDENT_LENGTH
+                                }
+                            }
+                        } else {
+                            lineMarkdownText.length
+                        }
+                    }
                 }
 
                 val textRangeInQuote = TextRange.from(markdownOffsetRelativeToQuote, lineMarkdownTextLength)
@@ -101,6 +121,7 @@ class Injector : MultiHostInjector {
         val prefixLength = documentation.heredocPrefix.textLength
         val quoteOffset = documentation.textOffset
         var inCodeBlock = false
+        var listIndent = -1
 
         for (line in documentation.heredocLineList) {
             val lineTextLength = line.textLength
@@ -114,44 +135,67 @@ class Injector : MultiHostInjector {
                 val lineOffsetRelativeToQuote = lineOffset - quoteOffset
                 val markdownOffsetRelativeToQuote = lineOffsetRelativeToQuote + prefixLength
 
-                if (lineMarkdownText.startsWith(CODE_BLOCK_INDENT)) {
-                    val lineCodeText = lineMarkdownText.substring(CODE_BLOCK_INDENT_LENGTH)
-                    val codeOffsetRelativeToQuote = markdownOffsetRelativeToQuote + CODE_BLOCK_INDENT_LENGTH
+                val listStartMatcher = LIST_START_PATTERN.matcher(lineMarkdownText)
 
-                    if (!lineCodeText.startsWith(EXCEPTION_PREFIX)) {
-                        val (lineElixirText, elixirOffsetRelativeToQuote) = when {
-                            lineCodeText.startsWith(IEX_PROMPT) -> {
-                                Pair(
-                                    lineCodeText.substring(IEX_PROMPT_LENGTH),
-                                    codeOffsetRelativeToQuote + IEX_PROMPT_LENGTH
-                                )
-                            }
-                            lineCodeText.startsWith(IEX_CONTINUATION) -> {
-                                Pair(
-                                    lineCodeText.substring(IEX_CONTINUATION_LENGTH),
-                                    codeOffsetRelativeToQuote + IEX_CONTINUATION_LENGTH
-                                )
-                            }
-                            else -> {
-                                Pair(lineCodeText, codeOffsetRelativeToQuote)
-                            }
-                        }
+                if (listStartMatcher.matches()) {
+                    listIndent = listStartMatcher.group("indent").length
 
-                        val textRangeInQuote = TextRange.from(elixirOffsetRelativeToQuote, lineElixirText.length)
-
-                        if (!inCodeBlock) {
-                            registrar.startInjecting(ElixirLanguage)
-
-                            inCodeBlock = true
-                        }
-
-                        registrar.addPlace(null, null, documentation, textRangeInQuote)
-                    }
-                } else if (lineMarkdownText.isNotBlank()) {
                     if (inCodeBlock) {
                         registrar.doneInjecting()
 
                         inCodeBlock = false
+                    }
+                } else {
+                    if (listIndent > 0) {
+                        val indentedMatcher = INDENTED_PATTERN.matcher(lineMarkdownText)
+
+                        if (indentedMatcher.matches() && indentedMatcher.group("indent").length < listIndent + 2) {
+                            listIndent = -1
+                        }
+                    }
+
+                    if (listIndent == -1) {
+                        if (lineMarkdownText.startsWith(CODE_BLOCK_INDENT)) {
+                            val lineCodeText = lineMarkdownText.substring(CODE_BLOCK_INDENT_LENGTH)
+                            val codeOffsetRelativeToQuote = markdownOffsetRelativeToQuote + CODE_BLOCK_INDENT_LENGTH
+
+                            if (!lineCodeText.startsWith(EXCEPTION_PREFIX)) {
+                                val (lineElixirText, elixirOffsetRelativeToQuote) = when {
+                                    lineCodeText.startsWith(IEX_PROMPT) -> {
+                                        Pair(
+                                            lineCodeText.substring(IEX_PROMPT_LENGTH),
+                                            codeOffsetRelativeToQuote + IEX_PROMPT_LENGTH
+                                        )
+                                    }
+                                    lineCodeText.startsWith(IEX_CONTINUATION) -> {
+                                        Pair(
+                                            lineCodeText.substring(IEX_CONTINUATION_LENGTH),
+                                            codeOffsetRelativeToQuote + IEX_CONTINUATION_LENGTH
+                                        )
+                                    }
+                                    else -> {
+                                        Pair(lineCodeText, codeOffsetRelativeToQuote)
+                                    }
+                                }
+
+                                val textRangeInQuote =
+                                    TextRange.from(elixirOffsetRelativeToQuote, lineElixirText.length)
+
+                                if (!inCodeBlock) {
+                                    registrar.startInjecting(ElixirLanguage)
+
+                                    inCodeBlock = true
+                                }
+
+                                registrar.addPlace(null, null, documentation, textRangeInQuote)
+                            }
+                        } else if (lineMarkdownText.isNotBlank()) {
+                            if (inCodeBlock) {
+                                registrar.doneInjecting()
+
+                                inCodeBlock = false
+                            }
+                        }
                     }
                 }
             }
@@ -173,6 +217,8 @@ class Injector : MultiHostInjector {
         private const val IEX_CONTINUATION = "...> "
         private const val IEX_CONTINUATION_LENGTH = IEX_CONTINUATION.length
         private const val EXCEPTION_PREFIX = "** ("
+        private val LIST_START_PATTERN = Pattern.compile("(?<indent>\\s*)([-*+]|\\d+\\.) \\S+.*\n")
+        private val INDENTED_PATTERN = Pattern.compile("(?<indent>\\s*).*\n")
 
         fun isValidHost(atUnqualifiedNoParenthesesCall: AtUnqualifiedNoParenthesesCall<*>): Boolean =
             atUnqualifiedNoParenthesesCall.atIdentifier.lastChild?.text in DOCUMENTATION_NAME_SET
