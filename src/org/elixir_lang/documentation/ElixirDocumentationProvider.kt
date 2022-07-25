@@ -4,6 +4,7 @@ import com.ericsson.otp.erlang.OtpErlangBinary
 import com.ericsson.otp.erlang.OtpErlangObject
 import com.intellij.lang.documentation.DocumentationMarkup
 import com.intellij.lang.documentation.DocumentationProvider
+import com.intellij.lang.parser.GeneratedParserUtilBase.DummyBlock
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.TextRange
@@ -81,6 +82,7 @@ class ElixirDocumentationProvider : DocumentationProvider {
     private fun collectDocComments(element: PsiElement, sink: Consumer<in PsiDocCommentBase>) {
         when (element) {
             is Call -> collectDocComments(element, sink)
+            is DummyBlock -> Unit
             else -> {
                 Logger.error(javaClass, "Don't know how to collect doc comments", element)
             }
