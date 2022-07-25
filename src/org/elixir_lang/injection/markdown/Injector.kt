@@ -95,7 +95,7 @@ class Injector : MultiHostInjector {
                                 lineCodeText.startsWith(IEX_CONTINUATION) -> {
                                     CODE_BLOCK_INDENT_LENGTH + IEX_CONTINUATION_LENGTH
                                 }
-                                lineCodeText.startsWith(EXCEPTION_PREFIX) -> {
+                                lineCodeText.startsWith(DEBUG_PREFIX) || lineCodeText.startsWith(EXCEPTION_PREFIX) -> {
                                     lineMarkdownText.length
                                 }
                                 else -> {
@@ -170,7 +170,7 @@ class Injector : MultiHostInjector {
                             val lineCodeText = lineMarkdownText.substring(CODE_BLOCK_INDENT_LENGTH)
                             val codeOffsetRelativeToQuote = markdownOffsetRelativeToQuote + CODE_BLOCK_INDENT_LENGTH
 
-                            if (!lineCodeText.startsWith(EXCEPTION_PREFIX)) {
+                            if (!(lineCodeText.startsWith(DEBUG_PREFIX) || lineCodeText.startsWith(EXCEPTION_PREFIX))) {
                                 val (lineElixirText, elixirOffsetRelativeToQuote) = when {
                                     lineCodeText.startsWith(IEX_PROMPT) -> {
                                         Pair(
@@ -228,6 +228,7 @@ class Injector : MultiHostInjector {
         private const val IEX_CONTINUATION = "...> "
         private const val IEX_CONTINUATION_LENGTH = IEX_CONTINUATION.length
         private const val EXCEPTION_PREFIX = "** ("
+        private const val DEBUG_PREFIX = "*DBG* "
         private val LIST_START_PATTERN = Pattern.compile("(?<indent>\\s*)([-*+]|\\d+\\.) \\S+.*\n")
         private val INDENTED_PATTERN = Pattern.compile("(?<indent>\\s*).*\n")
 
