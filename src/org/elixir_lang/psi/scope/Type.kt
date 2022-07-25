@@ -42,7 +42,7 @@ abstract class Type : PsiScopeProcessor {
             // type variable in a `when key: type`
             is ElixirKeywordKey -> executeOnParameter(element, state)
             is ElixirNoParenthesesOneArgument, is ElixirAccessExpression -> executeOnChildren(element, state)
-            is ElixirAtom, is ElixirFile, is ElixirList, is ElixirParentheticalStab, is ElixirTuple,
+            is ElixirAtom, is ElixirFile, is ElixirLine, is ElixirList, is ElixirParentheticalStab, is ElixirTuple,
             is WholeNumber,
             -> false
             is ModuleImpl<*> -> execute(element, state)
