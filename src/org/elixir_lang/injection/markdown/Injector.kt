@@ -29,6 +29,7 @@ class Injector : MultiHostInjector {
                 injectElixirInCodeBlocksInQuote(registrar, documentation)
             }
             is ElixirAtomKeyword -> Unit
+            is ElixirLine -> injectMarkdownInQuote(registrar, documentation)
             is QuotableKeywordPair -> {
                 when (val key = documentation.keywordKey.text) {
                     "since" -> Unit
@@ -114,6 +115,15 @@ class Injector : MultiHostInjector {
 
         registrar.doneInjecting()
     }
+
+    private fun injectMarkdownInQuote(registrar: MultiHostRegistrar, documentation: ElixirLine) {
+        documentation.lineBody?.let { lineBody ->
+            registrar.startInjecting(MarkdownLanguage.INSTANCE)
+            registrar.addPlace(null, null, documentation, lineBody.textRangeInParent)
+            registrar.doneInjecting()
+        }
+    }
+
 
     private fun injectElixirInCodeBlocksInQuote(registrar: MultiHostRegistrar, documentation: Heredoc) {
         registrar.startInjecting(MarkdownLanguage.INSTANCE)

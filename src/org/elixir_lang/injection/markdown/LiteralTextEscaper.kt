@@ -1,6 +1,7 @@
 package org.elixir_lang.injection.markdown
 
 import com.intellij.openapi.util.TextRange
+import org.elixir_lang.psi.ElixirLine
 import org.elixir_lang.psi.Heredoc
 import org.elixir_lang.psi.Parent
 
@@ -28,6 +29,7 @@ class LiteralTextEscaper(parent: Parent) : com.intellij.psi.LiteralTextEscaper<P
 
                 TextRange.from(startOffset, length)
             }
+            is ElixirLine -> myHost.lineBody?.textRangeInParent ?: TextRange.from(1, 0)
             else -> super.getRelevantTextRange()
         }
 
