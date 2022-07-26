@@ -16,6 +16,7 @@ import org.intellij.markdown.html.GeneratingProvider
 import org.intellij.markdown.html.HtmlGenerator
 import org.intellij.markdown.html.URI
 import org.intellij.markdown.parser.LinkMap
+import java.util.regex.Pattern
 
 class MarkdownFlavourDescriptor(private val project: Project) : GFMFlavourDescriptor() {
     override fun createHtmlGeneratingProviders(linkMap: LinkMap, baseURI: URI?): Map<IElementType, GeneratingProvider> =
@@ -33,37 +34,71 @@ class MarkdownFlavourDescriptor(private val project: Project) : GFMFlavourDescri
                             if (node.children.size == 3) {
                                 val nameChild = node.children[1]
                                 val name = nameChild.getTextInNode(text).toString()
-                                val globalSearchScope = GlobalSearchScope.allScope(project)
-                                val modulars = mutableListOf<PsiElement>()
+                                val moduleFunctionArityMatcher = MODULE_FUNCTION_ARITY_PATTERN.matcher(name)
 
-                                StubIndex
-                                    .getInstance()
-                                    .processElements(
-                                        ModularName.KEY,
-                                        name,
-                                        project,
-                                        globalSearchScope,
-                                        null,
-                                        NamedElement::class.java
-                                    ) { namedElement ->
-                                        modulars.add(namedElement)
+                                if (moduleFunctionArityMatcher.matches()) {
+                                    val module = moduleFunctionArityMatcher.group("module")
+                                    val function = moduleFunctionArityMatcher.group("function")
+                                    val arity = moduleFunctionArityMatcher.group("arity").toInt()
+
+                                    val functionCount =
+                                        module
+                                            .let { modulars(project, it) }
+                                            .flatMap { modular ->
+                                                org.elixir_lang.psi.scope.call_definition_clause.MultiResolve.resolveResults(
+                                                    function,
+                                                    arity,
+                                                    false,
+                                                    modular
+                                                )
+                                            }
+                                            .count { it.isValidResult }
+
+                                    if (functionCount > 0) {
+
+
+                                        visitor.consumeTagOpen(
+                                            node,
+                                            "a",
+                                            "href=\"${DocumentationManagerProtocol.PSI_ELEMENT_PROTOCOL}${name}\""
+                                        )
+                                        gfmHtmlGeneratingProvider!!.processNode(visitor, text, node)
+                                        visitor.consumeTagClose("a")
                                     }
-
-                                if (modulars.isNotEmpty()) {
-                                    visitor.consumeTagOpen(
-                                        node,
-                                        "a",
-                                        "href=\"${DocumentationManagerProtocol.PSI_ELEMENT_PROTOCOL}${name}\""
-                                    )
-                                    gfmHtmlGeneratingProvider!!.processNode(visitor, text, node)
-                                    visitor.consumeTagClose("a")
                                 } else {
-                                    TODO()
+                                    val modulars = modulars(project, name)
+
+                                    if (modulars.isNotEmpty()) {
+                                        visitor.consumeTagOpen(
+                                            node,
+                                            "a",
+                                            "href=\"${DocumentationManagerProtocol.PSI_ELEMENT_PROTOCOL}${name}\""
+                                        )
+                                        gfmHtmlGeneratingProvider!!.processNode(visitor, text, node)
+                                        visitor.consumeTagClose("a")
+                                    }
                                 }
                             }
-
                         }
                     }
                 }
             }
+
+    companion object {
+        val MODULE_FUNCTION_ARITY_PATTERN: Pattern = Pattern.compile("(?<module>.+)\\.(?<function>.+)/(?<arity>\\d+)")
+
+        fun modulars(project: Project, name: String): Collection<PsiElement> {
+            val globalSearchScope = GlobalSearchScope.allScope(project)
+
+            return StubIndex
+                .getElements(
+                    ModularName.KEY,
+                    name,
+                    project,
+                    globalSearchScope,
+                    null,
+                    NamedElement::class.java
+                )
+        }
+    }
 }

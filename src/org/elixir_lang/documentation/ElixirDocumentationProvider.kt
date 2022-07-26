@@ -10,8 +10,6 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.*
 import com.intellij.psi.impl.source.tree.LeafPsiElement
-import com.intellij.psi.search.GlobalSearchScope
-import com.intellij.psi.stubs.StubIndex
 import com.intellij.psi.util.PsiTreeUtil
 import org.elixir_lang.beam.chunk.beam_documentation.docs.documented.Hidden
 import org.elixir_lang.beam.chunk.beam_documentation.docs.documented.MarkdownByLanguage
@@ -23,10 +21,10 @@ import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.call.macroChildCallSequence
 import org.elixir_lang.psi.impl.childExpressions
 import org.elixir_lang.psi.impl.identifierName
-import org.elixir_lang.psi.stub.index.ModularName
 import org.elixir_lang.psi.stub.type.call.Stub
 import org.elixir_lang.psi.stub.type.call.Stub.isModular
 import org.elixir_lang.reference.ModuleAttribute.Companion.isDocumentationName
+import org.elixir_lang.reference.Resolver
 import org.intellij.markdown.html.HtmlGenerator
 import org.intellij.markdown.parser.MarkdownParser
 import java.lang.Integer.max
@@ -131,24 +129,40 @@ class ElixirDocumentationProvider : DocumentationProvider {
         context: PsiElement
     ): PsiElement? {
         val project = context.project
-        val globalSearchScope = GlobalSearchScope.allScope(project)
+        val moduleFunctionArityMatcher = MarkdownFlavourDescriptor.MODULE_FUNCTION_ARITY_PATTERN.matcher(link)
+        val moduleFunctionArity = moduleFunctionArityMatcher.matches()
 
-        val modulars = StubIndex
-            .getElements(
-                ModularName.KEY,
-                link,
-                project,
-                globalSearchScope,
-                null,
-                NamedElement::class.java
-            )
+        val module = if (moduleFunctionArity) {
+            moduleFunctionArityMatcher.group("module")
+        } else {
+            link
+        }
 
-        return when (modulars.size) {
-            0 -> null
-            1 -> modulars.single()
-            else -> {
-                TODO()
-            }
+        val modulars = MarkdownFlavourDescriptor.modulars(project, module)
+
+        return if (moduleFunctionArity) {
+            val function = moduleFunctionArityMatcher.group("function")
+            val arity = moduleFunctionArityMatcher.group("arity").toInt()
+
+            modulars
+                .flatMap { modular ->
+                    org.elixir_lang.psi.scope.call_definition_clause.MultiResolve.resolveResults(
+                        function,
+                        arity,
+                        false,
+                        modular
+                    )
+                }
+                .let { Resolver.preferred(context, false, it) }
+                .map { it.element }
+                .let { Resolver.preferSource(it) }
+                .firstOrNull()
+        } else {
+            modulars
+                .toList()
+                .let { Resolver.preferUnderSameModule(context, it) }
+                .let { Resolver.preferSource(it) }
+                .firstOrNull()
         }
     }
 
