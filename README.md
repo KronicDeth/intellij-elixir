@@ -2655,7 +2655,7 @@ Using Go To Definition (Cmd+Click) on the link will take you to the module defin
 
 #### Quick Documentation
 
-You can get documentation for functions and macros that have a `@doc` or aliases of modules that have a `@moduledoc` in a pop-up using [Quick Documentation](https://www.jetbrains.com/help/idea/viewing-reference-information.html#inline-quick-documentation).
+You can get documentation for functions and macros that have a `@doc`, aliases of modules that have a `@moduledoc` or types that have a `@typedoc` in a pop-up using [Quick Documentation](https://www.jetbrains.com/help/idea/viewing-reference-information.html#inline-quick-documentation).
 
 ##### For a function
 
@@ -2668,8 +2668,17 @@ You can get documentation for functions and macros that have a `@doc` or aliases
 
 1. Place the cursor on a fully-qualified module name
 2. Display the documentation with either:
-   * A keyboard shortcut: F1 to show rendered `@doc`
+   * A keyboard shortcut: F1 to show rendered `@moduledoc`
    * From the menu: View > Quick Documentation
+
+##### For a type
+
+1. Place the cursor over the name of a type being used. 
+2. Display the documentation with either:
+   * A keyboard shortcut: F1 to show rendered `@typedoc`
+   * From the menu: View > Quick Documentation
+
+   ![](screenshots/features/documentation/quick/typedoc.png)
 
 ### Run/Debug Configurations
 

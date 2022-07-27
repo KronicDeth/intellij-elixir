@@ -215,9 +215,14 @@ class ElixirDocumentationProvider : DocumentationProvider {
 
         documentationHtml.append("<i>module</i> <b>").append(fetchedDocs.module).append("</b>\n")
 
-        if (fetchedDocs is FetchedDocs.FunctionOrMacroDocumentation) {
-            for (head in fetchedDocs.heads) {
-                documentationHtml.append(head).append("\n")
+        when (fetchedDocs) {
+            is FetchedDocs.FunctionOrMacroDocumentation -> {
+                for (head in fetchedDocs.heads) {
+                    documentationHtml.append(head).append("\n")
+                }
+            }
+            is FetchedDocs.TypeDocumentation -> {
+                documentationHtml.append(fetchedDocs.head).append("\n")
             }
         }
 
@@ -303,6 +308,14 @@ class ElixirDocumentationProvider : DocumentationProvider {
                     }
 
                     documentationHtml.append(DocumentationMarkup.SECTIONS_END)
+                }
+            }
+            is FetchedDocs.TypeDocumentation -> {
+                fetchedDocs.typedoc.let { typedoc ->
+                    documentationHtml
+                        .append(DocumentationMarkup.CONTENT_START)
+                        .append(html(project, typedoc))
+                        .append(DocumentationMarkup.CONTENT_END)
                 }
             }
         }

@@ -14,6 +14,7 @@ import org.elixir_lang.psi.impl.enclosingMacroCall
 import org.elixir_lang.psi.impl.identifierName
 import org.elixir_lang.psi.impl.siblingExpressions
 import org.elixir_lang.psi.stub.type.call.Stub.isModular
+import org.elixir_lang.reference.ModuleAttribute.Companion.isTypeName
 
 class Comment(val moduleAttribute: AtUnqualifiedNoParenthesesCall<*>) : FakePsiElement(), PsiDocCommentBase {
     override fun getParent(): PsiElement = moduleAttribute
@@ -26,6 +27,12 @@ class Comment(val moduleAttribute: AtUnqualifiedNoParenthesesCall<*>) : FakePsiE
             "doc" -> {
                 moduleAttribute.siblingExpressions(forward = true, withSelf = false).firstOrNull { expression ->
                     expression is Call && CallDefinitionClause.`is`(expression)
+                }
+            }
+            "typedoc" -> {
+                moduleAttribute.siblingExpressions(forward = true, withSelf = false).firstOrNull { expression ->
+                    expression is AtUnqualifiedNoParenthesesCall<*> &&
+                            isTypeName(expression.atIdentifier.identifierName())
                 }
             }
             else -> {

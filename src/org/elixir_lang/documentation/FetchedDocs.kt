@@ -87,6 +87,9 @@ sealed class FetchedDocs(open val module: String) {
     }
 
     data class ModuleDocumentation(override val module: String, val moduledoc: String) : FetchedDocs(module)
+
+    data class TypeDocumentation(override val module: String, val head: String, val typedoc: String) :
+        FetchedDocs(module)
 }
 
 private val DEPRECATED = "deprecated"
