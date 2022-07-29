@@ -31,44 +31,41 @@ class MarkdownFlavourDescriptor(private val project: Project) : GFMFlavourDescri
                             text: String,
                             node: ASTNode
                         ) {
-                            if (node.children.size == 3) {
-                                val nameChild = node.children[1]
-                                val name = nameChild.getTextInNode(text).toString()
-                                val moduleFunctionArityMatcher = MODULE_FUNCTION_ARITY_PATTERN.matcher(name)
+                            when (node.children.size) {
+                                3 -> {
+                                    val nameChild = node.children[1]
+                                    val name = nameChild.getTextInNode(text).toString()
+                                    val moduleRelativeArityMatcher = MODULE_RELATIVE_ARITY_PATTERN.matcher(name)
 
-                                if (moduleFunctionArityMatcher.matches()) {
-                                    val module = moduleFunctionArityMatcher.group("module")
-                                    val function = moduleFunctionArityMatcher.group("function")
-                                    val arity = moduleFunctionArityMatcher.group("arity").toInt()
+                                    val link = if (moduleRelativeArityMatcher.matches()) {
+                                        val module = moduleRelativeArityMatcher.group("module")
 
-                                    val functionCount =
-                                        module
-                                            .let { modulars(project, it) }
-                                            .flatMap { modular ->
-                                                org.elixir_lang.psi.scope.call_definition_clause.MultiResolve.resolveResults(
-                                                    function,
-                                                    arity,
-                                                    false,
-                                                    modular
-                                                )
-                                            }
-                                            .count { it.isValidResult }
+                                        if (module != null) {
+                                            val relative = moduleRelativeArityMatcher.group("relative")
+                                            val arity = moduleRelativeArityMatcher.group("arity").toInt()
 
-                                    if (functionCount > 0) {
+                                            val functionCount =
+                                                module
+                                                    .let { modulars(project, it) }
+                                                    .flatMap { modular ->
+                                                        org.elixir_lang.psi.scope.call_definition_clause.MultiResolve.resolveResults(
+                                                            relative,
+                                                            arity,
+                                                            false,
+                                                            modular
+                                                        )
+                                                    }
+                                                    .count { it.isValidResult }
 
-
-                                        visitor.consumeTagOpen(
-                                            node,
-                                            "a",
-                                            "href=\"${DocumentationManagerProtocol.PSI_ELEMENT_PROTOCOL}${name}\""
-                                        )
-                                        gfmHtmlGeneratingProvider!!.processNode(visitor, text, node)
-                                        visitor.consumeTagClose("a")
+                                            functionCount > 0
+                                        } else {
+                                            true
+                                        }
+                                    } else {
+                                        modulars(project, name).isNotEmpty()
                                     }
-                                } else {
-                                    val modulars = modulars(project, name)
 
-                                    if (modulars.isNotEmpty()) {
+                                    if (link) {
                                         visitor.consumeTagOpen(
                                             node,
                                             "a",
@@ -78,6 +75,39 @@ class MarkdownFlavourDescriptor(private val project: Project) : GFMFlavourDescri
                                         visitor.consumeTagClose("a")
                                     }
                                 }
+                                5 -> {
+                                    when (val kind = node.children[1].getTextInNode(text).toString()) {
+                                        "c", "t" -> {
+                                            val nameChild = node.children[3]
+                                            val name = nameChild.getTextInNode(text).toString()
+                                            val moduleRelativeArityMatcher = MODULE_RELATIVE_ARITY_PATTERN.matcher(name)
+
+                                            if (moduleRelativeArityMatcher.matches()) {
+                                                val module = moduleRelativeArityMatcher.group("module")
+
+                                                val link = if (module != null) {
+                                                    modulars(project, name).isNotEmpty()
+                                                } else {
+                                                    true
+
+                                                }
+
+                                                if (link) {
+                                                    visitor.consumeTagOpen(
+                                                        node,
+                                                        "a",
+                                                        "href=\"${
+                                                            DocumentationManagerProtocol
+                                                                .PSI_ELEMENT_PROTOCOL
+                                                        }${kind}:${name}\""
+                                                    )
+                                                    gfmHtmlGeneratingProvider!!.processNode(visitor, text, node)
+                                                    visitor.consumeTagClose("a")
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -85,7 +115,8 @@ class MarkdownFlavourDescriptor(private val project: Project) : GFMFlavourDescri
             }
 
     companion object {
-        val MODULE_FUNCTION_ARITY_PATTERN: Pattern = Pattern.compile("(?<module>.+)\\.(?<function>.+)/(?<arity>\\d+)")
+        val MODULE_RELATIVE_ARITY_PATTERN: Pattern =
+            Pattern.compile("((?<module>.+)\\.)?(?<relative>.+)/(?<arity>\\d+)")
 
         fun modulars(project: Project, name: String): Collection<PsiElement> {
             val globalSearchScope = GlobalSearchScope.allScope(project)

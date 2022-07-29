@@ -17,6 +17,7 @@ import org.elixir_lang.beam.chunk.beam_documentation.docs.documented.None
 import org.elixir_lang.beam.psi.BeamFileImpl
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.*
+import org.elixir_lang.psi.CallDefinitionClause.enclosingModularMacroCall
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.call.macroChildCallSequence
 import org.elixir_lang.psi.impl.childExpressions
@@ -25,11 +26,13 @@ import org.elixir_lang.psi.stub.type.call.Stub
 import org.elixir_lang.psi.stub.type.call.Stub.isModular
 import org.elixir_lang.reference.ModuleAttribute.Companion.isDocumentationName
 import org.elixir_lang.reference.Resolver
+import org.elixir_lang.structure_view.element.Callback
 import org.intellij.markdown.html.HtmlGenerator
 import org.intellij.markdown.parser.MarkdownParser
 import java.lang.Integer.max
 import java.lang.Integer.min
 import java.util.function.Consumer
+import java.util.regex.Pattern
 
 
 class ElixirDocumentationProvider : DocumentationProvider {
@@ -123,41 +126,143 @@ class ElixirDocumentationProvider : DocumentationProvider {
         return super.getDocumentationElementForLookupItem(psiManager, `object`, element)
     }
 
+    private val LINK_RELATIVE_PATTERN: Pattern =
+        Pattern.compile("((?<kind>[ct]):)?((?<module>.+)\\.)?(?<relative>.+)/(?<arity>\\d+)")
+
     override fun getDocumentationElementForLink(
         psiManager: PsiManager,
         link: String,
         context: PsiElement
     ): PsiElement? {
         val project = context.project
-        val moduleFunctionArityMatcher = MarkdownFlavourDescriptor.MODULE_FUNCTION_ARITY_PATTERN.matcher(link)
-        val moduleFunctionArity = moduleFunctionArityMatcher.matches()
+        val relativeLinkMatcher = LINK_RELATIVE_PATTERN.matcher(link)
 
-        val module = if (moduleFunctionArity) {
-            moduleFunctionArityMatcher.group("module")
-        } else {
-            link
-        }
+        return if (relativeLinkMatcher.matches()) {
+            val module = relativeLinkMatcher.group("module")
 
-        val modulars = MarkdownFlavourDescriptor.modulars(project, module)
+            when (val kind = relativeLinkMatcher.group("kind")) {
+                null -> {
+                    val relative = relativeLinkMatcher.group("relative")
+                    val arity = relativeLinkMatcher.group("arity").toInt()
 
-        return if (moduleFunctionArity) {
-            val function = moduleFunctionArityMatcher.group("function")
-            val arity = moduleFunctionArityMatcher.group("arity").toInt()
+                    val resolveResults = if (module != null) {
+                        MarkdownFlavourDescriptor
+                            .modulars(project, module)
+                            .flatMap { modular ->
+                                org.elixir_lang.psi.scope.call_definition_clause.MultiResolve.resolveResults(
+                                    relative,
+                                    arity,
+                                    false,
+                                    modular
+                                )
+                            }
+                    } else {
+                        context
+                            .let { it as? Call }
+                            ?.let { call ->
+                                call.takeIf(::isModular) ?: enclosingModularMacroCall(call)
+                            }
+                            ?.let { modular ->
+                                org.elixir_lang.psi.scope.call_definition_clause.MultiResolve.resolveResults(
+                                    relative,
+                                    arity,
+                                    false,
+                                    modular
+                                )
+                            }
+                            ?.toList()
+                            .orEmpty()
+                    }
 
-            modulars
-                .flatMap { modular ->
-                    org.elixir_lang.psi.scope.call_definition_clause.MultiResolve.resolveResults(
-                        function,
-                        arity,
-                        false,
-                        modular
-                    )
+                    resolveResults
+                        .let { Resolver.preferred(context, false, it) }
+                        .map { it.element }
+                        .let { Resolver.preferSource(it) }
+                        .firstOrNull()
                 }
-                .let { Resolver.preferred(context, false, it) }
-                .map { it.element }
-                .let { Resolver.preferSource(it) }
-                .firstOrNull()
+                "c" -> {
+                    val relative = relativeLinkMatcher.group("relative")
+                    val arity = relativeLinkMatcher.group("arity").toInt()
+
+                    val resolveResults = if (module != null) {
+                        MarkdownFlavourDescriptor
+                            .modulars(project, module)
+                            .flatMap { modular ->
+                                org.elixir_lang.psi.scope.call_definition_clause.MultiResolve.resolveResults(
+                                    relative,
+                                    arity,
+                                    false,
+                                    modular
+                                )
+                            }
+                    } else {
+                        context
+                            .let { it as? Call }
+                            ?.let { call ->
+                                call.takeIf(::isModular) ?: enclosingModularMacroCall(call)
+                            }
+                            ?.let { modular ->
+                                org.elixir_lang.psi.scope.call_definition_clause.MultiResolve.resolveResults(
+                                    relative,
+                                    arity,
+                                    false,
+                                    modular
+                                )
+                            }
+                            ?.toList()
+                            .orEmpty()
+                    }
+
+                    resolveResults
+                        .filter { resolveResult ->
+                            resolveResult
+                                .element
+                                .let { it as? Call }
+                                ?.let(Callback.Companion::`is`)
+                                ?: false
+                        }
+                        .let { Resolver.preferred(context, false, it) }
+                        .map { it.element }
+                        .let { Resolver.preferSource(it) }
+                        .firstOrNull()
+                }
+                "t" -> {
+                    val relative = relativeLinkMatcher.group("relative")
+                    val arity = relativeLinkMatcher.group("arity").toInt()
+
+                    val resolveResults = if (module != null) {
+                        MarkdownFlavourDescriptor
+                            .modulars(project, module)
+                            .flatMap { modular ->
+                                org.elixir_lang.psi.scope.type.MultiResolve.resolveResults(
+                                    relative,
+                                    arity,
+                                    false,
+                                    modular
+                                )
+                            }
+                    } else {
+                        org.elixir_lang.psi.scope.type.MultiResolve.resolveResults(relative, arity, false, context)
+                    }
+
+                    resolveResults
+                        .let { Resolver.preferred(context, false, it) }
+                        .mapNotNull { it.element }
+                        .let { Resolver.preferSource(it) }
+                        .firstOrNull()
+                }
+                else -> {
+                    Logger.error(
+                        javaClass, "Don't know how to find element for link (${link}) of kind (${kind})",
+                        context
+                    )
+
+                    null
+                }
+            }
         } else {
+            val modulars = MarkdownFlavourDescriptor.modulars(project, link)
+
             modulars
                 .toList()
                 .let { Resolver.preferUnderSameModule(context, it) }
