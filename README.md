@@ -2659,6 +2659,15 @@ You can get documentation for functions and macros that have a `@doc`, aliases o
 
 ##### For a function
 
+1. Place the cursor over the name of callback being referneced.
+2. Display the documentation with either:
+   * A keyboard shortcut: F1 to show rendered `@doc`
+   * From the menu: View > Quick Documentation
+
+   ![](screenshots/features/documentation/quick/@callback-@doc.png)
+
+##### For a function
+
 1. Place the cursor over the name of function being called.
 2. Display the documentation with either:
    * A keyboard shortcut: F1 to show rendered `@doc`

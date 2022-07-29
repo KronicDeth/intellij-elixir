@@ -18,6 +18,9 @@ import org.elixir_lang.psi.impl.prevSiblingSequence
 import org.elixir_lang.psi.impl.stripAccessExpression
 
 sealed class FetchedDocs(open val module: String) {
+    data class CallbackDocumentation(override val module: String, val head: String, val doc: String) :
+        FetchedDocs(module)
+
     data class FunctionOrMacroDocumentation(
         override val module: String,
         val deprecated: OtpErlangObject?,

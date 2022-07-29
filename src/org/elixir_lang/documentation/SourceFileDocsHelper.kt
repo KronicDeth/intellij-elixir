@@ -20,7 +20,14 @@ object SourceFileDocsHelper {
         else -> null
     }
 
-    private fun fetchDocs(moduleAttribute: AtUnqualifiedNoParenthesesCall<*>): FetchedDocs? {
+    private fun fetchDocs(moduleAttribute: AtUnqualifiedNoParenthesesCall<*>): FetchedDocs? =
+        when (moduleAttribute.atIdentifier.identifierName()) {
+            "type", "typep", "opaque" -> fetchTypeDocs(moduleAttribute)
+            "callback", "@macrocallback" -> fetchCallbackDocs(moduleAttribute)
+            else -> null
+        }
+
+    private fun fetchTypeDocs(moduleAttribute: AtUnqualifiedNoParenthesesCall<*>): FetchedDocs.TypeDocumentation? {
         val typeDoc = moduleAttribute
             .siblingExpressions(forward = false, withSelf = false)
             .filterIsInstance<AtUnqualifiedNoParenthesesCall<*>>()
@@ -42,6 +49,34 @@ object SourceFileDocsHelper {
                 val module = (modular as? CanonicallyNamed)?.canonicalName().orEmpty()
 
                 FetchedDocs.TypeDocumentation(module, moduleAttribute.text, typeDoc)
+            }
+        } else {
+            null
+        }
+    }
+
+    private fun fetchCallbackDocs(moduleAttribute: AtUnqualifiedNoParenthesesCall<*>): FetchedDocs.CallbackDocumentation? {
+        val typeDoc = moduleAttribute
+            .siblingExpressions(forward = false, withSelf = false)
+            .filterIsInstance<AtUnqualifiedNoParenthesesCall<*>>()
+            .firstOrNull { previousModuleAttribute ->
+                previousModuleAttribute.atIdentifier.identifierName() == "doc"
+            }
+            ?.lastChild
+            ?.firstChild
+            ?.firstChild
+            ?.let { documentation ->
+                when (documentation) {
+                    is Heredoc -> documentation.children.joinToString("") { it.text }
+                    else -> TODO()
+                }
+            }
+
+        return if (!typeDoc.isNullOrEmpty()) {
+            enclosingModularMacroCall(moduleAttribute)?.let { modular ->
+                val module = (modular as? CanonicallyNamed)?.canonicalName().orEmpty()
+
+                FetchedDocs.CallbackDocumentation(module, moduleAttribute.text, typeDoc)
             }
         } else {
             null

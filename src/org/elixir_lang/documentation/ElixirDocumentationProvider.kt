@@ -216,6 +216,9 @@ class ElixirDocumentationProvider : DocumentationProvider {
         documentationHtml.append("<i>module</i> <b>").append(fetchedDocs.module).append("</b>\n")
 
         when (fetchedDocs) {
+            is FetchedDocs.CallbackDocumentation -> {
+                documentationHtml.append(fetchedDocs.head).append("\n")
+            }
             is FetchedDocs.FunctionOrMacroDocumentation -> {
                 for (head in fetchedDocs.heads) {
                     documentationHtml.append(head).append("\n")
@@ -230,6 +233,14 @@ class ElixirDocumentationProvider : DocumentationProvider {
 
 
         when (fetchedDocs) {
+            is FetchedDocs.CallbackDocumentation -> {
+                fetchedDocs.doc.let { doc ->
+                    documentationHtml
+                        .append(DocumentationMarkup.CONTENT_START)
+                        .append(html(project, doc))
+                        .append(DocumentationMarkup.CONTENT_END)
+                }
+            }
             is FetchedDocs.ModuleDocumentation -> {
                 fetchedDocs.moduledoc.let { moduledoc ->
                     documentationHtml
