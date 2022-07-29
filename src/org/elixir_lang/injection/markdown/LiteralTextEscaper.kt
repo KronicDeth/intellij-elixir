@@ -16,20 +16,20 @@ class LiteralTextEscaper(parent: Parent) : com.intellij.psi.LiteralTextEscaper<P
         rangeInsideHost.startOffset + offsetInDecoded;
 
     override fun getRelevantTextRange(): TextRange =
-        when (myHost) {
+        when (val host = myHost) {
             is Heredoc -> {
-                val heredocLineList = myHost.heredocLineList
+                val heredocLineList = host.heredocLineList
 
                 val relevantStartOffset = heredocLineList.first().textRange.startOffset
                 val relevantEndOffset = heredocLineList.last().textRange.endOffset
 
-                val hostTextRange = myHost.textRange
+                val hostTextRange = host.textRange
                 val startOffset = relevantStartOffset - hostTextRange.startOffset
                 val length = relevantEndOffset - relevantStartOffset
 
                 TextRange.from(startOffset, length)
             }
-            is ElixirLine -> myHost.lineBody?.textRangeInParent ?: TextRange.from(1, 0)
+            is ElixirLine -> host.lineBody?.textRangeInParent ?: TextRange.from(1, 0)
             else -> super.getRelevantTextRange()
         }
 

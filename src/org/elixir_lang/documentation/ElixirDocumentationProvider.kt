@@ -331,6 +331,7 @@ class ElixirDocumentationProvider : DocumentationProvider {
                     documentationHtml.append(head).append("\n")
                 }
             }
+            is FetchedDocs.ModuleDocumentation -> Unit
             is FetchedDocs.TypeDocumentation -> {
                 documentationHtml.append(fetchedDocs.head).append("\n")
             }
