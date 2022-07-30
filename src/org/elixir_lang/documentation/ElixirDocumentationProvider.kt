@@ -22,6 +22,7 @@ import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.call.macroChildCallSequence
 import org.elixir_lang.psi.impl.childExpressions
 import org.elixir_lang.psi.impl.identifierName
+import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.psi.stub.type.call.Stub
 import org.elixir_lang.psi.stub.type.call.Stub.isModular
 import org.elixir_lang.reference.ModuleAttribute.Companion.isDocumentationName
@@ -80,10 +81,11 @@ class ElixirDocumentationProvider : DocumentationProvider {
         file.childExpressions().forEach { collectDocComments(it, sink) }
     }
 
-    private fun collectDocComments(element: PsiElement, sink: Consumer<in PsiDocCommentBase>) {
+    private tailrec fun collectDocComments(element: PsiElement, sink: Consumer<in PsiDocCommentBase>) {
         when (element) {
             is Call -> collectDocComments(element, sink)
-            is DummyBlock -> Unit
+            is ElixirAccessExpression -> collectDocComments(element.stripAccessExpression(), sink)
+            is DummyBlock, is ElixirList -> Unit
             else -> {
                 Logger.error(javaClass, "Don't know how to collect doc comments", element)
             }
