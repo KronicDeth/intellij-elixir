@@ -12,6 +12,8 @@ import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.psi.*;
 import com.ericsson.otp.erlang.OtpErlangList;
 import com.ericsson.otp.erlang.OtpErlangObject;
+import com.intellij.psi.LiteralTextEscaper;
+import com.intellij.psi.PsiLanguageInjectionHost;
 
 public class ElixirLiteralSigilHeredocImpl extends ASTWrapperPsiElement implements ElixirLiteralSigilHeredoc {
 
@@ -73,6 +75,11 @@ public class ElixirLiteralSigilHeredocImpl extends ASTWrapperPsiElement implemen
   }
 
   @Override
+  public @NotNull LiteralTextEscaper<? extends PsiLanguageInjectionHost> createLiteralTextEscaper() {
+    return ElixirPsiImplUtil.createLiteralTextEscaper(this);
+  }
+
+  @Override
   public @NotNull List<? extends HeredocLine> getHeredocLineList() {
     return ElixirPsiImplUtil.getHeredocLineList(this);
   }
@@ -80,6 +87,11 @@ public class ElixirLiteralSigilHeredocImpl extends ASTWrapperPsiElement implemen
   @Override
   public @NotNull Integer indentation() {
     return ElixirPsiImplUtil.indentation(this);
+  }
+
+  @Override
+  public boolean isValidHost() {
+    return ElixirPsiImplUtil.isValidHost(this);
   }
 
   @Override
@@ -120,6 +132,11 @@ public class ElixirLiteralSigilHeredocImpl extends ASTWrapperPsiElement implemen
   @Override
   public char sigilName() {
     return ElixirPsiImplUtil.sigilName(this);
+  }
+
+  @Override
+  public PsiLanguageInjectionHost updateText(@NotNull String text) {
+    return ElixirPsiImplUtil.updateText(this, text);
   }
 
 }

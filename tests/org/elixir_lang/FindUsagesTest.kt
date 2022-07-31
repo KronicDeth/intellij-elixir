@@ -11,14 +11,16 @@ class FindUsagesTest : PlatformTestCase() {
     }
 
     fun testFunctionRecursiveDeclaration() {
-        val usages = myFixture.testFindUsagesUsingAction("function_recursive_declaration.ex", "kernel.ex").map { it as UsageInfo2UsageAdapter }
+        val usages = myFixture.testFindUsagesUsingAction("function_recursive_declaration.ex", "kernel.ex")
+            .map { it as UsageInfo2UsageAdapter }
 
         assertEquals(3, usages.size)
-        assertContainsElements( usages.map { it.element!!.textOffset }, listOf(63, 93))
+        assertContainsElements(usages.map { it.element!!.textOffset }, listOf(63, 93))
 
         val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
 
-        assertEquals("""<root> (3)
+        assertEquals(
+            """<root> (3)
  ${usages()} (3)
   Call definition clause (2)
    light_idea_test_case (2)
@@ -32,18 +34,21 @@ class FindUsagesTest : PlatformTestCase() {
      function_recursive_declaration.ex (1)
       5function(t, [h | acc])
 """,
-                usageViewTreeTextRepresentation)
+            usageViewTreeTextRepresentation
+        )
     }
 
     fun testFunctionRecursiveUsage() {
-        val usages = myFixture.testFindUsagesUsingAction("function_recursive_usage.ex", "kernel.ex").map { it as UsageInfo2UsageAdapter }
+        val usages = myFixture.testFindUsagesUsingAction("function_recursive_usage.ex", "kernel.ex")
+            .map { it as UsageInfo2UsageAdapter }
 
         assertEquals(3, usages.size)
-        assertContainsElements( usages.map { it.element!!.textOffset }, listOf(63, 93))
+        assertContainsElements(usages.map { it.element!!.textOffset }, listOf(63, 93))
 
         val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
 
-        assertEquals("""<root> (3)
+        assertEquals(
+            """<root> (3)
  ${usages()} (3)
   Call definition clause (2)
    light_idea_test_case (2)
@@ -57,18 +62,21 @@ class FindUsagesTest : PlatformTestCase() {
      function_recursive_usage.ex (1)
       5function(t, [h | acc])
 """,
-                usageViewTreeTextRepresentation)
+            usageViewTreeTextRepresentation
+        )
     }
 
     fun testFunctionSingleClauseUnused() {
-        val usages = myFixture.testFindUsagesUsingAction("function_single_clause_unused.ex", "kernel.ex").map { it as UsageInfo2UsageAdapter }
+        val usages = myFixture.testFindUsagesUsingAction("function_single_clause_unused.ex", "kernel.ex")
+            .map { it as UsageInfo2UsageAdapter }
 
         assertEquals(1, usages.size)
-        assertContainsElements( usages.map { it.element!!.textOffset }, listOf(26))
+        assertContainsElements(usages.map { it.element!!.textOffset }, listOf(26))
 
         val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
 
-        assertEquals("""<root> (1)
+        assertEquals(
+            """<root> (1)
  ${usages()} (1)
   Call definition clause (1)
    light_idea_test_case (1)
@@ -76,18 +84,21 @@ class FindUsagesTest : PlatformTestCase() {
      function_single_clause_unused.ex (1)
       2def function, do: :ok
 """,
-                usageViewTreeTextRepresentation)
+            usageViewTreeTextRepresentation
+        )
     }
 
     fun testFunctionMultipleClausesUnused() {
-        val usages = myFixture.testFindUsagesUsingAction("function_multiple_clauses_unused.ex", "kernel.ex").map { it as UsageInfo2UsageAdapter }
+        val usages = myFixture.testFindUsagesUsingAction("function_multiple_clauses_unused.ex", "kernel.ex")
+            .map { it as UsageInfo2UsageAdapter }
 
         assertEquals(2, usages.size)
-        assertContainsElements( usages.map { it.element!!.textOffset }, listOf(26))
+        assertContainsElements(usages.map { it.element!!.textOffset }, listOf(26))
 
         val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
 
-        assertEquals("""<root> (2)
+        assertEquals(
+            """<root> (2)
  ${usages()} (2)
   Call definition clause (2)
    light_idea_test_case (2)
@@ -96,18 +107,24 @@ class FindUsagesTest : PlatformTestCase() {
       2def function(list) when is_list(list), do: []
       3def function(map) when is_map(map), do: %{}
 """,
-                usageViewTreeTextRepresentation)
+            usageViewTreeTextRepresentation
+        )
     }
 
     fun testFunctionMultipleModulesDeclaration() {
-        val usages = myFixture.testFindUsagesUsingAction("function_multiple_modules_declaration_target.ex", "function_multiple_modules_declaration_usage.ex", "kernel.ex").map { it as UsageInfo2UsageAdapter }
+        val usages = myFixture.testFindUsagesUsingAction(
+            "function_multiple_modules_declaration_target.ex",
+            "function_multiple_modules_declaration_usage.ex",
+            "kernel.ex"
+        ).map { it as UsageInfo2UsageAdapter }
 
         assertEquals(2, usages.size)
-        assertContainsElements( usages.map { it.element!!.textOffset }, listOf(31, 50))
+        assertContainsElements(usages.map { it.element!!.textOffset }, listOf(31, 50))
 
         val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
 
-        assertEquals("""<root> (2)
+        assertEquals(
+            """<root> (2)
  ${usages()} (2)
   Call definition clause (1)
    light_idea_test_case (1)
@@ -120,18 +137,24 @@ class FindUsagesTest : PlatformTestCase() {
      function_multiple_modules_declaration_usage.ex (1)
       3Declaration.declaration()
 """,
-                usageViewTreeTextRepresentation)
+            usageViewTreeTextRepresentation
+        )
     }
 
     fun testFunctionMultipleModulesUsage() {
-        val usages = myFixture.testFindUsagesUsingAction("function_multiple_modules_usage_target.ex", "function_multiple_modules_usage_declaration.ex", "kernel.ex").map { it as UsageInfo2UsageAdapter }
+        val usages = myFixture.testFindUsagesUsingAction(
+            "function_multiple_modules_usage_target.ex",
+            "function_multiple_modules_usage_declaration.ex",
+            "kernel.ex"
+        ).map { it as UsageInfo2UsageAdapter }
 
         assertEquals(2, usages.size)
-        assertContainsElements( usages.map { it.element!!.textOffset }, listOf(31, 50))
+        assertContainsElements(usages.map { it.element!!.textOffset }, listOf(31, 50))
 
         val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
 
-        assertEquals("""<root> (2)
+        assertEquals(
+            """<root> (2)
  ${usages()} (2)
   Call definition clause (1)
    light_idea_test_case (1)
@@ -144,18 +167,24 @@ class FindUsagesTest : PlatformTestCase() {
      function_multiple_modules_usage_target.ex (1)
       3Declaration.declaration()
 """,
-                usageViewTreeTextRepresentation)
+            usageViewTreeTextRepresentation
+        )
     }
 
     fun testFunctionImportDeclaration() {
-        val usages = myFixture.testFindUsagesUsingAction("function_import_declaration_target.ex", "function_import_declaration_usage.ex", "kernel.ex").map { it as UsageInfo2UsageAdapter }
+        val usages = myFixture.testFindUsagesUsingAction(
+            "function_import_declaration_target.ex",
+            "function_import_declaration_usage.ex",
+            "kernel.ex"
+        ).map { it as UsageInfo2UsageAdapter }
 
         assertEquals(2, usages.size)
-        assertContainsElements( usages.map { it.element!!.textOffset }, listOf(31, 60))
+        assertContainsElements(usages.map { it.element!!.textOffset }, listOf(31, 60))
 
         val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
 
-        assertEquals("""<root> (2)
+        assertEquals(
+            """<root> (2)
  ${usages()} (2)
   Call definition clause (1)
    light_idea_test_case (1)
@@ -168,12 +197,17 @@ class FindUsagesTest : PlatformTestCase() {
      function_import_declaration_usage.ex (1)
       5declaration()
 """,
-                usageViewTreeTextRepresentation)
+            usageViewTreeTextRepresentation
+        )
     }
 
     fun testFunctionImportUsage() {
         val usageInfos = if (AlreadyResolved.alreadyResolved) {
-            myFixture.configureByFiles("function_import_usage_target.ex", "function_import_usage_declaration.ex", "kernel.ex")
+            myFixture.configureByFiles(
+                "function_import_usage_target.ex",
+                "function_import_usage_declaration.ex",
+                "kernel.ex"
+            )
 
             val reference = myFixture.getReferenceAtCaretPositionWithAssertion() as PsiPolyVariantReference
             assertNotNull(reference)
@@ -183,7 +217,11 @@ class FindUsagesTest : PlatformTestCase() {
 
             myFixture.findUsages(resolved[0].element!!)
         } else {
-            myFixture.testFindUsagesUsingAction("function_import_usage_target.ex", "function_import_usage_declaration.ex", "kernel.ex").map { it.let { it as UsageInfo2UsageAdapter }.usageInfo }
+            myFixture.testFindUsagesUsingAction(
+                "function_import_usage_target.ex",
+                "function_import_usage_declaration.ex",
+                "kernel.ex"
+            ).map { it.let { it as UsageInfo2UsageAdapter }.usageInfo }
         }
 
         assertEquals(2, usageInfos.size)
@@ -191,7 +229,8 @@ class FindUsagesTest : PlatformTestCase() {
 
         val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usageInfos)
 
-        assertEquals("""<root> (2)
+        assertEquals(
+            """<root> (2)
  ${usages()} (2)
   Call definition clause (1)
    light_idea_test_case (1)
@@ -204,18 +243,21 @@ class FindUsagesTest : PlatformTestCase() {
      function_import_usage_target.ex (1)
       5declaration()
 """,
-                usageViewTreeTextRepresentation)
+            usageViewTreeTextRepresentation
+        )
     }
 
     fun testParameterDeclaration() {
-        val usages = myFixture.testFindUsagesUsingAction("parameter_declaration.ex", "kernel.ex").map { it as UsageInfo2UsageAdapter }
+        val usages = myFixture.testFindUsagesUsingAction("parameter_declaration.ex", "kernel.ex")
+            .map { it as UsageInfo2UsageAdapter }
 
         assertEquals(2, usages.size)
-        assertContainsElements( usages.map { it.element!!.textOffset }, listOf(39, 70))
+        assertContainsElements(usages.map { it.element!!.textOffset }, listOf(39, 70))
 
         val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
 
-        assertEquals("""<root> (2)
+        assertEquals(
+            """<root> (2)
  ${usages()} (2)
   Parameter declaration (1)
    light_idea_test_case (1)
@@ -228,18 +270,21 @@ class FindUsagesTest : PlatformTestCase() {
      parameter_declaration.ex (1)
       3%{parameter: parameter}
 """,
-                usageViewTreeTextRepresentation)
+            usageViewTreeTextRepresentation
+        )
     }
 
     fun testModuleRecursiveDeclaration() {
-        val usages = myFixture.testFindUsagesUsingAction("module_recursive_declaration.ex", "kernel.ex").map { it as UsageInfo2UsageAdapter }
+        val usages = myFixture.testFindUsagesUsingAction("module_recursive_declaration.ex", "kernel.ex")
+            .map { it as UsageInfo2UsageAdapter }
 
         assertEquals(2, usages.size)
-        assertContainsElements( usages.map { it.element!!.textOffset }, listOf(10, 33))
+        assertContainsElements(usages.map { it.element!!.textOffset }, listOf(10, 33))
 
         val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
 
-        assertEquals("""<root> (2)
+        assertEquals(
+            """<root> (2)
  ${usages()} (2)
   Alias (1)
    light_idea_test_case (1)
@@ -252,7 +297,8 @@ class FindUsagesTest : PlatformTestCase() {
      module_recursive_declaration.ex (1)
       1defmodule Declaration do
 """,
-                usageViewTreeTextRepresentation)
+            usageViewTreeTextRepresentation
+        )
     }
 
     fun testModuleRecursiveUsage() {
@@ -267,17 +313,18 @@ class FindUsagesTest : PlatformTestCase() {
             val resolved = reference.multiResolve(false)
             assertEquals(2, resolved.size)
 
-             myFixture.findUsages(resolved[0].element!!)
+            myFixture.findUsages(resolved[0].element!!)
         } else {
             myFixture.testFindUsagesUsingAction(*fileNames).map { it.let { it as UsageInfo2UsageAdapter }.usageInfo }
         }
 
         assertEquals(2, usageInfos.size)
-        assertContainsElements( usageInfos.map { it.element!!.textOffset }, listOf(10, 33))
+        assertContainsElements(usageInfos.map { it.element!!.textOffset }, listOf(10, 33))
 
         val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usageInfos)
 
-        assertEquals("""<root> (2)
+        assertEquals(
+            """<root> (2)
  ${usages()} (2)
   Alias (1)
    light_idea_test_case (1)
@@ -290,18 +337,21 @@ class FindUsagesTest : PlatformTestCase() {
      module_recursive_usage.ex (1)
       1defmodule Declaration do
 """,
-                usageViewTreeTextRepresentation)
+            usageViewTreeTextRepresentation
+        )
     }
 
     fun testModuleNestedRecursiveDeclaration() {
-        val usages = myFixture.testFindUsagesUsingAction("module_nested_recursive_declaration.ex", "kernel.ex").map { it as UsageInfo2UsageAdapter }
+        val usages = myFixture.testFindUsagesUsingAction("module_nested_recursive_declaration.ex", "kernel.ex")
+            .map { it as UsageInfo2UsageAdapter }
 
         assertEquals(3, usages.size)
-        assertContainsElements( usages.map { it.element!!.textOffset }, listOf(10, 40, 75))
+        assertContainsElements(usages.map { it.element!!.textOffset }, listOf(10, 40, 75))
 
         val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
 
-        assertEquals("""<root> (3)
+        assertEquals(
+            """<root> (3)
  ${usages()} (3)
   Alias (2)
    light_idea_test_case (2)
@@ -315,18 +365,24 @@ class FindUsagesTest : PlatformTestCase() {
      module_nested_recursive_declaration.ex (1)
       1defmodule Parent.Declaration do
 """,
-                usageViewTreeTextRepresentation)
+            usageViewTreeTextRepresentation
+        )
     }
 
     fun testModuleMultipleModulesDeclaration() {
-        val usages = myFixture.testFindUsagesUsingAction("module_multiple_modules_declaration_target.ex", "module_multiple_modules_declaration_usage.ex", "kernel.ex").map { it as UsageInfo2UsageAdapter }
+        val usages = myFixture.testFindUsagesUsingAction(
+            "module_multiple_modules_declaration_target.ex",
+            "module_multiple_modules_declaration_usage.ex",
+            "kernel.ex"
+        ).map { it as UsageInfo2UsageAdapter }
 
         assertEquals(2, usages.size)
-        assertContainsElements( usages.map { it.element!!.textOffset }, listOf(10, 27))
+        assertContainsElements(usages.map { it.element!!.textOffset }, listOf(10, 27))
 
         val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
 
-        assertEquals("""<root> (2)
+        assertEquals(
+            """<root> (2)
  ${usages()} (2)
   Alias (1)
    light_idea_test_case (1)
@@ -339,11 +395,16 @@ class FindUsagesTest : PlatformTestCase() {
      module_multiple_modules_declaration_target.ex (1)
       1defmodule Declaration do
 """,
-                usageViewTreeTextRepresentation)
+            usageViewTreeTextRepresentation
+        )
     }
 
     fun testModuleMultipleModulesUsage() {
-        val fileNames = arrayOf("module_multiple_modules_usage_target.ex", "module_multiple_modules_usage_declaration.ex", "kernel.ex")
+        val fileNames = arrayOf(
+            "module_multiple_modules_usage_target.ex",
+            "module_multiple_modules_usage_declaration.ex",
+            "kernel.ex"
+        )
 
         val usageInfos = if (AlreadyResolved.alreadyResolved) {
             myFixture.configureByFiles(*fileNames)
@@ -360,11 +421,12 @@ class FindUsagesTest : PlatformTestCase() {
         }
 
         assertEquals(2, usageInfos.size)
-        assertContainsElements( usageInfos.map { it.element!!.textOffset }, listOf(10, 27))
+        assertContainsElements(usageInfos.map { it.element!!.textOffset }, listOf(10, 27))
 
         val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usageInfos)
 
-        assertEquals("""<root> (2)
+        assertEquals(
+            """<root> (2)
  ${usages()} (2)
   Alias (1)
    light_idea_test_case (1)
@@ -377,18 +439,21 @@ class FindUsagesTest : PlatformTestCase() {
      module_multiple_modules_usage_declaration.ex (1)
       1defmodule Declaration do
 """,
-                usageViewTreeTextRepresentation)
+            usageViewTreeTextRepresentation
+        )
     }
 
     fun testParameterUnused() {
-        val usages = myFixture.testFindUsagesUsingAction("parameter_unused.ex", "kernel.ex").map { it as UsageInfo2UsageAdapter }
+        val usages =
+            myFixture.testFindUsagesUsingAction("parameter_unused.ex", "kernel.ex").map { it as UsageInfo2UsageAdapter }
 
         assertEquals(1, usages.size)
-        assertContainsElements( usages.map { it.element!!.textOffset }, listOf(39))
+        assertContainsElements(usages.map { it.element!!.textOffset }, listOf(39))
 
         val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
 
-        assertEquals("""<root> (1)
+        assertEquals(
+            """<root> (1)
  ${usages()} (1)
   Parameter declaration (1)
    light_idea_test_case (1)
@@ -396,18 +461,21 @@ class FindUsagesTest : PlatformTestCase() {
      parameter_unused.ex (1)
       2defp function(_parameter) do
 """,
-                usageViewTreeTextRepresentation)
+            usageViewTreeTextRepresentation
+        )
     }
 
     fun testParameterUsage() {
-        val usages = myFixture.testFindUsagesUsingAction("parameter_usage.ex", "kernel.ex").map { it as UsageInfo2UsageAdapter }
+        val usages =
+            myFixture.testFindUsagesUsingAction("parameter_usage.ex", "kernel.ex").map { it as UsageInfo2UsageAdapter }
 
         assertEquals(2, usages.size)
-        assertContainsElements( usages.map { it.element!!.textOffset }, listOf(39))
+        assertContainsElements(usages.map { it.element!!.textOffset }, listOf(39))
 
         val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
 
-        assertEquals("""<root> (2)
+        assertEquals(
+            """<root> (2)
  ${usages()} (2)
   Parameter declaration (1)
    light_idea_test_case (1)
@@ -420,18 +488,21 @@ class FindUsagesTest : PlatformTestCase() {
      parameter_usage.ex (1)
       3%{parameter: parameter}
 """,
-                usageViewTreeTextRepresentation)
+            usageViewTreeTextRepresentation
+        )
     }
 
     fun testVariableDeclaration() {
-        val usages = myFixture.testFindUsagesUsingAction("variable_declaration.ex", "kernel.ex").map { it as UsageInfo2UsageAdapter }
+        val usages = myFixture.testFindUsagesUsingAction("variable_declaration.ex", "kernel.ex")
+            .map { it as UsageInfo2UsageAdapter }
 
         assertEquals(2, usages.size)
-        assertContainsElements( usages.map { it.element!!.textOffset }, listOf(46, 99))
+        assertContainsElements(usages.map { it.element!!.textOffset }, listOf(46, 99))
 
         val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
 
-        assertEquals("""<root> (2)
+        assertEquals(
+            """<root> (2)
  ${usages()} (2)
   Value read (1)
    light_idea_test_case (1)
@@ -444,19 +515,22 @@ class FindUsagesTest : PlatformTestCase() {
      variable_declaration.ex (1)
       3variable = Application.get_env(:variable, :key)
 """,
-                usageViewTreeTextRepresentation)
+            usageViewTreeTextRepresentation
+        )
     }
 
     fun testVariableUnused() {
-        val usages = myFixture.testFindUsagesUsingAction("variable_unused.ex", "kernel.ex").map { it as UsageInfo2UsageAdapter }
+        val usages =
+            myFixture.testFindUsagesUsingAction("variable_unused.ex", "kernel.ex").map { it as UsageInfo2UsageAdapter }
 
         assertEquals(1, usages.size)
 
-        assertContainsElements( usages.map { it.element!!.textOffset }, listOf(46))
+        assertContainsElements(usages.map { it.element!!.textOffset }, listOf(46))
 
         val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
 
-        assertEquals("""<root> (1)
+        assertEquals(
+            """<root> (1)
  ${usages()} (1)
   Value write (1)
    light_idea_test_case (1)
@@ -464,18 +538,21 @@ class FindUsagesTest : PlatformTestCase() {
      variable_unused.ex (1)
       3variable = Application.get_env(:variable, :key)
 """,
-                usageViewTreeTextRepresentation)
+            usageViewTreeTextRepresentation
+        )
     }
 
     fun testVariableUsage() {
-        val usages = myFixture.testFindUsagesUsingAction("variable_usage.ex", "kernel.ex").map { it as UsageInfo2UsageAdapter }
+        val usages =
+            myFixture.testFindUsagesUsingAction("variable_usage.ex", "kernel.ex").map { it as UsageInfo2UsageAdapter }
 
         assertEquals(2, usages.size)
-        assertContainsElements( usages.map { it.element!!.textOffset }, listOf(46))
+        assertContainsElements(usages.map { it.element!!.textOffset }, listOf(46))
 
         val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
 
-        assertEquals("""<root> (2)
+        assertEquals(
+            """<root> (2)
  ${usages()} (2)
   Value read (1)
    light_idea_test_case (1)
@@ -488,18 +565,21 @@ class FindUsagesTest : PlatformTestCase() {
      variable_usage.ex (1)
       3variable = Application.get_env(:variable, :key)
 """,
-                usageViewTreeTextRepresentation)
+            usageViewTreeTextRepresentation
+        )
     }
 
     fun testModuleAttributeDeclaration() {
-        val usages = myFixture.testFindUsagesUsingAction("module_attribute_declaration.ex", "kernel.ex").map { it as UsageInfo2UsageAdapter }
+        val usages = myFixture.testFindUsagesUsingAction("module_attribute_declaration.ex", "kernel.ex")
+            .map { it as UsageInfo2UsageAdapter }
 
         assertEquals(2, usages.size)
-        assertContainsElements( usages.map { it.element!!.textOffset }, listOf(31, 69))
+        assertContainsElements(usages.map { it.element!!.textOffset }, listOf(31, 69))
 
         val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
 
-        assertEquals("""<root> (2)
+        assertEquals(
+            """<root> (2)
  ${usages()} (2)
   Module attribute accumulate or override (1)
    light_idea_test_case (1)
@@ -512,18 +592,21 @@ class FindUsagesTest : PlatformTestCase() {
      module_attribute_declaration.ex (1)
       4def usage, do: @module_attribute
 """,
-                usageViewTreeTextRepresentation)
+            usageViewTreeTextRepresentation
+        )
     }
 
     fun testModuleAttributeUsage() {
-        val usages = myFixture.testFindUsagesUsingAction("module_attribute_usage.ex", "kernel.ex").map { it as UsageInfo2UsageAdapter }
+        val usages = myFixture.testFindUsagesUsingAction("module_attribute_usage.ex", "kernel.ex")
+            .map { it as UsageInfo2UsageAdapter }
 
         assertEquals(2, usages.size)
-        assertContainsElements( usages.map { it.element!!.textOffset }, listOf(31, 69))
+        assertContainsElements(usages.map { it.element!!.textOffset }, listOf(31, 69))
 
         val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
 
-        assertEquals("""<root> (2)
+        assertEquals(
+            """<root> (2)
  ${usages()} (2)
   Module attribute accumulate or override (1)
    light_idea_test_case (1)
@@ -536,21 +619,24 @@ class FindUsagesTest : PlatformTestCase() {
      module_attribute_usage.ex (1)
       4def usage, do: @module_attribute
 """,
-                usageViewTreeTextRepresentation)
+            usageViewTreeTextRepresentation
+        )
     }
 
     fun testIssue2374() {
-        val usages = myFixture.testFindUsagesUsingAction("issue_2374.ex", "kernel.ex").map { it as UsageInfo2UsageAdapter }
+        val usages =
+            myFixture.testFindUsagesUsingAction("issue_2374.ex", "kernel.ex").map { it as UsageInfo2UsageAdapter }
 
         assertEquals(3, usages.size)
 
         usages.map { it.element!!.textOffset }.sorted()
 
-        assertContainsElements( usages.map { it.element!!.textOffset }, listOf(23, 53, 53))
+        assertContainsElements(usages.map { it.element!!.textOffset }, listOf(23, 53, 53))
 
         val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
 
-        assertEquals("""<root> (3)
+        assertEquals(
+            """<root> (3)
  ${usages()} (3)
   Call definition clause (3)
    light_idea_test_case (3)
@@ -560,29 +646,54 @@ class FindUsagesTest : PlatformTestCase() {
       3def bar, do: foo()
       4def baz, do: foo()
 """,
-                usageViewTreeTextRepresentation)
+            usageViewTreeTextRepresentation
+        )
     }
 
     fun testDefUsage() {
-        val usages = myFixture.testFindUsagesUsingAction("def_usage.ex", "kernel.ex").map { it as UsageInfo2UsageAdapter }
+        val usages =
+            myFixture.testFindUsagesUsingAction("def_usage.ex", "kernel.ex").map { it as UsageInfo2UsageAdapter }
 
-        assertEquals(98, usages.size)
+        assertEquals(120, usages.size)
 
         val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
 
-        assertEquals("""<root> (98)
- ${usages()} (98)
+        assertEquals(
+            """<root> (120)
+ Usages in (120)
   Call definition clause (1)
    light_idea_test_case (1)
      (1)
      kernel.ex (1)
       619defmacro def(call, expr) do
-  Function call (97)
-   light_idea_test_case (97)
-     (97)
+  Function call (119)
+   light_idea_test_case (119)
+     (119)
      def_usage.ex (1)
       2def usage, do: :ok
-     kernel.ex (96)
+     kernel.ex (118)
+      144def drive(%User{age: age}) when age >= 16 do
+      370def first_data, do: @my_data
+      372def second_data, do: @my_data
+      516def bar, do: :baz
+      525def sum(a, b) do
+      539def multiply_by(number, factor \\ 2) do
+      561def join(string1, nil, _separator) do
+      565def join(string1, string2, separator) do
+      583def foo(bar) do
+      587def foo(_bar) do
+      592def foo(_bar) do
+      603def convert(number) do
+      610def convert(number) do
+      715def exception(value) do
+      755def converge(n) when n > 0, do: step(n, 0)
+      877def one, do: 1
+      878def two, do: 2
+      993def test(x, y) do
+      1005def test(x, y) do
+      1028def foo do
+      1040def foo do
+      1067def bar do
       2678def left != right do
       2702def left !== right do
       2718def left * right do
@@ -680,7 +791,8 @@ class FindUsagesTest : PlatformTestCase() {
       4495def tuple_size(tuple) do
       4523def update_in(data, [_ | _] = keys, fun) when :erlang.is_function(fun) do
 """,
-                usageViewTreeTextRepresentation)
+            usageViewTreeTextRepresentation
+        )
     }
 
     private fun usages(): String =

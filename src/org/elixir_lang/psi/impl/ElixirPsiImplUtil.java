@@ -11,6 +11,7 @@ import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.psi.search.SearchScope;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
+import kotlin.NotImplementedError;
 import kotlin.jvm.functions.Function1;
 import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.call.Call;
@@ -273,6 +274,18 @@ public class ElixirPsiImplUtil {
 
     public static boolean isModuleName(@NotNull final ElixirNoParenthesesOneArgument noParenthesesOneArgument) {
         return MaybeModuleNameImpl.isModuleName(noParenthesesOneArgument);
+    }
+
+    public static boolean isValidHost(@NotNull final Parent parent) {
+        return org.elixir_lang.injection.PsiLanguageInjectionHost.isValidHost(parent);
+    }
+
+    public static PsiLanguageInjectionHost updateText(@NotNull final Parent parent, @NotNull String text) {
+        throw new NotImplementedError();
+    }
+
+    public static @NotNull LiteralTextEscaper<? extends PsiLanguageInjectionHost> createLiteralTextEscaper(@NotNull final Parent parent) {
+        return org.elixir_lang.injection.PsiLanguageInjectionHost.createLiteralTextEscaper(parent);
     }
 
     @Contract(pure = true)

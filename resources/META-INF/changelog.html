@@ -1,5 +1,74 @@
 <html>
 <body>
+<h1>v13.2.0</h1>
+<ul>
+  <li>
+    <p>Enhancements</p>
+    <ul dir="auto">
+      <li>Rendered Markdown toggle for <code class="notranslate">@moduledoc</code>, <code class="notranslate">@typedoc</code>, and <code class="notranslate">@doc</code>
+        <ul dir="auto">
+          <li>Inject markdown in <code class="notranslate">@doc deprecated: ...</code></li>
+          <li>Inject Markdown into doc lines and heredocs</li>
+          <li>Ignore <code class="notranslate">false</code> for documentation module attributes</li>
+          <li>Ignore <code class="notranslate">@doc</code> metadata that can't include Markdown
+            <ul dir="auto">
+              <li><code class="notranslate">guard: ...</code></li>
+              <li><code class="notranslate">since: ...</code></li>
+            </ul>
+          </li>
+          <li>Ignore <code class="notranslate">@callback(unquote(spec))</code> when trying to find typespecs</li>
+          <li>Interleave Markdown and Elixir for doctests
+            <ul dir="auto">
+              <li>Mark code blocks as Elixir language in Markdown documentation</li>
+              <li>Mark multi-line exceptions in doctests as Markdown</li>
+              <li>Treat <em>DBG</em> prefix doctest lines as Markdown instead of Elixir</li>
+              <li>Resolve owner of docs as following call definition clause.</li>
+              <li>Count <code class="notranslate">...&gt; </code> as Markdown since it's not Elixir syntax</li>
+              <li>Count <code class="notranslate">** (...</code> as Markdown since it's not Elixir syntax for exception in iex prompts</li>
+              <li>Count <code class="notranslate">iex&gt; </code> as Markdown since it's not Elixir syntax</li>
+            </ul>
+          </li>
+          <li>Documentation links in rendered documentation
+            <ul dir="auto">
+              <li>Modulars <code class="notranslate">MODULE</code></li>
+              <li>Callbacks
+                <ul dir="auto">
+                  <li>Relative (<code class="notranslate">c:NAME/ARITY</code>)</li>
+                  <li>Absolute (<code class="notranslate">c:MODULE.NAME/ARITY</code>)</li>
+                </ul>
+              </li>
+              <li>Types
+                <ul dir="auto">
+                  <li>Relative (<code class="notranslate">t:NAME/ARITY</code>)</li>
+                  <li>Absolute (<code class="notranslate">t:MODULE.NAME/ARITY</code>)</li>
+                </ul>
+              </li>
+              <li>Functions and Macros
+                <ul dir="auto">
+                  <li>Relative (<code class="notranslate">NAME/ARITY</code>)</li>
+                  <li>Absolute (<code class="notranslate">MODULE.NAME/ARITY</code>)</li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li>Quick Documentation for more elements
+        <ul dir="auto">
+          <li>Callbacks (<code class="notranslate">@doc</code> above <code class="notranslate">@callback</code> and <code class="notranslate">@macrocallback</code>)</li>
+          <li>Types (<code class="notranslate">@typedoc</code> above <code class="notranslate">@type</code>, <code class="notranslate">@typep</code>, and <code class="notranslate">@opaque</code>)</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>Bug Fixes</p>
+    <ul dir="auto">
+      <li>Add compiled CallDefinitionImpl delegation targets to resolve results</li>
+      <li>Log non-Call modulars for resolving delegation</li>
+    </ul>
+  </li>
+</ul>
 <h1>v13.1.1</h1>
 <ul>
   <li>

@@ -8,28 +8,94 @@ import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.CanonicallyNamed
 import org.elixir_lang.psi.impl.ElixirUnmatchedUnqualifiedNoParenthesesCallImpl
 import org.elixir_lang.psi.impl.call.macroChildCallList
+import org.elixir_lang.psi.impl.identifierName
+import org.elixir_lang.psi.impl.siblingExpressions
 import org.elixir_lang.psi.stub.type.call.Stub
 import org.elixir_lang.structure_view.element.CallDefinitionHead
 
 object SourceFileDocsHelper {
     fun fetchDocs(element: PsiElement): FetchedDocs? = when (element) {
+        is AtUnqualifiedNoParenthesesCall<*> -> fetchDocs(element)
         is Call -> fetchDocs(element)
         else -> null
+    }
+
+    private fun fetchDocs(moduleAttribute: AtUnqualifiedNoParenthesesCall<*>): FetchedDocs? =
+        when (moduleAttribute.atIdentifier.identifierName()) {
+            "type", "typep", "opaque" -> fetchTypeDocs(moduleAttribute)
+            "callback", "@macrocallback" -> fetchCallbackDocs(moduleAttribute)
+            else -> null
+        }
+
+    private fun fetchTypeDocs(moduleAttribute: AtUnqualifiedNoParenthesesCall<*>): FetchedDocs.TypeDocumentation? {
+        val typeDoc = moduleAttribute
+            .siblingExpressions(forward = false, withSelf = false)
+            .filterIsInstance<AtUnqualifiedNoParenthesesCall<*>>()
+            .firstOrNull { previousModuleAttribute ->
+                previousModuleAttribute.atIdentifier.identifierName() == "typedoc"
+            }
+            ?.lastChild
+            ?.firstChild
+            ?.firstChild
+            ?.let { documentation ->
+                when (documentation) {
+                    is Heredoc -> documentation.children.joinToString("") { it.text }
+                    else -> TODO()
+                }
+            }
+
+        return if (!typeDoc.isNullOrEmpty()) {
+            enclosingModularMacroCall(moduleAttribute)?.let { modular ->
+                val module = (modular as? CanonicallyNamed)?.canonicalName().orEmpty()
+
+                FetchedDocs.TypeDocumentation(module, moduleAttribute.text, typeDoc)
+            }
+        } else {
+            null
+        }
+    }
+
+    private fun fetchCallbackDocs(moduleAttribute: AtUnqualifiedNoParenthesesCall<*>): FetchedDocs.CallbackDocumentation? {
+        val typeDoc = moduleAttribute
+            .siblingExpressions(forward = false, withSelf = false)
+            .filterIsInstance<AtUnqualifiedNoParenthesesCall<*>>()
+            .firstOrNull { previousModuleAttribute ->
+                previousModuleAttribute.atIdentifier.identifierName() == "doc"
+            }
+            ?.lastChild
+            ?.firstChild
+            ?.firstChild
+            ?.let { documentation ->
+                when (documentation) {
+                    is Heredoc -> documentation.children.joinToString("") { it.text }
+                    else -> TODO()
+                }
+            }
+
+        return if (!typeDoc.isNullOrEmpty()) {
+            enclosingModularMacroCall(moduleAttribute)?.let { modular ->
+                val module = (modular as? CanonicallyNamed)?.canonicalName().orEmpty()
+
+                FetchedDocs.CallbackDocumentation(module, moduleAttribute.text, typeDoc)
+            }
+        } else {
+            null
+        }
     }
 
     private fun fetchDocs(call: Call): FetchedDocs? = when {
         Stub.isModular(call) -> {
             val moduleDoc = (call as? ElixirUnmatchedUnqualifiedNoParenthesesCallImpl)
-                    ?.doBlock
-                    ?.stab
-                    ?.stabBody
-                    ?.unmatchedExpressionList
-                    ?.asSequence()
-                    ?.filterIsInstance<ElixirUnmatchedAtUnqualifiedNoParenthesesCall>()
-                    ?.filter { it.atIdentifier.lastChild?.text == "moduledoc" }
-                    ?.mapNotNull { (it.lastChild?.firstChild?.firstChild as? Heredoc)?.children?.toList() }
-                    ?.flatten()
-                    ?.joinToString("") { it.text }
+                ?.doBlock
+                ?.stab
+                ?.stabBody
+                ?.unmatchedExpressionList
+                ?.asSequence()
+                ?.filterIsInstance<ElixirUnmatchedAtUnqualifiedNoParenthesesCall>()
+                ?.filter { it.atIdentifier.lastChild?.text == "moduledoc" }
+                ?.mapNotNull { (it.lastChild?.firstChild?.firstChild as? Heredoc)?.children?.toList() }
+                ?.flatten()
+                ?.joinToString("") { it.text }
 
             if (!moduleDoc.isNullOrEmpty()) {
                 FetchedDocs.ModuleDocumentation(call.canonicalName().orEmpty(), moduleDoc)
@@ -45,33 +111,34 @@ object SourceFileDocsHelper {
                     val module = (modular as? CanonicallyNamed)?.canonicalName().orEmpty()
 
                     modular
-                            .macroChildCallList()
-                            .mapNotNull { sibling ->
-                                if (CallDefinitionClause.`is`(sibling)) {
-                                    CallDefinitionClause
-                                            .head(sibling)
-                                            ?.let { siblingHead ->
-                                                CallDefinitionHead
-                                                        .nameArityInterval(siblingHead, state)
-                                                        ?.let { siblingNameArityInterval ->
-                                                            if ((siblingNameArityInterval.name == nameArityRange.name) &&
-                                                                    siblingNameArityInterval.arityInterval.overlaps(nameArityRange.arityInterval)) {
-                                                                FetchedDocs
-                                                                        .FunctionOrMacroDocumentation
-                                                                        .fromCallDefinitionClauseCall(module, sibling, siblingHead)
-                                                            } else {
-                                                                null
-                                                            }
-                                                        }
+                        .macroChildCallList()
+                        .mapNotNull { sibling ->
+                            if (CallDefinitionClause.`is`(sibling)) {
+                                CallDefinitionClause
+                                    .head(sibling)
+                                    ?.let { siblingHead ->
+                                        CallDefinitionHead
+                                            .nameArityInterval(siblingHead, state)
+                                            ?.let { siblingNameArityInterval ->
+                                                if ((siblingNameArityInterval.name == nameArityRange.name) &&
+                                                    siblingNameArityInterval.arityInterval.overlaps(nameArityRange.arityInterval)
+                                                ) {
+                                                    FetchedDocs
+                                                        .FunctionOrMacroDocumentation
+                                                        .fromCallDefinitionClauseCall(module, sibling, siblingHead)
+                                                } else {
+                                                    null
+                                                }
                                             }
-                                } else {
-                                    null
-                                }
+                                    }
+                            } else {
+                                null
                             }
-                            .takeIf(List<*>::isNotEmpty)
-                            ?.reduce { acc, documentation ->
-                                acc.merge(documentation)
-                            }
+                        }
+                        .takeIf(List<*>::isNotEmpty)
+                        ?.reduce { acc, documentation ->
+                            acc.merge(documentation)
+                        }
                 }
             }
         }

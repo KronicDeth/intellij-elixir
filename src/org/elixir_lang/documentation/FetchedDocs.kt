@@ -18,12 +18,17 @@ import org.elixir_lang.psi.impl.prevSiblingSequence
 import org.elixir_lang.psi.impl.stripAccessExpression
 
 sealed class FetchedDocs(open val module: String) {
-    data class FunctionOrMacroDocumentation(override val module: String,
-                                            val deprecated: OtpErlangObject?,
-                                            val doc: Doc?,
-                                            val impls: List<String>,
-                                            val specs: List<String>,
-                                            val heads: List<String>) : FetchedDocs(module) {
+    data class CallbackDocumentation(override val module: String, val head: String, val doc: String) :
+        FetchedDocs(module)
+
+    data class FunctionOrMacroDocumentation(
+        override val module: String,
+        val deprecated: OtpErlangObject?,
+        val doc: Doc?,
+        val impls: List<String>,
+        val specs: List<String>,
+        val heads: List<String>
+    ) : FetchedDocs(module) {
         fun merge(other: FunctionOrMacroDocumentation): FunctionOrMacroDocumentation {
             assert(module == other.module)
 
@@ -34,22 +39,28 @@ sealed class FetchedDocs(open val module: String) {
             val heads = this.heads + other.heads
 
             return FunctionOrMacroDocumentation(
-                    module,
-                    deprecated,
-                    doc,
-                    impls,
-                    specs,
-                    heads
+                module,
+                deprecated,
+                doc,
+                impls,
+                specs,
+                heads
             )
         }
 
         companion object {
             private val logger = Logger.getInstance(FunctionOrMacroDocumentation::class.java)
 
-            fun fromCallDefinitionClauseCall(module: String, call: Call, head: PsiElement): FunctionOrMacroDocumentation {
+            fun fromCallDefinitionClauseCall(
+                module: String,
+                call: Call,
+                head: PsiElement
+            ): FunctionOrMacroDocumentation {
                 val callDefinitionAttributeListByName = callDefinitionAttributeListByName(call)
-                val deprecated = callDefinitionAttributeListByName[DEPRECATED]?.joinModuleAttributeQuoteText()?.let { OtpErlangBinary(it.toByteArray()) }
-                val doc = callDefinitionAttributeListByName[DOC]?.joinModuleAttributeQuoteText()?.let { MarkdownByLanguage.english(it) }
+                val deprecated = callDefinitionAttributeListByName[DEPRECATED]?.joinModuleAttributeQuoteText()
+                    ?.let { OtpErlangBinary(it.toByteArray()) }
+                val doc = callDefinitionAttributeListByName[DOC]?.joinModuleAttributeQuoteText()
+                    ?.let { MarkdownByLanguage.english(it) }
                 val impls = callDefinitionAttributeListByName[IMPL].moduleAttributeValueTextList()
                 val specs = callDefinitionAttributeListByName[SPEC].moduleAttributeValueTextList()
                 val heads = listOf(head.text)
@@ -60,7 +71,13 @@ sealed class FetchedDocs(open val module: String) {
             private fun mergeDeprecated(first: OtpErlangObject?, second: OtpErlangObject?): OtpErlangObject? =
                 if (first != null) {
                     if (second != null) {
-                        logger.error("Don't know how to merge deprecated metadata (${inspect(first)}) and ${inspect(second)})")
+                        logger.error(
+                            "Don't know how to merge deprecated metadata (${inspect(first)}) and ${
+                                inspect(
+                                    second
+                                )
+                            })"
+                        )
 
                         null
                     } else {
@@ -73,6 +90,9 @@ sealed class FetchedDocs(open val module: String) {
     }
 
     data class ModuleDocumentation(override val module: String, val moduledoc: String) : FetchedDocs(module)
+
+    data class TypeDocumentation(override val module: String, val head: String, val typedoc: String) :
+        FetchedDocs(module)
 }
 
 private val DEPRECATED = "deprecated"
@@ -82,39 +102,39 @@ private val SPEC = "spec"
 private val CALL_DEFINITION_ATTRIBUTE_NAME_SET: Set<String> = setOf(DEPRECATED, DOC, IMPL, SPEC)
 
 private fun callDefinitionAttributeListByName(callDefinitionCall: Call): Map<String, List<AtUnqualifiedNoParenthesesCall<*>>> =
-        callDefinitionCall
-                .prevSiblingSequence()
-                .drop(1)
-                .takeWhile { it !is Call || !CallDefinitionClause.`is`(it) }
-                .filterIsInstance<AtUnqualifiedNoParenthesesCall<*>>()
-                .filter { CALL_DEFINITION_ATTRIBUTE_NAME_SET.contains(it.atIdentifier.identifierName()) }
-                .groupBy { it.atIdentifier.identifierName() }
+    callDefinitionCall
+        .prevSiblingSequence()
+        .drop(1)
+        .takeWhile { it !is Call || !CallDefinitionClause.`is`(it) }
+        .filterIsInstance<AtUnqualifiedNoParenthesesCall<*>>()
+        .filter { CALL_DEFINITION_ATTRIBUTE_NAME_SET.contains(it.atIdentifier.identifierName()) }
+        .groupBy { it.atIdentifier.identifierName() }
 
 private fun List<AtUnqualifiedNoParenthesesCall<*>>.joinModuleAttributeQuoteText(): String? =
-        this
-                .asSequence()
-                .flatMap<AtUnqualifiedNoParenthesesCall<*>, String> { moduleAttribute ->
-                    moduleAttribute
-                            .moduleAttributeValue()
-                            ?.let { quote ->
-                                when (quote) {
-                                    is Heredoc -> quote.children.asSequence().map(PsiElement::getText)
-                                    is ElixirLine -> quote.body?.text?.let { text -> sequenceOf(text) }
-                                    else -> null
-                                }
-                            }
-                            ?: emptySequence()
+    this
+        .asSequence()
+        .flatMap<AtUnqualifiedNoParenthesesCall<*>, String> { moduleAttribute ->
+            moduleAttribute
+                .moduleAttributeValue()
+                ?.let { quote ->
+                    when (quote) {
+                        is Heredoc -> quote.children.asSequence().map(PsiElement::getText)
+                        is ElixirLine -> quote.body?.text?.let { text -> sequenceOf(text) }
+                        else -> null
+                    }
                 }
-                .toList()
-                .takeIf(List<*>::isNotEmpty)
-                ?.joinToString("")
+                ?: emptySequence()
+        }
+        .toList()
+        .takeIf(List<*>::isNotEmpty)
+        ?.joinToString("")
 
 private fun List<AtUnqualifiedNoParenthesesCall<*>>?.moduleAttributeValueTextList(): List<String> =
-        this?.mapNotNull { it.moduleAttributeValueText() }.orEmpty()
+    this?.mapNotNull { it.moduleAttributeValueText() }.orEmpty()
 
 private fun AtUnqualifiedNoParenthesesCall<*>.moduleAttributeValueText(): String? = this.moduleAttributeValue()?.text
 
-private fun AtUnqualifiedNoParenthesesCall<*>.moduleAttributeValue(): PsiElement? = this
-        .finalArguments()
-        ?.singleOrNull()
-        ?.stripAccessExpression()
+fun AtUnqualifiedNoParenthesesCall<*>.moduleAttributeValue(): PsiElement? = this
+    .finalArguments()
+    ?.singleOrNull()
+    ?.stripAccessExpression()

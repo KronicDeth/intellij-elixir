@@ -8,6 +8,7 @@ import org.elixir_lang.EEx.FUNCTION_FROM_FILE_ARITY_RANGE
 import org.elixir_lang.EEx.FUNCTION_FROM_STRING_ARITY_RANGE
 import org.elixir_lang.NameArityInterval
 import org.elixir_lang.beam.psi.impl.CallDefinitionImpl
+import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.CallDefinitionClause.nameArityInterval
 import org.elixir_lang.psi.call.Call
@@ -83,8 +84,24 @@ private constructor(
                                 val modularResolveResults = resolveResults(nameInDefiningModule, resolvedPrimaryArity, incompleteCode, modular)
 
                                 for (modularResultResult in modularResolveResults) {
-                                    modularResultResult.element.let { it as Call }.let { call ->
-                                        addToResolveResults(call, nameInDefiningModule, modularResultResult.isValidResult, state)
+                                    when (val modularResultResultElement = modularResultResult.element) {
+                                        is Call -> addToResolveResults(
+                                            modularResultResultElement,
+                                            nameInDefiningModule,
+                                            modularResultResult.isValidResult,
+                                            state
+                                        )
+                                        is CallDefinitionImpl<*> -> addToResolveResults(
+                                            modularResultResultElement,
+                                            nameInDefiningModule,
+                                            modularResultResult.isValidResult,
+                                            state
+                                        )
+                                        else -> {
+                                            Logger.error(javaClass,
+                                                         "Don't know how to add resolve results for delegation",
+                                                         modularResultResultElement)
+                                        }
                                     }
                                 }
 

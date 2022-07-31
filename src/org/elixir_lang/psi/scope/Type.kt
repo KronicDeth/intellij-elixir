@@ -42,7 +42,7 @@ abstract class Type : PsiScopeProcessor {
             // type variable in a `when key: type`
             is ElixirKeywordKey -> executeOnParameter(element, state)
             is ElixirNoParenthesesOneArgument, is ElixirAccessExpression -> executeOnChildren(element, state)
-            is ElixirAtom, is ElixirFile, is ElixirList, is ElixirParentheticalStab, is ElixirTuple,
+            is ElixirAtom, is ElixirFile, is ElixirLine, is ElixirList, is ElixirParentheticalStab, is ElixirTuple,
             is WholeNumber,
             -> false
             is ModuleImpl<*> -> execute(element, state)
@@ -254,7 +254,9 @@ internal fun PsiElement.ancestorTypeSpec(): AtUnqualifiedNoParenthesesCall<*>? =
             // types
         is Type, is Call,
         -> parent.ancestorTypeSpec()
-        // `fn` anonymous function type just uses parentheses and `->`, like `(type1, type2 -> type3)`
+        // `@callback(unquote(spec))`
+        is AtOperation,
+            // `fn` anonymous function type just uses parentheses and `->`, like `(type1, type2 -> type3)`
         is ElixirAnonymousFunction,
             // BitStrings use `::` like types, but cannot contain type parameters or declarations
         is ElixirBitString,

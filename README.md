@@ -95,7 +95,9 @@ Table of Contents[![Backers on Open Collective](https://opencollective.com/intel
             * [Individual File](#individual-file)
             * [Project](#project-1)
          * [Live Templates](#live-templates)
-         * [Quick Documentation](#quick-documentation)
+         * [Documentation](#documentation)
+           * [Rendered View](#rendered-view)
+           * [Quick Documentation](#quick-documentation)
          * [Run/Debug Configurations](#rundebug-configurations)
             * [Distillery Release CLI <a href="resources/icons/run/distillery/release-cli.svg" target="_blank" rel="noopener noreferrer"><img src="resources/icons/run/distillery/release-cli.svg" alt="Elixir Mix Icon with tapered neck to make a retort as used in distilleries" title="Distillery Release CLI Icon" style="max-width:100\x;"></a>](#distillery-release-cli-)
                * [Running](#running)
@@ -302,7 +304,7 @@ Once you have your IDE of choice installed, you can [install this plugin](#insta
 | Embedded Elixir (EEx) Templates             | Yes           | Yes            |                                                                                       |
 | Building/Compiling                          | Yes           | No             | Build/compile as part `mix` run configurations only                                   |
 | Live Templates                              | Yes           | Yes            |                                                                                       |
-| Quick Documentation                         | Yes           | Yes            |                                                                                       |
+| Documentation                               | Yes           | Yes            |                                                                                       |
 | Run Configurations                          | Yes           | Yes            |                                                                                       |
 | Completion                                  | Yes           | Yes            |                                                                                       |
 | Decompilation                               | Yes           | Yes            |                                                                                       |
@@ -2599,23 +2601,93 @@ rescue
   </tbody>
 </table>
 
-### Quick Documentation
+### Documentation
 
-You can get documentation for functions and macros that have a `@doc` or aliases of modules that have a `@moduledoc` in a pop-up using [Quick Documentation](https://www.jetbrains.com/help/idea/viewing-reference-information.html#inline-quick-documentation).
+#### Editor
 
-#### For a function
+Documentation in `@moduledoc`, `@typedoc` or `@doc` module attribute values are marked as Markdown language, so that [the JetBrains supplied Markdown support](https://www.jetbrains.com/help/idea/markdown-reference.html) works in documentation.
+
+##### Code Blocks
+
+Code in code blocks (indented 4 spaces) are marked as Elixir language, so all the normal language support works in code examples and doctests.
+
+This includes highlighting reads and writes of variables
+
+![](screenshots/features/documentation/editor/Variable Usage.png)
+
+and Go To Definition for calls
+
+![](screenshots/features/documentation/editor/Go To Definition.png)
+
+##### Toggling Editor to Rendered
+
+1. Start with the Editor
+   ![](screenshots/features/documentation/editor/Markdown%20Editor.png)
+2. Click the "Toggle Rendered View" button in the gutter next to the editor.
+   ![](screenshots/features/documentation/editor/Toggle%20Editor%20to%20Rendered%20View.png)
+3. Rendered View will be shown
+   ![](screenshots/features/documentation/rendered_view/HTML Rendered View.png)
+
+#### Rendered View
+
+Markdown documentation in `@moduledoc`, `@typedoc` or `@doc` can be toggled back and forth from the editable Markdown view and the rendered HTML view.
+
+##### Aliases link to Modules
+
+In the rendered view, aliases are clickable and navigatable.
+
+Clicking the links will show the documentation for module.
+
+![](screenshots/features/documentation/rendered_view/alias_link/Quick Documentation.png)
+
+Using Go To Definition (Cmd+Click) on the link will take you to the module definition.
+
+![](screenshots/features/documentation/rendered_view/alias_link/Go To Definition.png)
+
+##### Toggling Rendered to Editor
+
+1. Start with the Rendered View
+   ![](screenshots/features/documentation/rendered_view/HTML Rendered View.png)
+2. Click the "Toggle Rendered View" button in the gutter next to the editor.
+   ![](screenshots/features/documentation/rendered_view/Toggle Rendered View to Editor.png)
+3. Editor will be shown
+   ![](screenshots/features/documentation/editor/Markdown%20Editor.png)
+
+#### Quick Documentation
+
+You can get documentation for functions and macros that have a `@doc`, aliases of modules that have a `@moduledoc` or types that have a `@typedoc` in a pop-up using [Quick Documentation](https://www.jetbrains.com/help/idea/viewing-reference-information.html#inline-quick-documentation).
+
+##### For a function
+
+1. Place the cursor over the name of callback being referneced.
+2. Display the documentation with either:
+   * A keyboard shortcut: F1 to show rendered `@doc`
+   * From the menu: View > Quick Documentation
+
+   ![](screenshots/features/documentation/quick/@callback-@doc.png)
+
+##### For a function
 
 1. Place the cursor over the name of function being called.
 2. Display the documentation with either:
    * A keyboard shortcut: F1 to show rendered `@doc`
    * From the menu: View > Quick Documentation
 
-#### For a module
+##### For a module
 
 1. Place the cursor on a fully-qualified module name
 2. Display the documentation with either:
-   * A keyboard shortcut: F1 to show rendered `@doc`
+   * A keyboard shortcut: F1 to show rendered `@moduledoc`
    * From the menu: View > Quick Documentation
+
+##### For a type
+
+1. Place the cursor over the name of a type being used. 
+2. Display the documentation with either:
+   * A keyboard shortcut: F1 to show rendered `@typedoc`
+   * From the menu: View > Quick Documentation
+
+   ![](screenshots/features/documentation/quick/typedoc.png)
 
 ### Run/Debug Configurations
 
