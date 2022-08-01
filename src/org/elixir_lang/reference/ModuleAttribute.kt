@@ -70,9 +70,11 @@ class ModuleAttribute(psiElement: PsiElement) : PsiPolyVariantReferenceBase<PsiE
         val elementTextRange = element.textRange
         val startOffset = elementTextRange.startOffset
 
-        return when (myElement) {
+        //using a local variable we don't have the error about the "impossible smart cast"
+        // because no other thread can access to it
+        return when (val myElementLocal = myElement) {
             is AtUnqualifiedNoParenthesesCall<*> -> {
-                val atIdentifierTextRange = myElement.atIdentifier.textRange
+                val atIdentifierTextRange = myElementLocal.atIdentifier.textRange
 
                 TextRange.create(
                     atIdentifierTextRange.startOffset - startOffset,

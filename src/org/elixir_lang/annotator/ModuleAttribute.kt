@@ -1270,12 +1270,11 @@ class ModuleAttribute : Annotator, DumbAware {
 
         if (functionNameElement != null) {
             Highlighter.highlight(annotationHolder, functionNameElement.textRange, typeTextAttributesKey)
-            highlightTypesAndTypeParameterUsages(
-                unqualifiedNoParenthesesCall.primaryArguments(),
-                typeParameterNameSet,
-                annotationHolder,
-                typeTextAttributesKey
-            )
+            for (psiElement in unqualifiedNoParenthesesCall.primaryArguments()) {
+                if (psiElement != null) {
+                    highlightTypesAndTypeParameterUsages(psiElement, typeParameterNameSet, annotationHolder, typeTextAttributesKey)
+                }
+            }
         } else {
             error("Cannot highlight types and type parameter usages", unqualifiedNoParenthesesCall)
         }
@@ -1292,12 +1291,13 @@ class ModuleAttribute : Annotator, DumbAware {
 
             if (functionNameElement != null) {
                 Highlighter.highlight(annotationHolder, functionNameElement.textRange, typeTextAttributesKey)
-                highlightTypesAndTypeParameterUsages(
-                    unqualifiedParenthesesCall.primaryArguments(),
-                    typeParameterNameSet,
-                    annotationHolder,
-                    typeTextAttributesKey
-                )
+
+                for (psiElement in unqualifiedParenthesesCall.primaryArguments()) {
+                    if (psiElement != null) {
+                        highlightTypesAndTypeParameterUsages(psiElement, typeParameterNameSet, annotationHolder, typeTextAttributesKey)
+                    }
+                }
+
                 unqualifiedParenthesesCall
                     .secondaryArguments()
                     ?.map { it!! }

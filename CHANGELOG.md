@@ -302,11 +302,17 @@
   * Quick Documentation for more elements
     * Callbacks (`@doc` above `@callback` and `@macrocallback`)
     * Types (`@typedoc` above `@type`, `@typep`, and `@opaque`)
+* [#2766](https://github.com/KronicDeth/intellij-elixir/pull/2766) - [@ViseLuca](https://github.com/ViseLuca)
+  * Compatibility with IntelliJ 2022.2.
+  * Updated Elixir version used in tests.
+  * Updated Gradle dependencies.
 
 ### Bug Fixes
 * [#2768](https://github.com/KronicDeth/intellij-elixir/pull/2768) - [@KronicDeth](https://github.com/KronicDeth)
   * Add compiled CallDefinitionImpl delegation targets to resolve results
   * Log non-Call modulars for resolving delegation
+* [#2766](https://github.com/KronicDeth/intellij-elixir/pull/2766) - [@KronicDeth](https://github.com/KronicDeth)
+  * Fix operator token set for `**`.
 
 ## v13.1.1
 
