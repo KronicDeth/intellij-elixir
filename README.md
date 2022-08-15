@@ -4467,21 +4467,21 @@ You can bring up Go To Symbol with the keyboard shortcut (⌥⌘O on OSX) or usi
 
 ### Go To Test
 
-Go to Test allows you to jump from the a Source Module to its corresponding Test Module
+Go to Test allows you to jump from the Source Module to its corresponding Test Module
 
 1. Have the cursor in the body of a Module
-2. Active the Go To Test action with one of the following:
+2. Activate the Go To Test action with one of the following:
     1. `Shift+Cmd+T`
-    2. Select Navigate &gt Test from the menu.
+    2. Select Navigate &gt; Test from the menu.
 
 ### Go To Test Subject
 
 Go to Test Subject allows you to jump from the a Test Module to its corresponding Source Module
 
 1. Have the cursor in the body of a Test Module
-2. Active the Go To Test Subject action with one of the following:
+2. Activate the Go To Test Subject action with one of the following:
     1. `Shift+Cmd+T`
-    2. Select Navigate &gt Test Subject from the menu.
+    2. Select Navigate &gt; Test Subject from the menu.
 
 ### Find Usages and Show Usages
 
