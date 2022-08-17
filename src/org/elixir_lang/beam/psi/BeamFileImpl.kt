@@ -384,10 +384,12 @@ class BeamFileImpl private constructor(
                     mirrorTreeElement = SourceTreeToPsiMap.psiToTreeNotNull(mirror)
                     try {
                         val finalMirrorTreeElement = mirrorTreeElement!!
+                        LOGGER.info("Setting mirror for $fileName")
                         ProgressManager.getInstance().executeNonCancelableSection(Runnable {
                             setMirror(finalMirrorTreeElement)
                             putUserData(MODULE_DOCUMENT_LINK_KEY, document)
                         })
+                        LOGGER.info("Mirror for $fileName")
                     } catch (e: InvalidMirrorException) {
                         LOGGER.error(file.url, e)
                     }
