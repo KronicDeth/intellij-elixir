@@ -560,23 +560,7 @@ defmodule Module do
   """
 
   @doc false
-  def add_doc(module, line, kind, {name, arity}, signature, doc) do
-    (
-      assert_not_compiled!({:add_doc, 6}, module)
-      case(kind === :defp or kind === :defmacrop or kind === :typep) do
-        false ->
-          {set, _bag} = data_tables_for(module)
-          compile_doc(set, nil, line, kind, name, arity, signature, nil, doc, %{}, %Macro.Env{aliases: [], context: nil, context_modules: [Module], contextual_vars: [], current_vars: {%{{:_bag, nil} => 8, {:arity, nil} => 4, {:doc, nil} => 6, {:kind, nil} => 2, {:line, nil} => 1, {:module, nil} => 0, {:name, nil} => 3, {:set, nil} => 7, {:signature, nil} => 5}, %{{:_bag, nil} => 8, {:arity, nil} => 4, {:doc, nil} => 6, {:kind, nil} => 2, {:line, nil} => 1, {:module, nil} => 0, {:name, nil} => 3, {:set, nil} => 7, {:signature, nil} => 5}}, file: "/private/tmp/elixir-20201103-80297-pfqt4c/elixir-1.11.2/lib/elixir/lib/module.ex", function: {:add_doc, 6}, functions: [{Kernel, [!=: 2, !==: 2, *: 2, +: 1, +: 2, ++: 2, -: 1, -: 2, --: 2, /: 2, <: 2, <=: 2, ==: 2, ===: 2, =~: 2, >: 2, >=: 2, abs: 1, apply: 2, apply: 3, binary_part: 3, bit_size: 1, byte_size: 1, ceil: 1, div: 2, elem: 2, exit: 1, floor: 1, function_exported?: 3, get_and_update_in: 3, get_in: 2, hd: 1, inspect: 1, inspect: 2, is_atom: 1, is_binary: 1, is_bitstring: 1, is_boolean: 1, is_float: 1, is_function: 1, is_function: 2, is_integer: 1, is_list: 1, is_map: 1, is_map_key: 2, is_number: 1, is_pid: 1, is_port: 1, is_reference: 1, is_tuple: 1, length: 1, macro_exported?: 3, make_ref: 0, map_size: 1, max: 2, min: 2, node: 0, node: 1, not: 1, pop_in: 2, put_elem: 3, put_in: 3, rem: 2, round: 1, self: 0, send: 2, spawn: 1, spawn: 3, spawn_link: 1, spawn_link: 3, spawn_monitor: 1, spawn_monitor: 3, struct: 1, struct: 2, struct!: 1, struct!: 2, throw: 1, tl: 1, trunc: 1, tuple_size: 1, update_in: 3]}], lexical_tracker: nil, line: 1405, macro_aliases: [], macros: [{Kernel, [!: 1, &&: 2, ..: 2, <>: 2, @: 1, alias!: 1, and: 2, binding: 0, binding: 1, def: 1, def: 2, defdelegate: 2, defexception: 1, defguard: 1, defguardp: 1, defimpl: 2, defimpl: 3, defmacro: 1, defmacro: 2, defmacrop: 1, defmacrop: 2, defmodule: 2, defoverridable: 1, defp: 1, defp: 2, defprotocol: 2, defstruct: 1, destructure: 2, get_and_update_in: 2, if: 2, in: 2, is_exception: 1, is_exception: 2, is_nil: 1, is_struct: 1, is_struct: 2, match?: 2, or: 2, pop_in: 1, put_in: 2, raise: 1, raise: 2, reraise: 2, reraise: 3, sigil_C: 2, sigil_D: 2, sigil_N: 2, sigil_R: 2, sigil_S: 2, sigil_T: 2, sigil_U: 2, sigil_W: 2, sigil_c: 2, sigil_r: 2, sigil_s: 2, sigil_w: 2, to_char_list: 1, to_charlist: 1, to_string: 1, unless: 2, update_in: 2, use: 1, use: 2, var!: 1, var!: 2, |>: 2, ||: 2]}], module: Module, prematch_vars: :warn, requires: [Application, Kernel, Kernel.Typespec], tracers: [], unused_vars: {%{{:_bag, 8} => 1404, {:arity, 4} => false, {:doc, 6} => false, {:kind, 2} => false, {:line, 1} => false, {:module, 0} => false, {:name, 3} => false, {:set, 7} => false, {:signature, 5} => false}, 9}, vars: [arity: nil, doc: nil, kind: nil, line: nil, module: nil, name: nil, signature: nil]}, false)
-          :ok
-        true ->
-          if(doc) do
-            :ok
-          else
-            {:error, :private_doc}
-          end
-      end
-    )
-  end
+  def add_doc(module, line, kind, {name, arity}, signature, doc), do: ...
 
   def behaviour_info(p0) do
     # body not decompiled
@@ -1436,27 +1420,7 @@ defmodule Module do
     end
   end
 
-  defp check_behaviours(env, behaviours) do
-    Enum.reduce(behaviours, %{}, fn behaviour, acc -> cond() do
-      not(is_atom(behaviour)) ->
-        message = <<"@behaviour "::binary(), Kernel.inspect(behaviour)::binary(), " must be an atom (in module "::binary(), Kernel.inspect(env.module())::binary(), ")"::binary()>>
-        IO.warn(message, Macro.Env.stacktrace(env))
-        acc
-      Code.ensure_compiled(behaviour) != {:module, behaviour} ->
-        message = <<"@behaviour "::binary(), Kernel.inspect(behaviour)::binary(), " does not exist (in module "::binary(), Kernel.inspect(env.module())::binary(), ")"::binary()>>
-        IO.warn(message, Macro.Env.stacktrace(env))
-        acc
-      not(:erlang.function_exported(behaviour, :behaviour_info, 1)) ->
-        message = <<"module "::binary(), Kernel.inspect(behaviour)::binary(), " is not a behaviour (in module "::binary(), Kernel.inspect(env.module())::binary(), ")"::binary()>>
-        IO.warn(message, Macro.Env.stacktrace(env))
-        acc
-      true ->
-        :elixir_env.trace({:require, [], behaviour, []}, env)
-        optional_callbacks = behaviour_info(behaviour, :optional_callbacks)
-        callbacks = behaviour_info(behaviour, :callbacks)
-        Enum.reduce(callbacks, acc, fn x1, x2 -> add_callback(x1, behaviour, env, optional_callbacks, x2) end)
-    end end)
-  end
+  defp check_behaviours(env, behaviours), do: ...
 
   defp check_callbacks(env, callbacks, all_definitions) do
     (
@@ -1531,43 +1495,7 @@ defmodule Module do
     end
   end
 
-  defp compile_doc(table, ctx, line, kind, name, arity, args, body, doc, doc_meta, env, impl) do
-    (
-      key = {doc_key(kind), name, arity}
-      signature = build_signature(args, env)
-      case(:ets.lookup(table, key)) do
-        [] ->
-          doc = if(is_nil(doc) && impl) do
-            doc
-          else
-            false
-          end
-          :ets.insert(table, {key, ctx, line, signature, doc, doc_meta})
-        [{_, current_ctx, current_line, current_sign, current_doc, current_doc_meta}] ->
-          case(is_binary(current_doc) and is_binary(doc) and body != nil and is_nil(current_ctx)) do
-            false ->
-              nil
-            true ->
-              message = <<"redefining @doc attribute previously set at line "::binary(), String.Chars.to_string(current_line)::binary(), ".\n\nPlease remove the duplicate docs. If instead you want to override a previously defined @doc, attach the @doc attribute to a function head:\n\n    @doc \"\"\"\n    new docs\n    \"\"\"\n    def "::binary(), String.Chars.to_string(name)::binary(), "(...)\n"::binary()>>
-              IO.warn(message, Macro.Env.stacktrace(%{env | line: line}))
-          end
-          signature = merge_signatures(current_sign, signature, 1)
-          doc = case(is_nil(doc)) do
-            false ->
-              doc
-            true ->
-              current_doc
-          end
-          doc = if(is_nil(doc) && impl) do
-            doc
-          else
-            false
-          end
-          doc_meta = Map.merge(current_doc_meta, doc_meta)
-          :ets.insert(table, {key, ctx, current_line, signature, doc, doc_meta})
-      end
-    )
-  end
+  defp compile_doc(table, ctx, line, kind, name, arity, args, body, doc, doc_meta, env, impl), do: ...
 
   defp compile_doc_meta(set, bag, name, arity, defaults) do
     (

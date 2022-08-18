@@ -657,19 +657,7 @@ defmodule Kernel do
 
 
   """
-  defmacro defdelegate(funs, opts) do
-    (
-      funs = Macro.escape(funs, unquote: true)
-      opts = with(true <- is_list(opts), {:ok, target} <- Keyword.fetch(opts, :to), {:__aliases__, _, _} <- target) do
-        target = Macro.expand(target, %{__CALLER__ | function: {:__info__, 1}})
-        Keyword.replace!(opts, :to, target)
-      else
-        _ ->
-          opts
-      end
-      {:__block__, [], [{:=, [], [{:funs, [line: 5084], Kernel}, funs]}, {:=, [], [{:opts, [line: 5084], Kernel}, opts]}, {:__block__, [], [{:=, [], [{:target, [], Kernel}, {:||, [context: Kernel, import: Kernel], [{{:".", [], [{:__aliases__, [alias: false], [:"Keyword"]}, :get]}, [], [{:opts, [], Kernel}, :to]}, {:raise, [context: Kernel, import: Kernel], [{:__aliases__, [alias: false], [:"ArgumentError"]}, "expected to: to be given as argument"]}]}]}, {:if, [context: Kernel, import: Kernel], [{:is_list, [context: Kernel, import: Kernel], [{:funs, [], Kernel}]}, [do: {{:".", [], [{:__aliases__, [alias: false], [:"IO"]}, :warn]}, [], ["passing a list to Kernel.defdelegate/2 is deprecated, please define each delegate separately", {{:".", [], [{:__aliases__, [alias: false], [:"Macro", :"Env"]}, :stacktrace]}, [], [{:__ENV__, [], Kernel}]}]}]]}, {:if, [context: Kernel, import: Kernel], [{{:".", [], [{:__aliases__, [alias: false], [:"Keyword"]}, :has_key?]}, [], [{:opts, [], Kernel}, :append_first]}, [do: {{:".", [], [{:__aliases__, [alias: false], [:"IO"]}, :warn]}, [], ["Kernel.defdelegate/2 :append_first option is deprecated", {{:".", [], [{:__aliases__, [alias: false], [:"Macro", :"Env"]}, :stacktrace]}, [], [{:__ENV__, [], Kernel}]}]}]]}, {:for, [], [{:<-, [], [{:fun, [], Kernel}, {{:".", [], [{:__aliases__, [alias: false], [:"List"]}, :wrap]}, [], [{:funs, [], Kernel}]}]}, [do: {:__block__, [], [{:=, [], [{:"{}", [], [{:name, [], Kernel}, {:args, [], Kernel}, {:as, [], Kernel}, {:as_args, [], Kernel}]}, {{:".", [], [{:__aliases__, [alias: false], [:"Kernel", :"Utils"]}, :defdelegate]}, [], [{:fun, [], Kernel}, {:opts, [], Kernel}]}]}, {:@, [context: Kernel, import: :elixir_bootstrap], [{:doc, [context: Kernel], [[delegate_to: {:"{}", [], [{:target, [], Kernel}, {:as, [], Kernel}, {{:".", [], [:erlang, :length]}, [], [{:as_args, [], Kernel}]}]}]]}]}, {:def, [context: Kernel, import: :elixir_bootstrap], [{{:unquote, [], [{:name, [], Kernel}]}, [context: Kernel], [{:unquote_splicing, [], [{:args, [], Kernel}]}]}, [do: {{{:".", [], [{:unquote, [], [{:target, [], Kernel}]}, :unquote]}, [], [{:as, [], Kernel}]}, [], [{:unquote_splicing, [], [{:as_args, [], Kernel}]}]}]]}]}]]}]}]}
-    )
-  end
+  defmacro defdelegate(funs, opts), do: ...
 
   @doc ~S"""
   Defines an exception.
@@ -724,9 +712,7 @@ defmodule Kernel do
   exception messages.
 
   """
-  defmacro defexception(fields) do
-    {:__block__, [], [{:=, [], [{:fields, [line: 4640], Kernel}, fields]}, {:__block__, [], [{:@, [context: Kernel, import: :elixir_bootstrap], [{:behaviour, [context: Kernel], [{:__aliases__, [alias: false], [:"Exception"]}]}]}, {:=, [], [{:struct, [], Kernel}, {:defstruct, [context: Kernel, import: Kernel], [{:++, [context: Kernel, import: Kernel], [[__exception__: true], {:fields, [], Kernel}]}]}]}, {:if, [context: Kernel, import: Kernel], [{{:".", [], [{:__aliases__, [alias: false], [:"Map"]}, :has_key?]}, [], [{:struct, [], Kernel}, :message]}, [do: {:__block__, [], [{:@, [context: Kernel, import: :elixir_bootstrap], [{:impl, [context: Kernel], [true]}]}, {:def, [context: Kernel, import: :elixir_bootstrap], [{:message, [context: Kernel], [{:exception, [], Kernel}]}, [do: {{:".", [], [{:exception, [], Kernel}, :message]}, [no_parens: true], []}]]}, {:defoverridable, [context: Kernel, import: Kernel], [[message: 1]]}, {:@, [context: Kernel, import: :elixir_bootstrap], [{:impl, [context: Kernel], [true]}]}, {:def, [context: Kernel, import: :elixir_bootstrap], [{:when, [context: Kernel], [{:exception, [], [{:msg, [], Kernel}]}, {{:".", [], [{:__aliases__, [alias: false], [:"Kernel"]}, :is_binary]}, [], [{:msg, [], Kernel}]}]}, [do: {:exception, [], [[message: {:msg, [], Kernel}]]}]]}]}]]}, {:@, [context: Kernel, import: :elixir_bootstrap], [{:impl, [context: Kernel], [true]}]}, {:def, [context: Kernel, import: :elixir_bootstrap], [{:when, [context: Kernel], [{:exception, [], [{:args, [], Kernel}]}, {{:".", [], [{:__aliases__, [alias: false], [:"Kernel"]}, :is_list]}, [], [{:args, [], Kernel}]}]}, [do: {:__block__, [], [{:=, [], [{:struct, [], Kernel}, {:__struct__, [], []}]}, {:=, [], [{{:valid, [], Kernel}, {:invalid, [], Kernel}}, {{:".", [], [{:__aliases__, [alias: false], [:"Enum"]}, :split_with]}, [], [{:args, [], Kernel}, {:fn, [], [{:"->", [], [[{{:k, [], Kernel}, {:_, [], Kernel}}], {{:".", [], [{:__aliases__, [alias: false], [:"Map"]}, :has_key?]}, [], [{:struct, [], Kernel}, {:k, [], Kernel}]}]}]}]}]}, {:case, [], [{:invalid, [], Kernel}, [do: [{:"->", [], [[[]], :ok]}, {:"->", [], [[{:_, [], Kernel}], {{:".", [], [{:__aliases__, [alias: false], [:"IO"]}, :warn]}, [], [{:<>, [context: Kernel, import: Kernel], ["the following fields are unknown when raising ", {:<>, [context: Kernel, import: Kernel], [{:"<<>>", [], [{:::, [], [{{:".", [], [Kernel, :to_string]}, [], [{{:".", [], [{:__aliases__, [alias: false], [:"Kernel"]}, :inspect]}, [], [{:__MODULE__, [], Kernel}]}]}, {:binary, [], Kernel}]}, ": ", {:::, [], [{{:".", [], [Kernel, :to_string]}, [], [{{:".", [], [{:__aliases__, [alias: false], [:"Kernel"]}, :inspect]}, [], [{:invalid, [], Kernel}]}]}, {:binary, [], Kernel}]}, ". "]}, {:<>, [context: Kernel, import: Kernel], ["Please make sure to only give known fields when raising ", {:<>, [context: Kernel, import: Kernel], [{:"<<>>", [], ["or redefine ", {:::, [], [{{:".", [], [Kernel, :to_string]}, [], [{{:".", [], [{:__aliases__, [alias: false], [:"Kernel"]}, :inspect]}, [], [{:__MODULE__, [], Kernel}]}]}, {:binary, [], Kernel}]}, ".exception/1 to "]}, {:<>, [context: Kernel, import: Kernel], ["discard unknown fields. Future Elixir versions will raise on ", "unknown fields given to raise/2"]}]}]}]}]}]}]}]]]}, {{:".", [], [{:__aliases__, [alias: false], [:"Kernel"]}, :struct!]}, [], [{:struct, [], Kernel}, {:valid, [], Kernel}]}]}]]}, {:defoverridable, [context: Kernel, import: Kernel], [[exception: 1]]}]}]}
-  end
+  defmacro defexception(fields), do: ...
 
   @doc ~S"""
   Generates a macro suitable for use in guard expressions.
@@ -946,36 +932,7 @@ defmodule Kernel do
   `PID`, and `Reference`.
 
   """
-  defmacro defmodule(alias, [do: block]) do
-    (
-      env = __CALLER__
-      boot? = bootstrapped?(Macro)
-      expanded = case(boot?) do
-        true ->
-          Macro.expand(alias, env)
-        false ->
-          alias
-      end
-      {expanded, with_alias} = case(boot? and is_atom(expanded)) do
-        true ->
-          {full, old, new} = expand_module(alias, expanded, env)
-          meta = [defined: full, context: env.module()] ++ alias_meta(alias)
-          {full, {:alias, meta, [old, [as: new, warn: false]]}}
-        false ->
-          {expanded, nil}
-      end
-      block = {:__block__, [], [{:=, [], [{:result, [], Kernel}, block]}, {{:".", [], [:elixir_utils, :noop]}, [], []}, {:result, [], Kernel}]}
-      escaped = case(env) do
-        %{function: nil, lexical_tracker: pid} when is_pid(pid) ->
-          integer = Kernel.LexicalTracker.write_cache(pid, block)
-          {{:".", [], [{:__aliases__, [alias: false], [:"Kernel", :"LexicalTracker"]}, :read_cache]}, [], [pid, integer]}
-        %{} ->
-          :elixir_quote.escape(block, :default, false)
-      end
-      module_vars = :lists.map(&:module_var/1, :maps.keys(elem(env.current_vars(), 0)))
-      {:__block__, [], [with_alias, {{:".", [], [:elixir_module, :compile]}, [], [expanded, escaped, module_vars, {:__ENV__, [], Kernel}]}]}
-    )
-  end
+  defmacro defmodule(alias, [do: block]), do: ...
 
   @doc ~S"""
   Makes the given functions in the current module overridable.
@@ -1210,17 +1167,7 @@ defmodule Kernel do
   use `@type`.
 
   """
-  defmacro defstruct(fields) do
-    (
-      builder = case(bootstrapped?(Enum)) do
-        true ->
-          {:case, [], [{:@, [context: Kernel, import: :elixir_bootstrap], [{:enforce_keys, [context: Kernel], Kernel}]}, [do: [{:"->", [], [[[]], {:def, [context: Kernel, import: :elixir_bootstrap], [{:__struct__, [context: Kernel], [{:kv, [], Kernel}]}, [do: {{:".", [], [{:__aliases__, [alias: false], [:"Enum"]}, :reduce]}, [], [{:kv, [], Kernel}, {:@, [context: Kernel, import: :elixir_bootstrap], [{:struct, [context: Kernel], Kernel}]}, {:fn, [], [{:"->", [], [[{{:key, [], Kernel}, {:val, [], Kernel}}, {:map, [], Kernel}], {{:".", [], [{:__aliases__, [alias: false], [:"Map"]}, :replace!]}, [], [{:map, [], Kernel}, {:key, [], Kernel}, {:val, [], Kernel}]}]}]}]}]]}]}, {:"->", [], [[{:_, [], Kernel}], {:def, [context: Kernel, import: :elixir_bootstrap], [{:__struct__, [context: Kernel], [{:kv, [], Kernel}]}, [do: {:__block__, [], [{:=, [], [{{:map, [], Kernel}, {:keys, [], Kernel}}, {{:".", [], [{:__aliases__, [alias: false], [:"Enum"]}, :reduce]}, [], [{:kv, [], Kernel}, {{:@, [context: Kernel, import: :elixir_bootstrap], [{:struct, [context: Kernel], Kernel}]}, {:@, [context: Kernel, import: :elixir_bootstrap], [{:enforce_keys, [context: Kernel], Kernel}]}}, {:fn, [], [{:"->", [], [[{{:key, [], Kernel}, {:val, [], Kernel}}, {{:map, [], Kernel}, {:keys, [], Kernel}}], {{{:".", [], [{:__aliases__, [alias: false], [:"Map"]}, :replace!]}, [], [{:map, [], Kernel}, {:key, [], Kernel}, {:val, [], Kernel}]}, {{:".", [], [{:__aliases__, [alias: false], [:"List"]}, :delete]}, [], [{:keys, [], Kernel}, {:key, [], Kernel}]}}]}]}]}]}, {:case, [], [{:keys, [], Kernel}, [do: [{:"->", [], [[[]], {:map, [], Kernel}]}, {:"->", [], [[{:_, [], Kernel}], {:raise, [context: Kernel, import: Kernel], [{:__aliases__, [alias: false], [:"ArgumentError"]}, {:<>, [context: Kernel, import: Kernel], ["the following keys must also be given when building ", {:"<<>>", [], ["struct ", {:::, [], [{{:".", [], [Kernel, :to_string]}, [], [{:inspect, [context: Kernel, import: Kernel], [{:__MODULE__, [], Kernel}]}]}, {:binary, [], Kernel}]}, ": ", {:::, [], [{{:".", [], [Kernel, :to_string]}, [], [{:inspect, [context: Kernel, import: Kernel], [{:keys, [], Kernel}]}]}, {:binary, [], Kernel}]}]}]}]}]}]]]}]}]]}]}]]]}
-        false ->
-          {:__block__, [], [{:=, [], [{:_, [], Kernel}, {:@, [context: Kernel, import: :elixir_bootstrap], [{:enforce_keys, [context: Kernel], Kernel}]}]}, {:def, [context: Kernel, import: :elixir_bootstrap], [{:__struct__, [context: Kernel], [{:kv, [], Kernel}]}, [do: {{:".", [], [:lists, :foldl]}, [], [{:fn, [], [{:"->", [], [[{{:key, [], Kernel}, {:val, [], Kernel}}, {:acc, [], Kernel}], {{:".", [], [{:__aliases__, [alias: false], [:"Map"]}, :replace!]}, [], [{:acc, [], Kernel}, {:key, [], Kernel}, {:val, [], Kernel}]}]}]}, {:@, [context: Kernel, import: :elixir_bootstrap], [{:struct, [context: Kernel], Kernel}]}, {:kv, [], Kernel}]}]]}]}
-      end
-      {:__block__, [], [{:if, [context: Kernel, import: Kernel], [{{:".", [], [{:__aliases__, [alias: false], [:"Module"]}, :has_attribute?]}, [], [{:__MODULE__, [], Kernel}, :struct]}, [do: {:raise, [context: Kernel, import: Kernel], [{:__aliases__, [alias: false], [:"ArgumentError"]}, {:<>, [context: Kernel, import: Kernel], ["defstruct has already been called for ", {:"<<>>", [], [{:::, [], [{{:".", [], [Kernel, :to_string]}, [], [{{:".", [], [{:__aliases__, [alias: false], [:"Kernel"]}, :inspect]}, [], [{:__MODULE__, [], Kernel}]}]}, {:binary, [], Kernel}]}, ", defstruct can only be called once per module"]}]}]}]]}, {:=, [], [{:"{}", [], [{:struct, [], Kernel}, {:keys, [], Kernel}, {:derive, [], Kernel}]}, {{:".", [], [{:__aliases__, [alias: false], [:"Kernel", :"Utils"]}, :defstruct]}, [], [{:__MODULE__, [], Kernel}, fields]}]}, {:@, [context: Kernel, import: :elixir_bootstrap], [{:struct, [context: Kernel, import: Kernel], [{:struct, [], Kernel}]}]}, {:@, [context: Kernel, import: :elixir_bootstrap], [{:enforce_keys, [context: Kernel], [{:keys, [], Kernel}]}]}, {:case, [], [{:derive, [], Kernel}, [do: [{:"->", [], [[[]], :ok]}, {:"->", [], [[{:_, [], Kernel}], {{:".", [], [{:__aliases__, [alias: false], [:"Protocol"]}, :__derive__]}, [], [{:derive, [], Kernel}, {:__MODULE__, [], Kernel}, {:__ENV__, [], Kernel}]}]}]]]}, {:def, [context: Kernel, import: :elixir_bootstrap], [{:__struct__, [context: Kernel], []}, [do: {:@, [context: Kernel, import: :elixir_bootstrap], [{:struct, [context: Kernel], Kernel}]}]]}, builder, {{:".", [], [{:__aliases__, [alias: false], [:"Kernel", :"Utils"]}, :announce_struct]}, [], [{:__MODULE__, [], Kernel}]}, {:struct, [], Kernel}]}
-    )
-  end
+  defmacro defstruct(fields), do: ...
 
   @doc ~S"""
   Destructures two lists, assigning each term in the
@@ -1419,42 +1366,7 @@ defmodule Kernel do
   this AST to `left not in right`.
 
   """
-  defmacro left in right do
-    (
-      in_body? = is_nil(__CALLER__.context())
-      expand = case(bootstrapped?(Macro)) do
-        true ->
-          fn x1 -> Macro.expand(x1, __CALLER__) end
-        false ->
-          fn x1 -> x1 end
-      end
-      case(expand.(right)) do
-        [] when not(in_body?) ->
-          false
-        [] ->
-          {:__block__, [], [{:=, [], [{:_, [], Kernel}, left]}, false]}
-        [head | tail] = list when not(in_body?) ->
-          in_list(left, head, tail, expand, list, in_body?)
-        [_ | _] = list when in_body? ->
-          case(ensure_evaled(list, {0, []}, expand)) do
-            {[head | tail], {_, []}} ->
-              in_var(in_body?, left, fn x1 -> in_list(x1, head, tail, expand, list, in_body?) end)
-            {[head | tail], {_, vars_values}} ->
-              {vars, values} = :lists.unzip(:lists.reverse(vars_values))
-              is_in_list = fn x1 -> in_list(x1, head, tail, expand, list, in_body?) end
-              {:__block__, [], [{:=, [], [{:"{}", [], :elixir_quote.list(vars, [])}, {:"{}", [], :elixir_quote.list(values, [])}]}, in_var(in_body?, left, is_in_list)]}
-          end
-        {:"%{}", _meta, [__struct__: Range, first: first, last: last]} ->
-          in_var(in_body?, left, fn x1 -> in_range(x1, expand.(first), expand.(last)) end)
-        right when in_body? ->
-          {{:".", [], [{:__aliases__, [], [:"Elixir", :"Enum"]}, :member?]}, [], [right, left]}
-        %Range{first: _, last: _} ->
-          raise(ArgumentError, "non-literal range in guard should be escaped with Macro.escape/2")
-        right ->
-          raise_on_invalid_args_in_2(right)
-      end
-    )
-  end
+  defmacro left in right, do: ...
 
   @doc ~S"""
   Returns true if `term` is an exception; otherwise returns `false`.
@@ -1497,16 +1409,7 @@ defmodule Kernel do
 
 
   """
-  defmacro is_exception(term, name) do
-    case(__CALLER__.context()) do
-      nil ->
-        {:case, [], [name, [do: [{:"->", [], [[{:when, [], [{:name, [], Kernel}, {:is_atom, [context: Kernel, import: Kernel], [{:name, [], Kernel}]}]}], {:case, [], [term, [do: [{:"->", [], [[{:"%{}", [], [__struct__: {:^, [], [{:name, [], Kernel}]}, __exception__: true]}], true]}, {:"->", [], [[{:_, [], Kernel}], false]}]]]}]}, {:"->", [], [[{:_, [], Kernel}], {:raise, [context: Kernel, import: Kernel], [{:__aliases__, [alias: false], [:"ArgumentError"]}]}]}]]]}
-      :match ->
-        invalid_match!(:is_exception)
-      :guard ->
-        {:and, [context: Kernel, import: Kernel], [{:and, [context: Kernel, import: Kernel], [{:and, [context: Kernel, import: Kernel], [{:and, [context: Kernel, import: Kernel], [{:and, [context: Kernel, import: Kernel], [{:is_map, [context: Kernel, import: Kernel], [term]}, {:or, [context: Kernel, import: Kernel], [{:is_atom, [context: Kernel, import: Kernel], [name]}, :fail]}]}, {{:".", [], [:erlang, :is_map_key]}, [], [:__struct__, term]}]}, {:==, [context: Kernel, import: Kernel], [{{:".", [], [:erlang, :map_get]}, [], [:__struct__, term]}, name]}]}, {{:".", [], [:erlang, :is_map_key]}, [], [:__exception__, term]}]}, {:==, [context: Kernel, import: Kernel], [{{:".", [], [:erlang, :map_get]}, [], [:__exception__, term]}, true]}]}
-    end
-  end
+  defmacro is_exception(term, name), do: ...
 
   @doc ~S"""
   Returns `true` if `term` is `nil`, `false` otherwise.
@@ -4752,27 +4655,7 @@ defmodule Kernel do
     )
   end
 
-  defp define_guard(kind, guard, env) do
-    case(:elixir_utils.extract_guards(guard)) do
-      {call, [_, _ | _]} ->
-        raise(ArgumentError, <<"invalid syntax in defguard "::binary(), Macro.to_string(call)::binary(), ", "::binary(), "only a single when clause is allowed"::binary()>>)
-      {call, impls} ->
-        case(Macro.decompose_call(call)) do
-          {_name, args} ->
-            validate_variable_only_args!(call, args)
-            macro_definition = case(impls) do
-              [] ->
-                define(kind, call, nil, env)
-              [guard] ->
-                quoted = {:__block__, [], [{:require, [context: Kernel], [{:__aliases__, [alias: false], [:"Kernel", :"Utils"]}]}, {{:".", [], [{:__aliases__, [alias: false], [:"Kernel", :"Utils"]}, :defguard]}, [], [args, guard]}]}
-                define(kind, call, [do: quoted], env)
-            end
-            {:__block__, [], [{:@, [context: Kernel, import: :elixir_bootstrap], [{:doc, [context: Kernel], [[guard: true]]}]}, macro_definition]}
-          _invalid_definition ->
-            raise(ArgumentError, <<"invalid syntax in defguard "::binary(), Macro.to_string(call)::binary()>>)
-        end
-    end
-  end
+  defp define_guard(kind, guard, env), do: ...
 
   defp do_at([arg], meta, name, function?, env) do
     (
@@ -4797,31 +4680,7 @@ defmodule Kernel do
     )
   end
 
-  defp do_at(args, _meta, name, function?, env) when is_atom(args) or args == [] do
-    (
-      line = env.line()
-      doc_attr? = :lists.member(name, [:moduledoc, :typedoc, :doc])
-      case(function?) do
-        true ->
-          value = case(Module.__get_attribute__(env.module(), name, line)) do
-            {_, doc} when doc_attr? ->
-              doc
-            other ->
-              other
-          end
-          try() do
-            :elixir_quote.escape(value, :default, false)
-          rescue
-            ex in [ArgumentError] ->
-              raise(ArgumentError, <<"cannot inject attribute @"::binary(), String.Chars.to_string(name)::binary(), " into function/macro because "::binary(), Exception.message(ex)::binary()>>)
-          end
-        false when doc_attr? ->
-          {:case, [], [{{:".", [], [{:__aliases__, [alias: false], [:"Module"]}, :__get_attribute__]}, [], [{:__MODULE__, [], Kernel}, name, line]}, [do: [{:"->", [], [[{{:_, [], Kernel}, {:doc, [], Kernel}}], {:doc, [], Kernel}]}, {:"->", [], [[{:other, [], Kernel}], {:other, [], Kernel}]}]]]}
-        false ->
-          {{:".", [], [{:__aliases__, [alias: false], [:"Module"]}, :__get_attribute__]}, [], [{:__MODULE__, [], Kernel}, name, line]}
-      end
-    )
-  end
+  defp do_at(args, _meta, name, function?, env) when is_atom(args) or args == [], do: ...
 
   defp do_at(args, _meta, name, _function?, _env) do
     raise(ArgumentError, <<"expected 0 or 1 argument for @"::binary(), String.Chars.to_string(name)::binary(), ", got: "::binary(), String.Chars.to_string(length(args))::binary()>>)
@@ -5146,38 +5005,7 @@ defmodule Kernel do
     split_words(string, 's', caller)
   end
 
-  defp split_words(string, [mod], caller) when mod == 115 or mod == 97 or mod == 99 do
-    case(is_binary(string)) do
-      true ->
-        parts = String.split(string)
-        parts_with_trailing_comma = :lists.filter(fn x1 -> byte_size(x1) > 1 and :binary.last(x1) == 44 end, parts)
-        case(parts_with_trailing_comma != []) do
-          false ->
-            nil
-          true ->
-            stacktrace = Macro.Env.stacktrace(caller)
-            IO.warn(<<"the sigils ~w/~W do not allow trailing commas at the end of each word. "::binary(), "If the comma is necessary, define a regular list with [...], otherwise remove the comma."::binary()>>, stacktrace)
-        end
-        case(mod) do
-          115 ->
-            parts
-          97 ->
-            :lists.map(&String.to_atom/1, parts)
-          99 ->
-            :lists.map(&String.to_charlist/1, parts)
-        end
-      false ->
-        parts = {{:".", [], [{:__aliases__, [alias: false], [:"String"]}, :split]}, [], [string]}
-        case(mod) do
-          115 ->
-            parts
-          97 ->
-            {{:".", [], [:lists, :map]}, [], [{:&, [], [{:/, [context: Kernel, import: Kernel], [{{:".", [], [{:__aliases__, [alias: false], [:"String"]}, :to_atom]}, [no_parens: true], []}, 1]}]}, parts]}
-          99 ->
-            {{:".", [], [:lists, :map]}, [], [{:&, [], [{:/, [context: Kernel, import: Kernel], [{{:".", [], [{:__aliases__, [alias: false], [:"String"]}, :to_charlist]}, [no_parens: true], []}, 1]}]}, parts]}
-        end
-    end
-  end
+  defp split_words(string, [mod], caller) when mod == 115 or mod == 97 or mod == 99, do: ...
 
   defp split_words(_string, _mods, _caller) do
     raise(ArgumentError, "modifier must be one of: s, a, c")
