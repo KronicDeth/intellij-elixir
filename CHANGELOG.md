@@ -275,7 +275,9 @@
 ### Bug Fixes
 * [#2787](https://github.com/KronicDeth/intellij-elixir/pull/2787) - [@KronicDeth](https://github.com/KronicDeth)
   * Ignore `PsiErrorElement` when collecting doc comments.
-
+* [#2793](https://github.com/KronicDeth/intellij-elixir/pull/2793) - [@JamesFerguson](https://github.com/JamesFerguson)
+  * Fix README typos.
+.
 ## v13.2.0
 
 ### Enhancements
