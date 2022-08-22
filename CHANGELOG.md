@@ -282,6 +282,8 @@
     Parsing complex decompiles can freeze the IDE.  Logging before parsing the decompiles will give a chance of finding the file and recovering the decompiled code to find the error or complexity that needs to be suppressed.
   * Use `Options.truncateDecompiledBodyz on Elixir decompiled bodies too.
     Previously, this was only used for Erlang functions.  Fixes parsing decompiled code causing freezes for some files.
+* [#2804](https://github.com/KronicDeth/intellij-elixir/pull/2804) - [@KronicDeth](https://github.com/KronicDeth) 
+  *  Ignore `authors: ...` for documentation when injecting Markdown.
 
 ## v13.2.0
 
