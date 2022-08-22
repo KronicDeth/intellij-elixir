@@ -275,6 +275,13 @@
 ### Bug Fixes
 * [#2787](https://github.com/KronicDeth/intellij-elixir/pull/2787) - [@KronicDeth](https://github.com/KronicDeth)
   * Ignore `PsiErrorElement` when collecting doc comments.
+* [#2793](https://github.com/KronicDeth/intellij-elixir/pull/2793) - [@JamesFerguson](https://github.com/JamesFerguson)
+  * Fix README typos.
+* [#2800](https://github.com/KronicDeth/intellij-elixir/pull/2800) - [@KronicDeth](https://github.com/KronicDeth)
+  * Log before and after setting mirror for decompiled files.
+    Parsing complex decompiles can freeze the IDE.  Logging before parsing the decompiles will give a chance of finding the file and recovering the decompiled code to find the error or complexity that needs to be suppressed.
+  * Use `Options.truncateDecompiledBodyz on Elixir decompiled bodies too.
+    Previously, this was only used for Erlang functions.  Fixes parsing decompiled code causing freezes for some files.
 
 ## v13.2.0
 

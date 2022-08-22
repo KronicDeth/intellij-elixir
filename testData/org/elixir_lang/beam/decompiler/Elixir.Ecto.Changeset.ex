@@ -1879,47 +1879,7 @@ defmodule Ecto.Changeset do
 
 
   """
-  def unsafe_validate_unique(changeset, fields, repo, opts) when is_list(opts) do
-    (
-      fields = List.wrap(fields)
-      {repo_opts, opts} = Keyword.pop(opts, :repo_opts, [])
-      {validations, schema} = case(changeset) do
-        %Ecto.Changeset{validations: validations, data: %schema{}} ->
-          {validations, schema}
-        %Ecto.Changeset{} ->
-          raise(ArgumentError, "unsafe_validate_unique/4 does not work with schemaless changesets")
-      end
-      changeset = %{changeset | validations: [{:unsafe_unique, fields} | validations]}
-      where_clause = for(field <- fields) do
-        {field, get_field(changeset, field)}
-      end
-      any_prior_errors_for_fields? = Enum.any?(changeset.errors(), fn x1 -> Enum.member?(fields, elem(x1, 0)) end)
-      unrelated_changes? = Enum.all?(fields, fn x1 -> not(Map.has_key?(changeset.changes(), x1)) end)
-      any_nil_values_for_fields? = Enum.any?(where_clause, fn x1 -> is_nil(elem(x1, 1)) end)
-      if(unrelated_changes? || x || x) do
-        query = (
-          query = (
-            query = Ecto.Query.Builder.Filter.filter!(:where, :and, maybe_exclude_itself(Keyword.get(opts, :query, schema), schema, changeset), where_clause, 0, "/Users/cliftonmcintosh/code/gringotts/deps/ecto/lib/ecto/changeset.ex", 1891)
-            Ecto.Query.Builder.Select.apply(query, %Ecto.Query.SelectExpr{fields: nil, expr: true, params: [], file: "/Users/cliftonmcintosh/code/gringotts/deps/ecto/lib/ecto/changeset.ex", line: 1892, take: %{}})
-          )
-          Ecto.Query.Builder.LimitOffset.apply(query, :limit, %Ecto.Query.QueryExpr{expr: 1, params: [], file: "/Users/cliftonmcintosh/code/gringotts/deps/ecto/lib/ecto/changeset.ex", line: 1893})
-        )
-        query = if(prefix = opts[:prefix]) do
-          query
-        else
-          Ecto.Query.put_query_prefix(query, prefix)
-        end
-        if(repo.one(query, repo_opts)) do
-          changeset
-        else
-          error_key = Keyword.get(opts, :error_key, :erlang.hd(fields))
-          add_error(changeset, error_key, message(opts, "has already been taken"), validation: :unsafe_unique, fields: fields)
-        end
-      else
-        changeset
-      end
-    )
-  end
+  def unsafe_validate_unique(changeset, fields, repo, opts) when is_list(opts), do: ...
 
   @doc ~S"""
   Updates a change.
@@ -2284,18 +2244,7 @@ defmodule Ecto.Changeset do
 
 
   """
-  def validate_number(changeset, field, opts) do
-    validate_change(changeset, field, {:number, opts}, fn field, value ->
-      {message, opts} = Keyword.pop(opts, :message)
-      Enum.find_value(opts, [], fn {spec_key, target_value} -> case(:maps.find(spec_key, %{equal_to: {&:erlang.==/2, "must be equal to %{number}"}, greater_than: {&:erlang.>/2, "must be greater than %{number}"}, greater_than_or_equal_to: {&:erlang.>=/2, "must be greater than or equal to %{number}"}, less_than: {&:erlang.</2, "must be less than %{number}"}, less_than_or_equal_to: {&:erlang."=<"/2, "must be less than or equal to %{number}"}, not_equal_to: {&:erlang."/="/2, "must be not equal to %{number}"}})) do
-        {:ok, {spec_function, default_message}} ->
-          validate_number(field, value, message || x, spec_key, spec_function, target_value)
-        :error ->
-          supported_options = Enum.map_join(:maps.keys(%{equal_to: {&:erlang.==/2, "must be equal to %{number}"}, greater_than: {&:erlang.>/2, "must be greater than %{number}"}, greater_than_or_equal_to: {&:erlang.>=/2, "must be greater than or equal to %{number}"}, less_than: {&:erlang.</2, "must be less than %{number}"}, less_than_or_equal_to: {&:erlang."=<"/2, "must be less than or equal to %{number}"}, not_equal_to: {&:erlang."/="/2, "must be not equal to %{number}"}}), "\n", fn x1 -> <<"  * "::binary(), Kernel.inspect(x1)::binary()>> end)
-          raise(ArgumentError, <<"unknown option "::binary(), Kernel.inspect(spec_key)::binary(), " given to validate_number/3\n\nThe supported options are:\n\n"::binary(), String.Chars.to_string(supported_options)::binary(), "\n"::binary()>>)
-      end end)
-    end)
-  end
+  def validate_number(changeset, field, opts), do: ...
 
   def validate_required(x0, x1) do
     super(x0, x1, [])
@@ -2778,41 +2727,7 @@ defmodule Ecto.Changeset do
     raise(ArgumentError, <<"cast_"::binary(), String.Chars.to_string(type)::binary(), "/3 expects the changeset to be cast. "::binary(), "Please call cast/4 before calling cast_"::binary(), String.Chars.to_string(type)::binary(), "/3"::binary()>>)
   end
 
-  defp cast_relation(type, %Ecto.Changeset{} = changeset, key, opts) do
-    (
-      {key, param_key} = cast_key(key)
-      %{data: data, types: types, params: params, changes: changes} = changeset
-      %{related: related} = relation = relation!(:cast, type, key, Map.get(types, key))
-      params = params || x
-      {changeset, required?} = if(opts[:required]) do
-        {changeset, false}
-      else
-        {Map.update!(changeset, :required, fn x1 -> [key | x1] end), true}
-      end
-      on_cast = Keyword.get_lazy(opts, :with, fn -> on_cast_default(type, related) end)
-      original = Map.get(data, key)
-      changeset = case(:maps.find(param_key, params)) do
-        {:ok, value} ->
-          current = Ecto.Changeset.Relation.load!(data, original)
-          case(Ecto.Changeset.Relation.cast(relation, data, value, current, on_cast)) do
-            {:ok, change, relation_valid?} when change != original ->
-              valid? = changeset.valid?() and relation_valid?
-              changes = :maps.put(key, change, changes)
-              changeset = %{force_update(changeset, opts) | changes: changes, valid?: valid?}
-              missing_relation(changeset, key, current, required?, relation, opts)
-            {:error, {message, meta}} ->
-              meta = [validation: type] ++ meta
-              error = {key, {message(opts, :invalid_message, message), meta}}
-              %{changeset | errors: [error | changeset.errors()], valid?: false}
-            _ ->
-              missing_relation(changeset, key, current, required?, relation, opts)
-          end
-        :error ->
-          missing_relation(changeset, key, original, required?, relation, opts)
-      end
-      elem(Map.get_and_update!(changeset, :types, fn x -> Access.get_and_update(x, key, fn x -> {nil, (fn {type, relation} -> {type, %{relation | on_cast: on_cast}} end).(x)} end) end), 1)
-    )
-  end
+  defp cast_relation(type, %Ecto.Changeset{} = changeset, key, opts), do: ...
 
   defp cast_type!(types, key) do
     case(types) do
@@ -2970,36 +2885,7 @@ defmodule Ecto.Changeset do
     end
   end
 
-  defp maybe_exclude_itself(base_query, schema, changeset) do
-    case(Enum.map(schema.__schema__(:primary_key), fn x1 -> {x1, get_field(changeset, x1)} end)) do
-      [{_pk_field, nil} | _remaining_pks] ->
-        base_query
-      [{pk_field, value} | remaining_pks] ->
-        first_expr = %Ecto.Query.DynamicExpr{fun: fn query ->
-          _ = query
-          {{:==, [], [{{:".", [], [{:&, [], [0]}, Ecto.Query.Builder.atom!(pk_field, "field/2")]}, [], []}, {:^, [], [0]}]}, [{Ecto.Query.Builder.not_nil!(value), {0, pk_field}}], []}
-        end, binding: [{:q, [line: 1923], nil}], file: "/Users/cliftonmcintosh/code/gringotts/deps/ecto/lib/ecto/changeset.ex", line: 1923}
-        case(Enum.reduce_while(remaining_pks, first_expr, fn
-         {_pk_field, nil}, _expr ->
-            {:halt, nil}
-          {pk_field, value}, expr ->
-            {:cont, %Ecto.Query.DynamicExpr{fun: fn query ->
-              _ = query
-              {{:and, [], [{:^, [], [0]}, {:==, [], [{{:".", [], [{:&, [], [0]}, Ecto.Query.Builder.atom!(pk_field, "field/2")]}, [], []}, {:^, [], [1]}]}]}, [{expr, :boolean}, {Ecto.Query.Builder.not_nil!(value), {0, pk_field}}], []}
-            end, binding: [{:q, [line: 1930], nil}], file: "/Users/cliftonmcintosh/code/gringotts/deps/ecto/lib/ecto/changeset.ex", line: 1930}}
-        end)) do
-          nil ->
-            base_query
-          matches_pk ->
-            Ecto.Query.Builder.Filter.filter!(:where, :and, base_query, %Ecto.Query.DynamicExpr{fun: fn query ->
-              _ = query
-              {{:not, [], [{:^, [], [0]}]}, [{matches_pk, :boolean}], []}
-            end, binding: [], file: "/Users/cliftonmcintosh/code/gringotts/deps/ecto/lib/ecto/changeset.ex", line: 1937}, 0, "/Users/cliftonmcintosh/code/gringotts/deps/ecto/lib/ecto/changeset.ex", 1937)
-        end
-      [] ->
-        base_query
-    end
-  end
+  defp maybe_exclude_itself(base_query, schema, changeset), do: ...
 
   defp merge_identical(object, nil, _thing) do
     object
