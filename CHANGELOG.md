@@ -284,6 +284,8 @@
     Previously, this was only used for Erlang functions.  Fixes parsing decompiled code causing freezes for some files.
 * [#2804](https://github.com/KronicDeth/intellij-elixir/pull/2804) - [@KronicDeth](https://github.com/KronicDeth) 
   *  Ignore `authors: ...` for documentation when injecting Markdown.
+* [#2808](https://github.com/KronicDeth/intellij-elixir/pull/2808) - [@KronicDeth](https://github.com/KronicDeth) 
+  * Stop `prependQualifiers` when reaching a qualified bracket operation (`Alias.function[key]`).
 
 ## v13.2.0
 

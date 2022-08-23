@@ -34,6 +34,7 @@ fun QualifiableAlias.computeReference(): PsiPolyVariantReference? =
                 // If the parent ends at the same offset, then the parent should supply the reference
                 null
             }
+
         else ->
 
             if (this.fullyQualifiedName() !in arrayOf(
@@ -99,6 +100,7 @@ private fun PsiReference.toModulars(): Set<PsiElement> =
                     ?: emptySet()
             }.toSet()
         }
+
         else -> {
             resolve()
                 ?.let { resolved -> toModulars(resolved) }
@@ -142,9 +144,13 @@ object QualifiableAliasImpl {
                 // Top of expression inside of interpolation
             is ElixirInterpolation,
                 // Typing an alias on a new line in the body of function
-            is ElixirStabBody -> accumulator
+            is ElixirStabBody,
+                // bracket like `Alias.function[key]`
+            is QualifiedBracketOperation -> accumulator
+
             is ElixirAccessExpression, is ElixirMultipleAliases ->
                 prependQualifiers(ancestor.parent, ancestor, accumulator)
+
             is QualifiedAlias, is Qualified, is QualifiedMultipleAliases -> {
                 val children = ancestor.children
                 val operatorIndex = operatorIndex(children)
@@ -170,6 +176,7 @@ object QualifiableAliasImpl {
 
                                         "?.${accumulator}"
                                     }
+
                                     1 -> "${modularSet.single().name}.${accumulator}"
                                     else -> {
                                         Logger.error(
@@ -182,6 +189,7 @@ object QualifiableAliasImpl {
                                     }
                                 }
                             }
+
                             else -> {
                                 Logger.error(
                                     QualifiableAlias::class.java,
@@ -201,6 +209,7 @@ object QualifiableAliasImpl {
                     "?.${accumulator}"
                 }
             }
+
             else -> {
                 Logger.error(QualifiableAlias::class.java, "Don't know how to prepend qualifier", ancestor)
 
