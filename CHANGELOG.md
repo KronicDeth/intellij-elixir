@@ -286,6 +286,8 @@
   *  Ignore `authors: ...` for documentation when injecting Markdown.
 * [#2808](https://github.com/KronicDeth/intellij-elixir/pull/2808) - [@KronicDeth](https://github.com/KronicDeth) 
   * Stop `prependQualifiers` when reaching a qualified bracket operation (`Alias.function[key]`).
+* [#2809](https://github.com/KronicDeth/intellij-elixir/pull/2809) - [@KronicDeth](https://github.com/KronicDeth) 
+  * Skip `-1` and other unary operations when resolving types.
 
 ## v13.2.0
 
