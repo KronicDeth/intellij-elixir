@@ -85,7 +85,7 @@ class ElixirDocumentationProvider : DocumentationProvider {
         when (element) {
             is Call -> collectDocComments(element, sink)
             is ElixirAccessExpression -> collectDocComments(element.stripAccessExpression(), sink)
-            is DummyBlock, is ElixirList, is PsiErrorElement -> Unit
+            is DummyBlock, is ElixirList, is ElixirMapOperation, is PsiErrorElement -> Unit
             else -> {
                 Logger.error(javaClass, "Don't know how to collect doc comments", element)
             }
