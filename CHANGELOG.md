@@ -288,6 +288,8 @@
   * Stop `prependQualifiers` when reaching a qualified bracket operation (`Alias.function[key]`).
 * [#2809](https://github.com/KronicDeth/intellij-elixir/pull/2809) - [@KronicDeth](https://github.com/KronicDeth) 
   * Skip `-1` and other unary operations when resolving types.
+* [#2810](https://github.com/KronicDeth/intellij-elixir/pull/2810) - [@KronicDeth](https://github.com/KronicDeth) 
+  * Ignore maps at the root of files when collecting doc comments.
 
 ## v13.2.0
 
