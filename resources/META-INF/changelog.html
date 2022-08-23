@@ -13,6 +13,7 @@
         Previously, this was only used for Erlang functions.  Fixes parsing decompiled code causing freezes for some files.</li>
       <li>Ignore <code class="notranslate">authors: ...</code> for documentation when injecting Markdown.</li>
       <li>Stop <code class="notranslate">prependQualifiers</code> when reaching a qualified bracket operation (<code class="notranslate">Alias.function[key]</code>).</li>
+      <li>Skip <code class="notranslate">-1</code> and other unary operations when resolving types.</li>
     </ul>
   </li>
 </ul>

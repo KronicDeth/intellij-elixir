@@ -90,6 +90,8 @@ private constructor(private val name: String,
                 is UnqualifiedParenthesesCall<*>,
                 // Literals
                 is QualifiableAlias,
+                // -1 and other negative integer literals
+                is UnaryOperation,
                 is ElixirAtom,
                 is ElixirAtomKeyword,
                 is ElixirBitString,
