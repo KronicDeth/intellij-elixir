@@ -34,6 +34,7 @@ tailrec fun PsiElement.selfOrEnclosingMacroCall(): Call? =
     when (this) {
         is ElixirDoBlock ->
             parent.let { it as? Call }
+
         is ElixirAnonymousFunction -> {
             parent.let { it as? ElixirAccessExpression }?.parent.let { it as? Arguments }?.parent.let { it as? ElixirMatchedParenthesesArguments }?.parent
                 .let { it as? Call }?.let { call ->
@@ -46,6 +47,7 @@ tailrec fun PsiElement.selfOrEnclosingMacroCall(): Call? =
                     }
                 }?.parent?.selfOrEnclosingMacroCall()
         }
+
         is Arguments,
         is AtUnqualifiedNoParenthesesCall<*>,
         is ElixirAccessExpression,
@@ -65,12 +67,14 @@ tailrec fun PsiElement.selfOrEnclosingMacroCall(): Call? =
         is QualifiedAlias,
         is QualifiedMultipleAliases ->
             parent.selfOrEnclosingMacroCall()
+
         is Call ->
             when {
                 isCalling(KERNEL, ALIAS) -> this
                 isCalling(org.elixir_lang.psi.call.name.Module.MODULE, CREATE, 3) -> this
                 else -> null
             }
+
         is QuotableKeywordPair ->
             if (this.hasKeywordKey("do")) {
                 parent.let { it as? QuotableKeywordList }?.parent.let { keywordListParent ->
@@ -79,12 +83,14 @@ tailrec fun PsiElement.selfOrEnclosingMacroCall(): Call? =
                         is ElixirParenthesesArguments -> {
                             keywordListParent.parent.let { it as? ElixirMatchedParenthesesArguments }
                         }
+
                         else -> null
                     }
                 }?.parent.let { it as? Call }
             } else {
                 null
             }
+
         else -> null
     }
 
@@ -117,6 +123,7 @@ fun <R> PsiElement.foldChildrenWhile(
     when (this) {
         is ElixirAccessExpression ->
             operation(firstChild, initial)
+
         is ElixirList, is ElixirStabBody -> {
             var child: PsiElement? = firstChild
             var final = AccumulatorContinue(initial, true)
@@ -137,6 +144,7 @@ fun <R> PsiElement.foldChildrenWhile(
 
             final
         }
+
         else ->
             AccumulatorContinue(initial, true)
     }
@@ -217,7 +225,7 @@ fun PsiElement.childExpressions(forward: Boolean = true): Sequence<PsiElement> {
         lastChild
     }
 
-    return seed.siblingExpressions(forward, withSelf = true)
+    return seed?.siblingExpressions(forward, withSelf = true) ?: emptySequence()
 }
 
 fun PsiElement.siblingExpressions(forward: Boolean = true, withSelf: Boolean = true): Sequence<PsiElement> =

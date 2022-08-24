@@ -290,6 +290,8 @@
   * Skip `-1` and other unary operations when resolving types.
 * [#2810](https://github.com/KronicDeth/intellij-elixir/pull/2810) - [@KronicDeth](https://github.com/KronicDeth) 
   * Ignore maps at the root of files when collecting doc comments.
+* [#2812](https://github.com/KronicDeth/intellij-elixir/pull/2812) - [@KronicDeth](https://github.com/KronicDeth) 
+  * Return `emptySequence` from `childExpressions` when `PsiElement` has no `firstChild` or `lastChild`.
 
 ## v13.2.0
 
