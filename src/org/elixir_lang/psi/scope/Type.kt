@@ -42,9 +42,10 @@ abstract class Type : PsiScopeProcessor {
             // type variable in a `when key: type`
             is ElixirKeywordKey -> executeOnParameter(element, state)
             is ElixirNoParenthesesOneArgument, is ElixirAccessExpression -> executeOnChildren(element, state)
-            is ElixirAtom, is ElixirFile, is ElixirLine, is ElixirList, is ElixirParentheticalStab, is ElixirTuple,
-            is WholeNumber,
+            is ElixirAtom, is ElixirFile, is ElixirLine, is ElixirList, is ElixirParentheticalStab,
+            is ElixirStructOperation, is ElixirTuple, is WholeNumber
             -> false
+
             is ModuleImpl<*> -> execute(element, state)
             is TypeDefinitionImpl<*> -> execute(element, state)
             is CallDefinitionImpl<*> -> true
@@ -162,6 +163,7 @@ abstract class Type : PsiScopeProcessor {
                         } ?: true
                     }
                 }
+
                 else -> TODO()
             }
         } ?: true
@@ -171,6 +173,7 @@ abstract class Type : PsiScopeProcessor {
             is Call -> descendant.whileInStabBodyChildExpressions {
                 executeOnDefprotocolDefinitionExpression(it, state)
             }
+
             else -> {
                 true
             }
@@ -196,6 +199,7 @@ abstract class Type : PsiScopeProcessor {
                 } else {
                     true
                 }
+
             else -> true
         }
 
@@ -228,6 +232,7 @@ internal fun PsiElement.ancestorTypeSpec(): AtUnqualifiedNoParenthesesCall<*>? =
                 null
             }
         }
+
         is Arguments,
         is ElixirAccessExpression,
         is ElixirKeywords,
@@ -278,6 +283,7 @@ internal fun PsiElement.ancestorTypeSpec(): AtUnqualifiedNoParenthesesCall<*>? =
             // __MODULE__.* does not matter that it is in a type
         is QualifiableAlias,
         -> null
+
         else -> {
             Logger.error(PsiElement::class.java, "Don't know how to find ancestorTypeSpec", this)
 
