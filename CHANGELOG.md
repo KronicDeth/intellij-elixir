@@ -292,6 +292,8 @@
   * Ignore maps at the root of files when collecting doc comments.
 * [#2812](https://github.com/KronicDeth/intellij-elixir/pull/2812) - [@KronicDeth](https://github.com/KronicDeth) 
   * Return `emptySequence` from `childExpressions` when `PsiElement` has no `firstChild` or `lastChild`.
+* [#2814](https://github.com/KronicDeth/intellij-elixir/pull/2814) - [@KronicDeth](https://github.com/KronicDeth) 
+  * Don't descend inside struct literal when resolving types.
 
 ## v13.2.0
 
