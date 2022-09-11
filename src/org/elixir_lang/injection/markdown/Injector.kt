@@ -31,7 +31,7 @@ class Injector : MultiHostInjector {
                 injectElixirInCodeBlocksInQuote(registrar, documentation)
             }
 
-            is ElixirAtomKeyword -> Unit
+            is ElixirAlias, is ElixirAtomKeyword -> Unit
             is ElixirLine -> injectMarkdownInQuote(registrar, documentation)
             is QuotableKeywordPair -> {
                 when (val key = documentation.keywordKey.text) {
