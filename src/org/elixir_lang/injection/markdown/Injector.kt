@@ -7,6 +7,7 @@ import com.intellij.psi.PsiElement
 import org.elixir_lang.ElixirLanguage
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.*
+import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.reference.ModuleAttribute.Companion.DOCUMENTATION_NAME_SET
 import org.intellij.plugins.markdown.lang.MarkdownLanguage
 import java.util.regex.Pattern
@@ -19,6 +20,7 @@ class Injector : MultiHostInjector {
             ?.lastChild
             ?.firstChild
             ?.firstChild
+            ?.stripAccessExpression()
             ?.let { getLanguagesToInjectInQuote(registrar, it) }
     }
 
@@ -28,7 +30,8 @@ class Injector : MultiHostInjector {
                 injectMarkdownInQuote(registrar, documentation)
                 injectElixirInCodeBlocksInQuote(registrar, documentation)
             }
-            is ElixirAtomKeyword -> Unit
+
+            is ElixirAlias, is ElixirAtomKeyword -> Unit
             is ElixirLine -> injectMarkdownInQuote(registrar, documentation)
             is QuotableKeywordPair -> {
                 when (val key = documentation.keywordKey.text) {
@@ -43,6 +46,7 @@ class Injector : MultiHostInjector {
                     }
                 }
             }
+
             else -> {
                 Logger.error(javaClass, "Do not know whether to inject Markdown in documentation", documentation)
             }
@@ -95,19 +99,23 @@ class Injector : MultiHostInjector {
 
                                     CODE_BLOCK_INDENT_LENGTH + IEX_PROMPT_LENGTH
                                 }
+
                                 lineCodeText.startsWith(IEX_CONTINUATION) -> {
                                     CODE_BLOCK_INDENT_LENGTH + IEX_CONTINUATION_LENGTH
                                 }
+
                                 lineCodeText.startsWith(DEBUG_PREFIX) -> {
                                     inException = false
 
                                     lineMarkdownText.length
                                 }
+
                                 lineCodeText.startsWith(EXCEPTION_PREFIX) -> {
                                     inException = true
 
                                     lineMarkdownText.length
                                 }
+
                                 else -> {
                                     if (inException) {
                                         lineMarkdownText.length
@@ -201,6 +209,7 @@ class Injector : MultiHostInjector {
                                             codeOffsetRelativeToQuote + IEX_PROMPT_LENGTH
                                         )
                                     }
+
                                     lineCodeText.startsWith(IEX_CONTINUATION) -> {
                                         inException = false
 
@@ -209,6 +218,7 @@ class Injector : MultiHostInjector {
                                             codeOffsetRelativeToQuote + IEX_CONTINUATION_LENGTH
                                         )
                                     }
+
                                     else -> {
                                         Pair(lineCodeText, codeOffsetRelativeToQuote)
                                     }
