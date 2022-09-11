@@ -17,6 +17,7 @@
       <li>Ignore maps at the root of files when collecting doc comments.</li>
       <li>Return <code class="notranslate">emptySequence</code> from <code class="notranslate">childExpressions</code> when <code class="notranslate">PsiElement</code> has no <code class="notranslate">firstChild</code> or <code class="notranslate">lastChild</code>.</li>
       <li>Don't descend inside struct literal when resolving types.</li>
+      <li>Ignore injecting Markdown in calls that read the text from a file, such as in <code class="notranslate">@moduledoc File.read!(Path.join([__DIR__, "..", "README.md"]))</code></li>
     </ul>
   </li>
 </ul>

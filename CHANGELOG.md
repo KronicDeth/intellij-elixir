@@ -294,6 +294,8 @@
   * Return `emptySequence` from `childExpressions` when `PsiElement` has no `firstChild` or `lastChild`.
 * [#2814](https://github.com/KronicDeth/intellij-elixir/pull/2814) - [@KronicDeth](https://github.com/KronicDeth) 
   * Don't descend inside struct literal when resolving types.
+* [#2848](https://github.com/KronicDeth/intellij-elixir/pull/2848) - [@KronicDeth](https://github.com/KronicDeth) 
+  * Ignore injecting Markdown in calls that read the text from a file, such as in `@moduledoc File.read!(Path.join([__DIR__, "..", "README.md"]))`
 
 ## v13.2.0
 
