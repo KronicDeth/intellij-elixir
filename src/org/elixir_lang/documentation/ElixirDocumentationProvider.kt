@@ -87,8 +87,12 @@ class ElixirDocumentationProvider : DocumentationProvider {
         when (element) {
             is Call -> collectDocComments(element, sink)
             is ElixirAccessExpression -> collectDocComments(element.stripAccessExpression(), sink)
-            is DummyBlock, is ElixirAlias, is ElixirDecimalFloat, is ElixirDecimalWholeNumber, is ElixirList,
-            is ElixirMapOperation, is PsiErrorElement
+            is DummyBlock, is ElixirAlias,
+                // Numbers
+            is ElixirDecimalFloat, is ElixirDecimalWholeNumber,
+                // Containers
+            is ElixirList, is ElixirMapOperation, is ElixirTuple,
+            is PsiErrorElement
             -> Unit
 
             else -> {
