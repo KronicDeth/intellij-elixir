@@ -64,11 +64,13 @@ class ElixirDocumentationProvider : DocumentationProvider {
                                 heredocLine.text.substring(startIndex)
                             }
                         }
+
                         is ElixirLine -> quote.body?.text
                         else -> null
                     }
                 }
             }
+
             else -> null
         }
 
@@ -85,7 +87,14 @@ class ElixirDocumentationProvider : DocumentationProvider {
         when (element) {
             is Call -> collectDocComments(element, sink)
             is ElixirAccessExpression -> collectDocComments(element.stripAccessExpression(), sink)
-            is DummyBlock, is ElixirList, is ElixirMapOperation, is PsiErrorElement -> Unit
+            is DummyBlock, is ElixirAlias,
+                // Numbers
+            is ElixirDecimalFloat, is ElixirDecimalWholeNumber,
+                // Containers
+            is ElixirList, is ElixirMapOperation, is ElixirTuple,
+            is PsiErrorElement
+            -> Unit
+
             else -> {
                 Logger.error(javaClass, "Don't know how to collect doc comments", element)
             }
@@ -182,6 +191,7 @@ class ElixirDocumentationProvider : DocumentationProvider {
                         .let { Resolver.preferSource(it) }
                         .firstOrNull()
                 }
+
                 "c" -> {
                     val relative = relativeLinkMatcher.group("relative")
                     val arity = relativeLinkMatcher.group("arity").toInt()
@@ -228,6 +238,7 @@ class ElixirDocumentationProvider : DocumentationProvider {
                         .let { Resolver.preferSource(it) }
                         .firstOrNull()
                 }
+
                 "t" -> {
                     val relative = relativeLinkMatcher.group("relative")
                     val arity = relativeLinkMatcher.group("arity").toInt()
@@ -253,6 +264,7 @@ class ElixirDocumentationProvider : DocumentationProvider {
                         .let { Resolver.preferSource(it) }
                         .firstOrNull()
                 }
+
                 else -> {
                     Logger.error(
                         javaClass, "Don't know how to find element for link (${link}) of kind (${kind})",
@@ -297,6 +309,7 @@ class ElixirDocumentationProvider : DocumentationProvider {
                         .singleOrNull { CallDefinitionClause.`is`(it) }
                 }
         }
+
         is QualifiableAlias -> {
             val reference = contextElement.getReference()
 
@@ -312,6 +325,7 @@ class ElixirDocumentationProvider : DocumentationProvider {
                 getCustomDocumentationElement(contextElement.parent)
             }
         }
+
         else -> null
     }
 
@@ -326,11 +340,13 @@ class ElixirDocumentationProvider : DocumentationProvider {
             is FetchedDocs.CallbackDocumentation -> {
                 documentationHtml.append(fetchedDocs.head).append("\n")
             }
+
             is FetchedDocs.FunctionOrMacroDocumentation -> {
                 for (head in fetchedDocs.heads) {
                     documentationHtml.append(head).append("\n")
                 }
             }
+
             is FetchedDocs.ModuleDocumentation -> Unit
             is FetchedDocs.TypeDocumentation -> {
                 documentationHtml.append(fetchedDocs.head).append("\n")
@@ -349,6 +365,7 @@ class ElixirDocumentationProvider : DocumentationProvider {
                         .append(DocumentationMarkup.CONTENT_END)
                 }
             }
+
             is FetchedDocs.ModuleDocumentation -> {
                 fetchedDocs.moduledoc.let { moduledoc ->
                     documentationHtml
@@ -357,6 +374,7 @@ class ElixirDocumentationProvider : DocumentationProvider {
                         .append(DocumentationMarkup.CONTENT_END)
                 }
             }
+
             is FetchedDocs.FunctionOrMacroDocumentation -> {
                 fetchedDocs.doc?.let { doc ->
                     when (doc) {
@@ -366,6 +384,7 @@ class ElixirDocumentationProvider : DocumentationProvider {
                                 .append(DocumentationMarkup.CONTENT_START)
                                 .append(false)
                                 .append(DocumentationMarkup.CONTENT_END)
+
                         is MarkdownByLanguage ->
                             doc.formattedByLanguage.values.map { formatted ->
                                 documentationHtml
@@ -429,6 +448,7 @@ class ElixirDocumentationProvider : DocumentationProvider {
                     documentationHtml.append(DocumentationMarkup.SECTIONS_END)
                 }
             }
+
             is FetchedDocs.TypeDocumentation -> {
                 fetchedDocs.typedoc.let { typedoc ->
                     documentationHtml
@@ -450,6 +470,7 @@ class ElixirDocumentationProvider : DocumentationProvider {
                     .binaryValue()
                     .let { String(it, Charsets.UTF_8) }
                     .let { html(project, it) }
+
             else -> {
                 Logger.error(javaClass, "Don't know how to render deprecated metadata", otpErlangObject)
 

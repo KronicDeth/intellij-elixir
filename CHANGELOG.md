@@ -296,6 +296,12 @@
   * Don't descend inside struct literal when resolving types.
 * [#2848](https://github.com/KronicDeth/intellij-elixir/pull/2848) - [@KronicDeth](https://github.com/KronicDeth) 
   * Ignore injecting Markdown in calls that read the text from a file, such as in `@moduledoc File.read!(Path.join([__DIR__, "..", "README.md"]))`
+* [#2858](https://github.com/KronicDeth/intellij-elixir/pull/2858) - [@KronicDeth](https://github.com/KronicDeth)
+  * Ignore undocument script code at root of files.
+    * Alias used in qualified call.
+    * Integers
+    * Floats
+    * Tuples
 
 ## v13.2.0
 
