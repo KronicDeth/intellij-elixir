@@ -308,6 +308,8 @@
   * Ignore pipelines for injecting Markdown in doc comments.
 * [#2892](https://github.com/KronicDeth/intellij-elixir/pull/2892) - [@KronicDeth](https://github.com/KronicDeth)
   * Ignore useless `warn_missing` in `edeliver`'s `distillery` dep.
+* [#2893](https://github.com/KronicDeth/intellij-elixir/pull/2893) - [@KronicDeth](https://github.com/KronicDeth)
+  * Stop accumulating qualifiers when bracket operation is hit either as qualifier or argument.
 
 ## v13.2.0
 
