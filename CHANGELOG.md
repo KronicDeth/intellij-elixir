@@ -304,6 +304,8 @@
     * Tuples
 * [#2890](https://github.com/KronicDeth/intellij-elixir/pull/2890) - [@KronicDeth](https://github.com/KronicDeth)
   * Stop `ancestorTypeSpec` on `QualifiedMultipleAliases`.
+* [#2891](https://github.com/KronicDeth/intellij-elixir/pull/2891) - [@KronicDeth](https://github.com/KronicDeth)
+  * Ignore pipelines for injecting Markdown in doc comments.
 
 ## v13.2.0
 
