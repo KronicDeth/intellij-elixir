@@ -302,6 +302,8 @@
     * Integers
     * Floats
     * Tuples
+* [#2890](https://github.com/KronicDeth/intellij-elixir/pull/2890) - [@KronicDeth](https://github.com/KronicDeth)
+  * Stop `ancestorTypeSpec` on `QualifiedMultipleAliases`.
 
 ## v13.2.0
 
