@@ -31,7 +31,15 @@ class Injector : MultiHostInjector {
                 injectElixirInCodeBlocksInQuote(registrar, documentation)
             }
 
-            is ElixirAlias, is ElixirAtomKeyword -> Unit
+            is ElixirAlias,
+                // @external_resource "README.md"
+                // @moduledoc @external_resource
+                //            |> File.read!()
+                //            |> String.split("<!-- MDOC !-->")
+                //            |> Enum.fetch!(1)
+            is ElixirMatchedArrowOperation,
+            is ElixirAtomKeyword -> Unit
+
             is ElixirLine -> injectMarkdownInQuote(registrar, documentation)
             is QuotableKeywordPair -> {
                 when (val key = documentation.keywordKey.text) {
