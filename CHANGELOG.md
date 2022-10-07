@@ -306,6 +306,8 @@
   * Stop `ancestorTypeSpec` on `QualifiedMultipleAliases`.
 * [#2891](https://github.com/KronicDeth/intellij-elixir/pull/2891) - [@KronicDeth](https://github.com/KronicDeth)
   * Ignore pipelines for injecting Markdown in doc comments.
+* [#2892](https://github.com/KronicDeth/intellij-elixir/pull/2892) - [@KronicDeth](https://github.com/KronicDeth)
+  * Ignore useless `warn_missing` in `edeliver`'s `distillery` dep.
 
 ## v13.2.0
 

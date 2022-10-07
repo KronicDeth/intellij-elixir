@@ -48,7 +48,9 @@ data class Dep(val application: String, val path: String, val type: Type = Type.
                                 when (key) {
                                     "app", "branch", "commit", "compile", "env", "git", "github", "hex", "manager",
                                     "only", "optional", "organization", "override", "ref", "repo", "runtime",
-                                    GUARDIAN_RUNTIME_TYPO, "sparse", "submodules", "system_env", "tag", "targets" -> acc
+                                    GUARDIAN_RUNTIME_TYPO, "sparse", "submodules", "system_env", "tag", "targets",
+                                    EDELIVER_DISTILLERY_WARN_MISSING -> acc
+
                                     "in_umbrella" -> acc.copy(path = "apps/$name", type = Type.MODULE)
                                     "path" -> putPath(acc, keywordPair.keywordValue)
                                     else -> {
@@ -142,6 +144,7 @@ data class Dep(val application: String, val path: String, val type: Type = Type.
                         dep
                     }
                 }
+
                 else -> dep
             }
 
@@ -165,3 +168,4 @@ data class Dep(val application: String, val path: String, val type: Type = Type.
 // https://github.com/ueberauth/guardian/issues/594
 @Suppress("SpellCheckingInspection")
 const val GUARDIAN_RUNTIME_TYPO: String = "runtume"
+const val EDELIVER_DISTILLERY_WARN_MISSING: String = "warn_missing"
