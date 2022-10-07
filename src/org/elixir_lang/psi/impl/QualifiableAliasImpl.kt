@@ -145,8 +145,15 @@ object QualifiableAliasImpl {
             is ElixirInterpolation,
                 // Typing an alias on a new line in the body of function
             is ElixirStabBody,
-                // bracket like `Alias.function[key]`
-            is QualifiedBracketOperation -> accumulator
+                // https://github.com/KronicDeth/intellij-elixir/issues/2839
+                //
+                // params do
+                //   requires :keys, type: List[String], default: []
+                // end
+                // `List[String]` in above or bracket like `Alias.function[key]`
+            is BracketOperation,
+                // like `[String]` in above
+            is ElixirBracketArguments -> accumulator
 
             is ElixirAccessExpression, is ElixirMultipleAliases ->
                 prependQualifiers(ancestor.parent, ancestor, accumulator)
