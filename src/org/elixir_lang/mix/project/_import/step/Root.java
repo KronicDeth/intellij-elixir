@@ -162,8 +162,10 @@ public class Root extends ProjectImportWizardStep {
 
             Sdk sdk = getWizardContext().getProjectJdk();
 
-            updateHex(workingDirectory, sdk);
-            fetchDependencies(workingDirectory, sdk);
+            if (sdk != null) {
+                updateHex(workingDirectory, sdk);
+                fetchDependencies(workingDirectory, sdk);
+            }
         }
 
         Builder builder = getBuilder();
