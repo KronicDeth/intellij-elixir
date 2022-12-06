@@ -18,10 +18,10 @@ jobs:
       - name: Set up Elixir
         uses: actions/setup-elixir@v1
         with:
-          otp-version: 24.1.6
+          otp-version: 24.3.4.6
           elixir-version: 1.13.0
       - name: Export OTP_RELEASE
-        run: echo "OTP_RELEASE=24.1.6" >> $GITHUB_ENV
+        run: echo "OTP_RELEASE=24.3.4.6" >> $GITHUB_ENV
       - name: Export ERLANG_SDK_HOME
         run: echo "ERLANG_SDK_HOME=`erl -eval 'io:format("~s", [code:root_dir()]).' -noshell -run init stop`" >> $GITHUB_ENV
       - name: Grant execute permission for gradlew
@@ -48,7 +48,7 @@ jobs:
       - name: Run Plugin Verifier
         run: ./gradlew --stacktrace runPluginVerifier
   release:
-    needs: [test, runPluginVerifier]
+    needs: [ test, runPluginVerifier ]
     runs-on: ubuntu-latest
 
     steps:
