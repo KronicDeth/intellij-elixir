@@ -95,7 +95,7 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
     //noinspection GrUnresolvedAccess
     kotlinOptions {
         apiVersion = "1.3"
-        jvmTarget = "11"
+        jvmTarget = "17"
         freeCompilerArgs = ["-Xjvm-default=all"]
     }
 }
