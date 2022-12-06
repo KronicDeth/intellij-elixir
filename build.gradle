@@ -70,7 +70,7 @@ allprojects {
         pluginDescription.set(bodyInnerHTML("resources/META-INF/description.html"))
 
         sinceBuild = "221.5080"
-        untilBuild = "222.*"
+        untilBuild = "223.*"
     }
 
     publishPlugin {
@@ -84,7 +84,7 @@ allprojects {
     }
 
     runPluginVerifier {
-        ideVersions = ["2022.1", "2022.2"]
+        ideVersions = ["2022.1", "2022.2", "2022.3"]
     }
 }
 
