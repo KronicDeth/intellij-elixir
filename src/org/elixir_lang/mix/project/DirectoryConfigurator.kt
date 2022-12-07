@@ -20,6 +20,8 @@ import com.intellij.platform.PlatformProjectOpenProcessor.Companion.runDirectory
 import com.intellij.projectImport.ProjectAttachProcessor
 import com.intellij.util.PlatformUtils
 import com.intellij.util.io.exists
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.elixir_lang.DepsWatcher
 import org.elixir_lang.Facet
 import org.elixir_lang.mix.Project.addFolders
@@ -49,7 +51,11 @@ class DirectoryConfigurator : com.intellij.platform.DirectoryProjectConfigurator
             if (otpApp.root == baseDir) {
                 configureRootOtpApp(project, otpApp)
             } else {
-                configureDescendantOtpApp(project, otpApp)
+                runBlocking {
+                    launch(coroutineContext) {
+                        configureDescendantOtpApp(project, otpApp)
+                    }
+                }
             }
         }
     }
@@ -73,7 +79,7 @@ class DirectoryConfigurator : com.intellij.platform.DirectoryProjectConfigurator
         }
     }
 
-    private fun configureDescendantOtpApp(rootProject: Project, otpApp: OtpApp) {
+    private suspend fun configureDescendantOtpApp(rootProject: Project, otpApp: OtpApp) {
         if (!PlatformUtils.isGoIde() && ProjectAttachProcessor.canAttachToProject()) {
             newProject(otpApp)?.let { otpAppProject ->
                 attachToProject(rootProject, Paths.get(otpApp.root.path))
@@ -100,22 +106,23 @@ class DirectoryConfigurator : com.intellij.platform.DirectoryProjectConfigurator
     /**
      * @return Only returns a project if it is new.
      */
-    private fun newProject(otpApp: OtpApp): Project? {
+    private suspend fun newProject(otpApp: OtpApp): Project? {
         val projectDir = Paths.get(FileUtil.toSystemDependentName(otpApp.root.path), Project.DIRECTORY_STORE_FOLDER)
 
         return if (projectDir.exists()) {
             null
         } else {
             val path = otpApp.root.path.let { Paths.get(it) }
+            val openProjectTask = OpenProjectTask(
+                isNewProject = true,
+                useDefaultProjectAsTemplate = false,
+            ).copy(projectName = otpApp.name)
 
             ProjectManagerEx
                 .getInstanceEx()
                 .newProject(
-                    path, OpenProjectTask(
-                        isNewProject = true,
-                        useDefaultProjectAsTemplate = false,
-                        projectName = otpApp.name
-                    )
+                    path,
+                    openProjectTask
                 )
                 ?.let { project ->
                     runDirectoryProjectConfigurators(path, project, false)

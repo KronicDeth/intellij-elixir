@@ -2,6 +2,7 @@ package org.elixir_lang.code_insight.line_marker_provider
 
 import com.intellij.codeInsight.CodeInsightBundle
 import com.intellij.codeInsight.ContainerProvider
+import com.intellij.codeInsight.daemon.GutterIconNavigationHandler
 import com.intellij.codeInsight.daemon.LineMarkerInfo
 import com.intellij.codeInsight.daemon.LineMarkerProvider
 import com.intellij.codeInsight.daemon.impl.PsiElementListNavigator
@@ -25,96 +26,103 @@ import javax.swing.Icon
 
 class Protocol : LineMarkerProvider {
     override fun getLineMarkerInfo(element: PsiElement): LineMarkerInfo<*>? =
-            when (element) {
-                is Call -> getLineMarkerInfo(element)
-                else -> null
-            }
+        when (element) {
+            is Call -> getLineMarkerInfo(element)
+            else -> null
+        }
 
     private fun getLineMarkerInfo(call: Call): LineMarkerInfo<*>? =
-            if (Protocol.`is`(call)) {
-                val targets: NotNullLazyValue<Collection<PsiElement>> = NotNullLazyValue.createValue {
-                    val implementations = mutableListOf<PsiElement>()
+        if (Protocol.`is`(call)) {
+            val targets: NotNullLazyValue<Collection<PsiElement>> = NotNullLazyValue.createValue {
+                val implementations = mutableListOf<PsiElement>()
 
-                    Protocol.processImplementations(call) { implementation ->
-                        implementations.add(implementation)
-                    }
-
-                    implementations
+                Protocol.processImplementations(call) { implementation ->
+                    implementations.add(implementation)
                 }
 
-                ImplsGutterIconBuilder()
-                        .setTargets(targets)
-                        .createLineMarkerInfo(call)
-            } else if (CallDefinitionClause.`is`(call)) {
-                enclosingModularMacroCall(call)?.let { modularCall ->
-                    CallDefinitionClause.nameArityInterval(call, ResolveState.initial())?.let { protocolNameArityInterval ->
-                        if (Protocol.`is`(modularCall)) {
-                            val targets: NotNullLazyValue<Collection<PsiElement>> = NotNullLazyValue.createValue {
-                                val implementations = mutableListOf<PsiElement>()
+                implementations
+            }
 
-                                Protocol.processImplementations(modularCall) { defimpl ->
-                                    for (defimplChild in (defimpl as Call).macroChildCallList()) {
-                                        if (CallDefinitionClause.`is`(defimplChild)) {
-                                            CallDefinitionClause.nameArityInterval(defimplChild, ResolveState.initial())?.let { implNameArityInterval ->
+            ImplsGutterIconBuilder()
+                .setTargets(targets)
+                .createLineMarkerInfo(call)
+        } else if (CallDefinitionClause.`is`(call)) {
+            enclosingModularMacroCall(call)?.let { modularCall ->
+                CallDefinitionClause.nameArityInterval(call, ResolveState.initial())?.let { protocolNameArityInterval ->
+                    if (Protocol.`is`(modularCall)) {
+                        val targets: NotNullLazyValue<Collection<PsiElement>> = NotNullLazyValue.createValue {
+                            val implementations = mutableListOf<PsiElement>()
+
+                            Protocol.processImplementations(modularCall) { defimpl ->
+                                for (defimplChild in (defimpl as Call).macroChildCallList()) {
+                                    if (CallDefinitionClause.`is`(defimplChild)) {
+                                        CallDefinitionClause.nameArityInterval(defimplChild, ResolveState.initial())
+                                            ?.let { implNameArityInterval ->
                                                 if (implNameArityInterval.name == protocolNameArityInterval.name &&
-                                                        implNameArityInterval.arityInterval.overlaps(protocolNameArityInterval.arityInterval)) {
+                                                    implNameArityInterval.arityInterval.overlaps(
+                                                        protocolNameArityInterval.arityInterval
+                                                    )
+                                                ) {
                                                     implementations.add(defimplChild)
                                                 }
                                             }
-                                        }
                                     }
-
-                                    true
                                 }
 
-                                implementations
+                                true
                             }
 
-
-                            ImplsGutterIconBuilder()
-                                    .setTargets(targets)
-                                    .createLineMarkerInfo(call)
-                        } else {
-                            null
+                            implementations
                         }
+
+
+                        ImplsGutterIconBuilder()
+                            .setTargets(targets)
+                            .createLineMarkerInfo(call)
+                    } else {
+                        null
                     }
                 }
-            } else {
-                null
             }
+        } else {
+            null
+        }
+
     private class ImplsGutterIconBuilder() :
-            NavigationGutterIconBuilder<PsiElement>(
-                    Icons.Protocol.GoToImplementations,
-                    DEFAULT_PSI_CONVERTOR,
-                    PSI_GOTO_RELATED_ITEM_PROVIDER
-            ) {
+        NavigationGutterIconBuilder<PsiElement>(
+            Icons.Protocol.GoToImplementations,
+            DEFAULT_PSI_CONVERTOR,
+            PSI_GOTO_RELATED_ITEM_PROVIDER
+        ) {
 
         override fun createGutterIconRenderer(
-                pointers: NotNullLazyValue<List<SmartPsiElementPointer<*>>>,
-                renderer: Computable<PsiElementListCellRenderer<*>>,
-                empty: Boolean
+            pointers: NotNullLazyValue<List<SmartPsiElementPointer<*>>>,
+            renderer: Computable<PsiElementListCellRenderer<*>>,
+            empty: Boolean,
+            navigationHandler: GutterIconNavigationHandler<PsiElement>?
         ): NavigationGutterIconRenderer {
             return ImplsNavigationGutterIconRenderer(
-                    popupTitle = myPopupTitle,
-                    emptyText = myEmptyText,
-                    pointers = pointers,
-                    cellRenderer = renderer,
-                    alignment = myAlignment,
-                    icon = myIcon,
-                    tooltipText = myTooltipText,
-                    empty = empty
+                popupTitle = myPopupTitle,
+                emptyText = myEmptyText,
+                pointers = pointers,
+                cellRenderer = renderer,
+                alignment = myAlignment,
+                icon = myIcon,
+                tooltipText = myTooltipText,
+                empty = empty
             )
         }
     }
+
     private class ImplsNavigationGutterIconRenderer(
-            popupTitle: String?,
-            emptyText: String?,
-            pointers: NotNullLazyValue<List<SmartPsiElementPointer<*>>>,
-            cellRenderer: Computable<PsiElementListCellRenderer<*>>,
-            private val alignment: Alignment,
-            private val icon: Icon,
-            private val tooltipText: String?,
-            private val empty: Boolean
+        popupTitle: String?,
+        emptyText: String?,
+        pointers: NotNullLazyValue<List<SmartPsiElementPointer<*>>>,
+        cellRenderer: Computable<PsiElementListCellRenderer<*>>,
+        private val alignment: Alignment,
+        private val icon: Icon,
+        private val tooltipText: String?,
+        private val empty: Boolean
     ) : NavigationGutterIconRenderer(popupTitle, emptyText, cellRenderer, pointers) {
         override fun isNavigateAction(): Boolean = !empty
         override fun getIcon(): Icon = icon
@@ -132,11 +140,11 @@ class Protocol : LineMarkerProvider {
 
             @Suppress("DialogTitleCapitalization")
             PsiElementListNavigator.openTargets(
-                    event,
-                    targets,
-                    CodeInsightBundle.message("goto.implementation.chooserTitle", escapedName, targets.size, ""),
-                    CodeInsightBundle.message("goto.implementation.findUsages.title", escapedName, targets.size),
-                    renderer
+                event,
+                targets,
+                CodeInsightBundle.message("goto.implementation.chooserTitle", escapedName, targets.size, ""),
+                CodeInsightBundle.message("goto.implementation.findUsages.title", escapedName, targets.size),
+                renderer
             )
         }
 
@@ -155,7 +163,8 @@ class Protocol : LineMarkerProvider {
 
         private fun containerText(element: PsiElement): String? {
             val container = container(element)
-            val containerPresentation = if (container == null || container is PsiFile) null else (container as NavigationItem).presentation
+            val containerPresentation =
+                if (container == null || container is PsiFile) null else (container as NavigationItem).presentation
             return containerPresentation?.presentableText
         }
 
