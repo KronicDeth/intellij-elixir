@@ -8,7 +8,7 @@ jobs:
 
     strategy:
       matrix:
-        ideaVersion: [ "2022.1" ]
+        ideaVersion: [ "2022.1", "2022.2", "2022.3" ]
 
     steps:
       - uses: actions/checkout@v2
