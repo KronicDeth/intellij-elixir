@@ -88,6 +88,7 @@ class ElixirDocumentationProvider : DocumentationProvider {
             is Call -> collectDocComments(element, sink)
             is ElixirAccessExpression -> collectDocComments(element.stripAccessExpression(), sink)
             is DummyBlock, is ElixirAlias,
+            is ElixirAtom,
                 // Numbers
             is ElixirDecimalFloat, is ElixirDecimalWholeNumber,
                 // Containers
