@@ -15,14 +15,12 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.ProjectJdkTable
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.projectRoots.SdkTypeId
-import com.intellij.openapi.roots.*
+import com.intellij.openapi.roots.CompilerModuleExtension
 import com.intellij.openapi.roots.ex.ProjectRootManagerEx
 import com.intellij.openapi.roots.ui.configuration.ModulesProvider
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.text.StringUtil
-import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.openapi.vfs.VirtualFileVisitor
 import com.intellij.openapi.vfs.newvfs.impl.VirtualDirectoryImpl
 import com.intellij.packaging.artifacts.ModifiableArtifactModel
 import com.intellij.projectImport.ProjectImportBuilder
@@ -31,11 +29,9 @@ import org.elixir_lang.mix.Icons
 import org.elixir_lang.mix.Project.createModulesForOtpApps
 import org.elixir_lang.mix.project.OtpApp
 import org.elixir_lang.sdk.elixir.Type
-
-import javax.swing.*
 import java.io.File
 import java.io.IOException
-import java.util.*
+import javax.swing.Icon
 
 /**
  * Created by zyuyou on 15/7/1.
@@ -77,11 +73,15 @@ class Builder : ProjectImportBuilder<OtpApp>() {
             return true
         }
 
-        val resultCode = Messages.showYesNoCancelDialog(ApplicationInfoEx.getInstanceEx().fullApplicationName + " module files found:\n\n" +
-                StringUtil.join(myFoundOtpApps, { importedOtpApp ->
-                    val ideaModuleFile = importedOtpApp.ideaModuleFile
-                    if (ideaModuleFile != null) "    " + ideaModuleFile.path + "\n" else ""
-                }, "") + "\nWould you like to reuse them?", "Module files found", Messages.getQuestionIcon())
+        val resultCode =
+            Messages.showYesNoCancelDialog(ApplicationInfoEx.getInstanceEx().fullApplicationName + " module files found:\n\n" +
+                                                   StringUtil.join(myFoundOtpApps, { importedOtpApp ->
+                                                       val ideaModuleFile = importedOtpApp.ideaModuleFile
+                                                       if (ideaModuleFile != null) "    " + ideaModuleFile.path + "\n" else ""
+                                                   }, "") + "\nWould you like to reuse them?",
+                                           "Module files found",
+                                           Messages.getQuestionIcon()
+            )
 
         return when (resultCode) {
             Messages.YES -> true
@@ -92,35 +92,50 @@ class Builder : ProjectImportBuilder<OtpApp>() {
                 LOG.error(e)
                 false
             }
+
             else -> false
         }
     }
 
-    override fun commit(project: Project,
-               moduleModel: ModifiableModuleModel?,
-               modulesProvider: ModulesProvider,
-               artifactModel: ModifiableArtifactModel?): List<Module> {
+    override fun commit(
+        project: Project,
+        moduleModel: ModifiableModuleModel?,
+        modulesProvider: ModulesProvider,
+        artifactModel: ModifiableArtifactModel?
+    ): List<Module> {
         fixProjectSdk(project)
         val createModules = createModulesForOtpApps(
-                project,
-                mySelectedOtpApps,
-                { moduleModel ?: ModuleManager.getInstance(project).modifiableModel },
-                { otpApp, rootModel ->
-                    val compilerModuleExt = rootModel.getModuleExtension(CompilerModuleExtension::class.java)
-                    compilerModuleExt.inheritCompilerOutputPath(false)
-                    val ideaModuleDir = otpApp.root
+            project,
+            mySelectedOtpApps,
+            { moduleModel ?: ModuleManager.getInstance(project).getModifiableModel() },
+            { otpApp, rootModel ->
+                val compilerModuleExt = rootModel.getModuleExtension(CompilerModuleExtension::class.java)
+                compilerModuleExt.inheritCompilerOutputPath(false)
+                val ideaModuleDir = otpApp.root
 
-                    val _buildDir = if (myProjectRoot != null && myProjectRoot == ideaModuleDir) {
-                        ideaModuleDir
-                    } else {
-                        ideaModuleDir.parent.parent
-                    }
-
-                    compilerModuleExt.setCompilerOutputPath(_buildDir!!.toString() + StringUtil.replace("/_build/dev/lib/" + otpApp.name + "/ebin", "/", File.separator))
-                    compilerModuleExt.setCompilerOutputPathForTests(_buildDir.toString() + StringUtil.replace("/_build/test/lib/" + otpApp.name + "/ebin", "/", File.separator))
-                    // output paths need to be included, so that they are indexed for Phoenix EEx Template Elixir Line Breakpoints
-                    compilerModuleExt.isExcludeOutput = false
+                val _buildDir = if (myProjectRoot != null && myProjectRoot == ideaModuleDir) {
+                    ideaModuleDir
+                } else {
+                    ideaModuleDir.parent.parent
                 }
+
+                compilerModuleExt.setCompilerOutputPath(
+                    _buildDir!!.toString() + StringUtil.replace(
+                        "/_build/dev/lib/" + otpApp.name + "/ebin",
+                        "/",
+                        File.separator
+                    )
+                )
+                compilerModuleExt.setCompilerOutputPathForTests(
+                    _buildDir.toString() + StringUtil.replace(
+                        "/_build/test/lib/" + otpApp.name + "/ebin",
+                        "/",
+                        File.separator
+                    )
+                )
+                // output paths need to be included, so that they are indexed for Phoenix EEx Template Elixir Line Breakpoints
+                compilerModuleExt.isExcludeOutput = false
+            }
         )
 
         if (myIsImportingProject) {
@@ -143,11 +158,12 @@ class Builder : ProjectImportBuilder<OtpApp>() {
             projectRoot.refreshAndFindChild("deps")
         }
 
-        ProgressManager.getInstance().run(object : Task.Modal(ProjectImportBuilder.getCurrentProject(), "Scanning Mix Projects", true) {
-            override fun run(indicator: ProgressIndicator) {
-                myFoundOtpApps = org.elixir_lang.mix.Project.findOtpApps(projectRoot, indicator)
-            }
-        })
+        ProgressManager.getInstance()
+            .run(object : Task.Modal(ProjectImportBuilder.getCurrentProject(), "Scanning Mix Projects", true) {
+                override fun run(indicator: ProgressIndicator) {
+                    myFoundOtpApps = org.elixir_lang.mix.Project.findOtpApps(projectRoot, indicator)
+                }
+            })
 
         mySelectedOtpApps = myFoundOtpApps
 

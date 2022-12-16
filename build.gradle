@@ -1,6 +1,6 @@
 plugins {
-    id 'org.jetbrains.intellij' version "1.7.0"
-    id "org.jetbrains.kotlin.jvm" version "1.7.10"
+    id 'org.jetbrains.intellij' version "1.10.0"
+    id "org.jetbrains.kotlin.jvm" version "1.7.20"
     id 'de.undercouch.download' version "4.1.2"
 }
 
@@ -70,7 +70,7 @@ allprojects {
         pluginDescription.set(bodyInnerHTML("resources/META-INF/description.html"))
 
         sinceBuild = "221.5080"
-        untilBuild = "222.*"
+        untilBuild = "223.*"
     }
 
     publishPlugin {
@@ -84,7 +84,7 @@ allprojects {
     }
 
     runPluginVerifier {
-        ideVersions = ["2022.1", "2022.2"]
+        ideVersions = ["2022.3"]
     }
 }
 
@@ -94,8 +94,8 @@ apply plugin: "kotlin"
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
     //noinspection GrUnresolvedAccess
     kotlinOptions {
-        apiVersion = "1.3"
-        jvmTarget = "11"
+        apiVersion = "1.7"
+        jvmTarget = "17"
         freeCompilerArgs = ["-Xjvm-default=all"]
     }
 }
