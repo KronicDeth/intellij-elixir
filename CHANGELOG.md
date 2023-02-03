@@ -549,6 +549,8 @@
 ### Bug Fixes
 * [#2954](https://github.com/KronicDeth/intellij-elixir/pull/2954) - [@KronicDeth](https://github.com/KronicDeth)
   * Ignore atoms at top-level when looking for docs. 
+* [#3040](https://github.com/KronicDeth/intellij-elixir/pull/3040) - [@KronicDeth](https://github.com/KronicDeth)
+  * Replace `TODO()` in `leex.reference.resolver.Assign` with logger errors that include `PSiElement`.
 
 ## v14.0.0
 
