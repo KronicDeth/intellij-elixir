@@ -81,7 +81,7 @@ class Callable : PsiReferenceBase<Call>, PsiPolyVariantReference {
             }
 
             val callDefinitionClauseLookupElementList =
-                    org.elixir_lang.psi.scope.call_definition_clause.Variants.lookupElementList(myElement)
+                org.elixir_lang.psi.scope.call_definition_clause.Variants.lookupElementList(myElement)
 
             (variableLookupElementList + callDefinitionClauseLookupElementList).toTypedArray()
         } else {
@@ -89,9 +89,9 @@ class Callable : PsiReferenceBase<Call>, PsiPolyVariantReference {
         }
 
     override fun isReferenceTo(element: PsiElement): Boolean =
-            multiResolve(false).any {
-                it.isValidResult && element.manager.areElementsEquivalent(it.element, element)
-            }
+        multiResolve(false).any {
+            it.isValidResult && element.manager.areElementsEquivalent(it.element, element)
+        }
 
     /**
      * Returns the results of resolving the reference.
@@ -102,7 +102,7 @@ class Callable : PsiReferenceBase<Call>, PsiPolyVariantReference {
      * @return the array of results for resolving the reference.
      */
     override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> =
-            resolveWithCaching(myElement.project, this, incompleteCode)
+        resolveWithCaching(myElement.project, this, incompleteCode)
 
     /**
      * Returns the element which is the target of the reference.
@@ -123,8 +123,8 @@ class Callable : PsiReferenceBase<Call>, PsiPolyVariantReference {
             named.nameIdentifier?.let { nameIdentifier ->
                 val nameIdentifierRangeInDocument = nameIdentifier.textRange
                 TextRange(
-                        nameIdentifierRangeInDocument.startOffset - myElementStartOffset,
-                        nameIdentifierRangeInDocument.endOffset - myElementStartOffset
+                    nameIdentifierRangeInDocument.startOffset - myElementStartOffset,
+                    nameIdentifierRangeInDocument.endOffset - myElementStartOffset
                 )
             }
         } ?: TextRange(0, myElementRangeInDocument.endOffset - myElementStartOffset)
@@ -132,22 +132,25 @@ class Callable : PsiReferenceBase<Call>, PsiPolyVariantReference {
 
     companion object {
         val BIT_STRING_TYPES: Set<String> = Sets.newHashSet(
-                "binary",
-                "bits",
-                "bitstring",
-                "bytes",
-                "float",
-                "integer",
-                "utf16",
-                "utf32",
-                "utf8"
+            "binary",
+            "bits",
+            "bitstring",
+            "bytes",
+            "float",
+            "integer",
+            "utf16",
+            "utf32",
+            "utf8"
         )
+
         @JvmField
         val IGNORED = "_"
 
         @Contract(pure = true)
-        fun bitStringSegmentOptionElementDescription(call: Call,
-                                                     location: ElementDescriptionLocation): String? {
+        fun bitStringSegmentOptionElementDescription(
+            call: Call,
+            location: ElementDescriptionLocation
+        ): String? {
             var elementDescription = call.name?.let { name ->
                 when {
                     BIT_STRING_ENDIANNESS.contains(name) -> bitStringEndiannessElementDescription(location)
@@ -166,22 +169,22 @@ class Callable : PsiReferenceBase<Call>, PsiPolyVariantReference {
         }
 
         private val BIT_STRING_ENDIANNESS = Sets.newHashSet(
-                "big",
-                "little",
-                "native"
+            "big",
+            "little",
+            "native"
         )
         private val BIT_STRING_SIGNEDNESS = Sets.newHashSet(
-                "signed",
-                "unsigned"
+            "signed",
+            "unsigned"
         )
 
         @Contract(pure = true)
         private fun bitStringEndiannessElementDescription(location: ElementDescriptionLocation): String? =
-                if (location === UsageViewTypeLocation.INSTANCE) {
-                    "bitstring endianness"
-                } else {
-                    null
-                }
+            if (location === UsageViewTypeLocation.INSTANCE) {
+                "bitstring endianness"
+            } else {
+                null
+            }
 
         @Contract(pure = true)
         private fun bitStringSignednessElementDescription(location: ElementDescriptionLocation): String? =
@@ -235,39 +238,39 @@ class Callable : PsiReferenceBase<Call>, PsiPolyVariantReference {
 
         @Contract(pure = true)
         fun isBitStreamSegmentOption(element: PsiElement): Boolean =
-                typeContext(element)?.let { type ->
-                    val typeParent = type.parent
+            typeContext(element)?.let { type ->
+                val typeParent = type.parent
 
-                    if (typeParent is ElixirBitString) {
-                        val rightOperand = type.rightOperand()
+                if (typeParent is ElixirBitString) {
+                    val rightOperand = type.rightOperand()
 
-                        if (PsiTreeUtil.isAncestor(rightOperand, element, false)) {
-                            isBitStreamSegmentOptionDown(rightOperand!!, element)
-                        } else {
-                            false
-                        }
+                    if (PsiTreeUtil.isAncestor(rightOperand, element, false)) {
+                        isBitStreamSegmentOptionDown(rightOperand!!, element)
                     } else {
                         false
                     }
-                } ?: false
+                } else {
+                    false
+                }
+            } ?: false
 
         @JvmStatic
         @Contract(pure = true)
         fun isDefiner(call: Call): Boolean =
-                org.elixir_lang.psi.CallDefinitionClause.`is`(call) ||
-                        Delegation.`is`(call) ||
-                        Implementation.`is`(call) ||
-                        org.elixir_lang.psi.Module.`is`(call) ||
-                        Protocol.`is`(call)
+            org.elixir_lang.psi.CallDefinitionClause.`is`(call) ||
+                    Delegation.`is`(call) ||
+                    Implementation.`is`(call) ||
+                    org.elixir_lang.psi.Module.`is`(call) ||
+                    Protocol.`is`(call)
 
         @JvmStatic
         @Contract(pure = true)
         fun isIgnored(element: PsiElement): Boolean =
-                if (element is ElixirKeywordKey || element is UnqualifiedNoArgumentsCall<*>) {
-                    (element as PsiNamedElement).name == IGNORED
-                } else {
-                    false
-                }
+            if (element is ElixirKeywordKey || element is UnqualifiedNoArgumentsCall<*>) {
+                (element as PsiNamedElement).name == IGNORED
+            } else {
+                false
+            }
 
         @Contract(pure = true)
         @JvmStatic
@@ -301,74 +304,78 @@ class Callable : PsiReferenceBase<Call>, PsiPolyVariantReference {
         @Contract(pure = true)
         @JvmStatic
         tailrec fun isVariable(ancestor: PsiElement): Boolean =
-                when (ancestor) {
-                    is ElixirInterpolation,
-                        // bound quoted variable name in {@code quote bind_quoted: [name: value] do ... end}
-                    is ElixirKeywordKey,
-                    is ElixirStabNoParenthesesSignature,
-                        /* if a StabOperation is encountered before ElixirStabNoParenthesesSignature or
-                           ElixirStabParenthesesSignature, then must have come from body */
-                    is ElixirStabOperation,
-                    is ElixirStabParenthesesSignature,
-                    is InMatch,
-                    is Match ->
-                        true
-                    is ElixirAccessExpression,
-                    is ElixirAssociations,
-                    is ElixirAssociationsBase,
-                    is ElixirBitString,
-                    is ElixirBlockItem,
-                    is ElixirBlockList,
-                    is ElixirBracketArguments,
-                    is ElixirContainerAssociationOperation,
-                    is ElixirDoBlock,
-                    is ElixirEex,
-                    is ElixirEexTag,
-                    is ElixirKeywordPair,
-                    is ElixirKeywords,
-                    is ElixirList,
-                    is ElixirMapArguments,
-                    is ElixirMapConstructionArguments,
-                    is ElixirMapOperation,
-                    is ElixirMapUpdateArguments,
-                        /* parenthesesArguments can be used in @spec other type declarations, so may not be variable
-                           until ancestor call is checked */
-                    is ElixirMatchedParenthesesArguments,
-                        /* Happens when tuple is after `MyAlias.` when add qualified call above line with pre-existing
-                           tuple */
-                    is ElixirMultipleAliases,
-                    is ElixirNoParenthesesOneArgument,
-                    is ElixirNoParenthesesArguments,
-                    is ElixirNoParenthesesKeywordPair,
-                    is ElixirNoParenthesesKeywords,
-                        /* ElixirNoParenthesesManyStrictNoParenthesesExpression and ElixirNoParenthesesStrict indicates
-                           a syntax error, but it can also occur during typing, so try searching above the syntax error
-                           to resolve whether a variable */
-                    is ElixirNoParenthesesManyStrictNoParenthesesExpression,
-                    is ElixirNoParenthesesStrict,
-                    is ElixirParenthesesArguments,
-                    is ElixirParentheticalStab,
-                    is ElixirStab,
-                    is ElixirStabBody,
-                    is ElixirStructOperation,
-                    is ElixirTuple,
-                    is ElixirVariable,
-                    is QualifiedAlias,
-                    is Type ->
-                        isVariable(ancestor.parent)
-                    is Call -> // MUST be after any operations because operations also implement Call
-                        isVariable(ancestor)
-                    else -> {
-                        if (!(ancestor is AtUnqualifiedBracketOperation ||
-                                        ancestor is AtOperation ||
-                                        ancestor is BracketOperation ||
-                                        ancestor is PsiFile ||
-                                        ancestor is QualifiedMultipleAliases)) {
-                            error("Don't know how to check if variable", ancestor)
-                        }
-                        false
+            when (ancestor) {
+                is ElixirInterpolation,
+                    // bound quoted variable name in {@code quote bind_quoted: [name: value] do ... end}
+                is ElixirKeywordKey,
+                is ElixirStabNoParenthesesSignature,
+                    /* if a StabOperation is encountered before ElixirStabNoParenthesesSignature or
+                       ElixirStabParenthesesSignature, then must have come from body */
+                is ElixirStabOperation,
+                is ElixirStabParenthesesSignature,
+                is InMatch,
+                is Match ->
+                    true
+
+                is ElixirAccessExpression,
+                is ElixirAssociations,
+                is ElixirAssociationsBase,
+                is ElixirBitString,
+                is ElixirBlockItem,
+                is ElixirBlockList,
+                is ElixirBracketArguments,
+                is ElixirContainerAssociationOperation,
+                is ElixirDoBlock,
+                is ElixirEex,
+                is ElixirEexTag,
+                is ElixirKeywordPair,
+                is ElixirKeywords,
+                is ElixirList,
+                is ElixirMapArguments,
+                is ElixirMapConstructionArguments,
+                is ElixirMapOperation,
+                is ElixirMapUpdateArguments,
+                    /* parenthesesArguments can be used in @spec other type declarations, so may not be variable
+                       until ancestor call is checked */
+                is ElixirMatchedParenthesesArguments,
+                    /* Happens when tuple is after `MyAlias.` when add qualified call above line with pre-existing
+                       tuple */
+                is ElixirMultipleAliases,
+                is ElixirNoParenthesesOneArgument,
+                is ElixirNoParenthesesArguments,
+                is ElixirNoParenthesesKeywordPair,
+                is ElixirNoParenthesesKeywords,
+                    /* ElixirNoParenthesesManyStrictNoParenthesesExpression and ElixirNoParenthesesStrict indicates
+                       a syntax error, but it can also occur during typing, so try searching above the syntax error
+                       to resolve whether a variable */
+                is ElixirNoParenthesesManyStrictNoParenthesesExpression,
+                is ElixirNoParenthesesStrict,
+                is ElixirParenthesesArguments,
+                is ElixirParentheticalStab,
+                is ElixirStab,
+                is ElixirStabBody,
+                is ElixirStructOperation,
+                is ElixirTuple,
+                is ElixirVariable,
+                is QualifiedAlias,
+                is Type ->
+                    isVariable(ancestor.parent)
+
+                is Call -> // MUST be after any operations because operations also implement Call
+                    isVariable(ancestor)
+
+                else -> {
+                    if (!(ancestor is AtUnqualifiedBracketOperation ||
+                                ancestor is AtOperation ||
+                                ancestor is BracketOperation ||
+                                ancestor is PsiFile ||
+                                ancestor is QualifiedMultipleAliases)
+                    ) {
+                        error("Don't know how to check if variable", ancestor)
                     }
+                    false
                 }
+            }
 
         fun parameterElementDescription(call: Call, location: ElementDescriptionLocation): String? =
             if (location === UsageViewLongNameLocation.INSTANCE || location === UsageViewShortNameLocation.INSTANCE) {
@@ -396,24 +403,24 @@ class Callable : PsiReferenceBase<Call>, PsiPolyVariantReference {
             }
 
         fun parameterWithDefaultElementDescription(location: ElementDescriptionLocation): String? =
-                if (location === UsageViewTypeLocation.INSTANCE) {
-                    "parameter with default"
-                } else {
-                    null
-                }
+            if (location === UsageViewTypeLocation.INSTANCE) {
+                "parameter with default"
+            } else {
+                null
+            }
 
         fun variableElementDescription(call: Call, location: ElementDescriptionLocation): String? =
-                if (location === UsageViewLongNameLocation.INSTANCE || location === UsageViewShortNameLocation.INSTANCE) {
-                    call.name
-                } else if (location === UsageViewTypeLocation.INSTANCE) {
-                    VARIABLE_USAGE_VIEW_TYPE_LOCATION_ELEMENT_DESCRIPTION
-                } else {
-                    null
-                }
+            if (location === UsageViewLongNameLocation.INSTANCE || location === UsageViewShortNameLocation.INSTANCE) {
+                call.name
+            } else if (location === UsageViewTypeLocation.INSTANCE) {
+                VARIABLE_USAGE_VIEW_TYPE_LOCATION_ELEMENT_DESCRIPTION
+            } else {
+                null
+            }
 
         @JvmStatic
         fun variableUseScope(match: UnqualifiedNoArgumentsCall<*>): LocalSearchScope =
-                variableUseScope(match as PsiElement)
+            variableUseScope(match as PsiElement)
 
         private fun error(message: String, element: PsiElement) {
             Logger.error(Callable::class.java, message, element)
@@ -481,99 +488,106 @@ class Callable : PsiReferenceBase<Call>, PsiPolyVariantReference {
             }
 
         private fun variableUseScope(call: Call): LocalSearchScope =
-                when (selector(call)) {
-                    UseScopeImpl.UseScopeSelector.PARENT -> variableUseScope(call.parent)
-                    UseScopeImpl.UseScopeSelector.SELF -> LocalSearchScope(call)
-                    UseScopeImpl.UseScopeSelector.SELF_AND_FOLLOWING_SIBLINGS -> {
-                        val selfAndFollowingSiblingList = ArrayList<PsiElement>()
-                        var sibling: PsiElement? = call
+            when (selector(call)) {
+                UseScopeImpl.UseScopeSelector.PARENT -> variableUseScope(call.parent)
+                UseScopeImpl.UseScopeSelector.SELF -> LocalSearchScope(call)
+                UseScopeImpl.UseScopeSelector.SELF_AND_FOLLOWING_SIBLINGS -> {
+                    val selfAndFollowingSiblingList = ArrayList<PsiElement>()
+                    var sibling: PsiElement? = call
 
-                        while (sibling != null) {
-                            selfAndFollowingSiblingList.add(sibling)
+                    while (sibling != null) {
+                        selfAndFollowingSiblingList.add(sibling)
 
-                            sibling = sibling.nextSibling
-                        }
-
-                        selfAndFollowingSiblingList.toTypedArray().let { LocalSearchScope(it) }
+                        sibling = sibling.nextSibling
                     }
+
+                    selfAndFollowingSiblingList.toTypedArray().let { LocalSearchScope(it) }
                 }
+            }
 
         private fun variableUseScope(match: Match): LocalSearchScope =
-                match.parent.let { parent ->
-                    when (parent) {
-                        is ElixirEexTag, is ElixirStabBody -> {
-                            val ancestor = PsiTreeUtil.getContextOfType(
-                                    parent,
-                                    ElixirAnonymousFunction::class.java,
-                                    ElixirBlockItem::class.java,
-                                    ElixirDoBlock::class.java,
-                                    ElixirParentheticalStab::class.java,
-                                    ElixirStabOperation::class.java
-                            )
+            match.parent.let { parent ->
+                when (parent) {
+                    is ElixirEexTag, is ElixirStabBody -> {
+                        val ancestor = PsiTreeUtil.getContextOfType(
+                            parent,
+                            ElixirAnonymousFunction::class.java,
+                            ElixirBlockItem::class.java,
+                            ElixirDoBlock::class.java,
+                            ElixirParentheticalStab::class.java,
+                            ElixirStabOperation::class.java
+                        )
 
-                            if (ancestor is ElixirParentheticalStab) {
-                                variableUseScope(parent)
-                            } else {
-                                /* all non-ElixirParentheticalStab are block-like and so could have multiple statements after the match
-                                   where the match variable is used */
-                                match.selfAndFollowingSiblingsSearchScope()
-                            }
+                        if (ancestor is ElixirParentheticalStab) {
+                            variableUseScope(parent)
+                        } else {
+                            /* all non-ElixirParentheticalStab are block-like and so could have multiple statements after the match
+                               where the match variable is used */
+                            match.selfAndFollowingSiblingsSearchScope()
                         }
-                        is PsiFile -> match.selfAndFollowingSiblingsSearchScope()
-                        else -> variableUseScope(parent)
                     }
+
+                    is PsiFile -> match.selfAndFollowingSiblingsSearchScope()
+                    else -> variableUseScope(parent)
                 }
+            }
 
         private tailrec fun variableUseScope(ancestor: PsiElement): LocalSearchScope =
-                when (ancestor) {
-                    is ElixirAccessExpression,
-                    is ElixirAssociations,
-                    is ElixirAssociationsBase,
-                    is ElixirBitString,
-                    is ElixirBlockItem,
-                    is ElixirBlockList,
-                    is ElixirContainerAssociationOperation,
-                    is ElixirDoBlock,
-                    is ElixirKeywordPair,
-                    is ElixirKeywords,
-                    is ElixirList,
-                    is ElixirMapArguments,
-                    is ElixirMapConstructionArguments,
-                    is ElixirMapOperation,
-                    is ElixirMatchedParenthesesArguments,
-                    is ElixirNoParenthesesOneArgument,
-                    is ElixirNoParenthesesArguments,
-                    is ElixirNoParenthesesKeywordPair,
-                    is ElixirNoParenthesesKeywords,
-                    is ElixirParenthesesArguments,
-                    is ElixirParentheticalStab,
-                    is ElixirStab,
-                    is ElixirStabBody,
-                    is ElixirStabNoParenthesesSignature,
-                    is ElixirStabParenthesesSignature,
-                    is ElixirStructOperation,
-                    is ElixirTuple,
-                    is InMatch,
-                    is Type,
-                    is UnqualifiedNoArgumentsCall<*> ->
-                        variableUseScope(ancestor.parent)
-                    is ElixirStabOperation,
-                    is QualifiedAlias ->
-                        LocalSearchScope(ancestor)
-                    is Match ->
-                        variableUseScope(ancestor)
-                    is Call ->
-                        variableUseScope(ancestor)
-                    is ElixirMapUpdateArguments,
-                    is ElixirInterpolation ->
-                        /* no variable can be declared inside these classes, so this is a variable usage missing a
-                           declaration, so it has no use scope */
-                        LocalSearchScope.EMPTY
-                    else -> {
-                        error("Don't know how to find variable use scope", ancestor)
-                        LocalSearchScope.EMPTY
-                    }
+            when (ancestor) {
+                is ElixirAccessExpression,
+                is ElixirAssociations,
+                is ElixirAssociationsBase,
+                is ElixirBitString,
+                is ElixirBlockItem,
+                is ElixirBlockList,
+                is ElixirContainerAssociationOperation,
+                is ElixirDoBlock,
+                is ElixirKeywordPair,
+                is ElixirKeywords,
+                is ElixirList,
+                is ElixirMapArguments,
+                is ElixirMapConstructionArguments,
+                is ElixirMapOperation,
+                is ElixirMatchedParenthesesArguments,
+                is ElixirNoParenthesesOneArgument,
+                is ElixirNoParenthesesArguments,
+                is ElixirNoParenthesesKeywordPair,
+                is ElixirNoParenthesesKeywords,
+                is ElixirParenthesesArguments,
+                is ElixirParentheticalStab,
+                is ElixirStab,
+                is ElixirStabBody,
+                is ElixirStabNoParenthesesSignature,
+                is ElixirStabParenthesesSignature,
+                is ElixirStructOperation,
+                is ElixirTuple,
+                is InMatch,
+                is Type,
+                is UnqualifiedNoArgumentsCall<*> ->
+                    variableUseScope(ancestor.parent)
+
+                is ElixirStabOperation,
+                is QualifiedAlias ->
+                    LocalSearchScope(ancestor)
+
+                is Match ->
+                    variableUseScope(ancestor)
+
+                is Call ->
+                    variableUseScope(ancestor)
+
+                is ElixirMapUpdateArguments,
+                is ElixirEexTag,
+                is ElixirInterpolation ->
+                    /* no variable can be declared inside these classes, so this is a variable usage missing a
+                       declaration, so it has no use scope */
+                    LocalSearchScope.EMPTY
+
+                else -> {
+                    error("Don't know how to find variable use scope", ancestor)
+                    LocalSearchScope.EMPTY
                 }
+            }
     }
 }
 
@@ -583,23 +597,23 @@ private fun resolveWithCaching(project: Project, callable: Callable, incompleteC
     ApplicationManager.getApplication().runReadAction(ResolveWithCachingComputable(project, callable, incompleteCode))
 
 private class ResolveWithCachingComputable(
-        val project: Project,
-        val callable: Callable,
-        val incompleteCode: Boolean
-): Computable<Array<ResolveResult>> {
+    val project: Project,
+    val callable: Callable,
+    val incompleteCode: Boolean
+) : Computable<Array<ResolveResult>> {
     override fun compute(): Array<ResolveResult> =
-            ResolveCache
-                    .getInstance(project)
-                    .resolveWithCaching(
-                            callable,
-                            org.elixir_lang.reference.resolver.Callable,
-                            false,
-                            incompleteCode
-                    )
+        ResolveCache
+            .getInstance(project)
+            .resolveWithCaching(
+                callable,
+                org.elixir_lang.reference.resolver.Callable,
+                false,
+                incompleteCode
+            )
 }
 
 private fun typeContext(element: PsiElement): Type? =
-        ApplicationManager.getApplication().runReadAction(TypeContextComputable(element))
+    ApplicationManager.getApplication().runReadAction(TypeContextComputable(element))
 
 private class TypeContextComputable(val element: PsiElement) : Computable<Type?> {
     override fun compute(): Type? = PsiTreeUtil.getContextOfType(element, Type::class.java)
