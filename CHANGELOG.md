@@ -553,6 +553,9 @@
   * Replace `TODO()` in `leex.reference.resolver.Assign` with logger errors that include `PSiElement`.
 * [#3041](https://github.com/KronicDeth/intellij-elixir/pull/3041) - [@KronicDeth](https://github.com/KronicDeth)
   * Ignore `type` for docs.
+* [#3042](https://github.com/KronicDeth/intellij-elixir/pull/3042) - [@KronicDeth](https://github.com/KronicDeth)
+  * Don't look for variable use scope above EEx tags.
+    If a variable is declared in an EEx tag then it is actually missing its declaration and cannot be resolved, so ignore its usage.
 
 ## v14.0.0
 
