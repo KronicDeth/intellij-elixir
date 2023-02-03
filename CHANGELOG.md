@@ -551,6 +551,8 @@
   * Ignore atoms at top-level when looking for docs. 
 * [#3040](https://github.com/KronicDeth/intellij-elixir/pull/3040) - [@KronicDeth](https://github.com/KronicDeth)
   * Replace `TODO()` in `leex.reference.resolver.Assign` with logger errors that include `PSiElement`.
+* [#3041](https://github.com/KronicDeth/intellij-elixir/pull/3041) - [@KronicDeth](https://github.com/KronicDeth)
+  * Ignore `type` for docs.
 
 ## v14.0.0
 
