@@ -31,8 +31,12 @@ object Elixir {
     }
 
     fun elixirSdkToEnsuredErlangSdk(elixirSdk: Sdk): Sdk =
-        elixirSdk.sdkAdditionalData?.let { it as SdkAdditionalData }?.ensureErlangSdk()
+        elixirSdkToErlangSdk(elixirSdk)
             ?: throw MissingErlangSdk(elixirSdk)
+
+    fun elixirSdkHasErlangSdk(elixirSdk: Sdk): Boolean = elixirSdkToErlangSdk(elixirSdk) != null
+    fun elixirSdkToErlangSdk(elixirSdk: Sdk): Sdk? =
+        elixirSdk.sdkAdditionalData?.let { it as SdkAdditionalData }?.erlangSdk
 
     /**
      * Adds `-pa ebinDirectory` for those in the `elixirSdk` that aren't in the `erlangSdk`

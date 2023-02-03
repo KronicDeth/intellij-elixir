@@ -558,6 +558,8 @@
     If a variable is declared in an EEx tag then it is actually missing its declaration and cannot be resolved, so ignore its usage.
 * [#3043](https://github.com/KronicDeth/intellij-elixir/pull/3043) - [@KronicDeth](https://github.com/KronicDeth)
   * Check if module is disposed when write action is run for `syncLibraries`.
+* [#3044](https://github.com/KronicDeth/intellij-elixir/pull/3044) - [@KronicDeth](https://github.com/KronicDeth)
+  * Only use Elixir SDK for `mix format` if it has an Erlang SDK.
 
 ## v14.0.0
 
