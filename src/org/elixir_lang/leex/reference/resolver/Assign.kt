@@ -7,6 +7,7 @@ import com.intellij.psi.impl.source.resolve.ResolveCache
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.search.searches.ReferencesSearch
 import com.intellij.psi.stubs.StubIndex
+import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.leex.reference.Assign
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.Modular.callDefinitionClauseCallFoldWhile
@@ -87,6 +88,7 @@ object Assign : ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.
                     resolveInCallDefinitionClauseExpression(assign, incompleteCode, child, accumulator)
                 }
             }
+
             is Arrow -> {
                 val leftAccumulatorContinue = expression.leftOperand()?.let { leftOperand ->
                     resolveInCallDefinitionClauseExpression(assign, incompleteCode, leftOperand, initial)
@@ -105,6 +107,7 @@ object Assign : ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.
                     leftAccumulatorContinue
                 }
             }
+
             is Match -> {
                 val rightOperand = expression.rightOperand()
 
@@ -114,6 +117,7 @@ object Assign : ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.
                     AccumulatorContinue(initial, true)
                 }
             }
+
             is ElixirAtom, is ElixirAtomKeyword, is ElixirEndOfExpression, is ElixirList, is ElixirMapOperation,
             is ElixirStructOperation, is QualifiableAlias, is QuotableKeywordList, is Quote -> AccumulatorContinue(
                 initial,
@@ -153,6 +157,7 @@ object Assign : ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.
                                         socketAccumulatorContinue
                                     }
                                 }
+
                             3 -> expression
                                 .finalArguments()
                                 ?.let { arguments ->
@@ -181,8 +186,10 @@ object Assign : ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.
                                         socketAccumulatorContinue
                                     }
                                 }
+
                             else -> null
                         } ?: AccumulatorContinue(initial, true)
+
                     "assign_new" ->
                         when (expression.resolvedFinalArity()) {
                             3 -> expression
@@ -213,8 +220,10 @@ object Assign : ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.
                                         socketAccumulatorContinue
                                     }
                                 }
+
                             else -> null
                         } ?: AccumulatorContinue(initial, true)
+
                     "put_flash" ->
                         if (expression.resolvedFinalArity() == 3 && FLASH.startsWith(assign.name)) {
                             val validResult = assign.name == FLASH
@@ -224,6 +233,7 @@ object Assign : ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.
                         } else {
                             AccumulatorContinue(initial, true)
                         }
+
                     else -> {
                         val doBlock = expression.doBlock
 
@@ -257,6 +267,7 @@ object Assign : ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.
                         }
                     }
                 }
+
             is ElixirStab -> {
                 val stabBody = expression.stabBody
 
@@ -273,6 +284,7 @@ object Assign : ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.
                     }
                 }
             }
+
             is ElixirStabOperation -> {
                 val rightOperand = expression.rightOperand()
 
@@ -282,10 +294,12 @@ object Assign : ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.
                     AccumulatorContinue(initial, true)
                 }
             }
+
             is ElixirBlockList ->
                 AccumulatorContinue.foldWhile(expression.blockItemList, initial) { blockItem, accumulator ->
                     resolveInCallDefinitionClauseExpression(assign, incompleteCode, blockItem, accumulator)
                 }
+
             is ElixirBlockItem -> {
                 val stab = expression.stab
 
@@ -295,8 +309,11 @@ object Assign : ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.
                     AccumulatorContinue(initial, true)
                 }
             }
+
             else -> {
-                TODO()
+                error("Cannot resolve assign in call definition clause expression", expression)
+
+                AccumulatorContinue(initial, true)
             }
         }
 
@@ -313,6 +330,7 @@ object Assign : ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.
                 expression.stripAccessExpression(),
                 initial
             )
+
             is ElixirKeywordKey -> {
                 if (expression.line == null) {
                     val resolvedName = expression.text
@@ -329,6 +347,7 @@ object Assign : ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.
                     null
                 } ?: initial
             }
+
             is ElixirMapOperation -> resolveInAssign2Argument(assign, incompleteCode, expression.mapArguments, initial)
             is ElixirMapArguments -> {
                 val child = expression.mapConstructionArguments ?: expression.mapConstructionArguments
@@ -339,16 +358,21 @@ object Assign : ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.
                     initial
                 }
             }
+
             is ElixirMapConstructionArguments -> expression.arguments().fold(initial) { acc, argument ->
                 resolveInAssign2Argument(assign, incompleteCode, argument, acc)
             }
+
             is QuotableKeywordList -> expression.quotableKeywordPairList().fold(initial) { acc, keywordPair ->
                 resolveInAssign2Argument(assign, incompleteCode, keywordPair, acc)
             }
+
             is QuotableKeywordPair -> resolveInAssign2Argument(assign, incompleteCode, expression.keywordKey, initial)
             is ElixirUnmatchedUnqualifiedNoArgumentsCall -> initial
             else -> {
-                TODO()
+                error("Cannot resolve assign in assign/2 argument", expression)
+
+                initial
             }
         }
 
@@ -365,6 +389,7 @@ object Assign : ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.
                 expression.stripAccessExpression(),
                 initial
             )
+
             is ElixirAtom -> if (expression.line == null) {
                 val resolvedName = expression.node.lastChildNode.text
                 val assignName = assign.name
@@ -378,8 +403,11 @@ object Assign : ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.
             } else {
                 null
             } ?: initial
+
             else -> {
-                TODO()
+                error("Cannot resolve assign in atom argument", expression)
+
+                initial
             }
         }
 
@@ -412,6 +440,7 @@ object Assign : ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.
             } else {
                 null
             }
+
             else -> null
         }
 
@@ -436,6 +465,7 @@ object Assign : ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.
                 assigns.quotableKeywordPairList().flatMap { keywordPair ->
                     resolveInLiveComponentAssigns(assign, incompleteCode, keywordPair)
                 }
+
             is QuotableKeywordPair -> resolveInLiveComponentAssigns(assign, incompleteCode, assigns.keywordKey)
             is ElixirKeywordKey -> {
                 if (assigns.line == null) {
@@ -453,6 +483,7 @@ object Assign : ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.
                     null
                 } ?: emptyList()
             }
+
             else -> emptyList()
         }
 
@@ -472,6 +503,7 @@ object Assign : ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.
                     AccumulatorContinue(initial, true)
                 }
             }
+
             is UnqualifiedNoArgumentsCall<*> -> if (expression.resolvedFinalArity() == 0) {
                 // resolve as a variable
                 expression.reference?.let { reference ->
@@ -495,7 +527,9 @@ object Assign : ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.
             // function calls are the source of the socket, don't resolve through the function call
             is Call -> resolveSocketAsOtherNamedElement(assign, incompleteCode, expression, initial)
             else -> {
-                TODO()
+                error("Cannot resolve assign in @myself expression", expression)
+
+                AccumulatorContinue(initial, true)
             }
         }
 
@@ -571,6 +605,7 @@ object Assign : ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.
                     resolveInToRendered(assign, incompleteCode, child, accumulator)
                 }
             }
+
             is Match -> {
                 val rightOperand = expression.rightOperand()
 
@@ -580,6 +615,7 @@ object Assign : ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.
                     AccumulatorContinue(initial, true)
                 }
             }
+
             is Call -> when (expression.functionName()) {
                 "put_in" -> when (expression.resolvedFinalArity()) {
                     2 -> {
@@ -596,8 +632,10 @@ object Assign : ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.
                             }
                         }
                     }
+
                     else -> null
                 } ?: AccumulatorContinue(initial, true)
+
                 else -> {
                     val arguments = expression.finalArguments()
 
@@ -622,6 +660,7 @@ object Assign : ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.
                     }
                 }
             }
+
             is ElixirStab -> {
                 val stabBody = expression.stabBody
 
@@ -633,6 +672,7 @@ object Assign : ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.
                     }
                 }
             }
+
             is ElixirStabOperation -> {
                 val rightOperand = expression.rightOperand()
 
@@ -642,9 +682,12 @@ object Assign : ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.
                     AccumulatorContinue(initial, true)
                 }
             }
+
             is ElixirEndOfExpression -> AccumulatorContinue(initial, true)
             else -> {
-                TODO()
+                error("Cannot resolve assign in to_rendered expression", expression)
+
+                AccumulatorContinue(initial, true)
             }
         }
 
@@ -722,6 +765,7 @@ object Assign : ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.
                     resolveMyself(assign, incompleteCode, child, accumulator)
                 }
             }
+
             is ElixirAnonymousFunction -> resolveMyself(assign, incompleteCode, expression.stab, initial)
             is Match -> {
                 val rightOperand = expression.rightOperand()
@@ -732,10 +776,14 @@ object Assign : ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.
                     AccumulatorContinue(initial, true)
                 }
             }
+
             is Arrow, is AtOperation, is ElixirAtomKeyword, is Pipe, is Two -> AccumulatorContinue(initial, true)
             is Operation -> {
-                TODO()
+                error("Cannot resolve assign in operation for @myself", expression)
+
+                AccumulatorContinue(initial, true)
             }
+
             is Call -> {
                 val arguments = expression.finalArguments()
 
@@ -759,6 +807,7 @@ object Assign : ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.
                     argumentsAccumulatorContinue
                 }
             }
+
             is ElixirMapOperation -> resolveMyself(assign, incompleteCode, expression.mapArguments, initial)
             is ElixirMapArguments -> {
                 val child = expression.mapConstructionArguments ?: expression.mapConstructionArguments
@@ -769,11 +818,13 @@ object Assign : ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.
                     AccumulatorContinue(initial, true)
                 }
             }
+
             is ElixirMapConstructionArguments -> {
                 AccumulatorContinue.foldWhile(expression.arguments(), initial) { argument, accumulator ->
                     resolveMyself(assign, incompleteCode, argument, accumulator)
                 }
             }
+
             is ElixirStab -> {
                 val stabBody = expression.stabBody
 
@@ -785,6 +836,7 @@ object Assign : ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.
                     }
                 }
             }
+
             is ElixirStabOperation -> {
                 val rightOperand = expression.rightOperand()
 
@@ -794,6 +846,7 @@ object Assign : ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.
                     AccumulatorContinue(initial, true)
                 }
             }
+
             is QuotableKeywordList ->
                 AccumulatorContinue.foldWhile(
                     expression.quotableKeywordPairList(),
@@ -801,6 +854,7 @@ object Assign : ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.
                 ) { keywordPair, accumulator ->
                     resolveMyself(assign, incompleteCode, keywordPair, accumulator)
                 }
+
             is QuotableKeywordPair -> resolveMyself(assign, incompleteCode, expression.keywordKey, initial)
             is ElixirKeywordKey -> {
                 if (expression.line == null) {
@@ -820,8 +874,11 @@ object Assign : ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.
                     null
                 } ?: AccumulatorContinue(initial, true)
             }
+
             else -> {
-                TODO()
+                error("Cannot resolve assign for  @myself", expression)
+
+                AccumulatorContinue(initial, true)
             }
         }
 
@@ -857,5 +914,9 @@ object Assign : ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.
 
             LibraryScopeCache.getInstance(project).getLibraryScope(orderEntries)
         } ?: GlobalSearchScope.allScope(project)
+    }
+
+    fun error(title: String, element: PsiElement) {
+        Logger.error(Assign::class.java, title, element)
     }
 }
