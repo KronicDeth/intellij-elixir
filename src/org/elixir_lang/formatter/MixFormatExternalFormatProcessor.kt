@@ -12,6 +12,7 @@ import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiFile
 import com.intellij.psi.codeStyle.ExternalFormatProcessor
+import org.elixir_lang.Elixir.elixirSdkHasErlangSdk
 import org.elixir_lang.Mix
 import org.elixir_lang.code_style.CodeStyleSettings
 import org.elixir_lang.psi.ElixirFile
@@ -42,7 +43,7 @@ class MixFormatExternalFormatProcessor : ExternalFormatProcessor {
 
                 application.executeOnPooledThread {
                     workingDirectory(source)?.let { workingDirectory ->
-                        mostSpecificSdk(source)?.let { sdk ->
+                        mostSpecificSdk(source)?.takeIf(::elixirSdkHasErlangSdk)?.let { sdk ->
                             format(workingDirectory, sdk, document.text)?.let { formattedText ->
                                 application.invokeLater {
                                     if (source.isValid) {
@@ -94,7 +95,7 @@ class MixFormatExternalFormatProcessor : ExternalFormatProcessor {
                 commandLine
             } catch (fileNotFoundException: FileNotFoundException) {
                 LOGGER.info(fileNotFoundException)
-                
+
                 null
             }
 
