@@ -556,6 +556,8 @@
 * [#3042](https://github.com/KronicDeth/intellij-elixir/pull/3042) - [@KronicDeth](https://github.com/KronicDeth)
   * Don't look for variable use scope above EEx tags.
     If a variable is declared in an EEx tag then it is actually missing its declaration and cannot be resolved, so ignore its usage.
+* [#3043](https://github.com/KronicDeth/intellij-elixir/pull/3043) - [@KronicDeth](https://github.com/KronicDeth)
+  * Check if module is disposed when write action is run for `syncLibraries`.
 
 ## v14.0.0
 

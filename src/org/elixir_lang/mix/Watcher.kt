@@ -71,61 +71,65 @@ class Watcher(private val project: Project) : BulkFileListener {
                 ApplicationManager.getApplication().runWriteAction {
                     val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
                     val moduleManager = ModuleManager.getInstance(project)
-                    val moduleRootManager = ModuleRootManager.getInstance(module)
 
-                    for (dep in deps) {
-                        if (progressIndicator.isCanceled) {
-                            break
-                        }
+                    if (!module.isDisposed) {
+                        val moduleRootManager = ModuleRootManager.getInstance(module)
 
-                        val depName = dep.application
-
-                        when (dep.type) {
-                            Dep.Type.MODULE -> {
-                                progressIndicator.text2 =
-                                    "Adding $depName Module as dependency of ${module.name} Module"
-
-                                val depModule = moduleManager.findModuleByName(depName)
-
-                                if (depModule != null) {
-                                    if (!moduleRootManager.isDependsOn(depModule)) {
-                                        ModuleRootModificationUtil.addDependency(module, depModule)
-                                    }
-                                } else {
-                                    moduleRootManager.modifiableModel.run {
-                                        addInvalidModuleEntry(depName)
-                                        commit()
-                                    }
-                                }
+                        for (dep in deps) {
+                            if (progressIndicator.isCanceled) {
+                                break
                             }
-                            Dep.Type.LIBRARY -> {
-                                progressIndicator.text2 =
-                                    "Adding $depName Library as dependency of ${module.name} Module"
 
-                                val depLibrary = libraryTable.getLibraryByName(depName)
+                            val depName = dep.application
 
-                                if (depLibrary != null) {
-                                    if (moduleRootManager.orderEntries.none { it is LibraryOrderEntry && it.libraryName == depName }) {
-                                        ModuleRootModificationUtil.addDependency(module, depLibrary)
-                                    }
-                                } else {
-                                    val libraryTableModifiableModule = libraryTable.modifiableModel
+                            when (dep.type) {
+                                Dep.Type.MODULE -> {
+                                    progressIndicator.text2 =
+                                        "Adding $depName Module as dependency of ${module.name} Module"
 
-                                    val invalidLibrary = libraryTableModifiableModule.createLibrary(depName, Kind)
+                                    val depModule = moduleManager.findModuleByName(depName)
 
-                                    libraryTableModifiableModule.commit()
-
-                                    moduleRootManager.modifiableModel.run {
-                                        addLibraryEntry(invalidLibrary)
-                                        commit()
+                                    if (depModule != null) {
+                                        if (!moduleRootManager.isDependsOn(depModule)) {
+                                            ModuleRootModificationUtil.addDependency(module, depModule)
+                                        }
+                                    } else {
+                                        moduleRootManager.modifiableModel.run {
+                                            addInvalidModuleEntry(depName)
+                                            commit()
+                                        }
                                     }
                                 }
 
+                                Dep.Type.LIBRARY -> {
+                                    progressIndicator.text2 =
+                                        "Adding $depName Library as dependency of ${module.name} Module"
+
+                                    val depLibrary = libraryTable.getLibraryByName(depName)
+
+                                    if (depLibrary != null) {
+                                        if (moduleRootManager.orderEntries.none { it is LibraryOrderEntry && it.libraryName == depName }) {
+                                            ModuleRootModificationUtil.addDependency(module, depLibrary)
+                                        }
+                                    } else {
+                                        val libraryTableModifiableModule = libraryTable.modifiableModel
+
+                                        val invalidLibrary = libraryTableModifiableModule.createLibrary(depName, Kind)
+
+                                        libraryTableModifiableModule.commit()
+
+                                        moduleRootManager.modifiableModel.run {
+                                            addLibraryEntry(invalidLibrary)
+                                            commit()
+                                        }
+                                    }
+
+                                }
                             }
                         }
+
+                        syncExternalPathLibraries(deps, progressIndicator)
                     }
-
-                    syncExternalPathLibraries(deps, progressIndicator)
                 }
             }
         }
