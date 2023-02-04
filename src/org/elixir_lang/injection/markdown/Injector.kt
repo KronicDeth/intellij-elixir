@@ -38,6 +38,8 @@ class Injector : MultiHostInjector {
                 //            |> String.split("<!-- MDOC !-->")
                 //            |> Enum.fetch!(1)
             is ElixirMatchedArrowOperation,
+                // With missing quotes like in #2991 `@module implements logic`
+            is ElixirIdentifier,
             is ElixirAtomKeyword -> Unit
 
             is ElixirLine -> injectMarkdownInQuote(registrar, documentation)

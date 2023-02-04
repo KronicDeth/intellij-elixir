@@ -562,6 +562,8 @@
   * Only use Elixir SDK for `mix format` if it has an Erlang SDK.
 * [#3045](https://github.com/KronicDeth/intellij-elixir/pull/3045) - [@KronicDeth](https://github.com/KronicDeth)
   * Include more lines of context for stacktraces in error reports.
+* [#3046](https://github.com/KronicDeth/intellij-elixir/pull/3046) - [@KronicDeth](https://github.com/KronicDeth)
+  * Ignore identifier when `@*doc` attribute isn't quoted.
 
 ## v14.0.0
 
