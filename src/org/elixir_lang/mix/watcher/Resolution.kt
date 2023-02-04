@@ -10,21 +10,22 @@ import com.intellij.psi.PsiManager
 import com.intellij.psi.util.CachedValue
 import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager.getCachedValue
-import org.elixir_lang.mix.Dep
+import com.intellij.util.IncorrectOperationException
 import org.elixir_lang.PackageManager
+import org.elixir_lang.mix.Dep
 import org.elixir_lang.package_manager.virtualFile
 import java.util.*
 
 class Resolution(
-        val rootVirtualFileToDepSet: Map<VirtualFile, Set<Dep>>,
-        val depToRootVirtualFile: Map<Dep, VirtualFile?>
+    val rootVirtualFileToDepSet: Map<VirtualFile, Set<Dep>>,
+    val depToRootVirtualFile: Map<Dep, VirtualFile?>
 ) {
     companion object {
         fun resolution(
-                project: Project,
-                psiManager: PsiManager,
-                progressIndicator: ProgressIndicator,
-                vararg rootVirtualFiles: VirtualFile
+            project: Project,
+            psiManager: PsiManager,
+            progressIndicator: ProgressIndicator,
+            vararg rootVirtualFiles: VirtualFile
         ): Resolution {
             val rootVirtualFileQueue: Queue<VirtualFile> = ArrayDeque<VirtualFile>()
             rootVirtualFileQueue.addAll(rootVirtualFiles)
@@ -51,8 +52,9 @@ class Resolution(
                                 depToRootVirtualFile[dep] = depRootVirtualFile
 
                                 if (depRootVirtualFile != null &&
-                                        !rootVirtualFileToDepSet.contains(depRootVirtualFile) &&
-                                        !rootVirtualFileQueue.contains(depRootVirtualFile)) {
+                                    !rootVirtualFileToDepSet.contains(depRootVirtualFile) &&
+                                    !rootVirtualFileQueue.contains(depRootVirtualFile)
+                                ) {
                                     rootVirtualFileQueue.add(depRootVirtualFile)
                                 }
                             }
@@ -67,9 +69,9 @@ class Resolution(
         }
 
         private fun rootVirtualFileToDepSet(
-                psiManager: PsiManager,
-                progressIndicator: ProgressIndicator,
-                rootVirtualFile: VirtualFile
+            psiManager: PsiManager,
+            progressIndicator: ProgressIndicator,
+            rootVirtualFile: VirtualFile
         ): Set<Dep> {
             progressIndicator.text2 = "Finding package file under ${rootVirtualFile.path}"
             val packageManagerVirtualFile = virtualFile(rootVirtualFile)
@@ -84,12 +86,18 @@ class Resolution(
         }
 
         private fun packageVirtualFileToDepSet(
-                psiManager: PsiManager,
-                progressIndicator: ProgressIndicator,
-                packageManager: PackageManager,
-                packageVirtualFile: VirtualFile
+            psiManager: PsiManager,
+            progressIndicator: ProgressIndicator,
+            packageManager: PackageManager,
+            packageVirtualFile: VirtualFile
         ): Set<Dep> {
-            val packagePsiFile = runReadAction { psiManager.findFile(packageVirtualFile) }
+            val packagePsiFile = runReadAction {
+                try {
+                    psiManager.findFile(packageVirtualFile)
+                } catch (error: IncorrectOperationException) {
+                    null
+                }
+            }
 
             return if (packagePsiFile != null && !progressIndicator.isCanceled) {
                 progressIndicator.text2 = "Finding deps in ${packagePsiFile.virtualFile.path}"
@@ -101,18 +109,18 @@ class Resolution(
         }
 
         private fun packagePsiFileToDepSet(
-                packageManager: PackageManager,
-                packagePsiFile: PsiFile
+            packageManager: PackageManager,
+            packagePsiFile: PsiFile
         ): Set<Dep> =
-                runReadAction {
-                    getCachedValue(packagePsiFile, DEP_SET) {
-                        packageManager
-                                .depGatherer()
-                                .apply { packagePsiFile.accept(this) }
-                                .depSet.toSet()
-                                .let { CachedValueProvider.Result.create(it, packagePsiFile) }
-                    }
+            runReadAction {
+                getCachedValue(packagePsiFile, DEP_SET) {
+                    packageManager
+                        .depGatherer()
+                        .apply { packagePsiFile.accept(this) }
+                        .depSet.toSet()
+                        .let { CachedValueProvider.Result.create(it, packagePsiFile) }
                 }
+            }
     }
 }
 
