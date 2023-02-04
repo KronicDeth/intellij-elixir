@@ -169,7 +169,7 @@ class Request private constructor(val title: String, val body: String) {
             val lines = ExceptionUtil.getThrowableText(throwable).lineSequence()
             val lastPluginLine = lines.indexOfLast { it.contains("at org.elixir_lang.") }
             val filteredLines = if (lastPluginLine != -1) {
-                lines.take(lastPluginLine + 1)
+                lines.take(lastPluginLine + 10)
             } else {
                 lines
             }
