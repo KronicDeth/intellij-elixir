@@ -570,6 +570,8 @@
   * Don't decompile Erlang `And` as Elixir `and`.
 * [#3061](https://github.com/KronicDeth/intellij-elixir/pull/3061) - [@KronicDeth](https://github.com/KronicDeth)
   * Ignore `request_body` and `responses` for docs.
+* [#3062](https://github.com/KronicDeth/intellij-elixir/pull/3062) - [@KronicDeth](https://github.com/KronicDeth)
+  * Check if heredoc has lines before calculating host text range for Markdown docs.
 
 ## v14.0.0
 
