@@ -20,14 +20,18 @@ class LiteralTextEscaper(parent: Parent) : com.intellij.psi.LiteralTextEscaper<P
             is Heredoc -> {
                 val heredocLineList = host.heredocLineList
 
-                val relevantStartOffset = heredocLineList.first().textRange.startOffset
-                val relevantEndOffset = heredocLineList.last().textRange.endOffset
+                if (heredocLineList.isNotEmpty()) {
+                    val relevantStartOffset = heredocLineList.first().textRange.startOffset
+                    val relevantEndOffset = heredocLineList.last().textRange.endOffset
 
-                val hostTextRange = host.textRange
-                val startOffset = relevantStartOffset - hostTextRange.startOffset
-                val length = relevantEndOffset - relevantStartOffset
+                    val hostTextRange = host.textRange
+                    val startOffset = relevantStartOffset - hostTextRange.startOffset
+                    val length = relevantEndOffset - relevantStartOffset
 
-                TextRange.from(startOffset, length)
+                    TextRange.from(startOffset, length)
+                } else {
+                    TextRange.from(1, 0)
+                }
             }
             is ElixirLine -> host.lineBody?.textRangeInParent ?: TextRange.from(1, 0)
             else -> super.getRelevantTextRange()
