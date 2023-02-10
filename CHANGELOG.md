@@ -566,6 +566,8 @@
   * Ignore identifier when `@*doc` attribute isn't quoted.
 * [#3047](https://github.com/KronicDeth/intellij-elixir/pull/3047) - [@KronicDeth](https://github.com/KronicDeth)
   * Ignore if package virtual file is disposed before the deps can be read.
+* [#3060](https://github.com/KronicDeth/intellij-elixir/pull/3060) - [@KronicDeth](https://github.com/KronicDeth)
+  * Don't decompile Erlang `And` as Elixir `and`.
 
 ## v14.0.0
 
