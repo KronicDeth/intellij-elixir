@@ -75,7 +75,9 @@ object Var {
 private val KEYWORD_BLOCK_KEYWORD_SET = Macro.KEYWORD_BLOCK_KEYWORDS.toSet()
 
 private fun String.escapeElixirKeyword(): String =
-    if (KEYWORD_BLOCK_KEYWORD_SET.contains(this) || this == "end" || this == "fn" || this == "in" || this == "when") {
+    if (KEYWORD_BLOCK_KEYWORD_SET.contains(this) || this == "end" || this == "fn" || this == "in" || this == "when"
+        || this == "and"
+    ) {
         "erlangVariable${this.capitalize()}"
     } else {
         this

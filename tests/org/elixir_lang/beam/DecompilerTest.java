@@ -488,6 +488,10 @@ public class DecompilerTest extends PlatformTestCase {
         assertDecompiled("Elixir.RabbitMq.Handler");
     }
 
+    public void testIssue2976() throws IOException {
+        assertDecompiled("inet_db");
+    }
+
     /*
      * Instance Methods
      */
