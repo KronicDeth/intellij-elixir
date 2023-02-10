@@ -572,6 +572,8 @@
   * Ignore `request_body` and `responses` for docs.
 * [#3062](https://github.com/KronicDeth/intellij-elixir/pull/3062) - [@KronicDeth](https://github.com/KronicDeth)
   * Check if heredoc has lines before calculating host text range for Markdown docs.
+* [#3064](https://github.com/KronicDeth/intellij-elixir/pull/3064) - [@KronicDeth](https://github.com/KronicDeth)
+  * Ignore if stubs ids can't be found when resolving Callables.
 
 ## v14.0.0
 
