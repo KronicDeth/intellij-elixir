@@ -568,6 +568,8 @@
   * Ignore if package virtual file is disposed before the deps can be read.
 * [#3060](https://github.com/KronicDeth/intellij-elixir/pull/3060) - [@KronicDeth](https://github.com/KronicDeth)
   * Don't decompile Erlang `And` as Elixir `and`.
+* [#3061](https://github.com/KronicDeth/intellij-elixir/pull/3061) - [@KronicDeth](https://github.com/KronicDeth)
+  * Ignore `request_body` and `responses` for docs.
 
 ## v14.0.0
 

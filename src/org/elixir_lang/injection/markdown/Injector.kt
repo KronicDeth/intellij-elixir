@@ -46,7 +46,7 @@ class Injector : MultiHostInjector {
             is QuotableKeywordPair -> {
                 when (val key = documentation.keywordKey.text) {
                     "deprecated" -> getLanguagesToInjectInQuote(registrar, documentation.keywordValue)
-                    "authors", "guard", "since", "type" -> Unit
+                    "authors", "guard", "request_body", "responses", "since", "type" -> Unit
                     else -> {
                         Logger.error(
                             javaClass,
