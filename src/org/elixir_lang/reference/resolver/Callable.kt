@@ -191,47 +191,54 @@ object Callable : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Cal
             val validResult = false
 
             for (key in keys) {
-                stubIndex
-                    .processElements(AllName.KEY, key, project, scope, NamedElement::class.java) { namedElement ->
-                        if (namedElement is Call) {
-                            if (CallDefinitionClause.`is`(namedElement)) {
-                                if (incompleteCode ||
-                                    nameArityInterval(namedElement, resolveState(namedElement, key))
-                                        ?.arityInterval?.contains(arity) == true
-                                ) {
-                                    resolveResults.add(
-                                        VisitedElementSetResolveResult(
-                                            namedElement,
-                                            validResult,
-                                            emptySet()
-                                        )
-                                    )
-                                }
-                            } else if (Callback.`is`(namedElement)) {
-                                if (incompleteCode ||
-                                    Callback
-                                        .headCall(namedElement as AtUnqualifiedNoParenthesesCall<*>)
-                                        ?.let {
-                                            CallDefinitionHead.nameArityInterval(
-                                                it,
-                                                resolveState(namedElement, key)
+                try {
+                    stubIndex
+                        .processElements(AllName.KEY, key, project, scope, NamedElement::class.java) { namedElement ->
+                            if (namedElement is Call) {
+                                if (CallDefinitionClause.`is`(namedElement)) {
+                                    if (incompleteCode ||
+                                        nameArityInterval(namedElement, resolveState(namedElement, key))
+                                            ?.arityInterval?.contains(arity) == true
+                                    ) {
+                                        resolveResults.add(
+                                            VisitedElementSetResolveResult(
+                                                namedElement,
+                                                validResult,
+                                                emptySet()
                                             )
-                                        }
-                                        ?.arityInterval?.contains(arity) == true
-                                ) {
-                                    resolveResults.add(
-                                        VisitedElementSetResolveResult(
-                                            namedElement,
-                                            validResult,
-                                            emptySet()
                                         )
-                                    )
+                                    }
+                                } else if (Callback.`is`(namedElement)) {
+                                    if (incompleteCode ||
+                                        Callback
+                                            .headCall(namedElement as AtUnqualifiedNoParenthesesCall<*>)
+                                            ?.let {
+                                                CallDefinitionHead.nameArityInterval(
+                                                    it,
+                                                    resolveState(namedElement, key)
+                                                )
+                                            }
+                                            ?.arityInterval?.contains(arity) == true
+                                    ) {
+                                        resolveResults.add(
+                                            VisitedElementSetResolveResult(
+                                                namedElement,
+                                                validResult,
+                                                emptySet()
+                                            )
+                                        )
+                                    }
                                 }
                             }
-                        }
 
-                        true
+                            true
+                        }
+                } catch (throwable: Throwable) {
+                    // ignore "Stub ids not found for key" as in #2945
+                    if (throwable.message?.contains("Stub ids not found for key") != true) {
+                        throw throwable
                     }
+                }
             }
         }
 
