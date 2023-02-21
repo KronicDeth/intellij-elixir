@@ -29,8 +29,7 @@ public class PrefixTest extends LightPlatformCodeInsightFixtureTestCase {
         PsiElement[] primaryArguments = grandParentPrefixCall.primaryArguments();
 
         assertNotNull(primaryArguments);
-        assertEquals(1, primaryArguments.length);
-        assertNull(primaryArguments[0]);
+        assertEquals(0, primaryArguments.length);
     }
 
     /*

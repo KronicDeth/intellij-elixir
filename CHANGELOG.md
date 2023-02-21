@@ -576,6 +576,8 @@
   * Ignore if stubs ids can't be found when resolving Callables.
 * [#3075](https://github.com/KronicDeth/intellij-elixir/pull/3075) - [@KronicDeth](https://github.com/KronicDeth)
   * Ignore hexadecimal numbers at the root of the file when collecting doc comment.
+* [#3076](https://github.com/KronicDeth/intellij-elixir/pull/3076) - [@KronicDeth](https://github.com/KronicDeth)
+  * Return an empty array of primaryArguments instead of array with null operand for unary operation without operand.
 
 ## v14.0.0
 
