@@ -90,7 +90,7 @@ class ElixirDocumentationProvider : DocumentationProvider {
             is DummyBlock, is ElixirAlias,
             is ElixirAtom,
                 // Numbers
-            is ElixirDecimalFloat, is ElixirDecimalWholeNumber,
+            is ElixirDecimalFloat, is ElixirDecimalWholeNumber, is ElixirHexadecimalWholeNumber,
                 // Containers
             is ElixirList, is ElixirMapOperation, is ElixirTuple,
             is PsiErrorElement
