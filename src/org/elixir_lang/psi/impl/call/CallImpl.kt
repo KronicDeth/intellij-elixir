@@ -614,7 +614,11 @@ object CallImpl {
 
     @Contract(pure = true)
     @JvmStatic
-    fun primaryArguments(prefix: Prefix): Array<PsiElement?> = arrayOf(prefix.operand())
+    fun primaryArguments(prefix: Prefix): Array<PsiElement> =
+        prefix
+            .operand()
+            ?.let { arrayOf(it) }
+            ?: emptyArray()
 
     @Contract(pure = true)
     @JvmStatic
