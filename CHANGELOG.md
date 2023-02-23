@@ -578,6 +578,9 @@
   * Ignore hexadecimal numbers at the root of the file when collecting doc comment.
 * [#3076](https://github.com/KronicDeth/intellij-elixir/pull/3076) - [@KronicDeth](https://github.com/KronicDeth)
   * Return an empty array of primaryArguments instead of array with null operand for unary operation without operand.
+* [#3079](https://github.com/KronicDeth/intellij-elixir/pull/3079) - [@KronicDeth](https://github.com/KronicDeth)
+  * Set `sinceBuild` to IntelliJ IDEA 2022.3.
+    Fixes incorrect compatibility listed with < 2022.3 when < 2022.3 support was removed in 14.0.0 with #2946.
 
 ## v14.0.0
 
