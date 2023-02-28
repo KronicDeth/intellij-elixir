@@ -74,6 +74,7 @@ fun Call.computeReference(): PsiReference? =
                 }
                     ?: computeCallableReference()
             }
+
             parent.isSlashInCaptureNameSlashArity() -> null
             else -> computeCallableReference()
         }
@@ -86,6 +87,7 @@ private fun PsiElement.isCaptureNonNumericOperation(): Boolean =
         is ElixirMatchedCaptureNonNumericOperation,
         is ElixirUnmatchedCaptureNonNumericOperation ->
             true
+
         else ->
             false
     }
@@ -589,12 +591,21 @@ object CallImpl {
 
     @Contract(pure = true)
     @JvmStatic
-    fun primaryArguments(notIn: NotIn): Array<PsiElement?> {
+    fun primaryArguments(notIn: NotIn): Array<PsiElement> {
         val children = notIn.children
         val leftOperand = org.elixir_lang.psi.operation.not_in.Normalized.leftOperand(children)
-        val rightOperand = org.elixir_lang.psi.operation.not_in.Normalized.rightOperand(children)
 
-        return arrayOf(leftOperand, rightOperand)
+        return if (leftOperand != null) {
+            val rightOperand = org.elixir_lang.psi.operation.not_in.Normalized.rightOperand(children)
+
+            if (rightOperand != null) {
+                arrayOf(leftOperand, rightOperand)
+            } else {
+                arrayOf(leftOperand)
+            }
+        } else {
+            emptyArray()
+        }
     }
 
     @Contract(pure = true)

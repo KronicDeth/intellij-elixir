@@ -37,6 +37,13 @@
           a guess that <code>minBy</code> was what was throwing the <code>NoSuchElement</code> exception.
         </p>
       </li>
+      <li>
+        <p>Ignore <code>null</code> operands for <code>not in</code> <code>primaryArguments()</code>.</p>
+        <p>
+          Instead of including both left and right operand always and so having null operand in fixed size array return
+          array with only non-null operands.
+        </p>
+      </li>
     </ul>
   </li>
 </ul>
