@@ -581,6 +581,9 @@
 * [#3079](https://github.com/KronicDeth/intellij-elixir/pull/3079) - [@KronicDeth](https://github.com/KronicDeth)
   * Set `sinceBuild` to IntelliJ IDEA 2022.3.
     Fixes incorrect compatibility listed with < 2022.3 when < 2022.3 support was removed in 14.0.0 with #2946.
+* [#3082](https://github.com/KronicDeth/intellij-elixir/pull/3082) - [@KronicDeth](https://github.com/KronicDeth)
+  * Use `minByOrNull` to protect from empty module list.
+    This fix may not work as the line number reported in the errors is actually outside of the file. This is only a guess that `minBy` was what was throwing the `NoSuchElement` exception.
 
 ## v14.0.0
 
