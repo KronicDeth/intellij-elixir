@@ -584,6 +584,9 @@
 * [#3082](https://github.com/KronicDeth/intellij-elixir/pull/3082) - [@KronicDeth](https://github.com/KronicDeth)
   * Use `minByOrNull` to protect from empty module list.
     This fix may not work as the line number reported in the errors is actually outside of the file. This is only a guess that `minBy` was what was throwing the `NoSuchElement` exception.
+* [#3083](https://github.com/KronicDeth/intellij-elixir/pull/3083) - [@KronicDeth](https://github.com/KronicDeth)
+  * Ignore `null` operands for `not in` `primaryArguments()`.
+    Instead of including both left and right operand always and so having null operand in fixed size array return array with only non-null operands.
 
 ## v14.0.0
 
