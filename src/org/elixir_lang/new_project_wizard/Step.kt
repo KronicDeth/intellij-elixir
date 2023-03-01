@@ -3,12 +3,17 @@ package org.elixir_lang.new_project_wizard
 import com.intellij.execution.ExecutionException
 import com.intellij.execution.process.ProcessOutput
 import com.intellij.execution.util.ExecUtil
+import com.intellij.ide.JavaUiBundle
+import com.intellij.ide.util.projectWizard.WizardContext
 import com.intellij.ide.wizard.AbstractNewProjectWizardStep
 import com.intellij.ide.wizard.NewProjectWizardBaseData
 import com.intellij.ide.wizard.NewProjectWizardLanguageStep
 import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.observable.properties.ObservableMutableProperty
+import com.intellij.openapi.observable.properties.ObservableProperty
+import com.intellij.openapi.options.ConfigurationException
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
@@ -16,10 +21,16 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.projectRoots.SdkTypeId
 import com.intellij.openapi.roots.ProjectRootManager
-import com.intellij.openapi.roots.ui.configuration.sdkComboBox
+import com.intellij.openapi.roots.ui.configuration.*
+import com.intellij.openapi.roots.ui.configuration.projectRoot.ProjectSdksModel
+import com.intellij.openapi.ui.ValidationInfo
+import com.intellij.openapi.util.Disposer
+import com.intellij.openapi.util.NlsContexts
 import com.intellij.ui.dsl.builder.*
 import com.intellij.ui.dsl.gridLayout.HorizontalAlign
+import com.intellij.ui.layout.ValidationInfoBuilder
 import kotlinx.coroutines.CancellationException
+import org.elixir_lang.Elixir
 import org.elixir_lang.Mix
 import org.elixir_lang.module.ElixirModuleBuilder
 import org.elixir_lang.module.ElixirModuleType
@@ -49,8 +60,7 @@ class Step(parent: NewProjectWizardLanguageStep) : AbstractNewProjectWizardStep(
     override fun setupUI(builder: Panel) {
         with(builder) {
             row("Elixir SDK:") {
-                val sdkTypeFilter = { it: SdkTypeId -> it == Type.instance; }
-                sdkComboBox(context, sdkProperty, ElixirModuleType.MODULE_TYPE_ID, sdkTypeFilter)
+                elixirSdkComboBox(context, sdkProperty)
                     .columns(COLUMNS_MEDIUM)
             }
             collapsibleGroup("mix new Options") {
@@ -169,6 +179,64 @@ class Step(parent: NewProjectWizardLanguageStep) : AbstractNewProjectWizardStep(
             Logger.getInstance(javaClass).error(ioException)
 
             throw ioException
+        }
+    }
+}
+
+private val ELIXIR_SDK_TYPE_FILTER = { it: SdkTypeId -> it == Type.instance; }
+private val ANY_SDK_FILTER: ((Sdk) -> Boolean) = { true }
+private val ANY_SDK_TYPE_FILTER: ((SdkTypeId) -> Boolean) = { true }
+private val ANY_SUGGESTED_SDK_FILTER: ((SdkListItem.SuggestedItem) -> Boolean) = { true }
+private val NEW_SDK_CALLBACK_DEFAULT: ((Sdk) -> Unit) = {}
+
+fun Row.elixirSdkComboBox(context: WizardContext, sdkProperty: ObservableMutableProperty<Sdk?>): Cell<JdkComboBox> {
+    val sdksModel = ProjectSdksModel()
+
+    Disposer.register(context.disposable) {
+        sdksModel.disposeUIResources()
+    }
+
+    val comboBox = createSdkComboBox(
+        context.project,
+        sdksModel,
+        sdkProperty,
+        ElixirModuleType.MODULE_TYPE_ID,
+        ELIXIR_SDK_TYPE_FILTER,
+        ANY_SDK_FILTER,
+        ANY_SUGGESTED_SDK_FILTER,
+        ANY_SDK_TYPE_FILTER,
+        NEW_SDK_CALLBACK_DEFAULT
+    )
+
+    return cell(comboBox)
+        .validationOnApply { validateElixirSdk(sdkProperty, sdksModel) }
+        .onApply { context.projectJdk = sdkProperty.get() }
+}
+
+fun ValidationInfoBuilder.validateElixirSdk(
+    sdkProperty: ObservableProperty<Sdk?>,
+    sdkModel: ProjectSdksModel
+): ValidationInfo? = validateAndGetSdkValidationMessage(sdkProperty, sdkModel)?.let { error(it) }
+
+private fun validateAndGetSdkValidationMessage(
+    sdkProperty: ObservableProperty<Sdk?>,
+    sdkModel: ProjectSdksModel
+): @NlsContexts.DialogMessage String? {
+    val sdk = sdkProperty.get()
+
+    return if (sdk == null) {
+        JavaUiBundle.message("title.no.jdk.specified")
+    } else {
+        if (Elixir.elixirSdkHasErlangSdk(sdk)) {
+            try {
+                sdkModel.apply(null, true)
+
+                null
+            } catch (e: ConfigurationException) {
+                e.message ?: e.title
+            }
+        } else {
+            "Internal Erlang SDK is not in Elixir SDK.  Set it before picking this Elixir SDK."
         }
     }
 }
