@@ -587,6 +587,9 @@
 * [#3083](https://github.com/KronicDeth/intellij-elixir/pull/3083) - [@KronicDeth](https://github.com/KronicDeth)
   * Ignore `null` operands for `not in` `primaryArguments()`.
     Instead of including both left and right operand always and so having null operand in fixed size array return array with only non-null operands.
+* [#3085](https://github.com/KronicDeth/intellij-elixir/pull/3085) - [@KronicDeth](https://github.com/KronicDeth)
+  * Don't allow Elixir SDK without Erlang SDK to be selected for New Project.
+    The SDK has to be able to work for `mix new`.
 
 ## v14.0.0
 
