@@ -592,6 +592,8 @@
     The SDK has to be able to work for `mix new`.
 * [#3086](https://github.com/KronicDeth/intellij-elixir/pull/3086) - [@KronicDeth](https://github.com/KronicDeth)
   * Ignore strings, charlists, and sigils at the top of file when looking for doc comments.
+* [#3097](https://github.com/KronicDeth/intellij-elixir/pull/3097) - [@KronicDeth](https://github.com/KronicDeth)
+  * Ignore top-level Aliases when collecting docs.
 
 ## v14.0.0
 

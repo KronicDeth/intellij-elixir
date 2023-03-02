@@ -95,6 +95,8 @@ class ElixirDocumentationProvider : DocumentationProvider {
             is ElixirList, is ElixirMapOperation, is ElixirTuple,
                 // Strings, Charlists, and Sigils
             is Parent,
+                // Aliases
+            is QualifiableAlias,
             is PsiErrorElement
             -> Unit
 
