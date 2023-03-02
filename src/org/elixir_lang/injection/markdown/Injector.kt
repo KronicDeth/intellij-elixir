@@ -31,6 +31,19 @@ class Injector : MultiHostInjector {
                 injectElixirInCodeBlocksInQuote(registrar, documentation)
             }
 
+            // Issue #2923 associated bug.  @moduledoc on unquote
+            //    #
+            //    # * We inline most of the code for performance, so it is specific
+            //    #   per helper module anyway.
+            //    #
+            //    code = quote do
+            //      @moduledoc unquote(docs) && """
+            //      Module with named helpers generated from #{inspect unquote(env.module)}.
+            //      """
+            //      unquote(defhelper)
+            //      unquote(defcatch_all)
+            //      unquote_splicing(impls)
+            is ElixirMatchedUnqualifiedParenthesesCall,
             is ElixirAlias,
                 // @external_resource "README.md"
                 // @moduledoc @external_resource
