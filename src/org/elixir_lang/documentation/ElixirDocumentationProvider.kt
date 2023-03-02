@@ -93,6 +93,8 @@ class ElixirDocumentationProvider : DocumentationProvider {
             is ElixirDecimalFloat, is ElixirDecimalWholeNumber, is ElixirHexadecimalWholeNumber,
                 // Containers
             is ElixirList, is ElixirMapOperation, is ElixirTuple,
+                // Strings, Charlists, and Sigils
+            is Parent,
             is PsiErrorElement
             -> Unit
 

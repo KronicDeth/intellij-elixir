@@ -590,6 +590,8 @@
 * [#3085](https://github.com/KronicDeth/intellij-elixir/pull/3085) - [@KronicDeth](https://github.com/KronicDeth)
   * Don't allow Elixir SDK without Erlang SDK to be selected for New Project.
     The SDK has to be able to work for `mix new`.
+* [#3086](https://github.com/KronicDeth/intellij-elixir/pull/3086) - [@KronicDeth](https://github.com/KronicDeth)
+  * Ignore strings, charlists, and sigils at the top of file when looking for doc comments.
 
 ## v14.0.0
 
