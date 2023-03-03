@@ -36,16 +36,32 @@ tailrec fun PsiElement.selfOrEnclosingMacroCall(): Call? =
             parent.let { it as? Call }
 
         is ElixirAnonymousFunction -> {
-            parent.let { it as? ElixirAccessExpression }?.parent.let { it as? Arguments }?.parent.let { it as? ElixirMatchedParenthesesArguments }?.parent
-                .let { it as? Call }?.let { call ->
-                    if (call.resolvedModuleName() == "Enum" &&
-                        call.functionName() in arrayOf("each", "map", "reduce")
-                    ) {
-                        call
-                    } else {
-                        null
-                    }
-                }?.parent?.selfOrEnclosingMacroCall()
+            val generator = when (val grandParent = parent.let { it as? ElixirAccessExpression }?.parent) {
+                // `defhelper = fn` in
+                //  defhelper = quote @anno do
+                //      defhelper = fn helper, vars, opts, bins, segs, trailing_slash? ->
+                //        def unquote(:"#{helper}_path")(conn_or_endpoint, unquote(Macro.escape(opts)), unquote_splicing(vars)) do
+                //          unquote(:"#{helper}_path")(conn_or_endpoint, unquote(Macro.escape(opts)), unquote_splicing(vars), [])
+                //        end
+                is Match -> grandParent
+
+                is Arguments -> {
+                    grandParent.parent.let { it as? ElixirMatchedParenthesesArguments }?.parent
+                        .let { it as? Call }?.let { call ->
+                            if (call.resolvedModuleName() == "Enum" &&
+                                call.functionName() in arrayOf("each", "map", "reduce")
+                            ) {
+                                call
+                            } else {
+                                null
+                            }
+                        }
+                }
+
+                else -> null
+            }
+
+            generator?.parent?.selfOrEnclosingMacroCall()
         }
 
         is Arguments,

@@ -594,6 +594,9 @@
   * Ignore strings, charlists, and sigils at the top of file when looking for doc comments.
 * [#3097](https://github.com/KronicDeth/intellij-elixir/pull/3097) - [@KronicDeth](https://github.com/KronicDeth)
   * Ignore top-level Aliases when collecting docs.
+* [#3098](https://github.com/KronicDeth/intellij-elixir/pull/3098) - [@KronicDeth](https://github.com/KronicDeth)
+  * Ignored `unquote` calls when injecting docs.
+  * Find enclosing `quote` when `def`s are inside an `fn` as in Phoenix Route Helpers.
 
 ## v14.0.0
 
