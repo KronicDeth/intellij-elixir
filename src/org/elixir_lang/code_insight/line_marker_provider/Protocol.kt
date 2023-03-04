@@ -15,6 +15,7 @@ import com.intellij.openapi.util.NotNullLazyValue
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.*
 import org.elixir_lang.Icons
+import org.elixir_lang.beam.psi.impl.ModuleImpl
 import org.elixir_lang.psi.CallDefinitionClause
 import org.elixir_lang.psi.CallDefinitionClause.enclosingModularMacroCall
 import org.elixir_lang.psi.Protocol
@@ -54,19 +55,34 @@ class Protocol : LineMarkerProvider {
                             val implementations = mutableListOf<PsiElement>()
 
                             Protocol.processImplementations(modularCall) { defimpl ->
-                                for (defimplChild in (defimpl as Call).macroChildCallList()) {
-                                    if (CallDefinitionClause.`is`(defimplChild)) {
-                                        CallDefinitionClause.nameArityInterval(defimplChild, ResolveState.initial())
-                                            ?.let { implNameArityInterval ->
-                                                if (implNameArityInterval.name == protocolNameArityInterval.name &&
-                                                    implNameArityInterval.arityInterval.overlaps(
-                                                        protocolNameArityInterval.arityInterval
-                                                    )
-                                                ) {
-                                                    implementations.add(defimplChild)
-                                                }
+                                when (defimpl) {
+                                    is Call ->
+                                        for (defimplChild in defimpl.macroChildCallList()) {
+                                            if (CallDefinitionClause.`is`(defimplChild)) {
+                                                CallDefinitionClause
+                                                    .nameArityInterval(defimplChild, ResolveState.initial())
+                                                    ?.let { implNameArityInterval ->
+                                                        if (implNameArityInterval.name == protocolNameArityInterval.name &&
+                                                            implNameArityInterval.arityInterval.overlaps(
+                                                                protocolNameArityInterval.arityInterval
+                                                            )
+                                                        ) {
+                                                            implementations.add(defimplChild)
+                                                        }
+                                                    }
                                             }
-                                    }
+                                        }
+
+                                    is ModuleImpl<*> ->
+                                        for (callDefinition in defimpl.callDefinitions()) {
+                                            val implNameArityInterval = callDefinition.nameArityInterval
+
+                                            if (implNameArityInterval.name == protocolNameArityInterval.name &&
+                                                implNameArityInterval.arityInterval.overlaps
+                                                    (protocolNameArityInterval.arityInterval)) {
+                                                implementations.add(callDefinition)
+                                            }
+                                        }
                                 }
 
                                 true

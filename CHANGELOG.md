@@ -597,6 +597,8 @@
 * [#3098](https://github.com/KronicDeth/intellij-elixir/pull/3098) - [@KronicDeth](https://github.com/KronicDeth)
   * Ignored `unquote` calls when injecting docs.
   * Find enclosing `quote` when `def`s are inside an `fn` as in Phoenix Route Helpers.
+* [#3099](https://github.com/KronicDeth/intellij-elixir/pull/3099) - [@KronicDeth](https://github.com/KronicDeth)
+  * Handle binary modules when processing protocols and implementations for line markers and definition search.
 
 ## v14.0.0
 
