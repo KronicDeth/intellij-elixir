@@ -101,7 +101,16 @@ class DefinitionsScopedSearch :
                             }
                         }
                     }
-                    is CallDefinitionImpl<*> -> TODO()
+                    is ModuleImpl<*> ->
+                        for (callDefinition in defimpl.callDefinitions()) {
+                            val implNameArityInterval = callDefinition.nameArityInterval
+
+                            if (implNameArityInterval.name == name &&
+                                implNameArityInterval.arityInterval.contains(arity)
+                            ) {
+                                consumer.process(callDefinition)
+                            }
+                        }
                 }
 
                 true
