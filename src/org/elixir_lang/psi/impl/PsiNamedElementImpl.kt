@@ -104,14 +104,18 @@ object PsiNamedElementImpl {
         named: org.elixir_lang.psi.call.Named,
         newName: String
     ): PsiElement {
-        val functionNameElement = named.functionNameElement()
-        val newFunctionNameElementCall = ElementFactory.createUnqualifiedNoArgumentsCall(named.project, newName)
+        if (CallDefinitionClause.`is`(named)) {
+            CallDefinitionClause.head(named)?.let { it as? org.elixir_lang.psi.call.Named }?.setName(newName)
+        } else {
+            val functionNameElement = named.functionNameElement()
+            val newFunctionNameElementCall = ElementFactory.createUnqualifiedNoArgumentsCall(named.project, newName)
 
-        val nameNode = functionNameElement!!.node
-        val newNameNode = newFunctionNameElementCall.functionNameElement().node
+            val nameNode = functionNameElement!!.node
+            val newNameNode = newFunctionNameElementCall.functionNameElement().node
 
-        val node = nameNode.treeParent
-        node.replaceChild(nameNode, newNameNode)
+            val node = nameNode.treeParent
+            node.replaceChild(nameNode, newNameNode)
+        }
 
         return named
     }

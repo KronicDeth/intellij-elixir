@@ -61,6 +61,16 @@
       <li>
         Skip unqualified no arguments calls when Ecto.Query.from arguments are being typed.
       </li>
+      <li>
+        <p>Setting name on a call definition clause sets the name on the head instead.</p>
+        <p>
+          The JetBrains API both renames the usage references AND the original element where the rename refactoring was
+          started, but when started on a call definition clause the <code>functionNameElement</code> is the
+          <code>def</code>, <code>defp</code>, <code>defmacro</code>, or <code>defmacrop</code> and so both the name of
+          the call was changed, but the <code>def*</code> was also changed to the new name.  Now, if
+          <code>setName</code> is called on a definition, the head is renamed instead.
+        </p>
+      </li>
     </ul>
   </li>
 </ul>
