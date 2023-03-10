@@ -604,6 +604,8 @@
 * [#3103](https://github.com/KronicDeth/intellij-elixir/pull/3103) - [@KronicDeth](https://github.com/KronicDeth)
   * Setting name on a call definition clause sets the name on the head instead.
     The JetBrains API both renames the usage references AND the original element where the rename refactoring was started, but when started on a call definition clause the `functionNameElement` is the `def`, `defp`, `defmacro`, or `defmacrop` and so both the name of the call was changed, but the `def*` was also changed to the new name.  Now, if `setName` is called on a definition, the head is renamed instead.
+* [#3111](https://github.com/KronicDeth/intellij-elixir/pull/3111) - [@KronicDeth](https://github.com/KronicDeth)
+  * Filter out Elixir SDKs that don't have an Erlang SDK when importing projects.
 
 ## v14.0.0
 
