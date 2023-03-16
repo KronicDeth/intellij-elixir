@@ -1,19 +1,29 @@
 package org.elixir_lang.dialyzer.service
 
 import com.intellij.execution.configurations.ParametersList
-import com.intellij.execution.process.*
+import com.intellij.execution.process.ProcessEvent
+import com.intellij.execution.process.ProcessHandlerFactory
+import com.intellij.execution.process.ProcessListener
+import com.intellij.execution.process.ProcessOutputType
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.Storage
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.util.Key
+import org.elixir_lang.Elixir.elixirSdkHasErlangSdk
 import org.elixir_lang.Mix
 import org.elixir_lang.notification.setup_sdk.Notifier
 import org.elixir_lang.run.ensureWorkingDirectory
 import org.elixir_lang.sdk.elixir.Type.Companion.mostSpecificSdk
 
-data class DialyzerWarn(val fileName: String, val line: Int, val message: String = "", val successfulTyping: String = "")
+data class DialyzerWarn(
+    val fileName: String,
+    val line: Int,
+    val message: String = "",
+    val successfulTyping: String = ""
+)
+
 class DialyzerException(message: String?, inner: Throwable?) : Exception(message, inner)
 
 @Service
@@ -31,27 +41,38 @@ class DialyzerServiceImpl : DialyzerService {
         val sdk = mostSpecificSdk(module)
 
         return if (sdk != null) {
-            dialyzerWarnings(workingDirectory, sdk)
+            if (elixirSdkHasErlangSdk(sdk)) {
+                dialyzerWarnings(workingDirectory, sdk)
+            } else {
+                val project = module.project
+                Notifier.error(
+                    module,
+                    "Missing Internal Erlang SDK for module Elixir SDK",
+                    "The configured Elixir SDK for the module ${module.name} or its project ${project.name} does not " +
+                            "have an Internal Erlang SDK configured"
+                )
+
+                emptyList()
+            }
         } else {
             val project = module.project
             Notifier.error(
-                    module,
-                    "Missing module Elixir SDK",
-                    "There is no configured Elixir SDK for the module ${module.name} or its project ${project.name}"
+                module,
+                "Missing module Elixir SDK",
+                "There is no configured Elixir SDK for the module ${module.name} or its project ${project.name}"
             )
 
             emptyList()
         }
     }
 
-    private fun dialyzerWarnings(workingDirectory: String, elixirSdk: Sdk) : List<DialyzerWarn> = try {
+    private fun dialyzerWarnings(workingDirectory: String, elixirSdk: Sdk): List<DialyzerWarn> = try {
         parseDialyzerOutput(run(workingDirectory, elixirSdk))
-    }
-    catch (ex: Exception) {
+    } catch (ex: Exception) {
         throw DialyzerException("Error while running Dialyzer: ${ex.message}", ex)
     }
 
-    private fun run(workingDirectory: String, elixirSdk: Sdk) : Pair<String, String> {
+    private fun run(workingDirectory: String, elixirSdk: Sdk): Pair<String, String> {
         log.info("Dialyzer starting...")
         val erlArgumentList = ParametersList.parse(erlArguments).toList()
         val elixirArgumentList = ParametersList.parse(elixirArguments).toList()
@@ -72,11 +93,14 @@ class DialyzerServiceImpl : DialyzerService {
                         outputType.isStderr -> {
                             stderrBuilder.append(event.text)
                         }
+
                         outputType.isStdout -> {
                             stdoutBuilder.append(event.text)
                         }
+
                         outputType != ProcessOutputType.SYSTEM -> TODO()
                     }
+
                     else -> TODO()
                 }
             }
