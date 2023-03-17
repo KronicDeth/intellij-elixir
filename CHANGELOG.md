@@ -608,7 +608,9 @@
   * Filter out Elixir SDKs that don't have an Erlang SDK when importing projects.
 * [#3121](https://github.com/KronicDeth/intellij-elixir/pull/3121) - [@KronicDeth](https://github.com/KronicDeth)
   * Check Elixir SDK has Erlang SDK before running dialyzer.
-    Notify user of configuration error instead of throwin exceptiion when constructing `mix` commandline.
+    Notify user of configuration error instead of throwing exception when constructing `mix` commandline.
+* [#3124](https://github.com/KronicDeth/intellij-elixir/pull/3124) - [@KronicDeth](https://github.com/KronicDeth)
+  * Log heredoc where markdown cannot be injected.
 
 ## v14.0.0
 

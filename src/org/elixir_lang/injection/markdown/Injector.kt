@@ -2,6 +2,7 @@ package org.elixir_lang.injection.markdown
 
 import com.intellij.lang.injection.MultiHostInjector
 import com.intellij.lang.injection.MultiHostRegistrar
+import com.intellij.openapi.diagnostic.RuntimeExceptionWithAttachments
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import org.elixir_lang.ElixirLanguage
@@ -157,7 +158,11 @@ class Injector : MultiHostInjector {
 
                 val textRangeInQuote = TextRange.from(markdownOffsetRelativeToQuote, lineMarkdownTextLength)
 
-                registrar.addPlace(null, null, documentation, textRangeInQuote)
+                try {
+                    registrar.addPlace(null, null, documentation, textRangeInQuote)
+                } catch (exception: RuntimeExceptionWithAttachments) {
+                    Logger.error(javaClass, "Cannot inject markdown in Heredoc", documentation)
+                }
             }
         }
 
