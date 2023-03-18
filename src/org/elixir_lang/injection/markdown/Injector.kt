@@ -78,8 +78,7 @@ class Injector : MultiHostInjector {
     }
 
     private fun injectMarkdownInQuote(registrar: MultiHostRegistrar, documentation: Heredoc) {
-        registrar.startInjecting(MarkdownLanguage.INSTANCE)
-
+        var injectionStarted = false
         val prefixLength = documentation.heredocPrefix.textLength
         val quoteOffset = documentation.textOffset
         var listIndent = -1
@@ -158,6 +157,11 @@ class Injector : MultiHostInjector {
 
                 val textRangeInQuote = TextRange.from(markdownOffsetRelativeToQuote, lineMarkdownTextLength)
 
+                if (!injectionStarted) {
+                    registrar.startInjecting(MarkdownLanguage.INSTANCE)
+                    injectionStarted = true
+                }
+
                 try {
                     registrar.addPlace(null, null, documentation, textRangeInQuote)
                 } catch (exception: RuntimeExceptionWithAttachments) {
@@ -166,7 +170,9 @@ class Injector : MultiHostInjector {
             }
         }
 
-        registrar.doneInjecting()
+        if (injectionStarted) {
+            registrar.doneInjecting()
+        }
     }
 
     private fun injectMarkdownInQuote(registrar: MultiHostRegistrar, documentation: ElixirLine) {
