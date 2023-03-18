@@ -5,6 +5,7 @@ import com.intellij.openapi.application.runReadAction
 import com.intellij.openapi.util.Computable
 import com.intellij.psi.PsiElement
 import org.elixir_lang.Name
+import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.module.PutAttribute
 import org.elixir_lang.module.RegisterAttribute
 import org.elixir_lang.psi.*
@@ -111,10 +112,20 @@ object PsiNamedElementImpl {
             val newFunctionNameElementCall = ElementFactory.createUnqualifiedNoArgumentsCall(named.project, newName)
 
             val nameNode = functionNameElement!!.node
+            val nameElementType = nameNode.elementType
             val newNameNode = newFunctionNameElementCall.functionNameElement().node
+            val newNameElementType = newNameNode.elementType
 
-            val node = nameNode.treeParent
-            node.replaceChild(nameNode, newNameNode)
+            if (nameElementType == newNameElementType) {
+                val node = nameNode.treeParent
+                node.replaceChild(nameNode, newNameNode)
+            } else {
+                Logger.error(
+                    javaClass,
+                    "New name node elementType (${newNameElementType}) does not match old name node elementType (${nameElementType})",
+                    named
+                )
+            }
         }
 
         return named
