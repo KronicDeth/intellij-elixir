@@ -610,7 +610,9 @@
   * Check Elixir SDK has Erlang SDK before running dialyzer.
     Notify user of configuration error instead of throwing exception when constructing `mix` commandline.
 * [#3124](https://github.com/KronicDeth/intellij-elixir/pull/3124) - [@KronicDeth](https://github.com/KronicDeth)
-  * Log heredoc where markdown cannot be injected.
+  * Log heredoc where Markdown cannot be injected.
+* [#3125](https://github.com/KronicDeth/intellij-elixir/pull/3125) - [@KronicDeth](https://github.com/KronicDeth)
+  * Don't inject Markdown in empty heredoc docs.
 
 ## v14.0.0
 
