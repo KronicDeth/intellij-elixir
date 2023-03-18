@@ -109,11 +109,31 @@ object PsiNamedElementImpl {
             CallDefinitionClause.head(named)?.let { it as? org.elixir_lang.psi.call.Named }?.setName(newName)
         } else {
             val functionNameElement = named.functionNameElement()
-            val newFunctionNameElementCall = ElementFactory.createUnqualifiedNoArgumentsCall(named.project, newName)
-
             val nameNode = functionNameElement!!.node
             val nameElementType = nameNode.elementType
-            val newNameNode = newFunctionNameElementCall.functionNameElement().node
+
+            val newNameNode = when (functionNameElement) {
+                is ElixirIdentifier -> {
+                    val newFunctionNameElementCall =
+                        ElementFactory.createUnqualifiedNoArgumentsCall(named.project, newName)
+
+                    newFunctionNameElementCall.functionNameElement().node
+                }
+
+                is ElixirRelativeIdentifier -> {
+                    val newFunctionNameElementCall =
+                        ElementFactory.createQualifiedNoArgumentsCall(named.project, "Qualifier", newName)
+
+                    newFunctionNameElementCall.functionNameElement()!!.node
+                }
+
+                else -> {
+                    Logger.error(javaClass, "Don't know how to replace function name", named)
+
+                    nameNode
+                }
+            }
+
             val newNameElementType = newNameNode.elementType
 
             if (nameElementType == newNameElementType) {

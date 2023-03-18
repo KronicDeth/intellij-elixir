@@ -56,6 +56,10 @@ public class ElementFactory {
         return onlyElementOfType(project, text, AtOperation.class);
     }
 
+    public static QualifiedNoArgumentsCall createQualifiedNoArgumentsCall(Project project, String qualifier, String name) {
+        return onlyElementOfType(project, qualifier + "." + name, QualifiedNoArgumentsCall.class);
+    }
+
     public static UnqualifiedNoArgumentsCall createUnqualifiedNoArgumentsCall(Project project, String name) {
         return onlyElementOfType(project, name, UnqualifiedNoArgumentsCall.class);
     }
