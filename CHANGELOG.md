@@ -613,6 +613,9 @@
   * Log heredoc where Markdown cannot be injected.
 * [#3125](https://github.com/KronicDeth/intellij-elixir/pull/3125) - [@KronicDeth](https://github.com/KronicDeth)
   * Don't inject Markdown in empty heredoc docs.
+* [#3126](https://github.com/KronicDeth/intellij-elixir/pull/3126) - [@KronicDeth](https://github.com/KronicDeth)
+  * Log if new name element type does not match old name element type.
+  * Replace name with relative identifier instead of identifier for qualified calls on rename.
 
 ## v14.0.0
 

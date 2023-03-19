@@ -5,6 +5,7 @@ import com.intellij.openapi.application.runReadAction
 import com.intellij.openapi.util.Computable
 import com.intellij.psi.PsiElement
 import org.elixir_lang.Name
+import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.module.PutAttribute
 import org.elixir_lang.module.RegisterAttribute
 import org.elixir_lang.psi.*
@@ -108,13 +109,43 @@ object PsiNamedElementImpl {
             CallDefinitionClause.head(named)?.let { it as? org.elixir_lang.psi.call.Named }?.setName(newName)
         } else {
             val functionNameElement = named.functionNameElement()
-            val newFunctionNameElementCall = ElementFactory.createUnqualifiedNoArgumentsCall(named.project, newName)
-
             val nameNode = functionNameElement!!.node
-            val newNameNode = newFunctionNameElementCall.functionNameElement().node
+            val nameElementType = nameNode.elementType
 
-            val node = nameNode.treeParent
-            node.replaceChild(nameNode, newNameNode)
+            val newNameNode = when (functionNameElement) {
+                is ElixirIdentifier -> {
+                    val newFunctionNameElementCall =
+                        ElementFactory.createUnqualifiedNoArgumentsCall(named.project, newName)
+
+                    newFunctionNameElementCall.functionNameElement().node
+                }
+
+                is ElixirRelativeIdentifier -> {
+                    val newFunctionNameElementCall =
+                        ElementFactory.createQualifiedNoArgumentsCall(named.project, "Qualifier", newName)
+
+                    newFunctionNameElementCall.functionNameElement()!!.node
+                }
+
+                else -> {
+                    Logger.error(javaClass, "Don't know how to replace function name", named)
+
+                    nameNode
+                }
+            }
+
+            val newNameElementType = newNameNode.elementType
+
+            if (nameElementType == newNameElementType) {
+                val node = nameNode.treeParent
+                node.replaceChild(nameNode, newNameNode)
+            } else {
+                Logger.error(
+                    javaClass,
+                    "New name node elementType (${newNameElementType}) does not match old name node elementType (${nameElementType})",
+                    named
+                )
+            }
         }
 
         return named
