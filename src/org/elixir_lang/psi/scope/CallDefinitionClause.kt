@@ -136,7 +136,7 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
                     }
                 }
 
-                keepProcessing()
+                true
             }
             Import.`is`(element) -> {
                 try {
