@@ -616,6 +616,14 @@
 * [#3126](https://github.com/KronicDeth/intellij-elixir/pull/3126) - [@KronicDeth](https://github.com/KronicDeth)
   * Log if new name element type does not match old name element type.
   * Replace name with relative identifier instead of identifier for qualified calls on rename.
+* [#3127](https://github.com/KronicDeth/intellij-elixir/pull/3127) - [@KronicDeth](https://github.com/KronicDeth)
+  * Keep looking for variants above if and unless 
+    `if` and `unless` used to call `keepProcessing()` after checking if the child calls when resolving or searching for variants, but Variants returned `false` always from `keepProcessing()`.
+  
+    This stops the variant search from terminating inside of an `if` or `unless` when it wouldn't outside of one as was reported in [#2751](https://github.com/KronicDeth/intellij-elixir/issues/2751).
+  * List `Kernel` and `Kernel.SpecialForms` variants inside modulars.
+    Keep processing at end of modulars when looking for variants, which will check the implicit imports of `Kernel` and `Kernel.SpecialForms`.
+  * Prevent listing variants from outer module in nested module 
 
 ## v14.0.0
 
