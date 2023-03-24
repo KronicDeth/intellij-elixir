@@ -1,6 +1,7 @@
 package org.elixir_lang
 
 import com.intellij.find.findUsages.PsiElement2UsageTargetAdapter
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.psi.PsiElement
 import com.intellij.usages.UsageTarget
 import com.intellij.usages.impl.rules.UsageType
@@ -15,44 +16,54 @@ import org.elixir_lang.reference.Callable
 
 class UsageTypeProvider : com.intellij.usages.impl.rules.UsageTypeProviderEx {
     override fun getUsageType(element: PsiElement?, targets: Array<out UsageTarget>): UsageType? =
-            when (element) {
-                is AtUnqualifiedNoParenthesesCall<*> -> MODULE_ATTRIBUTE_ACCUMULATE_OR_OVERRIDE
-                is AtOperation -> MODULE_ATTRIBUTE_READ
-                is QualifiableAlias -> qualifiableAliasUsageType(element, entrance = element)
-                is Call -> getUsageType(element, targets)
-                else -> null
-            }
+        when (element) {
+            is AtUnqualifiedNoParenthesesCall<*> -> MODULE_ATTRIBUTE_ACCUMULATE_OR_OVERRIDE
+            is AtOperation -> MODULE_ATTRIBUTE_READ
+            is QualifiableAlias -> qualifiableAliasUsageType(element, entrance = element)
+            is Call -> getUsageType(element, targets)
+            else -> null
+        }
 
     override fun getUsageType(element: PsiElement): UsageType? = getUsageType(element, emptyArray())
 
     private fun getUsageType(targets: Array<out UsageTarget>): UsageType? =
-            targets.map { getUsageType(it) }.fold(null as UsageType?) { acc, targetUsageType ->
-                when {
-                    acc == targetUsageType ->
-                        acc
-                    (acc == FUNCTION_DEFINITION_CLAUSE && targetUsageType == MACRO_DEFINITION_CLAUSE) ||
-                            (acc == MACRO_DEFINITION_CLAUSE && targetUsageType == FUNCTION_DEFINITION_CLAUSE) ||
-                            (acc == CALL_DEFINITION_CLAUSE && (targetUsageType == FUNCTION_DEFINITION_CLAUSE || targetUsageType == MACRO_DEFINITION_CLAUSE)) ->
-                        CALL_DEFINITION_CLAUSE
-                    acc == null ->
-                        targetUsageType
-                    else ->
-                        TODO()
+        targets.map { getUsageType(it) }.fold(null as UsageType?) { acc, targetUsageType ->
+            when {
+                acc == targetUsageType ->
+                    acc
+
+                (acc == FUNCTION_DEFINITION_CLAUSE && targetUsageType == MACRO_DEFINITION_CLAUSE) ||
+                        (acc == MACRO_DEFINITION_CLAUSE && targetUsageType == FUNCTION_DEFINITION_CLAUSE) ||
+                        (acc == CALL_DEFINITION_CLAUSE && (targetUsageType == FUNCTION_DEFINITION_CLAUSE || targetUsageType == MACRO_DEFINITION_CLAUSE)) ->
+                    CALL_DEFINITION_CLAUSE
+
+                acc == null ->
+                    targetUsageType
+
+                else -> {
+                    logger.error(
+                        "Don't know how to choose between current usage type (${acc}) and target usage type " +
+                                "(${targetUsageType}). Favoring current usage type."
+                    )
+
+                    acc
                 }
             }
+        }
 
     private fun getUsageType(usageTarget: UsageTarget): UsageType? =
-            when (usageTarget) {
-                is PsiElement2UsageTargetAdapter ->
-                    getUsageType(usageTarget.element).let { usageType ->
-                        when (usageType) {
-                            FUNCTION_CALL -> FUNCTION_DEFINITION_CLAUSE
-                            MACRO_CALL -> MACRO_DEFINITION_CLAUSE
-                            else -> usageType
-                        }
+        when (usageTarget) {
+            is PsiElement2UsageTargetAdapter ->
+                getUsageType(usageTarget.element).let { usageType ->
+                    when (usageType) {
+                        FUNCTION_CALL -> FUNCTION_DEFINITION_CLAUSE
+                        MACRO_CALL -> MACRO_DEFINITION_CLAUSE
+                        else -> usageType
                     }
-                else -> null
-            }
+                }
+
+            else -> null
+        }
 
     private fun getUsageType(call: Call, targets: Array<out UsageTarget>): UsageType? =
         when (ReadWriteAccessDetector.getExpressionAccess(call)) {
@@ -62,30 +73,33 @@ class UsageTypeProvider : com.intellij.usages.impl.rules.UsageTypeProviderEx {
         }
 
     private tailrec fun qualifiableAliasUsageType(psiElement: PsiElement, entrance: QualifiableAlias): UsageType? =
-            when (psiElement) {
-                is ElixirAccessExpression,
-                is ElixirMatchedQualifiedMultipleAliases,
-                is ElixirMultipleAliases,
-                is ElixirNoParenthesesOneArgument,
-                is ElixirUnmatchedQualifiedMultipleAliases,
-                is QualifiableAlias ->
-                    qualifiableAliasUsageType(psiElement.parent, entrance)
-                is Qualified ->
-                    if (psiElement.qualifier().isEquivalentTo(entrance)) {
-                        REMOTE_CALL
-                    } else {
-                        null
-                    }
-                is Call ->
-                    when {
-                        Use.`is`(psiElement) -> USE
-                        Module.`is`(psiElement) -> MODULE_DEFINITION
-                        psiElement.isCalling(KERNEL, Function.ALIAS) -> ALIAS
-                        else -> null
-                    }
-                else ->
+        when (psiElement) {
+            is ElixirAccessExpression,
+            is ElixirMatchedQualifiedMultipleAliases,
+            is ElixirMultipleAliases,
+            is ElixirNoParenthesesOneArgument,
+            is ElixirUnmatchedQualifiedMultipleAliases,
+            is QualifiableAlias ->
+                qualifiableAliasUsageType(psiElement.parent, entrance)
+
+            is Qualified ->
+                if (psiElement.qualifier().isEquivalentTo(entrance)) {
+                    REMOTE_CALL
+                } else {
                     null
-            }
+                }
+
+            is Call ->
+                when {
+                    Use.`is`(psiElement) -> USE
+                    Module.`is`(psiElement) -> MODULE_DEFINITION
+                    psiElement.isCalling(KERNEL, Function.ALIAS) -> ALIAS
+                    else -> null
+                }
+
+            else ->
+                null
+        }
 
     private fun getReadUsageType(call: Call, targets: Array<out UsageTarget>): UsageType {
         return when {
@@ -96,7 +110,7 @@ class UsageTypeProvider : com.intellij.usages.impl.rules.UsageTypeProviderEx {
                 val parameter = Parameter(call).let { Parameter.putParameterized(it) }
 
                 if (parameter.isCallDefinitionClauseName) {
-                     val parameterized = parameter.parameterized
+                    val parameterized = parameter.parameterized
 
                     if (parameterized != null && targets.anyEquivalentElement(parameterized)) {
                         targetsUsageType
@@ -125,11 +139,13 @@ class UsageTypeProvider : com.intellij.usages.impl.rules.UsageTypeProviderEx {
     companion object {
         val ALIAS = UsageType { "Alias" }
         val CALL = UsageType { "Call" }
-        val CALL_DEFINITION_CLAUSE = UsageType {"Call definition clause" }
+        val CALL_DEFINITION_CLAUSE = UsageType { "Call definition clause" }
         val FUNCTION_PARAMETER = UsageType { "Parameter declaration" }
         val MODULE_DEFINITION = UsageType { "Module definition" }
         val MODULE_ATTRIBUTE_ACCUMULATE_OR_OVERRIDE = UsageType { "Module attribute accumulate or override" }
         val MODULE_ATTRIBUTE_READ = UsageType { "Module attribute read" }
+
+        private val logger = Logger.getInstance(UsageTypeProvider::class.java)
     }
 }
 

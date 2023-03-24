@@ -624,6 +624,8 @@
   * List `Kernel` and `Kernel.SpecialForms` variants inside modulars.
     Keep processing at end of modulars when looking for variants, which will check the implicit imports of `Kernel` and `Kernel.SpecialForms`.
   * Prevent listing variants from outer module in nested module 
+* [#3139](https://github.com/KronicDeth/intellij-elixir/pull/3139) - [@KronicDeth](https://github.com/KronicDeth)
+  * Log the accumulated and target usage type that cannot be folded.
 
 ## v14.0.0
 
