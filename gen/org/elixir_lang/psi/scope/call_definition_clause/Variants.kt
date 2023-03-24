@@ -166,7 +166,7 @@ class Variants : CallDefinitionClause() {
      *
      * @return `true` to keep searching up the PSI tree; `false` to stop searching.
      */
-    override fun keepProcessing(): Boolean = false
+    override fun keepProcessing(): Boolean = true
 
 
     companion object {
