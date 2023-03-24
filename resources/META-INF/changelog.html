@@ -80,6 +80,24 @@
       <li>Don't inject markdown in empty heredoc docs.</li>
       <li>Log if new name element type does not match old name element type.</li>
       <li>Replace name with relative identifier instead of identifier for qualified calls on rename.</li>
+      <li>
+        <p>Keep looking for variants above <code>if</code> and <code>unless</code>.</p>
+        <p>
+          <code>if</code> and <code>unless</code> used to call <code>keepProcessing()</code> after checking if the child
+          calls when resolving or searching for variants, but Variants returned <code>false</code> always from
+          <code>keepProcessing()</code>.
+        </p>
+        <p>
+          This stops the variant search from terminating inside of an <code>if</code> or <code>unless</code> when it
+          wouldn't outside of one as was reported in
+          <a href="https://github.com/KronicDeth/intellij-elixir/issues/2751">#2751</a>.
+        </p>
+      </li>
+      <li>
+        <p>List `Kernel` and `Kernel.SpecialForms` variants inside modulars.</p>
+        <p>Keep processing at end of modulars when looking for variants, which will check the implicit imports of `Kernel` and `Kernel.SpecialForms`.</p>
+      </li>
+      <li>Prevent listing variants from outer module in nested module.</li>
     </ul>
   </li>
 </ul>
@@ -92,7 +110,7 @@
     </ul>
   </li>
   <li>
-    <p>Enhancments</p>
+    /<p>Enhancments</p>
     <ul>
       <li>Add 2022.3 compatibility.</li>
     </ul>
