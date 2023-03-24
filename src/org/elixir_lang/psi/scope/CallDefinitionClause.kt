@@ -14,7 +14,6 @@ import org.elixir_lang.beam.psi.impl.ModuleImpl
 import org.elixir_lang.ecto.query.WindowAPI
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.*
-import org.elixir_lang.psi.Module
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function.*
 import org.elixir_lang.psi.call.name.Module.KERNEL
@@ -22,10 +21,12 @@ import org.elixir_lang.psi.call.name.Module.KERNEL_SPECIAL_FORMS
 import org.elixir_lang.psi.ex_unit.Case
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.hasDoBlockOrKeyword
+import org.elixir_lang.psi.impl.ancestorSequence
 import org.elixir_lang.psi.impl.call.*
 import org.elixir_lang.psi.impl.keywordValue
 import org.elixir_lang.psi.impl.siblingExpressions
 import org.elixir_lang.psi.scope.WhileIn.whileIn
+import org.elixir_lang.psi.stub.type.call.Stub.isModular
 import org.elixir_lang.structure_view.element.Callback
 import org.elixir_lang.structure_view.element.Delegation
 
@@ -153,9 +154,8 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
 
                 true
             }
-            (Module.`is`(element) ||
-                    Implementation.`is`(element) ||
-                    Protocol.`is`(element) ||
+
+            (isModular(element) ||
                     Case.isChild(element, state))
                     && modularContainsEntrance(element, state) -> {
                 val childCalls = element.macroChildCallSequence()
@@ -267,13 +267,15 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
             if (callFile == entrance.containingFile) {
                 /* Only allow scanning back down in outer nested modules for siblings.  Prevents scanning in sibling
                    nested modules in https://github.com/KronicDeth/intellij-elixir/issues/1270 */
-                call.isAncestor(entrance, false)
+                modularContains(call, entrance)
             } else {
                 // done by injection or viewFile
                 true
             }
         } ?: false
 
+    private fun modularContains(modular: Call, contained: PsiElement): Boolean =
+        contained.ancestorSequence().filterIsInstance<Call>().firstOrNull { isModular(it) } == modular
 
     private fun implicitImports(element: PsiElement, state: ResolveState): Boolean {
         val project = element.project
