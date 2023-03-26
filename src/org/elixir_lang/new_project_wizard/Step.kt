@@ -136,10 +136,12 @@ class Step(parent: NewProjectWizardLanguageStep) : AbstractNewProjectWizardStep(
             } else if (processOutput.isTimeout) {
                 throw TimeoutException()
             } else if (processOutput.exitCode != 0) {
+                val stderrWithoutColorCodes = processOutput.stderr.replace(Regex("\u001B\\[[;\\d]*m"), "")
+
                 NotificationGroupManager
                     .getInstance()
                     .getNotificationGroup("Elixir")
-                    .createNotification("mix new failed", processOutput.stderr, NotificationType.ERROR)
+                    .createNotification("mix new failed", stderrWithoutColorCodes, NotificationType.ERROR)
                     // project will fail to initialize and not have a window, so don't use `project`
                     .notify(null)
 
