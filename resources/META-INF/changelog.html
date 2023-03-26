@@ -99,6 +99,18 @@
       </li>
       <li>Prevent listing variants from outer module in nested module.</li>
       <li>Log the accumulated and target usage type that cannot be folded.</li>
+      <li>Fix reporting <code>mix new</code> errors as notifications
+        <ul dir="auto">
+          <li>Don't associate mix new errors with new project as it doesn't have a frame, so the notification was suppressed before.</li>
+          <li>Strip color codes from mix new error notification.</li>
+        </ul>
+      </li>
+      <li>Validate <code>--app</code> is set correctly for new projects
+        <ul dir="auto">
+          <li>If inferred from project name, make sure the name is valid application name the same as <code>mix new</code> does.</li>
+          <li>If <code>--app</code> is set explicitly, make sure it follows naming rules for <code>mix new</code>.</li>
+        </ul>
+      </li>
     </ul>
   </li>
 </ul>
