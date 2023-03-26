@@ -68,6 +68,31 @@ class Step(parent: NewProjectWizardLanguageStep) : AbstractNewProjectWizardStep(
                     textField()
                         .bindText(mixNewAppProperty)
                         .horizontalAlign(HorizontalAlign.FILL)
+                        .validationOnApply {
+                            if (mixNewApp.isNullOrBlank()) {
+                                val name = this@Step.name
+
+                                if (!name.matches(APPLICATION_NAME_REGEX)) {
+                                    error(
+                                        "Application name ust start with a lowercase ASCII letter, followed by " +
+                                                "lowercase ASCII letters, numbers, or underscores, got: \"${name}\"" +
+                                                ". The application name is inferred from the path, if you'd like to" +
+                                                " explicitly name the application set --app"
+                                    )
+                                } else {
+                                    null
+                                }
+                            } else {
+                                if (!mixNewApp.matches(APPLICATION_NAME_REGEX)) {
+                                    error(
+                                        "Application name ust start with a lowercase ASCII letter, followed by " +
+                                                "lowercase ASCII letters, numbers, or underscores."
+                                    )
+                                } else {
+                                    null
+                                }
+                            }
+                        }
                 }.bottomGap(BottomGap.SMALL)
                 row("--module") {
                     textField()
@@ -191,6 +216,7 @@ private val ANY_SDK_FILTER: ((Sdk) -> Boolean) = { true }
 private val ANY_SDK_TYPE_FILTER: ((SdkTypeId) -> Boolean) = { true }
 private val ANY_SUGGESTED_SDK_FILTER: ((SdkListItem.SuggestedItem) -> Boolean) = { true }
 private val NEW_SDK_CALLBACK_DEFAULT: ((Sdk) -> Unit) = {}
+private val APPLICATION_NAME_REGEX: Regex = Regex("[a-z]([a-z0-9_])*")
 
 fun Row.elixirSdkComboBox(context: WizardContext, sdkProperty: ObservableMutableProperty<Sdk?>): Cell<JdkComboBox> {
     val sdksModel = ProjectSdksModel()
