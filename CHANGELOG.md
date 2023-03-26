@@ -626,7 +626,14 @@
   * Prevent listing variants from outer module in nested module 
 * [#3139](https://github.com/KronicDeth/intellij-elixir/pull/3139) - [@KronicDeth](https://github.com/KronicDeth)
   * Log the accumulated and target usage type that cannot be folded.
-
+* [#3140](https://github.com/KronicDeth/intellij-elixir/pull/3140) - [@KronicDeth](https://github.com/KronicDeth)
+  * Fix reporting `mix new` errors as notifications
+    * Don't associate mix new errors with new project as it doesn't have a frame, so the notification was suppressed before.
+    * Strip color codes from mix new error notification.
+  * Validate `--app` is set correctly for new projects
+    * If inferred from project name, make sure the name is valid application name the same as `mix new` does.
+    * If `--app` is set explicitly, make sure it follows naming rules for `mix new`.
+  
 ## v14.0.0
 
 ### Incompatible Changes
