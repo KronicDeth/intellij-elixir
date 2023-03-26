@@ -140,7 +140,8 @@ class Step(parent: NewProjectWizardLanguageStep) : AbstractNewProjectWizardStep(
                     .getInstance()
                     .getNotificationGroup("Elixir")
                     .createNotification("mix new failed", processOutput.stderr, NotificationType.ERROR)
-                    .notify(project)
+                    // project will fail to initialize and not have a window, so don't use `project`
+                    .notify(null)
 
                 throw IOException()
             }
