@@ -79,7 +79,8 @@ class Protocol : LineMarkerProvider {
 
                                             if (implNameArityInterval.name == protocolNameArityInterval.name &&
                                                 implNameArityInterval.arityInterval.overlaps
-                                                    (protocolNameArityInterval.arityInterval)) {
+                                                    (protocolNameArityInterval.arityInterval)
+                                            ) {
                                                 implementations.add(callDefinition)
                                             }
                                         }
@@ -104,16 +105,15 @@ class Protocol : LineMarkerProvider {
             null
         }
 
-    private class ImplsGutterIconBuilder() :
+    private class ImplsGutterIconBuilder :
         NavigationGutterIconBuilder<PsiElement>(
             Icons.Protocol.GoToImplementations,
             DEFAULT_PSI_CONVERTOR,
             PSI_GOTO_RELATED_ITEM_PROVIDER
         ) {
-
         override fun createGutterIconRenderer(
-            pointers: NotNullLazyValue<List<SmartPsiElementPointer<*>>>,
-            renderer: Computable<PsiElementListCellRenderer<*>>,
+            pointers: NotNullLazyValue<out MutableList<SmartPsiElementPointer<*>>>,
+            renderer: Computable<out PsiElementListCellRenderer<*>>,
             empty: Boolean,
             navigationHandler: GutterIconNavigationHandler<PsiElement>?
         ): NavigationGutterIconRenderer {
@@ -133,8 +133,8 @@ class Protocol : LineMarkerProvider {
     private class ImplsNavigationGutterIconRenderer(
         popupTitle: String?,
         emptyText: String?,
-        pointers: NotNullLazyValue<List<SmartPsiElementPointer<*>>>,
-        cellRenderer: Computable<PsiElementListCellRenderer<*>>,
+        pointers: NotNullLazyValue<out MutableList<SmartPsiElementPointer<*>>>,
+        cellRenderer: Computable<out PsiElementListCellRenderer<*>>,
         private val alignment: Alignment,
         private val icon: Icon,
         private val tooltipText: String?,

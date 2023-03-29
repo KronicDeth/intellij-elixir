@@ -19,7 +19,6 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.platform.PlatformProjectOpenProcessor.Companion.runDirectoryProjectConfigurators
 import com.intellij.projectImport.ProjectAttachProcessor
 import com.intellij.util.PlatformUtils
-import com.intellij.util.io.exists
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.elixir_lang.DepsWatcher
@@ -28,6 +27,7 @@ import org.elixir_lang.mix.Project.addFolders
 import org.elixir_lang.mix.Watcher
 import java.nio.file.Path
 import java.nio.file.Paths
+import kotlin.io.path.exists
 
 /**
  * Used in Small IDEs like Rubymine that don't support [OpenProcessor].

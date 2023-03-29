@@ -12,7 +12,6 @@ import com.intellij.execution.runners.RunConfigurationWithSuppressedDefaultRunAc
 import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.options.SettingsEditorGroup
 import com.intellij.openapi.project.Project
-import com.intellij.util.io.exists
 import org.elixir_lang.Distillery
 import org.elixir_lang.debugger.Modules
 import org.elixir_lang.debugger.configuration.Debuggable
@@ -23,6 +22,7 @@ import org.jdom.Element
 import java.io.File
 import java.nio.file.Path
 import java.nio.file.Paths
+import kotlin.io.path.exists
 
 class Configuration(name: String, project: Project, configurationFactory: ConfigurationFactory) :
     org.elixir_lang.run.Configuration(name, project, configurationFactory),
