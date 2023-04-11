@@ -1,5 +1,20 @@
 <html>
 <body>
+<h1>v14.0.2</h1>
+<ul>
+  <li>
+    <p>Bug Fixes</p>
+    <ul>
+      <li>
+        <p>Ignore from preload list that doesn't have square brackets.</p>
+        <p>
+          When trying to resolve keyword keys to <code>from</code>, don't error on unknown keys if any previous key was
+          preload as this may be a list of preloads that is missing the square brackets.
+        </p>
+      </li>
+    </ul>
+  </li>
+</ul>
 <h1>v14.0.1</h1>
 <ul>
   <li>
@@ -94,8 +109,8 @@
         </p>
       </li>
       <li>
-        <p>List `Kernel` and `Kernel.SpecialForms` variants inside modulars.</p>
-        <p>Keep processing at end of modulars when looking for variants, which will check the implicit imports of `Kernel` and `Kernel.SpecialForms`.</p>
+        <p>List <code>Kernel</code> and <code>Kernel.SpecialForms</code> variants inside modulars.</p>
+        <p>Keep processing at end of modulars when looking for variants, which will check the implicit imports of <code>Kernel</code> and <code>Kernel.SpecialForms</code>.</p>
       </li>
       <li>Prevent listing variants from outer module in nested module.</li>
       <li>Log the accumulated and target usage type that cannot be folded.</li>

@@ -9,6 +9,7 @@ import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
 import org.elixir_lang.psi.impl.childExpressions
+import org.elixir_lang.psi.impl.prevSiblingSequence
 import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.psi.impl.whileInChildExpressions
 import org.elixir_lang.psi.operation.Arrow
@@ -136,11 +137,17 @@ private object From : NameArityRangeWalker("from", 1..2) {
                     "windows" -> true
 
                     else -> {
-                        Logger.error(
-                            logger,
-                            "Don't know how to find reference variables for keyword key $keywordKeyText",
-                            fromKeywords
-                        )
+                        // https://github.com/KronicDeth/intellij-elixir/issues/3171
+                        // Missing list around preload arguments
+                        if (!fromKeywords.prevSiblingSequence().filterIsInstance<QuotableKeywordPair>().drop(1).any {
+                                it.keywordKey.text in arrayOf("preload")
+                            }) {
+                            Logger.error(
+                                logger,
+                                "Don't know how to find reference variables for keyword key $keywordKeyText",
+                                fromKeywords
+                            )
+                        }
 
                         true
                     }
