@@ -1,7 +1,7 @@
 plugins {
-    id 'org.jetbrains.intellij' version "1.13.3"
+    id "org.jetbrains.intellij" version "1.13.3"
     id "org.jetbrains.kotlin.jvm" version "1.7.20"
-    id 'de.undercouch.download' version "4.1.2"
+    id "de.undercouch.download" version "4.1.2"
 }
 
 ext {
@@ -75,7 +75,7 @@ allprojects {
 
     publishPlugin {
         distributionFile = provider {
-            System.getenv("ASSET_PATH")
+            file(System.getenv("ASSET_PATH"))
         }
         token = provider {
             System.getenv("JET_BRAINS_MARKETPLACE_TOKEN")
