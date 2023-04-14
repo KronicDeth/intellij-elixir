@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   test:
@@ -16,7 +16,7 @@ jobs:
         with:
           java-version: 17
       - name: Set up Elixir
-        uses: actions/setup-elixir@v1
+        uses: erlef/setup-beam@v1
         with:
           otp-version: 24.3.4.6
           elixir-version: 1.13.0
