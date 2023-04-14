@@ -256,7 +256,7 @@ Table of Contents[![Backers on Open Collective](https://opencollective.com/intel
 
 # Elixir plugin
 
-[![Build Status](https://travis-ci.org/KronicDeth/intellij-elixir.svg?branch=master)](https://travis-ci.org/KronicDeth/intellij-elixir)
+[![Build Status](https://travis-ci.org/KronicDeth/intellij-elixir.svg?branch=main)](https://travis-ci.org/KronicDeth/intellij-elixir)
 
 This is a plugin that adds support for [Elixir](http://elixir-lang.org/) to JetBrains IDEs.
 
@@ -5775,7 +5775,7 @@ The Visibility icons indicated whether the element is usable outside its definin
 
 ### Canary releases
 
-Builds on `master` will produce pre-release builds of format `NEXT_VERSION-pre+YYYYMMDDHHMMSS`.
+Builds on `main` will produce pre-release builds of format `NEXT_VERSION-pre+YYYYMMDDHHMMSS`.
 
 #### Inside IDE using JetBrains repository
 
