@@ -16,6 +16,8 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 17
+      - name: Install Elixir shared libraries
+        run: sudo apt-get install libncurses5
       - name: Set up Elixir
         uses: erlef/setup-beam@v1
         with:
