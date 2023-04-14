@@ -4,7 +4,7 @@
 
 Any changes to the README are delayed until the last PR before release because in the past new users have read the
 README and assumed that any features in the README MUST exist in the version they can install from the JetBrains
-repository, so documenting `master` features in the README leads to just more support work.
+repository, so documenting `main` features in the README leads to just more support work.
 
 ## Build Release
 

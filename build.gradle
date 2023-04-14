@@ -75,7 +75,7 @@ allprojects {
 
     publishPlugin {
         distributionFile = provider {
-            System.getenv("ASSET_PATH")
+            new File(System.getenv("ASSET_PATH"))
         }
         token = provider {
             System.getenv("JET_BRAINS_MARKETPLACE_TOKEN")
