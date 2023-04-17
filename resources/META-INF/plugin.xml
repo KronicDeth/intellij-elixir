@@ -9,8 +9,6 @@
     <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
          on how to target different products -->
     <depends>com.intellij.modules.lang</depends>
-    <!-- Needed for JPS builder -->
-    <depends optional="true">com.intellij.modules.java</depends>
     <depends>org.intellij.plugins.markdown</depends>
     <depends config-file="rich-platform-plugin.xml" optional="true">com.intellij.modules.java</depends>
 
