@@ -294,6 +294,8 @@
 * [#3172](https://github.com/KronicDeth/intellij-elixir/pull/3172) - [@KronicDeth](https://github.com/KronicDeth)
   * Ignore from preload list that doesn't have square brackets.
     When trying to resolve keyword keys to `from`, don't error on unknown keys if any previous key was preload as this may be a list of preloads that is missing the square brackets.
+* [#3176](https://github.com/KronicDeth/intellij-elixir/pull/3176) - [@sh41](https://github.com/sh41)
+  * Re-enable canary releases.
 
 ## v14.0.1
 
