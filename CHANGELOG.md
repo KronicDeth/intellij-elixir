@@ -280,6 +280,13 @@
 
 </details>
 
+## v15.0.1
+
+### Bug Fixes
+* [#3183](https://github.com/KronicDeth/intellij-elixir/pull/3183) - [@vanderson139](https://github.com/vanderson139)
+  * Support 2023.1 RubyMine and WebStorm.
+    RubyMine and WebStorm have a `FIX` version of `174`, which is less than IntelliJ's `175` in IntelliJ 2023.1's builder number, `231.8109.175`.
+
 ## v15.0.0
 
 ### Incompatible Changes
