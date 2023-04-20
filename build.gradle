@@ -69,7 +69,7 @@ allprojects {
         changeNotes.set(bodyInnerHTML("resources/META-INF/changelog.html"))
         pluginDescription.set(bodyInnerHTML("resources/META-INF/description.html"))
 
-        sinceBuild = "231.8109.175"
+        sinceBuild = "231.8109.174"
         untilBuild = "231.*"
     }
 
