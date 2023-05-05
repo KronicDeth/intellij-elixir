@@ -290,6 +290,8 @@
 * [#3185](https://github.com/KronicDeth/intellij-elixir/pull/3213) - [@KronicDeth](https://github.com/KronicDeth)
   * Replace uses of `Cell.horizontalAlign(HorizontalAlign)`
     The API is scheduled for removal and is replaced by `Call.align(AlignX.FILL)`.
+* [#3214](https://github.com/KronicDeth/intellij-elixir/pull/3214) - [@KronicDeth](https://github.com/KronicDeth)
+  * Ignore `group:` for docs.
 
 ## v15.0.1
 
