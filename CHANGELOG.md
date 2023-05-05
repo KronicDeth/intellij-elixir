@@ -1443,54 +1443,54 @@
       The generated `MyApp.Endpoint` for `mix phx.new` has a section to enable code-reloading at compile time:
 
       ```elixir
-    # Code reloading can be explicitly enabled under the
-    # :code_reloader configuration of your endpoint.
-    if code_reloading? do socket("/phoenix/live_reload/socket", Phoenix.LiveReloader.Socket)
-    plug(Phoenix.LiveReloader)
-    plug(Phoenix.CodeReloader)
-    end
-    ```
+      # Code reloading can be explicitly enabled under the
+      # :code_reloader configuration of your endpoint.
+      if code_reloading? do socket("/phoenix/live_reload/socket", Phoenix.LiveReloader.Socket)
+      plug(Phoenix.LiveReloader)
+      plug(Phoenix.CodeReloader)
+      end
+      ```
 
-          Previously, `code_reloading?` variable would not resolve because psi.scope.Variable ignored `use` calls,
-          not `use` calls are entered and the `var!(code_reloading?)` is found in `Phoenix.Endpoint.config/1` by way of
-          the `unquote(config(opts))` call in the `quote` block in `__using__(opts)`.
-        * Resolve qualified calls with unknown resolvable qualifier using only relative identifier and arity.
-        * `@spec`
-            * Resolve `@spec` to `defdelegate` calls.
-            * Resolve @specs to the definitions if the definitions are in a for comprehension
-        * `Ecto`
-            * `Query`
-                * Resolve reference variables in `Ecto.Query`
-                    * Reference variables are introduced in as the left operand of `in` passed to `from/2` and
-                      the `join:` keyword in `from/2`.
-                    * `join/3-5`
-                    * Resolve bindings in `select/2-3`.
-                    * Resolve reference variables in `where/2,3` binding. Also add support for resolving `a`
-                      in `[{^assoc, a}]` binding.
-                    * Resolve `bindings` in `group_by/2-3`.
-                    * Resolve `bindings` and `expressions` in `order_by/2-3`.
-                    * Resolve `bindings` in `having/2-3`.
-                    * Add `select_merge` to declaring `Ecto.Query` macros.
-                    * Add `distinct/2-3` as a declaring `Ecto.Query` macro.
-                * Resolve `field` calls in Ecto `schema` blocks
+      Previously, `code_reloading?` variable would not resolve because psi.scope.Variable ignored `use` calls,
+      not `use` calls are entered and the `var!(code_reloading?)` is found in `Phoenix.Endpoint.config/1` by way of
+      the `unquote(config(opts))` call in the `quote` block in `__using__(opts)`.
+    * Resolve qualified calls with unknown resolvable qualifier using only relative identifier and arity.
+    * `@spec`
+      * Resolve `@spec` to `defdelegate` calls.
+      * Resolve @specs to the definitions if the definitions are in a for comprehension
+    * `Ecto`
+      * `Query`
+        * Resolve reference variables in `Ecto.Query`
+          * Reference variables are introduced in as the left operand of `in` passed to `from/2` and
+            the `join:` keyword in `from/2`.
+          * `join/3-5`
+          * Resolve bindings in `select/2-3`.
+          * Resolve reference variables in `where/2,3` binding. Also add support for resolving `a`
+            in `[{^assoc, a}]` binding.
+          * Resolve `bindings` in `group_by/2-3`.
+          * Resolve `bindings` and `expressions` in `order_by/2-3`.
+          * Resolve `bindings` in `having/2-3`.
+          * Add `select_merge` to declaring `Ecto.Query` macros.
+          * Add `distinct/2-3` as a declaring `Ecto.Query` macro.
+        * Resolve `field` calls in Ecto `schema` blocks
 
-                  How `field` works in `schema` for `Ecto.Schema`
-                    1. `use Ecto.Schema`
-                    2. `Ecto.Schema.__using__`
-                    3. `import Ecto.Schema, only: [schema: 2, embedded_schema: 1]``
+          How `field` works in `schema` for `Ecto.Schema`
+            1. `use Ecto.Schema`
+            2. `Ecto.Schema.__using__`
+            3. `import Ecto.Schema, only: [schema: 2, embedded_schema: 1]``
 
-                  Note that only the outer DSLs, schema and embedded_schema are available even though field/2 is defined
-                  in Ecto.Schema.
+          Note that only the outer DSLs, schema and embedded_schema are available even though field/2 is defined
+          in Ecto.Schema.
 
-                  So when you call `schema ... do`
-                    1. `defmacro schema(source, [do: block])`
-                    2. `schema(__CALLER__, source, true, :id, block)`
-                    3. `defp schema(caller, source, meta?, type, block)`
-                    4. There's a big `prelude = quote do` quote block
+          So when you call `schema ... do`
+            1. `defmacro schema(source, [do: block])`
+            2. `schema(__CALLER__, source, true, :id, block)`
+            3. `defp schema(caller, source, meta?, type, block)`
+            4. There's a big `prelude = quote do` quote block
 
-                  At the end of prelude there is
+          At the end of prelude there is
 
-                  ```elixir
+          ```elixir
           try do
             import Ecto.Schema
             unquote(block)
@@ -1499,51 +1499,51 @@
           end
           ```
 
-                  Hey! An `import Ecto.Schema`, but `prelude` is just floating as a variable. At the end
-                  of  `defp schema(caller, source, meta?, type, block)` is
+          Hey! An `import Ecto.Schema`, but `prelude` is just floating as a variable. At the end
+          of  `defp schema(caller, source, meta?, type, block)` is
 
-                  ```elixir
+          ```elixir
           quote do
             unquote(prelude)
             unquote(postlude)
           end
           ```
 
-                  So to statically analyze an `Ecto.Schema` module.
+          So to statically analyze an `Ecto.Schema` module.
 
-                    1. Resolve `schema/2` to `defmacro schema` by walking the `use`, `__using__`, `quote`, and `import`.
-                    2. Inside the `schema/2` (or macros in general if you want to get fancy 💅 and support more DSLs),
-                    3. Go into the body of the macro. If there's a call, resolve it
-                    4. Go into the called function
-                    5. Look for a `quote` block at the end (the same as my current `__using__` support)
-                    6. If there's a `Call` inside an `unquote` see if you can resolve it to a variable in addition to a
-                       call definition (which is already supported for Phoenix).
-                    7. If it's a variable, check it's value. If it's a `quote`, use the quote block handling
-                    8. In the quote block handling add support for `try`
-                    9. Walk the `try` and see the `import`, walk the `import` to find `Ecto.Schema.field/2`
-                * `API`
-                    * Resolve `Ecto.Query.API` functions in `Ecto.Query`
-                    * `from(order_by: ...)`
-                    * `from(select: ...)`
-                        * `from(select: tuple())`
-                    * `from(where: ...)`
-                    * `group_by/2-3`
-                    * `having/2-3`
-                    * `select/2-3` `expr` argument
-                    * `where`
-                    * Resolve `Ecto.Query.API.fragment` to arity interval `0..`.
-                    * Resolve `fragment` nested in other `Ecto.Query.API` call like `type`.
-                    * Walk `rightOperand` of `join(..., ... in ..., ...)` for `Ecto.Query.API` usages like `fragment`.
-        * Resolve module attributes defined in `use` `__using__` `quote` block
-            * Change `org.elixir_lang.reference.resolver.ModuleAttribute` to use `PsiScopeProcessor` for non-`@for` and
-              non-`@protocol` instead of custom logic.
-            * Don't descend into a `use` if the `ENTRANCE` is an ancestor since that means the `Alias` on the `use` is
-              probably being resolved.
-            * `AtUnqualifiedNoParenthesesCall.processDeclarations` will call `processor.execute` when it isn't a type
-              spec.
-            * The `UseScopeSelector` for `AtUnqualifiedNoParenthesesCallImpl` has been changed
-              to `SELF_AND_FOLLOWING_SIBLINGS` since the module attribute is used that way. The previous `SELF` value
-              was when the `UseScopeSelector` only applied to variables.
+          1. Resolve `schema/2` to `defmacro schema` by walking the `use`, `__using__`, `quote`, and `import`.
+          2. Inside the `schema/2` (or macros in general if you want to get fancy 💅 and support more DSLs),
+          3. Go into the body of the macro. If there's a call, resolve it
+          4. Go into the called function
+          5. Look for a `quote` block at the end (the same as my current `__using__` support)
+          6. If there's a `Call` inside an `unquote` see if you can resolve it to a variable in addition to a
+             call definition (which is already supported for Phoenix).
+          7. If it's a variable, check it's value. If it's a `quote`, use the quote block handling
+          8. In the quote block handling add support for `try`
+          9. Walk the `try` and see the `import`, walk the `import` to find `Ecto.Schema.field/2`
+      * `API`
+        * Resolve `Ecto.Query.API` functions in `Ecto.Query`
+        * `from(order_by: ...)`
+        * `from(select: ...)`
+                * `from(select: tuple())`
+        * `from(where: ...)`
+        * `group_by/2-3`
+        * `having/2-3`
+        * `select/2-3` `expr` argument
+        * `where`
+        * Resolve `Ecto.Query.API.fragment` to arity interval `0..`.
+        * Resolve `fragment` nested in other `Ecto.Query.API` call like `type`.
+        * Walk `rightOperand` of `join(..., ... in ..., ...)` for `Ecto.Query.API` usages like `fragment`.
+    * Resolve module attributes defined in `use` `__using__` `quote` block
+      * Change `org.elixir_lang.reference.resolver.ModuleAttribute` to use `PsiScopeProcessor` for non-`@for` and
+        non-`@protocol` instead of custom logic.
+      * Don't descend into a `use` if the `ENTRANCE` is an ancestor since that means the `Alias` on the `use` is
+        probably being resolved.
+      * `AtUnqualifiedNoParenthesesCall.processDeclarations` will call `processor.execute` when it isn't a type
+        spec.
+      * The `UseScopeSelector` for `AtUnqualifiedNoParenthesesCallImpl` has been changed
+        to `SELF_AND_FOLLOWING_SIBLINGS` since the module attribute is used that way. The previous `SELF` value
+        was when the `UseScopeSelector` only applied to variables.
   * "Elixir References" inspection for finding unresolved or invalid references.
     * `visitAtNonNumericOperation`
       Helps "Elixir References" find unresolved assigns.
