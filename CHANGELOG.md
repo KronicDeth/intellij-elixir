@@ -4,253 +4,255 @@
 
 <details>
 
-* [v15.0.1](#v1501)
+* [v15.0.2](#v1502)
    * [Bug Fixes](#bug-fixes)
+* [v15.0.1](#v1501)
+   * [Bug Fixes](#bug-fixes-1)
 * [v15.0.0](#v1500)
    * [Incompatible Changes](#incompatible-changes)
    * [Enhancements](#enhancements)
-   * [Bug Fixes](#bug-fixes-1)
-* [v14.0.1](#v1401)
    * [Bug Fixes](#bug-fixes-2)
+* [v14.0.1](#v1401)
+   * [Bug Fixes](#bug-fixes-3)
 * [v14.0.0](#v1400)
    * [Incompatible Changes](#incompatible-changes-1)
    * [Enhancements](#enhancements-1)
-   * [Bug Fixes](#bug-fixes-3)
-* [v13.2.1](#v1321)
    * [Bug Fixes](#bug-fixes-4)
+* [v13.2.1](#v1321)
+   * [Bug Fixes](#bug-fixes-5)
 * [v13.2.0](#v1320)
    * [Enhancements](#enhancements-2)
-   * [Bug Fixes](#bug-fixes-5)
-* [v13.1.1](#v1311)
    * [Bug Fixes](#bug-fixes-6)
+* [v13.1.1](#v1311)
+   * [Bug Fixes](#bug-fixes-7)
 * [v13.1.0](#v1310)
    * [Enhancements](#enhancements-3)
-   * [Bug Fixes](#bug-fixes-7)
+   * [Bug Fixes](#bug-fixes-8)
 * [v13.0.0](#v1300)
    * [Incompatible Changes](#incompatible-changes-2)
    * [Enhancements](#enhancements-4)
-   * [Bug Fixes](#bug-fixes-8)
-* [v12.2.1](#v1221)
    * [Bug Fixes](#bug-fixes-9)
+* [v12.2.1](#v1221)
+   * [Bug Fixes](#bug-fixes-10)
 * [v12.2.0](#v1220)
    * [Enhancements](#enhancements-5)
-   * [Bug Fixes](#bug-fixes-10)
+   * [Bug Fixes](#bug-fixes-11)
 * [v12.1.0](#v1210)
    * [Enhancements](#enhancements-6)
-   * [Bug Fixes](#bug-fixes-11)
-* [v12.0.1](#v1201)
    * [Bug Fixes](#bug-fixes-12)
+* [v12.0.1](#v1201)
+   * [Bug Fixes](#bug-fixes-13)
 * [v12.0.0](#v1200)
    * [Breaking Changes](#breaking-changes)
    * [Enhancements](#enhancements-7)
-   * [Bug Fixes](#bug-fixes-13)
-* [v11.13.0](#v11130)
    * [Bug Fixes](#bug-fixes-14)
+* [v11.13.0](#v11130)
+   * [Bug Fixes](#bug-fixes-15)
    * [Enhancements](#enhancements-8)
 * [v11.12.0](#v11120)
-   * [Bug Fixes](#bug-fixes-15)
+   * [Bug Fixes](#bug-fixes-16)
    * [Enhancements](#enhancements-9)
 * [v11.11.0](#v11110)
    * [Enhancements](#enhancements-10)
-   * [Bug Fixes](#bug-fixes-16)
+   * [Bug Fixes](#bug-fixes-17)
 * [v11.10.0](#v11100)
    * [Enhancements](#enhancements-11)
-   * [Bug Fixes](#bug-fixes-17)
-* [v11.9.2](#v1192)
    * [Bug Fixes](#bug-fixes-18)
-* [v11.9.1](#v1191)
+* [v11.9.2](#v1192)
    * [Bug Fixes](#bug-fixes-19)
+* [v11.9.1](#v1191)
+   * [Bug Fixes](#bug-fixes-20)
 * [v11.9.0](#v1190)
    * [Enhancements](#enhancements-12)
-   * [Bug Fixes](#bug-fixes-20)
-* [v11.8.1](#v1181)
    * [Bug Fixes](#bug-fixes-21)
+* [v11.8.1](#v1181)
+   * [Bug Fixes](#bug-fixes-22)
 * [v11.8.0](#v1180)
    * [Enhancements](#enhancements-13)
-   * [Bug Fixes](#bug-fixes-22)
+   * [Bug Fixes](#bug-fixes-23)
 * [v11.7.0](#v1170)
    * [Enhancements](#enhancements-14)
-   * [Bug Fixes](#bug-fixes-23)
-* [v11.6.1](#v1161)
    * [Bug Fixes](#bug-fixes-24)
+* [v11.6.1](#v1161)
+   * [Bug Fixes](#bug-fixes-25)
 * [v11.6.0](#v1160)
    * [Enhancements](#enhancements-15)
-   * [Bug Fixes](#bug-fixes-25)
+   * [Bug Fixes](#bug-fixes-26)
 * [v11.5.0](#v1150)
    * [Enhancements](#enhancements-16)
-   * [Bug Fixes](#bug-fixes-26)
+   * [Bug Fixes](#bug-fixes-27)
 * [v11.4.0](#v1140)
    * [Enhancements](#enhancements-17)
 * [v11.3.0](#v1130)
    * [Enhancements](#enhancements-18)
-   * [Bug Fixes](#bug-fixes-27)
+   * [Bug Fixes](#bug-fixes-28)
 * [v11.2.0](#v1120)
    * [Enhancements](#enhancements-19)
-   * [Bug Fixes](#bug-fixes-28)
+   * [Bug Fixes](#bug-fixes-29)
 * [v11.1.0](#v1110)
    * [Enhancements](#enhancements-20)
-   * [Bug Fixes](#bug-fixes-29)
-* [v11.0.1](#v1101)
    * [Bug Fixes](#bug-fixes-30)
+* [v11.0.1](#v1101)
+   * [Bug Fixes](#bug-fixes-31)
 * [v11.0.0](#v1100)
    * [Enhancements](#enhancements-21)
-   * [Bug Fixes](#bug-fixes-31)
+   * [Bug Fixes](#bug-fixes-32)
    * [Incompatible Changes](#incompatible-changes-3)
 * [v10.6.0](#v1060)
    * [Enhancements](#enhancements-22)
-   * [Bug Fixes](#bug-fixes-32)
-* [v10.5.1](#v1051)
    * [Bug Fixes](#bug-fixes-33)
+* [v10.5.1](#v1051)
+   * [Bug Fixes](#bug-fixes-34)
 * [v10.5.0](#v1050)
    * [Enhancements](#enhancements-23)
-   * [Bug Fixes](#bug-fixes-34)
+   * [Bug Fixes](#bug-fixes-35)
 * [v10.4.0](#v1040)
    * [Enhancements](#enhancements-24)
-   * [Bug Fixes](#bug-fixes-35)
+   * [Bug Fixes](#bug-fixes-36)
 * [v10.3.0](#v1030)
    * [Enhancements](#enhancements-25)
-   * [Bug Fixes](#bug-fixes-36)
+   * [Bug Fixes](#bug-fixes-37)
 * [v10.2.0](#v1020)
    * [Enhancements](#enhancements-26)
-   * [Bug Fixes](#bug-fixes-37)
+   * [Bug Fixes](#bug-fixes-38)
 * [v10.1.0](#v1010)
    * [Enhancements](#enhancements-27)
-   * [Bug Fixes](#bug-fixes-38)
-* [v10.0.1](#v1001)
    * [Bug Fixes](#bug-fixes-39)
+* [v10.0.1](#v1001)
+   * [Bug Fixes](#bug-fixes-40)
 * [v10.0.0](#v1000)
    * [Enhancements](#enhancements-28)
-   * [Bug Fixes](#bug-fixes-40)
+   * [Bug Fixes](#bug-fixes-41)
    * [Incompatible Changes](#incompatible-changes-4)
 * [v9.0.0](#v900)
    * [Enhancements](#enhancements-29)
-   * [Bug Fixes](#bug-fixes-41)
+   * [Bug Fixes](#bug-fixes-42)
    * [Incompatible Changs](#incompatible-changs)
 * [v8.1.0](#v810)
    * [Enhancements](#enhancements-30)
-   * [Bug Fixes](#bug-fixes-42)
+   * [Bug Fixes](#bug-fixes-43)
 * [v8.0.0](#v800)
    * [Enhancements](#enhancements-31)
-   * [Bug Fixes](#bug-fixes-43)
+   * [Bug Fixes](#bug-fixes-44)
    * [Incompatible Changes](#incompatible-changes-5)
 * [v7.5.0](#v750)
    * [Enhancements](#enhancements-32)
-   * [Bug Fixes](#bug-fixes-44)
+   * [Bug Fixes](#bug-fixes-45)
 * [v7.4.0](#v740)
    * [Enhancements](#enhancements-33)
-   * [Bug Fixes](#bug-fixes-45)
+   * [Bug Fixes](#bug-fixes-46)
 * [v7.3.0](#v730)
    * [Enhancements](#enhancements-34)
-   * [Bug Fixes](#bug-fixes-46)
-* [v7.2.1](#v721)
    * [Bug Fixes](#bug-fixes-47)
+* [v7.2.1](#v721)
+   * [Bug Fixes](#bug-fixes-48)
 * [v7.2.0](#v720)
    * [Enhancements](#enhancements-35)
-   * [Bug Fixes](#bug-fixes-48)
+   * [Bug Fixes](#bug-fixes-49)
 * [v7.1.0](#v710)
    * [Enhancements](#enhancements-36)
-   * [Bug Fixes](#bug-fixes-49)
+   * [Bug Fixes](#bug-fixes-50)
 * [v7.0.0](#v700)
    * [Enhancements](#enhancements-37)
-   * [Bug Fixes](#bug-fixes-50)
+   * [Bug Fixes](#bug-fixes-51)
 * [Incompatible Changes](#incompatible-changes-6)
 * [v6.7.0](#v670)
    * [Enhancements](#enhancements-38)
-   * [Bug Fixes](#bug-fixes-51)
+   * [Bug Fixes](#bug-fixes-52)
 * [v6.6.0](#v660)
    * [Enhancements](#enhancements-39)
-   * [Bug Fixes](#bug-fixes-52)
-* [v6.5.1](#v651)
    * [Bug Fixes](#bug-fixes-53)
+* [v6.5.1](#v651)
+   * [Bug Fixes](#bug-fixes-54)
 * [v6.5.0](#v650)
    * [Enhancements](#enhancements-40)
-   * [Bug Fixes](#bug-fixes-54)
+   * [Bug Fixes](#bug-fixes-55)
 * [v6.4.0](#v640)
    * [Enhancements](#enhancements-41)
-   * [Bug Fixes](#bug-fixes-55)
+   * [Bug Fixes](#bug-fixes-56)
 * [v6.3.0](#v630)
    * [Enhancements](#enhancements-42)
-   * [Bug Fixes](#bug-fixes-56)
+   * [Bug Fixes](#bug-fixes-57)
 * [v6.2.0](#v620)
    * [Enhancements](#enhancements-43)
-   * [Bug Fixes](#bug-fixes-57)
-* [v6.1.1](#v611)
    * [Bug Fixes](#bug-fixes-58)
+* [v6.1.1](#v611)
+   * [Bug Fixes](#bug-fixes-59)
 * [v6.1.0](#v610)
    * [Enhancements](#enhancements-44)
-   * [Bug Fixes](#bug-fixes-59)
+   * [Bug Fixes](#bug-fixes-60)
 * [v6.0.0](#v600)
    * [Enhancements](#enhancements-45)
-   * [Bug Fixes](#bug-fixes-60)
+   * [Bug Fixes](#bug-fixes-61)
    * [Incompatible Changes](#incompatible-changes-7)
 * [v5.1.0](#v510)
    * [Enhancements](#enhancements-46)
-   * [Bug Fixes](#bug-fixes-61)
+   * [Bug Fixes](#bug-fixes-62)
 * [v5.0.0](#v500)
    * [Enhancements](#enhancements-47)
-   * [Bug Fixes](#bug-fixes-62)
+   * [Bug Fixes](#bug-fixes-63)
    * [Incompatible Changes](#incompatible-changes-8)
 * [v4.7.0](#v470)
    * [Enhancements](#enhancements-48)
-   * [Bug Fixes](#bug-fixes-63)
+   * [Bug Fixes](#bug-fixes-64)
 * [v4.6.0](#v460)
    * [Enhancements](#enhancements-49)
-   * [Bug Fixes](#bug-fixes-64)
+   * [Bug Fixes](#bug-fixes-65)
 * [v4.5.0](#v450)
    * [Enhancements](#enhancements-50)
 * [v4.4.0](#v440)
    * [Enhancements](#enhancements-51)
-   * [Bug Fixes](#bug-fixes-65)
+   * [Bug Fixes](#bug-fixes-66)
 * [v4.3.0](#v430)
    * [Enhancements](#enhancements-52)
-   * [Bug Fixes](#bug-fixes-66)
+   * [Bug Fixes](#bug-fixes-67)
 * [v4.2.0](#v420)
    * [Enhancements](#enhancements-53)
-   * [Bug Fixes](#bug-fixes-67)
+   * [Bug Fixes](#bug-fixes-68)
 * [v4.1.0](#v410)
    * [Enhancements](#enhancements-54)
-   * [Bug Fixes](#bug-fixes-68)
+   * [Bug Fixes](#bug-fixes-69)
 * [v4.0.0](#v400)
    * [Enhancements](#enhancements-55)
-   * [Bug Fixes](#bug-fixes-69)
+   * [Bug Fixes](#bug-fixes-70)
    * [Incompatible Changes](#incompatible-changes-9)
 * [v3.0.1](#v301)
-   * [Bug Fixes](#bug-fixes-70)
+   * [Bug Fixes](#bug-fixes-71)
 * [v3.0.0](#v300)
    * [Enhancements](#enhancements-56)
-   * [Bug Fixes](#bug-fixes-71)
+   * [Bug Fixes](#bug-fixes-72)
    * [Incompatible Changes](#incompatible-changes-10)
 * [v2.2.0](#v220)
    * [Enhancement](#enhancement)
-   * [Bug Fixes](#bug-fixes-72)
+   * [Bug Fixes](#bug-fixes-73)
 * [v2.1.0](#v210)
    * [Enhancement](#enhancement-1)
-   * [Bug Fixes](#bug-fixes-73)
+   * [Bug Fixes](#bug-fixes-74)
 * [v2.0.0](#v200)
    * [Enhancements](#enhancements-57)
-   * [Bug Fixes](#bug-fixes-74)
+   * [Bug Fixes](#bug-fixes-75)
    * [Incompatible Changes](#incompatible-changes-11)
 * [v1.2.1](#v121)
    * [Enhancements](#enhancements-58)
-   * [Bug Fixes](#bug-fixes-75)
+   * [Bug Fixes](#bug-fixes-76)
 * [v1.2.0](#v120)
    * [Enhancements](#enhancements-59)
-   * [Bug Fixes](#bug-fixes-76)
+   * [Bug Fixes](#bug-fixes-77)
 * [v1.1.0](#v110)
    * [Enhancements](#enhancements-60)
 * [v1.0.0](#v100)
    * [Enhancements](#enhancements-61)
-   * [Bug Fixes](#bug-fixes-77)
+   * [Bug Fixes](#bug-fixes-78)
    * [Incompatible Fixes](#incompatible-fixes)
 * [v0.3.5](#v035)
    * [Enhancements](#enhancements-62)
-   * [Bug Fixes](#bug-fixes-78)
+   * [Bug Fixes](#bug-fixes-79)
 * [v0.3.4](#v034)
    * [Enhancements](#enhancements-63)
 * [v0.3.3](#v033)
    * [Enhancements](#enhancements-64)
 * [v0.3.2](#v032)
-   * [Bug Fixes](#bug-fixes-79)
+   * [Bug Fixes](#bug-fixes-80)
 * [v0.3.1](#v031)
    * [Enhancements](#enhancements-65)
 * [v0.3.0](#v030)
@@ -258,29 +260,36 @@
    * [Incompatible Changes](#incompatible-changes-12)
 * [v0.2.1](#v021)
    * [Enhancements](#enhancements-67)
-   * [Bug Fixes](#bug-fixes-80)
+   * [Bug Fixes](#bug-fixes-81)
 * [v0.2.0](#v020)
    * [Enhancements](#enhancements-68)
    * [Incompatible Changes](#incompatible-changes-13)
 * [v0.1.4](#v014)
    * [Enhancements](#enhancements-69)
-   * [Bug Fixes](#bug-fixes-81)
-* [v0.1.3](#v013)
    * [Bug Fixes](#bug-fixes-82)
+* [v0.1.3](#v013)
+   * [Bug Fixes](#bug-fixes-83)
 * [v0.1.2](#v012)
    * [Enhancements](#enhancements-70)
 * [v0.1.1](#v011)
-   * [Bug Fixes](#bug-fixes-83)
+   * [Bug Fixes](#bug-fixes-84)
 * [v0.1.0](#v010)
    * [Enhancements](#enhancements-71)
-   * [Bug Fixes](#bug-fixes-84)
+   * [Bug Fixes](#bug-fixes-85)
 * [v0.0.3](#v003)
    * [Enhancements](#enhancements-72)
 * [v0.0.2](#v002)
    * [Enhancements](#enhancements-73)
-   * [Bug Fixes](#bug-fixes-85)
+   * [Bug Fixes](#bug-fixes-86)
 
 </details>
+
+## v15.0.2
+
+### Bug Fixes
+* [#3185](https://github.com/KronicDeth/intellij-elixir/pull/3213) - [@KronicDeth](https://github.com/KronicDeth)
+  * Replace uses of `Cell.horizontalAlign(HorizontalAlign)`
+    The API is scheduled for removal and is replaced by `Call.align(AlignX.FILL)`.
 
 ## v15.0.1
 
@@ -1434,54 +1443,54 @@
       The generated `MyApp.Endpoint` for `mix phx.new` has a section to enable code-reloading at compile time:
 
       ```elixir
-    # Code reloading can be explicitly enabled under the
-    # :code_reloader configuration of your endpoint.
-    if code_reloading? do socket("/phoenix/live_reload/socket", Phoenix.LiveReloader.Socket)
-    plug(Phoenix.LiveReloader)
-    plug(Phoenix.CodeReloader)
-    end
-    ```
+      # Code reloading can be explicitly enabled under the
+      # :code_reloader configuration of your endpoint.
+      if code_reloading? do socket("/phoenix/live_reload/socket", Phoenix.LiveReloader.Socket)
+      plug(Phoenix.LiveReloader)
+      plug(Phoenix.CodeReloader)
+      end
+      ```
 
-          Previously, `code_reloading?` variable would not resolve because psi.scope.Variable ignored `use` calls,
-          not `use` calls are entered and the `var!(code_reloading?)` is found in `Phoenix.Endpoint.config/1` by way of
-          the `unquote(config(opts))` call in the `quote` block in `__using__(opts)`.
-        * Resolve qualified calls with unknown resolvable qualifier using only relative identifier and arity.
-        * `@spec`
-            * Resolve `@spec` to `defdelegate` calls.
-            * Resolve @specs to the definitions if the definitions are in a for comprehension
-        * `Ecto`
-            * `Query`
-                * Resolve reference variables in `Ecto.Query`
-                    * Reference variables are introduced in as the left operand of `in` passed to `from/2` and
-                      the `join:` keyword in `from/2`.
-                    * `join/3-5`
-                    * Resolve bindings in `select/2-3`.
-                    * Resolve reference variables in `where/2,3` binding. Also add support for resolving `a`
-                      in `[{^assoc, a}]` binding.
-                    * Resolve `bindings` in `group_by/2-3`.
-                    * Resolve `bindings` and `expressions` in `order_by/2-3`.
-                    * Resolve `bindings` in `having/2-3`.
-                    * Add `select_merge` to declaring `Ecto.Query` macros.
-                    * Add `distinct/2-3` as a declaring `Ecto.Query` macro.
-                * Resolve `field` calls in Ecto `schema` blocks
+      Previously, `code_reloading?` variable would not resolve because psi.scope.Variable ignored `use` calls,
+      not `use` calls are entered and the `var!(code_reloading?)` is found in `Phoenix.Endpoint.config/1` by way of
+      the `unquote(config(opts))` call in the `quote` block in `__using__(opts)`.
+    * Resolve qualified calls with unknown resolvable qualifier using only relative identifier and arity.
+    * `@spec`
+      * Resolve `@spec` to `defdelegate` calls.
+      * Resolve @specs to the definitions if the definitions are in a for comprehension
+    * `Ecto`
+      * `Query`
+        * Resolve reference variables in `Ecto.Query`
+          * Reference variables are introduced in as the left operand of `in` passed to `from/2` and
+            the `join:` keyword in `from/2`.
+          * `join/3-5`
+          * Resolve bindings in `select/2-3`.
+          * Resolve reference variables in `where/2,3` binding. Also add support for resolving `a`
+            in `[{^assoc, a}]` binding.
+          * Resolve `bindings` in `group_by/2-3`.
+          * Resolve `bindings` and `expressions` in `order_by/2-3`.
+          * Resolve `bindings` in `having/2-3`.
+          * Add `select_merge` to declaring `Ecto.Query` macros.
+          * Add `distinct/2-3` as a declaring `Ecto.Query` macro.
+        * Resolve `field` calls in Ecto `schema` blocks
 
-                  How `field` works in `schema` for `Ecto.Schema`
-                    1. `use Ecto.Schema`
-                    2. `Ecto.Schema.__using__`
-                    3. `import Ecto.Schema, only: [schema: 2, embedded_schema: 1]``
+          How `field` works in `schema` for `Ecto.Schema`
+            1. `use Ecto.Schema`
+            2. `Ecto.Schema.__using__`
+            3. `import Ecto.Schema, only: [schema: 2, embedded_schema: 1]``
 
-                  Note that only the outer DSLs, schema and embedded_schema are available even though field/2 is defined
-                  in Ecto.Schema.
+          Note that only the outer DSLs, schema and embedded_schema are available even though field/2 is defined
+          in Ecto.Schema.
 
-                  So when you call `schema ... do`
-                    1. `defmacro schema(source, [do: block])`
-                    2. `schema(__CALLER__, source, true, :id, block)`
-                    3. `defp schema(caller, source, meta?, type, block)`
-                    4. There's a big `prelude = quote do` quote block
+          So when you call `schema ... do`
+            1. `defmacro schema(source, [do: block])`
+            2. `schema(__CALLER__, source, true, :id, block)`
+            3. `defp schema(caller, source, meta?, type, block)`
+            4. There's a big `prelude = quote do` quote block
 
-                  At the end of prelude there is
+          At the end of prelude there is
 
-                  ```elixir
+          ```elixir
           try do
             import Ecto.Schema
             unquote(block)
@@ -1490,51 +1499,51 @@
           end
           ```
 
-                  Hey! An `import Ecto.Schema`, but `prelude` is just floating as a variable. At the end
-                  of  `defp schema(caller, source, meta?, type, block)` is
+          Hey! An `import Ecto.Schema`, but `prelude` is just floating as a variable. At the end
+          of  `defp schema(caller, source, meta?, type, block)` is
 
-                  ```elixir
+          ```elixir
           quote do
             unquote(prelude)
             unquote(postlude)
           end
           ```
 
-                  So to statically analyze an `Ecto.Schema` module.
+          So to statically analyze an `Ecto.Schema` module.
 
-                    1. Resolve `schema/2` to `defmacro schema` by walking the `use`, `__using__`, `quote`, and `import`.
-                    2. Inside the `schema/2` (or macros in general if you want to get fancy 💅 and support more DSLs),
-                    3. Go into the body of the macro. If there's a call, resolve it
-                    4. Go into the called function
-                    5. Look for a `quote` block at the end (the same as my current `__using__` support)
-                    6. If there's a `Call` inside an `unquote` see if you can resolve it to a variable in addition to a
-                       call definition (which is already supported for Phoenix).
-                    7. If it's a variable, check it's value. If it's a `quote`, use the quote block handling
-                    8. In the quote block handling add support for `try`
-                    9. Walk the `try` and see the `import`, walk the `import` to find `Ecto.Schema.field/2`
-                * `API`
-                    * Resolve `Ecto.Query.API` functions in `Ecto.Query`
-                    * `from(order_by: ...)`
-                    * `from(select: ...)`
-                        * `from(select: tuple())`
-                    * `from(where: ...)`
-                    * `group_by/2-3`
-                    * `having/2-3`
-                    * `select/2-3` `expr` argument
-                    * `where`
-                    * Resolve `Ecto.Query.API.fragment` to arity interval `0..`.
-                    * Resolve `fragment` nested in other `Ecto.Query.API` call like `type`.
-                    * Walk `rightOperand` of `join(..., ... in ..., ...)` for `Ecto.Query.API` usages like `fragment`.
-        * Resolve module attributes defined in `use` `__using__` `quote` block
-            * Change `org.elixir_lang.reference.resolver.ModuleAttribute` to use `PsiScopeProcessor` for non-`@for` and
-              non-`@protocol` instead of custom logic.
-            * Don't descend into a `use` if the `ENTRANCE` is an ancestor since that means the `Alias` on the `use` is
-              probably being resolved.
-            * `AtUnqualifiedNoParenthesesCall.processDeclarations` will call `processor.execute` when it isn't a type
-              spec.
-            * The `UseScopeSelector` for `AtUnqualifiedNoParenthesesCallImpl` has been changed
-              to `SELF_AND_FOLLOWING_SIBLINGS` since the module attribute is used that way. The previous `SELF` value
-              was when the `UseScopeSelector` only applied to variables.
+          1. Resolve `schema/2` to `defmacro schema` by walking the `use`, `__using__`, `quote`, and `import`.
+          2. Inside the `schema/2` (or macros in general if you want to get fancy 💅 and support more DSLs),
+          3. Go into the body of the macro. If there's a call, resolve it
+          4. Go into the called function
+          5. Look for a `quote` block at the end (the same as my current `__using__` support)
+          6. If there's a `Call` inside an `unquote` see if you can resolve it to a variable in addition to a
+             call definition (which is already supported for Phoenix).
+          7. If it's a variable, check it's value. If it's a `quote`, use the quote block handling
+          8. In the quote block handling add support for `try`
+          9. Walk the `try` and see the `import`, walk the `import` to find `Ecto.Schema.field/2`
+      * `API`
+        * Resolve `Ecto.Query.API` functions in `Ecto.Query`
+        * `from(order_by: ...)`
+        * `from(select: ...)`
+                * `from(select: tuple())`
+        * `from(where: ...)`
+        * `group_by/2-3`
+        * `having/2-3`
+        * `select/2-3` `expr` argument
+        * `where`
+        * Resolve `Ecto.Query.API.fragment` to arity interval `0..`.
+        * Resolve `fragment` nested in other `Ecto.Query.API` call like `type`.
+        * Walk `rightOperand` of `join(..., ... in ..., ...)` for `Ecto.Query.API` usages like `fragment`.
+    * Resolve module attributes defined in `use` `__using__` `quote` block
+      * Change `org.elixir_lang.reference.resolver.ModuleAttribute` to use `PsiScopeProcessor` for non-`@for` and
+        non-`@protocol` instead of custom logic.
+      * Don't descend into a `use` if the `ENTRANCE` is an ancestor since that means the `Alias` on the `use` is
+        probably being resolved.
+      * `AtUnqualifiedNoParenthesesCall.processDeclarations` will call `processor.execute` when it isn't a type
+        spec.
+      * The `UseScopeSelector` for `AtUnqualifiedNoParenthesesCallImpl` has been changed
+        to `SELF_AND_FOLLOWING_SIBLINGS` since the module attribute is used that way. The previous `SELF` value
+        was when the `UseScopeSelector` only applied to variables.
   * "Elixir References" inspection for finding unresolved or invalid references.
     * `visitAtNonNumericOperation`
       Helps "Elixir References" find unresolved assigns.

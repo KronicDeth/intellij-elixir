@@ -27,7 +27,6 @@ import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.NlsContexts
 import com.intellij.ui.dsl.builder.*
-import com.intellij.ui.dsl.gridLayout.HorizontalAlign
 import com.intellij.ui.layout.ValidationInfoBuilder
 import kotlinx.coroutines.CancellationException
 import org.elixir_lang.Elixir
@@ -67,7 +66,7 @@ class Step(parent: NewProjectWizardLanguageStep) : AbstractNewProjectWizardStep(
                 row("--app") {
                     textField()
                         .bindText(mixNewAppProperty)
-                        .horizontalAlign(HorizontalAlign.FILL)
+                        .align(AlignX.FILL)
                         .validationOnApply {
                             if (mixNewApp.isNullOrBlank()) {
                                 val name = this@Step.name
@@ -97,7 +96,7 @@ class Step(parent: NewProjectWizardLanguageStep) : AbstractNewProjectWizardStep(
                 row("--module") {
                     textField()
                         .bindText(mixNewModuleProperty)
-                        .horizontalAlign(HorizontalAlign.FILL)
+                        .align(AlignX.FILL)
                 }.bottomGap(BottomGap.SMALL)
                 row {
                     checkBox("--sup")
