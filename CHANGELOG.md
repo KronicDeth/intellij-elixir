@@ -292,6 +292,8 @@
     The API is scheduled for removal and is replaced by `Call.align(AlignX.FILL)`.
 * [#3214](https://github.com/KronicDeth/intellij-elixir/pull/3214) - [@KronicDeth](https://github.com/KronicDeth)
   * Ignore `group:` for docs.
+* [#3242](https://github.com/KronicDeth/intellij-elixir/pull/3242) - [@KronicDeth](https://github.com/KronicDeth)
+  * Don't resolve built-in types against the index if index is updating.
 
 ## v15.0.1
 

@@ -1,5 +1,6 @@
 package org.elixir_lang.reference.resolver
 
+import com.intellij.openapi.project.DumbService
 import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveResult
 import com.intellij.psi.impl.source.resolve.ResolveCache
@@ -56,16 +57,18 @@ object Type : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Type> {
         val project = entrance.project
         val resolveResultList = mutableListOf<ResolveResult>()
 
-        StubIndex.getInstance().processElements(
-            ModularName.KEY,
-            ":erlang",
-            project,
-            GlobalSearchScope.allScope(project),
-            NamedElement::class.java
-        ) { namedElement ->
-            resolveResultList.addAll(MultiResolve.resolveResults(name, arity, false, namedElement))
+        if (!DumbService.isDumb(project)) {
+            StubIndex.getInstance().processElements(
+                ModularName.KEY,
+                ":erlang",
+                project,
+                GlobalSearchScope.allScope(project),
+                NamedElement::class.java
+            ) { namedElement ->
+                resolveResultList.addAll(MultiResolve.resolveResults(name, arity, false, namedElement))
 
-            true
+                true
+            }
         }
 
         return resolveResultList.toTypedArray()
