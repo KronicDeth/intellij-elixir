@@ -296,6 +296,8 @@
   * Don't resolve built-in types against the index if index is updating.
 * [#3249](https://github.com/KronicDeth/intellij-elixir/pull/3249) - [@KronicDeth](https://github.com/KronicDeth)
   * `findModuleForPsiElement` in `mostSpecificSdk` in read action.
+* [#3250](https://github.com/KronicDeth/intellij-elixir/pull/3250) - [@KronicDeth](https://github.com/KronicDeth)
+  * Skip finding `mix.exs` for OTP apps if it can't be read.
 
 ## v15.0.1
 
