@@ -294,6 +294,8 @@
   * Ignore `group:` for docs.
 * [#3242](https://github.com/KronicDeth/intellij-elixir/pull/3242) - [@KronicDeth](https://github.com/KronicDeth)
   * Don't resolve built-in types against the index if index is updating.
+* [#3249](https://github.com/KronicDeth/intellij-elixir/pull/3249) - [@KronicDeth](https://github.com/KronicDeth)
+  * `findModuleForPsiElement` in `mostSpecificSdk` in read action.
 
 ## v15.0.1
 

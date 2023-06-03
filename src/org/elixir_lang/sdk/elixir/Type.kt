@@ -3,6 +3,7 @@ package org.elixir_lang.sdk.elixir
 import com.intellij.facet.FacetManager
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
+import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.fileChooser.FileChooserDescriptor
 import com.intellij.openapi.module.Module
@@ -15,10 +16,7 @@ import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.roots.ProjectFileIndex
 import com.intellij.openapi.roots.ProjectRootManager
-import com.intellij.openapi.util.InvalidDataException
-import com.intellij.openapi.util.SystemInfo
-import com.intellij.openapi.util.Version
-import com.intellij.openapi.util.WriteExternalException
+import com.intellij.openapi.util.*
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
@@ -532,7 +530,9 @@ ELIXIR_SDK_HOME
                     ProjectFileIndex is available first */
                 if (ProjectFileIndex.SERVICE.getInstance(project) != null) {
                     val module = try {
-                        ModuleUtilCore.findModuleForPsiElement(psiElement)
+                        ReadAction.compute<Module, Throwable> {
+                            ModuleUtilCore.findModuleForPsiElement(psiElement)
+                        }
                     } catch (_: AlreadyDisposedException) {
                         null
                     }
