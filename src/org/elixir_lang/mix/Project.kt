@@ -16,14 +16,16 @@ import com.intellij.openapi.vfs.VirtualFileVisitor
 import org.elixir_lang.DepsWatcher
 import org.elixir_lang.mix.project.OtpApp
 import org.elixir_lang.module.ElixirModuleType
+import java.io.EOFException
 import java.io.File
-import java.util.Comparator
 
 object Project {
-    fun addSourceDirToContent(content: ContentEntry,
-                              root: VirtualFile,
-                              sourceDir: String,
-                              test: Boolean) {
+    fun addSourceDirToContent(
+        content: ContentEntry,
+        root: VirtualFile,
+        sourceDir: String,
+        test: Boolean
+    ) {
         content.addSourceFolder("${root.url}/$sourceDir", test)
     }
 
@@ -67,10 +69,10 @@ object Project {
     }
 
     fun createModulesForOtpApps(
-            project: Project,
-            otpApps: List<OtpApp>,
-            modifiableModuleModelFactory: () -> ModifiableModuleModel,
-            rootModelModifier: (OtpApp, ModifiableRootModel) -> Unit = { _, _ -> }
+        project: Project,
+        otpApps: List<OtpApp>,
+        modifiableModuleModelFactory: () -> ModifiableModuleModel,
+        rootModelModifier: (OtpApp, ModifiableRootModel) -> Unit = { _, _ -> }
     ): List<Module> =
         if (otpApps.isNotEmpty()) {
             val moduleModel = modifiableModuleModelFactory()
@@ -85,11 +87,12 @@ object Project {
                     moduleModel.commit()
                 }
 
-                ProgressManager.getInstance().run(object : Task.Modal(project, "Scanning dependencies for Libraries", true) {
-                    override fun run(indicator: ProgressIndicator) {
-                        DepsWatcher(project).syncLibraries(indicator)
-                    }
-                })
+                ProgressManager.getInstance()
+                    .run(object : Task.Modal(project, "Scanning dependencies for Libraries", true) {
+                        override fun run(indicator: ProgressIndicator) {
+                            DepsWatcher(project).syncLibraries(indicator)
+                        }
+                    })
             }
 
             createdRootModels.map { it.module }
@@ -97,7 +100,11 @@ object Project {
             emptyList()
         }
 
-    private fun createModuleForOtpApp(otpApp: OtpApp, moduleModel: ModifiableModuleModel, rootModelModifier: (OtpApp, ModifiableRootModel) -> Unit): ModifiableRootModel? {
+    private fun createModuleForOtpApp(
+        otpApp: OtpApp,
+        moduleModel: ModifiableModuleModel,
+        rootModelModifier: (OtpApp, ModifiableRootModel) -> Unit
+    ): ModifiableRootModel? {
         val ideaModuleDir = otpApp.root
         val ideaModuleFile = "${ideaModuleDir.canonicalPath}${File.separator}/${otpApp.name}.iml"
         val module = moduleModel.newModule(ideaModuleFile, ElixirModuleType.MODULE_TYPE_ID)
@@ -136,9 +143,13 @@ object Project {
     }
 
     private fun createImportedOtpApp(appRoot: VirtualFile): OtpApp? =
-            appRoot.findChild("mix.exs")?.let {
-                OtpApp(appRoot, it)
-            }
+        try {
+            appRoot.findChild("mix.exs")
+        } catch (_: EOFException) {
+            null
+        }?.let {
+            OtpApp(appRoot, it)
+        }
 
     private fun isAssetsOrBuildOrConfigOrDepsOrTestsDirectory(projectRootPath: String, path: String): Boolean {
         return (path.endsWith("/assets")
