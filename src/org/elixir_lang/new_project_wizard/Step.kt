@@ -169,7 +169,7 @@ class Step(parent: NewProjectWizardLanguageStep) : AbstractNewProjectWizardStep(
                     // project will fail to initialize and not have a window, so don't use `project`
                     .notify(null)
 
-                throw IOException()
+                throw IOException("mix new failed: $stderrWithoutColorCodes")
             }
 
             super.setupProject(project)

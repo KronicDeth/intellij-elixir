@@ -298,6 +298,8 @@
   * `findModuleForPsiElement` in `mostSpecificSdk` in read action.
 * [#3250](https://github.com/KronicDeth/intellij-elixir/pull/3250) - [@KronicDeth](https://github.com/KronicDeth)
   * Skip finding `mix.exs` for OTP apps if it can't be read.
+* [#3251](https://github.com/KronicDeth/intellij-elixir/pull/3251) - [@KronicDeth](https://github.com/KronicDeth)
+  * Include `mix new` stderr in `IOException` for better triage.
 
 ## v15.0.1
 
