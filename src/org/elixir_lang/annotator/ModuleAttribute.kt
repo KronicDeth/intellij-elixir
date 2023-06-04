@@ -77,6 +77,7 @@ class ModuleAttribute : Annotator, DumbAware {
                                 Highlighter.highlight(holder, textRange, ElixirSyntaxHighlighter.MODULE_ATTRIBUTE)
                                 highlightCallback(atUnqualifiedNoParenthesesCall, holder)
                             }
+
                             isDocumentationName(identifier) -> {
                                 Highlighter.highlight(
                                     holder,
@@ -85,14 +86,17 @@ class ModuleAttribute : Annotator, DumbAware {
                                 )
                                 highlightDocumentationText(atUnqualifiedNoParenthesesCall, holder)
                             }
+
                             isTypeName(identifier) -> {
                                 Highlighter.highlight(holder, textRange, ElixirSyntaxHighlighter.MODULE_ATTRIBUTE)
                                 highlightType(atUnqualifiedNoParenthesesCall, holder)
                             }
+
                             isSpecificationName(identifier) -> {
                                 Highlighter.highlight(holder, textRange, ElixirSyntaxHighlighter.MODULE_ATTRIBUTE)
                                 highlightSpecification(atUnqualifiedNoParenthesesCall, holder)
                             }
+
                             else -> {
                                 Highlighter.highlight(holder, textRange, ElixirSyntaxHighlighter.MODULE_ATTRIBUTE)
                             }
@@ -166,8 +170,10 @@ class ModuleAttribute : Annotator, DumbAware {
                                 .create()
                         }
                     }
+
                     is Quote ->
                         Textual.highlightQuote(holder, greatGrandChild, ElixirSyntaxHighlighter.DOCUMENTATION_TEXT)
+
                     is Sigil ->
                         Textual.highlightSigil(holder, greatGrandChild, ElixirSyntaxHighlighter.DOCUMENTATION_TEXT)
                 }
@@ -237,6 +243,7 @@ class ModuleAttribute : Annotator, DumbAware {
                         null
                     }
                 }
+
                 is ElixirMatchedUnqualifiedParenthesesCall -> {
                     // seen as `unquote(ast)`, but could also be just the beginning of typing
                     if (Function.UNQUOTE == grandChild.functionName()) {
@@ -259,6 +266,7 @@ class ModuleAttribute : Annotator, DumbAware {
                         )
                     }
                 }
+
                 is QuotableKeywordList -> {
                     grandChild.quotableKeywordPairList().singleOrNull()?.let { quotableKeywordPair ->
                         // occurs when user does `my_type: definition` instead of `my_type :: definition`
@@ -281,6 +289,7 @@ class ModuleAttribute : Annotator, DumbAware {
                     }
                     // Otherwise, allow the normal, non-type highlighting
                 }
+
                 is UnqualifiedNoArgumentsCall<*> -> {
                     // assume it's a type name that is being typed
                     val grandChildCall = grandChild as Call
@@ -293,6 +302,7 @@ class ModuleAttribute : Annotator, DumbAware {
                         Unit
                     }
                 }
+
                 is UnqualifiedNoParenthesesCall<*> -> {
                     /* Pretend that `::` separates the functionNameElement from the arguments, so that
                        ```
@@ -323,6 +333,7 @@ class ModuleAttribute : Annotator, DumbAware {
                 is QualifiableAlias,
                     // typing the parentheses before the relative name and before name like `@type String.()`
                 is DotCall<*> -> Unit
+
                 else -> {
                     cannotHighlightTypes(grandChild)
                 }
@@ -441,6 +452,7 @@ class ModuleAttribute : Annotator, DumbAware {
                     typeTextAttributesKey
                 )
             }
+
             is ElixirAlias -> {
                 highlightTypesAndTypeTypeParameterDeclarations(
                     psiElement,
@@ -449,6 +461,7 @@ class ModuleAttribute : Annotator, DumbAware {
                     typeTextAttributesKey
                 )
             }
+
             is ElixirUnmatchedUnqualifiedNoArgumentsCall -> {
                 highlightTypesAndTypeTypeParameterDeclarations(
                     psiElement,
@@ -457,6 +470,7 @@ class ModuleAttribute : Annotator, DumbAware {
                     typeTextAttributesKey
                 )
             }
+
             is ElixirUnmatchedTypeOperation -> {
                 highlightTypesAndTypeTypeParameterDeclarations(
                     psiElement,
@@ -465,6 +479,7 @@ class ModuleAttribute : Annotator, DumbAware {
                     typeTextAttributesKey
                 )
             }
+
             else -> {
                 if (psiElement !is ElixirAtomKeyword) {
                     error("Cannot highlight types and type parameter declarations", psiElement)
@@ -589,6 +604,7 @@ class ModuleAttribute : Annotator, DumbAware {
                             )
                         }
                     }
+
                     is Call -> {
                         highlightSpecification(
                             leftOperand,
@@ -598,6 +614,7 @@ class ModuleAttribute : Annotator, DumbAware {
                             typeParameterNameSet
                         )
                     }
+
                     else -> {
                         if (leftOperand != null) {
                             cannotHighlightTypes(leftOperand)
@@ -731,6 +748,7 @@ class ModuleAttribute : Annotator, DumbAware {
                     typeTextAttributesKey
                 )
             }
+
             is QuotableKeywordPair -> {
                 highlightTypesAndSpecificationTypeParameterDeclarations(
                     psiElement,
@@ -739,6 +757,7 @@ class ModuleAttribute : Annotator, DumbAware {
                     typeTextAttributesKey
                 )
             }
+
             is Type -> {
                 highlightTypesAndSpecificationTypeParameterDeclarations(
                     psiElement,
@@ -747,6 +766,7 @@ class ModuleAttribute : Annotator, DumbAware {
                     typeTextAttributesKey
                 )
             }
+
             is UnqualifiedNoArgumentsCall<*> -> {
                 highlightTypesAndSpecificationTypeParameterDeclarations(
                     psiElement,
@@ -754,11 +774,13 @@ class ModuleAttribute : Annotator, DumbAware {
                     annotationHolder
                 )
             }
+
             is UnqualifiedNoParenthesesCall<*> -> {
                 highlightTypesAndSpecificationTypeParameterDeclarations(
                     psiElement
                 )
             }
+
             else -> {
                 error("Cannot highlight types and specification type parameter declarations", psiElement)
             }
@@ -989,6 +1011,7 @@ class ModuleAttribute : Annotator, DumbAware {
                 annotationHolder,
                 typeTextAttributesKey
             )
+
             is ElixirAccessExpression,
             is ElixirAssociationsBase,
             is ElixirAssociations,
@@ -1010,22 +1033,26 @@ class ModuleAttribute : Annotator, DumbAware {
                 annotationHolder,
                 typeTextAttributesKey
             )
+
             is ElixirDecimalFloat -> highlightTypesAndTypeParameterUsages(
                 psiElement,
                 annotationHolder
             )
+
             is ElixirMapOperation -> highlightTypesAndTypeParameterUsages(
                 psiElement,
                 typeParameterNameSet,
                 annotationHolder,
                 typeTextAttributesKey
             )
+
             is ElixirMapUpdateArguments -> highlightTypesAndTypeParameterUsages(
                 psiElement,
                 typeParameterNameSet,
                 annotationHolder,
                 typeTextAttributesKey
             )
+
             is ElixirRelativeIdentifier,
             is UnqualifiedNoArgumentsCall<*>,
             -> {
@@ -1038,30 +1065,36 @@ class ModuleAttribute : Annotator, DumbAware {
                 }
                 Highlighter.highlight(annotationHolder, psiElement.textRange, textAttributesKey)
             }
+
             is ElixirStabParenthesesSignature -> highlightTypesAndTypeParameterUsages(
                 psiElement,
                 typeParameterNameSet,
                 annotationHolder,
                 typeTextAttributesKey
             )
+
             is ElixirStabOperation -> highlightTypesAndTypeParameterUsages(
                 psiElement,
                 typeParameterNameSet,
                 annotationHolder,
                 typeTextAttributesKey
             )
+
             is ElixirStructOperation -> highlightTypesAndTypeParameterUsages(
                 psiElement,
                 typeParameterNameSet,
                 annotationHolder,
                 typeTextAttributesKey
             )
+
             is ElixirLine,
             is ElixirHeredoc,
             ->
                 highlightTypeError(psiElement, "Char Lists and Strings aren't allowed in types", annotationHolder)
-            /* Occurs in the case of typing a {@code @type name ::} above a {@code @doc <HEREDOC>} and the
-                               {@code @doc <HEREDOC>} is interpreted as the right-operand of {@code ::} */
+
+            is AtOperation,
+                /* Occurs in the case of typing a {@code @type name ::} above a {@code @doc <HEREDOC>} and the
+                                   {@code @doc <HEREDOC>} is interpreted as the right-operand of {@code ::} */
             is AtUnqualifiedNoParenthesesCall<*>,  // leave normal highlighting
             is BracketOperation,
             is ElixirAlias,
@@ -1080,42 +1113,49 @@ class ModuleAttribute : Annotator, DumbAware {
             is ElixirUnmatchedUnaryOperation,
             is When,
             -> Unit
+
             is Infix -> highlightTypesAndTypeParameterUsages(
                 psiElement,
                 typeParameterNameSet,
                 annotationHolder,
                 typeTextAttributesKey
             )
+
             is QualifiedParenthesesCall<*> -> highlightTypesAndTypeParameterUsages(
                 psiElement,
                 typeParameterNameSet,
                 annotationHolder,
                 typeTextAttributesKey
             )
+
             is QualifiedAlias -> highlightTypesAndTypeParameterUsages(
                 psiElement,
                 typeParameterNameSet,
                 annotationHolder,
                 typeTextAttributesKey
             )
+
             is QualifiedNoArgumentsCall<*> -> highlightTypesAndTypeParameterUsages(
                 psiElement,
                 typeParameterNameSet,
                 annotationHolder,
                 typeTextAttributesKey
             )
+
             is QualifiedNoParenthesesCall<*> -> highlightTypesAndTypeParameterUsages(
                 psiElement,
                 typeParameterNameSet,
                 annotationHolder,
                 typeTextAttributesKey
             )
+
             is UnqualifiedNoParenthesesCall<*> -> highlightTypesAndTypeParameterUsages(
                 psiElement,
                 typeParameterNameSet,
                 annotationHolder,
                 typeTextAttributesKey
             )
+
             is UnqualifiedParenthesesCall<*> -> {
                 // `unquote_splicing` is being used to splat arguments or fields of a struct into the type.
                 // The arguments to `unquote_splicing` are normal calls or variables, not types.
@@ -1135,6 +1175,7 @@ class ModuleAttribute : Annotator, DumbAware {
                 annotationHolder,
                 typeTextAttributesKey
             )
+
             else -> cannotHighlightTypes(psiElement)
         }
     }
@@ -1273,7 +1314,12 @@ class ModuleAttribute : Annotator, DumbAware {
             Highlighter.highlight(annotationHolder, functionNameElement.textRange, typeTextAttributesKey)
             for (psiElement in unqualifiedNoParenthesesCall.primaryArguments()) {
                 if (psiElement != null) {
-                    highlightTypesAndTypeParameterUsages(psiElement, typeParameterNameSet, annotationHolder, typeTextAttributesKey)
+                    highlightTypesAndTypeParameterUsages(
+                        psiElement,
+                        typeParameterNameSet,
+                        annotationHolder,
+                        typeTextAttributesKey
+                    )
                 }
             }
         } else {
@@ -1295,7 +1341,12 @@ class ModuleAttribute : Annotator, DumbAware {
 
                 for (psiElement in unqualifiedParenthesesCall.primaryArguments()) {
                     if (psiElement != null) {
-                        highlightTypesAndTypeParameterUsages(psiElement, typeParameterNameSet, annotationHolder, typeTextAttributesKey)
+                        highlightTypesAndTypeParameterUsages(
+                            psiElement,
+                            typeParameterNameSet,
+                            annotationHolder,
+                            typeTextAttributesKey
+                        )
                     }
                 }
 
@@ -1363,21 +1414,27 @@ class ModuleAttribute : Annotator, DumbAware {
             is ElixirAccessExpression, is ElixirKeywords, is ElixirList, is ElixirNoParenthesesKeywords -> {
                 specificationTypeParameterNameSet(psiElement.children)
             }
+
             is ElixirKeywordPair -> {
                 specificationTypeParameterNameSet(psiElement)
             }
+
             is Type -> {
                 specificationTypeParameterNameSet(psiElement)
             }
+
             is ElixirNoParenthesesKeywordPair -> {
                 specificationTypeParameterNameSet(psiElement)
             }
+
             is UnqualifiedNoArgumentsCall<*> -> {
                 specificationTypeParameterNameSet(psiElement)
             }
+
             is UnqualifiedNoParenthesesCall<*> -> {
                 specificationTypeParameterNameSet(psiElement)
             }
+
             else -> {
                 error("Cannot extract specification type parameter name set", psiElement)
                 emptySet<String>()
@@ -1449,6 +1506,7 @@ class ModuleAttribute : Annotator, DumbAware {
             is ElixirAccessExpression -> {
                 typeTypeParameterNameSet(psiElement.getChildren())
             }
+
             is ElixirAlias -> {
                 /* Assume bare aliases are incorrectly capitalized type parameters, say from someone's that used to generics
                    in Java.
@@ -1456,13 +1514,16 @@ class ModuleAttribute : Annotator, DumbAware {
                    See https://github.com/KronicDeth/intellij-elixir/issues/694 */
                 typeTypeParameterNameSet(psiElement)
             }
+
             is ElixirTuple -> {
                 typeTypeParameterNameSet(psiElement)
             }
+
             is ElixirUnmatchedTypeOperation -> typeTypeParameterNameSet(psiElement)
             is ElixirUnmatchedUnqualifiedNoArgumentsCall -> {
                 setOf(psiElement.getText())
             }
+
             else -> {
                 error("Cannot extract type type parameter name set", psiElement)
                 emptySet<String>()
