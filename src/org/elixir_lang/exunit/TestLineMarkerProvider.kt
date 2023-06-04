@@ -5,19 +5,18 @@ import com.intellij.execution.lineMarker.RunLineMarkerContributor
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.impl.source.tree.LeafPsiElement
-import org.codehaus.plexus.interpolation.os.Os
+import org.apache.commons.lang.SystemUtils
 import org.elixir_lang.exunit.configuration.SUFFIX
 import org.elixir_lang.exunit.configuration.lineNumber
 import org.elixir_lang.mix.TestFinder
 import org.elixir_lang.psi.ElixirFile
-import org.elixir_lang.psi.ElixirUnmatchedQualifiedParenthesesCall
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.operation.Match
 
 /**
  * Provides the gutter "run" icons for tests.
  */
-class ExUnitLineMarkerProvider: RunLineMarkerContributor() {
+class ExUnitLineMarkerProvider : RunLineMarkerContributor() {
 
     override fun getInfo(element: PsiElement): Info? {
 
@@ -29,24 +28,24 @@ class ExUnitLineMarkerProvider: RunLineMarkerContributor() {
         if (!TestFinder.isTestElement(element) || element !is LeafPsiElement) {
             return null
         }
-        
+
         val parent = element.parent?.parent
-        
+
         if (parent !is Call) {
             return null
         }
-        
+
         // Assignment
         if (parent.parent is Match) {
             return null
         }
-        
+
         val functionElement = parent.firstChild
-        
+
         if (functionElement != element.parent) {
             return null
         }
-        
+
         val isClass = when (parent.functionName()) {
             "test" -> false
             "describe" -> true
@@ -57,7 +56,7 @@ class ExUnitLineMarkerProvider: RunLineMarkerContributor() {
 
         val number = lineNumber(element)
         var url = "file://${element.containingFile.virtualFile.path}:${number}"
-        if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+        if (SystemUtils.IS_OS_WINDOWS) {
             // In Elixir, the drive letter is lowercase for some reason.
             val location = "file://".length
             url = url.replaceRange(location, location + 1, url[location].toLowerCase().toString())

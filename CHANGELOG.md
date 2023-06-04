@@ -306,6 +306,8 @@
   * Highlight binary numbers as usual in types.
 * [#3253](https://github.com/KronicDeth/intellij-elixir/pull/3253) - [@KronicDeth](https://github.com/KronicDeth)
   * Highlight module attributes as usual in types.
+* [#3254](https://github.com/KronicDeth/intellij-elixir/pull/3254) - [@KronicDeth](https://github.com/KronicDeth)
+  * Use `org.apache.commons.lang.SystemUtils` instead of `org.codehaus.plexus.interpolation.os.Os` to detect if on Windows for Test marker file URL.
 
 ## v15.0.1
 
