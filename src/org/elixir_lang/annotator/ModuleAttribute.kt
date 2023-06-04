@@ -1069,6 +1069,7 @@ class ModuleAttribute : Annotator, DumbAware {
             is ElixirAtomKeyword,
             is ElixirBitString,
             is ElixirCharToken,
+            is ElixirBinaryWholeNumber,
             is ElixirDecimalWholeNumber,
                 // Fixes #2583
             is ElixirEmptyParentheses,

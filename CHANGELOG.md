@@ -300,6 +300,10 @@
   * Skip finding `mix.exs` for OTP apps if it can't be read.
 * [#3251](https://github.com/KronicDeth/intellij-elixir/pull/3251) - [@KronicDeth](https://github.com/KronicDeth)
   * Include `mix new` stderr in `IOException` for better triage.
+* [#3251](https://github.com/KronicDeth/intellij-elixir/pull/3251) - [@KronicDeth](https://github.com/KronicDeth)
+  * Include `mix new` stderr in `IOException` for better triage.
+* [#3252](https://github.com/KronicDeth/intellij-elixir/pull/3252) - [@KronicDeth](https://github.com/KronicDeth)
+  * Highlight binary numbers as usual in types.
 
 ## v15.0.1
 
