@@ -24,6 +24,11 @@
             </li>
             <li>Don't include <code>null</code> target usage types when finding usage type across all targets.</li>
             <li>Skip bare Aliases when resolving Types.</li>
+            <li>
+                <p>Exclude <code>.elixir_ls</code> directory when configuring new <code>Project</code>s.</p>
+                <p>If the <code>.elixir_ls</code> directory is included the <code>.beam</code> it produces can interfere
+                    with normal <code>StubIndex</code>.</p>
+            </li>
         </ul>
     </li>
 </ul>

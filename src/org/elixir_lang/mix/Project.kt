@@ -129,6 +129,8 @@ object Project {
         addSourceDirToContent(content, root, "spec", true)
         addSourceDirToContent(content, root, "test", true)
 
+        // Directory added by Elixir Language Server
+        excludeDirFromContent(content, root, ".elixir_ls")
         // Weird symlink phoenix and phoenix_html make to themselves in deps
         excludeDirFromContent(content, root, "assets/node_modules/phoenix")
         excludeDirFromContent(content, root, "assets/node_modules/phoenix_html")
