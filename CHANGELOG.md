@@ -30,6 +30,9 @@
   * Don't include `null` target usage types when finding usage type across all targets.
 * [#3262](https://github.com/KronicDeth/intellij-elixir/pull/3262) - [@KronicDeth](https://github.com/KronicDeth)
   * Skip bare Aliases when resolving Types.
+* [#3263](https://github.com/KronicDeth/intellij-elixir/pull/3263) - [@KronicDeth](https://github.com/KronicDeth)
+  * Exclude `.elixir_ls` directory when configuring new `Project`s.
+    If the `.elixir_ls` directory is included the `.beam` it produces can interfere with normal `StubIndex`.
 
 ## v15.0.1
 
