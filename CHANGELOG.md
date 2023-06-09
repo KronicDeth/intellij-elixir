@@ -24,6 +24,8 @@
   * Highlight module attributes as usual in types.
 * [#3254](https://github.com/KronicDeth/intellij-elixir/pull/3254) - [@KronicDeth](https://github.com/KronicDeth)
   * Use `org.apache.commons.lang.SystemUtils` instead of `org.codehaus.plexus.interpolation.os.Os` to detect if on Windows for Test marker file URL.
+* [#3260](https://github.com/KronicDeth/intellij-elixir/pull/3260) - [@KronicDeth](https://github.com/KronicDeth)
+  * Call `FileIndex.getContentRootForFile` in `ReadAction` when getting working directory for `mix format`.
 
 ## v15.0.1
 
