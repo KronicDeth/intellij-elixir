@@ -2,653 +2,76 @@
 <body>
 <h1>v15.0.2</h1>
 <ul>
-  <li>
-    <p>Bug Fixes</p>
-    <ul>
-      <li>
-        <p>Replace uses of <code>Cell.horizontalAlign(HorizontalAlign)</code></p>
-        <p>The API is scheduled for removal and is replaced by <code>Call.align(AlignX.FILL)</code>.</p>
-      </li>
-      <li>Ignore <code>group:</code> for docs.</li>
-      <li>Don't resolve built-in types against the index if index is updating.</li>
-      <li><code>findModuleForPsiElement</code> in <code>mostSpecificSdk</code> in read action.</li>
-      <li>Skip finding <code>mix.exs</code> for OTP apps if it can't be read.</li>
-      <li>Include <code>mix new</code> stderr in <code>IOException</code> for better triage.</li>
-      <li>Highlight binary numbers as usual in types.</li>
-      <li>Highlight module attributes as usual in types.</li>
-      <li>Use <code>org.apache.commons.lang.SystemUtils</code> instead of <code>org.codehaus.plexus.interpolation.os.Os</code> to detect if on Windows for Test marker file URL.</li>
-    </ul>
-  </li>
+    <li>
+        <p>Bug Fixes</p>
+        <ul>
+            <li>
+                <p>Replace uses of <code>Cell.horizontalAlign(HorizontalAlign)</code></p>
+                <p>The API is scheduled for removal and is replaced by <code>Call.align(AlignX.FILL)</code>.</p>
+            </li>
+            <li>Ignore <code>group:</code> for docs.</li>
+            <li>Don't resolve built-in types against the index if index is updating.</li>
+            <li><code>findModuleForPsiElement</code> in <code>mostSpecificSdk</code> in read action.</li>
+            <li>Skip finding <code>mix.exs</code> for OTP apps if it can't be read.</li>
+            <li>Include <code>mix new</code> stderr in <code>IOException</code> for better triage.</li>
+            <li>Highlight binary numbers as usual in types.</li>
+            <li>Highlight module attributes as usual in types.</li>
+            <li>Use <code>org.apache.commons.lang.SystemUtils</code> instead of <code>org.codehaus.plexus.interpolation.os.Os</code>
+                to detect if on Windows for Test marker file URL.
+            </li>
+        </ul>
+    </li>
 </ul>
 <h1>v15.0.1</h1>
 <ul>
-  <li>
-    <p>Bug Fixes</p>
-    <ul>
-      <li>
-        <p>Support 2023.1 RubyMine and WebStorm.</p>
-        <p>
-          RubyMine and WebStorm have a <code>FIX</code> version of <code>174</code>, which is less than IntelliJ's
-          <code>175</code> in IntelliJ 2023.1's builder number, <code>231.8109.175</code>.
-        </p>
-      </li>
-      <li>Don't resolve built-in types against the index if index is updating.</li>
-    </ul>
-  </li>
+    <li>
+        <p>Bug Fixes</p>
+        <ul>
+            <li>
+                <p>Support 2023.1 RubyMine and WebStorm.</p>
+                <p>
+                    RubyMine and WebStorm have a <code>FIX</code> version of <code>174</code>, which is less than
+                    IntelliJ's
+                    <code>175</code> in IntelliJ 2023.1's builder number, <code>231.8109.175</code>.
+                </p>
+            </li>
+            <li>Don't resolve built-in types against the index if index is updating.</li>
+        </ul>
+    </li>
 </ul>
 <h1>v15.0.0</h1>
 <ul>
-  <li>
-    <p>Incompatible Changes</p>
-    <ul>
-      <li>Drop support for <= 2022 IDEs.</li>
-    </ul>
-  </li>
-  <li>
-    <p>Enhancements</p>
-    <ul>
-      <li>Support 2023.1 IDEs.</li>
-    </ul>
-  </li>
-  <li>
-    <p>Bug Fixes</p>
-    <ul>
-      <li>
-        <p>Ignore from preload list that doesn't have square brackets.</p>
-        <p>
-          When trying to resolve keyword keys to <code>from</code>, don't error on unknown keys if any previous key was
-          preload as this may be a list of preloads that is missing the square brackets.
-        </p>
-      </li>
-      <li>Re-enable canary releases.</li>
-      <li>Remove duplicate dependency on <code>com.intellij.modules.java</code> plugin.</li>
-    </ul>
-  </li>
+    <li>
+        <p>Incompatible Changes</p>
+        <ul>
+            <li>Drop support for <= 2022 IDEs.</li>
+        </ul>
+    </li>
+    <li>
+        <p>Enhancements</p>
+        <ul>
+            <li>Support 2023.1 IDEs.</li>
+        </ul>
+    </li>
+    <li>
+        <p>Bug Fixes</p>
+        <ul>
+            <li>
+                <p>Ignore from preload list that doesn't have square brackets.</p>
+                <p>
+                    When trying to resolve keyword keys to <code>from</code>, don't error on unknown keys if any
+                    previous key was
+                    preload as this may be a list of preloads that is missing the square brackets.
+                </p>
+            </li>
+            <li>Re-enable canary releases.</li>
+            <li>Remove duplicate dependency on <code>com.intellij.modules.java</code> plugin.</li>
+        </ul>
+    </li>
 </ul>
-<h1>v14.0.1</h1>
-<ul>
-  <li>
-    <p>Bug Fixes</p>
-    <ul>
-      <li>Ignore atoms at top-level when looking for docs.</li>
-      <li>
-        Replace <code>TODO()</code> in <code>leex.reference.resolver.Assign</code> with logger errors that include
-        <code>PSiElement</code>.
-      </li>
-      <li>Ignore <code>type</code> for docs.</li>
-      <li>
-        Don't look for variable use scope above EEx tags.<br/>
-        If a variable is declared in an EEx tag then it is actually missing its declaration and cannot be resolved, so ignore its usage.
-      </li>
-      <li>Check if module is disposed when write action is run for <code>syncLibraries</code>.</li>
-      <li>Only use Elixir SDK for <code>mix format</code> if it has an Erlang SDK.</li>
-      <li>Include more lines of context for stacktraces in error reports.</li>
-      <li>Ignore identifier when <code>@*doc</code> attribute isn't quoted.</li>
-      <li>Ignore if package virtual file is disposed before the deps can be read.</li>
-      <li>Don't decompile Erlang <code>And</code> as Elixir <code>and</code>.</li>
-      <li>Ignore <code>request_body</code> and <code>responses</code> for docs.</li>
-      <li>Check if heredoc has lines before calculating host text range for Markdown docs.</li>
-      <li>Ignore if stubs ids can't be found when resolving Callables.</li>
-      <li>Ignore hexadecimal numbers at the root of the file when collecting doc comment.</li>
-      <li>Return an empty array of primaryArguments instead of array with null operand for unary operation without operand.</li>
-      <li>
-        <p>Set <code>sinceBuild</code> to IntelliJ IDEA 2022.3.</p>
-        <p>Fixes incorrect compatibility listed with < 2022.3 when < 2022.3 support was removed in 14.0.0 with #2946.</p>
-      </li>
-      <li>
-        <p>Use <code>minByOrNull</code> to protect from empty module list.</p>
-        <p>
-          This fix may not work as the line number reported in the errors is actually outside of the file. This is only
-          a guess that <code>minBy</code> was what was throwing the <code>NoSuchElement</code> exception.
-        </p>
-      </li>
-      <li>
-        <p>Ignore <code>null</code> operands for <code>not in</code> <code>primaryArguments()</code>.</p>
-        <p>
-          Instead of including both left and right operand always and so having null operand in fixed size array return
-          array with only non-null operands.
-        </p>
-      </li>
-      <li>
-        <p>Don't allow Elixir SDK without Erlang SDK to be selected for New Project.</p>
-        <p>The SDK has to be able to work for <code>mix new</code>.</p>
-      </li>
-      <li>Ignore strings, charlists, and sigils at the top of file when looking for doc comments.</li>
-      <li>Ignore top-level Aliases when collecting docs.</li>
-      <li>Ignored <code>unquote</code> calls when injecting docs.</li>
-      <li>
-        Find enclosing <code>quote</code> when <code>def</code>s are inside an <code>fn</code> as in
-        Phoenix Route Helpers.
-      </li>
-      <li>
-        Handle binary modules when processing protocols and implementations for line markers and definition search.
-      </li>
-      <li>
-        Skip unqualified no arguments calls when Ecto.Query.from arguments are being typed.
-      </li>
-      <li>
-        <p>Setting name on a call definition clause sets the name on the head instead.</p>
-        <p>
-          The JetBrains API both renames the usage references AND the original element where the rename refactoring was
-          started, but when started on a call definition clause the <code>functionNameElement</code> is the
-          <code>def</code>, <code>defp</code>, <code>defmacro</code>, or <code>defmacrop</code> and so both the name of
-          the call was changed, but the <code>def*</code> was also changed to the new name.  Now, if
-          <code>setName</code> is called on a definition, the head is renamed instead.
-        </p>
-      </li>
-      <li>Filter out Elixir SDKs that don't have an Erlang SDK when importing projects.</li>
-      <li>
-        <p>Check Elixir SDK has Erlang SDK before running dialyzer.</p>
-        <p>Notify user of configuration error instead of throwing exception when constructing <code>mix</code> commandline.</p>
-      </li>
-      <li>Log heredoc where Markdown cannot be injected.</li>
-      <li>Don't inject markdown in empty heredoc docs.</li>
-      <li>Log if new name element type does not match old name element type.</li>
-      <li>Replace name with relative identifier instead of identifier for qualified calls on rename.</li>
-      <li>
-        <p>Keep looking for variants above <code>if</code> and <code>unless</code>.</p>
-        <p>
-          <code>if</code> and <code>unless</code> used to call <code>keepProcessing()</code> after checking if the child
-          calls when resolving or searching for variants, but Variants returned <code>false</code> always from
-          <code>keepProcessing()</code>.
-        </p>
-        <p>
-          This stops the variant search from terminating inside of an <code>if</code> or <code>unless</code> when it
-          wouldn't outside of one as was reported in
-          <a href="https://github.com/KronicDeth/intellij-elixir/issues/2751">#2751</a>.
-        </p>
-      </li>
-      <li>
-        <p>List <code>Kernel</code> and <code>Kernel.SpecialForms</code> variants inside modulars.</p>
-        <p>Keep processing at end of modulars when looking for variants, which will check the implicit imports of <code>Kernel</code> and <code>Kernel.SpecialForms</code>.</p>
-      </li>
-      <li>Prevent listing variants from outer module in nested module.</li>
-      <li>Log the accumulated and target usage type that cannot be folded.</li>
-      <li>Fix reporting <code>mix new</code> errors as notifications
-        <ul dir="auto">
-          <li>Don't associate mix new errors with new project as it doesn't have a frame, so the notification was suppressed before.</li>
-          <li>Strip color codes from mix new error notification.</li>
-        </ul>
-      </li>
-      <li>Validate <code>--app</code> is set correctly for new projects
-        <ul dir="auto">
-          <li>If inferred from project name, make sure the name is valid application name the same as <code>mix new</code> does.</li>
-          <li>If <code>--app</code> is set explicitly, make sure it follows naming rules for <code>mix new</code>.</li>
-        </ul>
-      </li>
-    </ul>
-  </li>
-</ul>
-<h1>v14.0.0</h1>
-<ul>
-  <li>
-    <p>Incompatible Changes</p>
-    <ul>
-      <li>Drop support for IDES < 2022.3.</li>
-    </ul>
-  </li>
-  <li>
-    /<p>Enhancments</p>
-    <ul>
-      <li>Add 2022.3 compatibility.</li>
-    </ul>
-  </ul>
-  <li>
-    <p>Bug Fixes</p>
-    <ul dir="auto">
-      <li>Don't update hex or fetch dependencies if SDK not selected when creating project.</li>
-    </ul>
-  </li>
-</ul>
-<h1>v13.2.1</h1>
-<ul>
-  <li>
-    <p>Bug Fixes</p>
-    <ul dir="auto">
-      <li>Ignore <code>PsiErrorElement</code> when collecting doc comments.</li>
-      <li>Fix README typos.</li>
-      <li>Log before and after setting mirror for decompiled files.<br>
-        Parsing complex decompiles can freeze the IDE.  Logging before parsing the decompiles will give a chance of finding the file and recovering the decompiled code to find the error or complexity that needs to be suppressed.</li>
-      <li>Use `Options.truncateDecompiledBodyz on Elixir decompiled bodies too.<br>
-        Previously, this was only used for Erlang functions.  Fixes parsing decompiled code causing freezes for some files.</li>
-      <li>Ignore <code class="notranslate">authors: ...</code> for documentation when injecting Markdown.</li>
-      <li>Stop <code class="notranslate">prependQualifiers</code> when reaching a qualified bracket operation (<code class="notranslate">Alias.function[key]</code>).</li>
-      <li>Skip <code class="notranslate">-1</code> and other unary operations when resolving types.</li>
-      <li>Ignore maps at the root of files when collecting doc comments.</li>
-      <li>Return <code class="notranslate">emptySequence</code> from <code class="notranslate">childExpressions</code> when <code class="notranslate">PsiElement</code> has no <code class="notranslate">firstChild</code> or <code class="notranslate">lastChild</code>.</li>
-      <li>Don't descend inside struct literal when resolving types.</li>
-      <li>Ignore injecting Markdown in calls that read the text from a file, such as in <code class="notranslate">@moduledoc File.read!(Path.join([__DIR__, "..", "README.md"]))</code></li>
-      <li>Ignore undocument script code at root of files.
-        <ul dir="auto">
-          <li>Alias used in qualified call.</li>
-          <li>Integers</li>
-          <li>Floats</li>
-          <li>Tuples</li>
-        </ul>
-      </li>
-      <li>Stop <code class="notranslate">ancestorTypeSpec</code> on <code class="notranslate">QualifiedMultipleAliases</code>.</li>
-      <li>Ignore pipelines for injecting Markdown in doc comments.</li>
-      <li>Ignore useless <code class="notranslate">warn_missing</code> in <code class="notranslate">edeliver</code>'s <code class="notranslate">distillery</code> dep.</li>
-      <li>Stop accumulating qualifiers when bracket operation is hit either as qualifier or argument.</li>
-    </ul>
-  </li>
-</ul>
-<h1>v13.2.0</h1>
-<ul>
-  <li>
-    <p>Enhancements</p>
-    <ul dir="auto">
-      <li>Rendered Markdown toggle for <code class="notranslate">@moduledoc</code>, <code class="notranslate">@typedoc</code>, and <code class="notranslate">@doc</code>
-        <ul dir="auto">
-          <li>Inject markdown in <code class="notranslate">@doc deprecated: ...</code></li>
-          <li>Inject Markdown into doc lines and heredocs</li>
-          <li>Ignore <code class="notranslate">false</code> for documentation module attributes</li>
-          <li>Ignore <code class="notranslate">@doc</code> metadata that can't include Markdown
-            <ul dir="auto">
-              <li><code class="notranslate">guard: ...</code></li>
-              <li><code class="notranslate">since: ...</code></li>
-            </ul>
-          </li>
-          <li>Ignore <code class="notranslate">@callback(unquote(spec))</code> when trying to find typespecs</li>
-          <li>Interleave Markdown and Elixir for doctests
-            <ul dir="auto">
-              <li>Mark code blocks as Elixir language in Markdown documentation</li>
-              <li>Mark multi-line exceptions in doctests as Markdown</li>
-              <li>Treat <em>DBG</em> prefix doctest lines as Markdown instead of Elixir</li>
-              <li>Resolve owner of docs as following call definition clause.</li>
-              <li>Count <code class="notranslate">...&gt; </code> as Markdown since it's not Elixir syntax</li>
-              <li>Count <code class="notranslate">** (...</code> as Markdown since it's not Elixir syntax for exception in iex prompts</li>
-              <li>Count <code class="notranslate">iex&gt; </code> as Markdown since it's not Elixir syntax</li>
-            </ul>
-          </li>
-          <li>Documentation links in rendered documentation
-            <ul dir="auto">
-              <li>Modulars <code class="notranslate">MODULE</code></li>
-              <li>Callbacks
-                <ul dir="auto">
-                  <li>Relative (<code class="notranslate">c:NAME/ARITY</code>)</li>
-                  <li>Absolute (<code class="notranslate">c:MODULE.NAME/ARITY</code>)</li>
-                </ul>
-              </li>
-              <li>Types
-                <ul dir="auto">
-                  <li>Relative (<code class="notranslate">t:NAME/ARITY</code>)</li>
-                  <li>Absolute (<code class="notranslate">t:MODULE.NAME/ARITY</code>)</li>
-                </ul>
-              </li>
-              <li>Functions and Macros
-                <ul dir="auto">
-                  <li>Relative (<code class="notranslate">NAME/ARITY</code>)</li>
-                  <li>Absolute (<code class="notranslate">MODULE.NAME/ARITY</code>)</li>
-                </ul>
-              </li>
-            </ul>
-          </li>
-        </ul>
-      </li>
-      <li>Quick Documentation for more elements
-        <ul dir="auto">
-          <li>Callbacks (<code class="notranslate">@doc</code> above <code class="notranslate">@callback</code> and <code class="notranslate">@macrocallback</code>)</li>
-          <li>Types (<code class="notranslate">@typedoc</code> above <code class="notranslate">@type</code>, <code class="notranslate">@typep</code>, and <code class="notranslate">@opaque</code>)</li>
-        </ul>
-      </li>
-      <li>Compatibility with IntelliJ 2022.2.</li>
-      <li>Updated Elixir version used in tests.</li>
-      <li>Updated Gradle dependencies.</li>
-    </ul>
-  </li>
-  <li>
-    <p>Bug Fixes</p>
-    <ul dir="auto">
-      <li>Add compiled CallDefinitionImpl delegation targets to resolve results</li>
-      <li>Log non-Call modulars for resolving delegation</li>
-      <li>Fix operator token set for <code>**</code></li>
-    </ul>
-  </li>
-</ul>
-<h1>v13.1.1</h1>
-<ul>
-  <li>
-    <p>Bug Fixes</p>
-    <ul dir="auto">
-      <li>Fix Project Initialization Failed from New &gt; Project &gt; Elixir
-        <ul dir="auto">
-          <li>Catch and log <code class="notranslate">IOException</code>s swallowed by Project Initialization Failed.</li>
-          <li>Recursively delete project directory before running <code class="notranslate">mix new</code>.<br>
-            Previously, the directory was only deleted if empty, but whether the <code class="notranslate">.idea</code> directory is written when <code class="notranslate">setupProject</code> is called differs between IDE versions, so to be safe, recursively delete.</li>
-        </ul>
-      </li>
-      <li>Fix Go To Definition for function in compiled modules.<br>
-        When switching over to delayed decompilation, <code class="notranslate">ModuleImpl</code> did not have <code class="notranslate">processDeclaration</code> overloadded, so the <code class="notranslate">PsiScopeProcessor</code> was never called on it and so the <code class="notranslate">CallDefinitionClause</code> scope processor did not check the <code class="notranslate">ModuleImpl#callDefinitons</code>.</li>
-      <li>Implement Deprecated metadata handling for docs from BEAM files.</li>
-      <li>Don't assume Elixir <code class="notranslate">SDK</code> <code class="notranslate">sdkAdditionalData</code> is non-<code class="notranslate">null</code>.</li>
-      <li>Don't restrict Run Configurations to Run in Modules to Elixir modules.<br>
-        The docs for <code class="notranslate">ModuleType</code> say the concept is meant to be deprecated, so don't enforce it and trying to load <code class="notranslate">ElixirModuleType</code> in RubyMine breaks as it tries to load <code class="notranslate">ElixirModuleBuilder</code> and therefore <code class="notranslate">JavaModuleBuilder</code>, which only works in IntelliJ.</li>
-      <li>Add the facet in a write action in addition to setting the SDK.</li>
-      <li>Increase <code class="notranslate">SUSPECT_NAME_SET_SIZE</code> to <code class="notranslate">20</code>.<br>
-        Increased to cover the <code class="notranslate">15</code> <code class="notranslate">impl</code>s of <code class="notranslate">String.Chars</code> in the <code class="notranslate">geo</code> hex package.</li>
-      <li>Log if <code class="notranslate">erl</code> binary is not found when trying to run <code class="notranslate">mix format</code>.<br>
-        Log instead of letting it throw up the stack and cause an error report since the SDK not being set will be very common.</li>
-    </ul>
-  </li>
-</ul>
-<h1>v13.1.0</h1>
-<ul>
-  <li>
-    <p>Enhancements</p>
-    <ul dir="auto">
-      <li>Improved error reporting
-        <ul dir="auto">
-          <li>Include 5 lines of context around error elements</li>
-          <li>Use <code class="notranslate">originalFile</code> when calculating path, so that <code class="notranslate">.beam</code> file path is used for decompiled files that don't have a <code class="notranslate">VirtualFile</code>.</li>
-          <li>Compact line references
-            <ul dir="auto">
-              <li>Only including ending line if it is different than starting line.</li>
-              <li>Add ending line as a range after starting line instead of a completely separate path and line.</li>
-            </ul>
-          </li>
-          <li>Put stacktrace in <code class="notranslate">&lt;details&gt;</code> with <code class="notranslate">&lt;summary&gt;</code></li>
-        </ul>
-      </li>
-      <li>Update dependencies
-        <ul dir="auto">
-          <li><code class="notranslate">gradle</code> to <code class="notranslate">7.4.2</code></li>
-          <li><code class="notranslate">gradle-intellij-plugin</code> to <code class="notranslate">1.6.0</code></li>
-          <li>Set <code class="notranslate">-Xjvm-default=all</code> for Kotlin to allow <code class="notranslate">@JvmDefault</code> interfaces
-            <ul dir="auto">
-              <li>Needed for <code class="notranslate">LanguageNewProjectWizard</code> subclasses and associated implementations</li>
-            </ul>
-          </li>
-        </ul>
-      </li>
-      <li>New Project &gt; Language &gt; Elixir includes all mix options
-        <ul dir="auto">
-          <li><code class="notranslate">--app</code></li>
-          <li><code class="notranslate">--module</code></li>
-          <li><code class="notranslate">--sup</code></li>
-          <li><code class="notranslate">--umbrella</code></li>
-        </ul>
-      </li>
-      <li>Add <code class="notranslate">mix format</code> external formatter.<br>
-        Requires project or module SDK be set in order to run.  If the SDK is not available, only the internal formatter will be used.  The internal formatter is still used for file subsection formatting and new line indenting as <code class="notranslate">mix format</code> works at the file-level.
-        <ul dir="auto">
-          <li>
-            <p dir="auto">Allow <code class="notranslate">mix format</code> external formatter to be disabled.</p>
-            <ol dir="auto">
-              <li>Preferences</li>
-              <li>Editor &gt; Code Style &gt; Elixir</li>
-              <li>Click the <code class="notranslate">mix format</code> tab</li>
-              <li>Expand the General group</li>
-              <li>Uncheck "Format files with <code class="notranslate">mix format</code>".</li>
-            </ol>
-          </li>
-        </ul>
-      </li>
-      <li>Support Elixir 1.13.0 in debugger.</li>
-    </ul>
-  </li>
-  <li>
-    <p>Bug Fixes</p>
-    <ul dir="auto">
-      <li>Protect from <code class="notranslate">null</code> <code class="notranslate">containingFile</code> when fetching docs.</li>
-      <li>Show notification if $HOME_PATH/lib does not exist.<br>
-        Instead of logging an error show a notification since it can and does happen and is not a bug to be fixed in the plugin, but a configuration change the user needs to do.</li>
-      <li>Ignore tuples as type restrictions that occur during typing</li>
-      <li>Catch <code class="notranslate">AlreadyDisposedException</code> when trying to find module for PsiElement in <code class="notranslate">mostSpecificSdk</code>.
-        <ul dir="auto">
-          <li>Check if the project<code class="notranslate">is disposed before using it to get module for </code>PsiElement`.</li>
-        </ul>
-      </li>
-      <li>Ignore <code class="notranslate">()</code> as a type parameter as it occurs during typing.</li>
-      <li>Default the variable color if the specific type foreground is <code class="notranslate">null</code></li>
-      <li>Log unknown element for fetching docs from BEAM file</li>
-      <li>Look above <code class="notranslate">CallDefinitionImpl</code> for <code class="notranslate">Type</code> scope processing<br>
-        It should go up to the <code class="notranslate">ModuleImpl</code> to find the <code class="notranslate">TypeDefinitionImpl</code>.</li>
-      <li>Have Credo Global Inspection use standard <code class="notranslate">Mix.commandLine</code> used for Run Configurations.
-        <ul dir="auto">
-          <li>Allow environment variables to be set similar to Run Configurations for projects that require environment variables to be set for Mix tasks due to checks in their config.</li>
-          <li>No longer support Include Explanations as it takes too long to run.</li>
-          <li>Remove annotator until it can be re-implemented in performant manner using corrected environment and SDK from Global Inspection.</li>
-        </ul>
-      </li>
-      <li>Look above <code class="notranslate">&lt;variable&gt;.&lt;tuple&gt;</code> for <code class="notranslate">ancestorTypeSpec</code>.
-        <ul dir="auto">
-          <li>Look above <code class="notranslate">&lt;tuple&gt;</code> after <code class="notranslate">&lt;variable&gt;.</code> for <code class="notranslate">ancestorTypeSpec</code>.</li>
-        </ul>
-      </li>
-      <li>Fix Find Usages that resolve to compiled types.
-        <ul dir="auto">
-          <li>Add element description for <code class="notranslate">TypeDefinitionImpl</code>
-            <ul dir="auto">
-              <li>Node Text is <code class="notranslate">@&lt;module_attribte&gt; &lt;name&gt;(&lt;parameters&gt;) :: ...</code></li>
-              <li>Long Name and Short Name are just the <code class="notranslate">name</code></li>
-              <li>Type is <code class="notranslate">type</code></li>
-            </ul>
-          </li>
-          <li>Mirror <code class="notranslate">TypeDefinitionImpls</code> to types in decompiled source.<br>
-            Allow <code class="notranslate">TypeDefinitionImpl.getNavigation</code> to go to decompiled types.</li>
-        </ul>
-      </li>
-      <li>Allow types with atom keyword names to be highlight even though they are invalid names.</li>
-      <li>Catch <code class="notranslate">RuntimeException</code> if <code class="notranslate">rootProvider</code> is already disposed.<br>
-        Catching <code class="notranslate">AssertionError</code> used to be enough in <span class="reference"><svg class="octicon octicon-git-merge merged color-fg-done mr-1" title="Merged" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M5 3.254V3.25v.005a.75.75 0 110-.005v.004zm.45 1.9a2.25 2.25 0 10-1.95.218v5.256a2.25 2.25 0 101.5 0V7.123A5.735 5.735 0 009.25 9h1.378a2.251 2.251 0 100-1.5H9.25a4.25 4.25 0 01-3.8-2.346zM12.75 9a.75.75 0 100-1.5.75.75 0 000 1.5zm-8.5 4.5a.75.75 0 100-1.5.75.75 0 000 1.5z"></path></svg><a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="390489030" data-permission-text="Title is private" data-url="https://github.com/KronicDeth/intellij-elixir/issues/1359" data-hovercard-type="pull_request" data-hovercard-url="/KronicDeth/intellij-elixir/pull/1359/hovercard" href="https://github.com/KronicDeth/intellij-elixir/pull/1359"> Remove unused variables in Elixir debugger server<span class="issue-shorthand">&nbsp;#1359</span></a></span>, but not anymore as of <span class="reference"><svg class="octicon octicon-issue-opened open mr-1" title="Open" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M8 9.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"></path><path fill-rule="evenodd" d="M8 0a8 8 0 100 16A8 8 0 008 0zM1.5 8a6.5 6.5 0 1113 0 6.5 6.5 0 01-13 0z"></path></svg><a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="1221835398" data-permission-text="Title is private" data-url="https://github.com/KronicDeth/intellij-elixir/issues/2623" data-hovercard-type="issue" data-hovercard-url="/KronicDeth/intellij-elixir/issues/2623/hovercard" href="https://github.com/KronicDeth/intellij-elixir/issues/2623">com.intellij.openapi.util.TraceableDisposable$DisposalException: Already disposed<span class="issue-shorthand">&nbsp;#2623</span></a></span>.</li>
-      <li>Ignore invalid format that occur while user is typing when highlighting types
-        <ul dir="auto">
-          <li><code class="notranslate">@type name :: String.()</code></li>
-          <li><code class="notranslate">@type String.()</code></li>
-          <li><code class="notranslate">@type S</code></li>
-        </ul>
-      </li>
-      <li>Restore Project configuration for Small IDEs.<br>
-        I dropped an <code class="notranslate">!</code> when converting from <code class="notranslate">equals</code> to <code class="notranslate">==</code> when fixing the deprecation warnings, which made the Project SDK selection <em>only</em> be <strong>HIDDEN</strong> where it needed to be <strong>SHOWN</strong>.</li>
-      <li>Catch <code class="notranslate">StackOverflowError</code> in <code class="notranslate">find_usages.Provider.getType()</code>.</li>
-      <li>Element descriptions for <code class="notranslate">CallDefinitionImpl</code></li>
-      <li>Highlight <code class="notranslate">CallDefinitionImpl</code> references as predefined if resolved <code class="notranslate">CallDefinitionImpl</code> is in <code class="notranslate">Kernel</code> or <code class="notranslate">Kernel.SpecialForms</code>.<br>
-        Fixes highlighting <code class="notranslate">def</code> and other defined when using SDKs without source like Homebrew after the delayed-decompilation fixes from 12.2.1.  Now source-less (Homebrew) and SDKs with sources (ASDF) will both be able to highlight predefineds.</li>
-      <li>No longer record the SDK name as an attribute of the Facet configuration, as it didn't write back changes.
-        <ul dir="auto">
-          <li>Instead detect the Elixir SDK by finding any of the libraries that have an Elixir SDK name in the module. (The Elixir SDK was already being added as a library to allow indexing the SDK.)</li>
-        </ul>
-      </li>
-      <li>Clear out any existing Elixir SDKs listed as module libraries before setting a new SDK.<br>
-        This eliminates the duplicates that happened before. (It turns out the JetBrains API doesn't prevent duplicates. Oopsie.) It also ensures that no SDK is recorded if the SDK is deselected in the UI, which wouldn't happen before.</li>
-      <li>Handle disposed <code class="notranslate">Sdk.rootProvider</code> by reloading the <code class="notranslate">Sdk</code> when loading <code class="notranslate">ebinDirectories</code></li>
-      <li>In IntelliJ 2022, the New Project dialog changed and it no longer automatically listed <code class="notranslate">ModuleType.getBuilder</code> <code class="notranslate">ModuleBuilder</code>s as potential project builders, so it looked like Elixir New Project support disappeared.  Fix this by implementing the <code class="notranslate">newProjectWizard.language</code> extension that was added to control the Language switching in the new New Project dialog.</li>
-      <li>Remove references to <code class="notranslate">ElementClassHint</code> in BeamFileImpl that only work in IntelliJ.<br>
-        <code class="notranslate">ElementClassHint</code> is part of the <code class="notranslate">processDeclaration</code> system used in Java and so was in the code because <code class="notranslate">BeamFileImpl</code> was original based on <code class="notranslate">ClassFileImpl</code>, but since the Elixir resolvers don't use the hint system at all, it can just be removed.</li>
-      <li>Remove <code class="notranslate">CodeStyleSettingsProvider</code> because it is redundant with <code class="notranslate">LanguageCodeStyleSettingsProvider</code></li>
-      <li>Restrict <code class="notranslate">UsageTargetProvider</code> to <code class="notranslate">ElixirFile</code>s<br>
-        Without this restriction, it tries to run when developing the plugin itself and breaks Kotlin syntax highlighting.</li>
-      <li>Fix environment not being passed to debug runs of ESpec and ExUnit Run Configurations.<br>
-        The <code class="notranslate">env</code> from the <code class="notranslate">Configuration</code> was dropped because a local <code class="notranslate">env</code> was created to set <code class="notranslate">MIX_ENV</code> <code class="notranslate">true</code>.</li>
-    </ul>
-  </li>
-</ul>
-<h1>v13.0.0</h1>
-<ul>
-  <li>
-    <p>Incompatible Changes</p>
-    <ul dir="auto">
-      <li>Drop support for IDEs before 2022.1.</li>
-    </ul>
-  </li>
-  <li>
-    <p>Enhancements</p>
-    <ul dir="auto">
-      <li>Support 2022.1 IDEs
-        <ul dir="auto">
-          <li>Update IntelliJ Plugin Gradle to 1.5.3.</li>
-          <li>Set untilBuild explicitly</li>
-          <li>Target JVM Version 11</li>
-        </ul>
-      </li>
-      <li>Expand <code class="notranslate">untilBuild</code> to cover PATCH releases of 2022.1.</li>
-    </ul>
-  </li>
-  <li>
-    <p>Bug Fixes</p>
-    <ul dir="auto">
-      <li>Fix (some) plugin verifier warnings
-        <ul dir="auto">
-          <li>Fix (some) deprecation warnings.</li>
-          <li>Use fewer Internal APIs.</li>
-        </ul>
-      </li>
-      <li>Don't use ElixirModuleType to check if it is available.<br>
-        It will not load in IDEs that lack <code class="notranslate">JavaModuleBuilder</code>, which is why I was hard coding the ran previously.</li>
-      <li>Don't use <code class="notranslate">XmlSerializer</code> as equivalent of <code class="notranslate">DefaultJDOMExternalizer</code><br>
-        The <code class="notranslate">DefaultJDOMExternalizer</code> method calls weren't writing anything and the explicit attribute value accesses were, so it is more correct to just remove the original deprecated calls.</li>
-    </ul>
-  </li>
-</ul>
-<h1>v12.2.1</h1>
-<ul>
-  <li>
-    <p>Bug Fixes</p>
-    <ul dir="auto">
-      <li>
-        <p dir="auto">Don't call <code>.navigationElement</code> to prevent unnecessary decompilation when resolving references or showing completions.</p>
-        <ul dir="auto">
-          <li>Don't call <code>navigationElement</code> in <code>ChooseByNameContributor</code></li>
-          <li>Don't decompile Protocols to get their specific <code>t</code> type</li>
-          <li>Don't call <code>.navigationElement</code> when resolving built-in types in <code>:erlang</code></li>
-          <li>Don't use <code>navigationElement</code> in <code>CallDefinitionClause.implicitImports</code> for <code>Kernel</code> and <code>KernelSpecial.Forms</code>.</li>
-          <li>Don't call <code>.navigationElement</code> in <code>reference.resolver.Module.multiResolveProject</code><br>
-            Prevents decompiling modules when doing completion.</li>
-        </ul>
-        <p dir="auto">Handle <code>PsiCompiledElement</code> in places that previously only handled source and decompiled <code>Call</code>s</p>
-        <ul dir="auto">
-          <li><code>getElementDescription</code> for ModuleImpl</li>
-          <li>Complete call definition under binary modules</li>
-          <li>Don't look for variables in compiled elements</li>
-          <li>Don't assume elements have a non-null node<br>
-            Decompiled elements don't</li>
-          <li>Index <code>TypeDefinition</code>s in .beam files<br>
-            Only supported built-in types faked in <code>:erlang</code> for now</li>
-          <li>Walk <code>ModuleImpl</code> for <code>scope.Type</code></li>
-        </ul>
-      </li>
-    </ul>
-  </li>
-</ul>
-<h1>v12.2.0</h1>
-<ul>
-  <li>
-    <p>Enhancements</p>
-    <ul dir="auto">
-      <li>Test against support IDEA versions in CI to prevent another Find Usage regression
-        <ul dir="auto">
-          <li>2021.2.3 FindUsageTests differ from manual testings, so don't test 2021.2.3</li>
-          <li>Make FindUsagesTest UsageViewTreeText work for both 2021.1.3 and other versions</li>
-          <li>Add kernel.ex to all Find Usage Tests to ensure it doesn't work because it can't resolve primary element</li>
-        </ul>
-      </li>
-      <li>Add find usages for def test</li>
-    </ul>
-  </li>
-  <li>
-    <p>Bug Fixes</p>
-    <ul dir="auto">
-      <li>Work-around Find Usage bug due to temporary change in JetBrains API only in versions that have that change.
-        <ul dir="auto">
-          <li>Restore old find_usages.handler.Call</li>
-          <li>
-            Determine whether to resolve <code>FindUsageHandler</code> primary element based on application build number<br>
-            Assume that are 213.* builds have the already resolved call. This excludes 2021.3, but not 2021.3.1, which
-            includes the fix to restore the 2021.1.3 behaviour.
-          </li>
-        </ul>
-      </li>
-      <li>Fix HTML errors in <code>description.html</code>.</li>
-      <li>Add card one-liner.</li>
-    </ul>
-  </li>
-</ul>
-<h1>v12.1.0</h1>
-<ul>
-  <li>
-    <p>Enhancements</p>
-    <ul dir="auto">
-      <li>Add MacPorts SDK locations to README.</li>
-      <li>Update build to elixir 1.13.0</li>
-      <li>Add support for ** operator to lexer and parser<br>
-        Port <a href="https://github.com/elixir-lang/elixir/pull/11241">Add power operator</a>
-      </li>
-      <li>Color settings for each sigil name.  Both the interpolating (lower case) and literal (upper case) name use the same settings.</li>
-      <li>Add support for stepped ranges<br>
-        Port <a href="https://github.com/elixir-lang/elixir/pull/10810">elixir-lang/elixir#10810</a>
-        <ul dir="auto">
-          <li>Regression test for #2200</a>
-          </li>
-        </ul>
-      </li>
-      <li>Update CI
-        <ul dir="auto">
-          <li>Update to Elixir 1.12.3</li>
-          <li>Update to Erlang 24.1.6</li>
-        </ul>
-      </li>
-      <li>Use <code>getUsageViewTreeTextRepresentation</code> to check find usages.</li>
-      <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/2374">#2374</a>.</li>
-      <li>Regression test for<a href="https://github.com/KronicDeth/intellij-elixir/issues/2386">#2386</a><br>
-        Issue <a href="https://github.com/KronicDeth/intellij-elixir/issues/2386">#2386</a> had the same root cause (OtpExternalFun not being decompiled correctly) as Issue <a href="https://github.com/KronicDeth/intellij-elixir/issues/2410">#2410</a>, so Issue <a href="https://github.com/KronicDeth/intellij-elixir/issues/2386">#2386</a>
-        was fixed by Pull Request <a href="https://github.com/KronicDeth/intellij-elixir/pull/2441">#2441</a>, but since <a href="https://github.com/alexxero">@alexxero</a> was nice enough to upload the <code>.beam</code> file for Issue <a href="https://github.com/KronicDeth/intellij-elixir/issues/2386">#2386</a>, I might as well add it as a regression test too.</li>
-      <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/2446">#2446</a></li>
-    </ul>
-  </li>
-  <li>
-    <p>Bug Fixes</p>
-    <ul dir="auto">
-      <li>
-        <p dir="auto">Restore tests that weren't being run after 2021.3 upgrade.<br>
-          Upgrading to 2021.3 dropped the number of run tests from 3741 to 1452.  This was due to a change in the packaging in 2021.3 that triggered a gradle bug.</p>
-        <ul dir="auto">
-          <li>Fix test broken by missing <code>markdown</code> in plugins list<br>
-            Like the need for the <code>java</code> plugin to handle the <code>com.intellij.modules.java</code> <code>depends</code>in <code>plugin.xml</code>, the <code>org.intellij.plugins.markdown</code> <code>depends</code> needed <code>markdown</code> added to the list to make some of the tests work.  The failed tests weren't being run before after the 2021.3 upgrade.</li>
-          <li>Manually include tests instead of scanning.<br>
-            Work-around <a href="https://github.com/gradle/gradle/issues/18486">gradle/gradle#18486</a> as described in <a href="https://jetbrains-platform.slack.com/archives/C5U8BM1MK/p1637955960051600?thread_ts=1637923961.040000&amp;cid=C5U8BM1MK" rel="nofollow">this JetBrains Platform Slack #intellij-platform channel thread</a> that affects running tests with ideaVersion 2021.3.
-            <ul dir="auto">
-              <li>Rename ParsingTestCases with improper capitalization</li>
-            </ul>
-          </li>
-        </ul>
-      </li>
-      <li>Decompile <code>{:|, ..., ...}</code> as cons operator in Elixir Dbgi.</li>
-      <li>Fix missing guards when decompiling Elixr DbgI clauses using special decompiler<br>
-        Guards where missing because only <code>decompiler.appendSignature</code> was used.</li>
-      <li>Fix <strong>module</strong>.Reference.calculateDefaultRangeInElement<br>
-        <code>element.textOffset</code> instead of <code>element.textLength</code> was used for end of range.</li>
-      <li>Restore colors for char lists and strings lost with the PSI changes in <a href="https://github.com/KronicDeth/intellij-elixir/commit/e71b247aacaff389358ca5441c32512cdafd6af9">e71b247</a>.</li>
-      <li>Render <code>OtpErlangExternalFun</code> correctly as remote captures (<code>&amp;Mod.fun/arity</code>).<br>
-        Fixes decompiling <code>Ecto.Changeset.validate_number</code>.</li>
-      <li>Protect ExUnit configuration <code>Producer</code> from <code>ElixirFile</code> without <code>VirtualFile</code>.</li>
-      <li><code>Unquote.treeWalkUp</code> no longer assumes that the final argument to <code>unquote</code> is a <code>Call</code>.</li>
-      <li>Fix Find Usages for call definitions
-        <ul dir="auto">
-          <li>Don't resolve primary Find Usages element.<br>
-            The primary element passed to <code>FindUsageHandler</code> is now already resolved, so resolving it again for call definitions finds usages of <code>def</code>, <code>defmacro</code>, etc.</li>
-          <li>Since the element passed to <code>FindUsagesProvider#canFindUsageFor</code>, definers can no longer be excluded, so remove that check.</li>
-        </ul>
-      </li>
-      <li>Don't highlight <code>Quote</code> or <code>Sigil</code> as normal text if part of documentation.<br>
-        Since the annotators will run in arbitrary order, the <code>Textual</code> annotator has to avoid annotating the same nodes as the <code>ModuleAttribute</code> annotator or the colors can get interleaved.</li>
-      <li>Put <code>ENTRANCE</code> and Initial Visited Element in <code>__module__.Resolver</code>.</li>
-      <li>Keep searching when resolving type parameters if bitstring is encountered.</li>
-      <li>Fix <code>UnaliasedName.unaliasedName</code> for atoms.</li>
-      <li>Restore <code>ElixirAtom#getName</code><br>
-        Lost when parser was regenerated when Elixir &lt;= 1.6 support was dropped in <a href="https://github.com/KronicDeth/intellij-elixir/commit/679a9689cfe097018b9baa4e894d4550a84d7aac">679a968</a>.</li>
-    </ul>
-  </li>
-</ul>
-<h1>v12.0.1</h1>
-<ul>
-  <li>
-    <p>Bug Fixes</p>
-    <ul dir="auto">
-      <li>Override <code>Override org.elixir_lang.*.configuration.Factory.getId</code> to fix deprecation warning about the default implementation being accidentally localizable when it shouldn't be.  The Elixir plugin didn't localize these name using message bundles, so this wasn't an actual risk, but overriding is the only way to silence the error.</li>
-      <li>Stop look for qualifier at curly braces for <code>%{Alias}</code></li>
-    </ul>
-  </li>
-</ul>
+<h1>v14</h1>
+The
+<a href="https://htmlpreview.github.io/?https://github.com/KronicDeth/intellij-elixir/blob/v14.0.1/resources/META-INF/changelog.html">CHANGELOG
+    for v14</a>.
 </body>
 </html>
