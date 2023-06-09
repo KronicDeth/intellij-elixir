@@ -26,6 +26,8 @@
   * Use `org.apache.commons.lang.SystemUtils` instead of `org.codehaus.plexus.interpolation.os.Os` to detect if on Windows for Test marker file URL.
 * [#3260](https://github.com/KronicDeth/intellij-elixir/pull/3260) - [@KronicDeth](https://github.com/KronicDeth)
   * Call `FileIndex.getContentRootForFile` in `ReadAction` when getting working directory for `mix format`.
+* [#3261](https://github.com/KronicDeth/intellij-elixir/pull/3261) - [@KronicDeth](https://github.com/KronicDeth)
+  * Don't include `null` target usage types when finding usage type across all targets.
 
 ## v15.0.1
 

@@ -27,7 +27,7 @@ class UsageTypeProvider : com.intellij.usages.impl.rules.UsageTypeProviderEx {
     override fun getUsageType(element: PsiElement): UsageType? = getUsageType(element, emptyArray())
 
     private fun getUsageType(targets: Array<out UsageTarget>): UsageType? =
-        targets.map { getUsageType(it) }.fold(null as UsageType?) { acc, targetUsageType ->
+        targets.mapNotNull { getUsageType(it) }.fold(null as UsageType?) { acc, targetUsageType ->
             when {
                 acc == targetUsageType ->
                     acc
