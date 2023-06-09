@@ -4,6 +4,7 @@ import com.intellij.application.options.CodeStyle
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.process.CapturingProcessHandler
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.runReadAction
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.progress.ProgressManager
@@ -74,7 +75,11 @@ class MixFormatExternalFormatProcessor : ExternalFormatProcessor {
             psiFile
                 .virtualFile
                 ?.let { virtualFile ->
-                    ProjectRootManager.getInstance(psiFile.project).fileIndex.getContentRootForFile(virtualFile)
+                    val fileIndex = ProjectRootManager.getInstance(psiFile.project).fileIndex
+
+                    runReadAction {
+                        fileIndex.getContentRootForFile(virtualFile)
+                    }
                 }
                 ?.takeIf { contentRoot ->
                     contentRoot.findChild("mix.exs") != null
