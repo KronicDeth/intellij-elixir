@@ -28,6 +28,8 @@
   * Call `FileIndex.getContentRootForFile` in `ReadAction` when getting working directory for `mix format`.
 * [#3261](https://github.com/KronicDeth/intellij-elixir/pull/3261) - [@KronicDeth](https://github.com/KronicDeth)
   * Don't include `null` target usage types when finding usage type across all targets.
+* [#3262](https://github.com/KronicDeth/intellij-elixir/pull/3262) - [@KronicDeth](https://github.com/KronicDeth)
+  * Skip bare Aliases when resolving Types.
 
 ## v15.0.1
 
