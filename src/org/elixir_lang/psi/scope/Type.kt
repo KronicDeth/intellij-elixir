@@ -43,7 +43,7 @@ abstract class Type : PsiScopeProcessor {
             is ElixirKeywordKey -> executeOnParameter(element, state)
             is ElixirNoParenthesesOneArgument, is ElixirAccessExpression -> executeOnChildren(element, state)
             is ElixirAtom, is ElixirFile, is ElixirLine, is ElixirList, is ElixirParentheticalStab,
-            is ElixirStructOperation, is ElixirTuple, is WholeNumber
+            is ElixirStructOperation, is ElixirTuple, is QualifiableAlias, is WholeNumber
             -> false
 
             is ModuleImpl<*> -> execute(element, state)
