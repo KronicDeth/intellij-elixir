@@ -255,13 +255,20 @@ private fun validateAndGetSdkValidationMessage(
     return if (sdk == null) {
         JavaUiBundle.message("title.no.jdk.specified")
     } else {
-        if (Elixir.elixirSdkHasErlangSdk(sdk)) {
-            try {
-                sdkModel.apply(null, true)
+        val internalErlangSdk = Elixir.elixirSdkToErlangSdk(sdk)
 
-                null
-            } catch (e: ConfigurationException) {
-                e.message ?: e.title
+        if (internalErlangSdk != null) {
+            if (internalErlangSdk.homeDirectory != null) {
+                try {
+                    sdkModel.apply(null, true)
+
+                    null
+                } catch (e: ConfigurationException) {
+                    e.message ?: e.title
+                }
+            } else {
+                "Internal Erlang SDK (${internalErlangSdk.name} home directory (${internalErlangSdk.homePath}) " +
+                        "does not exists.  Did you uninstall it?"
             }
         } else {
             "Internal Erlang SDK is not in Elixir SDK.  Set it before picking this Elixir SDK."

@@ -33,6 +33,8 @@
 * [#3263](https://github.com/KronicDeth/intellij-elixir/pull/3263) - [@KronicDeth](https://github.com/KronicDeth)
   * Exclude `.elixir_ls` directory when configuring new `Project`s.
     If the `.elixir_ls` directory is included the `.beam` it produces can interfere with normal `StubIndex`.
+* [#3271](https://github.com/KronicDeth/intellij-elixir/pull/3271) - [@KronicDeth](https://github.com/KronicDeth)
+  * Check if Internal Erlang SDK home path exists for SDK for New Project.
 
 ## v15.0.1
 
