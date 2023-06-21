@@ -1,6 +1,10 @@
 # Changelog
 
-## v15.0.2
+## v15.1.0
+
+### Enhancemnts
+* [#3279](https://github.com/KronicDeth/intellij-elixir/pull/3279) - [@osbre](https://github.com/osbre)
+  * Add "Homebrew on Linux" SDK locations.
 
 ### Bug Fixes
 * [#3185](https://github.com/KronicDeth/intellij-elixir/pull/3213) - [@KronicDeth](https://github.com/KronicDeth)

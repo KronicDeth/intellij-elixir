@@ -4629,6 +4629,24 @@ When configuring an SDK, if you don't want to use the suggested SDK home path, y
     </tr>
     <tr>
       <td rowspan="3">
+        <a href="https://docs.brew.sh/Homebrew-on-Linux">Homebrew on Linux</a>
+      </td>
+      <td>Elixir SDK</td>
+      <td>
+         <code>/home/linuxbrew/.linuxbrew/Cellar/elixir/VERSION</code>
+      </td>
+    </tr>
+    <tr>
+      <td>Erlang SDK</td>
+      <td rowspan="2">
+        <code>/home/linuxbrew/.linuxbrew/Cellar/erlang/VERSION</code>
+      </td>
+    </tr>
+    <tr>
+      <td>Erlang for Elixir SDK</td>
+    </tr>
+    <tr>
+      <td rowspan="3">
         <a href="https://nixos.org/nix/download.html">Nix</a>
       </td>
       <td>Elixir SDK</td>
