@@ -75,7 +75,7 @@ class ElixirSdkForModuleStep(private val wizardContext: WizardContext) : ModuleW
         )
 
         val jdkLabel = JLabel(JavaUiBundle.message("label.project.jdk")).apply {
-            font = StartupUiUtil.getLabelFont().deriveFont(Font.BOLD)
+            font = StartupUiUtil.labelFont.deriveFont(Font.BOLD)
         }
         add(
             jdkLabel, GridBagConstraints(
