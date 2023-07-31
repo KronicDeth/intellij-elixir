@@ -1,6 +1,6 @@
 plugins {
     id "org.jetbrains.intellij" version "1.13.3"
-    id "org.jetbrains.kotlin.jvm" version "1.7.20"
+    id "org.jetbrains.kotlin.jvm" version "1.9.0"
     id "de.undercouch.download" version "4.1.2"
 }
 
@@ -69,8 +69,8 @@ allprojects {
         changeNotes.set(bodyInnerHTML("resources/META-INF/changelog.html"))
         pluginDescription.set(bodyInnerHTML("resources/META-INF/description.html"))
 
-        sinceBuild = "231.8109.174"
-        untilBuild = "231.*"
+        sinceBuild = "232.8660.143"
+        untilBuild = "232.*"
     }
 
     publishPlugin {
@@ -82,7 +82,7 @@ allprojects {
     }
 
     runPluginVerifier {
-        ideVersions = ["2023.1"]
+        ideVersions = ["2023.2"]
     }
 }
 
