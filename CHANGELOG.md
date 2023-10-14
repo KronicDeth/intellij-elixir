@@ -1,6 +1,6 @@
 # Changelog
 
-## v16.0.1
+## v16.1.0
 
 ### Bug Fixes
 * [#3431](https://github.com/KronicDeth/intellij-elixir/pull/3431) - [@KronicDeth](https://github.com/KronicDeth)
@@ -8,6 +8,10 @@
     * `org.elixir_lang.facet.configurable.Project` - "Elixir"
     * `org.elixir_lang.facets.sdks.erlang.Configurable` - "Internal Erlang SDKs"
     * `org.elixir_lang.facets.sdks.elixir.Configurable` - "SDKs"
+
+### Enhancements
+* [#2402](https://github.com/KronicDeth/intellij-elixir/pull/3402) - [@joshuataylor](https://github.com/joshuataylor)
+  * Support 2023.3 IDEs.
 
 ## v16.0.0
 
