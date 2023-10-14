@@ -16,6 +16,8 @@
   * Drop support for <= 2023.1 IDEs.
 
 ### Enhancements
+* [#2402](https://github.com/KronicDeth/intellij-elixir/pull/3402) - [@joshuataylor](https://github.com/joshuataylor)
+  * Support 2023.3 IDEs.
 * [#3327](https://github.com/KronicDeth/intellij-elixir/pull/3327) - [@marceloneppel](https://github.com/marceloneppel)
   * Support 2023.2 IDEs.
 
