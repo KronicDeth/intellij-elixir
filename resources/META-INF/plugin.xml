@@ -88,14 +88,17 @@
         <!-- Facet -->
         <applicationConfigurable id="language.elixir.sdks.elixir"
                                  parentId="language.elixir"
+                                 displayName="SDKs"
                                  provider="org.elixir_lang.facet.sdks.elixir.Provider"/>
         <applicationConfigurable id="language.elixir.sdks.erlang"
                                  parentId="language.elixir"
+                                 displayName="Internal Erlang SDKs"
                                  provider="org.elixir_lang.facet.sdks.erlang.Provider"/>
         <applicationService serviceImplementation="org.elixir_lang.facet.SdksService"
                             serviceInterface="org.elixir_lang.facet.SdksService"/>
         <projectConfigurable id="language.elixir"
                              parentId="language"
+                             displayName="Elixir"
                              provider="org.elixir_lang.facet.configurable.Provider"/>
 
         <facetType implementation="org.elixir_lang.facet.Type"/>

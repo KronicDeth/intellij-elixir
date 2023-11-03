@@ -1,5 +1,14 @@
 # Changelog
 
+## v16.0.1
+
+### Bug Fixes
+* [#3431](https://github.com/KronicDeth/intellij-elixir/pull/3431) - [@KronicDeth](https://github.com/KronicDeth)
+  * Add `displayName` in `plugin.xml` for configurables for faster menu loading.
+    * `org.elixir_lang.facet.configurable.Project` - "Elixir"
+    * `org.elixir_lang.facets.sdks.erlang.Configurable` - "Internal Erlang SDKs"
+    * `org.elixir_lang.facets.sdks.elixir.Configurable` - "SDKs"
+
 ## v16.0.0
 
 ### Incompatible Changes
