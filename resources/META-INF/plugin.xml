@@ -88,6 +88,7 @@
         <!-- Facet -->
         <applicationConfigurable id="language.elixir.sdks.elixir"
                                  parentId="language.elixir"
+                                 displayName="SDKs"
                                  provider="org.elixir_lang.facet.sdks.elixir.Provider"/>
         <applicationConfigurable id="language.elixir.sdks.erlang"
                                  parentId="language.elixir"
