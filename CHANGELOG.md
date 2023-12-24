@@ -1,6 +1,12 @@
 # Changelog
 
-## v17
+## v17.0.1
+
+### Bug Fixes
+* [#3491](https://github.com/KronicDeth/intellij-elixir/pull/3491) - [neominik](https://github.com/neominik)
+  * Render code snippets that are not links.
+
+## v17.0.0
 
 ### Breaking changes
 * [#3500](https://github.com/KronicDeth/intellij-elixir/pull/3500) - [@KronicDeth](https://github.com/KronicDeth)
