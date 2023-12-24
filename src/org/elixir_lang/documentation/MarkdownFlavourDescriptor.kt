@@ -19,6 +19,20 @@ import org.intellij.markdown.parser.LinkMap
 import java.util.regex.Pattern
 
 class MarkdownFlavourDescriptor(private val project: Project) : GFMFlavourDescriptor() {
+    fun renderGenericCode(
+        gfmHtmlGeneratingProvider: GeneratingProvider?,
+        visitor: HtmlGenerator.HtmlGeneratingVisitor,
+        text: String,
+        node: ASTNode
+    ) {
+        visitor.consumeTagOpen(
+            node,
+            "code",
+        )
+        gfmHtmlGeneratingProvider!!.processNode(visitor, text, node)
+        visitor.consumeTagClose("code")
+    }
+
     override fun createHtmlGeneratingProviders(linkMap: LinkMap, baseURI: URI?): Map<IElementType, GeneratingProvider> =
         super
             .createHtmlGeneratingProviders(linkMap, baseURI)
@@ -73,6 +87,8 @@ class MarkdownFlavourDescriptor(private val project: Project) : GFMFlavourDescri
                                         )
                                         gfmHtmlGeneratingProvider!!.processNode(visitor, text, node)
                                         visitor.consumeTagClose("a")
+                                    } else {
+                                        renderGenericCode(gfmHtmlGeneratingProvider, visitor, text, node)
                                     }
                                 }
                                 5 -> {
@@ -103,11 +119,15 @@ class MarkdownFlavourDescriptor(private val project: Project) : GFMFlavourDescri
                                                     )
                                                     gfmHtmlGeneratingProvider!!.processNode(visitor, text, node)
                                                     visitor.consumeTagClose("a")
+                                                } else {
+                                                    renderGenericCode(gfmHtmlGeneratingProvider, visitor, text, node)
                                                 }
                                             }
                                         }
+                                        else -> renderGenericCode(gfmHtmlGeneratingProvider, visitor, text, node)
                                     }
                                 }
+                                else -> renderGenericCode(gfmHtmlGeneratingProvider, visitor, text, node)
                             }
                         }
                     }
