@@ -4,7 +4,7 @@ import com.intellij.lang.ASTNode;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.ResolveResult;
 import com.intellij.psi.tree.IElementType;
-import org.apache.commons.lang.NotImplementedException;
+import org.apache.commons.lang3.NotImplementedException;
 import org.elixir_lang.psi.*;
 import org.elixir_lang.reference.resolver.atom.resolvable.Exact;
 import org.elixir_lang.reference.resolver.atom.resolvable.Pattern;

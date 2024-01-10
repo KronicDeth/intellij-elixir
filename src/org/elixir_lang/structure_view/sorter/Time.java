@@ -4,7 +4,7 @@ import com.intellij.icons.AllIcons;
 import com.intellij.ide.util.treeView.smartTree.ActionPresentation;
 import com.intellij.ide.util.treeView.smartTree.ActionPresentationData;
 import com.intellij.ide.util.treeView.smartTree.Sorter;
-import org.apache.commons.lang.NotImplementedException;
+import org.apache.commons.lang3.NotImplementedException;
 import org.elixir_lang.structure_view.element.Timed;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
