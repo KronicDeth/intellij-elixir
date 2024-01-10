@@ -1,7 +1,7 @@
 package org.elixir_lang;
 
 import com.ericsson.otp.erlang.*;
-import org.apache.commons.lang.NotImplementedException;
+import org.apache.commons.lang3.NotImplementedException;
 import org.jetbrains.annotations.Nullable;
 
 import static org.elixir_lang.psi.impl.QuotableImpl.NIL;

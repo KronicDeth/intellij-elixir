@@ -2,7 +2,7 @@ package org.elixir_lang.intellij_elixir
 
 import com.ericsson.otp.erlang.*
 import com.intellij.psi.PsiFile
-import org.apache.commons.lang.CharUtils
+import org.apache.commons.lang3.CharUtils
 import org.elixir_lang.GenericServer.call
 import org.elixir_lang.IntellijElixir
 import org.elixir_lang.Keyword.isKeyword

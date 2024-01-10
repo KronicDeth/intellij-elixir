@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.function.Predicate;
 
 import static com.intellij.formatting.ChildAttributes.DELEGATE_TO_PREV_CHILD;
-import static org.apache.commons.lang.StringUtils.isWhitespace;
+import static org.apache.commons.lang3.StringUtils.isWhitespace;
 import static org.elixir_lang.psi.ElixirTypes.*;
 import static org.elixir_lang.psi.ElixirTypes.DO;
 import static org.elixir_lang.psi.ElixirTypes.FN;
