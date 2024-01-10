@@ -90,6 +90,7 @@ public class GeneralCommandLine implements UserDataHolder {
     /**
      * @deprecated use {@link #getEnvironment()} (to remove in IDEA 14)
      */
+    @Deprecated
     @SuppressWarnings("unused")
     public Map<String, String> getEnvParams() {
         return getEnvironment();
@@ -98,6 +99,7 @@ public class GeneralCommandLine implements UserDataHolder {
     /**
      * @deprecated use {@link #getEnvironment()} (to remove in IDEA 14)
      */
+    @Deprecated
     @SuppressWarnings("unused")
     public void setEnvParams(@Nullable Map<String, String> envParams) {
         myEnvParams.clear();
