@@ -69,7 +69,7 @@ allprojects {
         changeNotes.set(bodyInnerHTML("resources/META-INF/changelog.html"))
         pluginDescription.set(bodyInnerHTML("resources/META-INF/description.html"))
 
-        sinceBuild = "232.8660.143"
+        sinceBuild = "233.11799.241"
         untilBuild = "233.*"
     }
 
@@ -82,7 +82,7 @@ allprojects {
     }
 
     runPluginVerifier {
-        ideVersions = ["2023.2", "2023.3"]
+        ideVersions = ["2023.3"]
     }
 }
 
