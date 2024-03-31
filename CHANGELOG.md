@@ -3,8 +3,10 @@
 ## v17.0.1
 
 ### Bug Fixes
-* [#3491](https://github.com/KronicDeth/intellij-elixir/pull/3491) - [neominik](https://github.com/neominik)
+* [#3491](https://github.com/KronicDeth/intellij-elixir/pull/3491) - [@neominik](https://github.com/neominik)
   * Render code snippets that are not links.
+* [#3562](https://github.com/KronicDeth/intellij-elixir/pull/3562) - [@ashleysommer](https://github.com/ashleysommer)
+  * Add the correct ERL and elixir arguments for starting IEx depending on the version of Elixir SDK.
 
 ## v17.0.0
 

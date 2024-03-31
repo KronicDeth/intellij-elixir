@@ -2,6 +2,7 @@ package org.elixir_lang
 
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.openapi.projectRoots.Sdk
+import com.intellij.openapi.util.Version
 import org.elixir_lang.Elixir.elixirSdkToEnsuredErlangSdk
 import org.elixir_lang.Elixir.prependNewCodePaths
 
@@ -19,15 +20,34 @@ object IEx {
         prependNewCodePaths(commandLine, elixirSdk, erlangSdk)
         commandLine.addParameters("-elixir", "ansi_enabled", "true")
         commandLine.addParameters(erlArgumentList)
-        addIEx(commandLine)
+        addIEx(commandLine, elixirSdk)
         commandLine.addParameter("--no-halt")
 
         return commandLine
     }
 
-    private fun addIEx(commandLine: GeneralCommandLine) {
+    private fun addIEx(commandLine: GeneralCommandLine, elixirSdk: Sdk) {
         commandLine.addParameter("-noshell")
-        commandLine.addParameters("-user", "Elixir.IEx.CLI")
-        commandLine.addParameter("-extra")
+
+        val elixirVersion = elixirSdk.versionString?.let { Version.parseVersion(it) }
+        if (elixirVersion?.lessThan(1, 15, 0) == true) {
+            /* Pre Elixir 1.15.0, IEx entrypoint was as Elixir.IEx.CLI start() */
+            commandLine.addParameters("-user", "Elixir.IEx.CLI")
+            commandLine.addParameter("-extra")
+        } else if (elixirVersion?.`is`(1, 15, 0) == true) {
+            /* Weird case for 1.15.0-rc1 to 1.15.0
+             * It had a bugged start_iex that needs to be specified differently. */
+            commandLine.addParameters("-s", "elixir", "start_cli")
+            commandLine.addParameters("-user", "elixir")
+            commandLine.addParameter("-extra")
+            commandLine.addParameters("-e", ":elixir.start_iex()")
+        } else {
+            /* Case for elixir 1.16.0+ (and 1.15.1+ from the 1.15 branch).
+             * We can call start_iex directly from elixir entrypoint. */
+            commandLine.addParameters("-s", "elixir", "start_iex")
+            commandLine.addParameters("-user", "elixir")
+            commandLine.addParameter("-extra")
+        }
+        commandLine.addParameter("+iex")
     }
 }
