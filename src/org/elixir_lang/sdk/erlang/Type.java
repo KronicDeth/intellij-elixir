@@ -2,6 +2,7 @@ package org.elixir_lang.sdk.erlang;
 
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.process.ProcessOutput;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.projectRoots.SdkModel;
@@ -155,8 +156,7 @@ public class Type extends SdkType {
     public void setupSdkPaths(@NotNull Sdk sdk) {
         SdkModificator sdkModificator = sdk.getSdkModificator();
         addCodePaths(sdkModificator);
-
-        sdkModificator.commitChanges();
+        ApplicationManager.getApplication().runWriteAction(sdkModificator::commitChanges);
     }
 
     /**

@@ -1,6 +1,7 @@
 package org.elixir_lang
 
 import com.intellij.openapi.application.ex.ApplicationInfoEx
+import com.intellij.openapi.util.Version
 import com.intellij.psi.PsiPolyVariantReference
 import com.intellij.usages.UsageInfo2UsageAdapter
 import org.elixir_lang.find_usages.handler.AlreadyResolved
@@ -650,10 +651,15 @@ class FindUsagesTest : PlatformTestCase() {
         )
     }
 
-    private fun usages(): String =
-        if (ApplicationInfoEx.getInstance().fullVersion == "2021.1.3") {
+    private fun usages(): String {
+        val ideVersion = Version.parseVersion(ApplicationInfoEx.getInstance().fullVersion)
+        val usagesString = if (ideVersion === null || ideVersion.lessThan(2021,2,0)) {
             "Found usages"
-        } else {
+        } else if (ideVersion.lessThan(2024,1,0)) {
             "Usages in"
+        } else {
+            "Usages"
         }
+        return usagesString
+    }
 }
