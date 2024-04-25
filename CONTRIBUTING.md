@@ -110,6 +110,11 @@ JetBrains plugins are able to set the text attribute values for `TextAttributeKe
 
 ## Building
 
+### Plugin
+If using WSL for your build environment you may alternatively build the plugin without launching the linux version of intellij.
+From the command line run `./gradlew buildPlugin` or from IntelliJ, right-click `intellij-elixir` in the Gradle Tool Window and select `buildPlugin`.
+and install from the `build/distributions` folder. 
+
 ### Documentation
 
 The documentation files ([`CHANGELOG.md`](CHANGELOG.md), [`CONTRIBUTING.md`](CONTRIBUTING.md), [`README.md`](README.md),
@@ -127,4 +132,3 @@ Then regenerate the table of contents using `doctoc`
 ```sh
 doctoc .
 ```
-
