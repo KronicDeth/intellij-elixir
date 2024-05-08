@@ -5,8 +5,10 @@ import com.intellij.application.options.CodeStyleAbstractPanel
 import com.intellij.application.options.IndentOptionsEditor
 import com.intellij.application.options.SmartIndentOptionsEditor
 import com.intellij.lang.Language
+import com.intellij.openapi.util.BuildNumber
 import com.intellij.psi.codeStyle.*
 import com.intellij.psi.codeStyle.LanguageCodeStyleSettingsProvider
+import com.intellij.psi.codeStyle.CodeStyleSettingsCustomizable.*
 import org.elixir_lang.ElixirLanguage
 import org.elixir_lang.code_style.CodeStyleSettings
 
@@ -27,10 +29,14 @@ class LanguageCodeStyleSettingsProvider : LanguageCodeStyleSettingsProvider() {
             SettingsType.SPACING_SETTINGS -> customizeSpaceSettings(consumer)
             SettingsType.WRAPPING_AND_BRACES_SETTINGS -> customizeWrappingAndBracesSettings(consumer)
             SettingsType.LANGUAGE_SPECIFIC -> customizeLanguageSpecific(consumer)
+            SettingsType.COMMENTER_SETTINGS -> customizeCodeGenerationSettings(consumer)
             SettingsType.BLANK_LINES_SETTINGS,
-            SettingsType.INDENT_SETTINGS,
-            SettingsType.COMMENTER_SETTINGS -> Unit
+            SettingsType.INDENT_SETTINGS -> Unit
         }
+    }
+
+    private fun customizeCodeGenerationSettings(consumer: CodeStyleSettingsCustomizable) {
+        consumer.showStandardOptions(*CodeGenerationPanel.getSupportedCommenterStandardOptionNames().toTypedArray())
     }
 
     private fun customizeSpaceSettings(consumer: CodeStyleSettingsCustomizable) {
