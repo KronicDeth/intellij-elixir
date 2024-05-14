@@ -9,6 +9,10 @@
   * Add the correct ERL and elixir arguments for starting IEx depending on the version of Elixir SDK.
 * [#3563](https://github.com/KronicDeth/intellij-elixir/pull/3563) - [@ashleysommer](https://github.com/ashleysommer)
   * Bundle latest OtpErlang.jar from JInterface v1.14 for OTP v26.
+* [#3564](https://github.com/KronicDeth/intellij-elixir/pull/3564) - [@ashleysommer](https://github.com/ashleysommer)
+  * Bump devtools
+    * Elixir to 1.14.5
+    * Erlang/OTP 24 to 24.3.4.16 
 
 ## v17.0.0
 

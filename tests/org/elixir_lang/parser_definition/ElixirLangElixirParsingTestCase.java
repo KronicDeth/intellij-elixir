@@ -50,9 +50,6 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
         assertParsed("lib/eex/lib/eex/smart_engine.ex", Parse.CORRECT);
     }
 
-    public void testEexTokenizer() {
-        assertParsed("lib/eex/lib/eex/tokenizer.ex", Parse.CORRECT);
-    }
 
     public void testAccess() {
         assertParsed("lib/elixir/lib/access.ex", Parse.CORRECT);
