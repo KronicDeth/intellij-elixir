@@ -4,7 +4,7 @@
     <vendor email="Kronic.Deth@gmail.com">Elle Imhoff</vendor>
 
     <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
-    <idea-version since-build="201.6668.113"/>
+    <idea-version since-build="241.0"/>
 
     <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
          on how to target different products -->
@@ -213,8 +213,9 @@
         <lang.parserDefinition language="Elixir" implementationClass="org.elixir_lang.ElixirParserDefinition"/>
         <lang.psiStructureViewFactory language="Elixir" implementationClass="org.elixir_lang.structure_view.Factory"/>
         <lang.quoteHandler language="Elixir" implementationClass="org.elixir_lang.QuoteHandler"/>
-        <lang.syntaxHighlighterFactory key="Elixir"
-                                       implementationClass="org.elixir_lang.ElixirSyntaxHighlighterFactory"/>
+        <lang.syntaxHighlighterFactory
+                                       implementationClass="org.elixir_lang.ElixirSyntaxHighlighterFactory"
+                                       language="Elixir"/>
         <localInspection displayName="Ambiguous nested calls" enabledByDefault="true" groupName="Elixir"
                          implementationClass="org.elixir_lang.inspection.NoParenthesesManyStrict" language="Elixir"
                          level="ERROR" shortName="NoParenthesesManyStrict"/>
