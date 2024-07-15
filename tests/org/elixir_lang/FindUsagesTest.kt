@@ -1,5 +1,7 @@
 package org.elixir_lang
 
+import com.intellij.openapi.application.ex.ApplicationInfoEx
+import com.intellij.openapi.util.Version
 import com.intellij.psi.PsiPolyVariantReference
 import com.intellij.usages.UsageInfo2UsageAdapter
 import org.elixir_lang.find_usages.handler.AlreadyResolved
@@ -20,18 +22,18 @@ class FindUsagesTest : PlatformTestCase() {
 
         assertEquals(
             """<root> (3)
- Usages (3)
+ ${usages()} (3)
   Call definition clause (2)
    light_idea_test_case (2)
      (2)
      function_recursive_declaration.ex (2)
-      2  def function([], acc), do: acc
-      4  def function([h | t], acc) do
+      2def function([], acc), do: acc
+      4def function([h | t], acc) do
   Value read (1)
    light_idea_test_case (1)
      (1)
      function_recursive_declaration.ex (1)
-      5    function(t, [h | acc])
+      5function(t, [h | acc])
 """,
             usageViewTreeTextRepresentation
         )
@@ -48,18 +50,18 @@ class FindUsagesTest : PlatformTestCase() {
 
         assertEquals(
             """<root> (3)
- Usages (3)
+ ${usages()} (3)
   Call definition clause (2)
    light_idea_test_case (2)
      (2)
      function_recursive_usage.ex (2)
-      2  def function([], acc), do: acc
-      4  def function([h | t], acc) do
+      2def function([], acc), do: acc
+      4def function([h | t], acc) do
   Value read (1)
    light_idea_test_case (1)
      (1)
      function_recursive_usage.ex (1)
-      5    function(t, [h | acc])
+      5function(t, [h | acc])
 """,
             usageViewTreeTextRepresentation
         )
@@ -76,12 +78,12 @@ class FindUsagesTest : PlatformTestCase() {
 
         assertEquals(
             """<root> (1)
- Usages (1)
+ ${usages()} (1)
   Call definition clause (1)
    light_idea_test_case (1)
      (1)
      function_single_clause_unused.ex (1)
-      2  def function, do: :ok
+      2def function, do: :ok
 """,
             usageViewTreeTextRepresentation
         )
@@ -98,13 +100,13 @@ class FindUsagesTest : PlatformTestCase() {
 
         assertEquals(
             """<root> (2)
- Usages (2)
+ ${usages()} (2)
   Call definition clause (2)
    light_idea_test_case (2)
      (2)
      function_multiple_clauses_unused.ex (2)
-      2  def function(list) when is_list(list), do: []
-      3  def function(map) when is_map(map), do: %{}
+      2def function(list) when is_list(list), do: []
+      3def function(map) when is_map(map), do: %{}
 """,
             usageViewTreeTextRepresentation
         )
@@ -124,17 +126,17 @@ class FindUsagesTest : PlatformTestCase() {
 
         assertEquals(
             """<root> (2)
- Usages (2)
+ ${usages()} (2)
   Call definition clause (1)
    light_idea_test_case (1)
      (1)
      function_multiple_modules_declaration_target.ex (1)
-      2  def declaration, do: :ok
+      2def declaration, do: :ok
   Value read (1)
    light_idea_test_case (1)
      (1)
      function_multiple_modules_declaration_usage.ex (1)
-      3    Declaration.declaration()
+      3Declaration.declaration()
 """,
             usageViewTreeTextRepresentation
         )
@@ -154,17 +156,17 @@ class FindUsagesTest : PlatformTestCase() {
 
         assertEquals(
             """<root> (2)
- Usages (2)
+ ${usages()} (2)
   Call definition clause (1)
    light_idea_test_case (1)
      (1)
      function_multiple_modules_usage_declaration.ex (1)
-      2  def declaration, do: :ok
+      2def declaration, do: :ok
   Value read (1)
    light_idea_test_case (1)
      (1)
      function_multiple_modules_usage_target.ex (1)
-      3    Declaration.declaration()
+      3Declaration.declaration()
 """,
             usageViewTreeTextRepresentation
         )
@@ -184,17 +186,17 @@ class FindUsagesTest : PlatformTestCase() {
 
         assertEquals(
             """<root> (2)
- Usages (2)
+ ${usages()} (2)
   Call definition clause (1)
    light_idea_test_case (1)
      (1)
      function_import_declaration_target.ex (1)
-      2  def declaration, do: :ok
+      2def declaration, do: :ok
   Value read (1)
    light_idea_test_case (1)
      (1)
      function_import_declaration_usage.ex (1)
-      5    declaration()
+      5declaration()
 """,
             usageViewTreeTextRepresentation
         )
@@ -230,17 +232,17 @@ class FindUsagesTest : PlatformTestCase() {
 
         assertEquals(
             """<root> (2)
- Usages (2)
+ ${usages()} (2)
   Call definition clause (1)
    light_idea_test_case (1)
      (1)
      function_import_usage_declaration.ex (1)
-      2  def declaration, do: :ok
+      2def declaration, do: :ok
   Value read (1)
    light_idea_test_case (1)
      (1)
      function_import_usage_target.ex (1)
-      5    declaration()
+      5declaration()
 """,
             usageViewTreeTextRepresentation
         )
@@ -257,17 +259,17 @@ class FindUsagesTest : PlatformTestCase() {
 
         assertEquals(
             """<root> (2)
- Usages (2)
+ ${usages()} (2)
   Parameter declaration (1)
    light_idea_test_case (1)
      (1)
      parameter_declaration.ex (1)
-      2  defp function(parameter) do
+      2defp function(parameter) do
   Value read (1)
    light_idea_test_case (1)
      (1)
      parameter_declaration.ex (1)
-      3    %{parameter: parameter}
+      3%{parameter: parameter}
 """,
             usageViewTreeTextRepresentation
         )
@@ -284,12 +286,12 @@ class FindUsagesTest : PlatformTestCase() {
 
         assertEquals(
             """<root> (2)
- Usages (2)
+ ${usages()} (2)
   Alias (1)
    light_idea_test_case (1)
      (1)
      module_recursive_declaration.ex (1)
-      2  alias Declaration
+      2alias Declaration
   Module definition (1)
    light_idea_test_case (1)
      (1)
@@ -324,12 +326,12 @@ class FindUsagesTest : PlatformTestCase() {
 
         assertEquals(
             """<root> (2)
- Usages (2)
+ ${usages()} (2)
   Alias (1)
    light_idea_test_case (1)
      (1)
      module_recursive_usage.ex (1)
-      2  alias Declaration
+      2alias Declaration
   Module definition (1)
    light_idea_test_case (1)
      (1)
@@ -351,13 +353,13 @@ class FindUsagesTest : PlatformTestCase() {
 
         assertEquals(
             """<root> (3)
- Usages (3)
+ ${usages()} (3)
   Alias (2)
    light_idea_test_case (2)
      (2)
      module_nested_recursive_declaration.ex (2)
-      2  alias Parent.Declaration
-      3  alias Parent.{Declaration}
+      2alias Parent.Declaration
+      3alias Parent.{Declaration}
   Module definition (1)
    light_idea_test_case (1)
      (1)
@@ -382,12 +384,12 @@ class FindUsagesTest : PlatformTestCase() {
 
         assertEquals(
             """<root> (2)
- Usages (2)
+ ${usages()} (2)
   Alias (1)
    light_idea_test_case (1)
      (1)
      module_multiple_modules_declaration_usage.ex (1)
-      2  alias Declaration
+      2alias Declaration
   Module definition (1)
    light_idea_test_case (1)
      (1)
@@ -426,12 +428,12 @@ class FindUsagesTest : PlatformTestCase() {
 
         assertEquals(
             """<root> (2)
- Usages (2)
+ ${usages()} (2)
   Alias (1)
    light_idea_test_case (1)
      (1)
      module_multiple_modules_usage_target.ex (1)
-      2  alias Declaration
+      2alias Declaration
   Module definition (1)
    light_idea_test_case (1)
      (1)
@@ -453,12 +455,12 @@ class FindUsagesTest : PlatformTestCase() {
 
         assertEquals(
             """<root> (1)
- Usages (1)
+ ${usages()} (1)
   Parameter declaration (1)
    light_idea_test_case (1)
      (1)
      parameter_unused.ex (1)
-      2  defp function(_parameter) do
+      2defp function(_parameter) do
 """,
             usageViewTreeTextRepresentation
         )
@@ -475,17 +477,17 @@ class FindUsagesTest : PlatformTestCase() {
 
         assertEquals(
             """<root> (2)
- Usages (2)
+ ${usages()} (2)
   Parameter declaration (1)
    light_idea_test_case (1)
      (1)
      parameter_usage.ex (1)
-      2  defp function(parameter) do
+      2defp function(parameter) do
   Value read (1)
    light_idea_test_case (1)
      (1)
      parameter_usage.ex (1)
-      3    %{parameter: parameter}
+      3%{parameter: parameter}
 """,
             usageViewTreeTextRepresentation
         )
@@ -502,17 +504,17 @@ class FindUsagesTest : PlatformTestCase() {
 
         assertEquals(
             """<root> (2)
- Usages (2)
+ ${usages()} (2)
   Value read (1)
    light_idea_test_case (1)
      (1)
      variable_declaration.ex (1)
-      5    variable
+      5variable
   Value write (1)
    light_idea_test_case (1)
      (1)
      variable_declaration.ex (1)
-      3    variable = Application.get_env(:variable, :key)
+      3variable = Application.get_env(:variable, :key)
 """,
             usageViewTreeTextRepresentation
         )
@@ -530,12 +532,12 @@ class FindUsagesTest : PlatformTestCase() {
 
         assertEquals(
             """<root> (1)
- Usages (1)
+ ${usages()} (1)
   Value write (1)
    light_idea_test_case (1)
      (1)
      variable_unused.ex (1)
-      3    variable = Application.get_env(:variable, :key)
+      3variable = Application.get_env(:variable, :key)
 """,
             usageViewTreeTextRepresentation
         )
@@ -552,17 +554,17 @@ class FindUsagesTest : PlatformTestCase() {
 
         assertEquals(
             """<root> (2)
- Usages (2)
+ ${usages()} (2)
   Value read (1)
    light_idea_test_case (1)
      (1)
      variable_usage.ex (1)
-      5    variable
+      5variable
   Value write (1)
    light_idea_test_case (1)
      (1)
      variable_usage.ex (1)
-      3    variable = Application.get_env(:variable, :key)
+      3variable = Application.get_env(:variable, :key)
 """,
             usageViewTreeTextRepresentation
         )
@@ -579,17 +581,17 @@ class FindUsagesTest : PlatformTestCase() {
 
         assertEquals(
             """<root> (2)
- Usages (2)
+ ${usages()} (2)
   Module attribute accumulate or override (1)
    light_idea_test_case (1)
      (1)
      module_attribute_declaration.ex (1)
-      2  @module_attribute 1
+      2@module_attribute 1
   Module attribute read (1)
    light_idea_test_case (1)
      (1)
      module_attribute_declaration.ex (1)
-      4  def usage, do: @module_attribute
+      4def usage, do: @module_attribute
 """,
             usageViewTreeTextRepresentation
         )
@@ -606,17 +608,17 @@ class FindUsagesTest : PlatformTestCase() {
 
         assertEquals(
             """<root> (2)
- Usages (2)
+ ${usages()} (2)
   Module attribute accumulate or override (1)
    light_idea_test_case (1)
      (1)
      module_attribute_usage.ex (1)
-      2  @module_attribute 1
+      2@module_attribute 1
   Module attribute read (1)
    light_idea_test_case (1)
      (1)
      module_attribute_usage.ex (1)
-      4  def usage, do: @module_attribute
+      4def usage, do: @module_attribute
 """,
             usageViewTreeTextRepresentation
         )
@@ -636,16 +638,28 @@ class FindUsagesTest : PlatformTestCase() {
 
         assertEquals(
             """<root> (3)
- Usages (3)
+ ${usages()} (3)
   Call definition clause (3)
    light_idea_test_case (3)
      (3)
      issue_2374.ex (3)
-      2  def foo, do: "foo"
-      3  def bar, do: foo()
-      4  def baz, do: foo()
+      2def foo, do: "foo"
+      3def bar, do: foo()
+      4def baz, do: foo()
 """,
             usageViewTreeTextRepresentation
         )
+    }
+
+    private fun usages(): String {
+        val ideVersion = Version.parseVersion(ApplicationInfoEx.getInstance().fullVersion)
+        val usagesString = if (ideVersion === null || ideVersion.lessThan(2021,2,0)) {
+            "Found usages"
+        } else if (ideVersion.lessThan(2024,1,0)) {
+            "Usages in"
+        } else {
+            "Usages"
+        }
+        return usagesString
     }
 }
