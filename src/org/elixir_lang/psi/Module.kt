@@ -26,5 +26,7 @@ object Module {
                     call.isCalling(Module.MODULE, Function.CREATE, 3)
 
     @Contract(pure = true)
-    fun name(call: Call): String = call.primaryArguments()!!.first()!!.text
+    fun name(call: Call): String = ApplicationManager.getApplication().runReadAction(Computable {
+        call.primaryArguments()?.firstOrNull()?.text ?: ""
+    })
 }
