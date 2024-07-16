@@ -88,7 +88,7 @@ allprojects {
 
 apply plugin: "kotlin"
 
-noinspection GroovyAssignabilityCheck,GrUnresolvedAccess
+//noinspection GroovyAssignabilityCheck,GrUnresolvedAccess
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
     //noinspection GrUnresolvedAccess
     kotlinOptions {
