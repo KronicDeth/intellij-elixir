@@ -531,23 +531,21 @@ ELIXIR_SDK_HOME
             return if (!project.isDisposed) {
                 /* ModuleUtilCore.findModuleForPsiElement can fail with NullPointerException if the
                     ProjectFileIndex.SERVICE.getInstance(Project) returns {@code null}, so check that the
-                    ProjectFileIndex is available first
-                */
+                    ProjectFileIndex is available first */
                 if (ProjectFileIndex.SERVICE.getInstance(project) != null) {
-                    ApplicationManager.getApplication().executeOnPooledThread(Callable {
-                        ReadAction.compute<Sdk?, Throwable> {
-                            try {
-                                val module = ModuleUtilCore.findModuleForPsiElement(psiElement)
-                                if (module != null) {
-                                    mostSpecificSdk(module)
-                                } else {
-                                    mostSpecificSdk(project)
-                                }
-                            } catch (_: AlreadyDisposedException) {
-                                null
-                            }
+                    val module = try {
+                        ReadAction.compute<Module, Throwable> {
+                            ModuleUtilCore.findModuleForPsiElement(psiElement)
                         }
-                    }).get()
+                    } catch (_: AlreadyDisposedException) {
+                        null
+                    }
+
+                    if (module != null) {
+                        mostSpecificSdk(module)
+                    } else {
+                        mostSpecificSdk(project)
+                    }
                 } else {
                     mostSpecificSdk(project)
                 }
