@@ -210,8 +210,9 @@ task getQuoterDeps(dependsOn: getQuoter) {
     doLast {
         exec {
             workingDir quoterUnzippedPath
-            executable "mix"
-            args "deps.get"
+            commandLine 'mix', 'do', 'local.rebar', '--force,', 'local.hex', '--force,', 'deps.get'
+            // standardOutput = System.out
+            // errorOutput = System.err
         }
     }
 }
@@ -223,8 +224,9 @@ task releaseQuoter(dependsOn: getQuoterDeps) {
         if (!file.canExecute()) {
             exec {
                 workingDir quoterUnzippedPath
-                executable "mix"
-                args "release"
+                commandLine 'mix', 'do', 'local.rebar', '--force,', 'local.hex', '--force,', 'deps.get,', 'release'
+                // standardOutput = System.out
+                // errorOutput = System.err
             }
         }
     }
