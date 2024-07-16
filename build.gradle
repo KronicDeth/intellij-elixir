@@ -54,7 +54,7 @@ allprojects {
                    // needed for documentation rendering
                    "markdown",
                    // always have IdeaVIM installed in sandbox
-                   "IdeaVIM:1.10.1"]
+                   "IdeaVIM:2.14.0"]
         pluginName.set('intellij-elixir')
         version.set(ideaVersion)
         downloadSources.set(Boolean.valueOf(sources))
@@ -82,7 +82,7 @@ allprojects {
     }
 
     runPluginVerifier {
-        ideVersions = ["2024.1"]
+        ideVersions = ["2024.1.4"]
     }
 }
 
@@ -104,6 +104,7 @@ test {
     environment "ELIXIR_LANG_ELIXIR_PATH", elixirPath
     environment "ELIXIR_EBIN_DIRECTORY", "${elixirPath}/lib/elixir/ebin/"
     environment "ELIXIR_VERSION", elixirVersion
+    systemProperty "idea.log.debug.categories", "org.intellij.elixir"
     setScanForTestClasses(false)
     include("**/Issue*.class")
     include("**/*Test.class")
@@ -256,6 +257,7 @@ task stopQuoter(type: Exec, dependsOn: releaseQuoter) {
 
 runIde {
     jvmArgs "-Didea.ProcessCanceledException=disabled"
+    systemProperty "idea.log.debug.categories", "org.intellij.elixir"
     maxHeapSize = "7g"
 }
 
