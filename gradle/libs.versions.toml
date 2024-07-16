@@ -1,0 +1,17 @@
+[versions]
+changelog = "2.2.0"
+intelliJPlatform = "2.0.0-beta9"
+kotlin = "1.9.24"
+kover = "0.8.1"
+qodana = "2024.1.5"
+annotations = "24.1.0"
+
+[libraries]
+annotations = { group = "org.jetbrains", name = "annotations", version.ref = "annotations" }
+
+[plugins]
+changelog = { id = "org.jetbrains.changelog", version.ref = "changelog" }
+intelliJPlatform = { id = "org.jetbrains.intellij.platform", version.ref = "intelliJPlatform" }
+kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
+qodana = { id = "org.jetbrains.qodana", version.ref = "qodana" }
