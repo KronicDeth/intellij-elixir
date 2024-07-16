@@ -136,7 +136,7 @@ dependencies {
     implementation project('jps-shared')
     implementation files('lib/OtpErlang.jar')
     implementation group: 'commons-io', name: 'commons-io', version: '2.16.1'
-    testImplementation('junit:junit:4.13.2')
+
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '2.2.9'
     testImplementation group: 'org.objenesis', name: 'objenesis', version: '2.4'
 }
@@ -211,8 +211,9 @@ task getQuoterDeps(dependsOn: getQuoter) {
     doLast {
         exec {
             workingDir quoterUnzippedPath
-            executable "mix"
-            args "deps.get"
+            commandLine 'mix', 'do', 'local.rebar', '--force,', 'local.hex', '--force,', 'deps.get'
+            // standardOutput = System.out
+            // errorOutput = System.err
         }
     }
 }
@@ -224,8 +225,9 @@ task releaseQuoter(dependsOn: getQuoterDeps) {
         if (!file.canExecute()) {
             exec {
                 workingDir quoterUnzippedPath
-                executable "mix"
-                args "release"
+                commandLine 'mix', 'do', 'local.rebar', '--force,', 'local.hex', '--force,', 'deps.get,', 'release'
+                // standardOutput = System.out
+                // errorOutput = System.err
             }
         }
     }
@@ -256,8 +258,8 @@ task stopQuoter(type: Exec, dependsOn: releaseQuoter) {
 }
 
 runIde {
-    jvmArgs "-Didea.ProcessCanceledException=disabled"
     systemProperty "idea.log.debug.categories", "org.intellij.elixir"
+    jvmArgs "-Didea.ProcessCanceledException=disabled"
     maxHeapSize = "7g"
 }
 
