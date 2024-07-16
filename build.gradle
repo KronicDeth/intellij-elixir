@@ -86,18 +86,6 @@ allprojects {
     }
 }
 
-apply plugin: "kotlin"
-
-//noinspection GroovyAssignabilityCheck,GrUnresolvedAccess
-tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
-    //noinspection GrUnresolvedAccess
-    kotlinOptions {
-        apiVersion = "1.7"
-        jvmTarget = "17"
-        freeCompilerArgs = ["-Xjvm-default=all"]
-    }
-}
-
 def compilationPackages = ['org/intellij/elixir/build/**', 'org/intellij/elixir/jps/**']
 
 test {
