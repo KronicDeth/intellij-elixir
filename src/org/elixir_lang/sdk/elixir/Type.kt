@@ -16,7 +16,10 @@ import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.roots.ProjectFileIndex
 import com.intellij.openapi.roots.ProjectRootManager
-import com.intellij.openapi.util.*
+import com.intellij.openapi.util.InvalidDataException
+import com.intellij.openapi.util.SystemInfo
+import com.intellij.openapi.util.Version
+import com.intellij.openapi.util.WriteExternalException
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
@@ -44,6 +47,7 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.*
 import javax.swing.Icon
+import java.util.concurrent.Callable
 
 class Type : org.elixir_lang.sdk.erlang_dependent.Type(SerializerExtension.ELIXIR_SDK_TYPE_ID) {
     /**
@@ -303,7 +307,7 @@ ELIXIR_SDK_HOME
             addDocumentationPaths(sdkModificator)
             addSourcePaths(sdkModificator)
             configureInternalErlangSdk(sdk, sdkModificator)
-            sdkModificator.commitChanges()
+            ApplicationManager.getApplication().runWriteAction { sdkModificator.commitChanges() }
         }
 
         private fun configureInternalErlangSdk(elixirSdk: Sdk, elixirSdkModificator: SdkModificator): Sdk? {
@@ -415,7 +419,7 @@ ELIXIR_SDK_HOME
             sdkModificator.homePath = sdkHome
             sdkModificator.versionString =
                 getVersionString(release) // must be set after home path, otherwise setting home path clears the version string
-            sdkModificator.commitChanges()
+            ApplicationManager.getApplication().runWriteAction { sdkModificator.commitChanges() }
             configureSdkPaths(sdk)
             return sdk
         }
@@ -527,21 +531,23 @@ ELIXIR_SDK_HOME
             return if (!project.isDisposed) {
                 /* ModuleUtilCore.findModuleForPsiElement can fail with NullPointerException if the
                     ProjectFileIndex.SERVICE.getInstance(Project) returns {@code null}, so check that the
-                    ProjectFileIndex is available first */
+                    ProjectFileIndex is available first
+                */
                 if (ProjectFileIndex.SERVICE.getInstance(project) != null) {
-                    val module = try {
-                        ReadAction.compute<Module, Throwable> {
-                            ModuleUtilCore.findModuleForPsiElement(psiElement)
+                    ApplicationManager.getApplication().executeOnPooledThread(Callable {
+                        ReadAction.compute<Sdk?, Throwable> {
+                            try {
+                                val module = ModuleUtilCore.findModuleForPsiElement(psiElement)
+                                if (module != null) {
+                                    mostSpecificSdk(module)
+                                } else {
+                                    mostSpecificSdk(project)
+                                }
+                            } catch (_: AlreadyDisposedException) {
+                                null
+                            }
                         }
-                    } catch (_: AlreadyDisposedException) {
-                        null
-                    }
-
-                    if (module != null) {
-                        mostSpecificSdk(module)
-                    } else {
-                        mostSpecificSdk(project)
-                    }
+                    }).get()
                 } else {
                     mostSpecificSdk(project)
                 }

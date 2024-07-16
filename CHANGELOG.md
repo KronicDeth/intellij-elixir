@@ -1,5 +1,10 @@
 # Changelog
 
+## v18.0.0
+### Breaking changes
+* [#3569](https://github.com/KronicDeth/intellij-elixir/pull/3569) - [@ashleysommer](https://github.com/ashleysommer), [@joshuataylor](https://github.com/joshuataylor)
+  * Drop support for <= 2024.1 IDEs.
+
 ## v17.0.1
 
 ### Bug Fixes
