@@ -4,6 +4,7 @@ import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import ReleaseQuoterTask
+import org.jetbrains.intellij.platform.gradle.GradleProperties
 
 fun properties(key: String) = providers.gradleProperty(key)
 fun environment(key: String) = providers.environmentVariable(key)
@@ -164,9 +165,9 @@ tasks {
         sourceCompatibility = properties("javaVersion").get()
         targetCompatibility = properties("javaVersion").get()
     }
-   named("compileTestJava") {
-       dependsOn(":jps-builder:composedJar", ":jps-shared:composedJar", "makeElixir")
-   }
+    named("compileTestJava") {
+        dependsOn(":jps-builder:composedJar", ":jps-shared:composedJar", "makeElixir")
+    }
 
     runIde {
         systemProperty("idea.log.info.categories", "org.intellij_lang=TRACE")
@@ -340,7 +341,14 @@ subprojects {
         }
     }
 
+    tasks.named("compileTestJava") {
+        dependsOn(":makeElixir")
+    }
+
     tasks.test {
+        dependsOn(":runQuoter", ":makeElixir")
+        finalizedBy(":stopQuoter")
+
         environment("ELIXIR_LANG_ELIXIR_PATH", rootProject.extra["elixirPath"] as String)
         environment("ELIXIR_EBIN_DIRECTORY", "${rootProject.extra["elixirPath"]}/lib/elixir/ebin/")
         environment("ELIXIR_VERSION", rootProject.extra["elixirVersion"] as String)
@@ -351,6 +359,7 @@ subprojects {
         testLogging {
             exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
         }
+        environment("RELEASE_TMP", tmpDirPath)
     }
 }
 //
