@@ -31,8 +31,8 @@ abstract class ReleaseQuoterTask @Inject constructor(
                 "release",
                 "--overwrite"
             )
-            it.standardOutput = System.out
-            it.errorOutput = System.err
+//            it.standardOutput = System.out
+//            it.errorOutput = System.err
         }
     }
 }

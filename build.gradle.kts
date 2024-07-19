@@ -237,8 +237,8 @@ tasks {
 
         workingDir = file(elixirPath)
         commandLine("make")
-        standardOutput = System.out
-        errorOutput = System.err
+        logging.captureStandardOutput(LogLevel.LIFECYCLE)
+        logging.captureStandardError(LogLevel.ERROR)
 
         inputs.dir(elixirPath)
         outputs.dir("$elixirPath/bin")
@@ -276,31 +276,22 @@ tasks {
     // Task to run the Quoter daemon
     register<Exec>("runQuoter") {
         dependsOn("releaseQuoter")
-        workingDir = file(quoterReleasePathValue)
-        commandLine = listOf(quoterExe, "daemon")
-        standardOutput = System.out
-        errorOutput = System.err
 
         environment("RELEASE_TMP", tmpDirPath)
         environment("RELEASE_COOKIE", "intellij_elixir")
         environment("RELEASE_DISTRIBUTION", "name")
         environment("RELEASE_NAME", "intellij_elixir@127.0.0.1")
-
-        doFirst {
-            println("Running Quoter daemon")
-        }
-        doLast {
-            println("Quoter daemon stopped")
-        }
+        workingDir = file(quoterReleasePathValue)
+        commandLine = listOf(quoterExe, "daemon")
+        logging.captureStandardOutput(LogLevel.LIFECYCLE)
+        logging.captureStandardError(LogLevel.ERROR)
     }
 
     // Task to stop the Quoter daemon
     register<Exec>("stopQuoter") {
         dependsOn("releaseQuoter")
-        workingDir = file(quoterReleasePathValue)
-        commandLine = listOf(quoterExe, "stop")
-        standardOutput = System.out
-        errorOutput = System.err
+//        logging.captureStandardOutput(LogLevel.LIFECYCLE)
+//        logging.captureStandardError(LogLevel.ERROR)
 
         environment("RELEASE_TMP", tmpDirPath)
         environment("RELEASE_COOKIE", "intellij_elixir")
@@ -308,10 +299,8 @@ tasks {
         environment("RELEASE_NAME", "intellij_elixir@127.0.0.1")
 
         isIgnoreExitValue = true
-
-        doFirst {
-            println("Stopping Quoter daemon")
-        }
+        workingDir = file(quoterReleasePathValue)
+        commandLine = listOf(quoterExe, "stop")
     }
     test {
         dependsOn("runQuoter", "makeElixir")
