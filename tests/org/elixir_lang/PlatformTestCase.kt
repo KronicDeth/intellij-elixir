@@ -1,10 +1,11 @@
 package org.elixir_lang
 
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
+import org.junit.Ignore
 import java.lang.Exception
 
-@org.junit.Ignore("abstract")
-open class PlatformTestCase : BasePlatformTestCase() {
+@Ignore("abstract")
+abstract class PlatformTestCase : BasePlatformTestCase() {
     @Throws(Exception::class)
     override fun tearDown() {
         try {

@@ -1,8 +1,9 @@
-import org.gradle.plugins.ide.idea.model.IdeaLanguageLevel
+import de.undercouch.gradle.tasks.download.Download
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
+import ReleaseQuoterTask
 
 fun properties(key: String) = providers.gradleProperty(key)
 fun environment(key: String) = providers.environmentVariable(key)
@@ -14,8 +15,7 @@ plugins {
     alias(libs.plugins.changelog)
     alias(libs.plugins.qodana)
     alias(libs.plugins.kover)
-    id("de.undercouch.download") version "4.1.2"
-    id("com.adarshr.test-logger") version "4.0.0"
+    alias(libs.plugins.gradleDownloadTask)
 }
 
 group = properties("pluginGroup").get()
@@ -25,11 +25,12 @@ val cachePath = "${rootDir}/cache"
 val elixirVersion = properties("elixirVersion").get()
 val elixirPath = "${cachePath}/elixir-${elixirVersion}"
 val quoterVersion = "2.1.0"
-val quoterUnzippedPath = "${cachePath}/elixir-${elixirVersion}-intellij_elixir-${quoterVersion}"
-val quoterReleasePath = "${quoterUnzippedPath}/_build/dev/rel/intellij_elixir"
-val quoterExe = "${quoterReleasePath}/bin/intellij_elixir"
-val quoterZipPath = "${cachePath}/intellij_elixir-${quoterVersion}.zip"
-val quoterZipRootPath = "${cachePath}/intellij_elixir-${quoterVersion}"
+
+val quoterUnzippedPathValue = "${cachePath}/elixir-${elixirVersion}-intellij_elixir-${quoterVersion}"
+val quoterReleasePathValue = "${quoterUnzippedPathValue}/intellij_elixir-${quoterVersion}/_build/dev/rel/intellij_elixir"
+val tmpDirPath = "${rootDir}/cachetmp"
+val quoterExe = "${quoterReleasePathValue}/bin/intellij_elixir"
+val quoterZipPathValue = "${cachePath}/intellij_elixir-${quoterVersion}.zip"
 
 val versionSuffix = if (project.hasProperty("isRelease") && project.property("isRelease") == "true") {
     ""
@@ -147,19 +148,29 @@ tasks {
         kotlinOptions.jvmTarget = properties("javaVersion").get()
     }
 
+    register<Delete>("deleteCache") {
+        delete("cache")
+        delete("build")
+        delete("jps-shared/build")
+        delete("jps-builder/build")
+    }
+
+    clean {
+        dependsOn("deleteCache")
+    }
+
     compileJava {
+        dependsOn(":jps-builder:composedJar", ":jps-shared:composedJar")
         sourceCompatibility = properties("javaVersion").get()
         targetCompatibility = properties("javaVersion").get()
     }
+   named("compileTestJava") {
+       dependsOn(":jps-builder:composedJar", ":jps-shared:composedJar", "makeElixir")
+   }
 
-//    withType<JavaCompile> {
-//        sourceCompatibility =
-//        targetCompatibility = "17"
-//    }
-//
     runIde {
-        systemProperty("idea.log.debug.categories", "org.intellij_lang=TRACE")
-        jvmArgs("-Didea.debug.mode=true", "-Didea.is.internal=true", "-Dlog4j2.debug=true", "-Dlogger.org=TRACE")
+        systemProperty("idea.log.info.categories", "org.intellij_lang=TRACE")
+        jvmArgs("-Didea.info.mode=true", "-Didea.is.internal=true", "-Dlog4j2.info=true", "-Dlogger.org=TRACE")
     }
 
     wrapper {
@@ -174,6 +185,7 @@ tasks {
     }
 
     test {
+        environment("RELEASE_TMP", tmpDirPath)
         environment("ELIXIR_LANG_ELIXIR_PATH", elixirPath)
         environment("ELIXIR_EBIN_DIRECTORY", "${elixirPath}/lib/elixir/ebin/")
         environment("ELIXIR_VERSION", elixirVersion)
@@ -181,10 +193,10 @@ tasks {
         include("**/Issue*.class")
         include("**/*Test.class")
         include("**/*TestCase.class")
+        dependsOn(":jps-builder:composedJar", ":jps-shared:composedJar")
 
-        useJUnit {
-            exclude(compilationPackages)
-        }
+        useJUnit()
+        exclude(compilationPackages)
         testLogging {
             exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
         }
@@ -192,6 +204,7 @@ tasks {
     register<Test>("testCompilation") {
         group = "Verification"
         dependsOn("classes", "testClasses")
+        environment("RELEASE_TMP", tmpDirPath)
         useJUnit {
             exclude(compilationPackages)
         }
@@ -199,111 +212,111 @@ tasks {
             exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
         }
     }
-    register<de.undercouch.gradle.tasks.download.Download>("getElixir") {
-        src("https://github.com/elixir-lang/elixir/archive/v${elixirVersion}.zip")
-        dest("${rootDir}/cache/Elixir.${elixirVersion}.zip")
+
+    register<Download>("downloadElixir") {
+        src("https://github.com/elixir-lang/elixir/archive/v$elixirVersion.zip")
+        dest("$rootDir/cache/Elixir.$elixirVersion.zip")
         overwrite(false)
-        doLast {
-            copy {
-                from(zipTree("${rootDir}/cache/Elixir.${elixirVersion}.zip"))
-                into("${rootDir}/cache/")
-            }
-            exec {
-                workingDir = file(elixirPath)
-                commandLine("make")
-                standardOutput = System.out
-                errorOutput = System.err
-            }
-        }
+
+        inputs.property("elixirVersion", elixirVersion)
+        outputs.file(dest)
+        outputs.cacheIf { true }
     }
 
-    register<de.undercouch.gradle.tasks.download.Download>("getQuoter") {
-        src("https://github.com/KronicDeth/intellij_elixir/archive/v${quoterVersion}.zip")
-        dest(quoterZipPath)
+    register<Copy>("extractElixir") {
+        dependsOn("downloadElixir")
+
+        from(zipTree("$rootDir/cache/Elixir.$elixirVersion.zip"))
+        into("$rootDir/cache/")
+
+        outputs.dir(elixirPath)
+    }
+
+    register<Exec>("makeElixir") {
+        dependsOn("extractElixir")
+
+        workingDir = file(elixirPath)
+        commandLine("make")
+        standardOutput = System.out
+        errorOutput = System.err
+
+        inputs.dir(elixirPath)
+        outputs.dir("$elixirPath/bin")
+        outputs.cacheIf { true }
+    }
+
+    // quoter
+    register<Download>("downloadQuoter") {
+        src("https://github.com/KronicDeth/intellij_elixir/archive/v$quoterVersion.zip")
+        dest(quoterZipPathValue)
         overwrite(false)
-        doLast {
-            copy {
-                from(zipTree(quoterZipPath))
-                into(cachePath)
-            }
-            file(quoterZipRootPath).renameTo(file(quoterUnzippedPath))
-        }
+        onlyIfModified(true)
+
+        inputs.property("quoterVersion", quoterVersion)
+        outputs.file(quoterZipPathValue)
+        outputs.cacheIf { true }
     }
 
-    register("getQuoterDeps") {
-        dependsOn("getQuoter")
-        doLast {
-            exec {
-                workingDir = file(quoterUnzippedPath)
-                commandLine("mix", "do", "local.rebar", "--force,", "local.hex", "--force,", "deps.get")
-                standardOutput = System.out
-                errorOutput = System.err
+    register<Copy>("extractQuoter") {
+        dependsOn("downloadQuoter", "extractElixir")  // Add "extractElixir" here
+        from(zipTree(quoterZipPathValue))
+        into(quoterUnzippedPathValue)
 
-            }
-        }
+        inputs.file(quoterZipPathValue)
+        outputs.dir(quoterUnzippedPathValue)
+        outputs.cacheIf { true }
     }
 
-    // @todo should this also delete the files before release?
-    register("releaseQuoter") {
-        dependsOn("getQuoterDeps")
-        doLast {
-            exec {
-                workingDir = file(quoterUnzippedPath)
-                commandLine(
-                    "mix",
-                    "do",
-                    "local.rebar",
-                    "--force,",
-                    "local.hex",
-                    "--force,",
-                    "deps.get,",
-                    "release",
-                    "--overwrite"
-                )
-                standardOutput = System.out
-                errorOutput = System.err
-
-            }
-        }
+    register<ReleaseQuoterTask>("releaseQuoter") {
+        dependsOn("extractQuoter")
+        quoterUnzippedPath.set(layout.dir(provider { file("${quoterUnzippedPathValue}/intellij_elixir-${quoterVersion}") }))
+        releaseOutputDir.set(layout.dir(provider { file(quoterReleasePathValue) }))
     }
 
-    compileTestJava {
-        dependsOn("getElixir", "getQuoter")
-    }
-
-    register("runQuoter") {
+    // Task to run the Quoter daemon
+    register<Exec>("runQuoter") {
         dependsOn("releaseQuoter")
-        doLast {
-            exec {
-                environment("RELEASE_COOKIE", "intellij_elixir")
-                environment("RELEASE_DISTRIBUTION", "name")
-                environment("RELEASE_NAME", "intellij_elixir@127.0.0.1")
-                commandLine(quoterExe, "daemon")
-                standardOutput = System.out
-                errorOutput = System.err
-            }
-        }
+        workingDir = file(quoterReleasePathValue)
+        commandLine = listOf(quoterExe, "daemon")
+        standardOutput = System.out
+        errorOutput = System.err
 
+        environment("RELEASE_TMP", tmpDirPath)
+        environment("RELEASE_COOKIE", "intellij_elixir")
+        environment("RELEASE_DISTRIBUTION", "name")
+        environment("RELEASE_NAME", "intellij_elixir@127.0.0.1")
+
+        doFirst {
+            println("Running Quoter daemon")
+        }
+        doLast {
+            println("Quoter daemon stopped")
+        }
     }
 
-    register("stopQuoter") {
+    // Task to stop the Quoter daemon
+    register<Exec>("stopQuoter") {
         dependsOn("releaseQuoter")
-        doLast {
-            exec {
-                environment("RELEASE_COOKIE", "intellij_elixir")
-                environment("RELEASE_DISTRIBUTION", "name")
-                environment("RELEASE_NAME", "intellij_elixir@127.0.0.1")
-                commandLine(quoterExe, "stop")
-                standardOutput = System.out
-                errorOutput = System.err
-                isIgnoreExitValue = true  // Sometimes the exit
-            }
+        workingDir = file(quoterReleasePathValue)
+        commandLine = listOf(quoterExe, "stop")
+        standardOutput = System.out
+        errorOutput = System.err
+
+        environment("RELEASE_TMP", tmpDirPath)
+        environment("RELEASE_COOKIE", "intellij_elixir")
+        environment("RELEASE_DISTRIBUTION", "name")
+        environment("RELEASE_NAME", "intellij_elixir@127.0.0.1")
+
+        isIgnoreExitValue = true
+
+        doFirst {
+            println("Stopping Quoter daemon")
         }
     }
-
     test {
-        dependsOn("runQuoter")
+        dependsOn("runQuoter", "makeElixir")
         finalizedBy("stopQuoter")
+        environment("RELEASE_TMP", tmpDirPath)
     }
 }
 

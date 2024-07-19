@@ -29,3 +29,5 @@ jps-shared/build
 jps-shared/out
 libs/
 .intellijPlatform
+buildSrc/build
+buildSrc/.gradle

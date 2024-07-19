@@ -10,6 +10,9 @@ dependencies {
 tasks.named("compileTestJava") {
     dependsOn(":jps-shared:composedJar")
 }
+tasks.named("compileJava") {
+    dependsOn(":jps-shared:composedJar")
+}
 
 tasks.named<Jar>("jar") {
     archiveFileName.set("jps-builder.jar")
