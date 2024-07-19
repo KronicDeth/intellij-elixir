@@ -1,4 +1,4 @@
-import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
+import org.gradle.plugins.ide.idea.model.IdeaLanguageLevel
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
@@ -15,6 +15,7 @@ plugins {
     alias(libs.plugins.qodana)
     alias(libs.plugins.kover)
     id("de.undercouch.download") version "4.1.2"
+    id("com.adarshr.test-logger") version "4.0.0"
 }
 
 group = properties("pluginGroup").get()
@@ -45,9 +46,9 @@ version = "${properties("pluginVersion").get()}$versionSuffix"
 
 repositories {
     mavenCentral()
-
     intellijPlatform {
         defaultRepositories()
+        jetbrainsRuntime()
     }
 }
 
@@ -62,16 +63,41 @@ dependencies {
 
     intellijPlatform {
         intellijIdeaCommunity(properties("platformVersion"))
+        instrumentationTools()
         bundledPlugins(properties("platformBundledPlugins").map { it.split(',') })
         plugins(properties("platformPlugins").map { it.split(',') })
-        testFramework(TestFrameworkType.Bundled)
+        testFramework(TestFrameworkType.Platform)
     }
 }
 
 kotlin {
     jvmToolchain(17)
 }
+
+sourceSets {
+    main {
+        java.srcDirs("src", "gen")
+        resources.srcDir("resources")
+    }
+    test {
+        java.srcDir("tests")
+    }
+}
+
+idea {
+    project {
+        jdkName = properties("javaVersion").get()
+//        languageLevel = IdeaLanguageLevel.JDK_17
+    }
+    module {
+        generatedSourceDirs.add(file("gen"))
+    }
+}
+
 intellijPlatform {
+    buildSearchableOptions = false
+    instrumentCode = false
+
     pluginConfiguration {
         id = properties("pluginGroup")
         name = properties("pluginName")
@@ -97,7 +123,10 @@ intellijPlatform {
 
     publishing {
         token = environment("PUBLISH_TOKEN")
-        channels = properties("pluginVersion").map { listOf(it.substringAfter('-', "").substringBefore('.').ifEmpty { "default" }) }
+        channels = properties("pluginVersion").map {
+            listOf(
+                it.substringAfter('-', "").substringBefore('.').ifEmpty { "default" })
+        }
     }
 }
 
@@ -106,7 +135,28 @@ changelog {
     repositoryUrl = properties("pluginRepositoryUrl")
 }
 
+val compilationPackages = listOf("org/intellij/elixir/build/**", "org/intellij/elixir/jps/**")
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
 tasks {
+    compileKotlin {
+        kotlinOptions.jvmTarget = properties("javaVersion").get()
+    }
+
+    compileJava {
+        sourceCompatibility = properties("javaVersion").get()
+        targetCompatibility = properties("javaVersion").get()
+    }
+
+//    withType<JavaCompile> {
+//        sourceCompatibility =
+//        targetCompatibility = "17"
+//    }
+//
     runIde {
         systemProperty("idea.log.debug.categories", "org.intellij_lang=TRACE")
         jvmArgs("-Didea.debug.mode=true", "-Didea.is.internal=true", "-Dlog4j2.debug=true", "-Dlogger.org=TRACE")
@@ -116,22 +166,39 @@ tasks {
         gradleVersion = properties("gradleVersion").get()
     }
 
-    buildSearchableOptions {
-        enabled = false
+    testIdeUi {
+        systemProperty("robot-server.port", "8082")
+        systemProperty("ide.mac.message.dialogs.as.sheets", "false")
+        systemProperty("jb.privacy.policy.text", "<!--999.999-->")
+        systemProperty("jb.consents.confirmation.enabled", "false")
     }
 
     test {
         environment("ELIXIR_LANG_ELIXIR_PATH", elixirPath)
         environment("ELIXIR_EBIN_DIRECTORY", "${elixirPath}/lib/elixir/ebin/")
         environment("ELIXIR_VERSION", elixirVersion)
+        isScanForTestClasses = false
+        include("**/Issue*.class")
+        include("**/*Test.class")
+        include("**/*TestCase.class")
+
         useJUnit {
-            exclude("org/intellij/elixir/build/**", "org/intellij/elixir/jps/**")
+            exclude(compilationPackages)
         }
         testLogging {
             exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
         }
     }
-
+    register<Test>("testCompilation") {
+        group = "Verification"
+        dependsOn("classes", "testClasses")
+        useJUnit {
+            exclude(compilationPackages)
+        }
+        testLogging {
+            exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+        }
+    }
     register<de.undercouch.gradle.tasks.download.Download>("getElixir") {
         src("https://github.com/elixir-lang/elixir/archive/v${elixirVersion}.zip")
         dest("${rootDir}/cache/Elixir.${elixirVersion}.zip")
@@ -144,6 +211,8 @@ tasks {
             exec {
                 workingDir = file(elixirPath)
                 commandLine("make")
+                standardOutput = System.out
+                errorOutput = System.err
             }
         }
     }
@@ -167,16 +236,33 @@ tasks {
             exec {
                 workingDir = file(quoterUnzippedPath)
                 commandLine("mix", "do", "local.rebar", "--force,", "local.hex", "--force,", "deps.get")
+                standardOutput = System.out
+                errorOutput = System.err
+
             }
         }
     }
 
+    // @todo should this also delete the files before release?
     register("releaseQuoter") {
         dependsOn("getQuoterDeps")
         doLast {
             exec {
                 workingDir = file(quoterUnzippedPath)
-                commandLine("mix", "do", "local.rebar", "--force,", "local.hex", "--force,", "deps.get,", "release")
+                commandLine(
+                    "mix",
+                    "do",
+                    "local.rebar",
+                    "--force,",
+                    "local.hex",
+                    "--force,",
+                    "deps.get,",
+                    "release",
+                    "--overwrite"
+                )
+                standardOutput = System.out
+                errorOutput = System.err
+
             }
         }
     }
@@ -185,22 +271,34 @@ tasks {
         dependsOn("getElixir", "getQuoter")
     }
 
-    register<Exec>("runQuoter") {
+    register("runQuoter") {
         dependsOn("releaseQuoter")
-        environment("RELEASE_COOKIE", "intellij_elixir")
-        environment("RELEASE_DISTRIBUTION", "name")
-        environment("RELEASE_NAME", "intellij_elixir@127.0.0.1")
-        executable(quoterExe)
-        args("daemon")
+        doLast {
+            exec {
+                environment("RELEASE_COOKIE", "intellij_elixir")
+                environment("RELEASE_DISTRIBUTION", "name")
+                environment("RELEASE_NAME", "intellij_elixir@127.0.0.1")
+                commandLine(quoterExe, "daemon")
+                standardOutput = System.out
+                errorOutput = System.err
+            }
+        }
+
     }
 
-    register<Exec>("stopQuoter") {
+    register("stopQuoter") {
         dependsOn("releaseQuoter")
-        environment("RELEASE_COOKIE", "intellij_elixir")
-        environment("RELEASE_DISTRIBUTION", "name")
-        environment("RELEASE_NAME", "intellij_elixir@127.0.0.1")
-        executable(quoterExe)
-        args("stop")
+        doLast {
+            exec {
+                environment("RELEASE_COOKIE", "intellij_elixir")
+                environment("RELEASE_DISTRIBUTION", "name")
+                environment("RELEASE_NAME", "intellij_elixir@127.0.0.1")
+                commandLine(quoterExe, "stop")
+                standardOutput = System.out
+                errorOutput = System.err
+                isIgnoreExitValue = true  // Sometimes the exit
+            }
+        }
     }
 
     test {
@@ -209,49 +307,55 @@ tasks {
     }
 }
 
-project(":jps-shared") {
+allprojects {
+    extra["elixirPath"] = elixirPath
+    apply(plugin = "java")
     apply(plugin = "kotlin")
+
+    tasks.withType<JavaCompile>().configureEach {
+        options.encoding = "UTF-8"
+    }
+}
+subprojects {
+    apply(plugin = "org.jetbrains.intellij.platform.module")
     apply(plugin = "java")
 
+    extra["elixirPath"] = elixirPath
+    repositories {
+        mavenCentral()
+        intellijPlatform {
+            defaultRepositories()
+            jetbrainsRuntime()
+        }
+    }
     dependencies {
-        implementation(kotlin("stdlib-jdk8"))
-        implementation("org.jetbrains:jps-build-api:241.18034.62")
-        implementation("org.jetbrains.intellij.deps:jdom:2.0.6")
-        implementation("com.intellij:annotations:12.0")
+        intellijPlatform {
+            intellijIdeaCommunity(properties("platformVersion"))
+            bundledPlugins(properties("platformBundledPlugins").map { it.split(',') })
+            plugins(properties("platformPlugins").map { it.split(',') })
+            testFramework(TestFrameworkType.Platform)
+            instrumentationTools()
+        }
     }
 
-    tasks.withType<JavaCompile> {
-        sourceCompatibility = "17"
-        targetCompatibility = "17"
-    }
+    tasks.test {
+        environment("ELIXIR_LANG_ELIXIR_PATH", rootProject.extra["elixirPath"] as String)
+        environment("ELIXIR_EBIN_DIRECTORY", "${rootProject.extra["elixirPath"]}/lib/elixir/ebin/")
+        environment("ELIXIR_VERSION", rootProject.extra["elixirVersion"] as String)
 
-    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-        kotlinOptions {
-            jvmTarget = "17"
+        useJUnit()
+        exclude(compilationPackages)
+
+        testLogging {
+            exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
         }
     }
 }
-
+//
 project(":jps-builder") {
-    apply(plugin = "kotlin")
     apply(plugin = "java")
 
     dependencies {
         implementation(project(":jps-shared"))
     }
-}
-
-allprojects {
-    apply(plugin = "org.jetbrains.intellij.platform")
-
-    repositories {
-        mavenCentral()
-        gradlePluginPortal()
-        maven("https://oss.sonatype.org/content/repositories/snapshots/")
-        maven("https://www.jetbrains.com/intellij-repository/snapshots/")
-        intellijPlatform {
-            defaultRepositories()
-        }
-    }
-    extra["elixirPath"] = elixirPath
 }

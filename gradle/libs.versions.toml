@@ -5,6 +5,7 @@ kotlin = "1.9.24"
 kover = "0.8.1"
 qodana = "2024.1.5"
 annotations = "24.1.0"
+intelliJPlatformMigration = "2.0.0-beta9"
 
 [libraries]
 annotations = { group = "org.jetbrains", name = "annotations", version.ref = "annotations" }
@@ -15,3 +16,4 @@ intelliJPlatform = { id = "org.jetbrains.intellij.platform", version.ref = "inte
 kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
 qodana = { id = "org.jetbrains.qodana", version.ref = "qodana" }
+#intelliJPlatformMigration = { id = "org.jetbrains.intellij.platform.migration", version.ref = "intelliJPlatformMigration" }
