@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 
+@Ignore("abstract")
 public class Test extends org.elixir_lang.flex_lexer.Test<LookAhead> {
     public static class Lex {
         @NotNull
