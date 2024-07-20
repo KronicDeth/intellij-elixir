@@ -3,6 +3,7 @@ import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
+
 fun properties(key: String) = providers.gradleProperty(key)
 fun environment(key: String) = providers.environmentVariable(key)
 
@@ -29,7 +30,8 @@ val elixirPath = "${cachePath}/elixir-${elixirVersion}"
 val quoterVersion = "2.1.0"
 
 val quoterUnzippedPathValue = "${cachePath}/elixir-${elixirVersion}-intellij_elixir-${quoterVersion}"
-val quoterReleasePathValue = "${quoterUnzippedPathValue}/intellij_elixir-${quoterVersion}/_build/dev/rel/intellij_elixir"
+val quoterReleasePathValue =
+    "${quoterUnzippedPathValue}/intellij_elixir-${quoterVersion}/_build/dev/rel/intellij_elixir"
 val tmpDirPath = "${rootDir}/cachetmp"
 val quoterExe = "${quoterReleasePathValue}/bin/intellij_elixir"
 val quoterZipPathValue = "${cachePath}/intellij_elixir-${quoterVersion}.zip"
@@ -39,7 +41,7 @@ val versionSuffix = if (project.hasProperty("isRelease") && project.property("is
 } else {
     val buildTime: String = ZonedDateTime
         .now(ZoneOffset.UTC)
-        .format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+        .format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"))
 
     "-pre+${buildTime}"
 }
@@ -102,9 +104,6 @@ idea {
 }
 
 intellijPlatform {
-//    buildSearchableOptions = false
-//    instrumentCode = false
-
     pluginConfiguration {
         id = properties("pluginGroup")
         name = properties("pluginName")
@@ -177,7 +176,13 @@ tasks {
 
     runIde {
         systemProperty("idea.log.info.categories", "org.intellij_lang=TRACE")
-        jvmArgs("-Didea.info.mode=true", "-Didea.is.internal=true", "-Dlog4j2.info=true", "-Dlogger.org=TRACE", "idea.ProcessCanceledException=disabled")
+        jvmArgs(
+            "-Didea.info.mode=true",
+            "-Didea.is.internal=true",
+            "-Dlog4j2.info=true",
+            "-Dlogger.org=TRACE",
+            "idea.ProcessCanceledException=disabled"
+        )
     }
 
     wrapper {
@@ -296,8 +301,6 @@ tasks {
     // Task to stop the Quoter daemon
     register<Exec>("stopQuoter") {
         dependsOn("releaseQuoter")
-//        logging.captureStandardOutput(LogLevel.LIFECYCLE)
-//        logging.captureStandardError(LogLevel.ERROR)
 
         environment("RELEASE_TMP", tmpDirPath)
         environment("RELEASE_COOKIE", "intellij_elixir")
@@ -343,7 +346,6 @@ subprojects {
             intellijIdeaCommunity(properties("platformVersion"))
             bundledPlugins(properties("platformBundledPlugins").map { it.split(',') })
             plugins(properties("platformPlugins").map { it.split(',') })
-//            testFramework(TestFrameworkType.Platform)
             instrumentationTools()
         }
     }
@@ -352,22 +354,6 @@ subprojects {
         dependsOn(":makeElixir")
     }
 
-//    tasks {
-//        withType<Test> {
-//            configure<JacocoTaskExtension> {
-//                isIncludeNoLocationClasses = true
-//                excludes = listOf("jdk.internal.*")
-//            }
-//        }
-//
-//        jacocoTestReport {
-//            classDirectories.setFrom(instrumentCode)
-//        }
-//
-//        jacocoTestCoverageVerification {
-//            classDirectories.setFrom(instrumentCode)
-//        }
-//    }
     tasks.test {
         dependsOn(":runQuoter", ":makeElixir")
         finalizedBy(":stopQuoter")
@@ -385,12 +371,10 @@ subprojects {
         environment("RELEASE_TMP", tmpDirPath)
     }
 }
-//
 project(":jps-builder") {
     apply(plugin = "java")
 
     dependencies {
         implementation(project(":jps-shared"))
     }
-
 }
