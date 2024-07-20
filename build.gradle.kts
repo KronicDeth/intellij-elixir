@@ -3,9 +3,6 @@ import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
-import ReleaseQuoterTask
-import org.jetbrains.intellij.platform.gradle.GradleProperties
-
 fun properties(key: String) = providers.gradleProperty(key)
 fun environment(key: String) = providers.environmentVariable(key)
 
@@ -18,7 +15,8 @@ plugins {
     alias(libs.plugins.changelog)
 
     alias(libs.plugins.qodana)
-    alias(libs.plugins.kover)
+    // https://github.com/JetBrains/intellij-platform-gradle-plugin/issues/1702
+//    alias(libs.plugins.kover)
     alias(libs.plugins.gradleDownloadTask)
 }
 
@@ -49,11 +47,6 @@ val channel = if (project.hasProperty("isRelease") && project.property("isReleas
 
 version = "${properties("pluginVersion").get()}$versionSuffix"
 
-//kover {
-//    excludeInstrumentation {
-//        packages("org.apache.velocity.*")
-//    }
-//}
 repositories {
     mavenCentral()
     intellijPlatform {
@@ -68,7 +61,6 @@ dependencies {
     implementation(project(":jps-shared"))
     implementation(files("lib/OtpErlang.jar"))
     implementation("commons-io:commons-io:2.16.1")
-//    implementation("org.apache.velocity:velocity-engine-core:2.3")
     testImplementation("org.mockito:mockito-core:2.2.9")
     testImplementation("org.objenesis:objenesis:2.4")
     implementation("junit:junit:4.13.2")
@@ -150,7 +142,7 @@ changelog {
     repositoryUrl = properties("pluginRepositoryUrl")
 }
 
-val compilationPackages = listOf("org/intellij/elixir/build/**", "org/intellij/elixir/jps/**", "org/apache/velocity/**")
+val compilationPackages = listOf("org/intellij/elixir/build/**", "org/intellij/elixir/jps/**")
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(17)
@@ -198,20 +190,6 @@ tasks {
         systemProperty("jb.privacy.policy.text", "<!--999.999-->")
         systemProperty("jb.consents.confirmation.enabled", "false")
     }
-    withType<Test> {
-        configure<JacocoTaskExtension> {
-            isIncludeNoLocationClasses = true
-            excludes = listOf("jdk.internal.*", "org/apache/velocity/**/*")
-        }
-    }
-
-    jacocoTestReport {
-        classDirectories.setFrom(instrumentCode)
-    }
-
-    jacocoTestCoverageVerification {
-        classDirectories.setFrom(instrumentCode)
-    }
     test {
         environment("RELEASE_TMP", tmpDirPath)
         environment("ELIXIR_LANG_ELIXIR_PATH", elixirPath)
@@ -228,9 +206,6 @@ tasks {
         testLogging {
             exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
         }
-        jacoco {
-            exclude(listOf("org/apache/velocity/runtime/DeprecatedRuntimeConstants", "org/apache/velocity/runtime/DeprecatedRuntimeConstants.class", "org/apache/velocity/runtime/**", "org/apache/velocity/**/*"))
-        }
     }
     register<Test>("testCompilation") {
         group = "Verification"
@@ -238,7 +213,6 @@ tasks {
         environment("RELEASE_TMP", tmpDirPath)
         useJUnit {
             include(compilationPackages)
-            exclude("org/apache/velocity/runtime/DeprecatedRuntimeConstants.class")
         }
         testLogging {
             exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
@@ -354,6 +328,7 @@ subprojects {
     apply(plugin = "org.jetbrains.intellij.platform.module")
     apply(plugin = "java")
 
+
     extra["elixirPath"] = elixirPath
     repositories {
         mavenCentral()
@@ -417,4 +392,5 @@ project(":jps-builder") {
     dependencies {
         implementation(project(":jps-shared"))
     }
+
 }
