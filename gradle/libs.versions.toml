@@ -1,11 +1,10 @@
 [versions]
 changelog = "2.2.0"
-intelliJPlatform = "2.0.0-beta9"
+intelliJPlatform = "2.0.0-RC1"
 kotlin = "1.9.24"
 kover = "0.8.1"
 qodana = "2024.1.5"
 annotations = "24.1.0"
-intelliJPlatformMigration = "2.0.0-beta9"
 gradleDownloadTask = "5.6.0"
 
 [libraries]

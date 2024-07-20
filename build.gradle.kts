@@ -11,9 +11,12 @@ fun environment(key: String) = providers.environmentVariable(key)
 
 plugins {
     id("java")
+    id("jacoco")
+
     alias(libs.plugins.kotlin)
     alias(libs.plugins.intelliJPlatform)
     alias(libs.plugins.changelog)
+
     alias(libs.plugins.qodana)
     alias(libs.plugins.kover)
     alias(libs.plugins.gradleDownloadTask)
@@ -46,6 +49,11 @@ val channel = if (project.hasProperty("isRelease") && project.property("isReleas
 
 version = "${properties("pluginVersion").get()}$versionSuffix"
 
+//kover {
+//    excludeInstrumentation {
+//        packages("org.apache.velocity.*")
+//    }
+//}
 repositories {
     mavenCentral()
     intellijPlatform {
@@ -60,8 +68,10 @@ dependencies {
     implementation(project(":jps-shared"))
     implementation(files("lib/OtpErlang.jar"))
     implementation("commons-io:commons-io:2.16.1")
+//    implementation("org.apache.velocity:velocity-engine-core:2.3")
     testImplementation("org.mockito:mockito-core:2.2.9")
     testImplementation("org.objenesis:objenesis:2.4")
+    implementation("junit:junit:4.13.2")
 
     intellijPlatform {
         intellijIdeaCommunity(properties("platformVersion"))
@@ -73,7 +83,10 @@ dependencies {
 }
 
 kotlin {
-    jvmToolchain(17)
+    jvmToolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+        vendor = JvmVendorSpec.JETBRAINS
+    }
 }
 
 sourceSets {
@@ -137,7 +150,7 @@ changelog {
     repositoryUrl = properties("pluginRepositoryUrl")
 }
 
-val compilationPackages = listOf("org/intellij/elixir/build/**", "org/intellij/elixir/jps/**")
+val compilationPackages = listOf("org/intellij/elixir/build/**", "org/intellij/elixir/jps/**", "org/apache/velocity/**")
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(17)
@@ -147,6 +160,7 @@ java {
 tasks {
     compileKotlin {
         kotlinOptions.jvmTarget = properties("javaVersion").get()
+        kotlinOptions.freeCompilerArgs = listOf("-Xjvm-default=all")
     }
 
     register<Delete>("deleteCache") {
@@ -171,7 +185,7 @@ tasks {
 
     runIde {
         systemProperty("idea.log.info.categories", "org.intellij_lang=TRACE")
-        jvmArgs("-Didea.info.mode=true", "-Didea.is.internal=true", "-Dlog4j2.info=true", "-Dlogger.org=TRACE")
+        jvmArgs("-Didea.info.mode=true", "-Didea.is.internal=true", "-Dlog4j2.info=true", "-Dlogger.org=TRACE", "idea.ProcessCanceledException=disabled")
     }
 
     wrapper {
@@ -184,7 +198,20 @@ tasks {
         systemProperty("jb.privacy.policy.text", "<!--999.999-->")
         systemProperty("jb.consents.confirmation.enabled", "false")
     }
+    withType<Test> {
+        configure<JacocoTaskExtension> {
+            isIncludeNoLocationClasses = true
+            excludes = listOf("jdk.internal.*", "org/apache/velocity/**/*")
+        }
+    }
 
+    jacocoTestReport {
+        classDirectories.setFrom(instrumentCode)
+    }
+
+    jacocoTestCoverageVerification {
+        classDirectories.setFrom(instrumentCode)
+    }
     test {
         environment("RELEASE_TMP", tmpDirPath)
         environment("ELIXIR_LANG_ELIXIR_PATH", elixirPath)
@@ -201,6 +228,9 @@ tasks {
         testLogging {
             exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
         }
+        jacoco {
+            exclude(listOf("org/apache/velocity/runtime/DeprecatedRuntimeConstants", "org/apache/velocity/runtime/DeprecatedRuntimeConstants.class", "org/apache/velocity/runtime/**", "org/apache/velocity/**/*"))
+        }
     }
     register<Test>("testCompilation") {
         group = "Verification"
@@ -208,6 +238,7 @@ tasks {
         environment("RELEASE_TMP", tmpDirPath)
         useJUnit {
             include(compilationPackages)
+            exclude("org/apache/velocity/runtime/DeprecatedRuntimeConstants.class")
         }
         testLogging {
             exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
@@ -332,11 +363,12 @@ subprojects {
         }
     }
     dependencies {
+        implementation("junit:junit:4.13.2")
         intellijPlatform {
             intellijIdeaCommunity(properties("platformVersion"))
             bundledPlugins(properties("platformBundledPlugins").map { it.split(',') })
             plugins(properties("platformPlugins").map { it.split(',') })
-            testFramework(TestFrameworkType.Platform)
+//            testFramework(TestFrameworkType.Platform)
             instrumentationTools()
         }
     }
@@ -345,6 +377,22 @@ subprojects {
         dependsOn(":makeElixir")
     }
 
+//    tasks {
+//        withType<Test> {
+//            configure<JacocoTaskExtension> {
+//                isIncludeNoLocationClasses = true
+//                excludes = listOf("jdk.internal.*")
+//            }
+//        }
+//
+//        jacocoTestReport {
+//            classDirectories.setFrom(instrumentCode)
+//        }
+//
+//        jacocoTestCoverageVerification {
+//            classDirectories.setFrom(instrumentCode)
+//        }
+//    }
     tasks.test {
         dependsOn(":runQuoter", ":makeElixir")
         finalizedBy(":stopQuoter")
