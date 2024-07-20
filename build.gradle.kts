@@ -97,8 +97,8 @@ idea {
 }
 
 intellijPlatform {
-    buildSearchableOptions = false
-    instrumentCode = false
+//    buildSearchableOptions = false
+//    instrumentCode = false
 
     pluginConfiguration {
         id = properties("pluginGroup")
@@ -207,7 +207,7 @@ tasks {
         dependsOn("classes", "testClasses")
         environment("RELEASE_TMP", tmpDirPath)
         useJUnit {
-            exclude(compilationPackages)
+            include(compilationPackages)
         }
         testLogging {
             exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
