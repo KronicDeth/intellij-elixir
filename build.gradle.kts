@@ -62,7 +62,7 @@ dependencies {
     implementation("commons-io:commons-io:2.16.1")
     testImplementation("org.mockito:mockito-core:2.2.9")
     testImplementation("org.objenesis:objenesis:2.4")
-    implementation("junit:junit:4.13.2")
+    testImplementation("junit:junit:4.13.2")
 
     intellijPlatform {
         intellijIdeaCommunity(properties("platformVersion"))
@@ -350,12 +350,13 @@ subprojects {
         }
     }
     dependencies {
-        implementation("junit:junit:4.13.2")
+        testImplementation("junit:junit:4.13.2")
         intellijPlatform {
             intellijIdeaCommunity(properties("platformVersion"))
             bundledPlugins(properties("platformBundledPlugins").map { it.split(',') })
             plugins(properties("platformPlugins").map { it.split(',') })
             instrumentationTools()
+            testFramework(TestFrameworkType.Platform)
         }
     }
 
