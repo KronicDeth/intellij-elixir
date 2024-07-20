@@ -8,7 +8,7 @@ import org.junit.Ignore;
 import java.io.IOException;
 
 
-@Ignore("abstract")
+//@Ignore("abstract")
 public abstract class Test<L extends Lexer> {
     /*
      * Fields

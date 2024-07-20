@@ -4,51 +4,47 @@ import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
+// Helper functions for accessing properties and environment variables
 fun properties(key: String) = providers.gradleProperty(key)
 fun environment(key: String) = providers.environmentVariable(key)
 
 plugins {
     id("java")
     id("jacoco")
-
     alias(libs.plugins.kotlin)
     alias(libs.plugins.intelliJPlatform)
     alias(libs.plugins.changelog)
-
     alias(libs.plugins.qodana)
-    // https://github.com/JetBrains/intellij-platform-gradle-plugin/issues/1702
-//    alias(libs.plugins.kover)
     alias(libs.plugins.gradleDownloadTask)
 }
 
+// Project configuration
 group = properties("pluginGroup").get()
 version = properties("pluginVersion").get()
 
+// Define paths and versions
 val cachePath = "${rootDir}/cache"
 val elixirVersion = properties("elixirVersion").get()
 val elixirPath = "${cachePath}/elixir-${elixirVersion}"
 val quoterVersion = "2.1.0"
-
 val quoterUnzippedPathValue = "${cachePath}/elixir-${elixirVersion}-intellij_elixir-${quoterVersion}"
-val quoterReleasePathValue =
-    "${quoterUnzippedPathValue}/intellij_elixir-${quoterVersion}/_build/dev/rel/intellij_elixir"
+val quoterReleasePathValue = "${quoterUnzippedPathValue}/intellij_elixir-${quoterVersion}/_build/dev/rel/intellij_elixir"
 val tmpDirPath = "${rootDir}/cachetmp"
 val quoterExe = "${quoterReleasePathValue}/bin/intellij_elixir"
 val quoterZipPathValue = "${cachePath}/intellij_elixir-${quoterVersion}.zip"
 
+// Version suffix and channel configuration
 val versionSuffix = if (project.hasProperty("isRelease") && project.property("isRelease") == "true") {
     ""
 } else {
-    val buildTime: String = ZonedDateTime
-        .now(ZoneOffset.UTC)
-        .format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"))
-
+    val buildTime: String = ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"))
     "-pre+${buildTime}"
 }
 val channel = if (project.hasProperty("isRelease") && project.property("isRelease") == "true") "default" else "canary"
 
 version = "${properties("pluginVersion").get()}$versionSuffix"
 
+// Repository configuration
 repositories {
     mavenCentral()
     intellijPlatform {
@@ -57,6 +53,7 @@ repositories {
     }
 }
 
+// Dependencies
 dependencies {
     implementation(libs.annotations)
     implementation(project(":jps-builder"))
@@ -76,6 +73,7 @@ dependencies {
     }
 }
 
+// Kotlin configuration
 kotlin {
     jvmToolchain {
         languageVersion = JavaLanguageVersion.of(17)
@@ -83,6 +81,7 @@ kotlin {
     }
 }
 
+// Source sets configuration
 sourceSets {
     main {
         java.srcDirs("src", "gen")
@@ -93,16 +92,17 @@ sourceSets {
     }
 }
 
+// IDEA project configuration
 idea {
     project {
         jdkName = properties("javaVersion").get()
-//        languageLevel = IdeaLanguageLevel.JDK_17
     }
     module {
         generatedSourceDirs.add(file("gen"))
     }
 }
 
+// IntelliJ Platform plugin configuration
 intellijPlatform {
     pluginConfiguration {
         id = properties("pluginGroup")
@@ -130,30 +130,35 @@ intellijPlatform {
     publishing {
         token = environment("PUBLISH_TOKEN")
         channels = properties("pluginVersion").map {
-            listOf(
-                it.substringAfter('-', "").substringBefore('.').ifEmpty { "default" })
+            listOf(it.substringAfter('-', "").substringBefore('.').ifEmpty { "default" })
         }
     }
 }
 
+// Changelog configuration
 changelog {
     groups.empty()
     repositoryUrl = properties("pluginRepositoryUrl")
 }
 
 val compilationPackages = listOf("org/intellij/elixir/build/**", "org/intellij/elixir/jps/**")
+
+// Java configuration
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(17)
     }
 }
 
+// Task configuration
 tasks {
+    // Kotlin compilation
     compileKotlin {
         kotlinOptions.jvmTarget = properties("javaVersion").get()
         kotlinOptions.freeCompilerArgs = listOf("-Xjvm-default=all")
     }
 
+    // Cache and build cleanup
     register<Delete>("deleteCache") {
         delete("cache")
         delete("build")
@@ -165,6 +170,7 @@ tasks {
         dependsOn("deleteCache")
     }
 
+    // Java compilation
     compileJava {
         dependsOn(":jps-builder:composedJar", ":jps-shared:composedJar")
         sourceCompatibility = properties("javaVersion").get()
@@ -174,6 +180,7 @@ tasks {
         dependsOn(":jps-builder:composedJar", ":jps-shared:composedJar", "makeElixir")
     }
 
+    // IDE run configuration
     runIde {
         systemProperty("idea.log.info.categories", "org.intellij_lang=TRACE")
         jvmArgs(
@@ -185,16 +192,20 @@ tasks {
         )
     }
 
+    // Gradle wrapper
     wrapper {
         gradleVersion = properties("gradleVersion").get()
     }
 
+    // UI testing configuration
     testIdeUi {
         systemProperty("robot-server.port", "8082")
         systemProperty("ide.mac.message.dialogs.as.sheets", "false")
         systemProperty("jb.privacy.policy.text", "<!--999.999-->")
         systemProperty("jb.consents.confirmation.enabled", "false")
     }
+
+    // Test configuration
     test {
         environment("RELEASE_TMP", tmpDirPath)
         environment("ELIXIR_LANG_ELIXIR_PATH", elixirPath)
@@ -212,6 +223,8 @@ tasks {
             exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
         }
     }
+
+    // Compilation test configuration
     register<Test>("testCompilation") {
         group = "Verification"
         dependsOn("classes", "testClasses")
@@ -224,6 +237,7 @@ tasks {
         }
     }
 
+    // Elixir download and setup
     register<Download>("downloadElixir") {
         src("https://github.com/elixir-lang/elixir/archive/v$elixirVersion.zip")
         dest("$rootDir/cache/Elixir.$elixirVersion.zip")
@@ -236,43 +250,37 @@ tasks {
 
     register<Copy>("extractElixir") {
         dependsOn("downloadElixir")
-
         from(zipTree("$rootDir/cache/Elixir.$elixirVersion.zip"))
         into("$rootDir/cache/")
-
         outputs.dir(elixirPath)
     }
 
     register<Exec>("makeElixir") {
         dependsOn("extractElixir")
-
         workingDir = file(elixirPath)
         commandLine("make")
         logging.captureStandardOutput(LogLevel.LIFECYCLE)
         logging.captureStandardError(LogLevel.ERROR)
-
         inputs.dir(elixirPath)
         outputs.dir("$elixirPath/bin")
         outputs.cacheIf { true }
     }
 
-    // quoter
+    // Quoter setup
     register<Download>("downloadQuoter") {
         src("https://github.com/KronicDeth/intellij_elixir/archive/v$quoterVersion.zip")
         dest(quoterZipPathValue)
         overwrite(false)
         onlyIfModified(true)
-
         inputs.property("quoterVersion", quoterVersion)
         outputs.file(quoterZipPathValue)
         outputs.cacheIf { true }
     }
 
     register<Copy>("extractQuoter") {
-        dependsOn("downloadQuoter", "extractElixir")  // Add "extractElixir" here
+        dependsOn("downloadQuoter", "extractElixir")
         from(zipTree(quoterZipPathValue))
         into(quoterUnzippedPathValue)
-
         inputs.file(quoterZipPathValue)
         outputs.dir(quoterUnzippedPathValue)
         outputs.cacheIf { true }
@@ -284,10 +292,9 @@ tasks {
         releaseOutputDir.set(layout.dir(provider { file(quoterReleasePathValue) }))
     }
 
-    // Task to run the Quoter daemon
+    // Quoter daemon management
     register<Exec>("runQuoter") {
         dependsOn("releaseQuoter")
-
         environment("RELEASE_TMP", tmpDirPath)
         environment("RELEASE_COOKIE", "intellij_elixir")
         environment("RELEASE_DISTRIBUTION", "name")
@@ -298,19 +305,17 @@ tasks {
         logging.captureStandardError(LogLevel.ERROR)
     }
 
-    // Task to stop the Quoter daemon
     register<Exec>("stopQuoter") {
         dependsOn("releaseQuoter")
-
         environment("RELEASE_TMP", tmpDirPath)
         environment("RELEASE_COOKIE", "intellij_elixir")
         environment("RELEASE_DISTRIBUTION", "name")
         environment("RELEASE_NAME", "intellij_elixir@127.0.0.1")
-
         isIgnoreExitValue = true
         workingDir = file(quoterReleasePathValue)
         commandLine = listOf(quoterExe, "stop")
     }
+
     test {
         dependsOn("runQuoter", "makeElixir")
         finalizedBy("stopQuoter")
@@ -318,6 +323,7 @@ tasks {
     }
 }
 
+// Configuration for all projects
 allprojects {
     extra["elixirPath"] = elixirPath
     apply(plugin = "java")
@@ -327,10 +333,11 @@ allprojects {
         options.encoding = "UTF-8"
     }
 }
+
+// Configuration for subprojects
 subprojects {
     apply(plugin = "org.jetbrains.intellij.platform.module")
     apply(plugin = "java")
-
 
     extra["elixirPath"] = elixirPath
     repositories {
@@ -371,6 +378,8 @@ subprojects {
         environment("RELEASE_TMP", tmpDirPath)
     }
 }
+
+// Configuration for jps-builder project
 project(":jps-builder") {
     apply(plugin = "java")
 
