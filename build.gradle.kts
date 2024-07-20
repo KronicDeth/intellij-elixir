@@ -70,6 +70,8 @@ dependencies {
         bundledPlugins(properties("platformBundledPlugins").map { it.split(',') })
         plugins(properties("platformPlugins").map { it.split(',') })
         testFramework(TestFrameworkType.Platform)
+        pluginVerifier()
+        zipSigner()
     }
 }
 
