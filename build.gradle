@@ -189,7 +189,7 @@ idea {
 
 task getElixir {
     doLast {
-        def folder = new File(elixirqPath)
+        def folder = new File(elixirPath)
 
         if (!folder.isDirectory() || folder.list().size() == 0) {
             download {
