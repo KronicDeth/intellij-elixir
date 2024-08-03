@@ -1,11 +1,10 @@
 import de.undercouch.gradle.tasks.download.Download
-import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
+import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 
-// Helper functions for accessing properties and environment variables
-fun properties(key: String) = providers.gradleProperty(key)
+// Helper functions for accessing environment variables
 fun environment(key: String) = providers.environmentVariable(key)
 
 plugins {
@@ -19,12 +18,12 @@ plugins {
 }
 
 // Project configuration
-group = properties("pluginGroup").get()
-version = properties("pluginVersion").get()
+group = providers.gradleProperty("pluginGroup").get()
+version = providers.gradleProperty("pluginVersion").get()
 
 // Define paths and versions
 val cachePath = "${rootDir}/cache"
-val elixirVersion = properties("elixirVersion").get()
+val elixirVersion = providers.gradleProperty("elixirVersion").get()
 val elixirPath = "${cachePath}/elixir-${elixirVersion}"
 val quoterVersion = "2.1.0"
 val quoterUnzippedPathValue = "${cachePath}/elixir-${elixirVersion}-intellij_elixir-${quoterVersion}"
@@ -42,33 +41,33 @@ val versionSuffix = if (project.hasProperty("isRelease") && project.property("is
 }
 val channel = if (project.hasProperty("isRelease") && project.property("isRelease") == "true") "default" else "canary"
 
-version = "${properties("pluginVersion").get()}$versionSuffix"
+version = "${providers.gradleProperty("pluginVersion").get()}$versionSuffix"
 
 // Repository configuration
 repositories {
     mavenCentral()
     intellijPlatform {
         defaultRepositories()
-        jetbrainsRuntime()
     }
 }
 
 // Dependencies
 dependencies {
     implementation(libs.annotations)
+    implementation(libs.commonsIo)
     implementation(project(":jps-builder"))
     implementation(project(":jps-shared"))
     implementation(files("lib/OtpErlang.jar"))
-    implementation("commons-io:commons-io:2.16.1")
-    testImplementation("org.mockito:mockito-core:2.2.9")
-    testImplementation("org.objenesis:objenesis:2.4")
     testImplementation("junit:junit:4.13.2")
+    testImplementation(libs.mockito)
+    testImplementation(libs.objenesis)
 
     intellijPlatform {
-        intellijIdeaCommunity(properties("platformVersion"))
+        create(providers.gradleProperty("platformType"), providers.gradleProperty("platformVersion"))
+        // intellijIdeaCommunity(providers.gradleProperty("platformVersion"))
+        bundledPlugins(providers.gradleProperty("platformBundledPlugins").map { it.split(',') })
         instrumentationTools()
-        bundledPlugins(properties("platformBundledPlugins").map { it.split(',') })
-        plugins(properties("platformPlugins").map { it.split(',') })
+        plugins(providers.gradleProperty("platformPlugins").map { it.split(',') })
         testFramework(TestFrameworkType.Platform)
         pluginVerifier()
         zipSigner()
@@ -77,10 +76,7 @@ dependencies {
 
 // Kotlin configuration
 kotlin {
-    jvmToolchain {
-        languageVersion = JavaLanguageVersion.of(17)
-        vendor = JvmVendorSpec.JETBRAINS
-    }
+    jvmToolchain(17)
 }
 
 // Source sets configuration
@@ -97,7 +93,7 @@ sourceSets {
 // IDEA project configuration
 idea {
     project {
-        jdkName = properties("javaVersion").get()
+        jdkName = providers.gradleProperty("javaVersion").get()
     }
     module {
         generatedSourceDirs.add(file("gen"))
@@ -107,19 +103,19 @@ idea {
 // IntelliJ Platform plugin configuration
 intellijPlatform {
     pluginConfiguration {
-        id = properties("pluginGroup")
-        name = properties("pluginName")
-        version = properties("pluginVersion")
-        description = properties("pluginDescription")
-        changeNotes = properties("pluginChangeNotes")
+        id = providers.gradleProperty("pluginGroup")
+        name = providers.gradleProperty("pluginName")
+        version = providers.gradleProperty("pluginVersion")
+        description = providers.gradleProperty("pluginDescription")
+        changeNotes = providers.gradleProperty("pluginChangeNotes")
         ideaVersion {
-            sinceBuild = properties("pluginSinceBuild")
-            untilBuild = properties("pluginUntilBuild")
+            sinceBuild = providers.gradleProperty("pluginSinceBuild")
+            untilBuild = providers.gradleProperty("pluginUntilBuild")
         }
         vendor {
-            name = properties("vendorName")
-            email = properties("vendorEmail")
-            url = properties("pluginRepositoryUrl")
+            name = providers.gradleProperty("vendorName")
+            email = providers.gradleProperty("vendorEmail")
+            url = providers.gradleProperty("pluginRepositoryUrl")
         }
     }
 
@@ -131,7 +127,7 @@ intellijPlatform {
 
     publishing {
         token = environment("PUBLISH_TOKEN")
-        channels = properties("pluginVersion").map {
+        channels = providers.gradleProperty("pluginVersion").map {
             listOf(it.substringAfter('-', "").substringBefore('.').ifEmpty { "default" })
         }
     }
@@ -140,7 +136,7 @@ intellijPlatform {
 // Changelog configuration
 changelog {
     groups.empty()
-    repositoryUrl = properties("pluginRepositoryUrl")
+    repositoryUrl = providers.gradleProperty("pluginRepositoryUrl")
 }
 
 val compilationPackages = listOf("org/intellij/elixir/build/**", "org/intellij/elixir/jps/**")
@@ -156,7 +152,7 @@ java {
 tasks {
     // Kotlin compilation
     compileKotlin {
-        kotlinOptions.jvmTarget = properties("javaVersion").get()
+        kotlinOptions.jvmTarget = providers.gradleProperty("javaVersion").get()
         kotlinOptions.freeCompilerArgs = listOf("-Xjvm-default=all")
     }
 
@@ -175,8 +171,8 @@ tasks {
     // Java compilation
     compileJava {
         dependsOn(":jps-builder:composedJar", ":jps-shared:composedJar")
-        sourceCompatibility = properties("javaVersion").get()
-        targetCompatibility = properties("javaVersion").get()
+        sourceCompatibility = providers.gradleProperty("javaVersion").get()
+        targetCompatibility = providers.gradleProperty("javaVersion").get()
     }
     named("compileTestJava") {
         dependsOn(":jps-builder:composedJar", ":jps-shared:composedJar", "makeElixir")
@@ -196,7 +192,7 @@ tasks {
 
     // Gradle wrapper
     wrapper {
-        gradleVersion = properties("gradleVersion").get()
+        gradleVersion = providers.gradleProperty("gradleVersion").get()
     }
 
     // UI testing configuration
@@ -328,8 +324,6 @@ tasks {
 // Configuration for all projects
 allprojects {
     extra["elixirPath"] = elixirPath
-    apply(plugin = "java")
-    apply(plugin = "kotlin")
 
     tasks.withType<JavaCompile>().configureEach {
         options.encoding = "UTF-8"
@@ -339,24 +333,27 @@ allprojects {
 // Configuration for subprojects
 subprojects {
     apply(plugin = "org.jetbrains.intellij.platform.module")
-    apply(plugin = "java")
 
     extra["elixirPath"] = elixirPath
+
     repositories {
         mavenCentral()
         intellijPlatform {
             defaultRepositories()
             jetbrainsRuntime()
+            mavenCentral()
         }
     }
     dependencies {
         testImplementation("junit:junit:4.13.2")
         intellijPlatform {
-            intellijIdeaCommunity(properties("platformVersion"))
-            bundledPlugins(properties("platformBundledPlugins").map { it.split(',') })
-            plugins(properties("platformPlugins").map { it.split(',') })
+            create(providers.gradleProperty("platformType"), providers.gradleProperty("platformVersion"))
             instrumentationTools()
+            bundledPlugins(providers.gradleProperty("platformBundledPlugins").map { it.split(',') })
+            plugins(providers.gradleProperty("platformPlugins").map { it.split(',') })
             testFramework(TestFrameworkType.Platform)
+            pluginVerifier()
+            zipSigner()
         }
     }
 

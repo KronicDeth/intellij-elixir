@@ -1,14 +1,22 @@
 [versions]
-changelog = "2.2.0"
-intelliJPlatform = "2.0.0-rc1"
+changelog = "2.2.1"
+intelliJPlatform = "2.0.0"
 kotlin = "1.9.24"
 kover = "0.8.3"
 qodana = "2024.1.5"
 annotations = "24.1.0"
 gradleDownloadTask = "5.6.0"
+junit4 = "4.13.2"
+commonsIo = "2.16.1"
+mockito = "2.2.9"
+objenesis = "2.4"
 
 [libraries]
 annotations = { group = "org.jetbrains", name = "annotations", version.ref = "annotations" }
+junit4 = { group = "junit4", name = "junit4", version.ref = "junit4" }
+mockito = { group = "org.mockito", name = "mockito-core", version.ref = "mockito" }
+objenesis = { group = "org.objenesis", name = "objenesis", version.ref = "objenesis" }
+commonsIo = { group = "commons-io", name = "commons-io", version.ref = "commonsIo" }
 
 [plugins]
 changelog = { id = "org.jetbrains.changelog", version.ref = "changelog" }

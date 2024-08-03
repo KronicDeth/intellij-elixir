@@ -1,8 +1,3 @@
-import org.jetbrains.intellij.platform.gradle.extensions.intellijPlatform
-plugins {
-    id("java")
-}
-
 dependencies {
     implementation(project(":jps-shared"))
 }
