@@ -1,20 +1,12 @@
 jar.archiveFileName = "jps-builder.jar"
 
-repositories {
-    mavenCentral()
-}
-
-sourceSets {
-    main {
-        java.srcDirs 'src'
-        resources.srcDirs 'resources'
-    }
-    test {
-        java.srcDir 'tests'
-    }
-}
-
 def compilationPackages = ['org/intellij/elixir/build/**', 'org/intellij/elixir/jps/**']
+repositories {
+  mavenCentral()
+  intellijPlatform {
+    defaultRepositories()
+  }
+}
 
 test {
   environment "ELIXIR_LANG_ELIXIR_PATH", elixirPath
@@ -28,5 +20,6 @@ test {
   }
 }
 
-publishPlugin.enabled = false
-verifyPlugin.enabled = false
+dependencies {
+    implementation project(':jps-shared')
+}

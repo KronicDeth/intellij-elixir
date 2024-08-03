@@ -11,7 +11,6 @@ import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.psi.PsiDirectory
 import org.elixir_lang.Icons
 import org.elixir_lang.psi.ElixirFile
-import org.junit.Test
 
 const val NEW_ELIXIR_MODULE = "New Elixir Module"
 const val DESCRIPTION = "Nested Aliases, like Foo.Bar.Baz, are created in subdirectory for the " + "parent Aliases, foo/bar/baz.ex"

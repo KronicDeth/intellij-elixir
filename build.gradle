@@ -1,8 +1,13 @@
+import org.jetbrains.intellij.platform.gradle.TestFrameworkType
+import org.jetbrains.intellij.platform.gradle.extensions.IntelliJPlatformDependenciesExtension
+
 plugins {
-    id "org.jetbrains.intellij" version "1.17.3"
+    id "org.jetbrains.intellij.platform" version "2.0.0"
     id "org.jetbrains.kotlin.jvm" version "1.9.10"
     id "de.undercouch.download" version "4.1.2"
 }
+
+apply plugin: "org.jetbrains.intellij.platform"
 
 ext {
     cachePath = "${rootDir}/cache"
@@ -35,7 +40,34 @@ allprojects {
     targetCompatibility = javaVersion
     tasks.withType(JavaCompile) { options.encoding = 'UTF-8' }
 }
+subprojects {
+    apply plugin: 'org.jetbrains.intellij.platform.module'
+    dependencies {
+        testImplementation 'junit:junit:4.13.2'
+        testImplementation "org.opentest4j:opentest4j:1.3.0"
 
+        intellijPlatform {
+            instrumentationTools()
+
+            intellijIdeaCommunity("2024.1.4")
+
+            bundledPlugins("com.intellij.java", "org.intellij.plugins.markdown")
+
+            testFramework(TestFrameworkType.Platform.INSTANCE)
+            // testFramework(TestFrameworkType.Plugin.Java.INSTANCE)
+        }
+    }
+    sourceSets {
+        main {
+            java.srcDirs 'src'
+            resources.srcDirs 'resources'
+        }
+        test {
+            java.srcDir 'tests'
+        }
+    }
+
+}
 sourceSets {
     main {
         java.srcDirs 'src', 'gen'
@@ -45,47 +77,31 @@ sourceSets {
         java.srcDir 'tests'
     }
 }
-
-allprojects {
-    apply plugin: 'org.jetbrains.intellij'
-    intellij {
-        plugins = [// needed for jps builder
-                   "java",
-                   // needed for documentation rendering
-                   "markdown",
-                   // always have IdeaVIM installed in sandbox
-                   "IdeaVIM:2.14.0"]
-        pluginName.set('intellij-elixir')
-        version.set(ideaVersion)
-        downloadSources.set(Boolean.valueOf(sources))
-    }
-
-    patchPluginXml {
-        def stripTag = { text, tag -> text.replace("<${tag}>", "").replace("</${tag}>", "") }
-        def bodyInnerHTML = { path ->
-            stripTag(stripTag(file(path).text, "html"), "body")
+intellijPlatform {
+    pluginConfiguration {
+        id = providers.gradleProperty("pluginGroup")
+        name = providers.gradleProperty("pluginName")
+        version = providers.gradleProperty("pluginVersion")
+        description = providers.gradleProperty("pluginDescription")
+        changeNotes = providers.gradleProperty("pluginChangeNotes")
+        ideaVersion {
+            sinceBuild = providers.gradleProperty("pluginSinceBuild")
+            untilBuild = providers.gradleProperty("pluginUntilBuild")
         }
-
-        changeNotes.set(bodyInnerHTML("resources/META-INF/changelog.html"))
-        pluginDescription.set(bodyInnerHTML("resources/META-INF/description.html"))
-
-        sinceBuild = "241.14494.240"
-        untilBuild = "241.*"
+        vendor {
+            name = providers.gradleProperty("vendorName")
+            email = providers.gradleProperty("vendorEmail")
+            url = providers.gradleProperty("pluginRepositoryUrl")
+        }
     }
 
-    publishPlugin {
-        distributionFile = layout.buildDirectory.file("distributions/${System.getenv("ASSET_NAME")}")
+    publishing {
         token = provider {
             System.getenv("JET_BRAINS_MARKETPLACE_TOKEN")
         }
         channels = publishChannels.split(',').toList()
     }
-
-    runPluginVerifier {
-        ideVersions = ["2024.1.4"]
-    }
 }
-
 apply plugin: "kotlin"
 
 //noinspection GroovyAssignabilityCheck,GrUnresolvedAccess
@@ -128,22 +144,36 @@ task testCompilation(type: Test, group: 'Verification', dependsOn: [classes, tes
 repositories {
     maven { url 'https://maven-central.storage.googleapis.com' }
     mavenCentral()
+    intellijPlatform {
+        defaultRepositories()
+    }
 }
 
 dependencies {
-    implementation project('jps-builder')
-    implementation project('jps-shared')
+    intellijPlatform {
+        instrumentationTools()
+
+        intellijIdeaCommunity("2024.1.4")
+
+        bundledPlugins("com.intellij.java", "org.intellij.plugins.markdown")
+
+        testFramework(TestFrameworkType.Platform.INSTANCE)
+        testFramework(TestFrameworkType.Plugin.Java.INSTANCE)
+    }
+    implementation project(':jps-builder')
+    implementation project(':jps-shared')
     implementation files('lib/OtpErlang.jar')
-    implementation group: 'commons-io', name: 'commons-io', version: '2.16.1'
+    implementation group: 'commons-io', name: 'commons-io', version: '2.5'
+
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation "org.opentest4j:opentest4j:1.3.0"
 
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '2.2.9'
     testImplementation group: 'org.objenesis', name: 'objenesis', version: '2.4'
 }
-
-project(':jps-builder') {
-    dependencies {
-        implementation project(':jps-shared')
-    }
+compileJava {
+    dependsOn ':jps-shared:composedJar'
+    dependsOn ':jps-builder:composedJar'
 }
 
 apply plugin: 'idea'
@@ -159,7 +189,7 @@ idea {
 
 task getElixir {
     doLast {
-        def folder = new File(elixirPath)
+        def folder = new File(elixirqPath)
 
         if (!folder.isDirectory() || folder.list().size() == 0) {
             download {
@@ -232,9 +262,6 @@ task releaseQuoter(dependsOn: getQuoterDeps) {
     }
 }
 
-compileJava {
-}
-
 compileTestJava {
     dependsOn getElixir
     dependsOn getQuoter
@@ -266,3 +293,13 @@ test {
     finalizedBy stopQuoter
 }
 
+apply plugin: 'idea'
+idea {
+    project {
+        jdkName = javaVersion
+        languageLevel = javaVersion
+    }
+    module {
+        generatedSourceDirs += file('gen')
+    }
+}
