@@ -58,10 +58,10 @@ dependencies {
     implementation(files("lib/OtpErlang.jar"))
     implementation(libs.annotations)
     implementation(libs.commonsIo)
-    testImplementation("junit:junit:4.13.2")
+    testImplementation(libs.junit4)
     testImplementation(libs.mockito)
     testImplementation(libs.objenesis)
-    testImplementation("org.opentest4j:opentest4j:1.3.0")
+    testImplementation(libs.opentest4j)
 
     intellijPlatform {
         create(providers.gradleProperty("platformType"), providers.gradleProperty("platformVersion"))
@@ -72,6 +72,9 @@ dependencies {
         testFramework(TestFrameworkType.Platform)
         pluginVerifier()
         zipSigner()
+        // @todo check if we can use this
+        // pluginModule(implementation(project(":jps-shared")))
+        // pluginModule(implementation(project(":jps-builder")))
     }
 }
 
@@ -334,6 +337,7 @@ allprojects {
 project(":") {
     apply(plugin = "kotlin")
 }
+
 // Configuration for subprojects
 subprojects {
     apply(plugin = "org.jetbrains.intellij.platform.module")
