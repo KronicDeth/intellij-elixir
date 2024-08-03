@@ -53,14 +53,15 @@ repositories {
 
 // Dependencies
 dependencies {
-    implementation(libs.annotations)
-    implementation(libs.commonsIo)
     implementation(project(":jps-builder"))
     implementation(project(":jps-shared"))
     implementation(files("lib/OtpErlang.jar"))
+    implementation(libs.annotations)
+    implementation(libs.commonsIo)
     testImplementation("junit:junit:4.13.2")
     testImplementation(libs.mockito)
     testImplementation(libs.objenesis)
+    testImplementation("org.opentest4j:opentest4j:1.3.0")
 
     intellijPlatform {
         create(providers.gradleProperty("platformType"), providers.gradleProperty("platformVersion"))
@@ -323,13 +324,16 @@ tasks {
 
 // Configuration for all projects
 allprojects {
+    apply(plugin = "java")
     extra["elixirPath"] = elixirPath
 
     tasks.withType<JavaCompile>().configureEach {
         options.encoding = "UTF-8"
     }
 }
-
+project(":") {
+    apply(plugin = "kotlin")
+}
 // Configuration for subprojects
 subprojects {
     apply(plugin = "org.jetbrains.intellij.platform.module")
@@ -346,6 +350,7 @@ subprojects {
     }
     dependencies {
         testImplementation("junit:junit:4.13.2")
+        testImplementation("org.opentest4j:opentest4j:1.3.0")
         intellijPlatform {
             create(providers.gradleProperty("platformType"), providers.gradleProperty("platformVersion"))
             instrumentationTools()

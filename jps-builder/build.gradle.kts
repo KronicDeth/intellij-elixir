@@ -1,7 +1,13 @@
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+
 dependencies {
     implementation(project(":jps-shared"))
 }
 
+plugins {
+    id("java")
+    id("org.jetbrains.intellij.platform")
+}
 tasks.named("compileTestJava") {
     dependsOn(":jps-shared:composedJar")
 }
@@ -9,8 +15,13 @@ tasks.named("compileJava") {
     dependsOn(":jps-shared:composedJar")
 }
 
-tasks.named<Jar>("jar") {
+
+tasks.jar {
     archiveFileName.set("jps-builder.jar")
+}
+
+repositories {
+    mavenCentral()
 }
 
 sourceSets {
@@ -23,16 +34,32 @@ sourceSets {
     }
 }
 
+// Retrieve elixirPath and elixirVersion from the root project extra properties
+val elixirPath: String by rootProject.extra
+val elixirVersion: String by rootProject.extra
+
 val compilationPackages = listOf("org/intellij/elixir/build/**", "org/intellij/elixir/jps/**")
 
 tasks.test {
-    environment("ELIXIR_LANG_ELIXIR_PATH", rootProject.extra["elixirPath"] as String)
-    environment("ELIXIR_EBIN_DIRECTORY", "${rootProject.extra["elixirPath"]}/lib/elixir/ebin/")
-    environment("ELIXIR_VERSION", rootProject.extra["elixirVersion"] as String)
+    environment("ELIXIR_LANG_ELIXIR_PATH", elixirPath)
+    environment("ELIXIR_EBIN_DIRECTORY", "${elixirPath}/lib/elixir/ebin/")
+    environment("ELIXIR_VERSION", elixirVersion)
     useJUnit {
         exclude(compilationPackages)
     }
     testLogging {
-        exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+        exceptionFormat = TestExceptionFormat.FULL
+    }
+}
+
+tasks {
+    buildSearchableOptions {
+        enabled = false
+    }
+    verifyPlugin {
+        enabled = false
+    }
+    publishPlugin {
+        enabled = false
     }
 }
