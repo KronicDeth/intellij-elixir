@@ -7,11 +7,12 @@ import org.elixir_lang.ElixirLanguage
 class ElixirCodeStyleMainPanel(currentSettings: CodeStyleSettings?, baseSettings: CodeStyleSettings) :
     TabbedLanguageCodeStylePanel(ElixirLanguage, currentSettings, baseSettings) {
 
-    override fun initTabs(settings: CodeStyleSettings?) {
+    override fun initTabs(settings: CodeStyleSettings) {
         addTab(MixFormatPanel(settings))
         addIndentOptionsTab(settings)
         addSpacesTab(settings)
         addWrappingAndBracesTab(settings)
+        addTab(CodeGenerationPanel(settings))
         // DO NOT have Blank Lines tab
     }
 }
