@@ -1,10 +1,10 @@
 package org.elixir_lang.structure_view.element;
 
 import com.intellij.psi.PsiElement;
-import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase;
+import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import org.elixir_lang.psi.call.Call;
 
-public class CallDefinitionHeadTest extends LightPlatformCodeInsightFixtureTestCase {
+public class CallDefinitionHeadTest extends BasePlatformTestCase {
     /*
      * Tests
      */
