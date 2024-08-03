@@ -383,12 +383,3 @@ subprojects {
         environment("RELEASE_TMP", tmpDirPath)
     }
 }
-
-// Configuration for jps-builder project
-project(":jps-builder") {
-    apply(plugin = "java")
-
-    dependencies {
-        implementation(project(":jps-shared"))
-    }
-}
