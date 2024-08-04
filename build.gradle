@@ -3,7 +3,7 @@ import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
 
 plugins {
     id "org.jetbrains.intellij.platform" version "2.0.0"
-    id "org.jetbrains.kotlin.jvm" version "1.9.10"
+    id "org.jetbrains.kotlin.jvm" version "1.9.24"
     id "de.undercouch.download" version "4.1.2"
     id 'com.adarshr.test-logger' version '4.0.0'
 }
