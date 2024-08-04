@@ -1,8 +1,2 @@
 jar.archiveFileName = "jps-shared.jar"
 testClasses.enabled = false
-repositories {
-    mavenCentral()
-    intellijPlatform {
-        defaultRepositories()
-    }
-}

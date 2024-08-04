@@ -1,5 +1,5 @@
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
-import org.jetbrains.intellij.platform.gradle.extensions.IntelliJPlatformDependenciesExtension
+import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
 
 plugins {
     id "org.jetbrains.intellij.platform" version "2.0.0"
@@ -43,6 +43,12 @@ allprojects {
 }
 subprojects {
     apply plugin: 'org.jetbrains.intellij.platform.module'
+    repositories {
+        mavenCentral()
+        intellijPlatform {
+            defaultRepositories()
+        }
+    }
     dependencies {
         testImplementation 'junit:junit:4.13.2'
         testImplementation "org.opentest4j:opentest4j:1.3.0"
@@ -50,12 +56,13 @@ subprojects {
         intellijPlatform {
             instrumentationTools()
 
-            intellijIdeaCommunity("2024.1.4")
+            create(providers.gradleProperty("platformType"), providers.gradleProperty("platformVersion"))
 
-            bundledPlugins("com.intellij.java", "org.intellij.plugins.markdown")
+            bundledPlugins providers.gradleProperty("platformBundledPlugins").map { it.split(',').toList() }
+            plugins providers.gradleProperty("platformPlugins").map { it.split(',').toList() }
 
             testFramework(TestFrameworkType.Platform.INSTANCE)
-            // testFramework(TestFrameworkType.Plugin.Java.INSTANCE)
+            testFramework(TestFrameworkType.Plugin.Java.INSTANCE)
         }
     }
     sourceSets {
@@ -80,11 +87,17 @@ sourceSets {
 }
 intellijPlatform {
     pluginConfiguration {
+        def stripTag = { text, tag -> text.replace("<${tag}>", "").replace("</${tag}>", "") }
+        def bodyInnerHTML = { path ->
+            stripTag(stripTag(file(path).text, "html"), "body")
+        }
+
         id = providers.gradleProperty("pluginGroup")
         name = providers.gradleProperty("pluginName")
         version = providers.gradleProperty("pluginVersion")
-        description = providers.gradleProperty("pluginDescription")
-        changeNotes = providers.gradleProperty("pluginChangeNotes")
+        changeNotes.set(bodyInnerHTML("resources/META-INF/changelog.html"))
+        description.set(bodyInnerHTML("resources/META-INF/description.html"))
+
         ideaVersion {
             sinceBuild = providers.gradleProperty("pluginSinceBuild")
             untilBuild = providers.gradleProperty("pluginUntilBuild")
@@ -96,11 +109,17 @@ intellijPlatform {
         }
     }
 
-    publishing {
+    publishPlugin {
         token = provider {
             System.getenv("JET_BRAINS_MARKETPLACE_TOKEN")
         }
         channels = publishChannels.split(',').toList()
+        archiveFile = layout.buildDirectory.file("distributions/${System.getenv("ASSET_NAME")}")
+    }
+    pluginVerification {
+        ides {
+            ide(IntelliJPlatformType.IntellijIdeaCommunity, providers.gradleProperty("baseVersion").toString())
+        }
     }
 }
 apply plugin: "kotlin"
@@ -133,6 +152,63 @@ test {
     }
 }
 
+intellijPlatformTesting {
+    runIde {
+        register("runIntelliJCommunity") {
+            type = IntelliJPlatformType.IntellijIdeaCommunity
+            version = providers.gradleProperty("platformVersion")
+            prepareSandboxTask {
+                sandboxDirectory = project.layout.buildDirectory.dir("rubymine-sandbox")
+            }
+//            plugins {
+//                plugin 'IdeaVIM' '2.15.0'
+//            }
+        }
+        register("runIntelliJUltimate") {
+            type = IntelliJPlatformType.IntellijIdeaUltimate
+            version = providers.gradleProperty("platformVersion")
+            prepareSandboxTask {
+                sandboxDirectory = project.layout.buildDirectory.dir("rubymine-sandbox")
+            }
+        }
+        register("runRubyMine") {
+            type = IntelliJPlatformType.RubyMine
+            version = providers.gradleProperty("platformVersion")
+            prepareSandboxTask {
+                sandboxDirectory = project.layout.buildDirectory.dir("rubymine-sandbox")
+            }
+        }
+        register("runRustRover") {
+            type = IntelliJPlatformType.RustRover
+            version = providers.gradleProperty("platformVersion")
+            prepareSandboxTask {
+                sandboxDirectory = project.layout.buildDirectory.dir("rustrover-sandbox")
+            }
+        }
+        register("runPyCharmCommunity") {
+            type = IntelliJPlatformType.PyCharmCommunity
+            version = providers.gradleProperty("platformVersion")
+            prepareSandboxTask {
+                sandboxDirectory = project.layout.buildDirectory.dir("pycharm-community-sandbox")
+            }
+        }
+        register("runPyCharmProfessional") {
+            type = IntelliJPlatformType.PyCharmProfessional
+            version = providers.gradleProperty("platformVersion")
+            prepareSandboxTask {
+                sandboxDirectory = project.layout.buildDirectory.dir("pycharm-pro-sandbox")
+            }
+        }
+        register("runWebStorm") {
+            type = IntelliJPlatformType.WebStorm
+            version = providers.gradleProperty("platformVersion")
+            prepareSandboxTask {
+                sandboxDirectory = project.layout.buildDirectory.dir("webstorm-sandbox")
+            }
+        }
+    }
+}
+
 task testCompilation(type: Test, group: 'Verification', dependsOn: [classes, testClasses]) {
     useJUnit {
         include compilationPackages
@@ -154,9 +230,9 @@ dependencies {
     intellijPlatform {
         instrumentationTools()
 
-        intellijIdeaCommunity("2024.1.4")
-
-        bundledPlugins("com.intellij.java", "org.intellij.plugins.markdown")
+        intellijIdeaCommunity(providers.gradleProperty("platformVersion"))
+        bundledPlugins providers.gradleProperty("platformBundledPlugins").map { it.split(',').toList() }
+        plugins providers.gradleProperty("platformPlugins").map { it.split(',').toList() }
 
         testFramework(TestFrameworkType.Platform.INSTANCE)
         testFramework(TestFrameworkType.Plugin.Java.INSTANCE)
@@ -264,6 +340,8 @@ task releaseQuoter(dependsOn: getQuoterDeps) {
 }
 
 compileTestJava {
+    dependsOn ":jps-builder:composedJar"
+    dependsOn ":jps-shared:composedJar"
     dependsOn getElixir
     dependsOn getQuoter
 }
@@ -285,8 +363,16 @@ task stopQuoter(type: Exec, dependsOn: releaseQuoter) {
 }
 
 runIde {
-    jvmArgs "-Didea.ProcessCanceledException=disabled"
+    systemProperty "idea.log.debug.categories", "org.jetbrains.dbt=TRACE"
+    systemProperty "idea.log.debug.categories", "com.github.joshuataylor=TRACE"
+    systemProperty "idea.log.debug.categories", "com.github.joshuataylor.dbthelper=TRACE"
+
+    systemProperty "ide.slow.operations.assertion", "true"
+    jvmArgs "-Didea.debug.mode=true", "-Didea.is.internal=true", "-Dlog4j2.debug=true", "-Dlogger.org=TRACE", "-XX:+AllowEnhancedClassRedefinition", "-XX:HotswapAgent=fatjar", "-Didea.ProcessCanceledException=disabled"
+//    jvmArgs "-Didea.ProcessCanceledException=disabled"
     maxHeapSize = "7g"
+    workingDir = file("/Users/josh/dev/aint/ijt")
+
 }
 
 test {

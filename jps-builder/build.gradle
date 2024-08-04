@@ -2,11 +2,11 @@ jar.archiveFileName = "jps-builder.jar"
 
 def compilationPackages = ['org/intellij/elixir/build/**', 'org/intellij/elixir/jps/**']
 
-repositories {
-    mavenCentral()
-    intellijPlatform {
-        defaultRepositories()
-    }
+compileTestJava {
+    dependsOn(":jps-shared:composedJar")
+}
+compileJava {
+    dependsOn(":jps-shared:composedJar")
 }
 
 // Ensuring the necessary tasks are executed before tests
