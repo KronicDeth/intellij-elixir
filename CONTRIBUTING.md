@@ -52,25 +52,49 @@ Gradle will handle all dependency management, including fetching the Intellij ID
 
 **NOTE:** If you're having trouble running the plugin against Intellij IDEA 14.1 on Mac, see this [comment](https://github.com/KronicDeth/intellij-elixir/pull/504#issuecomment-284275036).
 
-### From commandline
-You can run `./gradlew runIde` or `./gradlew test`.
+### From command line
+> Let's assume that you don't have much knowledge of the Java/Kotlin ecosystem, and just want to help contribute some changes.
+> Here are some tips on how make your changes and test them without hopefully too much fuss,
 
-### From IntelliJ
+To launch an IDE, you can run
+```sh
+./gradlew runIntelliJCommunity
+```
 
+Or from one of the following IDEs:
+
+- runIntelliJCommunity
+- runIntelliJUltimate
+- runPyCharmCommunity
+- runPyCharmProfessional
+- runRubyMine
+- runRustRover
+- runWebStorm
+
+To run all tests `./gradlew test`.
+
+To run a specific test:
+```sh
+./gradlew test --tests "org.elixir_lang.psi.operation.PrefixTest"
+```
+
+To build (so you get a .zip file):
+```sh
+./gradlew build
+# Or without tests
+./gradlew build -x test
+```
+
+### From IntelliJ IDEA
+#### Running the plugin in a specific IDE
 1. Open the Gradle Tool Window (`View > Tool Windows > Gradle` OR from the Gradle button on the right tool button bar)
-2. Expand `Elixir (root) > Tasks`
+2. Expand `Elixir (root) > Tasks > intellij platform`
+3. Double click `runIntelliJCommunity` (or which IDE you want to test with)
+4. Now the Run Configuration will be selected, and you can click the green arrow at the top of the screen.
 
-#### `runIde`
-
-1. Expand `intellij`
-2. Right-click `runIde`
-3. Select `Create 'intellij-elixir' [runIde]`
-
-#### `test`
-
+#### Verification
 1. Expand `verification`
-2. Right-click `test`
-3. Select `Create 'intellij-elixir' [test]`
+2. Double click `test`
 
 ### Color Schemes
 
