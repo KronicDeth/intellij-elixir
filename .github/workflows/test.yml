@@ -49,4 +49,4 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Run Plugin Verifier
-        run: ./gradlew --stacktrace runPluginVerifier
+        run: ./gradlew --stacktrace verifyPlugin
