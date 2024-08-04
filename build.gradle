@@ -153,57 +153,36 @@ test {
 }
 
 intellijPlatformTesting {
-    runIde {
-        register("runIntelliJCommunity") {
-            type = IntelliJPlatformType.IntellijIdeaCommunity
+    def platforms = [
+            "IntellijIdeaCommunity",
+            "IntellijIdeaUltimate",
+            "RubyMine",
+            "RustRover",
+            "PyCharmCommunity",
+            "PyCharmProfessional",
+            "WebStorm"
+    ]
+
+    // Use providers.gradleProperty to get the 'runIdePlugins' property
+    def runIdePluginsProperty = providers.gradleProperty("runIdePlugins").getOrElse("")
+    def runIdePluginsList = runIdePluginsProperty.split(",")
+
+    platforms.each { platform ->
+        runIde.create("run${platform}") {
+            type = IntelliJPlatformType."${platform}"
             version = providers.gradleProperty("platformVersion")
             prepareSandboxTask {
-                sandboxDirectory = project.layout.buildDirectory.dir("rubymine-sandbox")
+                sandboxDirectory = project.layout.buildDirectory.dir("${platform.toLowerCase()}-sandbox")
             }
-//            plugins {
-//                plugin 'IdeaVIM' '2.15.0'
-//            }
-        }
-        register("runIntelliJUltimate") {
-            type = IntelliJPlatformType.IntellijIdeaUltimate
-            version = providers.gradleProperty("platformVersion")
-            prepareSandboxTask {
-                sandboxDirectory = project.layout.buildDirectory.dir("rubymine-sandbox")
-            }
-        }
-        register("runRubyMine") {
-            type = IntelliJPlatformType.RubyMine
-            version = providers.gradleProperty("platformVersion")
-            prepareSandboxTask {
-                sandboxDirectory = project.layout.buildDirectory.dir("rubymine-sandbox")
-            }
-        }
-        register("runRustRover") {
-            type = IntelliJPlatformType.RustRover
-            version = providers.gradleProperty("platformVersion")
-            prepareSandboxTask {
-                sandboxDirectory = project.layout.buildDirectory.dir("rustrover-sandbox")
-            }
-        }
-        register("runPyCharmCommunity") {
-            type = IntelliJPlatformType.PyCharmCommunity
-            version = providers.gradleProperty("platformVersion")
-            prepareSandboxTask {
-                sandboxDirectory = project.layout.buildDirectory.dir("pycharm-community-sandbox")
-            }
-        }
-        register("runPyCharmProfessional") {
-            type = IntelliJPlatformType.PyCharmProfessional
-            version = providers.gradleProperty("platformVersion")
-            prepareSandboxTask {
-                sandboxDirectory = project.layout.buildDirectory.dir("pycharm-pro-sandbox")
-            }
-        }
-        register("runWebStorm") {
-            type = IntelliJPlatformType.WebStorm
-            version = providers.gradleProperty("platformVersion")
-            prepareSandboxTask {
-                sandboxDirectory = project.layout.buildDirectory.dir("webstorm-sandbox")
+
+            // if runIdePluginsList is not empty, set the plugins
+            if (runIdePluginsList.size() > 0) {
+                plugins {
+                    // Apply each plugin from the 'runIdePluginsList'
+                    runIdePluginsList.each { plugin ->
+                        plugins(plugin.trim())
+                    }
+                }
             }
         }
     }
@@ -363,16 +342,28 @@ task stopQuoter(type: Exec, dependsOn: releaseQuoter) {
 }
 
 runIde {
-    systemProperty "idea.log.debug.categories", "org.jetbrains.dbt=TRACE"
-    systemProperty "idea.log.debug.categories", "com.github.joshuataylor=TRACE"
-    systemProperty "idea.log.debug.categories", "com.github.joshuataylor.dbthelper=TRACE"
+    systemProperty "idea.log.debug.categories", "org.elixir_lang=TRACE"
+    // When wanting to disable EDT slow assertion..
+    // systemProperty "ide.slow.operations.assertion", "true"
 
-    systemProperty "ide.slow.operations.assertion", "true"
-    jvmArgs "-Didea.debug.mode=true", "-Didea.is.internal=true", "-Dlog4j2.debug=true", "-Dlogger.org=TRACE", "-XX:+AllowEnhancedClassRedefinition", "-XX:HotswapAgent=fatjar", "-Didea.ProcessCanceledException=disabled"
-//    jvmArgs "-Didea.ProcessCanceledException=disabled"
+    // -Didea.debug.mode=true:
+    // This enables debug mode for IntelliJ IDEA. It can be useful when developing plugins to get more detailed logging and debugging information.
+    // -Didea.is.internal=true:
+    // This flag indicates that the plugin is running in an internal mode, which may enable additional features or logging that are typically only available to IntelliJ developers.
+    // -Dlog4j2.debug=true:
+    // This enables debug logging for Log4j 2, which is the logging framework used by IntelliJ IDEA. It can help in troubleshooting logging-related issues in your plugin.
+    // -Dlogger.org=TRACE:
+    // This sets the logging level for the "org" package to TRACE, which is the most verbose logging level. This can be useful for detailed logging of plugin activities.
+    // -XX:+AllowEnhancedClassRedefinition:
+    // This is a JVM flag that allows for more flexible class redefinition during runtime. It can be beneficial for hot-swapping code changes without restarting the IDE.
+    // -Didea.ProcessCanceledException=disabled:
+    //This disables the throwing of ProcessCanceledException, which is typically used to cancel long-running processes in IntelliJ IDEA. Disabling it can be useful in certain debugging scenarios.
+    jvmArgs "-Didea.debug.mode=true", "-XX:+AllowEnhancedClassRedefinition", "-Didea.is.internal=true", "-Dlog4j2.debug=true", "-Dlogger.org=TRACE", "-Didea.ProcessCanceledException=disabled"
     maxHeapSize = "7g"
-    workingDir = file("/Users/josh/dev/aint/ijt")
-
+    // get from runIdeWorkingDirectory
+    if (project.hasProperty("runIdeWorkingDirectory") && !project.property("runIdeWorkingDirectory").isEmpty()) {
+        workingDir = file(project.property("runIdeWorkingDirectory"))
+    }
 }
 
 test {
