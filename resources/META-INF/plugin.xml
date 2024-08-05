@@ -1,10 +1,10 @@
-<idea-plugin version="2">
+<idea-plugin>
     <id>org.elixir_lang</id>
     <name>Elixir</name>
     <vendor email="Kronic.Deth@gmail.com">Elle Imhoff</vendor>
 
     <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
-    <idea-version since-build="241.14494.240"/>
+    <idea-version since-build="241.0"/>
 
     <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
          on how to target different products -->
@@ -13,8 +13,8 @@
     <depends config-file="rich-platform-plugin.xml" optional="true">com.intellij.modules.java</depends>
 
     <extensionPoints>
-        <extensionPoint qualifiedName="org.elixir_lang.packageManager" interface="org.elixir_lang.PackageManager"
-                        dynamic="true"/>
+        <extensionPoint interface="org.elixir_lang.PackageManager"
+                        dynamic="true" name="packageManager"/>
     </extensionPoints>
 
     <extensions defaultExtensionNs="org.elixir_lang">
@@ -94,8 +94,6 @@
                                  parentId="language.elixir"
                                  displayName="Internal Erlang SDKs"
                                  provider="org.elixir_lang.facet.sdks.erlang.Provider"/>
-        <applicationService serviceImplementation="org.elixir_lang.facet.SdksService"
-                            serviceInterface="org.elixir_lang.facet.SdksService"/>
         <projectConfigurable id="language.elixir"
                              parentId="language"
                              displayName="Elixir"
@@ -113,7 +111,7 @@
 
         <!-- for liveTemplates -->
         <defaultLiveTemplates file="liveTemplates/Elixir"/>
-        <liveTemplateContext implementation="org.elixir_lang.templates.ElixirContextType"/>
+        <liveTemplateContext implementation="org.elixir_lang.templates.ElixirContextType" contextId="ELIXIR"/>
         <!-- end liveTemplates -->
 
         <additionalTextAttributes file="colorSchemes/ElixirDarcula.xml" scheme="Darcula"/>
@@ -133,8 +131,8 @@
                           level="WARNING"
                           shortName="Credo"/>
         // groupId/parentId "Errors" is Editor > Inspections
-        <projectConfigurable instance="org.elixir_lang.credo.Configurable" groupId="Errors" parentId="Errors"/>
-        <projectService serviceImplementation="org.elixir_lang.credo.Service"/>
+        <projectConfigurable instance="org.elixir_lang.credo.Configurable" groupId="Errors" parentId="Errors"
+                             displayName="Credo"/>
 
         <!-- <code>.beam</code> -->
         <gotoRelatedProvider implementation="org.elixir_lang.goto_decompiled.Provider"/>
@@ -146,7 +144,7 @@
         <fileType name="BEAM" implementationClass="org.elixir_lang.beam.FileType" fieldName="INSTANCE" language="BEAM"
                   extensions="beam"/>
         <structureViewBuilder key="BEAM" factoryClass="org.elixir_lang.beam.StructureViewBuilderProvider"/>
-        <stubElementTypeHolder class="org.elixir_lang.beam.psi.stubs.ModuleStubElementTypes"/>
+        <stubElementTypeHolder class="org.elixir_lang.beam.psi.stubs.ModuleStubElementTypes" externalIdPrefix="elixirmodule."/>
         <syntaxHighlighter key="BEAM" factoryClass="org.elixir_lang.ElixirSyntaxHighlighterFactory"/>
 
         <!-- `.beam.asm` -->
@@ -193,8 +191,8 @@
                                         implementationClass="org.elixir_lang.code_insight.line_marker_provider.Implementation"/>
 
         <!-- folding -->
-        <applicationService serviceInterface="org.elixir_lang.folding.ElixirFoldingSettings"
-                            serviceImplementation="org.elixir_lang.folding.ElixirFoldingSettings"/>
+        <applicationService
+                serviceImplementation="org.elixir_lang.folding.ElixirFoldingSettings"/>
         <codeFoldingOptionsProvider instance="org.elixir_lang.folding.OptionsProvider"/>
         <lang.foldingBuilder language="Elixir" implementationClass="org.elixir_lang.folding.Builder"/>
 
@@ -222,7 +220,7 @@
         <localInspection displayName="Ambiguous parentheses" enabledByDefault="true" groupName="Elixir"
                          implementationClass="org.elixir_lang.inspection.NoParenthesesStrict" language="Elixir"
                          level="ERROR" shortName="NoParenthesesStrict"/>
-        <localInspection displayName="Keywords Not At End" enabledByDefault="true"
+        <localInspection displayName="Keywords not at end" enabledByDefault="true"
                          groupName="Elixir" implementationClass="org.elixir_lang.inspection.KeywordsNotAtEnd"
                          language="Elixir" level="ERROR" shortName="KeywordsNotAtEnd"/>
         <localInspection displayName="Keyword pair colon (:) used in type spec instead of type operator (::)"
@@ -278,7 +276,7 @@
         <projectService serviceInterface="org.elixir_lang.dialyzer.service.DialyzerService"
                         serviceImplementation="org.elixir_lang.dialyzer.service.DialyzerServiceImpl"/>
         <projectConfigurable instance="org.elixir_lang.dialyzer.service.Configurable" groupId="Errors"
-                             parentId="Errors"/>
+                             parentId="Errors" displayName="Dialyzer"/>
     </extensions>
 
     <projectListeners>

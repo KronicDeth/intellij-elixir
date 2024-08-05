@@ -183,22 +183,28 @@ class Editor(private val sdkModel: SdkModel, private val history: History, priva
 
         initialName = sdk.name
         initialPath = sdk.homePath
-        val sdkModificator = sdk.sdkModificator
-        sdkModificator.homePath = FileUtil.toSystemDependentName(homeValue)
 
-        sdkPathEditorByOrderRootType.values.forEach { pathEditor -> pathEditor.apply(sdkModificator) }
+        ApplicationManager.getApplication().runWriteAction {
+            val sdkModificator = sdk.sdkModificator
+            sdkModificator.homePath = FileUtil.toSystemDependentName(homeValue)
 
-        ApplicationManager.getApplication().runWriteAction { sdkModificator.commitChanges() }
+            sdkPathEditorByOrderRootType.values.forEach { pathEditor -> pathEditor.apply(sdkModificator) }
+
+            sdkModificator.commitChanges()
+        }
 
         additionalDataConfigurable.forEach(AdditionalDataConfigurable::apply)
     }
 
     override fun reset() {
-        val sdkModificator = sdk.sdkModificator
-        for (type in sdkPathEditorByOrderRootType.keys) {
-            sdkPathEditorByOrderRootType[type]?.reset(sdkModificator)
+        ApplicationManager.getApplication().runWriteAction {
+            val sdkModificator = sdk.sdkModificator
+            for (type in sdkPathEditorByOrderRootType.keys) {
+                sdkPathEditorByOrderRootType[type]?.reset(sdkModificator)
+            }
+            sdkModificator.commitChanges()
         }
-        sdkModificator.commitChanges()
+
         setHomePathValue(FileUtil.toSystemDependentName(sdk.homePath ?: ""))
         _versionString = null
         homeFieldLabel.text = homeFieldLabelValue
@@ -212,7 +218,6 @@ class Editor(private val sdkModel: SdkModel, private val history: History, priva
             tabbedPane.setEnabledAt(i, true)
         }
     }
-
     override fun disposeUIResources() {
         additionalDataConfigurableListBySdkType.keys
             .flatMap { additionalDataConfigurableListBySdkType[it]!! }
