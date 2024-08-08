@@ -2,8 +2,8 @@
 
 ## v18.0.2
 ### Enhancements
-* [#3569](https://github.com/KronicDeth/intellij-elixir/pull/3569) - [@ashleysommer](https://github.com/ashleysommer), [@joshuataylor](https://github.com/joshuataylor)
-  * Support 2024.2
+* [#3628](https://github.com/KronicDeth/intellij-elixir/pull/3628) - [@joshuataylor](https://github.com/joshuataylor)
+  * Add support for 2024.2 IDEs
 
 ## v18.0.1
 ### Enhancements
