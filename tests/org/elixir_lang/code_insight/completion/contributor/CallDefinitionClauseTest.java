@@ -3,13 +3,13 @@ package org.elixir_lang.code_insight.completion.contributor;
 import com.intellij.codeInsight.completion.CompletionType;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementPresentation;
-import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase;
+import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class CallDefinitionClauseTest extends LightPlatformCodeInsightFixtureTestCase {
+public class CallDefinitionClauseTest extends BasePlatformTestCase {
     /*
      * Tests
      */

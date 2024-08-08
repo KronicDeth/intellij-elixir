@@ -1,11 +1,11 @@
 package org.elixir_lang.psi.operation;
 
 import com.intellij.psi.PsiElement;
-import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase;
+import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import org.elixir_lang.psi.Operator;
 import org.elixir_lang.psi.call.Call;
 
-public class PrefixTest extends LightPlatformCodeInsightFixtureTestCase {
+public class PrefixTest extends BasePlatformTestCase {
     /*
      * Tests
      */
