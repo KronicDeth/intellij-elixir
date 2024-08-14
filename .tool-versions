@@ -1,9 +1,10 @@
 elixir 1.13.4-otp-24
 erlang 24.3.4.6
 
-# 17.0.12+7 / Azul Zulu: 17.52.17
-# GitHub actions uses JBR 17
+# 21.0.4+7 / Azul Zulu: 21.36.17
+# GitHub actions uses JBR 21
 # If using mise, you can change below to use JBR as well by doing (if version is 17.xxx)
-# mise link java@jbrsdk_jcef-17.0.11-b1312.2-2024.2 /path/to/jbrsdk_jcef-17.0.11-xxx-xxx-b1207.24/Contents/Home
-# Then setting it to `java jbrsdk_jcef-17.0.11-b1312.2-2024.2`
-java zulu-17.52.17
+# mac:
+# mise link java@jbrsdk_jcef-21.0.3-b509.4-2024.2 /path/to/jbrsdk_jcef-21.0.3-xxx-xxx-b509.4/Contents/Home
+# Then setting it to `java jbrsdk_jcef-21.0.3-b509.4-2024.2`
+java zulu-21.36.17
