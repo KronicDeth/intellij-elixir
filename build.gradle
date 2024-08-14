@@ -32,7 +32,7 @@ ext {
         channel = "canary"
     }
 
-    version "$baseVersion$versionSuffix"
+    version "$pluginVersion$versionSuffix"
 }
 
 allprojects {
