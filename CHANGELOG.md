@@ -1,6 +1,6 @@
 # Changelog
 
-## v18.0.2
+## v19.0.0
 
 ### Breaking changes
 * [#3619](https://github.com/KronicDeth/intellij-elixir/pull/3619) - [@joshuataylor](https://github.com/joshuataylor)
