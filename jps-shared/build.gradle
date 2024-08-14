@@ -1,4 +1,7 @@
-jar.archiveName = "jps-shared.jar"
+jar {
+    archiveBaseName.set("jps-shared")
+    archiveExtension.set("jar")
+}
 testClasses.enabled = false
 
 repositories {
