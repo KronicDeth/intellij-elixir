@@ -113,10 +113,11 @@ class DirectoryConfigurator : com.intellij.platform.DirectoryProjectConfigurator
             null
         } else {
             val path = otpApp.root.path.let { Paths.get(it) }
-            val openProjectTask = OpenProjectTask(
-                isNewProject = true,
-                useDefaultProjectAsTemplate = false,
-            ).copy(projectName = otpApp.name)
+            val openProjectTask = OpenProjectTask {
+                isNewProject = true
+                useDefaultProjectAsTemplate = false
+                projectName = otpApp.name
+            }
 
             ProjectManagerEx
                 .getInstanceEx()
