@@ -1,9 +1,24 @@
 # Changelog
 
+## v19.0.0
+
+### Breaking changes
+* [#3619](https://github.com/KronicDeth/intellij-elixir/pull/3619) - [@joshuataylor](https://github.com/joshuataylor)
+  * Drop support for < 2024.2 IDEs
+
+### Enhancements
+* [#3619](https://github.com/KronicDeth/intellij-elixir/pull/3619) - [@joshuataylor](https://github.com/joshuataylor)
+  * Support IntelliJ Gradle Plugin 2.0
+
+## v18.0.1
+### Enhancements
+* [#3582](https://github.com/KronicDeth/intellij-elixir/pull/3582) - [@rNoz](https://github.com/rNoz)
+  * Enabling proper code generation for comments (Comment with Line/Block Comment)
+
 ## v18.0.0
 ### Breaking changes
 * [#3569](https://github.com/KronicDeth/intellij-elixir/pull/3569) - [@ashleysommer](https://github.com/ashleysommer), [@joshuataylor](https://github.com/joshuataylor)
-  * Drop support for <= 2024.1 IDEs.
+  * Drop support for < 2024.1 IDEs.
 
 ## v17.0.1
 
