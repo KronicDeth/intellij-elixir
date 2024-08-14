@@ -35,7 +35,7 @@ jobs:
         run: ./gradlew --stacktrace releaseQuoter
       - name: Test with Gradle
         run: ./gradlew --stacktrace test
-  runPluginVerifier:
+  verifyPlugin:
     runs-on: ubuntu-latest
 
     steps:
@@ -48,9 +48,9 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Run Plugin Verifier
-        run: ./gradlew --stacktrace runPluginVerifier
+        run: ./gradlew --stacktrace verifyPlugin
   release:
-    needs: [ test, runPluginVerifier ]
+    needs: [ test, verifyPlugin ]
     runs-on: ubuntu-latest
 
     steps:

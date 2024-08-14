@@ -42,7 +42,7 @@ jobs:
         run: ./gradlew --stacktrace releaseQuoter
       - name: Test with Gradle
         run: ./gradlew --stacktrace test
-  runPluginVerifier:
+  verifyPlugin:
     runs-on: ubuntu-latest
 
     steps:
