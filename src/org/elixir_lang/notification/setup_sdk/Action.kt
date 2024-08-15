@@ -6,8 +6,6 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleType
 import com.intellij.openapi.project.Project
-import org.elixir_lang.notification.setup_sdk.Provider.Companion.showFacetSettings
-import org.elixir_lang.notification.setup_sdk.Provider.Companion.showModuleSettings
 
 /**
  * Created by zyuyou on 15/7/8.

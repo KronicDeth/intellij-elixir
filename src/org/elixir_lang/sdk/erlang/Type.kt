@@ -25,11 +25,11 @@ class Type : SdkType("Erlang SDK for Elixir SDK") {
         private const val ERTS_VERSION_PREFIX_LINE = "org.elixir_lang.sdk.erlang.Type ERTS_VERSION:"
         private const val PRINT_VERSION_INFO_EXPRESSION =
             "io:format(\"~n~s~n~s~n~s~n~s~n\",[" +
-                "\"$OTP_RELEASE_PREFIX_LINE\"," +
-                "erlang:system_info(otp_release)," +
-                "\"$ERTS_VERSION_PREFIX_LINE\"," +
-                "erlang:system_info(version)" +
-                "]),erlang:halt()."
+                    "\"$OTP_RELEASE_PREFIX_LINE\"," +
+                    "erlang:system_info(otp_release)," +
+                    "\"$ERTS_VERSION_PREFIX_LINE\"," +
+                    "erlang:system_info(version)" +
+                    "]),erlang:halt()."
         private const val WINDOWS_DEFAULT_HOME_PATH = "C:\\Program Files\\erl9.0"
         private val NIX_PATTERN = HomePath.nixPattern("erlang")
         private const val LINUX_MINT_HOME_PATH = "${HomePath.LINUX_MINT_HOME_PATH}/erlang"
@@ -78,9 +78,11 @@ class Type : SdkType("Erlang SDK for Elixir SDK") {
                     HomePath.mergeHomebrew(homePathByVersion, "erlang", VERSION_PATH_TO_HOME_PATH)
                     HomePath.mergeNixStore(homePathByVersion, NIX_PATTERN, VERSION_PATH_TO_HOME_PATH)
                 }
+
                 SystemInfo.isWindows -> {
                     putIfDirectory(homePathByVersion, HomePath.UNKNOWN_VERSION, WINDOWS_DEFAULT_HOME_PATH)
                 }
+
                 SystemInfo.isLinux -> {
                     putIfDirectory(homePathByVersion, HomePath.UNKNOWN_VERSION, LINUX_DEFAULT_HOME_PATH)
                     putIfDirectory(homePathByVersion, HomePath.UNKNOWN_VERSION, LINUX_MINT_HOME_PATH)
@@ -106,10 +108,10 @@ class Type : SdkType("Erlang SDK for Elixir SDK") {
 
     override fun isRootTypeApplicable(type: OrderRootType): Boolean =
         type == OrderRootType.CLASSES ||
-            type == OrderRootType.SOURCES ||
-            type ==
-            org.elixir_lang.sdk.Type
-                .documentationRootType()
+                type == OrderRootType.SOURCES ||
+                type ==
+                org.elixir_lang.sdk.Type
+                    .documentationRootType()
 
     override fun setupSdkPaths(sdk: Sdk) {
         val sdkModificator = sdk.sdkModificator
