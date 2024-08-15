@@ -29,7 +29,7 @@ class Provider : EditorNotificationProvider {
         project: Project,
         file: VirtualFile,
     ): Function<in FileEditor, out JComponent?> =
-        Function { fileEditor ->
+        Function {
             kotlinx.coroutines.runBlocking {
                 createNotificationPanel(file, project)
             }
@@ -60,91 +60,89 @@ class Provider : EditorNotificationProvider {
             }
         }
 
-    companion object {
-        fun showFacetSettings(project: Project) {
-            if (ProcessOutput.isSmallIde) {
-                showSmallIDEFacetSettings(project)
-            }
-            // TODO Elixir Facet in non-Elixir module in IntelliJ
+}
+
+fun showFacetSettings(project: Project) {
+    if (ProcessOutput.isSmallIde) {
+        showSmallIDEFacetSettings(project)
+    }
+    // TODO Elixir Facet in non-Elixir module in IntelliJ
+}
+
+fun showModuleSettings(
+    project: Project,
+    module: Module,
+) {
+    ProjectSettingsService.getInstance(project).openModuleSettings(module)
+}
+
+private fun showProjectSettings(project: Project) {
+    SdkPopupFactory.newBuilder()
+        .withProject(project)
+        .withSdkType(Type.instance)
+        .updateProjectSdkFromSelection()
+        .buildPopup()
+        .showInFocusCenter()
+}
+
+private fun showSmallIDEFacetSettings(project: Project) {
+    ShowSettingsUtilImpl.showSettingsDialog(project, "language", "Elixir")
+}
+
+private fun createSmallIDEFacetPanel(project: Project): EditorNotificationPanel =
+    EditorNotificationPanel().apply {
+        text = "Elixir Facet SDK is not defined"
+        @Suppress("DialogTitleCapitalization")
+        createActionLabel("Setup Elixir Facet SDK") {
+            showSmallIDEFacetSettings(project)
         }
+    }
 
-        fun showModuleSettings(
-            project: Project,
-            module: Module,
-        ) {
-            ProjectSettingsService.getInstance(project).openModuleSettings(module)
+private fun createFacetPanel(project: Project): EditorNotificationPanel? =
+    if (ProcessOutput.isSmallIde) {
+        createSmallIDEFacetPanel(project)
+    } else {
+        // TODO Elixir Facet in non-Elixir module in IntelliJ
+        null
+    }
+
+private fun createModulePanel(
+    project: Project,
+    module: Module,
+): EditorNotificationPanel =
+    EditorNotificationPanel().apply {
+        text = "Elixir Module SDK is not defined"
+        @Suppress("DialogTitleCapitalization")
+        createActionLabel("Setup Elixir Module SDK") {
+            showModuleSettings(project, module)
         }
+    }
 
-        private fun showProjectSettings(project: Project) {
-            SdkPopupFactory
-                .newBuilder()
-                .withProject(project)
-                .withSdkType(Type.instance)
-                .updateProjectSdkFromSelection()
-                .buildPopup()
-                .showInFocusCenter()
-        }
+private fun createPanel(
+    project: Project,
+    psiFile: PsiFile,
+): EditorNotificationPanel? {
+    val module = ModuleUtilCore.findModuleForPsiElement(psiFile)
 
-        private fun showSmallIDEFacetSettings(project: Project) {
-            ShowSettingsUtilImpl.showSettingsDialog(project, "language", "Elixir")
-        }
-
-        private fun createSmallIDEFacetPanel(project: Project): EditorNotificationPanel =
-            EditorNotificationPanel().apply {
-                text = "Elixir Facet SDK is not defined"
-                @Suppress("DialogTitleCapitalization")
-                createActionLabel("Setup Elixir Facet SDK") {
-                    showSmallIDEFacetSettings(project)
-                }
-            }
-
-        private fun createFacetPanel(project: Project): EditorNotificationPanel? =
-            if (ProcessOutput.isSmallIde) {
-                createSmallIDEFacetPanel(project)
+    return when {
+        module != null -> {
+            // CANNOT use ModuleType.is(module, ElixirModuleType.getInstance()) as ElixirModuleType depends on
+            // JavaModuleBuilder and so only available in IntelliJ
+            if (ModuleType.get(module).id == "ELIXIR_MODULE") {
+                createModulePanel(project, module)
             } else {
-                // TODO Elixir Facet in non-Elixir module in IntelliJ
-                null
-            }
-
-        private fun createModulePanel(
-            project: Project,
-            module: Module,
-        ): EditorNotificationPanel =
-            EditorNotificationPanel().apply {
-                text = "Elixir Module SDK is not defined"
-                @Suppress("DialogTitleCapitalization")
-                createActionLabel("Setup Elixir Module SDK") {
-                    showModuleSettings(project, module)
-                }
-            }
-
-        private fun createPanel(
-            project: Project,
-            psiFile: PsiFile,
-        ): EditorNotificationPanel? {
-            val module = ModuleUtilCore.findModuleForPsiElement(psiFile)
-
-            return when {
-                module != null -> {
-                    // CANNOT use ModuleType.is(module, ElixirModuleType.getInstance()) as ElixirModuleType depends on
-                    // JavaModuleBuilder and so only available in IntelliJ
-                    if (ModuleType.get(module).id == "ELIXIR_MODULE") {
-                        createModulePanel(project, module)
-                    } else {
-                        createFacetPanel(project)
-                    }
-                }
-                ProcessOutput.isSmallIde -> createSmallIDEFacetPanel(project)
-                else -> createProjectPanel(project)
+                createFacetPanel(project)
             }
         }
-
-        private fun createProjectPanel(project: Project): EditorNotificationPanel =
-            EditorNotificationPanel().apply {
-                text = "Project SDK is not defined"
-                createActionLabel(ProjectBundle.message("project.sdk.setup")) {
-                    showProjectSettings(project)
-                }
-            }
+        ProcessOutput.isSmallIde -> createSmallIDEFacetPanel(project)
+        else -> createProjectPanel(project)
     }
 }
+
+private fun createProjectPanel(project: Project): EditorNotificationPanel =
+    EditorNotificationPanel().apply {
+        text = "Project SDK is not defined"
+        createActionLabel(ProjectBundle.message("project.sdk.setup")) {
+            showProjectSettings(project)
+        }
+    }

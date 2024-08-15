@@ -12,8 +12,10 @@ class Release private constructor(
 ) : Comparable<Release> {
 
     companion object {
-        @JvmField val V_1_0_4 = Release("1", "0", "4", null, null)
-        @JvmField val LATEST = Release("1", "6", "0", "dev", null)
+        @JvmField
+        val V_1_0_4 = Release("1", "0", "4", null, null)
+        @JvmField
+        val LATEST = Release("1", "6", "0", "dev", null)
 
         private val VERSION_PATTERN = Pattern.compile(
             "(\\d+)(?:\\.(\\d+))?(?:\\.(\\d+))?(?:\\-([\\d\\w\\.\\-]+))?(?:\\+([\\d\\w\\-]+))?"

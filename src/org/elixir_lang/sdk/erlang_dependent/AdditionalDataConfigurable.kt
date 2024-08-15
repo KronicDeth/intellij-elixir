@@ -6,7 +6,6 @@ import com.intellij.openapi.projectRoots.AdditionalDataConfigurable
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.projectRoots.SdkModel
 import com.intellij.openapi.projectRoots.SdkModificator
-import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl
 import com.intellij.openapi.ui.ComboBox
 import com.intellij.openapi.util.Comparing
 import com.intellij.ui.SimpleListCellRenderer
@@ -190,7 +189,11 @@ class AdditionalDataConfigurable(
             )
         sdkModificator.sdkAdditionalData = sdkAdditionData
         ApplicationManager.getApplication().runWriteAction { sdkModificator.commitChanges() }
-        (elixirSdk as ProjectJdkImpl).resetVersionString()
+
+        // reset the version string to force the sdk to be reloaded
+        // @todo is this necessary?
+        this.sdkModificator.versionString = null
+        this.sdkModificator.commitChanges()
     }
 
     override fun reset() {
