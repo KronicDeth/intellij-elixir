@@ -1,5 +1,5 @@
-import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
+import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 
 plugins {
     id "org.jetbrains.intellij.platform" version "2.0.0"
@@ -154,24 +154,17 @@ test {
 }
 
 intellijPlatformTesting {
-    def platforms = [
-            "IntellijIdeaCommunity",
-            "IntellijIdeaUltimate",
-            "RubyMine",
-            "RustRover",
-            "PyCharmCommunity",
-            "PyCharmProfessional",
-            "WebStorm"
-    ]
+    // Get the list of platforms from gradle.properties
+    def platformsList = providers.gradleProperty("platformsList").get().split(",")
 
     // Use providers.gradleProperty to get the 'runIdePlugins' property
     def runIdePluginsProperty = providers.gradleProperty("runIdePlugins").getOrElse("")
     def runIdePluginsList = runIdePluginsProperty.split(",")
 
-    platforms.each { platform ->
+    platformsList.each { platform ->
         runIde.create("run${platform}") {
             type = IntelliJPlatformType."${platform}"
-            version = providers.gradleProperty("platformVersion")
+            version = providers.gradleProperty("platformVersion${platform}").get()
             prepareSandboxTask {
                 sandboxDirectory = project.layout.buildDirectory.dir("${platform.toLowerCase()}-sandbox")
             }
