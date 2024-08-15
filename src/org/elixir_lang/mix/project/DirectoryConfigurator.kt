@@ -5,6 +5,7 @@ import com.intellij.facet.FacetManager
 import com.intellij.facet.FacetType
 import com.intellij.facet.impl.FacetUtil.addFacet
 import com.intellij.ide.impl.OpenProjectTask
+import com.intellij.openapi.application.EDT
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.progress.ProgressIndicator
@@ -19,8 +20,10 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.platform.PlatformProjectOpenProcessor.Companion.runDirectoryProjectConfigurators
 import com.intellij.projectImport.ProjectAttachProcessor
 import com.intellij.util.PlatformUtils
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import org.elixir_lang.DepsWatcher
 import org.elixir_lang.Facet
 import org.elixir_lang.mix.Project.addFolders
@@ -28,6 +31,9 @@ import org.elixir_lang.mix.Watcher
 import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.io.path.exists
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.invokeLater
+import com.intellij.platform.PlatformProjectOpenProcessor
 
 /**
  * Used in Small IDEs like Rubymine that don't support [OpenProcessor].
@@ -51,10 +57,8 @@ class DirectoryConfigurator : com.intellij.platform.DirectoryProjectConfigurator
             if (otpApp.root == baseDir) {
                 configureRootOtpApp(project, otpApp)
             } else {
-                runBlocking {
-                    launch(coroutineContext) {
-                        configureDescendantOtpApp(project, otpApp)
-                    }
+                ApplicationManager.getApplication().executeOnPooledThread {
+                    configureDescendantOtpApp(project, otpApp)
                 }
             }
         }
@@ -79,59 +83,38 @@ class DirectoryConfigurator : com.intellij.platform.DirectoryProjectConfigurator
         }
     }
 
-    private suspend fun configureDescendantOtpApp(rootProject: Project, otpApp: OtpApp) {
+    private fun configureDescendantOtpApp(rootProject: Project, otpApp: OtpApp) {
         if (!PlatformUtils.isGoIde() && ProjectAttachProcessor.canAttachToProject()) {
-            newProject(otpApp)?.let { otpAppProject ->
-                attachToProject(rootProject, Paths.get(otpApp.root.path))
-
-                ProgressManager.getInstance().run(object : Task.Modal(
-                    otpAppProject,
-                    "Scanning mix.exs to connect libraries for newly attached project for OTP app ${otpApp.name}",
-                    true
-                ) {
-                    override fun run(progressIndicator: ProgressIndicator) {
-                        for (module in ModuleManager.getInstance(otpAppProject).modules) {
-                            if (progressIndicator.isCanceled) {
-                                break
-                            }
-
-                            Watcher(otpAppProject).syncLibraries(module, progressIndicator)
-                        }
-                    }
-                })
-            }
-        }
-    }
-
-    /**
-     * @return Only returns a project if it is new.
-     */
-    private suspend fun newProject(otpApp: OtpApp): Project? {
-        val projectDir = Paths.get(FileUtil.toSystemDependentName(otpApp.root.path), Project.DIRECTORY_STORE_FOLDER)
-
-        return if (projectDir.exists()) {
-            null
-        } else {
-            val path = otpApp.root.path.let { Paths.get(it) }
+            val path = Paths.get(otpApp.root.path)
             val openProjectTask = OpenProjectTask {
                 isNewProject = true
                 useDefaultProjectAsTemplate = false
                 projectName = otpApp.name
+                runConfigurators = true
             }
 
-            ProjectManagerEx
-                .getInstanceEx()
-                .newProject(
-                    path,
-                    openProjectTask
-                )
-                ?.let { project ->
-                    runDirectoryProjectConfigurators(path, project, false)
+            val otpAppProject = ProjectManagerEx.getInstanceEx().openProject(path, openProjectTask)
+            if (otpAppProject != null) {
+                ApplicationManager.getApplication().invokeLater {
+                    PlatformProjectOpenProcessor.attachToProject(rootProject, path, null)
 
-                    StoreUtil.saveSettings(project, true)
+                    ProgressManager.getInstance().run(object : Task.Modal(
+                        otpAppProject,
+                        "Scanning mix.exs to connect libraries for newly attached project for OTP app ${otpApp.name}",
+                        true
+                    ) {
+                        override fun run(progressIndicator: ProgressIndicator) {
+                            for (module in ModuleManager.getInstance(otpAppProject).modules) {
+                                if (progressIndicator.isCanceled) {
+                                    break
+                                }
 
-                    project
+                                Watcher(otpAppProject).syncLibraries(module, progressIndicator)
+                            }
+                        }
+                    })
                 }
+            }
         }
     }
 
