@@ -1,5 +1,6 @@
 import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
+import org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask
 
 plugins {
     id "org.jetbrains.intellij.platform" version "2.0.1"
@@ -124,6 +125,22 @@ intellijPlatform {
     }
 }
 apply plugin: "kotlin"
+
+tasks.withType(RunIdeTask) {
+    // Set JVM arguments
+    jvmArguments.addAll(["-Didea.debug.mode=true", "-Didea.is.internal=true", "-Dlog4j2.debug=true", "-Dlogger.org=TRACE", "-XX:+AllowEnhancedClassRedefinition"])
+
+    // Set system properties to debug log
+    systemProperty "idea.log.debug.categories", "org.elixir_lang"
+
+    // Set the maximum heap size
+    maxHeapSize = "7g"
+
+    // Optionally set the working directory if specified in the project properties
+    if (project.hasProperty("runIdeWorkingDirectory") && !project.property("runIdeWorkingDirectory").isEmpty()) {
+        workingDir = file(project.property("runIdeWorkingDirectory"))
+    }
+}
 
 //noinspection GroovyAssignabilityCheck,GrUnresolvedAccess
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {

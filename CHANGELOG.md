@@ -9,6 +9,9 @@
 * [#3640](https://github.com/KronicDeth/intellij-elixir/pull/3640) - [@joshuataylor](https://github.com/joshuataylor)
   * Bump intellij platform gradle to 2.0.1 and IdeaVIM to 2.16.0
 
+* [#3643](https://github.com/KronicDeth/intellij-elixir/pull/3643) - [@joshuataylor](https://github.com/joshuataylor)
+  * Fix RubyMine freezing for umbrella projects but showing the new project wizard as a temporary workaround. 
+
 ## v19.0.0
 
 ### Breaking changes
