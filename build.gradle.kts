@@ -135,7 +135,7 @@ tasks.test {
     environment("ELIXIR_LANG_ELIXIR_PATH", elixirPath)
     environment("ELIXIR_EBIN_DIRECTORY", "$elixirPath/lib/elixir/ebin/")
     environment("ELIXIR_VERSION", elixirVersion)
-    setScanForTestClasses(false)
+    isScanForTestClasses = false
     include("**/Issue*.class")
     include("**/*Test.class")
     include("**/*TestCase.class")
@@ -208,7 +208,7 @@ dependencies {
     implementation(project(":jps-builder"))
     implementation(project(":jps-shared"))
     implementation(files("lib/OtpErlang.jar"))
-    implementation("commons-io:commons-io:2.5")
+    implementation("commons-io:commons-io:2.16.1")
 
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.opentest4j:opentest4j:1.3.0")
