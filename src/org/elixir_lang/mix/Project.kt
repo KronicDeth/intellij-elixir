@@ -1,6 +1,7 @@
 package org.elixir_lang.mix
 
 import com.intellij.openapi.application.runWriteAction
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.module.ModifiableModuleModel
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.progress.ProgressIndicator
@@ -20,6 +21,8 @@ import java.io.EOFException
 import java.io.File
 
 object Project {
+    private val LOG = Logger.getInstance(Project::class.java)
+
     fun addSourceDirToContent(
         content: ContentEntry,
         root: VirtualFile,
@@ -41,6 +44,7 @@ object Project {
 
         VfsUtilCore.visitChildrenRecursively(root, object : VirtualFileVisitor<Any>() {
             override fun visitFile(file: VirtualFile): Boolean {
+                LOG.debug("visiting $file")
                 indicator.checkCanceled()
 
                 if (file.isDirectory) {
