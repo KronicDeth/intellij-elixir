@@ -3,6 +3,7 @@ import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 import org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask
 import java.text.SimpleDateFormat
 import java.util.*
+import de.undercouch.gradle.tasks.download.Download
 
 plugins {
     id("org.jetbrains.intellij.platform") version "2.0.1"
@@ -178,6 +179,12 @@ intellijPlatformTesting {
     }
 }
 
+tasks.register<Download>("downloadElixir") {
+    src("https://github.com/elixir-lang/elixir/archive/v${project.properties["elixirVersion"]}.zip")
+    dest("${rootDir}/cache/Elixir.${project.properties["elixirVersion"]}.zip")
+    overwrite(false)
+}
+
 tasks.register<Test>("testCompilation") {
     group = "Verification"
     dependsOn("classes", "testClasses")
@@ -242,6 +249,7 @@ idea {
 }
 
 tasks.register("getElixir") {
+    dependsOn("downloadElixir")
     doLast {
         val folder = File(elixirPath)
 
@@ -376,5 +384,10 @@ tasks {
         ) {
             workingDir = project.property("runIdeWorkingDirectory")?.let { file(it) }!!
         }
+    }
+
+    compileKotlin {
+        kotlinOptions.jvmTarget = providers.gradleProperty("javaVersion").get()
+        kotlinOptions.freeCompilerArgs = listOf("-Xjvm-default=all")
     }
 }
