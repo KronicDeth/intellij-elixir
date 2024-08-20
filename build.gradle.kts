@@ -1,7 +1,8 @@
 import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
+import org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask
 import java.text.SimpleDateFormat
-import java.util.Date
+import java.util.*
 
 plugins {
     id("org.jetbrains.intellij.platform") version "2.0.1"
@@ -148,8 +149,10 @@ tasks.test {
 }
 
 intellijPlatformTesting {
+    // Get the list of platforms from gradle.properties
     val platformsList = providers.gradleProperty("platformsList").get().split(",")
 
+    // Use providers.gradleProperty to get the 'runIdePlugins' property
     val runIdePluginsProperty = providers.gradleProperty("runIdePlugins").getOrElse("")
     val runIdePluginsList = runIdePluginsProperty.split(",")
 
@@ -161,7 +164,10 @@ intellijPlatformTesting {
                 sandboxDirectory = project.layout.buildDirectory.dir("${platform.lowercase()}-sandbox")
             }
 
+            // if runIdePluginsList is not empty, set the plugins
             if (runIdePluginsList.isNotEmpty()) {
+                // Apply each plugin from the 'runIdePluginsList'
+                // @todo can we move this to the runIde task?
                 plugins {
                     runIdePluginsList.forEach { plugin ->
                         plugins(plugin.trim())
@@ -227,7 +233,8 @@ apply(plugin = "idea")
 idea {
     project {
         jdkName = providers.gradleProperty("javaVersion").get()
-        languageLevel = providers.gradleProperty("javaVersion").get().let { org.gradle.plugins.ide.idea.model.IdeaLanguageLevel(it) }
+        languageLevel = providers.gradleProperty("javaVersion").get()
+            .let { org.gradle.plugins.ide.idea.model.IdeaLanguageLevel(it) }
     }
     module {
         generatedSourceDirs.add(file("gen"))
@@ -332,22 +339,6 @@ tasks.register<Exec>("stopQuoter") {
     args("stop")
 }
 
-tasks.named<JavaExec>("runIde") {
-    systemProperty("idea.log.debug.categories", "org.elixir_lang=TRACE")
-    jvmArgs(
-        "-Didea.debug.mode=true",
-        "-XX:+AllowEnhancedClassRedefinition",
-        "-Didea.is.internal=true",
-        "-Dlog4j2.debug=true",
-        "-Dlogger.org=TRACE",
-        "-Didea.ProcessCanceledException=disabled"
-    )
-    maxHeapSize = "7g"
-    if (project.hasProperty("runIdeWorkingDirectory") && project.property("runIdeWorkingDirectory").toString().isNotEmpty()) {
-        workingDir = project.property("runIdeWorkingDirectory")?.let { file(it) }!!
-    }
-}
-
 tasks.test {
     dependsOn("runQuoter")
     finalizedBy("stopQuoter")
@@ -363,5 +354,27 @@ idea {
     }
     module {
         generatedSourceDirs.add(file("gen"))
+    }
+}
+
+tasks {
+    withType<RunIdeTask> {
+        jvmArgumentProviders += CommandLineArgumentProvider {
+            listOf(
+                "-Didea.debug.mode=true",
+                "-XX:+AllowEnhancedClassRedefinition",
+                "-Didea.is.internal=true",
+                "-Dlog4j2.debug=true",
+                "-Dlogger.org.elixir_lang=TRACE",
+                "-Didea.ProcessCanceledException=disabled"
+            )
+        }
+        systemProperty("idea.log.debug.categories", "org.elixir_lang=TRACE")
+        maxHeapSize = "7g"
+        if (project.hasProperty("runIdeWorkingDirectory") && project.property("runIdeWorkingDirectory").toString()
+                .isNotEmpty()
+        ) {
+            workingDir = project.property("runIdeWorkingDirectory")?.let { file(it) }!!
+        }
     }
 }
