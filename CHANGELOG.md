@@ -1,5 +1,14 @@
 # Changelog
 
+## v19.0.1
+
+### Enhancements
+* [#3639](https://github.com/KronicDeth/intellij-elixir/pull/3639) - [@joshuataylor](https://github.com/joshuataylor)
+  * Support JetBrains Exception Analyzer
+
+* [#3640](https://github.com/KronicDeth/intellij-elixir/pull/3640) - [@joshuataylor](https://github.com/joshuataylor)
+  * Bump intellij platform gradle to 2.0.1 and IdeaVIM to 2.16.0
+
 ## v19.0.0
 
 ### Breaking changes
