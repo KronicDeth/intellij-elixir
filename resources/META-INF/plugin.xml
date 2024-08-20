@@ -22,7 +22,8 @@
     </extensions>
 
     <extensions defaultExtensionNs="com.intellij">
-        <errorHandler implementation="org.elixir_lang.errorreport.Submitter"/>
+<!--        <errorHandler implementation="org.elixir_lang.errorreport.Submitter"/>-->
+        <errorHandler implementation="com.intellij.diagnostic.JetBrainsMarketplaceErrorReportSubmitter"/>
 
         <!-- `openProjectProcessor` for Small IDEs -->
         <directoryProjectConfigurator implementation="org.elixir_lang.mix.project.DirectoryConfigurator"/>
