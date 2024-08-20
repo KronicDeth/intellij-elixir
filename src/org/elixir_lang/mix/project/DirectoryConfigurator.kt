@@ -5,6 +5,8 @@ import com.intellij.facet.FacetManager
 import com.intellij.facet.FacetType
 import com.intellij.facet.impl.FacetUtil.addFacet
 import com.intellij.ide.impl.OpenProjectTask
+import com.intellij.notification.NotificationGroupManager
+import com.intellij.notification.NotificationType
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
@@ -14,6 +16,9 @@ import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ex.ProjectManagerEx
 import com.intellij.openapi.roots.ModuleRootModificationUtil
+import com.intellij.openapi.roots.ProjectRootManager
+import com.intellij.openapi.roots.ui.configuration.ProjectStructureConfigurable
+import com.intellij.openapi.roots.ui.configuration.projectRoot.ProjectSdksModel
 import com.intellij.openapi.util.Ref
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vfs.VirtualFile
@@ -31,6 +36,7 @@ import org.elixir_lang.mix.Watcher
 import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.io.path.exists
+import org.elixir_lang.sdk.elixir.Type
 
 /**
  * Used in Small IDEs like Rubymine that don't support [OpenProcessor].
@@ -55,6 +61,22 @@ class DirectoryConfigurator : com.intellij.platform.DirectoryProjectConfigurator
             }
         })
 
+        // If this is an umbrella app, RubyMine currently freezes.
+        // Instead, let's just show a notification that the user needs to use the Wizard.
+        if (!isProjectCreatedWithWizard && foundOtpApps.isNotEmpty() && foundOtpApps.size > 1) {
+            LOG.info("not configuring project $project because it is an umbrella app")
+            NotificationGroupManager.getInstance()
+                .getNotificationGroup("Elixir")
+                .createNotification(
+                    "Umbrella App Detected",
+                    "Elixir Umbrella app detected, please use the Project Wizard to properly configure it when using an IDE like RubyMine.",
+                    NotificationType.WARNING
+                )
+                .notify(project)
+
+            return
+        }
+
         for (otpApp in foundOtpApps) {
             LOG.debug("configuring descendant otp app: ${otpApp.name}")
             if (otpApp.root == baseDir) {
@@ -63,15 +85,13 @@ class DirectoryConfigurator : com.intellij.platform.DirectoryProjectConfigurator
             } else {
                 runBlocking {
                     try {
-                        withTimeout(1000L) {
-                            launch(coroutineContext) {
-                                LOG.debug("Not otp app root: ${otpApp.name}, configuring descendant otp app.")
-                                configureDescendantOtpApp(project, otpApp)
-                            }
+                        withTimeout(2000L) {
+                            LOG.debug("Not otp app root: ${otpApp.name}, configuring descendant otp app.")
+                            configureDescendantOtpApp(project, otpApp)
                         }
                     } catch (e: TimeoutCancellationException) {
                         // Handle the timeout exception, e.g., log a warning or notify the user
-                        LOG.error(e)
+                        LOG.error("Timeout while configuring descendant OTP app: ${otpApp.name}", e)
                     }
                 }
             }
