@@ -121,7 +121,6 @@ intellijPlatform {
     pluginVerification {
         ides {
             ide(IntelliJPlatformType.IntellijIdeaCommunity, "2024.2.0.1")
-            ide(IntelliJPlatformType.RubyMine, "2024.2")
         }
     }
 }
