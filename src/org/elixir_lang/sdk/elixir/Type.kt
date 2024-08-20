@@ -45,6 +45,8 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.*
 import javax.swing.Icon
+import kotlin.Comparator
+import kotlin.collections.ArrayList
 
 class Type : org.elixir_lang.sdk.erlang_dependent.Type(SerializerExtension.ELIXIR_SDK_TYPE_ID) {
     /**
@@ -99,8 +101,7 @@ class Type : org.elixir_lang.sdk.erlang_dependent.Type(SerializerExtension.ELIXI
 
     override fun getPresentableName(): String = "Elixir SDK"
 
-    override fun getVersionString(sdkHome: String): String =
-        Release.fromString(File(sdkHome).name)?.version() ?: "Unknown"
+    override fun getVersionString(sdkHome: String): String = Release.fromString(File(sdkHome).name)?.version() ?: "Unknown"
 
     /**
      * Map of home paths to versions in descending version order so that newer versions are favored.
@@ -147,8 +148,7 @@ class Type : org.elixir_lang.sdk.erlang_dependent.Type(SerializerExtension.ELIXI
         return homePathByVersion
     }
 
-    private fun invalidSdkHomeException(virtualFile: VirtualFile): Exception =
-        Exception(invalidSdkHomeMessage(virtualFile))
+    private fun invalidSdkHomeException(virtualFile: VirtualFile): Exception = Exception(invalidSdkHomeMessage(virtualFile))
 
     private fun invalidSdkHomeMessage(virtualFile: VirtualFile): String =
         if (virtualFile.isDirectory) {
@@ -178,10 +178,10 @@ ELIXIR_SDK_HOME
         val iex = Elixir.getIExExecutable(path)
         val mix = Elixir.mixFile(path)
         return elixir.canExecute() &&
-                elixirc.canExecute() &&
-                iex.canExecute() &&
-                mix.canRead() &&
-                HomePath.hasEbinPath(path)
+            elixirc.canExecute() &&
+            iex.canExecute() &&
+            mix.canRead() &&
+            HomePath.hasEbinPath(path)
     }
 
     override fun setupSdkPaths(sdk: Sdk) {
@@ -218,8 +218,7 @@ ELIXIR_SDK_HOME
     override fun createAdditionalDataConfigurable(
         sdkModel: SdkModel,
         sdkModificator: SdkModificator,
-    ): com.intellij.openapi.projectRoots.AdditionalDataConfigurable =
-        AdditionalDataConfigurable(sdkModel, sdkModificator)
+    ): com.intellij.openapi.projectRoots.AdditionalDataConfigurable = AdditionalDataConfigurable(sdkModel, sdkModificator)
 
     override fun saveAdditionalData(
         additionalData: com.intellij.openapi.projectRoots.SdkAdditionalData,
@@ -396,12 +395,7 @@ ELIXIR_SDK_HOME
                     val configuredRoots = elixirSdkModificator.getRoots(type)
                     for (internalRoot in internalRoots) {
                         for (expandedInternalRoot in expandInternalErlangSdkRoot(internalRoot, type)) {
-                            sdkModificatorRootTypeConsumer(
-                                elixirSdkModificator,
-                                configuredRoots,
-                                expandedInternalRoot,
-                                type
-                            )
+                            sdkModificatorRootTypeConsumer(elixirSdkModificator, configuredRoots, expandedInternalRoot, type)
                         }
                     }
                 }
@@ -498,8 +492,8 @@ ELIXIR_SDK_HOME
         @JvmStatic
         fun erlangSdkType(): SdkType =
             if (ProcessOutput.isSmallIde) {
-                /* intellij-erlang's "Erlang SDK" does not work in small IDEs because it uses JavadocRoot for documentation,
-                   which isn't available in Small IDEs. */
+            /* intellij-erlang's "Erlang SDK" does not work in small IDEs because it uses JavadocRoot for documentation,
+               which isn't available in Small IDEs. */
                 null
             } else {
                 EP_NAME.extensionList.find { sdkType -> sdkType.name == "Erlang SDK" }
