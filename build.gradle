@@ -120,7 +120,7 @@ intellijPlatform {
     }
     pluginVerification {
         ides {
-            ide(IntelliJPlatformType.IntellijIdeaCommunity, "2024.2.0.1")
+            ide(IntelliJPlatformType.IntellijIdeaCommunity, "243.12818.47")
         }
     }
 }
