@@ -1,5 +1,11 @@
 # Changelog
 
+## v20.0.0
+
+### Enhancements
+* [#3651](https://github.com/KronicDeth/intellij-elixir/pull/3651) - [@joshuataylor](https://github.com/joshuataylor)
+  * Support Jetbrains 2024.3 (243.21565.193)
+
 ## v19.0.1
 
 ### Enhancements
