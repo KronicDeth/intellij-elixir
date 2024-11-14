@@ -142,8 +142,12 @@ tasks.withType(RunIdeTask) {
     }
 }
 
+kotlin {
+    jvmToolchain(21)
+}
+
 //noinspection GroovyAssignabilityCheck,GrUnresolvedAccess
-tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
     //noinspection GrUnresolvedAccess
     kotlinOptions {
         apiVersion = "1.7"
