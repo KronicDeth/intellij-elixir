@@ -1,5 +1,11 @@
 # Changelog
 
+## v20.0.1
+
+### Bug Fixes
+* [#3651](https://github.com/KronicDeth/intellij-elixir/pull/3667) - [@joshuataylor](https://github.com/joshuataylor)
+  * Support Webstorm 2024.3 (243.21565.180). Thanks to [@Kae-Tempest](https://github.com/Kae-Tempest) for the report!
+
 ## v20.0.0
 
 ### Enhancements
