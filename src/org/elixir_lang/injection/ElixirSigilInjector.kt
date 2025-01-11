@@ -1,19 +1,18 @@
 package org.elixir_lang.injection
 
-import com.intellij.formatting.InjectedFormattingOptionsProvider
 import com.intellij.lang.Language
 import com.intellij.lang.html.HTMLLanguage
 import com.intellij.lang.injection.MultiHostInjector
 import com.intellij.lang.injection.MultiHostRegistrar
+import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiFile
 import org.elixir_lang.psi.SigilHeredoc
 import org.elixir_lang.psi.SigilLine
 import java.util.regex.Pattern
 import org.elixir_lang.eex.Language as EexLanguage
 
-class ElixirSigilInjector : MultiHostInjector, InjectedFormattingOptionsProvider {
+class ElixirSigilInjector : MultiHostInjector {
     override fun getLanguagesToInject(registrar: MultiHostRegistrar, context: PsiElement) {
         when (context) {
             is SigilLine -> handleSigilLine(registrar, context)
@@ -28,9 +27,11 @@ class ElixirSigilInjector : MultiHostInjector, InjectedFormattingOptionsProvider
         sigilLine.body?.let { lineBody ->
             val lang = languageForSigil(sigilLine.sigilName())
             if (lang != null) {
-                registrar.startInjecting(lang)
-                registrar.addPlace(null, null, sigilLine, lineBody.textRangeInParent)
-                registrar.doneInjecting()
+                this.thisLogger().info("handleSigilLine - lineBody.textRangeInParent: ${lineBody.textRangeInParent}")
+                registrar
+                    .startInjecting(lang)
+                    .addPlace(null, null, sigilLine, lineBody.textRangeInParent)
+                    .doneInjecting()
             }
         }
     }
@@ -137,8 +138,6 @@ class ElixirSigilInjector : MultiHostInjector, InjectedFormattingOptionsProvider
             else -> null
         }
     }
-
-    override fun shouldDelegateToTopLevel(file: PsiFile) = true
 
     companion object {
         private const val CODE_BLOCK_INDENT = "    "

@@ -10,8 +10,11 @@
          on how to target different products -->
     <depends>com.intellij.modules.lang</depends>
     <depends>org.intellij.plugins.markdown</depends>
-    <depends>org.intellij.intelliLang</depends>
+
+    <!-- optional modules -->
+    <!-- See https://plugins.jetbrains.com/docs/intellij/plugin-dependencies.html#optional-plugin-dependencies for naming convention -->
     <depends config-file="rich-platform-plugin.xml" optional="true">com.intellij.modules.java</depends>
+    <depends config-file="optional/org.elixir_lang-withIntellijLang.xml" optional="true">org.intellij.intelliLang</depends>
 
     <extensionPoints>
         <extensionPoint qualifiedName="org.elixir_lang.packageManager" interface="org.elixir_lang.PackageManager"
@@ -273,15 +276,6 @@
 
         <multiHostInjector implementation="org.elixir_lang.injection.markdown.Injector"/>
 
-        <multiHostInjector
-                id="org.elixir_lang.injection.ElixirSigilInjector"
-                implementation="org.elixir_lang.injection.ElixirSigilInjector"/>
-
-        <formatting.injectedOptions
-			id="org.elixir_lang.injection.ElixirSigilInjector"
-			implementation="org.elixir_lang.injection.ElixirSigilInjector"
-		/>
-
         <!-- Dialyzer -->
         <globalInspection displayName="Dialyzer based inspections (Elixir)" shortName="Dialyzer"
                           enabledByDefault="true" groupName="Elixir"
@@ -291,11 +285,6 @@
                         serviceImplementation="org.elixir_lang.dialyzer.service.DialyzerServiceImpl"/>
         <projectConfigurable instance="org.elixir_lang.dialyzer.service.Configurable" groupId="Errors"
                              parentId="Errors"/>
-    </extensions>
-
-    <extensions defaultExtensionNs="org.intellij.intelliLang">
-        <languageSupport language="Elixir" implementation="org.elixir_lang.injection.ElixirSigilInjectionSupport"/>
-        <injectionConfig config="elixirInjections.xml"/>
     </extensions>
 
     <projectListeners>

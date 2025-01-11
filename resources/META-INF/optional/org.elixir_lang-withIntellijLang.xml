@@ -1,0 +1,18 @@
+<idea-plugin>
+    <extensions defaultExtensionNs="org.intellij.intelliLang">
+        <languageSupport implementation="org.elixir_lang.injection.ElixirSigilInjectionSupport"/>
+        <injectionConfig config="injection/elixirInjections.xml"/>
+    </extensions>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <multiHostInjector
+                id="org.elixir_lang.injection.ElixirSigilInjector"
+                implementation="org.elixir_lang.injection.ElixirSigilInjector"/>
+
+<!--        <formatting.injectedOptions-->
+<!--                id="org.elixir_lang.injection.ElixirSigilInjector"-->
+<!--                implementation="org.elixir_lang.injection.ElixirSigilInjector"-->
+<!--        />-->
+    </extensions>
+
+</idea-plugin>

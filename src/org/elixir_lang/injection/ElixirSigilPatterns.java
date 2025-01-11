@@ -1,9 +1,11 @@
 package org.elixir_lang.injection;
 
-import com.intellij.patterns.*;
-import org.elixir_lang.psi.Sigil;
+import com.intellij.patterns.ElementPattern;
+import com.intellij.patterns.PatternCondition;
+import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.ProcessingContext;
+import org.elixir_lang.psi.Sigil;
 import org.jetbrains.annotations.NotNull;
 
 public class ElixirSigilPatterns extends PlatformPatterns {
@@ -11,8 +13,9 @@ public class ElixirSigilPatterns extends PlatformPatterns {
         return psiElement().inside(psiElement(Sigil.class));
     }
 
+    @SuppressWarnings("unused")
     public static ElementPattern<?> sigilWithName(String name) {
-        return and(sigil(), psiElement().with(new ElixirSigilPatterns.SigilWithName(name))) ;
+        return and(sigil(), psiElement().with(new ElixirSigilPatterns.SigilWithName(name)));
     }
 
     public static class SigilWithName extends @NotNull PatternCondition<PsiElement> {
