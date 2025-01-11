@@ -1,152 +1,144 @@
 package org.elixir_lang.injection
 
+import com.intellij.formatting.InjectedFormattingOptionsProvider
 import com.intellij.lang.Language
+import com.intellij.lang.html.HTMLLanguage
 import com.intellij.lang.injection.MultiHostInjector
 import com.intellij.lang.injection.MultiHostRegistrar
-import com.intellij.lang.html.HTMLLanguage;
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
-import org.elixir_lang.eex.Language as EexLanguage;
-import org.elixir_lang.psi.*
+import com.intellij.psi.PsiFile
+import org.elixir_lang.psi.SigilHeredoc
+import org.elixir_lang.psi.SigilLine
 import java.util.regex.Pattern
+import org.elixir_lang.eex.Language as EexLanguage
 
-class ElixirSigilInjector : MultiHostInjector {
+class ElixirSigilInjector : MultiHostInjector, InjectedFormattingOptionsProvider {
     override fun getLanguagesToInject(registrar: MultiHostRegistrar, context: PsiElement) {
-        val sigilLine = context as? SigilLine
-        val sigilHeredoc = context as? SigilHeredoc
+        when (context) {
+            is SigilLine -> handleSigilLine(registrar, context)
+            is SigilHeredoc -> handleSigilHeredoc(registrar, context)
+            else -> return
+        }
+    }
 
-        if (sigilLine != null && sigilLine.isValidHost()) {
-            sigilLine.body?.let { lineBody ->
-                    val lang = languageForSigil(sigilLine.sigilName());
-                if (lang != null) {
-                    registrar.startInjecting(lang)
-                    registrar.addPlace(null, null, sigilLine, lineBody.textRangeInParent)
-                    registrar.doneInjecting()
-                }
+    private fun handleSigilLine(registrar: MultiHostRegistrar, sigilLine: SigilLine) {
+        if (!sigilLine.isValidHost) return
+
+        sigilLine.body?.let { lineBody ->
+            val lang = languageForSigil(sigilLine.sigilName())
+            if (lang != null) {
+                registrar.startInjecting(lang)
+                registrar.addPlace(null, null, sigilLine, lineBody.textRangeInParent)
+                registrar.doneInjecting()
             }
-        } else if (sigilHeredoc != null && sigilHeredoc.isValidHost()) {
-            val prefixLength = sigilHeredoc.heredocPrefix.textLength
-            val quoteOffset = sigilHeredoc.textOffset
-            var inCodeBlock = false
-            var listIndent = -1
-            var inException = false
+        }
+    }
 
-            for (line in sigilHeredoc.heredocLineList) {
-                val lineTextLength = line.textLength
-                val lineText = line.text
+    private fun handleSigilHeredoc(registrar: MultiHostRegistrar, sigilHeredoc: SigilHeredoc) {
+        if (!sigilHeredoc.isValidHost) return
 
-                // > to include newline
-                if (lineTextLength > prefixLength) {
-                    val lineMarkdownText = lineText.substring(prefixLength)
+        val lang = languageForSigil(sigilHeredoc.sigilName()) ?: return
 
-                    val lineOffset = line.textOffset
-                    val lineOffsetRelativeToQuote = lineOffset - quoteOffset
-                    val markdownOffsetRelativeToQuote = lineOffsetRelativeToQuote + prefixLength
+        // Find injectable content first
+        val injectableRanges = findInjectableRanges(sigilHeredoc)
+        if (injectableRanges.isEmpty()) return
 
-                    val listStartMatcher = LIST_START_PATTERN.matcher(lineMarkdownText)
+        // Only start injection if we have content to inject
+        registrar.startInjecting(lang)
+        for (range in injectableRanges) {
+            registrar.addPlace(null, null, sigilHeredoc, range)
+        }
+        registrar.doneInjecting()
+    }
 
-                    if (listStartMatcher.matches()) {
-                        listIndent = listStartMatcher.group("indent").length
+    private fun findInjectableRanges(sigilHeredoc: SigilHeredoc): List<TextRange> {
+        val ranges = mutableListOf<TextRange>()
+        val prefixLength = sigilHeredoc.heredocPrefix.textLength
+        val quoteOffset = sigilHeredoc.textOffset
+        var listIndent = -1
+        var inException = false
 
-                        if (inCodeBlock) {
-                            registrar.doneInjecting()
+        for (line in sigilHeredoc.heredocLineList) {
+            val lineTextLength = line.textLength
+            val lineText = line.text
 
-                            inCodeBlock = false
+            if (lineTextLength <= prefixLength) continue
+
+            val lineMarkdownText = lineText.substring(prefixLength)
+            val lineOffset = line.textOffset
+            val lineOffsetRelativeToQuote = lineOffset - quoteOffset
+            val markdownOffsetRelativeToQuote = lineOffsetRelativeToQuote + prefixLength
+
+            val listStartMatcher = LIST_START_PATTERN.matcher(lineMarkdownText)
+
+            when {
+                listStartMatcher.matches() -> {
+                    listIndent = listStartMatcher.group("indent").length
+                }
+
+                else -> {
+                    if (listIndent > 0) {
+                        val indentedMatcher = INDENTED_PATTERN.matcher(lineMarkdownText)
+                        if (indentedMatcher.matches() && indentedMatcher.group("indent").length < listIndent + 1) {
+                            listIndent = -1
                         }
-                    } else {
-                        if (listIndent > 0) {
-                            val indentedMatcher = INDENTED_PATTERN.matcher(lineMarkdownText)
+                    }
 
-                            if (indentedMatcher.matches() && indentedMatcher.group("indent").length < listIndent + 1) {
-                                listIndent = -1
-                            }
-                        }
+                    if (listIndent == -1 && lineMarkdownText.startsWith(CODE_BLOCK_INDENT)) {
+                        val lineCodeText = lineMarkdownText.substring(CODE_BLOCK_INDENT_LENGTH)
+                        val codeOffsetRelativeToQuote = markdownOffsetRelativeToQuote + CODE_BLOCK_INDENT_LENGTH
 
-                        if (listIndent == -1) {
-                            if (lineMarkdownText.startsWith(CODE_BLOCK_INDENT)) {
-                                val lineCodeText = lineMarkdownText.substring(CODE_BLOCK_INDENT_LENGTH)
-                                val codeOffsetRelativeToQuote = markdownOffsetRelativeToQuote + CODE_BLOCK_INDENT_LENGTH
-
-                                if (lineCodeText.startsWith(EXCEPTION_PREFIX)) {
-                                    inException = true
-                                } else if (lineCodeText.startsWith(DEBUG_PREFIX)) {
-                                    inException = false
-                                } else {
-                                    val (lineElixirText, elixirOffsetRelativeToQuote) = when {
-                                        lineCodeText.startsWith(IEX_PROMPT) -> {
-                                            inException = false
-
-                                            Pair(
-                                                    lineCodeText.substring(IEX_PROMPT_LENGTH),
-                                                    codeOffsetRelativeToQuote + IEX_PROMPT_LENGTH
-                                            )
-                                        }
-
-                                        lineCodeText.startsWith(IEX_CONTINUATION) -> {
-                                            inException = false
-
-                                            Pair(
-                                                    lineCodeText.substring(IEX_CONTINUATION_LENGTH),
-                                                    codeOffsetRelativeToQuote + IEX_CONTINUATION_LENGTH
-                                            )
-                                        }
-
-                                        else -> {
-                                            Pair(lineCodeText, codeOffsetRelativeToQuote)
-                                        }
+                        when {
+                            lineCodeText.startsWith(EXCEPTION_PREFIX) -> inException = true
+                            lineCodeText.startsWith(DEBUG_PREFIX) -> inException = false
+                            else -> {
+                                val (lineElixirText, elixirOffsetRelativeToQuote) = when {
+                                    lineCodeText.startsWith(IEX_PROMPT) -> {
+                                        inException = false
+                                        Pair<String, Int>(
+                                            lineCodeText.substring(IEX_PROMPT_LENGTH),
+                                            codeOffsetRelativeToQuote + IEX_PROMPT_LENGTH
+                                        )
                                     }
 
-                                    if (!inException) {
-                                        val textRangeInQuote =
-                                                TextRange.from(elixirOffsetRelativeToQuote, lineElixirText.length)
-
-                                        val lang = languageForSigil(sigilHeredoc.sigilName());
-                                        if (!inCodeBlock && lang != null) {
-                                            registrar.startInjecting(lang)
-
-                                            inCodeBlock = true
-                                        }
-
-                                        registrar.addPlace(null, null, sigilHeredoc, textRangeInQuote)
+                                    lineCodeText.startsWith(IEX_CONTINUATION) -> {
+                                        inException = false
+                                        Pair<String, Int>(
+                                            lineCodeText.substring(IEX_CONTINUATION_LENGTH),
+                                            codeOffsetRelativeToQuote + IEX_CONTINUATION_LENGTH
+                                        )
                                     }
+
+                                    else -> Pair(lineCodeText, codeOffsetRelativeToQuote)
                                 }
-                            } else if (lineMarkdownText.isNotBlank()) {
-                                if (inCodeBlock) {
-                                    registrar.doneInjecting()
 
-                                    inCodeBlock = false
-                                    inException = false
+                                if (!inException) {
+                                    ranges.add(TextRange.from(elixirOffsetRelativeToQuote, lineElixirText.length))
                                 }
                             }
                         }
                     }
                 }
             }
-
-            if (inCodeBlock) {
-                registrar.doneInjecting()
-            }
-
-        } else {
-            for (child in context.children) {
-                getLanguagesToInject(registrar, child)
-            }
         }
+
+        return ranges
     }
 
     override fun elementsToInjectIn(): List<Class<out PsiElement>> {
-        return listOf(PsiElement::class.java)
+        return listOf(SigilLine::class.java, SigilHeredoc::class.java)
     }
 
-    fun languageForSigil(sigilName: Char): Language? {
-    if (sigilName == 'H') {
-        return HTMLLanguage.INSTANCE
-    } else if (sigilName == 'L') {
-        return EexLanguage.INSTANCE
+    private fun languageForSigil(sigilName: Char): Language? {
+        return when (sigilName) {
+            'H' -> HTMLLanguage.INSTANCE
+            'L' -> EexLanguage.INSTANCE
+            else -> null
+        }
     }
 
-    return null
-    }
+    override fun shouldDelegateToTopLevel(file: PsiFile) = true
 
     companion object {
         private const val CODE_BLOCK_INDENT = "    "
