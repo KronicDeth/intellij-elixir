@@ -5,10 +5,10 @@
         <place><![CDATA[sigilWithName("r")]]></place>
     </injection>
 
-    <injection language="HTML" injector-id="elixir">
-        <display-name>Sigil: (Phoenix) HTML</display-name>
-        <place><![CDATA[sigilWithName("H")]]></place>
-    </injection>
+<!--    <injection language="HTML" injector-id="elixir">-->
+<!--        <display-name>Sigil: (Phoenix) HTML</display-name>-->
+<!--        <place><![CDATA[sigilWithName("H")]]></place>-->
+<!--    </injection>-->
 
     <injection language="EEx" injector-id="elixir">
         <display-name>Sigil: (Phoenix) EEX</display-name>

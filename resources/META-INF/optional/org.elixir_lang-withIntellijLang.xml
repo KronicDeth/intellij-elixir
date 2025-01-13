@@ -5,14 +5,10 @@
     </extensions>
 
     <extensions defaultExtensionNs="com.intellij">
+        <multiHostInjector implementation="org.elixir_lang.injection.markdown.Injector"/>
         <multiHostInjector
                 id="org.elixir_lang.injection.ElixirSigilInjector"
                 implementation="org.elixir_lang.injection.ElixirSigilInjector"/>
-
-<!--        <formatting.injectedOptions-->
-<!--                id="org.elixir_lang.injection.ElixirSigilInjector"-->
-<!--                implementation="org.elixir_lang.injection.ElixirSigilInjector"-->
-<!--        />-->
     </extensions>
 
 </idea-plugin>
