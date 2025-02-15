@@ -200,6 +200,28 @@ intellijPlatformTesting {
                 }
             }
         }
+
+        // if enableEAPIDEs is true, create an EAP instance
+        if (providers.gradleProperty("enableEAPIDEs").get().toLowerCase() == "true") {
+            runIde.create("run${platform}EAP") {
+                type = IntelliJPlatformType."${platform}"
+                version = providers.gradleProperty("platformVersion${platform}EAP").get()
+                prepareSandboxTask {
+                    sandboxDirectory = project.layout.buildDirectory.dir("${platform.toLowerCase()}_eap-sandbox")
+                }
+                useInstaller = false
+
+                // if runIdePluginsList is not empty, set the plugins
+                if (runIdePluginsList.size() > 0) {
+                    plugins {
+                        // Apply each plugin from the 'runIdePluginsList'
+                        runIdePluginsList.each { plugin ->
+                            plugins(plugin.trim())
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
