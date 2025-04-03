@@ -102,7 +102,9 @@ intellijPlatform {
 
         ideaVersion {
             sinceBuild = providers.gradleProperty("pluginSinceBuild")
-            untilBuild = providers.gradleProperty("pluginUntilBuild")
+            // We want users to be able to install the plugin on future versions, and if there is incompatibility,
+            // they should hopefully create an issue :-).
+            untilBuild = provider { null }
         }
         vendor {
             name = providers.gradleProperty("vendorName")
