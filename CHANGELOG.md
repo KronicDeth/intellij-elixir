@@ -1,5 +1,10 @@
 # Changelog
 
+## v21.0.0
+### Enhancements
+* [#3651](https://github.com/KronicDeth/intellij-elixir/pull/3681) - [@joshuataylor](https://github.com/joshuataylor)
+  * Support Jetbrains 2025.1 and relax until-build.
+
 ## v20.0.1
 
 ### Bug Fixes
