@@ -102,7 +102,9 @@ intellijPlatform {
 
         ideaVersion {
             sinceBuild = providers.gradleProperty("pluginSinceBuild")
-            untilBuild = providers.gradleProperty("pluginUntilBuild")
+            // We want users to be able to install the plugin on future versions, and if there is incompatibility,
+            // they should hopefully create an issue :-).
+            untilBuild = provider { null }
         }
         vendor {
             name = providers.gradleProperty("vendorName")
@@ -196,6 +198,28 @@ intellijPlatformTesting {
                     // Apply each plugin from the 'runIdePluginsList'
                     runIdePluginsList.each { plugin ->
                         plugins(plugin.trim())
+                    }
+                }
+            }
+        }
+
+        // if enableEAPIDEs is true, create an EAP instance
+        if (providers.gradleProperty("enableEAPIDEs").get().toLowerCase() == "true") {
+            runIde.create("run${platform}EAP") {
+                type = IntelliJPlatformType."${platform}"
+                version = providers.gradleProperty("platformVersion${platform}EAP").get()
+                prepareSandboxTask {
+                    sandboxDirectory = project.layout.buildDirectory.dir("${platform.toLowerCase()}_eap-sandbox")
+                }
+                useInstaller = false
+
+                // if runIdePluginsList is not empty, set the plugins
+                if (runIdePluginsList.size() > 0) {
+                    plugins {
+                        // Apply each plugin from the 'runIdePluginsList'
+                        runIdePluginsList.each { plugin ->
+                            plugins(plugin.trim())
+                        }
                     }
                 }
             }
