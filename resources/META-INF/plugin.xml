@@ -10,6 +10,9 @@
          on how to target different products -->
     <depends>com.intellij.modules.lang</depends>
     <depends>org.intellij.plugins.markdown</depends>
+
+    <!-- optional modules -->
+    <!-- See https://plugins.jetbrains.com/docs/intellij/plugin-dependencies.html#optional-plugin-dependencies for naming convention -->
     <depends config-file="rich-platform-plugin.xml" optional="true">com.intellij.modules.java</depends>
 
     <extensionPoints>
@@ -63,6 +66,29 @@
                                       implementationClass="org.elixir_lang.eex.file.view_provider.Factory"/>
         <lang.parserDefinition language="EEx" implementationClass="org.elixir_lang.eex.ParserDefinition"/>
         <!--<lang.psiStructureViewFactory language="EEx" implementationClass="org.elixir_lang.eex.PsiStructureViewFactory"/>-->
+
+        <!-- HEEx -->
+        <fileType.fileViewProviderFactory
+            filetype="HEEx"
+            implementationClass="org.elixir_lang.eex.file.view_provider.Factory"
+        />
+        <fileType name="HTML Embedded Elixir"
+            implementationClass="org.elixir_lang.eex.file.Type"
+            fieldName="INSTANCE"
+            language="HEEx"
+            extensions="heex"
+        />
+        <lang.fileViewProviderFactory
+            language="HEEx"
+            implementationClass="org.elixir_lang.eex.file.view_provider.Factory"
+        />
+        <lang.fileViewProviderFactory
+            language="HEEx"
+            implementationClass="org.elixir_lang.eex.file.view_provider.Factory"/>
+        <lang.parserDefinition
+            language="HEEx"
+            implementationClass="org.elixir_lang.eex.ParserDefinition"
+        />
 
         <!-- Mix related extensions -->
         <configurationType implementation="org.elixir_lang.mix.configuration.Type"/>
