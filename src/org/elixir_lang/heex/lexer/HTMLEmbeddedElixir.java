@@ -8,7 +8,6 @@ import com.intellij.psi.tree.IElementType;
 import gnu.trove.THashMap;
 import org.elixir_lang.ElixirLanguage;
 import org.elixir_lang.ElixirLexer;
-import org.elixir_lang.heex.lexer.LookAhead;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -26,7 +25,7 @@ import static org.elixir_lang.psi.ElixirTypes.*;
  * can't use LookAheadLexer since it's {@link com.intellij.lexer.LookAheadLexer.LookAheadLexerPosition} only works for a
  * single lexer.
  */
-public class EmbeddedElixir extends LexerBase {
+public class HTMLEmbeddedElixir extends LexerBase {
     @NotNull
     private static final Map<IElementType, IElementType> HEEX_TOKEN_TYPE_TO_ELIXIR_TOKEN_TYPE = new THashMap<>();
     @NotNull
@@ -49,7 +48,7 @@ public class EmbeddedElixir extends LexerBase {
         HEEX_TOKEN_TYPE_TO_ELIXIR_TOKEN_TYPE.put(WHITE_SPACE, WHITE_SPACE);
     }
 
-    public EmbeddedElixir(Project project) {
+    public HTMLEmbeddedElixir(Project project) {
         this.heexLexer = new LookAhead();
         this.elixirLexer = new ElixirLexer(project);
     }
@@ -127,7 +126,7 @@ public class EmbeddedElixir extends LexerBase {
     }
 
     @NotNull
-    public EmbeddedElixir.Position getCurrentPosition() {
+    public HTMLEmbeddedElixir.Position getCurrentPosition() {
         return new Position(this);
     }
 
@@ -183,7 +182,7 @@ public class EmbeddedElixir extends LexerBase {
         @Nullable
         private final LexerPosition elixirPosition;
 
-        Position(final EmbeddedElixir lexer) {
+        Position(final HTMLEmbeddedElixir lexer) {
             this.heexPosition = lexer.heexLexer.getCurrentPosition();
 
             if (lexer.heexLexer.getTokenType() == ELIXIR) {
