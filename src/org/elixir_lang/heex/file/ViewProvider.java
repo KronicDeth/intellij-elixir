@@ -2,6 +2,7 @@ package org.elixir_lang.heex.file;
 
 import com.intellij.lang.LanguageParserDefinitions;
 import com.intellij.lang.ParserDefinition;
+import com.intellij.lang.html.HTMLLanguage;
 import com.intellij.openapi.fileTypes.LanguageFileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -16,11 +17,15 @@ import com.intellij.psi.tree.IElementType;
 import gnu.trove.THashSet;
 import org.elixir_lang.ElixirLanguage;
 import org.elixir_lang.heex.Language;
-import org.elixir_lang.heex.element_type.EmbeddedElixir;
+import org.elixir_lang.heex.element_type.HTMLEmbeddedElixir;
 import org.elixir_lang.heex.element_type.TemplateData;
+import org.elixir_lang.heex.html.HeexHTMLFileElementType;
+import org.elixir_lang.heex.html.HeexHTMLFileType;
+import org.elixir_lang.heex.html.HeexHTMLLanguage;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.swing.text.html.HTML;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -61,7 +66,9 @@ public class ViewProvider extends MultiplePsiFilesPerDocumentFileViewProvider
                     IElementType elementType;
 
                     if (language == ElixirLanguage.INSTANCE) {
-                        elementType = new EmbeddedElixir();
+                        elementType = new HTMLEmbeddedElixir();
+                    } else if (language == HTMLLanguage.INSTANCE) {
+                        elementType = new HeexHTMLFileElementType();
                     } else {
                         elementType = new TemplateData(language);
                     }
@@ -103,8 +110,14 @@ public class ViewProvider extends MultiplePsiFilesPerDocumentFileViewProvider
     @Nullable
     @Override
     protected PsiFile createFile(@NotNull com.intellij.lang.Language language) {
-        ParserDefinition parserDefinition = getDefinition(language);
+        ParserDefinition parserDefinition;
         PsiFileImpl psiFileImpl;
+
+        if (language.isKindOf(HTMLLanguage.INSTANCE)) {
+            parserDefinition = getDefinition(HeexHTMLLanguage.INSTANCE);
+        } else {
+            parserDefinition = getDefinition(language);
+        }
 
         if (parserDefinition == null) {
             psiFileImpl = null;

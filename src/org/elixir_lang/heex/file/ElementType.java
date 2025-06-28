@@ -42,7 +42,7 @@ public class ElementType extends IStubFileElementType<Stub> {
     @NotNull
     @Override
     public String getExternalId() {
-        return "elixir.embedded.FILE";
+        return "elixir.html_embedded.FILE";
     }
 
     @Override

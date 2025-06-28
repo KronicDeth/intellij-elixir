@@ -12,8 +12,8 @@ import org.elixir_lang.ElixirLanguage;
  * Elixir.bnf parses it like it was an interpolated expression separated by an outer string instead of adjacent Elixir
  * expressions.
  */
-public class EmbeddedElixir extends IFileElementType {
-    public EmbeddedElixir() {
+public class HTMLEmbeddedElixir extends IFileElementType {
+    public HTMLEmbeddedElixir() {
         super(ElixirLanguage.INSTANCE);
     }
 
@@ -28,7 +28,7 @@ public class EmbeddedElixir extends IFileElementType {
         PsiBuilder builder = PsiBuilderFactory.getInstance().createBuilder(
                 project,
                 chameleon,
-                new org.elixir_lang.heex.lexer.EmbeddedElixir(project),
+                new org.elixir_lang.heex.lexer.HTMLEmbeddedElixir(project),
                 languageForParser,
                 chameleon.getChars()
         );

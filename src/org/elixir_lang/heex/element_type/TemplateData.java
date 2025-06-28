@@ -1,6 +1,7 @@
 package org.elixir_lang.heex.element_type;
 
 import com.intellij.lang.Language;
+import com.intellij.lang.html.HTMLLanguage;
 import com.intellij.lexer.Lexer;
 import com.intellij.psi.templateLanguages.TemplateDataElementType;
 import com.intellij.psi.templateLanguages.TemplateLanguageFileViewProvider;

@@ -21,6 +21,6 @@ public class File extends PsiFileBase {
     @NotNull
     @Override
     public String toString() {
-        return "Embedded Elixir File";
+        return "HTML Embedded Elixir File";
     }
 }

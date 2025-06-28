@@ -14,8 +14,8 @@ import javax.swing.Icon
 // See https://github.com/JetBrains/intellij-plugins/blob/500f42337a87f463e0340f43e2411266fcfa9c5f/handlebars/src/com/dmarcotte/handlebars/file/HbFileType.java
 open class Type protected constructor(lang: Language? = org.elixir_lang.heex.Language.INSTANCE) :
     LanguageFileType(lang!!), TemplateLanguageFileType {
-    override fun getName(): String = "Embedded Elixir"
-    override fun getDescription(): String = "Embedded Elixir file"
+    override fun getName(): String = "HTML Embedded Elixir"
+    override fun getDescription(): String = "HTML Embedded Elixir file"
     override fun getDefaultExtension(): String = DEFAULT_EXTENSION
     override fun getIcon(): Icon? = Icons.FILE
 
