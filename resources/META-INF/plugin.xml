@@ -99,6 +99,11 @@
             fieldName="INSTANCE"
             language="HEExHTML"/>
 
+        <lang.inspectionSuppressor
+            language="HTML"
+            implementationClass="org.elixir_lang.heex.inspections.HTMLInspectionSuppressor"
+        />
+
         <!-- Mix related extensions -->
         <configurationType implementation="org.elixir_lang.mix.configuration.Type"/>
 
