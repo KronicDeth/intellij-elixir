@@ -7,6 +7,10 @@ import com.intellij.psi.PsiElement;
 
 public class HEExVisitor extends PsiElementVisitor {
 
+  public void visitBraces(@NotNull HEExBraces o) {
+    visitPsiElement(o);
+  }
+
   public void visitTag(@NotNull HEExTag o) {
     visitPsiElement(o);
   }

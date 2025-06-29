@@ -17,6 +17,8 @@ import org.elixir_lang.heex.psi.Types;
 %eof}
 
 %{
+  private int openBraceCount = 0;
+
   private void handleInState(int nextLexicalState) {
     yypushback(yylength());
     yybegin(nextLexicalState);
@@ -25,6 +27,9 @@ import org.elixir_lang.heex.psi.Types;
 
 OPENING = "<%"
 CLOSING = "%>"
+
+BRACE_OPENING = "{"
+BRACE_CLOSING = "}"
 
 COMMENT_MARKER = "#"
 EQUALS_MARKER = "="
@@ -41,6 +46,7 @@ ANY = [^]
 %state COMMENT
 %state ELIXIR
 %state MARKER_MAYBE
+%state BEGIN_MATCHED_BRACES, MATCHED_BRACES
 
 %%
 
@@ -48,6 +54,8 @@ ANY = [^]
   {ESCAPED_OPENING} { return Types.ESCAPED_OPENING; }
   {OPENING}         { yybegin(MARKER_MAYBE);
                       return Types.OPENING; }
+  {BRACE_OPENING}   { yybegin(BEGIN_MATCHED_BRACES);
+                      return Types.BRACE_OPENING; }
   {ANY}             { return Types.DATA; }
 }
 
@@ -62,6 +70,27 @@ ANY = [^]
                            return Types.PIPE_MARKER; }
   {ANY}                  { handleInState(ELIXIR);
                            return Types.EMPTY_MARKER; }
+}
+
+<BEGIN_MATCHED_BRACES> {
+  // We pretend there is an equals marker so it looks like a <%= tag to the Elixir parser
+  {ANY}                  { handleInState(MATCHED_BRACES);
+                           return Types.EQUALS_MARKER; }
+}
+
+<MATCHED_BRACES> {
+  {BRACE_OPENING}        { openBraceCount++;
+                           return Types.ELIXIR; }
+  {BRACE_CLOSING}        {
+                           if (openBraceCount > 0) {
+                             openBraceCount--;
+                             return Types.ELIXIR;
+                           } else {
+                             yybegin(YYINITIAL);
+                             return Types.BRACE_CLOSING;
+                           }
+                         }
+  {ANY}                  { return Types.ELIXIR; }
 }
 
 <COMMENT, ELIXIR> {

@@ -36,6 +36,18 @@ public class Parser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
+  // BRACE_OPENING EQUALS_MARKER ELIXIR BRACE_CLOSING
+  public static boolean braces(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "braces")) return false;
+    if (!nextTokenIs(b, BRACE_OPENING)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeTokens(b, 0, BRACE_OPENING, EQUALS_MARKER, ELIXIR, BRACE_CLOSING);
+    exit_section_(b, m, BRACES, r);
+    return r;
+  }
+
+  /* ********************************************************** */
   // COMMENT_MARKER COMMENT?
   static boolean commentBody(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "commentBody")) return false;
@@ -95,7 +107,7 @@ public class Parser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // (DATA | ESCAPED_OPENING | tag)*
+  // (DATA | ESCAPED_OPENING | tag | braces)*
   static boolean heexFile(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "heexFile")) return false;
     while (true) {
@@ -106,13 +118,14 @@ public class Parser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // DATA | ESCAPED_OPENING | tag
+  // DATA | ESCAPED_OPENING | tag | braces
   private static boolean heexFile_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "heexFile_0")) return false;
     boolean r;
     r = consumeToken(b, DATA);
     if (!r) r = consumeToken(b, ESCAPED_OPENING);
     if (!r) r = tag(b, l + 1);
+    if (!r) r = braces(b, l + 1);
     return r;
   }
 

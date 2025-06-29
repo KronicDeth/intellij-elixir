@@ -8,8 +8,11 @@ import org.elixir_lang.heex.psi.impl.*;
 
 public interface Types {
 
+  IElementType BRACES = new ElementType("BRACES");
   IElementType TAG = new ElementType("TAG");
 
+  IElementType BRACE_CLOSING = new TokenType("BRACE_CLOSING");
+  IElementType BRACE_OPENING = new TokenType("BRACE_OPENING");
   IElementType CLOSING = new TokenType("%>");
   IElementType COMMENT = new TokenType("Comment");
   IElementType COMMENT_MARKER = new TokenType("#");
@@ -25,7 +28,10 @@ public interface Types {
   class Factory {
     public static PsiElement createElement(ASTNode node) {
       IElementType type = node.getElementType();
-      if (type == TAG) {
+      if (type == BRACES) {
+        return new HEExBracesImpl(node);
+      }
+      else if (type == TAG) {
         return new HEExTagImpl(node);
       }
       throw new AssertionError("Unknown element type: " + type);
