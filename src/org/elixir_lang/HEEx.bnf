@@ -29,9 +29,10 @@
   ]
 }
 
-private heexFile ::= (DATA | ESCAPED_OPENING | tag)*
+private heexFile ::= (DATA | ESCAPED_OPENING | tag | braces)*
 tag ::= OPENING (commentBody | elixirBody) CLOSING
         { pin = 1 }
+braces ::= BRACE_OPENING EQUALS_MARKER ELIXIR BRACE_CLOSING
 
 private commentBody ::= COMMENT_MARKER COMMENT?
                         { pin = 1 }

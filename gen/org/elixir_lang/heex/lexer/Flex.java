@@ -22,6 +22,8 @@ public class Flex implements com.intellij.lexer.FlexLexer {
   public static final int COMMENT = 4;
   public static final int ELIXIR = 6;
   public static final int MARKER_MAYBE = 8;
+  public static final int BEGIN_MATCHED_BRACES = 10;
+  public static final int MATCHED_BRACES = 12;
 
   /**
    * ZZ_LEXSTATE[l] is the state in the DFA for the lexical state l
@@ -30,7 +32,7 @@ public class Flex implements com.intellij.lexer.FlexLexer {
    * l is of the form l = 2*k, k a non negative integer
    */
   private static final int ZZ_LEXSTATE[] = {
-     0,  0,  1,  1,  2,  2,  3,  3,  4, 4
+     0,  0,  1,  1,  2,  2,  3,  3,  4,  4,  5,  5,  6, 6
   };
 
   /**
@@ -69,7 +71,7 @@ public class Flex implements com.intellij.lexer.FlexLexer {
   private static final String ZZ_CMAP_BLOCKS_PACKED_0 =
     "\11\0\2\1\1\0\2\1\22\0\1\2\2\0\1\3"+
     "\1\0\1\4\11\0\1\5\14\0\1\6\1\7\1\10"+
-    "\75\0\1\11\u0183\0";
+    "\74\0\1\11\1\12\1\13\u0182\0";
 
   private static int [] zzUnpackcmap_blocks() {
     int [] result = new int[512];
@@ -96,11 +98,12 @@ public class Flex implements com.intellij.lexer.FlexLexer {
   private static final int [] ZZ_ACTION = zzUnpackAction();
 
   private static final String ZZ_ACTION_PACKED_0 =
-    "\5\0\2\1\2\2\2\3\2\4\1\5\1\6\1\7"+
-    "\1\10\1\11\1\12\2\0\1\13\1\14\1\0\1\15";
+    "\7\0\2\1\1\2\2\3\2\4\2\5\1\6\1\7"+
+    "\1\10\1\11\1\12\1\13\1\14\1\15\1\16\2\0"+
+    "\1\17\1\20\1\0\1\21";
 
   private static int [] zzUnpackAction() {
-    int [] result = new int[25];
+    int [] result = new int[31];
     int offset = 0;
     offset = zzUnpackAction(ZZ_ACTION_PACKED_0, offset, result);
     return result;
@@ -125,13 +128,13 @@ public class Flex implements com.intellij.lexer.FlexLexer {
   private static final int [] ZZ_ROWMAP = zzUnpackRowMap();
 
   private static final String ZZ_ROWMAP_PACKED_0 =
-    "\0\0\0\12\0\24\0\36\0\50\0\62\0\74\0\62"+
-    "\0\106\0\62\0\120\0\62\0\120\0\62\0\62\0\62"+
-    "\0\62\0\62\0\132\0\106\0\144\0\62\0\62\0\156"+
-    "\0\62";
+    "\0\0\0\14\0\30\0\44\0\60\0\74\0\110\0\124"+
+    "\0\140\0\124\0\124\0\154\0\124\0\170\0\124\0\170"+
+    "\0\124\0\124\0\124\0\124\0\124\0\124\0\124\0\124"+
+    "\0\204\0\154\0\220\0\124\0\124\0\234\0\124";
 
   private static int [] zzUnpackRowMap() {
-    int [] result = new int[25];
+    int [] result = new int[31];
     int offset = 0;
     offset = zzUnpackRowMap(ZZ_ROWMAP_PACKED_0, offset, result);
     return result;
@@ -154,14 +157,15 @@ public class Flex implements com.intellij.lexer.FlexLexer {
   private static final int [] ZZ_TRANS = zzUnpacktrans();
 
   private static final String ZZ_TRANS_PACKED_0 =
-    "\6\6\1\7\3\6\1\10\2\11\7\10\4\12\1\13"+
-    "\5\12\4\14\1\15\5\14\3\16\1\17\1\16\1\20"+
-    "\1\16\1\21\1\16\1\22\16\0\1\23\6\0\2\24"+
-    "\3\0\1\25\13\0\1\26\5\0\1\27\11\0\1\30"+
-    "\7\0\1\31\7\0";
+    "\6\10\1\11\2\10\1\12\2\10\1\13\2\14\11\13"+
+    "\4\15\1\16\7\15\4\17\1\20\7\17\3\21\1\22"+
+    "\1\21\1\23\1\21\1\24\2\21\1\25\1\21\14\26"+
+    "\11\17\1\27\1\17\1\30\20\0\1\31\10\0\2\32"+
+    "\3\0\1\33\15\0\1\34\7\0\1\35\13\0\1\36"+
+    "\11\0\1\37\11\0";
 
   private static int [] zzUnpacktrans() {
-    int [] result = new int[120];
+    int [] result = new int[168];
     int offset = 0;
     offset = zzUnpacktrans(ZZ_TRANS_PACKED_0, offset, result);
     return result;
@@ -199,11 +203,11 @@ public class Flex implements com.intellij.lexer.FlexLexer {
   private static final int [] ZZ_ATTRIBUTE = zzUnpackAttribute();
 
   private static final String ZZ_ATTRIBUTE_PACKED_0 =
-    "\5\0\1\11\1\1\1\11\1\1\1\11\1\1\1\11"+
-    "\1\1\5\11\1\1\2\0\2\11\1\0\1\11";
+    "\7\0\1\11\1\1\2\11\1\1\1\11\1\1\1\11"+
+    "\1\1\10\11\1\1\2\0\2\11\1\0\1\11";
 
   private static int [] zzUnpackAttribute() {
-    int [] result = new int[25];
+    int [] result = new int[31];
     int offset = 0;
     offset = zzUnpackAttribute(ZZ_ATTRIBUTE_PACKED_0, offset, result);
     return result;
@@ -270,6 +274,8 @@ public class Flex implements com.intellij.lexer.FlexLexer {
   private boolean zzEOFDone;
 
   /* user code: */
+  private int openBraceCount = 0;
+
   private void handleInState(int nextLexicalState) {
     yypushback(yylength());
     yybegin(nextLexicalState);
@@ -534,70 +540,99 @@ public class Flex implements com.intellij.lexer.FlexLexer {
             { return Types.DATA;
             }
           // fall through
-          case 14: break;
+          case 18: break;
           case 2:
+            { yybegin(BEGIN_MATCHED_BRACES);
+                      return Types.BRACE_OPENING;
+            }
+          // fall through
+          case 19: break;
+          case 3:
             { handleInState(YYINITIAL);
             }
           // fall through
-          case 15: break;
-          case 3:
+          case 20: break;
+          case 4:
             { return Types.COMMENT;
             }
           // fall through
-          case 16: break;
-          case 4:
+          case 21: break;
+          case 5:
             { return Types.ELIXIR;
             }
           // fall through
-          case 17: break;
-          case 5:
+          case 22: break;
+          case 6:
             { handleInState(ELIXIR);
                            return Types.EMPTY_MARKER;
             }
           // fall through
-          case 18: break;
-          case 6:
+          case 23: break;
+          case 7:
             { yybegin(COMMENT);
                            return Types.COMMENT_MARKER;
             }
           // fall through
-          case 19: break;
-          case 7:
+          case 24: break;
+          case 8:
             { yybegin(ELIXIR);
                            return Types.FORWARD_SLASH_MARKER;
             }
           // fall through
-          case 20: break;
-          case 8:
+          case 25: break;
+          case 9:
             { yybegin(ELIXIR);
                            return Types.EQUALS_MARKER;
             }
           // fall through
-          case 21: break;
-          case 9:
+          case 26: break;
+          case 10:
             { yybegin(ELIXIR);
                            return Types.PIPE_MARKER;
             }
           // fall through
-          case 22: break;
-          case 10:
+          case 27: break;
+          case 11:
+            { handleInState(MATCHED_BRACES);
+                           return Types.EQUALS_MARKER;
+            }
+          // fall through
+          case 28: break;
+          case 12:
+            { openBraceCount++;
+                           return Types.ELIXIR;
+            }
+          // fall through
+          case 29: break;
+          case 13:
+            { if (openBraceCount > 0) {
+                             openBraceCount--;
+                             return Types.ELIXIR;
+                           } else {
+                             yybegin(YYINITIAL);
+                             return Types.BRACE_CLOSING;
+                           }
+            }
+          // fall through
+          case 30: break;
+          case 14:
             { yybegin(MARKER_MAYBE);
                       return Types.OPENING;
             }
           // fall through
-          case 23: break;
-          case 11:
+          case 31: break;
+          case 15:
             { yybegin(WHITESPACE_MAYBE);
               return Types.CLOSING;
             }
           // fall through
-          case 24: break;
-          case 12:
+          case 32: break;
+          case 16:
             { return Types.ESCAPED_OPENING;
             }
           // fall through
-          case 25: break;
-          case 13:
+          case 33: break;
+          case 17:
             // lookahead expression with fixed lookahead length
             zzMarkedPos = Character.offsetByCodePoints
                 (zzBufferL, zzMarkedPos, -3);
@@ -605,7 +640,7 @@ public class Flex implements com.intellij.lexer.FlexLexer {
                                          return TokenType.WHITE_SPACE;
             }
           // fall through
-          case 26: break;
+          case 34: break;
           default:
             zzScanError(ZZ_NO_MATCH);
           }
