@@ -2,7 +2,7 @@ package org.elixir_lang.heex.lexer;
 
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
-import org.elixir_lang.heex.psi.Types;
+import kotlinx.html.SCRIPT;import org.elixir_lang.heex.psi.Types;
 
 %%
 
@@ -11,6 +11,7 @@ import org.elixir_lang.heex.psi.Types;
 %class Flex
 %implements com.intellij.lexer.FlexLexer
 %unicode
+%ignorecase
 %function advance
 %type IElementType
 %eof{  return;
@@ -42,20 +43,39 @@ PROCEDURAL_OPENING = {OPENING} " "
 WHITE_SPACE = [\ \t\f\r\n]+
 ANY = [^]
 
+START_SCRIPT_TAG = "<script"
+END_SCRIPT_TAG = "</script>"
+START_STYLE_TAG = "<style"
+END_STYLE_TAG = "</style>"
+
 %state WHITESPACE_MAYBE
 %state COMMENT
 %state ELIXIR
 %state MARKER_MAYBE
 %state BEGIN_MATCHED_BRACES, MATCHED_BRACES
+%state STYLE_TAG,SCRIPT_TAG
 
 %%
 
 <YYINITIAL> {
+  {BRACE_OPENING}   { yybegin(BEGIN_MATCHED_BRACES);
+                      return Types.BRACE_OPENING; }
+  {START_SCRIPT_TAG} { yybegin(SCRIPT_TAG); return Types.DATA; }
+  {START_STYLE_TAG} { yybegin(STYLE_TAG); return Types.DATA; }
+}
+
+<SCRIPT_TAG> {
+  {END_SCRIPT_TAG}  { yybegin(YYINITIAL); return Types.DATA; }
+}
+
+<STYLE_TAG> {
+  {END_STYLE_TAG}  { yybegin(YYINITIAL); return Types.DATA; }
+}
+
+<YYINITIAL,SCRIPT_TAG,STYLE_TAG> {
   {ESCAPED_OPENING} { return Types.ESCAPED_OPENING; }
   {OPENING}         { yybegin(MARKER_MAYBE);
                       return Types.OPENING; }
-  {BRACE_OPENING}   { yybegin(BEGIN_MATCHED_BRACES);
-                      return Types.BRACE_OPENING; }
   {ANY}             { return Types.DATA; }
 }
 
