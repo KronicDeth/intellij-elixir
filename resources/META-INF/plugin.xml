@@ -98,6 +98,10 @@
             implementationClass="org.elixir_lang.heex.html.HeexHTMLFileType"
             fieldName="INSTANCE"
             language="HEExHTML"/>
+        <lang.syntaxHighlighterFactory
+            language="HEExHTML"
+            implementationClass="org.elixir_lang.heex.html.HeexHTMLFileHighlighterFactory"
+        />
 
         <lang.inspectionSuppressor
             language="HTML"
