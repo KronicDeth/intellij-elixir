@@ -8,16 +8,16 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 // See https://github.com/JetBrains/intellij-plugins/blob/500f42337a87f463e0340f43e2411266fcfa9c5f/handlebars/src/com/dmarcotte/handlebars/HbLanguage.java
-public class Language extends com.intellij.lang.Language implements TemplateLanguage {
-    public static final Language INSTANCE = new Language();
+public class HeexLanguage extends com.intellij.lang.Language implements TemplateLanguage {
+    public static final HeexLanguage INSTANCE = new HeexLanguage();
 
-    protected Language(@Nullable com.intellij.lang.Language baseLanguage,
-                       @NotNull String ID,
-                       @NotNull String... mimeTypes) {
+    protected HeexLanguage(@Nullable com.intellij.lang.Language baseLanguage,
+                           @NotNull String ID,
+                           @NotNull String... mimeTypes) {
         super(baseLanguage, ID, mimeTypes);
     }
 
-    public Language() {
+    public HeexLanguage() {
         super("HEEx");
     }
 

@@ -1,21 +1,12 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by FernFlower decompiler)
-//
-
 package org.elixir_lang.heex.html;
 
 import com.intellij.icons.AllIcons.FileTypes;
 import com.intellij.ide.highlighter.HtmlFileType;
-import com.intellij.ide.highlighter.XmlLikeFileType;
-import com.intellij.lang.Language;
-import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 
-/** @see HtmlFileType */
-public class HeexHTMLFileType extends XmlLikeFileType {
+public class HeexHTMLFileType extends HtmlFileType {
     public static final HeexHTMLFileType INSTANCE = new HeexHTMLFileType();
 
     private HeexHTMLFileType() {

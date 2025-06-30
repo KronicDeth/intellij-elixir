@@ -4,11 +4,19 @@ import com.intellij.lexer.HtmlLexer;
 import org.jetbrains.annotations.NotNull;
 
 public class HeexHTMLLexer extends HtmlLexer {
+    public HeexHTMLLexer() {
+        super();
+    }
+
+    public HeexHTMLLexer(boolean highlightMode) {
+        super(highlightMode);
+    }
+
     @Override
     public void start(@NotNull CharSequence buffer, int startOffset, int endOffset, int initialState) {
         CharSequence maskedBuffer = maskRelativeComponentDots(buffer, startOffset, endOffset);
 
-        super.start(maskedBuffer, startOffset, endOffset, initialState);
+        super.start(maskedBuffer, 0, endOffset - startOffset, initialState);
     }
 
     /**
@@ -16,7 +24,7 @@ public class HeexHTMLLexer extends HtmlLexer {
      * allowing the lexer to properly process HEEx relative component tags (e.g. <.button>).
      */
     private CharSequence maskRelativeComponentDots(@NotNull CharSequence buffer, int startOffset, int endOffset) {
-        int startIndex = 0;
+        int startIndex = startOffset;
         StringBuilder stringBuilder = new StringBuilder(endOffset);
 
         for (int i = startOffset; i < endOffset; i++) {

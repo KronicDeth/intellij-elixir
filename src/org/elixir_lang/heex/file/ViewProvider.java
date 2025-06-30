@@ -12,26 +12,26 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.impl.source.PsiFileImpl;
 import com.intellij.psi.templateLanguages.ConfigurableTemplateLanguageFileViewProvider;
+import com.intellij.psi.templateLanguages.TemplateDataElementType;
 import com.intellij.psi.templateLanguages.TemplateDataLanguageMappings;
 import com.intellij.psi.tree.IElementType;
 import gnu.trove.THashSet;
 import org.elixir_lang.ElixirLanguage;
-import org.elixir_lang.heex.Language;
+import org.elixir_lang.heex.HeexLanguage;
 import org.elixir_lang.heex.element_type.HTMLEmbeddedElixir;
-import org.elixir_lang.heex.element_type.TemplateData;
-import org.elixir_lang.heex.html.HeexHTMLFileElementType;
-import org.elixir_lang.heex.html.HeexHTMLFileType;
 import org.elixir_lang.heex.html.HeexHTMLLanguage;
+import org.elixir_lang.heex.psi.Types;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.text.html.HTML;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import static org.elixir_lang.heex.file.Type.onlyTemplateDataFileType;
+import static org.elixir_lang.heex.psi.Types.HEEX_OUTER_ELEMENT;
+import static org.elixir_lang.heex.psi.Types.HEEX_TEMPLATE_ELEMENT;
 
 // See https://github.com/JetBrains/intellij-plugins/blob/500f42337a87f463e0340f43e2411266fcfa9c5f/handlebars/src/com/dmarcotte/handlebars/file/HbFileViewProvider.java
 public class ViewProvider extends MultiplePsiFilesPerDocumentFileViewProvider
@@ -67,10 +67,8 @@ public class ViewProvider extends MultiplePsiFilesPerDocumentFileViewProvider
 
                     if (language == ElixirLanguage.INSTANCE) {
                         elementType = new HTMLEmbeddedElixir();
-                    } else if (language == HTMLLanguage.INSTANCE) {
-                        elementType = new HeexHTMLFileElementType();
                     } else {
-                        elementType = new TemplateData(language);
+                        elementType = HEEX_TEMPLATE_ELEMENT;
                     }
 
                     return elementType;
@@ -93,7 +91,7 @@ public class ViewProvider extends MultiplePsiFilesPerDocumentFileViewProvider
         }
 
         if (templateDataLanguage == null) {
-            templateDataLanguage = Language.defaultTemplateLanguageFileType().getLanguage();
+            templateDataLanguage = HeexLanguage.defaultTemplateLanguageFileType().getLanguage();
         }
 
         com.intellij.lang.Language substituteLang =
@@ -157,6 +155,10 @@ public class ViewProvider extends MultiplePsiFilesPerDocumentFileViewProvider
     @NotNull
     @Override
     public com.intellij.lang.Language getTemplateDataLanguage() {
+        if (templateDataLanguage == HTMLLanguage.INSTANCE) {
+            return HeexHTMLLanguage.INSTANCE;
+        }
+
         return templateDataLanguage;
     }
 

@@ -4,6 +4,7 @@ import com.intellij.lang.Language;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.FileViewProvider;
 import com.intellij.psi.PsiManager;
+import org.elixir_lang.heex.HeexLanguage;
 import org.elixir_lang.heex.file.ViewProvider;
 import org.jetbrains.annotations.NotNull;
 
@@ -15,7 +16,7 @@ public class Factory implements com.intellij.psi.FileViewProviderFactory {
                                                    @NotNull Language language,
                                                    @NotNull PsiManager psiManager,
                                                    boolean eventSystemEnabled) {
-        assert language.isKindOf(org.elixir_lang.heex.Language.INSTANCE);
+        assert language.isKindOf(HeexLanguage.INSTANCE);
         return new ViewProvider(psiManager, virtualFile, eventSystemEnabled, language);
     }
 }

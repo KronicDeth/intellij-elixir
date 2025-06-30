@@ -1,9 +1,12 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.heex.psi;
 
+import com.intellij.psi.templateLanguages.TemplateDataElementType;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.PsiElement;
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.tree.OuterLanguageElementType;
+import org.elixir_lang.heex.HeexLanguage;
 import org.elixir_lang.heex.psi.impl.*;
 
 public interface Types {
@@ -24,6 +27,14 @@ public interface Types {
   IElementType FORWARD_SLASH_MARKER = new TokenType("/");
   IElementType OPENING = new TokenType("<%");
   IElementType PIPE_MARKER = new TokenType("|");
+
+  IElementType HEEX_OUTER_ELEMENT = new OuterLanguageElementType("HEEx", HeexLanguage.INSTANCE);
+  IElementType HEEX_TEMPLATE_ELEMENT = new TemplateDataElementType(
+      "HEEX_TEMPLATE_DATA",
+      HeexLanguage.INSTANCE,
+      Types.DATA,
+      HEEX_OUTER_ELEMENT
+  );
 
   class Factory {
     public static PsiElement createElement(ASTNode node) {

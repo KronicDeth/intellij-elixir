@@ -1,30 +1,18 @@
 package org.elixir_lang.heex;
 
-import com.google.common.collect.Iterables;
+import com.intellij.lang.html.HTMLLanguage;
 import com.intellij.openapi.editor.colors.EditorColorsScheme;
 import com.intellij.openapi.editor.ex.util.LayerDescriptor;
 import com.intellij.openapi.editor.ex.util.LayeredLexerEditorHighlighter;
 import com.intellij.openapi.fileTypes.*;
-import com.intellij.openapi.fileTypes.ex.FileTypeManagerEx;
-import com.intellij.openapi.fileTypes.impl.FileTypeAssocTable;
-import com.intellij.openapi.fileTypes.impl.FileTypeConfigurable;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.vfs.newvfs.impl.FakeVirtualFile;
 import com.intellij.psi.templateLanguages.TemplateDataLanguageMappings;
 import org.elixir_lang.ElixirFileType;
-import org.elixir_lang.ElixirLanguage;
-import org.elixir_lang.heex.Highlighter;
-import org.elixir_lang.heex.Language;
-import org.elixir_lang.heex.file.Type;
+import org.elixir_lang.heex.html.HeexHTMLLanguage;
 import org.elixir_lang.heex.psi.Types;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.elixir_lang.heex.file.Type.onlyTemplateDataFileType;
 
@@ -46,6 +34,10 @@ public class TemplateHighlighter extends LayeredLexerEditorHighlighter {
                     TemplateDataLanguageMappings.getInstance(project).getMapping(virtualFile);
 
             if (language != null) {
+                if (language.is(HTMLLanguage.INSTANCE)) {
+                    language = HeexHTMLLanguage.INSTANCE;
+                }
+
                 type = language.getAssociatedFileType();
             }
 
@@ -54,7 +46,7 @@ public class TemplateHighlighter extends LayeredLexerEditorHighlighter {
             }
 
             if (type == null) {
-                type = Language.defaultTemplateLanguageFileType();
+                type = HeexLanguage.defaultTemplateLanguageFileType();
             }
         }
 
