@@ -4,7 +4,10 @@ import com.intellij.lang.html.HTMLLanguage;
 import com.intellij.openapi.editor.colors.EditorColorsScheme;
 import com.intellij.openapi.editor.ex.util.LayerDescriptor;
 import com.intellij.openapi.editor.ex.util.LayeredLexerEditorHighlighter;
-import com.intellij.openapi.fileTypes.*;
+import com.intellij.openapi.fileTypes.FileType;
+import com.intellij.openapi.fileTypes.FileTypes;
+import com.intellij.openapi.fileTypes.SyntaxHighlighter;
+import com.intellij.openapi.fileTypes.SyntaxHighlighterFactory;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.templateLanguages.TemplateDataLanguageMappings;
@@ -51,11 +54,14 @@ public class TemplateHighlighter extends LayeredLexerEditorHighlighter {
         }
 
         SyntaxHighlighter dataHighlighter = SyntaxHighlighterFactory.getSyntaxHighlighter(type, project, virtualFile);
-
         registerLayer(Types.DATA, new LayerDescriptor(dataHighlighter, ""));
 
         SyntaxHighlighter elixirHighligher = SyntaxHighlighterFactory.getSyntaxHighlighter(ElixirFileType.INSTANCE, project, virtualFile);
-
         registerLayer(Types.ELIXIR, new LayerDescriptor(elixirHighligher, ""));
+    }
+
+    @Override
+    protected boolean updateLayers() {
+        return true;
     }
 }
