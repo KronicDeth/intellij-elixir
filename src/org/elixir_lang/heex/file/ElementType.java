@@ -8,7 +8,7 @@ import com.intellij.psi.stubs.StubInputStream;
 import com.intellij.psi.stubs.StubOutputStream;
 import com.intellij.psi.tree.IStubFileElementType;
 import org.elixir_lang.heex.File;
-import org.elixir_lang.heex.Language;
+import org.elixir_lang.heex.HeexLanguage;
 import org.elixir_lang.heex.file.psi.Stub;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,7 +18,7 @@ public class ElementType extends IStubFileElementType<Stub> {
     public static final IStubFileElementType INSTANCE = new ElementType();
 
     public ElementType() {
-        super("HEEX_FILE", Language.INSTANCE);
+        super("HEEX_FILE", HeexLanguage.INSTANCE);
     }
 
     @Override
