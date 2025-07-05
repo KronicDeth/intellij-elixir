@@ -29,12 +29,6 @@ public interface Types {
   IElementType PIPE_MARKER = new TokenType("|");
 
   IElementType HEEX_OUTER_ELEMENT = new OuterLanguageElementType("HEEx", HeexLanguage.INSTANCE);
-  IElementType HEEX_TEMPLATE_ELEMENT = new TemplateDataElementType(
-      "HEEX_TEMPLATE_DATA",
-      HeexLanguage.INSTANCE,
-      Types.DATA,
-      HEEX_OUTER_ELEMENT
-  );
 
   class Factory {
     public static PsiElement createElement(ASTNode node) {

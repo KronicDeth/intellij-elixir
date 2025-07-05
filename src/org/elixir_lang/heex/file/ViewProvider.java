@@ -12,15 +12,14 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.impl.source.PsiFileImpl;
 import com.intellij.psi.templateLanguages.ConfigurableTemplateLanguageFileViewProvider;
-import com.intellij.psi.templateLanguages.TemplateDataElementType;
 import com.intellij.psi.templateLanguages.TemplateDataLanguageMappings;
 import com.intellij.psi.tree.IElementType;
 import gnu.trove.THashSet;
 import org.elixir_lang.ElixirLanguage;
 import org.elixir_lang.heex.HeexLanguage;
 import org.elixir_lang.heex.element_type.HTMLEmbeddedElixir;
+import org.elixir_lang.heex.file.psi.TemplateData;
 import org.elixir_lang.heex.html.HeexHTMLLanguage;
-import org.elixir_lang.heex.psi.Types;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,8 +29,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import static org.elixir_lang.heex.file.Type.onlyTemplateDataFileType;
-import static org.elixir_lang.heex.psi.Types.HEEX_OUTER_ELEMENT;
-import static org.elixir_lang.heex.psi.Types.HEEX_TEMPLATE_ELEMENT;
 
 // See https://github.com/JetBrains/intellij-plugins/blob/500f42337a87f463e0340f43e2411266fcfa9c5f/handlebars/src/com/dmarcotte/handlebars/file/HbFileViewProvider.java
 public class ViewProvider extends MultiplePsiFilesPerDocumentFileViewProvider
@@ -63,15 +60,11 @@ public class ViewProvider extends MultiplePsiFilesPerDocumentFileViewProvider
         return ELEMENT_TYPE_BY_LANGUAGE_ID.computeIfAbsent(
                 language.getID(),
                 languageID -> {
-                    IElementType elementType;
-
                     if (language == ElixirLanguage.INSTANCE) {
-                        elementType = new HTMLEmbeddedElixir();
+                        return new HTMLEmbeddedElixir();
                     } else {
-                        elementType = HEEX_TEMPLATE_ELEMENT;
+                        return TemplateData.INSTANCE;
                     }
-
-                    return elementType;
                 }
         );
     }
@@ -149,7 +142,7 @@ public class ViewProvider extends MultiplePsiFilesPerDocumentFileViewProvider
     @NotNull
     @Override
     public Set<com.intellij.lang.Language> getLanguages() {
-        return new THashSet<>(Arrays.asList(getTemplateDataLanguage(), getBaseLanguage(), ElixirLanguage.INSTANCE));
+        return Set.of(getTemplateDataLanguage(), getBaseLanguage(), ElixirLanguage.INSTANCE);
     }
 
     @NotNull
@@ -163,7 +156,7 @@ public class ViewProvider extends MultiplePsiFilesPerDocumentFileViewProvider
     }
 
     @Override
-    protected MultiplePsiFilesPerDocumentFileViewProvider cloneInner(VirtualFile fileCopy) {
+    protected @NotNull MultiplePsiFilesPerDocumentFileViewProvider cloneInner(@NotNull VirtualFile fileCopy) {
         return new ViewProvider(getManager(), fileCopy, false, baseLanguage, templateDataLanguage);
     }
 

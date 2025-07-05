@@ -96,6 +96,10 @@
         <lang.parserDefinition
             language="HEExHTML"
             implementationClass="org.elixir_lang.heex.html.HeexHTMLParserDefinition"/>
+        <outerLanguageRangePatcher
+            language="HEExHTML"
+            implementationClass="org.elixir_lang.heex.html.HeexHTMLOuterLanguageRangePatcher"
+        />
 
         <lang.inspectionSuppressor
             language="HTML"
