@@ -87,54 +87,17 @@
             implementationClass="org.elixir_lang.heex.ParserDefinition"
         />
 
-        <!-- Define our custom extension of the HTML language -->
-        <fileType
-            name="HEEx HTML"
-            implementationClass="org.elixir_lang.heex.html.HeexHTMLFileType"
-            fieldName="INSTANCE"
-            language="HEExHTML"/>
-        <lang.parserDefinition
-            language="HEExHTML"
-            implementationClass="org.elixir_lang.heex.html.HeexHTMLParserDefinition"/>
+        <!-- Replaces  injected outer element types with a dummy string, ensuring the injections don't break the HTML lexer -->
         <outerLanguageRangePatcher
-            language="HEExHTML"
+            language="HTML"
             implementationClass="org.elixir_lang.heex.html.HeexHTMLOuterLanguageRangePatcher"
         />
 
+        <!-- Disable some unhelpful HTML inspections that are false positives for HEEx components -->
         <lang.inspectionSuppressor
             language="HTML"
             implementationClass="org.elixir_lang.heex.inspections.HTMLInspectionSuppressor"
         />
-
-        <!-- Add back in all the HTML functionality to our custom HTML language -->
-        <!-- See XmlPlugin.xml in Jetbrains' app-client.jar -->
-        <completion.confidence language="HEExHTML" implementationClass="com.intellij.codeInsight.completion.HtmlTextCompletionConfidence" id="heexHtmlText"/>
-        <codeInsight.lineMarkerProvider language="HEExHTML" implementationClass="com.intellij.html.HtmlLineMarkerProvider"/>
-        <lang.formatter language="HEExHTML" implementationClass="com.intellij.lang.html.HtmlFormattingModelBuilder"/>
-        <lang.lineWrapStrategy language="HEExHTML" implementationClass="com.intellij.psi.formatter.MarkupLineWrapPositionStrategy"/>
-        <lang.documentationProvider language="HEExHTML" implementationClass="com.intellij.xml.util.documentation.HtmlDocumentationProvider" id="heexHtml"/>
-        <lang.surroundDescriptor language="HEExHTML" implementationClass="com.intellij.lang.xml.XmlSurroundDescriptor" id="heex-html-xml"/>
-        <lang.unwrapDescriptor language="HEExHTML" implementationClass="com.intellij.lang.xml.XmlUnwrapDescriptor"/>
-        <lang.findUsagesProvider language="HEExHTML" implementationClass="com.intellij.lang.xml.XmlFindUsagesProvider"/>
-        <lang.commenter language="HEExHTML" implementationClass="com.intellij.lang.xml.XmlCommenter"/>
-        <braceMatcher filetype="HEExHTML" implementationClass="com.intellij.xml.impl.XmlBraceMatcher"/>
-        <lang.foldingBuilder language="HEExHTML" implementationClass="com.intellij.lang.xml.XmlFoldingBuilder"/>
-        <codeInsight.parameterInfo language="HEExHTML" implementationClass="com.intellij.codeInsight.hint.api.impls.XmlParameterInfoHandler"/>
-        <codeInsight.wordCompletionFilter language="HEExHTML" implementationClass="com.intellij.lang.xml.XmlWordCompletionFilter"/>
-        <lang.psiStructureViewFactory language="HEExHTML" implementationClass="com.intellij.lang.xml.XmlStructureViewBuilderFactory"/>
-        <lang.ast.factory language="HEExHTML" implementationClass="com.intellij.lang.xml.XmlASTFactory"/>
-        <quoteHandler fileType="HEExHTML" className="com.intellij.codeInsight.editorActions.HtmlQuoteHandler"/>
-        <lang.smartEnterProcessor language="HEExHTML" implementationClass="com.intellij.codeInsight.completion.XmlSmartEnterProcessor"/>
-        <html.scriptContentProvider language="HEExHTML" implementationClass="com.intellij.psi.impl.source.html.TemplateHtmlScriptContentProvider"/>
-        <idIndexer filetype="HEExHTML" implementationClass="com.intellij.psi.impl.cache.impl.idCache.HtmlIdIndexer"/>
-        <todoIndexer filetype="HEExHTML" implementationClass="com.intellij.psi.impl.cache.impl.idCache.HtmlTodoIndexer"/>
-        <lang.rearranger language="HEExHTML" implementationClass="com.intellij.xml.arrangement.HtmlRearranger"/>
-        <xml.psiPolicy language="HEExHTML" implementationClass="com.intellij.psi.impl.source.xml.behavior.HtmlPsiPolicy"/>
-        <spellchecker.support language="HEExHTML" implementationClass="com.intellij.spellchecker.xml.HtmlSpellcheckingStrategy"/>
-
-        <!-- These extension points require customisation instead of using the built-in classes -->
-        <lang.syntaxHighlighterFactory language="HEExHTML" implementationClass="org.elixir_lang.heex.html.HeexHTMLFileHighlighterFactory"/>
-        <typedHandler implementation="org.elixir_lang.heex.html.HeexHTMLAutoPopupHandler" id="heexHtmlAuto"/>
 
         <!-- Mix related extensions -->
         <configurationType implementation="org.elixir_lang.mix.configuration.Type"/>

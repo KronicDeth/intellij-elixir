@@ -7,6 +7,6 @@ import org.jetbrains.annotations.Nullable;
 public class HeexHTMLOuterLanguageRangePatcher implements TemplateDataElementType.OuterLanguageRangePatcher {
     @Override
     public @Nullable String getTextForOuterLanguageInsertionRange(@NotNull TemplateDataElementType templateDataElementType, @NotNull CharSequence charSequence) {
-        return "HEExInjection";
+        return "Injection";
     }
 }

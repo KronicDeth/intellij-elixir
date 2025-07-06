@@ -1,16 +1,13 @@
 package org.elixir_lang.heex.file
 
-import com.intellij.ide.highlighter.HtmlFileType
 import com.intellij.lang.Language
 import com.intellij.openapi.editor.colors.EditorColorsScheme
 import com.intellij.openapi.fileTypes.*
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.psi.xml.HtmlFileElementType
 import org.elixir_lang.heex.HeexLanguage
 import org.elixir_lang.heex.Icons
 import org.elixir_lang.heex.TemplateHighlighter
-import org.elixir_lang.heex.html.HeexHTMLFileType
 import java.util.*
 import java.util.stream.Collectors
 import javax.swing.Icon
@@ -52,8 +49,6 @@ open class Type protected constructor(lang: Language? = HeexLanguage.INSTANCE) :
                 ?.let { type ->
                     if (type === FileTypes.UNKNOWN) {
                         null
-                    } else if (type == HtmlFileType.INSTANCE) {
-                        Optional.of(HeexHTMLFileType.INSTANCE)
                     } else {
                         Optional.of(type)
                     }
