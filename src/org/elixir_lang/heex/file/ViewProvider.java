@@ -2,7 +2,6 @@ package org.elixir_lang.heex.file;
 
 import com.intellij.lang.LanguageParserDefinitions;
 import com.intellij.lang.ParserDefinition;
-import com.intellij.lang.html.HTMLLanguage;
 import com.intellij.openapi.fileTypes.LanguageFileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -14,16 +13,13 @@ import com.intellij.psi.impl.source.PsiFileImpl;
 import com.intellij.psi.templateLanguages.ConfigurableTemplateLanguageFileViewProvider;
 import com.intellij.psi.templateLanguages.TemplateDataLanguageMappings;
 import com.intellij.psi.tree.IElementType;
-import gnu.trove.THashSet;
 import org.elixir_lang.ElixirLanguage;
 import org.elixir_lang.heex.HeexLanguage;
 import org.elixir_lang.heex.element_type.HTMLEmbeddedElixir;
 import org.elixir_lang.heex.file.psi.TemplateData;
-import org.elixir_lang.heex.html.HeexHTMLLanguage;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -104,11 +100,7 @@ public class ViewProvider extends MultiplePsiFilesPerDocumentFileViewProvider
         ParserDefinition parserDefinition;
         PsiFileImpl psiFileImpl;
 
-        if (language.isKindOf(HTMLLanguage.INSTANCE)) {
-            parserDefinition = getDefinition(HeexHTMLLanguage.INSTANCE);
-        } else {
-            parserDefinition = getDefinition(language);
-        }
+        parserDefinition = getDefinition(language);
 
         if (parserDefinition == null) {
             psiFileImpl = null;
@@ -148,10 +140,6 @@ public class ViewProvider extends MultiplePsiFilesPerDocumentFileViewProvider
     @NotNull
     @Override
     public com.intellij.lang.Language getTemplateDataLanguage() {
-        if (templateDataLanguage == HTMLLanguage.INSTANCE) {
-            return HeexHTMLLanguage.INSTANCE;
-        }
-
         return templateDataLanguage;
     }
 

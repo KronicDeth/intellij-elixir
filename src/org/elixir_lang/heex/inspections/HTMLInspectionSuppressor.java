@@ -8,7 +8,7 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.xml.XmlTag;
 import com.intellij.xml.util.CheckEmptyTagInspection;
-import org.elixir_lang.heex.html.HeexHTMLLanguage;
+import org.elixir_lang.heex.HeexLanguage;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -21,13 +21,13 @@ public class HTMLInspectionSuppressor implements InspectionSuppressor {
     );
 
 
-    public boolean isSuppressedFor(PsiElement element, String toolId) {
+    public boolean isSuppressedFor(@NotNull PsiElement element, @NotNull String toolId) {
         if (!SUPPRESSED_INSPECTIONS.contains(toolId)) {
             return false;
         }
 
         PsiFile file = element.getContainingFile();
-        if (file != null && file.getViewProvider().hasLanguage(HeexHTMLLanguage.INSTANCE)) {
+        if (file != null && file.getViewProvider().hasLanguage(HeexLanguage.INSTANCE)) {
             XmlTag xmlTag = PsiTreeUtil.getParentOfType(element, XmlTag.class, false);
 
             // Tag names that contain dots are HEEx components
