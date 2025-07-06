@@ -43,9 +43,9 @@ PROCEDURAL_OPENING = {OPENING} " "
 WHITE_SPACE = [\ \t\f\r\n]+
 ANY = [^]
 
-START_SCRIPT_TAG = "<script"
+START_SCRIPT_TAG = <script[\s>]
 END_SCRIPT_TAG = "</script>"
-START_STYLE_TAG = "<style"
+START_STYLE_TAG = <style[\s>]
 END_STYLE_TAG = "</style>"
 
 %state WHITESPACE_MAYBE
