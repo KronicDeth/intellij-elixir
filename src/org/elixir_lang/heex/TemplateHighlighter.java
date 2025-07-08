@@ -1,5 +1,6 @@
 package org.elixir_lang.heex;
 
+import com.intellij.ide.highlighter.HtmlFileType;
 import com.intellij.openapi.editor.colors.EditorColorsScheme;
 import com.intellij.openapi.editor.ex.util.LayerDescriptor;
 import com.intellij.openapi.editor.ex.util.LayeredLexerEditorHighlighter;
@@ -11,6 +12,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.templateLanguages.TemplateDataLanguageMappings;
 import org.elixir_lang.ElixirFileType;
+import org.elixir_lang.heex.html.HeexHTMLFileHighlighter;
 import org.elixir_lang.heex.psi.Types;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -47,7 +49,12 @@ public class TemplateHighlighter extends LayeredLexerEditorHighlighter {
             }
         }
 
-        SyntaxHighlighter dataHighlighter = SyntaxHighlighterFactory.getSyntaxHighlighter(type, project, virtualFile);
+        SyntaxHighlighter dataHighlighter;
+        if (type == HtmlFileType.INSTANCE) {
+            dataHighlighter = new HeexHTMLFileHighlighter();
+        } else {
+            dataHighlighter = SyntaxHighlighterFactory.getSyntaxHighlighter(type, project, virtualFile);
+        }
         registerLayer(Types.DATA, new LayerDescriptor(dataHighlighter, ""));
 
         SyntaxHighlighter elixirHighligher = SyntaxHighlighterFactory.getSyntaxHighlighter(ElixirFileType.INSTANCE, project, virtualFile);
