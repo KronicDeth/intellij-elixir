@@ -10,7 +10,11 @@
          on how to target different products -->
     <depends>com.intellij.modules.lang</depends>
     <depends>org.intellij.plugins.markdown</depends>
+
+    <!-- optional modules -->
+    <!-- See https://plugins.jetbrains.com/docs/intellij/plugin-dependencies.html#optional-plugin-dependencies for naming convention -->
     <depends config-file="rich-platform-plugin.xml" optional="true">com.intellij.modules.java</depends>
+    <depends config-file="optional/org.elixir_lang-withIntellijLang.xml" optional="true">org.intellij.intelliLang</depends>
 
     <extensionPoints>
         <extensionPoint qualifiedName="org.elixir_lang.packageManager" interface="org.elixir_lang.PackageManager"
@@ -269,7 +273,6 @@
 
         <lang.documentationProvider implementationClass="org.elixir_lang.documentation.ElixirDocumentationProvider"
                                     language="Elixir"/>
-        <multiHostInjector implementation="org.elixir_lang.injection.markdown.Injector"/>
 
         <!-- Dialyzer -->
         <globalInspection displayName="Dialyzer based inspections (Elixir)" shortName="Dialyzer"
