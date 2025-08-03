@@ -117,7 +117,14 @@ intellijPlatform {
             System.getenv("JET_BRAINS_MARKETPLACE_TOKEN")
         }
         channels = publishChannels.split(',').toList()
-        archiveFile = layout.buildDirectory.file("distributions/${System.getenv("ASSET_NAME")}")
+        
+        // Use the path from the -PdistributionFile property if it exists,
+        // otherwise fall back to the old environment variable method.
+        if (project.hasProperty("distributionFile")) {
+            archiveFile = file(project.property("distributionFile"))
+        } else if (System.getenv("ASSET_NAME")) {
+            archiveFile = layout.buildDirectory.file("distributions/${System.getenv("ASSET_NAME")}")
+        }
     }
     pluginVerification {
         ides {
