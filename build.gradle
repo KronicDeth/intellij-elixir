@@ -96,7 +96,6 @@ intellijPlatform {
 
         id = providers.gradleProperty("pluginGroup")
         name = providers.gradleProperty("pluginName")
-        version = providers.gradleProperty("pluginVersion")
         changeNotes.set(bodyInnerHTML("resources/META-INF/changelog.html"))
         description.set(bodyInnerHTML("resources/META-INF/description.html"))
 
