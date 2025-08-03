@@ -11,11 +11,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Setup JBR 21
-        uses: actions/setup-java@v5
-        with:
-          distribution: 'jetbrains'
-          java-version: 21
+      - name: Setup JetBrains Runtime (JBR)
+        uses: ./.github/actions/setup-jbr
       - name: Set up Elixir
         uses: erlef/setup-beam@v1
         with:
@@ -40,11 +37,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Setup JBR 21
-        uses: actions/setup-java@v5
-        with:
-          distribution: 'jetbrains'
-          java-version: 21
+      - name: Setup JetBrains Runtime (JBR)
+        uses: ./.github/actions/setup-jbr
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Run Plugin Verifier
@@ -55,11 +49,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Setup JBR 21
-        uses: actions/setup-java@v5
-        with:
-          distribution: 'jetbrains'
-          java-version: 21
+      - name: Setup JetBrains Runtime (JBR)
+        uses: ./.github/actions/setup-jbr
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Build with Gradle
