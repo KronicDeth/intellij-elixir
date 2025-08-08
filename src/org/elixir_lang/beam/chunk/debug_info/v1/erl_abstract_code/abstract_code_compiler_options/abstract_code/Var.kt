@@ -7,6 +7,8 @@ import org.elixir_lang.Macro
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode.ifTag
 import org.elixir_lang.code.Identifier.inspectAsKey
+import java.util.Locale
+import java.util.Locale.getDefault
 
 object Var {
     fun <T> ifTo(term: OtpErlangObject?, ifTrue: (OtpErlangTuple) -> T): T? = ifTag(term, TAG, ifTrue)
@@ -36,7 +38,8 @@ object Var {
                 else -> AbstractCode.error("unknown_name:", "var name is unknown", name)
             }
 
-    fun nameToString(name: OtpErlangAtom) = name.atomValue().decapitalize().escapeElixirKeyword()
+    fun nameToString(name: OtpErlangAtom) =
+        name.atomValue().replaceFirstChar { it.lowercase(getDefault()) }.escapeElixirKeyword()
 
     private fun nameToMacroStringDeclaredScope(name: OtpErlangAtom, scope: Scope): MacroStringDeclaredScope {
         val varName = nameToString(name)

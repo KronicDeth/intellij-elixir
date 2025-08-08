@@ -8,6 +8,8 @@ import org.elixir_lang.NameArity
 import org.elixir_lang.beam.chunk.ElixirDocumentation
 import org.elixir_lang.beam.term.inspect
 import org.elixir_lang.beam.term.line
+import java.util.Locale
+import java.util.Locale.getDefault
 
 class TypeDoc(val nameArity: NameArity, val line: Int, val kind: Kind, val doc: Any?) {
     enum class Kind {
@@ -15,7 +17,7 @@ class TypeDoc(val nameArity: NameArity, val line: Int, val kind: Kind, val doc: 
         TYPE,
         TYPEP;
 
-        val attributeName: String by lazy { name.toLowerCase() }
+        val attributeName: String by lazy { name.lowercase(getDefault()) }
         val attribute: String by lazy { "@$attributeName" }
 
         companion object {

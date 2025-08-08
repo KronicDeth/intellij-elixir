@@ -1,9 +1,14 @@
 name: Test
 
-on: pull_request
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+  workflow_dispatch:
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.head_ref }}
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -12,15 +17,17 @@ jobs:
 
     strategy:
       matrix:
-        ideaVersion: [ "2024.2.0.1" ]
+        ideaVersion: [ "2025.2", "2025.1.3", "2024.1.7" ]
 
     steps:
       - uses: actions/checkout@v2
       - name: Setup JBR 21
-        uses: gmitch215/setup-java@6d2c5e1f82f180ae79f799f0ed6e3e5efb4e664d
+        uses: actions/setup-java@v4
         with:
           distribution: 'jetbrains'
           java-version: 21
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
       - name: Set up Elixir
         uses: erlef/setup-beam@v1
         with:
@@ -48,7 +55,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Setup JBR 21
-        uses: gmitch215/setup-java@6d2c5e1f82f180ae79f799f0ed6e3e5efb4e664d
+        uses: actions/setup-java@v4
         with:
           distribution: 'jetbrains'
           java-version: 21

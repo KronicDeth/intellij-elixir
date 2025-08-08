@@ -479,7 +479,7 @@ ELIXIR_SDK_HOME
                     {
                         ApplicationManager.getApplication().runWriteAction { projectJdkTable.addJdk(projectJdkImpl) }
                     },
-                    ModalityState.NON_MODAL,
+                    ModalityState.nonModal(),
                 )
                 projectJdkImpl
             } else {
@@ -516,10 +516,6 @@ ELIXIR_SDK_HOME
         @JvmStatic
         val instance: Type
             get() = findInstance(Type::class.java)
-
-        fun getNonNullRelease(element: PsiElement): Release = getRelease(element) ?: Release.LATEST
-
-        private fun getRelease(element: PsiElement): Release? = getRelease(mostSpecificSdk(element))
 
         @JvmStatic
         @Contract("null -> null")
@@ -575,8 +571,8 @@ ELIXIR_SDK_HOME
                                     ReadAction.compute<Module, Throwable> {
                                         ModuleUtilCore.findModuleForPsiElement(psiElement)
                                     }
-                                } catch (_: AlreadyDisposedException) {
-                                    null
+                                } catch (x: AlreadyDisposedException) {
+                                    throw x
                                 }
                             }.get() // Wait for the result
 
