@@ -1,5 +1,11 @@
 # Changelog
 
+## v22.0.0 (Unreleased)
+### Enhancements
+* [#3712](https://github.com/KronicDeth/intellij-elixir/pull/3712) - [@joshuataylor](https://github.com/joshuataylor)
+  * Upgrade Kotlin to 2.2.10, as it's deprecated in IntelliJ 2025.1+, various deprecations are also fixed.
+  * Fixed adding Erlang/Elixir SDKs in 2025.1+ IDEs.
+
 ## v21.0.0
 ### Enhancements
 * [#3651](https://github.com/KronicDeth/intellij-elixir/pull/3681) - [@joshuataylor](https://github.com/joshuataylor)
