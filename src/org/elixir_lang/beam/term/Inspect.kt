@@ -27,8 +27,8 @@ fun String.elixirEscape(): String {
 
 private fun Int.elixirEscape(): IntStream =
     when (this) {
-        '\n'.toInt() -> "\\n".codePoints()
-        '\r'.toInt() -> "\\r".codePoints()
+        '\n'.code -> "\\n".codePoints()
+        '\r'.code -> "\\r".codePoints()
         27 -> "\\e".codePoints()
         else -> IntStream.of(this)
     }

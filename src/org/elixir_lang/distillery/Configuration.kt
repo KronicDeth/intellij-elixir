@@ -22,6 +22,8 @@ import org.jdom.Element
 import java.io.File
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.util.Locale
+import java.util.Locale.getDefault
 import kotlin.io.path.exists
 
 class Configuration(name: String, project: Project, configurationFactory: ConfigurationFactory) :
@@ -108,7 +110,7 @@ class Configuration(name: String, project: Project, configurationFactory: Config
         }
 
     var codeLoadingMode: CodeLoadingMode?
-        get() = _envs[CODE_LOADING_MODE]?.let { CodeLoadingMode.valueOf(it.toUpperCase()) }
+        get() = _envs[CODE_LOADING_MODE]?.let { CodeLoadingMode.valueOf(it.uppercase(getDefault())) }
         set(codeLoadingMode) {
             if (codeLoadingMode == null) {
                 _envs.remove(CODE_LOADING_MODE)

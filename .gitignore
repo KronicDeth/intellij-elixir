@@ -29,3 +29,4 @@ jps-shared/build
 jps-shared/out
 libs/
 .intellijPlatform
+/.kotlin

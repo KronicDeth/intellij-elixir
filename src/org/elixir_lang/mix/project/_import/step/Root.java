@@ -10,6 +10,7 @@ import com.intellij.execution.process.ProcessTerminatedListener;
 import com.intellij.ide.util.projectWizard.WizardContext;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
@@ -46,12 +47,11 @@ public class Root extends ProjectImportWizardStep {
 
         String projectFileDirectory = context.getProjectFileDirectory();
         //noinspection DialogTitleCapitalization
-        myProjectRootComponent.addBrowseFolderListener(
-                "Select mix.exs of a mix project to import",
-                "",
-                null,
-                FileChooserDescriptorFactory.createSingleFolderDescriptor()
-        );
+        FileChooserDescriptor descriptor = FileChooserDescriptorFactory.createSingleFolderDescriptor()
+                .withTitle("Select mix.exs of a mix project to import")
+                .withDescription("");
+
+        myProjectRootComponent.addBrowseFolderListener(null, descriptor);
 
         myProjectRootComponent.setText(projectFileDirectory); // provide project path
 
@@ -95,7 +95,7 @@ public class Root extends ProjectImportWizardStep {
                             handler.addProcessListener(
                                     new ProcessAdapter() {
                                         @Override
-                                        public void onTextAvailable(ProcessEvent event, Key outputType) {
+                                        public void onTextAvailable(@NotNull ProcessEvent event, @NotNull Key outputType) {
                                             String text = event.getText();
                                             indicator.setText2(text);
                                         }

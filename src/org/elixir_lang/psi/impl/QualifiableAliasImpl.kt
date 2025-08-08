@@ -6,8 +6,8 @@ import com.intellij.psi.PsiReference
 import com.intellij.psi.ResolveResult
 import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager
+import com.intellij.psi.util.endOffset
 import com.intellij.psi.util.isAncestor
-import com.intellij.refactoring.suggested.endOffset
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
@@ -25,7 +25,7 @@ fun QualifiableAlias.computeReference(): PsiPolyVariantReference? =
         is QualifiableAlias ->
             // If the `parent` goes beyond this element then this element is the outermost Qualifiable alias that is still
             // ends in this element, so it represents the fully-qualified name.
-            if (endOffset < parent.endOffset) {
+            if (this.endOffset < parent.endOffset) {
                 // The range in the element though should only be the final to match the guidance in
                 // `com.intellij.psi.PsiReference#getRangeInElement`, which appears necessary to make completion to
                 // work
