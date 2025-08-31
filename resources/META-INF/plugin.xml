@@ -22,7 +22,11 @@
     </extensions>
 
     <extensions defaultExtensionNs="com.intellij">
-<!--        <errorHandler implementation="org.elixir_lang.errorreport.Submitter"/>-->
+        <registryKey key="org.elixir_lang.injection.enableLiteralSigilInjection"
+                     defaultValue="false"
+                     description="Enables literal sigil injection, which allows the Elixir sigil ~S to work. WARNING: THIS IS CURRENTLY BUGGY AND CAUSING ISSUES WITH ~s"/>
+
+        <!--        <errorHandler implementation="org.elixir_lang.errorreport.Submitter"/>-->
         <errorHandler implementation="com.intellij.diagnostic.JetBrainsMarketplaceErrorReportSubmitter"/>
 
         <!-- `openProjectProcessor` for Small IDEs -->
@@ -215,8 +219,8 @@
         <lang.psiStructureViewFactory language="Elixir" implementationClass="org.elixir_lang.structure_view.Factory"/>
         <lang.quoteHandler language="Elixir" implementationClass="org.elixir_lang.QuoteHandler"/>
         <lang.syntaxHighlighterFactory
-                                       implementationClass="org.elixir_lang.ElixirSyntaxHighlighterFactory"
-                                       language="Elixir"/>
+                implementationClass="org.elixir_lang.ElixirSyntaxHighlighterFactory"
+                language="Elixir"/>
         <localInspection displayName="Ambiguous nested calls" enabledByDefault="true" groupName="Elixir"
                          implementationClass="org.elixir_lang.inspection.NoParenthesesManyStrict" language="Elixir"
                          level="ERROR" shortName="NoParenthesesManyStrict"/>

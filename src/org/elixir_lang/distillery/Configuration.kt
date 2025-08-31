@@ -108,7 +108,7 @@ class Configuration(name: String, project: Project, configurationFactory: Config
         }
 
     var codeLoadingMode: CodeLoadingMode?
-        get() = _envs[CODE_LOADING_MODE]?.let { CodeLoadingMode.valueOf(it.toUpperCase()) }
+        get() = _envs[CODE_LOADING_MODE]?.let { CodeLoadingMode.valueOf(it.uppercase()) }
         set(codeLoadingMode) {
             if (codeLoadingMode == null) {
                 _envs.remove(CODE_LOADING_MODE)

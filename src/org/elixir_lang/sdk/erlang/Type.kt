@@ -2,7 +2,9 @@ package org.elixir_lang.sdk.erlang
 
 import com.intellij.execution.ExecutionException
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.writeAction
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.progress.runBlockingCancellable
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.projectRoots.SdkModel
 import com.intellij.openapi.projectRoots.SdkModificator
@@ -117,7 +119,19 @@ class Type : SdkType("Erlang SDK for Elixir SDK") {
         val sdkModificator = sdk.sdkModificator
         org.elixir_lang.sdk.Type
             .addCodePaths(sdkModificator)
-        ApplicationManager.getApplication().runWriteAction { sdkModificator.commitChanges() }
+
+        // Check if we're already in a write action (called from Elixir SDK setup)
+        if (ApplicationManager.getApplication().isWriteAccessAllowed) {
+            // We're already in a write action, commit directly
+            sdkModificator.commitChanges()
+        } else {
+            // Use coroutine-based approach for IntelliJ 2025.2+ compatibility when called independently
+            runBlockingCancellable {
+                writeAction {
+                    sdkModificator.commitChanges()
+                }
+            }
+        }
     }
 
     override fun suggestHomePath(): String? = suggestHomePaths().firstOrNull()

@@ -4,9 +4,9 @@ import com.intellij.lang.injection.MultiHostInjector
 import com.intellij.lang.injection.MultiHostRegistrar
 import com.intellij.openapi.diagnostic.RuntimeExceptionWithAttachments
 import com.intellij.openapi.util.TextRange
+import com.intellij.openapi.util.registry.Registry
 import com.intellij.psi.PsiElement
 import org.elixir_lang.ElixirLanguage
-import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.reference.ModuleAttribute.Companion.DOCUMENTATION_NAME_SET
@@ -25,9 +25,37 @@ class Injector : MultiHostInjector {
             ?.let { getLanguagesToInjectInQuote(registrar, it) }
     }
 
+    /**
+     * Returns true if we should inject into literal sigils (~S, ~W, …).
+     * By default this is **disabled** to avoid SmartPsiElementPointer issues in IntelliJ 2025.1+.
+     * Can be enabled via Registry for testing or if using older IntelliJ versions.
+     */
+    private fun literalSigilInjectionEnabled(): Boolean =
+        Registry.`is`(REG_KEY_ENABLE_LITERAL_SIGIL_INJECTION, false)
+
     private fun getLanguagesToInjectInQuote(registrar: MultiHostRegistrar, documentation: PsiElement) {
         when (documentation) {
+            is SigilHeredoc -> {
+                // Handle sigil heredocs (like ~s"""...""" or ~S"""...""")
+                val isLiteral = isLiteralSigil(documentation)
+
+                if (isLiteral) {
+                    // Literal sigils (~S""") - inject with caution due to IntelliJ 2025.1+ issues
+                    val injectionEnabled = literalSigilInjectionEnabled()
+
+                    if (injectionEnabled) {
+                        // If enabled via Registry, inject Markdown only (no nested Elixir)
+                        injectMarkdownInQuote(registrar, documentation)
+                    }
+                    // If disabled, no injection occurs to avoid SmartPsiElementPointer crashes
+                } else {
+                    // Interpolating sigils (~s""") - inject Elixir code blocks only
+                    injectElixirInCodeBlocksInQuote(registrar, documentation)
+                }
+            }
+
             is Heredoc -> {
+                // Handle regular heredocs (like """...""" or '''...''')
                 injectMarkdownInQuote(registrar, documentation)
                 injectElixirInCodeBlocksInQuote(registrar, documentation)
             }
@@ -62,24 +90,22 @@ class Injector : MultiHostInjector {
                     "deprecated" -> getLanguagesToInjectInQuote(registrar, documentation.keywordValue)
                     "authors", "group", "guard", "request_body", "responses", "since", "type" -> Unit
                     else -> {
-                        Logger.error(
-                            javaClass,
+                        LOGGER.error(
                             "Do not known whether to inject Markdown in documentation key $key",
-                            documentation
                         )
                     }
                 }
             }
 
             else -> {
-                Logger.error(javaClass, "Do not know whether to inject Markdown in documentation", documentation)
+                LOGGER.error("Do not know whether to inject Markdown in documentation")
             }
         }
     }
 
     private fun injectMarkdownInQuote(registrar: MultiHostRegistrar, documentation: Heredoc) {
         var injectionStarted = false
-        val prefixLength = documentation.heredocPrefix.textLength
+        val prefixLength = documentation.heredocPrefix?.textLength ?: 0
         val quoteOffset = documentation.textOffset
         var listIndent = -1
         var inException = false
@@ -165,7 +191,7 @@ class Injector : MultiHostInjector {
                 try {
                     registrar.addPlace(null, null, documentation, textRangeInQuote)
                 } catch (exception: RuntimeExceptionWithAttachments) {
-                    Logger.error(javaClass, "Cannot inject markdown in Heredoc", documentation)
+                    LOGGER.error("Cannot inject markdown in Heredoc - exception: $exception", exception)
                 }
             }
         }
@@ -187,7 +213,7 @@ class Injector : MultiHostInjector {
     private fun injectElixirInCodeBlocksInQuote(registrar: MultiHostRegistrar, documentation: Heredoc) {
         registrar.startInjecting(MarkdownLanguage.INSTANCE)
 
-        val prefixLength = documentation.heredocPrefix.textLength
+        val prefixLength = documentation.heredocPrefix?.textLength ?: 0
         val quoteOffset = documentation.textOffset
         var inCodeBlock = false
         var listIndent = -1
@@ -293,6 +319,7 @@ class Injector : MultiHostInjector {
         listOf(AtUnqualifiedNoParenthesesCall::class.java)
 
     companion object {
+        private val LOGGER = com.intellij.openapi.diagnostic.Logger.getInstance(Injector::class.java)
         private const val CODE_BLOCK_INDENT = "    "
         private const val CODE_BLOCK_INDENT_LENGTH = CODE_BLOCK_INDENT.length
         private const val IEX_PROMPT = "iex> "
@@ -306,5 +333,18 @@ class Injector : MultiHostInjector {
 
         fun isValidHost(atUnqualifiedNoParenthesesCall: AtUnqualifiedNoParenthesesCall<*>): Boolean =
             atUnqualifiedNoParenthesesCall.atIdentifier.lastChild?.text in DOCUMENTATION_NAME_SET
+
+        /**
+         * Registry key to control literal sigil injection behavior.
+         *
+         * Path: Help -> Find Action… -> "Registry…" -> search for this key name
+         */
+        const val REG_KEY_ENABLE_LITERAL_SIGIL_INJECTION =
+            "org.elixir_lang.injection.enableLiteralSigilInjection"
+
+        private fun isLiteralSigil(heredoc: Heredoc): Boolean {
+            val prefix = heredoc.heredocPrefix?.text ?: return false
+            return prefix.length >= 2 && prefix[0] == '~' && prefix[1].isUpperCase()
+        }
     }
 }

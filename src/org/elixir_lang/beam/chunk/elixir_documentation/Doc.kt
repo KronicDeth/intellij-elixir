@@ -10,13 +10,15 @@ import org.elixir_lang.NameArity
 import org.elixir_lang.beam.chunk.ElixirDocumentation.Companion.doc
 import org.elixir_lang.beam.term.inspect
 import org.elixir_lang.beam.term.line
+import java.util.Locale
+import java.util.Locale.getDefault
 
 data class Doc(val nameArity: NameArity, val line: Int, val kind: Kind, val arguments: List<String>, val doc: Any?) {
     enum class Kind {
         DEF,
         DEFMACRO;
 
-        val macro: String by lazy { name.toLowerCase() }
+        val macro: String by lazy { name.lowercase(getDefault()) }
 
         companion object {
             private val KIND_BY_MACRO = Kind.values().associateBy { it.macro }
