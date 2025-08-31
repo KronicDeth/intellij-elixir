@@ -222,8 +222,8 @@ class ElixirSyntaxHighlighter : SyntaxHighlighterBase() {
             ('A'..'Z').flatMap { letter ->
                 arrayOf("LOWER", "UPPER").map { capitalization ->
                     val name: Char = when (capitalization) {
-                        "LOWER" -> letter.toLowerCase()
-                        "UPPER" -> letter.toUpperCase()
+                        "LOWER" -> letter.lowercaseChar()
+                        "UPPER" -> letter.uppercaseChar()
                         else -> '?'
                     }
 
@@ -235,8 +235,8 @@ class ElixirSyntaxHighlighter : SyntaxHighlighterBase() {
         val SIGIL_NAMES: kotlin.collections.List<Char> = ('A'..'Z').flatMap { letter ->
             arrayOf("LOWER", "UPPER").map { capitalization ->
                 val name: Char = when (capitalization) {
-                    "LOWER" -> letter.toLowerCase()
-                    "UPPER" -> letter.toUpperCase()
+                    "LOWER" -> letter.lowercaseChar()
+                    "UPPER" -> letter.uppercaseChar()
                     else -> '?'
                 }
                 name
@@ -247,8 +247,8 @@ class ElixirSyntaxHighlighter : SyntaxHighlighterBase() {
         val SIGIL_BY_NAME: Map<Char, TextAttributesKey> = ('A'..'Z').flatMap { letter ->
             arrayOf("LOWER", "UPPER").map { capitalization ->
                 val name: Char = when (capitalization) {
-                    "LOWER" -> letter.toLowerCase()
-                    "UPPER" -> letter.toUpperCase()
+                    "LOWER" -> letter.lowercaseChar()
+                    "UPPER" -> letter.uppercaseChar()
                     else -> '?'
                 }
                 name to TextAttributesKey.createTextAttributesKey("ELIXIR_SIGIL_${capitalization}_${letter}", SIGIL)
