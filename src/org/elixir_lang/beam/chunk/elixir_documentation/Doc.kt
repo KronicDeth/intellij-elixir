@@ -18,7 +18,7 @@ data class Doc(val nameArity: NameArity, val line: Int, val kind: Kind, val argu
         DEF,
         DEFMACRO;
 
-        val macro: String by lazy { name.lowercase(getDefault()) }
+        val macro: String by lazy { name.lowercase() }
 
         companion object {
             private val KIND_BY_MACRO = Kind.values().associateBy { it.macro }
