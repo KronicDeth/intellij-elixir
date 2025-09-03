@@ -25,7 +25,6 @@ import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.psi.PsiElement
-import com.intellij.serviceContainer.AlreadyDisposedException
 import com.intellij.util.system.CpuArch
 import gnu.trove.THashSet
 import org.apache.commons.io.FilenameUtils
@@ -588,12 +587,8 @@ ELIXIR_SDK_HOME
                         ApplicationManager
                             .getApplication()
                             .executeOnPooledThread<Module?> {
-                                try {
-                                    ReadAction.compute<Module, Throwable> {
-                                        ModuleUtilCore.findModuleForPsiElement(psiElement)
-                                    }
-                                } catch (_: AlreadyDisposedException) {
-                                    null
+                                ReadAction.compute<Module, Throwable> {
+                                    ModuleUtilCore.findModuleForPsiElement(psiElement)
                                 }
                             }.get() // Wait for the result
 
