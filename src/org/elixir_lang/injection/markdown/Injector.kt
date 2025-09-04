@@ -31,7 +31,7 @@ class Injector : MultiHostInjector {
      * Can be enabled via Registry for testing or if using older IntelliJ versions.
      */
     private fun literalSigilInjectionEnabled(): Boolean =
-        Registry.`is`(REG_KEY_ENABLE_LITERAL_SIGIL_INJECTION, false)
+        Registry.`is`(REG_KEY_ENABLE_LITERAL_SIGIL_INJECTION, true)
 
     private fun getLanguagesToInjectInQuote(registrar: MultiHostRegistrar, documentation: PsiElement) {
         when (documentation) {
