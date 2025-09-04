@@ -3,7 +3,7 @@ package org.elixir_lang.sdk.elixir
 import com.intellij.facet.FacetManager
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ReadAction
-import com.intellij.openapi.application.writeAction
+import com.intellij.openapi.application.edtWriteAction
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.fileChooser.FileChooserDescriptor
 import com.intellij.openapi.module.Module
@@ -337,7 +337,7 @@ ELIXIR_SDK_HOME
 
             // Use coroutine-based approach for final commit for IntelliJ 2025.2+ compatibility
             runBlockingCancellable {
-                writeAction {
+                edtWriteAction {
                     sdkModificator.commitChanges()
                 }
             }
@@ -489,7 +489,7 @@ ELIXIR_SDK_HOME
 
                 // Add to SDK table and setup paths using coroutine-based approach
                 runBlockingCancellable {
-                    writeAction {
+                    edtWriteAction {
                         projectJdkTable.addJdk(projectJdkImpl)
 
                         // Setup SDK paths - this will work properly within the write action

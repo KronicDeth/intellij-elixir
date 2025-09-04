@@ -1,7 +1,9 @@
 package org.elixir_lang.beam.assembly
 
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.edtWriteAction
 import com.intellij.openapi.editor.Document
+import com.intellij.openapi.progress.runBlockingCancellable
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiFileFactory
@@ -178,8 +180,10 @@ class Controls(val cache: Cache, val project: Project): JBScrollPane() {
     private fun computeDocumentText() = cache.code?.assembly(cache, assemblyOptions) ?: DEFAULT_TEXT
 
     private fun setDocumentText() {
-        ApplicationManager.getApplication().runWriteAction {
-            document.setText(computeDocumentText())
+        runBlockingCancellable {
+            edtWriteAction {
+                document.setText(computeDocumentText())
+            }
         }
     }
 }

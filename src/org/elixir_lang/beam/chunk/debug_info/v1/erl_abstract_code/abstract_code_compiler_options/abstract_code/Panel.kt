@@ -2,8 +2,9 @@
 
 package org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code
 
-import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.edtWriteAction
 import com.intellij.openapi.editor.EditorFactory
+import com.intellij.openapi.progress.runBlockingCancellable
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiFileFactory
@@ -37,7 +38,6 @@ class Panel(private val formsTree: Tree, project: Project): JPanel(GridLayout(1,
 
     private val attributeModuleByAttribute = createWeakValueMap<ToMacroString, String>()
 
-    private var attributes: WeakReference<String> = WeakReference<String>(null)
     private var attributesModule: WeakReference<String> = WeakReference<String>(null)
 
     private var clauseByClause = createWeakValueMap<Clause, String>()
@@ -47,7 +47,6 @@ class Panel(private val formsTree: Tree, project: Project): JPanel(GridLayout(1,
 
     private val functionModuleByFunction = createWeakValueMap<Function, String>()
 
-    private var functions: WeakReference<String> = WeakReference<String>(null)
     private var functionsModule: WeakReference<String> = WeakReference<String>(null)
 
     private var module: WeakReference<String> = WeakReference<String>(null)
@@ -204,8 +203,10 @@ class Panel(private val formsTree: Tree, project: Project): JPanel(GridLayout(1,
             else -> DEFAULT_TEXT
         }
 
-        ApplicationManager.getApplication().runWriteAction {
-            document.setText(text)
+        runBlockingCancellable {
+            edtWriteAction {
+                document.setText(text)
+            }
         }
     }
 

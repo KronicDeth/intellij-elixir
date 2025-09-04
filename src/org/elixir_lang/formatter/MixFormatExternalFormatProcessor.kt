@@ -5,9 +5,11 @@ import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.process.CapturingProcessHandler
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.runReadAction
+import com.intellij.openapi.application.edtWriteAction
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.progress.ProgressManager
+import com.intellij.openapi.progress.runBlockingCancellable
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.util.TextRange
@@ -46,10 +48,10 @@ class MixFormatExternalFormatProcessor : ExternalFormatProcessor {
                     workingDirectory(source)?.let { workingDirectory ->
                         mostSpecificSdk(source)?.takeIf(::elixirSdkHasErlangSdk)?.let { sdk ->
                             format(workingDirectory, sdk, document.text)?.let { formattedText ->
-                                application.invokeLater {
+                                runBlockingCancellable {
                                     if (source.isValid) {
-                                        CommandProcessor.getInstance().runUndoTransparentAction {
-                                            application.runWriteAction {
+                                        edtWriteAction {
+                                            CommandProcessor.getInstance().runUndoTransparentAction {
                                                 document.setText(formattedText)
                                             }
                                         }
