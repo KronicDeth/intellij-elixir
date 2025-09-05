@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v5
       - name: Setup JetBrains Runtime (JBR)
         uses: ./.github/actions/setup-jbr
       - name: Set up Elixir
@@ -34,9 +34,8 @@ jobs:
         run: ./gradlew --stacktrace test
   verifyPlugin:
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v5
       - name: Setup JetBrains Runtime (JBR)
         uses: ./.github/actions/setup-jbr
       - name: Grant execute permission for gradlew
@@ -46,9 +45,8 @@ jobs:
   release:
     needs: [ test, verifyPlugin ]
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v5
       - name: Setup JetBrains Runtime (JBR)
         uses: ./.github/actions/setup-jbr
       - name: Grant execute permission for gradlew
