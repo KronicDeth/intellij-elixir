@@ -1,0 +1,11 @@
+name: 'Setup JetBrains Runtime (JBR) 21'
+description: 'Installs and sets up JBR 21 using a standardized step'
+runs:
+  using: "composite"
+  steps:
+    - name: Setup JBR 21 ☕
+      uses: actions/setup-java@v5
+      with:
+        distribution: 'jetbrains'
+        java-version: 21
+        cache: 'gradle'

@@ -1,6 +1,6 @@
 name: Test
 
-on: pull_request
+on: [ pull_request, workflow_dispatch ]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref }}
@@ -12,15 +12,12 @@ jobs:
 
     strategy:
       matrix:
-        ideaVersion: [ "2024.2.0.1" ]
+        ideaVersion: [ "2024.3.6" ]
 
     steps:
-      - uses: actions/checkout@v2
-      - name: Setup JBR 21
-        uses: gmitch215/setup-java@6d2c5e1f82f180ae79f799f0ed6e3e5efb4e664d
-        with:
-          distribution: 'jetbrains'
-          java-version: 21
+      - uses: actions/checkout@v5
+      - name: Setup JetBrains Runtime (JBR)
+        uses: ./.github/actions/setup-jbr
       - name: Set up Elixir
         uses: erlef/setup-beam@v1
         with:
@@ -46,12 +43,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
-      - name: Setup JBR 21
-        uses: gmitch215/setup-java@6d2c5e1f82f180ae79f799f0ed6e3e5efb4e664d
-        with:
-          distribution: 'jetbrains'
-          java-version: 21
+      - uses: actions/checkout@v5
+      - name: Setup JetBrains Runtime (JBR)
+        uses: ./.github/actions/setup-jbr
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Run Plugin Verifier
