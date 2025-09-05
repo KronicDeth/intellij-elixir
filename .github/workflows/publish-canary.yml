@@ -1,0 +1,30 @@
+name: Publish to Canary
+on:
+#  release:
+#    types: [prereleased]
+  workflow_dispatch:
+
+jobs:
+  publish-to-canary:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository 💾
+        uses: actions/checkout@v4
+
+      - name: Setup JetBrains Runtime (JBR) ☕
+        uses: ./.github/actions/setup-jbr
+
+      - name: Download release asset 📦
+        id: download_asset
+        uses: dsaltares/fetch-gh-release-asset@1.1.2
+        with:
+          repo: ${{ github.repository }}
+          version: tags/${{ github.ref_name }}
+          file: intellij-elixir-${{ github.ref_name }}.zip
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish to Canary 🐣
+        env:
+          JET_BRAINS_MARKETPLACE_TOKEN: ${{ secrets.JetBrainsMarketplaceToken }}
+        run: >
+          ./gradlew publishPlugin -PdistributionFile=intellij-elixir-${{ github.ref_name }}.zip
