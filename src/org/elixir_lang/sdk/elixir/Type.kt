@@ -2,12 +2,13 @@ package org.elixir_lang.sdk.elixir
 
 import com.intellij.facet.FacetManager
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.application.ReadAction
+import com.intellij.openapi.application.writeAction
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.fileChooser.FileChooserDescriptor
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleUtilCore
+import com.intellij.openapi.progress.runBlockingCancellable
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectBundle
 import com.intellij.openapi.projectRoots.*
@@ -326,12 +327,21 @@ ELIXIR_SDK_HOME
 
         private fun configureSdkPaths(sdk: Sdk) {
             val sdkModificator = sdk.sdkModificator
-            org.elixir_lang.sdk.Type
-                .addCodePaths(sdkModificator)
+
+            // Configure base paths
+            org.elixir_lang.sdk.Type.addCodePaths(sdkModificator)
             addDocumentationPaths(sdkModificator)
             addSourcePaths(sdkModificator)
+
+            // Configure internal Erlang SDK - this will now create and fully setup the Erlang SDK synchronously
             configureInternalErlangSdk(sdk, sdkModificator)
-            ApplicationManager.getApplication().runWriteAction { sdkModificator.commitChanges() }
+
+            // Use coroutine-based approach for final commit for IntelliJ 2025.2+ compatibility
+            runBlockingCancellable {
+                writeAction {
+                    sdkModificator.commitChanges()
+                }
+            }
         }
 
         private fun configureInternalErlangSdk(
@@ -471,16 +481,23 @@ ELIXIR_SDK_HOME
         ): Sdk? {
             val sdkName = erlangSdkType.suggestSdkName("Default " + erlangSdkType.name, homePath)
             val projectJdkImpl = ProjectJdkImpl(sdkName, erlangSdkType)
-            projectJdkImpl.homePath = homePath
-            erlangSdkType.setupSdkPaths(projectJdkImpl)
+            var modificator = projectJdkImpl.sdkModificator
+            modificator.homePath = homePath
 
             return if (projectJdkImpl.versionString != null) {
-                ApplicationManager.getApplication().invokeAndWait(
-                    {
-                        ApplicationManager.getApplication().runWriteAction { projectJdkTable.addJdk(projectJdkImpl) }
-                    },
-                    ModalityState.NON_MODAL,
-                )
+                // First commit the basic SDK setup
+                modificator.commitChanges()
+
+                // Add to SDK table and setup paths using coroutine-based approach
+                runBlockingCancellable {
+                    writeAction {
+                        projectJdkTable.addJdk(projectJdkImpl)
+
+                        // Setup SDK paths - this will work properly within the write action
+                        erlangSdkType.setupSdkPaths(projectJdkImpl)
+                    }
+                }
+
                 projectJdkImpl
             } else {
                 null
