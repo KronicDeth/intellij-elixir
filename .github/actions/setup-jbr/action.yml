@@ -8,3 +8,4 @@ runs:
       with:
         distribution: 'jetbrains'
         java-version: 21
+        cache: 'gradle'
