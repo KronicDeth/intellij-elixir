@@ -1,7 +1,9 @@
 name: Publish to Canary
 on:
-  release:
-    types: [prereleased]
+#  release:
+#    types: [prereleased]
+  workflow_dispatch:
+
 jobs:
   publish-to-canary:
     runs-on: ubuntu-latest
