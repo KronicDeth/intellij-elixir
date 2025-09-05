@@ -27,16 +27,22 @@ ext {
     quoterZipPath = "${cachePath}/intellij_elixir-${quoterVersion}.zip"
     quoterZipRootPath = "${cachePath}/intellij_elixir-${quoterVersion}"
 
-    if (project.hasProperty("isRelease") && isRelease) {
+    def baseVersion = providers.gradleProperty("pluginVersion").get()
+
+    publishChannelProperty = providers.gradleProperty("publishChannel").getOrElse("canary")
+    if (publishChannelProperty == "default") {
         versionSuffix = ""
-        channel = "default"
+    }
+    // if versionSuffix gradle property is set, use it, it will append -<versionSuffix> to the base version
+    // Check if versionSuffix exists and is not empty
+    else if (providers.gradleProperty("versionSuffix").isPresent() && !providers.gradleProperty("versionSuffix").get().isEmpty()) {
+        versionSuffix = "-${providers.gradleProperty("versionSuffix").get()}"
     } else {
         def date = new Date().format("yyyyMMddHHmmss", TimeZone.getTimeZone("UTC"))
         versionSuffix = "-pre+$date"
-        channel = "canary"
     }
 
-    version = "$pluginVersion$versionSuffix"
+    pluginVersion = "$baseVersion$versionSuffix"
 }
 
 allprojects {
@@ -103,6 +109,7 @@ intellijPlatform {
 
         id = providers.gradleProperty("pluginGroup")
         name = providers.gradleProperty("pluginName")
+        version = pluginVersion
         changeNotes.set(bodyInnerHTML("resources/META-INF/changelog.html"))
         description.set(bodyInnerHTML("resources/META-INF/description.html"))
 
@@ -119,12 +126,26 @@ intellijPlatform {
         }
     }
 
+    signPlugin {
+        certificateChain = providers.environmentVariable("IJ_CERTIFICATE_CHAIN")
+        privateKey = providers.environmentVariable("IJ_PRIVATE_KEY")
+        password = providers.environmentVariable("IJ_PRIVATE_KEY_PASSWORD")
+    }
+
+
+    buildPlugin {
+        // if -PpluginName exists, use it, or fallback to intellij-elixir. Not sure how to override otherwise.
+        archiveBaseName = providers.gradleProperty("pluginDistributionName").getOrElse("intellij-elixir")
+    }
+
+    publishing {
+        channels = [publishChannelProperty]
+    }
+
     publishPlugin {
         token = provider {
             System.getenv("JET_BRAINS_MARKETPLACE_TOKEN")
         }
-        channels = publishChannels.split(',').toList()
-        
         // Use the path from the -PdistributionFile property if it exists,
         // otherwise fall back to the old environment variable method.
         if (project.hasProperty("distributionFile")) {
