@@ -1,6 +1,6 @@
 name: Test
 
-on: pull_request
+on: [ pull_request, workflow_dispatch ]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref }}
@@ -12,10 +12,10 @@ jobs:
 
     strategy:
       matrix:
-        ideaVersion: [ "2024.2.0.1" ]
+        ideaVersion: [ "2024.3.6" ]
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v5
       - name: Setup JetBrains Runtime (JBR)
         uses: ./.github/actions/setup-jbr
       - name: Set up Elixir
@@ -43,7 +43,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v5
       - name: Setup JetBrains Runtime (JBR)
         uses: ./.github/actions/setup-jbr
       - name: Grant execute permission for gradlew
