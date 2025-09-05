@@ -4,7 +4,7 @@ runs:
   using: "composite"
   steps:
     - name: Setup JBR 21 ☕
-      uses: gmitch215/setup-java@6d2c5e1f82f180ae79f799f0ed6e3e5efb4e664d
+      uses: actions/setup-java@v5
       with:
         distribution: 'jetbrains'
         java-version: 21
