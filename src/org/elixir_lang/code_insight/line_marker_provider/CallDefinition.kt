@@ -52,6 +52,22 @@ class CallDefinition : LineMarkerProvider {
         return callDefinitionSeparator(leafPsiElement)
     }
 
+    private fun callDefinitionSeparator(call: Call): LineMarkerInfo<*> {
+        // Find the leaf element (identifier token) within the Call
+        val leafPsiElement = call
+            .functionNameElement()
+            ?.node
+            ?.findChildByType(ElixirTypes.IDENTIFIER_TOKEN) as LeafPsiElement?
+            ?: call
+                .node
+                .findChildByType(ElixirTypes.IDENTIFIER_TOKEN) as LeafPsiElement?
+            ?: error(
+                "Call (${call.text}) does not have an IDENTIFIER_TOKEN"
+            )
+
+        return callDefinitionSeparator(leafPsiElement)
+    }
+
     private fun callDefinitionSeparator(psiElement: PsiElement): LineMarkerInfo<*> =
         LineMarkerInfo(
             psiElement,

@@ -69,7 +69,7 @@ class Editor(private val sdkModel: SdkModel, private val history: History, priva
 
     override fun getHelpTopic(): String? = null
 
-    override fun createComponent(): JComponent? {
+    override fun createComponent(): JComponent {
         return mainPanel
     }
 
@@ -84,7 +84,7 @@ class Editor(private val sdkModel: SdkModel, private val history: History, priva
                 pathEditor(orderRootType)?.let { pathEditor ->
                     pathEditor.setAddBaseDir(sdk.homeDirectory)
                     tabbedPane.addTab(pathEditor.displayName, pathEditor.createComponent())
-                    sdkPathEditorByOrderRootType.put(orderRootType, pathEditor)
+                    sdkPathEditorByOrderRootType[orderRootType] = pathEditor
                 }
             }
 
@@ -188,7 +188,9 @@ class Editor(private val sdkModel: SdkModel, private val history: History, priva
 
         sdkPathEditorByOrderRootType.values.forEach { pathEditor -> pathEditor.apply(sdkModificator) }
 
-        ApplicationManager.getApplication().runWriteAction { sdkModificator.commitChanges() }
+        ApplicationManager.getApplication().runWriteAction {
+            sdkModificator.commitChanges()
+        }
 
         additionalDataConfigurable.forEach(AdditionalDataConfigurable::apply)
     }
@@ -318,7 +320,7 @@ class Editor(private val sdkModel: SdkModel, private val history: History, priva
 
             if (component == null) {
                 component = configurable.createComponent()
-                componentByAdditionalDataConfigurable.put(configurable, component)
+                componentByAdditionalDataConfigurable[configurable] = component
             }
 
             if (component != null) {
@@ -333,14 +335,14 @@ class Editor(private val sdkModel: SdkModel, private val history: History, priva
 
         if (configurables == null) {
             configurables = Lists.newArrayList()
-            additionalDataConfigurableListBySdkType.put(sdkType, configurables)
+            additionalDataConfigurableListBySdkType[sdkType] = configurables
 
             sdkType.createAdditionalDataConfigurable(sdkModel, editedSdkModificator)?.let {
-                configurables!!.add(it)
+                configurables.add(it)
             }
         }
 
-        return configurables!!
+        return configurables
     }
 
     override fun navigateTo(place: Place?, requestFocus: Boolean): ActionCallback {

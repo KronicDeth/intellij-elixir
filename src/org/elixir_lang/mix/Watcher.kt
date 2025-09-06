@@ -33,7 +33,7 @@ class Watcher(private val project: Project) : BulkFileListener {
     }
 
     private fun contentsChanged(event: VFileContentChangeEvent) {
-        if (event.file.name == PackageManager.fileName) {
+        if (event.file.name == PackageManager.FILE_NAME) {
             ModuleUtil.findModuleForFile(event.file, project)?.let { module ->
                 val eventFileParent = event.file.parent
                 val shouldSync =

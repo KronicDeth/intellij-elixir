@@ -14,7 +14,9 @@ import com.intellij.openapi.util.Computable
 import com.intellij.openapi.util.NotNullLazyValue
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.*
+import com.intellij.psi.impl.source.tree.LeafPsiElement
 import org.elixir_lang.Icons
+import org.elixir_lang.psi.ElixirTypes
 import org.elixir_lang.beam.psi.impl.ModuleImpl
 import org.elixir_lang.psi.CallDefinitionClause
 import org.elixir_lang.psi.CallDefinitionClause.enclosingModularMacroCall
@@ -32,6 +34,17 @@ class Protocol : LineMarkerProvider {
             else -> null
         }
 
+    private fun getLeafElementForCall(call: Call): LeafPsiElement? {
+        // Find the leaf element (identifier token) within the Call for line marker registration
+        return call
+            .functionNameElement()
+            ?.node
+            ?.findChildByType(ElixirTypes.IDENTIFIER_TOKEN) as LeafPsiElement?
+            ?: call
+                .node
+                .findChildByType(ElixirTypes.IDENTIFIER_TOKEN) as LeafPsiElement?
+    }
+
     private fun getLineMarkerInfo(call: Call): LineMarkerInfo<*>? =
         if (Protocol.`is`(call)) {
             val targets: NotNullLazyValue<Collection<PsiElement>> = NotNullLazyValue.createValue {
@@ -44,9 +57,11 @@ class Protocol : LineMarkerProvider {
                 implementations
             }
 
-            ImplsGutterIconBuilder()
-                .setTargets(targets)
-                .createLineMarkerInfo(call)
+            getLeafElementForCall(call)?.let { leafElement ->
+                ImplsGutterIconBuilder()
+                    .setTargets(targets)
+                    .createLineMarkerInfo(leafElement)
+            }
         } else if (CallDefinitionClause.`is`(call)) {
             enclosingModularMacroCall(call)?.let { modularCall ->
                 CallDefinitionClause.nameArityInterval(call, ResolveState.initial())?.let { protocolNameArityInterval ->
@@ -93,9 +108,11 @@ class Protocol : LineMarkerProvider {
                         }
 
 
-                        ImplsGutterIconBuilder()
-                            .setTargets(targets)
-                            .createLineMarkerInfo(call)
+                        getLeafElementForCall(call)?.let { leafElement ->
+                            ImplsGutterIconBuilder()
+                                .setTargets(targets)
+                                .createLineMarkerInfo(leafElement)
+                        }
                     } else {
                         null
                     }

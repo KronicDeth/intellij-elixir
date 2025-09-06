@@ -15,7 +15,7 @@ import org.elixir_lang.psi.call.qualification.Qualified
 import org.elixir_lang.reference.Callable
 
 class UsageTypeProvider : com.intellij.usages.impl.rules.UsageTypeProviderEx {
-    override fun getUsageType(element: PsiElement?, targets: Array<out UsageTarget>): UsageType? =
+    override fun getUsageType(element: PsiElement, targets: Array<UsageTarget>): UsageType? =
         when (element) {
             is AtUnqualifiedNoParenthesesCall<*> -> MODULE_ATTRIBUTE_ACCUMULATE_OR_OVERRIDE
             is AtOperation -> MODULE_ATTRIBUTE_READ
@@ -26,7 +26,7 @@ class UsageTypeProvider : com.intellij.usages.impl.rules.UsageTypeProviderEx {
 
     override fun getUsageType(element: PsiElement): UsageType? = getUsageType(element, emptyArray())
 
-    private fun getUsageType(targets: Array<out UsageTarget>): UsageType? =
+    private fun getUsageType(targets: Array<UsageTarget>): UsageType? =
         targets.mapNotNull { getUsageType(it) }.fold(null as UsageType?) { acc, targetUsageType ->
             when {
                 acc == targetUsageType ->
@@ -65,7 +65,7 @@ class UsageTypeProvider : com.intellij.usages.impl.rules.UsageTypeProviderEx {
             else -> null
         }
 
-    private fun getUsageType(call: Call, targets: Array<out UsageTarget>): UsageType? =
+    private fun getUsageType(call: Call, targets: Array<UsageTarget>): UsageType? =
         when (ReadWriteAccessDetector.getExpressionAccess(call)) {
             com.intellij.codeInsight.highlighting.ReadWriteAccessDetector.Access.Read -> getReadUsageType(call, targets)
             com.intellij.codeInsight.highlighting.ReadWriteAccessDetector.Access.Write -> getWriteUsageType(call)
@@ -101,7 +101,7 @@ class UsageTypeProvider : com.intellij.usages.impl.rules.UsageTypeProviderEx {
                 null
         }
 
-    private fun getReadUsageType(call: Call, targets: Array<out UsageTarget>): UsageType {
+    private fun getReadUsageType(call: Call, targets: Array<UsageTarget>): UsageType {
         return when {
             CallDefinitionClause.isFunction(call) -> FUNCTION_CALL
             CallDefinitionClause.isMacro(call) -> MACRO_CALL
@@ -156,7 +156,7 @@ private val MACRO_DEFINITION_CLAUSE = UsageType { "Macro definition clause" }
 private val REMOTE_CALL = UsageType { "Remote call" }
 private val USE = UsageType { "Use" }
 
-private fun Array<out UsageTarget>.anyEquivalentElement(element: PsiElement): Boolean =
+private fun Array<UsageTarget>.anyEquivalentElement(element: PsiElement): Boolean =
     element.manager.let { manager ->
         this.any {
             manager.areElementsEquivalent(element, (it as? PsiElement2UsageTargetAdapter)?.element)

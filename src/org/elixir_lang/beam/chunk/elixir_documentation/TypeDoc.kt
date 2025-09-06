@@ -15,7 +15,7 @@ class TypeDoc(val nameArity: NameArity, val line: Int, val kind: Kind, val doc: 
         TYPE,
         TYPEP;
 
-        val attributeName: String by lazy { name.toLowerCase() }
+        val attributeName: String by lazy { name.lowercase() }
         val attribute: String by lazy { "@$attributeName" }
 
         companion object {

@@ -9,3 +9,4 @@ runs:
         distribution: 'jetbrains'
         java-version: 21
         cache: 'gradle'
+        java-package: 'jdk+jcef'

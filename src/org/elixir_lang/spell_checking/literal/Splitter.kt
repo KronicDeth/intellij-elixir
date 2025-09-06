@@ -6,7 +6,7 @@ import com.intellij.spellchecker.inspections.PlainTextSplitter
 import com.intellij.util.Consumer
 
 object Splitter : BaseSplitter() {
-    override fun split(text: String?, range: TextRange, consumer: Consumer<TextRange>?) {
+    override fun split(text: String?, range: TextRange, consumer: Consumer<TextRange>) {
         if (text != null && 1 <= range.length && 0 <= range.startOffset) {
             val nonescapedTextRangeList = excludeByPattern(text, range, ESCAPE_SEQUENCE_PATTERN, 0)
 

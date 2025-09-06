@@ -188,7 +188,9 @@ class AdditionalDataConfigurable(
                 elixirSdk!!,
             )
         sdkModificator.sdkAdditionalData = sdkAdditionData
-        ApplicationManager.getApplication().runWriteAction { sdkModificator.commitChanges() }
+        ApplicationManager.getApplication().runWriteAction {
+            sdkModificator.commitChanges()
+        }
 
         this.sdkModificator.commitChanges()
     }

@@ -108,3 +108,4 @@ private fun Iterable<CallNameArityInterval>.withEnclosingModularMacroCall():
 
 private fun Iterable<EnclosingCallEnclosedCallNameArityInterval>.toSecondaryElements(): List<PsiElement> =
         this.flatMap { it.toSecondaryElements() }
+

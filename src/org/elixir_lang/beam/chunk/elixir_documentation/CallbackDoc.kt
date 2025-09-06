@@ -14,19 +14,21 @@ data class CallbackDoc(val nameArity: NameArity, val line: Int, val kind: Kind, 
         CALLBACK,
         MACROCALLBACK;
 
-        val attributeName: String by lazy { name.toLowerCase() }
+        val attributeName: String by lazy { name.lowercase() }
         val attribute: String by lazy { "@$attributeName" }
 
         companion object {
             private val KIND_BY_ATTRIBUTE_NAME =
-                    Kind.values().associateBy { it.attributeName }
+                Kind.values().associateBy { it.attributeName }
 
             fun from(term: OtpErlangObject): Kind? =
                 when (term) {
                     is OtpErlangAtom ->
-                            from(term)
+                        from(term)
+
                     else -> {
-                        logger.error("""
+                        logger.error(
+                            """
                                      Kind `${term.javaClass}` is not an `OtpErlangAtom`
 
                                      ## kind
@@ -34,7 +36,8 @@ data class CallbackDoc(val nameArity: NameArity, val line: Int, val kind: Kind, 
                                      ```elixir
                                      ${inspect(term)}
                                      ```
-                                     """)
+                                     """
+                        )
 
                         null
                     }
@@ -53,7 +56,8 @@ data class CallbackDoc(val nameArity: NameArity, val line: Int, val kind: Kind, 
             when (term) {
                 is OtpErlangTuple -> from(term)
                 else -> {
-                    logger.error("""
+                    logger.error(
+                        """
                                  :callback_docs element is not a tuple
 
                                  ## element
@@ -61,7 +65,8 @@ data class CallbackDoc(val nameArity: NameArity, val line: Int, val kind: Kind, 
                                  ```elixir
                                  ${inspect(term)}
                                  ```
-                                 """.trimIndent())
+                                 """.trimIndent()
+                    )
 
                     null
                 }
@@ -82,18 +87,19 @@ data class CallbackDoc(val nameArity: NameArity, val line: Int, val kind: Kind, 
                     null
                 }
             } else {
-                logger.error("""
+                logger.error(
+                    """
                              :callback_docs element tuple arity ($arity) is not 4
 
                              ```elixir
                              ${inspect(tuple)}
                              ```
-                             """.trimIndent())
+                             """.trimIndent()
+                )
 
                 null
             }
         }
-
 
 
     }

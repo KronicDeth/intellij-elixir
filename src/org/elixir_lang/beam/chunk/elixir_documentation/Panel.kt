@@ -1,7 +1,9 @@
 package org.elixir_lang.beam.chunk.elixir_documentation
 
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.edtWriteAction
 import com.intellij.openapi.editor.EditorFactory
+import com.intellij.openapi.progress.runBlockingCancellable
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiFileFactory
@@ -51,8 +53,10 @@ class Panel(private val elixirDocumentationTree: Tree, project: Project, private
             else -> DEFAULT_TEXT
         }
 
-        ApplicationManager.getApplication().runWriteAction {
-            document.setText(text)
+        runBlockingCancellable {
+            edtWriteAction {
+                document.setText(text)
+            }
         }
     }
 
