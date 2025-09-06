@@ -4,7 +4,6 @@ import com.intellij.facet.FacetManager
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.application.edtWriteAction
-import com.intellij.openapi.application.writeAction
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.fileChooser.FileChooserDescriptor
 import com.intellij.openapi.module.Module
@@ -16,7 +15,6 @@ import com.intellij.openapi.projectRoots.*
 import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl
 import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.roots.OrderRootType
-import com.intellij.openapi.roots.ProjectFileIndex
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.util.InvalidDataException
 import com.intellij.openapi.util.SystemInfo
@@ -338,8 +336,10 @@ ELIXIR_SDK_HOME
 
             // Use coroutine-based approach for final commit for IntelliJ 2025.2+ compatibility
             runBlockingCancellable {
-                writeAction {
+                edtWriteAction {
+                    LOG.debug("Committing SDK changes for ${sdk.name}")
                     sdkModificator.commitChanges()
+                    LOG.debug("Committed SDK changes for ${sdk.name}")
                 }
             }
         }
