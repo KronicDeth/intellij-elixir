@@ -4,6 +4,7 @@ import com.intellij.facet.FacetManager
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.application.edtWriteAction
+import com.intellij.openapi.application.writeAction
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.fileChooser.FileChooserDescriptor
 import com.intellij.openapi.module.Module
@@ -337,7 +338,7 @@ ELIXIR_SDK_HOME
 
             // Use coroutine-based approach for final commit for IntelliJ 2025.2+ compatibility
             runBlockingCancellable {
-                edtWriteAction {
+                writeAction {
                     sdkModificator.commitChanges()
                 }
             }
@@ -581,7 +582,7 @@ ELIXIR_SDK_HOME
             val project = psiElement.project
 
             return if (!project.isDisposed) {
-                if (ProjectFileIndex.SERVICE.getInstance(project) != null) {
+                run {
                     // Use a background thread to perform the ReadAction
                     val module =
                         ApplicationManager
@@ -597,8 +598,6 @@ ELIXIR_SDK_HOME
                     } else {
                         mostSpecificSdk(project)
                     }
-                } else {
-                    mostSpecificSdk(project)
                 }
             } else {
                 null
