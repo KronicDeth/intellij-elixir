@@ -307,6 +307,19 @@
             <separator/>
             <add-to-group group-id="HelpMenu" anchor="before" relative-to-action="ProductivityGuide"/>
         </group>
+        <group id="LangElixir.SdkActions">
+            <separator/>
+            <action id="Elixir.RefreshActiveElixirSdk" class="org.elixir_lang.action.RefreshActiveElixirSdkAction"
+                    text="Refresh Active Elixir SDK"
+                    icon="AllIcons.General.Refresh"
+                    description="Refreshes classpath and documentation paths for the active Elixir/Erlang for Elixir SDK"/>
+            <action id="Elixir.RefreshAllElixirSdks" class="org.elixir_lang.action.RefreshAllElixirSdksAction"
+                    text="Refresh All Elixir SDKs"
+                    icon="AllIcons.General.Refresh"
+                    description="Refreshes classpath and documentation paths for all configured Elixir/Erlang SDKs"/>
+            <separator/>
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+        </group>
         <group id="Internal.Elixir" popup="true" compact="true" text="Elixir">
             <action id="BEAM.BulkDecompilation" class="BulkDecompilation"
                     text="BEAM Bulk Decompilation"
