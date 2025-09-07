@@ -10,12 +10,11 @@ import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.platform.ide.progress.ModalTaskOwner
 import com.intellij.platform.ide.progress.runWithModalProgressBlocking
 import org.elixir_lang.notification.setup_sdk.Notifier
+import org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData
 import org.elixir_lang.sdk.elixir.Type as ElixirSdkType
 import org.elixir_lang.sdk.erlang.Type as ErlangSdkType
-import org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData
 
 class RefreshActiveElixirSdkAction : AnAction() {
-
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return
 

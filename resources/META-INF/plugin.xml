@@ -1,4 +1,4 @@
-<idea-plugin>
+<idea-plugin require-restart="true">
     <id>org.elixir_lang</id>
     <name>Elixir</name>
     <vendor email="Kronic.Deth@gmail.com">Elle Imhoff</vendor>
@@ -317,11 +317,15 @@
                     text="Refresh All Elixir SDKs"
                     icon="AllIcons.General.Refresh"
                     description="Refreshes classpath and documentation paths for all configured Elixir/Erlang SDKs"/>
+            <action id="Elixir.DeleteAllSdks" class="org.elixir_lang.action.DeleteAllSdksAction"
+                    text="Delete All Elixir/Erlang SDKs"
+                    icon="AllIcons.General.Remove"
+                    description="Removes all Elixir and Erlang SDKs from the IDE (useful in Small IDEs where SDKs can become corrupted)"/>
             <separator/>
             <add-to-group group-id="ToolsMenu" anchor="last"/>
         </group>
-        <group id="Internal.Elixir" popup="true" compact="true" text="Elixir">
-            <action id="BEAM.BulkDecompilation" class="BulkDecompilation"
+        <group id="Internal.Elixir" popup="true" internal="true" compact="true" text="Elixir">
+            <action id="BEAM.BulkDecompilation" internal="true" class="BulkDecompilation"
                     text="BEAM Bulk Decompilation"
                     description="Decompiles all .beam files in the project, modules, and SDKs to check that all decompiled code is parsable as valid Elixir"/>
             <add-to-group group-id="Internal" anchor="first"/>
