@@ -35,9 +35,8 @@ class DeleteAllSdksAction : AnAction() {
 
     override fun update(e: AnActionEvent) {
         super.update(e)
-        // Only show this action in small IDEs where SDKs can glitch
         val project = e.project
-        e.presentation.isVisible = project != null && ProcessOutput.isSmallIde
+        e.presentation.isVisible = project != null
     }
 
     private fun removeAllElixirAndErlangSdks(project: Project) {
