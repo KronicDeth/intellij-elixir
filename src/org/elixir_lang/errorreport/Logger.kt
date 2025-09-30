@@ -1,7 +1,7 @@
 package org.elixir_lang.errorreport
 
 import com.ericsson.otp.erlang.OtpErlangObject
-import com.intellij.diagnostic.AttachmentFactory
+import com.intellij.diagnostic.CoreAttachmentFactory
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
@@ -47,7 +47,7 @@ object Logger {
         val message = message(containingFile, element)
         val virtualFile = containingFile.virtualFile
         if (virtualFile != null) {
-            val attachment = AttachmentFactory.createAttachment(virtualFile)
+            val attachment = CoreAttachmentFactory.createAttachment(virtualFile)
             logger.error(message, throwable, attachment)
         } else {
             logger.error(message, throwable)

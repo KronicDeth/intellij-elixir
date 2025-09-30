@@ -5,7 +5,7 @@ import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.application.writeAction
+import com.intellij.openapi.application.edtWriteAction
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.ProjectJdkTable
@@ -73,7 +73,7 @@ class DeleteAllSdksAction : AnAction() {
         val sdksRemoved = runWithModalProgressBlocking(project, "Removing All Elixir/Erlang SDKs") {
             var removedCount = 0
             
-            writeAction {
+            edtWriteAction {
                 LOG.info("Starting removal of ${allTargetSdks.size} SDK(s) and associated libraries")
                 
                 for (sdk in allTargetSdks) {

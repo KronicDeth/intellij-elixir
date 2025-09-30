@@ -16,9 +16,6 @@ import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ex.ProjectManagerEx
 import com.intellij.openapi.roots.ModuleRootModificationUtil
-import com.intellij.openapi.roots.ProjectRootManager
-import com.intellij.openapi.roots.ui.configuration.ProjectStructureConfigurable
-import com.intellij.openapi.roots.ui.configuration.projectRoot.ProjectSdksModel
 import com.intellij.openapi.util.Ref
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vfs.VirtualFile
@@ -26,7 +23,6 @@ import com.intellij.platform.PlatformProjectOpenProcessor.Companion.runDirectory
 import com.intellij.projectImport.ProjectAttachProcessor
 import com.intellij.util.PlatformUtils
 import kotlinx.coroutines.TimeoutCancellationException
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
 import org.elixir_lang.DepsWatcher
@@ -36,7 +32,6 @@ import org.elixir_lang.mix.Watcher
 import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.io.path.exists
-import org.elixir_lang.sdk.elixir.Type
 
 /**
  * Used in Small IDEs like Rubymine that don't support [OpenProcessor].
@@ -173,7 +168,8 @@ class DirectoryConfigurator : com.intellij.platform.DirectoryProjectConfigurator
                 )
                 ?.let { project ->
                     LOG.debug("runDirectoryProjectConfigurators for project: $project at $path")
-                    runDirectoryProjectConfigurators(path, project, false)
+                    // @todo changed in 2025.3, to add createModule.
+                    runDirectoryProjectConfigurators(path, project, newProject = false, createModule = false)
                     LOG.debug("runDirectoryProjectConfigurators complete for project: $project at $path")
 
                     LOG.debug("Saving settings for project: $project at $path")

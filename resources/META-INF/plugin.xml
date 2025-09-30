@@ -4,13 +4,16 @@
     <vendor email="Kronic.Deth@gmail.com">Elle Imhoff</vendor>
 
     <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
-    <idea-version since-build="243.21565.180"/>
+    <idea-version since-build="253.22441.1"/>
 
     <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
          on how to target different products -->
+    <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.lang</depends>
+    <depends>com.intellij.modules.xml</depends>
     <depends>org.intellij.plugins.markdown</depends>
     <depends config-file="rich-platform-plugin.xml" optional="true">com.intellij.modules.java</depends>
+    <depends config-file="optional/org.elixir_lang-withIntellijLang.xml" optional="true">org.intellij.intelliLang</depends>
 
     <extensionPoints>
         <extensionPoint qualifiedName="org.elixir_lang.packageManager" interface="org.elixir_lang.PackageManager"
@@ -22,11 +25,12 @@
     </extensions>
 
     <extensions defaultExtensionNs="com.intellij">
-        <registryKey key="org.elixir_lang.injection.enableLiteralSigilInjection"
-                     defaultValue="false"
-                     description="Enables literal sigil injection, which allows the Elixir sigil ~S to work. WARNING: THIS IS CURRENTLY BUGGY AND CAUSING ISSUES WITH ~s"/>
 
-        <!--        <errorHandler implementation="org.elixir_lang.errorreport.Submitter"/>-->
+        <!-- Status Bar Widget -->
+        <statusBarWidgetFactory
+                id="ElixirSdkStatus"
+                implementation="org.elixir_lang.status_bar_widget.ElixirSdkStatusWidgetFactory"/>
+
         <errorHandler implementation="com.intellij.diagnostic.JetBrainsMarketplaceErrorReportSubmitter"/>
 
         <!-- `openProjectProcessor` for Small IDEs -->
@@ -89,6 +93,12 @@
                   language="Elixir" extensions="ex"/>
         <fileType name="Elixir Script" implementationClass="org.elixir_lang.ElixirScriptFileType" fieldName="INSTANCE"
                   language="Elixir" extensions="exs"/>
+
+        <projectConfigurable
+                parentId="language.elixir"
+                displayName="Elixir Experimental Settings"
+                id="org.elixir_lang.settings.ElixirExperimentalSettingsConfigurable"
+                instance="org.elixir_lang.settings.ElixirExperimentalSettingsConfigurable"/>
 
         <!-- Facet -->
         <applicationConfigurable id="language.elixir.sdks.elixir"
@@ -273,7 +283,6 @@
 
         <lang.documentationProvider implementationClass="org.elixir_lang.documentation.ElixirDocumentationProvider"
                                     language="Elixir"/>
-        <multiHostInjector implementation="org.elixir_lang.injection.markdown.Injector"/>
 
         <!-- Dialyzer -->
         <globalInspection displayName="Dialyzer based inspections (Elixir)" shortName="Dialyzer"
@@ -303,7 +312,7 @@
         </group>
         <group id="LangElixir.HelpActions">
             <separator/>
-            <action id="Elixir.Help" class="org.elixir_lang.action.HelpAction" text="IntelliJ Elixir Help"/>
+            <action id="Elixir.Help" class="org.elixir_lang.action.HelpAction" text="IntelliJ Elixir Help" icon="AllIcons.Windows.Help" />
             <separator/>
             <add-to-group group-id="HelpMenu" anchor="before" relative-to-action="ProductivityGuide"/>
         </group>

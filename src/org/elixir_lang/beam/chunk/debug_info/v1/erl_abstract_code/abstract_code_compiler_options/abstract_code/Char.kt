@@ -11,20 +11,18 @@ object Char {
             ifTag(term, TAG) { toMacroStringDeclaredScope(it) }
 
     fun toMacroStringDeclaredScope(term: OtpErlangTuple): MacroStringDeclaredScope =
-            toString(term).let { MacroStringDeclaredScope(it, doBlock = false, Scope.EMPTY) }
+        MacroStringDeclaredScope(toString(term), doBlock = false, Scope.EMPTY)
 
     private const val TAG = "char"
 
     private fun codePointToString(term: OtpErlangLong): String {
         val macroStringBuilder = StringBuilder().append('?')
-        val codePoint = term.intValue()
-
-        when (codePoint) {
-            '\\'.toInt() -> macroStringBuilder.append("\\\\")
-            '\n'.toInt() -> macroStringBuilder.append("\\n")
-            '\r'.toInt() -> macroStringBuilder.append("\\r")
-            ' '.toInt() -> macroStringBuilder.append("\\s")
-            '\t'.toInt() -> macroStringBuilder.append("\\t")
+        when (val codePoint = term.intValue()) {
+            '\\'.code -> macroStringBuilder.append("\\\\")
+            '\n'.code -> macroStringBuilder.append("\\n")
+            '\r'.code -> macroStringBuilder.append("\\r")
+            ' '.code -> macroStringBuilder.append("\\s")
+            '\t'.code -> macroStringBuilder.append("\\t")
             else -> macroStringBuilder.appendCodePoint(codePoint)
         }
 

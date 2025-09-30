@@ -1,16 +1,20 @@
 package org.elixir_lang.settings
 
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.ui.dsl.builder.panel
 import javax.swing.JComponent
 
+private val LOG = logger<ElixirExperimentalSettingsConfigurable>()
+
 /**
  * Configurable for Elixir experimental features.
  * Currently supports enabling HTML language injection for ~H sigils used in Phoenix LiveView templates.
  */
-class ElixirExperimentalSettingsConfigurable : Configurable, Configurable.Beta {
+internal class ElixirExperimentalSettingsConfigurable : Configurable, Configurable.Beta {
     private var settingsPanel: DialogPanel? = null
     private val settings = ElixirExperimentalSettings.instance
 
@@ -39,7 +43,7 @@ class ElixirExperimentalSettingsConfigurable : Configurable, Configurable.Beta {
             group("Status Bar Widget") {
                 row {
                     // @todo check enableDeleteSdkSmallIDE
-                    checkBox("Shows a Status Bar Widget showing if the Elixir SDK is correctly configured") // TODO: localize
+                    checkBox("Enable Status Bar Widget showing if the Elixir SDK is correctly configured") // TODO: localize
                         .comment("Adds a widget to the status bar that indicates whether the Elixir SDK is properly configured for the current project.")
                         .bindSelected(
                             getter = { settings.state.enableStatusBarWidget },
@@ -68,10 +72,29 @@ class ElixirExperimentalSettingsConfigurable : Configurable, Configurable.Beta {
     }
 
     override fun apply() {
+        // Check if settings have been modified BEFORE we apply changes
+        if (!isModified()) {
+            LOG.debug("No modifications detected, skipping apply")
+            return
+        }
+
+        // Store the old state before applying changes
+        val oldState = settings.state.copy()
+        LOG.debug("ElixirExperimentalSettingsConfigurable.apply() - oldState: $oldState")
+
+        // Apply the changes from the panel (this modifies settings.state directly)
         settingsPanel?.apply()
-        
-        // Trigger settings change notification so listeners can react to changes
-        settings.updateState(settings.state.copy())
+
+        // Get the new state after applying
+        val newState = settings.state.copy()
+        LOG.debug("ElixirExperimentalSettingsConfigurable.apply() - newState: $newState")
+
+        // Force the change notification by calling updateState with oldState and newState
+        LOG.debug("Settings were modified, calling updateState(). StatusBarWidget: ${oldState.enableStatusBarWidget} -> ${newState.enableStatusBarWidget}")
+
+        // We need to manually trigger the change notification since the state was modified in-place
+        val messageBus = com.intellij.openapi.application.ApplicationManager.getApplication().messageBus
+        messageBus.syncPublisher(ElixirExperimentalSettings.SETTINGS_CHANGED_TOPIC).settingsChanged(oldState, newState)
     }
 
     override fun getDisplayName(): String = "Elixir Experimental Settings"

@@ -4,14 +4,18 @@ import com.intellij.lang.Language
 import com.intellij.lang.html.HTMLLanguage
 import com.intellij.lang.injection.MultiHostInjector
 import com.intellij.lang.injection.MultiHostRegistrar
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.psi.PsiElement
 import org.elixir_lang.psi.SigilHeredoc
 import org.elixir_lang.psi.SigilLine
 import org.intellij.lang.regexp.RegExpLanguage
 import org.elixir_lang.eex.Language as EexLanguage
 
-class ElixirSigilInjector : MultiHostInjector {
+private val LOG = logger<ElixirSigilInjector>()
+
+internal class ElixirSigilInjector : MultiHostInjector {
     override fun getLanguagesToInject(registrar: MultiHostRegistrar, context: PsiElement) {
+//        LOG.debug("getLanguagesToInject", "context", context)
         when (context) {
             is SigilLine -> handleSigilLine(registrar, context)
             is SigilHeredoc -> handleSigilHeredoc(registrar, context)

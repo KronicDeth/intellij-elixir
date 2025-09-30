@@ -1,6 +1,7 @@
 package org.elixir_lang.status_bar_widget
 
 import com.intellij.icons.AllIcons
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.ProjectJdkTable
 import com.intellij.openapi.projectRoots.Sdk
@@ -13,19 +14,15 @@ import org.elixir_lang.Icons
 import org.elixir_lang.jps.HomePath
 import org.elixir_lang.sdk.elixir.Type
 import org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData
-import org.elixir_lang.settings.ElixirExperimentalSettings
 import org.jetbrains.annotations.NotNull
+
+private val LOG = logger<ElixirSdkStatusWidget>()
 
 class ElixirSdkStatusWidget(@param:NotNull private val project: Project) : StatusBarWidget,
     StatusBarWidget.MultipleTextValuesPresentation {
 
     companion object {
         const val ID = "ElixirSdkStatus"
-
-        fun isAvailableOnProject(@Suppress("UNUSED_PARAMETER") project: Project): Boolean {
-            // Only show widget if experimental setting is enabled
-            return ElixirExperimentalSettings.instance.state.enableStatusBarWidget
-        }
     }
 
     private var statusBar: StatusBar? = null
@@ -83,6 +80,7 @@ class ElixirSdkStatusWidget(@param:NotNull private val project: Project) : Statu
         statusBar = null
         cachedPresentation = null
         Disposer.dispose(this)
+        LOG.debug("Disposed ElixirSdkStatusWidget")
     }
 
     // MultipleTextValuesPresentation implementation

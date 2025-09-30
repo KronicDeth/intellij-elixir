@@ -70,7 +70,6 @@ subprojects {
             create(providers.gradleProperty("platformType"), providers.gradleProperty("platformVersion"))
 
             bundledPlugins providers.gradleProperty("platformBundledPlugins").map { it.split(',').toList() }
-
             bundledModules providers.gradleProperty("platformBundledModules").map { it.split(',').toList() }
 
             instrumentationTools()
@@ -89,8 +88,8 @@ subprojects {
             java.srcDir 'tests'
         }
     }
-
 }
+
 sourceSets {
     main {
         java.srcDirs 'src', 'gen'
@@ -182,9 +181,8 @@ tasks.withType(RunIdeTask).configureEach {
     // Set JVM arguments
     jvmArguments.addAll(["-Didea.debug.mode=true", "-Didea.is.internal=true", "-Dlog4j2.debug=true", "-Dlogger.org=TRACE", "-XX:+AllowEnhancedClassRedefinition", "-XXHotswapAgent=fatjar"])
 
-
     // Set system properties to debug log
-    systemProperty "idea.log.debug.categories", "org.elixir_lang:all"
+    systemProperty "idea.log.debug.categories", "org.elixir_lang"
 
     // Set the maximum heap size
     maxHeapSize = "7g"
@@ -421,8 +419,7 @@ task stopQuoter(type: Exec, dependsOn: releaseQuoter) {
 }
 
 runIde {
-    systemProperty "idea.log.debug.categories", "org.elixir_lang:all"
-    systemProperty "org.elixir_lang.statusBar.enabled", "true"
+    systemProperty "idea.log.debug.categories", "org.elixir_lang"
     // When wanting to disable EDT slow assertion..
     // systemProperty "ide.slow.operations.assertion", "true"
 
@@ -440,6 +437,7 @@ runIde {
     //This disables the throwing of ProcessCanceledException, which is typically used to cancel long-running processes in IntelliJ IDEA. Disabling it can be useful in certain debugging scenarios.
     jvmArgs "-Didea.debug.mode=true", "-XX:+AllowEnhancedClassRedefinition", "-Didea.is.internal=true", "-Dlog4j2.debug=true", "-Dlogger.org=TRACE", "-Didea.ProcessCanceledException=disabled"
     maxHeapSize = "7g"
+    autoReload = false
     // get from runIdeWorkingDirectory
     if (project.hasProperty("runIdeWorkingDirectory") && !project.property("runIdeWorkingDirectory").isEmpty()) {
         workingDir = file(project.property("runIdeWorkingDirectory"))

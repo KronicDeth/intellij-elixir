@@ -3,14 +3,15 @@ package org.elixir_lang.mix.project._import
 import com.intellij.compiler.CompilerWorkspaceConfiguration
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ex.ApplicationInfoEx
+import com.intellij.openapi.application.edtWriteAction
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.module.ModifiableModuleModel
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.options.ConfigurationException
-import com.intellij.openapi.progress.ProgressIndicator
+import com.intellij.openapi.progress.EmptyProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
-import com.intellij.openapi.progress.Task
+import com.intellij.openapi.progress.runBlockingCancellable
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.ProjectJdkTable
 import com.intellij.openapi.projectRoots.Sdk
@@ -23,6 +24,7 @@ import com.intellij.openapi.util.text.StringUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.newvfs.impl.VirtualDirectoryImpl
 import com.intellij.packaging.artifacts.ModifiableArtifactModel
+import com.intellij.platform.ide.progress.runWithModalProgressBlocking
 import com.intellij.projectImport.ProjectImportBuilder
 import org.elixir_lang.configuration.ElixirCompilerSettings
 import org.elixir_lang.mix.Icons
@@ -103,7 +105,9 @@ class Builder : ProjectImportBuilder<OtpApp>() {
         modulesProvider: ModulesProvider,
         artifactModel: ModifiableArtifactModel?
     ): List<Module> {
-        fixProjectSdk(project)
+        runBlockingCancellable {
+            fixProjectSdk(project)
+        }
         val createModules = createModulesForOtpApps(
             project,
             mySelectedOtpApps,
@@ -158,12 +162,10 @@ class Builder : ProjectImportBuilder<OtpApp>() {
             projectRoot.refreshAndFindChild("deps")
         }
 
-        ProgressManager.getInstance()
-            .run(object : Task.Modal(ProjectImportBuilder.getCurrentProject(), "Scanning Mix Projects", true) {
-                override fun run(indicator: ProgressIndicator) {
-                    myFoundOtpApps = org.elixir_lang.mix.Project.findOtpApps(projectRoot, indicator)
-                }
-            })
+        // Use EmptyProgressIndicator for simple progress tracking without UI
+        // Not sure if this is right, but :shrug:.
+        val progressIndicator = ProgressManager.getInstance().progressIndicator ?: EmptyProgressIndicator()
+        myFoundOtpApps = org.elixir_lang.mix.Project.findOtpApps(projectRoot, progressIndicator)
 
         mySelectedOtpApps = myFoundOtpApps
 
@@ -177,14 +179,14 @@ class Builder : ProjectImportBuilder<OtpApp>() {
     companion object {
         private val LOG = Logger.getInstance(Builder::class.java)
 
-        private fun fixProjectSdk(project: Project): Sdk? {
+        private suspend fun fixProjectSdk(project: Project): Sdk? {
             val projectRootMgr = ProjectRootManagerEx.getInstanceEx(project)
             val selectedSdk = projectRootMgr.projectSdk
             val fixedProjectSdk: Sdk?
 
             if (selectedSdk == null || selectedSdk.sdkType !== Type.instance) {
                 fixedProjectSdk = ProjectJdkTable.getInstance().findMostRecentSdkOfType(Type.instance)
-                ApplicationManager.getApplication().runWriteAction { projectRootMgr.projectSdk = fixedProjectSdk }
+                edtWriteAction { projectRootMgr.projectSdk = fixedProjectSdk }
             } else {
                 fixedProjectSdk = selectedSdk
             }
@@ -196,8 +198,9 @@ class Builder : ProjectImportBuilder<OtpApp>() {
         private fun deleteIdeaModuleFiles(otpApps: List<OtpApp>) {
             val ex = arrayOfNulls<IOException>(1)
 
-            ApplicationManager.getApplication().runWriteAction(object : Runnable {
-                override fun run() {
+            // Use runBlockingCancellable for coroutine-aware write action
+            runBlockingCancellable {
+                edtWriteAction {
                     for (importedOtpApp in otpApps) {
                         val ideaModuleFile = importedOtpApp.ideaModuleFile
                         if (ideaModuleFile != null) {
@@ -207,11 +210,10 @@ class Builder : ProjectImportBuilder<OtpApp>() {
                             } catch (e: IOException) {
                                 ex[0] = e
                             }
-
                         }
                     }
                 }
-            })
+            }
 
             ex[0]?.let { ioException ->
                 throw ioException

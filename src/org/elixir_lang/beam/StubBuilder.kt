@@ -21,7 +21,7 @@ class StubBuilder : BinaryFileStubBuilder {
         return if (stub != null) {
             stub
         } else {
-            LOGGER.debug("No stub built for file $fileContent")
+//            LOGGER.debug("No stub built for file $fileContent")
             null
         }
     }

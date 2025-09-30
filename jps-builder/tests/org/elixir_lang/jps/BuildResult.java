@@ -1,7 +1,5 @@
 package org.elixir_lang.jps;
 
-import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.util.Function;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jps.incremental.MessageHandler;
 import org.jetbrains.jps.incremental.messages.BuildMessage;
@@ -10,6 +8,7 @@ import org.junit.Assert;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by zyuyou on 15/7/17.
@@ -56,9 +55,16 @@ public class BuildResult implements MessageHandler {
   }
 
   public void assertSuccessful(){
-    Function<BuildMessage, String> toStringFunction = StringUtil.createToStringFunction(BuildMessage.class);
-    Assert.assertTrue("Build failed. \nErrors:\n" + StringUtil.join(myErrorMessages, toStringFunction, "\n") +
-        "\nInfo messages:\n" + StringUtil.join(myInfoMessages, toStringFunction, "\n"), isSuccessful());
+      String errors = myErrorMessages.stream()
+              .map(BuildMessage::toString)
+              .collect(Collectors.joining("\n"));
+
+      String infos = myInfoMessages.stream()
+              .map(BuildMessage::toString)
+              .collect(Collectors.joining("\n"));
+
+      Assert.assertTrue("Build failed. \nErrors:\n" + errors +
+              "\nInfo messages:\n" + infos, isSuccessful());
   }
 
   @NotNull
