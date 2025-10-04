@@ -15,7 +15,6 @@ private val LOG = logger<ElixirSigilInjector>()
 
 internal class ElixirSigilInjector : MultiHostInjector {
     override fun getLanguagesToInject(registrar: MultiHostRegistrar, context: PsiElement) {
-//        LOG.debug("getLanguagesToInject", "context", context)
         when (context) {
             is SigilLine -> handleSigilLine(registrar, context)
             is SigilHeredoc -> handleSigilHeredoc(registrar, context)
@@ -36,14 +35,35 @@ internal class ElixirSigilInjector : MultiHostInjector {
     }
 
     private fun handleSigilHeredoc(registrar: MultiHostRegistrar, sigilHeredoc: SigilHeredoc) {
-        if (!sigilHeredoc.isValidHost || sigilHeredoc.heredocLineList.isEmpty() || !sigilHeredoc.isValid) return
+        if (!sigilHeredoc.isValidHost || sigilHeredoc.heredocLineList.isEmpty() || !sigilHeredoc.isValid) {
+            if (LOG.isDebugEnabled) {
+                LOG.debug(
+                    "handleSigilHeredoc: returning early: " +
+                            "isValidHost=${sigilHeredoc.isValidHost}, " +
+                            "heredocLineList.isEmpty=${sigilHeredoc.heredocLineList.isEmpty()}, " +
+                            "isValid=${sigilHeredoc.isValid}"
+                )
+            }
+            return
+        }
 
         val lang = languageForSigil(sigilHeredoc.sigilName()) ?: return
         registrar.startInjecting(lang)
+        if (LOG.isDebugEnabled) {
+            LOG.debug("handleSigilHeredoc: injecting ${lang.displayName} into ${sigilHeredoc.heredocLineList.size} lines")
+        }
         for (item in sigilHeredoc.heredocLineList) {
             if (item.isValid) {
+                if (LOG.isDebugEnabled) {
+                    LOG.debug("handleSigilHeredoc: injecting into heredocLine: ${item.text}")
+                }
                 registrar.addPlace(null, null, sigilHeredoc, item.textRangeInParent)
+            } else if (LOG.isDebugEnabled) {
+                LOG.debug("handleSigilHeredoc: skipping invalid heredocLine")
             }
+        }
+        if (LOG.isDebugEnabled) {
+            LOG.debug("handleSigilHeredoc: done injecting into ${sigilHeredoc.heredocLineList.size} lines")
         }
 
         registrar.doneInjecting()
@@ -52,6 +72,10 @@ internal class ElixirSigilInjector : MultiHostInjector {
     override fun elementsToInjectIn() = listOf(SigilHeredoc::class.java, SigilLine::class.java)
 
     private fun languageForSigil(sigilName: Char): Language? {
+        if (LOG.isDebugEnabled) {
+            LOG.debug("languageForSigil: sigilName='$sigilName'")
+        }
+
         return when (sigilName) {
             'H' -> HTMLLanguage.INSTANCE
             'L' -> EexLanguage.INSTANCE

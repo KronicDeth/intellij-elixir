@@ -4,7 +4,7 @@ import com.intellij.psi.PsiLanguageInjectionHost
 import org.intellij.plugins.intelliLang.inject.AbstractLanguageInjectionSupport
 import org.jetbrains.annotations.NonNls
 
-class ElixirSigilInjectionSupport : AbstractLanguageInjectionSupport() {
+internal class ElixirSigilInjectionSupport : AbstractLanguageInjectionSupport() {
     override fun getId(): String {
         return ELIXIR_SUPPORT_ID
     }
