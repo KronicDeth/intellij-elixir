@@ -12,7 +12,9 @@ import org.jetbrains.annotations.NotNull;
  */
 @State(
         name = "ElixirFoldingSettings",
-        storages = @Storage(value = "editor.codeinsight.xml")
+        storages = {
+                @Storage(value = "editor.codeinsight.xml")
+        }
 )
 public class ElixirFoldingSettings implements PersistentStateComponent<ElixirFoldingSettings> {
     /*

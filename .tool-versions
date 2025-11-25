@@ -7,4 +7,4 @@ erlang 24.3.4.6
 # mac:
 # mise link java@jbrsdk_jcef-21.0.3-b509.4-2024.2 /path/to/jbrsdk_jcef-21.0.3-xxx-xxx-b509.4/Contents/Home
 # Then setting it to `java jbrsdk_jcef-21.0.3-b509.4-2024.2`
-java zulu-21.36.17
+java jetbrains-21.0.8b1038.68
