@@ -22,6 +22,8 @@ open class PlatformTestCase : BasePlatformTestCase() {
             Registry.get(Injector.REG_KEY_ENABLE_LITERAL_SIGIL_INJECTION).resetToDefault()
         } catch (e: Exception) {
 
+        } finally {
+            super.tearDown()
         }
     }
 
