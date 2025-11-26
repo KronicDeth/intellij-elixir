@@ -6,7 +6,6 @@ import com.intellij.psi.PsiPolyVariantReferenceBase
 import com.intellij.psi.ResolveResult
 import com.intellij.psi.impl.source.resolve.ResolveCache
 import com.intellij.psi.util.PsiTreeUtil
-import com.intellij.refactoring.suggested.startOffset
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.call.finalArguments
@@ -52,8 +51,8 @@ class Type(typeSpec: AtUnqualifiedNoParenthesesCall<*>, type: Call) : PsiPolyVar
             if (typeSpec.isEquivalentTo(type)) {
                 typeHead(typeSpec)
                         ?.let { typeHead ->
-                            val typeStartOffset = type.startOffset
-                            val typeHeadStartOffset = typeHead.startOffset
+                            val typeStartOffset = type.textRange.startOffset
+                            val typeHeadStartOffset = typeHead.textRange.startOffset
                             val startOffset = typeHeadStartOffset - typeStartOffset
                             val endOffset = startOffset + typeHead.textLength
 
