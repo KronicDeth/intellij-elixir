@@ -9,8 +9,7 @@ import org.elixir_lang.PlatformTestCase;
 
 import java.io.File;
 import java.io.IOException;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
+import java.nio.charset.Charset;
 
 public class DecompilerTest extends PlatformTestCase {
     /*
@@ -514,7 +513,7 @@ public class DecompilerTest extends PlatformTestCase {
         String prefix = testDataPath + "/" + name + ".";
 
         File expectedFile = new File(prefix + "ex");
-        String expected = Files.toString(expectedFile, UTF_8);
+        String expected = Files.toString(expectedFile, Charset.forName("UTF-8"));
 
         VfsRootAccess.allowRootAccess(getTestRootDisposable(), testDataPath);
 
