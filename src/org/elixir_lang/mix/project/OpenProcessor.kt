@@ -18,6 +18,7 @@ class OpenProcessor : ProjectOpenProcessorBase<Builder>() {
         val projectRoot = file.parent
         wizardContext.projectName = projectRoot.name
         builder.setProjectRoot(projectRoot)
-        return true
+        // Return false to avoid the problematic runBlockingModalWithRawProgressReporter in IntelliJ 2025.3
+        return false
     }
 }
