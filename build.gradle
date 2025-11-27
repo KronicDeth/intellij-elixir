@@ -1,3 +1,4 @@
+import org.codehaus.groovy.runtime.GStringImpl
 import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 import org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask
@@ -76,9 +77,9 @@ static String latestEapBuild() {
 }
 
 ext {
-    cachePath = "${rootDir}/cache"
+    cachePath = "${rootDir}/cache" as GStringImpl
 
-    elixirPath = "${cachePath}/elixir-${elixirVersion}"
+    elixirPath = "${cachePath}/elixir-${elixirVersion}" as GStringImpl
 
     quoterVersion = "2.1.0"
 
@@ -89,22 +90,22 @@ ext {
 
     println("Building against IntelliJ Platform version: ${actualPlatformVersion}")
 
-    quoterUnzippedPath = "${cachePath}/elixir-${elixirVersion}-intellij_elixir-${quoterVersion}"
-    quoterReleasePath = "${quoterUnzippedPath}/_build/dev/rel/intellij_elixir"
-    quoterExe = "${quoterReleasePath}/bin/intellij_elixir"
-    quoterZipPath = "${cachePath}/intellij_elixir-${quoterVersion}.zip"
-    quoterZipRootPath = "${cachePath}/intellij_elixir-${quoterVersion}"
+    quoterUnzippedPath = "${cachePath}/elixir-${elixirVersion}-intellij_elixir-${quoterVersion}" as GStringImpl
+    quoterReleasePath = "${quoterUnzippedPath}/_build/dev/rel/intellij_elixir" as GStringImpl
+    quoterExe = "${quoterReleasePath}/bin/intellij_elixir" as GStringImpl
+    quoterZipPath = "${cachePath}/intellij_elixir-${quoterVersion}.zip" as GStringImpl
+    quoterZipRootPath = "${cachePath}/intellij_elixir-${quoterVersion}" as GStringImpl
 
     if (project.hasProperty("isRelease") && isRelease) {
-        versionSuffix = ""
+        versionSuffix = "" as GStringImpl
         channel = "default"
     } else {
         def date = new Date().format("yyyyMMddHHmmss", TimeZone.getTimeZone("UTC"))
-        versionSuffix = "-pre+$date"
+        versionSuffix = "-pre+$date" as GStringImpl
         channel = "canary"
     }
 
-    version = "$pluginVersion$versionSuffix"
+    version = "$pluginVersion$versionSuffix" as GStringImpl
 }
 
 allprojects {
@@ -113,7 +114,7 @@ allprojects {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
     }
-    tasks.withType(JavaCompile) { options.encoding = 'UTF-8' }
+    tasks.withType(JavaCompile).tap { configureEach { options.encoding = 'UTF-8' } }
 }
 subprojects {
     apply plugin: 'org.jetbrains.intellij.platform.module'
@@ -410,16 +411,16 @@ task getQuoter {
             overwrite false
         }
 
-        def folder = new File(quoterUnzippedPath)
+        def folder = new File(quoterUnzippedPath as String)
         if (!folder.isDirectory() || folder.list().size() == 0) {
             copy {
                 from zipTree(quoterZipPath)
                 into cachePath
             }
 
-            def quoterZipRootFile = new File(quoterZipRootPath)
+            def quoterZipRootFile = new File(quoterZipRootPath as String)
 
-            quoterZipRootFile.renameTo(quoterUnzippedPath)
+            quoterZipRootFile.renameTo(quoterUnzippedPath as File)
         }
     }
 }
@@ -437,7 +438,7 @@ task getQuoterDeps(dependsOn: getQuoter) {
 
 task releaseQuoter(dependsOn: getQuoterDeps) {
     doLast {
-        def file = new File(quoterExe)
+        def file = new File(quoterExe as String)
 
         if (!file.canExecute()) {
             exec {
