@@ -20,8 +20,8 @@ apply plugin: "org.jetbrains.intellij.platform"
 static String latestEapBuild() {
     // 1) Prefer JetBrains Releases API to get a concrete numeric EAP build (e.g., 253.28294.169)
     List<URI> apiUris = [
-        new URI("https://data.services.jetbrains.com/products/releases?code=IIU&type=eap&latest=true&fields=build"),
-        new URI("https://data.services.jetbrains.com/products/releases?code=IIU&type=eap&latest=true")
+            new URI("https://data.services.jetbrains.com/products/releases?code=IIU&type=eap&latest=true&fields=build"),
+            new URI("https://data.services.jetbrains.com/products/releases?code=IIU&type=eap&latest=true")
     ]
     for (URI uri in apiUris) {
         String json
@@ -85,8 +85,8 @@ ext {
 
     // Determine the actual platform version to use
     actualPlatformVersion = (project.hasProperty("useDynamicEapVersion") && useDynamicEapVersion.toBoolean()
-        ? latestEapBuild()
-        : platformVersion).toString()
+            ? latestEapBuild()
+            : platformVersion).toString()
 
     println("Building against IntelliJ Platform version: ${actualPlatformVersion}")
 
@@ -322,7 +322,9 @@ intellijPlatformTesting {
     }
 }
 
-task testCompilation(type: Test, group: 'Verification', dependsOn: [classes, testClasses]) {
+tasks.register('testCompilation', Test) {
+    group = 'Verification'
+    dependsOn = [classes, testClasses]
     useJUnit {
         include compilationPackages
     }
@@ -403,7 +405,7 @@ tasks.register('getElixir') {
     }
 }
 
-task getQuoter {
+tasks.register('getQuoter') {
     doLast {
         download.run {
             src "https://github.com/KronicDeth/intellij_elixir/archive/v${quoterVersion}.zip"
@@ -425,7 +427,7 @@ task getQuoter {
     }
 }
 
-task getQuoterDeps(dependsOn: getQuoter) {
+tasks.register('getQuoterDeps') {
     doLast {
         exec {
             workingDir quoterUnzippedPath
@@ -436,7 +438,7 @@ task getQuoterDeps(dependsOn: getQuoter) {
     }
 }
 
-task releaseQuoter(dependsOn: getQuoterDeps) {
+tasks.register('releaseQuoter') {
     doLast {
         def file = new File(quoterExe as String)
 
@@ -458,7 +460,8 @@ compileTestJava {
     dependsOn getQuoter
 }
 
-task runQuoter(type: Exec, dependsOn: releaseQuoter) {
+tasks.register('runQuoter', Exec) {
+    dependsOn releaseQuoter
     environment "RELEASE_COOKIE", "intellij_elixir"
     environment "RELEASE_DISTRIBUTION", "name"
     environment "RELEASE_NAME", "intellij_elixir@127.0.0.1"
@@ -466,7 +469,8 @@ task runQuoter(type: Exec, dependsOn: releaseQuoter) {
     args "daemon"
 }
 
-task stopQuoter(type: Exec, dependsOn: releaseQuoter) {
+tasks.register('stopQuoter', Exec) {
+    dependsOn releaseQuoter
     environment "RELEASE_COOKIE", "intellij_elixir"
     environment "RELEASE_DISTRIBUTION", "name"
     environment "RELEASE_NAME", "intellij_elixir@127.0.0.1"
