@@ -270,8 +270,6 @@ tasks.withType<KotlinJvmCompile>().configureEach {
     }
 }
 
-val compilationPackages = listOf("org/intellij/elixir/build/**", "org/intellij/elixir/jps/**")
-
 tasks.named<Test>("test") {
     environment("ELIXIR_LANG_ELIXIR_PATH", elixirPath)
     environment("ELIXIR_EBIN_DIRECTORY", "${elixirPath}/lib/elixir/ebin/")
@@ -306,9 +304,6 @@ tasks.named<Test>("test") {
     exclude("**/org/elixir_lang/parser_definition/matched_call_operation/ParsingTestCase.class")
     exclude("**/org/elixir_lang/parser_definition/matched_dot_operator_call_operation/ParsingTestCase.class")
 
-    useJUnit {
-        exclude(*compilationPackages.toTypedArray())
-    }
     testLogging {
         exceptionFormat = TestExceptionFormat.FULL
     }
@@ -342,17 +337,6 @@ intellijPlatformTesting {
                 }
             }
         }
-    }
-}
-
-tasks.register<Test>("testCompilation") {
-    group = "Verification"
-    dependsOn(tasks.named("classes"), tasks.named("testClasses"))
-    useJUnit {
-        include(*compilationPackages.toTypedArray())
-    }
-    testLogging {
-        exceptionFormat = TestExceptionFormat.FULL
     }
 }
 
