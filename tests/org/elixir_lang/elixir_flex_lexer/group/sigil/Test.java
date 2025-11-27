@@ -53,7 +53,7 @@ public abstract class Test extends org.elixir_lang.elixir_flex_lexer.group.Test 
     protected abstract char promoter();
 
     public static Collection<Object[]> generateData(Collection<Object[]> terminatorData) {
-        Collection<Object[]> combinedData = new Vector<Object[]>();
+        Collection<Object[]> combinedData = new Vector<>();
         combinedData.addAll(QUOTE_DATA);
         combinedData.addAll(terminatorData);
 

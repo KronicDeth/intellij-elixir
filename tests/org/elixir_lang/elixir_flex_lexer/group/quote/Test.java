@@ -45,7 +45,7 @@ public abstract class Test extends org.elixir_lang.elixir_flex_lexer.group.Test 
                 }
         );
 
-        Collection<Object[]> combinedData = new Vector<Object[]>();
+        Collection<Object[]> combinedData = new Vector<>();
         combinedData.addAll(commonData);
         combinedData.addAll(quoteData);
 
