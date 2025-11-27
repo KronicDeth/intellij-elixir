@@ -19,7 +19,7 @@ abstract class PlatformTestCase : BasePlatformTestCase() {
         try {
             // Reset registry to default
             Registry.get(Injector.REG_KEY_ENABLE_LITERAL_SIGIL_INJECTION).resetToDefault()
-        } catch (e: Exception) {
+        } catch (_: Exception) {
 
         } finally {
             super.tearDown()

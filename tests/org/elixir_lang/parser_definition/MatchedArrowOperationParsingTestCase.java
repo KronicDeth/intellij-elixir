@@ -5,7 +5,7 @@ package org.elixir_lang.parser_definition;
  */
 public class MatchedArrowOperationParsingTestCase extends ParsingTestCase {
     public void testAssociativity() {
-        if (!isTravis()) {
+        if (isNotTravis()) {
             assertParsedAndQuotedCorrectly();
         }
     }
@@ -19,7 +19,7 @@ public class MatchedArrowOperationParsingTestCase extends ParsingTestCase {
     }
 
     public void testMatchedInOperation() {
-        if (!isTravis()) {
+        if (isNotTravis()) {
             assertParsedAndQuotedCorrectly();
         }
     }
