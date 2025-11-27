@@ -3,11 +3,8 @@ package org.elixir_lang.flex_lexer;
 import com.intellij.lexer.Lexer;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
-import org.junit.experimental.runners.Enclosed;
-import org.junit.runner.RunWith;
 
 
-@RunWith(Enclosed.class)
 public abstract class Test<L extends Lexer> {
     /*
      * Fields

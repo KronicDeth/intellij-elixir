@@ -4,8 +4,7 @@ import com.intellij.openapi.util.registry.Registry
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import org.elixir_lang.injection.markdown.Injector
 
-@org.junit.Ignore("abstract")
-open class PlatformTestCase : BasePlatformTestCase() {
+abstract class PlatformTestCase : BasePlatformTestCase() {
 
     @Throws(Exception::class)
     override fun setUp() {

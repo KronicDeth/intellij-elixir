@@ -258,6 +258,32 @@ test {
     include("**/Issue*.class")
     include("**/*Test.class")
     include("**/*TestCase.class")
+
+    // Exclude specific abstract base test classes so that they don't show as Ignored
+    exclude("**/org/elixir_lang/PlatformTestCase.class")
+    exclude("**/org/elixir_lang/eex/lexer/look_ahead/Test.class")
+    exclude("**/org/elixir_lang/elixir_flex_lexer/Test.class")
+    exclude("**/org/elixir_lang/elixir_flex_lexer/TokenTest.class")
+    exclude("**/org/elixir_lang/elixir_flex_lexer/group/Test.class")
+    exclude("**/org/elixir_lang/elixir_flex_lexer/group/quote/Test.class")
+    exclude("**/org/elixir_lang/elixir_flex_lexer/group/sigil/Test.class")
+    exclude("**/org/elixir_lang/elixir_flex_lexer/group_heredoc_end/quote/Test.class")
+    exclude("**/org/elixir_lang/elixir_flex_lexer/group_heredoc_end/sigil/Test.class")
+    exclude("**/org/elixir_lang/elixir_flex_lexer/group_heredoc_end/sigil/char_list/Test.class")
+    exclude("**/org/elixir_lang/elixir_flex_lexer/group_heredoc_end/sigil/custom/Test.class")
+    exclude("**/org/elixir_lang/elixir_flex_lexer/group_heredoc_end/sigil/regex/Test.class")
+    exclude("**/org/elixir_lang/elixir_flex_lexer/group_heredoc_end/sigil/string/Test.class")
+    exclude("**/org/elixir_lang/elixir_flex_lexer/group_heredoc_end/sigil/words/Test.class")
+    exclude("**/org/elixir_lang/elixir_flex_lexer/group_heredoc_line_body/quote/PromoterTest.class")
+    exclude("**/org/elixir_lang/elixir_flex_lexer/group_heredoc_line_body/sigil/PromoterTest.class")
+    exclude("**/org/elixir_lang/elixir_flex_lexer/named_sigil/Test.class")
+    exclude("**/org/elixir_lang/elixir_flex_lexer/sigil_modifiers/group/Test.class")
+    exclude("**/org/elixir_lang/elixir_flex_lexer/sigil_modifiers/group_heredoc_end/Test.class")
+    exclude("**/org/elixir_lang/flex_lexer/Test.class")
+    exclude("**/org/elixir_lang/parser_definition/ParsingTestCase.class")
+    exclude("**/org/elixir_lang/parser_definition/matched_call_operation/ParsingTestCase.class")
+    exclude("**/org/elixir_lang/parser_definition/matched_dot_operator_call_operation/ParsingTestCase.class")
+
     useJUnit {
         exclude compilationPackages
     }

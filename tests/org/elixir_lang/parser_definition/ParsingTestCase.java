@@ -16,7 +16,6 @@ import java.util.List;
 /**
  * Created by luke.imhoff on 8/7/14.
  */
-@org.junit.Ignore("abstract")
 public abstract class ParsingTestCase extends com.intellij.testFramework.ParsingTestCase {
     public ParsingTestCase() {
         this("ex", new ElixirParserDefinition());
