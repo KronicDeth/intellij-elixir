@@ -5,6 +5,7 @@ import com.intellij.psi.tree.IElementType;
 import org.elixir_lang.ElixirFlexLexer;
 import org.elixir_lang.elixir_flex_lexer.TokenTest;
 import org.elixir_lang.psi.ElixirTypes;
+import org.jetbrains.annotations.NotNull;
 import org.junit.runners.Parameterized;
 
 import java.util.Arrays;
@@ -47,7 +48,7 @@ public abstract class Test extends TokenTest {
     protected abstract char terminator();
 
     @Override
-    protected void start(CharSequence charSequence) {
+    protected void start(@NotNull CharSequence charSequence) {
         // start to trigger SIGIL_MODIFIERS after GROUP
         CharSequence fullCharSequence = "~r" + promoter() + terminator() + charSequence;
         super.start(fullCharSequence);
