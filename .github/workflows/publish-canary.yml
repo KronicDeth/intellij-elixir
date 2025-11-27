@@ -11,8 +11,10 @@ jobs:
       - name: Check out repository 💾
         uses: actions/checkout@v5
 
-      - name: Setup JetBrains Runtime (JBR) ☕
-        uses: ./.github/actions/setup-jbr
+      - name: Setup Build Environment ☕
+        uses: ./.github/actions/setup-env
+        with:
+          elixir-version: ''
 
       - name: Download release asset 📦
         id: download_asset

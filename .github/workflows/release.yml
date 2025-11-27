@@ -6,66 +6,43 @@ on:
       - main
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
+  test-and-verify:
+    uses: ./.github/workflows/shared-test.yml
+    with:
+      elixir-version: '1.13.4'
+      otp-version: '24.3.4.6'
 
-    steps:
-      - uses: actions/checkout@v5
-      - name: Setup JetBrains Runtime (JBR)
-        uses: ./.github/actions/setup-jbr
-      - name: Set up Elixir
-        uses: erlef/setup-beam@v1
-        with:
-          otp-version: 24.3.4.6
-          elixir-version: 1.13.0
-      - name: Export OTP_RELEASE
-        run: echo "OTP_RELEASE=24.3.4.6" >> $GITHUB_ENV
-      - name: Export ERLANG_SDK_HOME
-        run: echo "ERLANG_SDK_HOME=`erl -eval 'io:format("~s", [code:root_dir()]).' -noshell -run init stop`" >> $GITHUB_ENV
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-      - name: Compile Tests with Gradle
-        run: ./gradlew --stacktrace compileTestJava
-      - name: Get Elixir Source
-        run: ./gradlew --stacktrace getElixir
-      - name: Release Quoter
-        run: ./gradlew --stacktrace releaseQuoter
-      - name: Test with Gradle
-        run: ./gradlew --stacktrace test
-  verifyPlugin:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - name: Setup JetBrains Runtime (JBR)
-        uses: ./.github/actions/setup-jbr
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-      - name: Run Plugin Verifier
-        run: ./gradlew --stacktrace verifyPlugin
   release:
-    needs: [ test, verifyPlugin ]
+    needs: [ test-and-verify ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - name: Setup JetBrains Runtime (JBR)
-        uses: ./.github/actions/setup-jbr
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
+
+      - name: Setup Build Environment
+        uses: ./.github/actions/setup-env
+        with:
+          elixir-version: ''
+          skip-jcef: 'true'
+
       - name: Build with Gradle
         run: ./gradlew buildPlugin
+
       - name: Export ASSET_PATH
-        run: echo "ASSET_PATH=`ls -1 build/distributions/intellij-elixir-*.zip`" >> $GITHUB_ENV
+        run: echo "ASSET_PATH=$(ls -1 build/distributions/intellij-elixir-*.zip)" >> $GITHUB_ENV
+
       - name: Export ASSET_NAME
         run: echo "ASSET_NAME=${ASSET_PATH#build/distributions/}" >> $GITHUB_ENV
+
       - name: Export TAG
         run: |
           version_suffix_zip=${ASSET_NAME#intellij-elixir-}
           echo "TAG=v${version_suffix_zip%.zip}" >> $GITHUB_ENV
+
       - name: Tag Commit
         uses: hole19/git-tag-action@master
         env:
-          # TAG set above with `set-env name=TAG`
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Create Release
         id: create_release
         uses: actions/create-release@latest
@@ -75,6 +52,7 @@ jobs:
           tag_name: ${{ env.TAG }}
           release_name: ${{ env.TAG }}
           prerelease: true
+
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
         env:

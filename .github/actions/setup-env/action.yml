@@ -1,0 +1,57 @@
+name: 'Setup Build Environment'
+description: 'Sets up Java, Elixir, and Gradle for IntelliJ plugin builds'
+inputs:
+  elixir-version:
+    description: 'Elixir version'
+    required: false
+    default: '1.13.4'
+  otp-version:
+    description: 'OTP version'
+    required: false
+    default: '24.3.4.6'
+  idea-version:
+    description: 'IntelliJ IDEA version'
+    required: false
+    default: ''
+  skip-gradle-cache:
+    description: 'Skip Gradle cache'
+    required: false
+    default: 'false'
+  skip-jcef:
+    description: 'Skip JCEF package (set to true for release/verifyPlugin jobs)'
+    required: false
+    default: 'false'
+
+runs:
+  using: composite
+  steps:
+    - name: Setup JBR 21
+      uses: actions/setup-java@v5
+      with:
+        distribution: 'jetbrains'
+        java-version: 21
+        java-package: ${{ inputs.skip-jcef == 'false' && 'jdk+jcef' || 'jdk' }}
+
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v5
+
+    - name: Set up Elixir
+      env:
+        ImageOS: ubuntu24
+      if: ${{ inputs.elixir-version != '' }}
+      uses: erlef/setup-beam@v1
+      with:
+        otp-version: ${{ inputs.otp-version }}
+        elixir-version: ${{ inputs.elixir-version }}
+
+    - name: Export environment variables
+      shell: bash
+      run: |
+        if [ -n "${{ inputs.elixir-version }}" ]; then
+          echo "OTP_RELEASE=${{ inputs.otp-version }}" >> $GITHUB_ENV
+          echo "ERLANG_SDK_HOME=$(erl -eval 'io:format("~s", [code:root_dir()]).' -noshell -run init stop)" >> $GITHUB_ENV
+        fi
+        chmod +x gradlew
+        if [ -n "${{ inputs.idea-version }}" ]; then
+          echo "ORG_GRADLE_PROJECT_ideaVersion=${{ inputs.idea-version }}" >> $GITHUB_ENV
+        fi

@@ -7,46 +7,10 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        ideaVersion: [ "2024.3.6" ]
-
-    steps:
-      - uses: actions/checkout@v5
-      - name: Setup JetBrains Runtime (JBR)
-        uses: ./.github/actions/setup-jbr
-      - name: Set up Elixir
-        uses: erlef/setup-beam@v1
-        with:
-          otp-version: 24.3.4.6
-          elixir-version:  1.13.4
-      - name: Export OTP_RELEASE
-        run: echo "OTP_RELEASE=24.3.4.6" >> $GITHUB_ENV
-      - name: Export ERLANG_SDK_HOME
-        run: echo "ERLANG_SDK_HOME=`erl -eval 'io:format("~s", [code:root_dir()]).' -noshell -run init stop`" >> $GITHUB_ENV
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-      - name: Export ideaVersion to gradle
-        run: echo "ORG_GRADLE_PROJECT_ideaVersion=${{matrix.ideaVersion}}" >> $GITHUB_ENV
-      - name: Compile Tests with Gradle
-        run: ./gradlew --stacktrace compileTestJava
-      - name: Get Elixir Source
-        run: ./gradlew --stacktrace getElixir
-      - name: Release Quoter
-        run: ./gradlew --stacktrace releaseQuoter
-      - name: Test with Gradle
-        run: ./gradlew --stacktrace test
-  verifyPlugin:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v5
-      - name: Setup JetBrains Runtime (JBR)
-        uses: ./.github/actions/setup-jbr
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-      - name: Run Plugin Verifier
-        run: ./gradlew --stacktrace verifyPlugin
+  test-and-verify:
+    uses: ./.github/workflows/shared-test.yml
+    with:
+      elixir-version: '1.13.4'
+      otp-version: '24.3.4.6'
+      idea-version: '2024.3.6'
+      upload-reports: true

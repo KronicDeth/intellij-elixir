@@ -309,6 +309,21 @@ tasks.named<Test>("test") {
     }
 }
 
+// Configure test-logger plugin for better console output
+testlogger {
+    theme = com.adarshr.gradle.testlogger.theme.ThemeType.MOCHA
+    showExceptions = true
+    showStackTraces = true
+    showFullStackTraces = false
+    showCauses = true
+    slowThreshold = 2000
+    showSummary = true
+    showStandardStreams = false
+    showPassedStandardStreams = false
+    showSkippedStandardStreams = false
+    showFailedStandardStreams = true
+}
+
 // Get the list of platforms from gradle.properties
 val runIdePlatformsList = providers.gradleProperty("runIdePlatforms").get().split(",")
 
