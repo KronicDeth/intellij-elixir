@@ -5,10 +5,8 @@ import com.intellij.psi.tree.IElementType;
 import org.elixir_lang.ElixirFlexLexer;
 import org.elixir_lang.elixir_flex_lexer.TokenTest;
 import org.elixir_lang.psi.ElixirTypes;
-import org.junit.Ignore;
 import org.junit.runners.Parameterized;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -17,7 +15,6 @@ import static org.junit.Assert.assertEquals;
 /**
  * Created by luke.imhoff on 10/23/14.
  */
-@Ignore("abstract")
 public abstract class Test extends TokenTest {
     /*
      * Constructors

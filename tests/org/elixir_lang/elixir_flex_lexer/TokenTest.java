@@ -1,7 +1,6 @@
 package org.elixir_lang.elixir_flex_lexer;
 
 import com.intellij.psi.tree.IElementType;
-import org.junit.Ignore;
 
 import java.io.IOException;
 
@@ -11,7 +10,6 @@ import static org.junit.Assert.assertTrue;
 /**
  * Created by luke.imhoff on 9/8/14.
  */
-@Ignore("abstract")
 public abstract class TokenTest extends Test {
     /*
      * Constants
@@ -33,11 +31,11 @@ public abstract class TokenTest extends Test {
     public TokenTest() {
     }
 
-    public TokenTest(CharSequence charSequence, IElementType tokenType, int lexicalState) {
+    protected TokenTest(CharSequence charSequence, IElementType tokenType, int lexicalState) {
         this(charSequence, tokenType, lexicalState, true);
     }
 
-    public TokenTest(CharSequence charSequence, IElementType tokenType, int lexicalState, boolean consumeAll) {
+    protected TokenTest(CharSequence charSequence, IElementType tokenType, int lexicalState, boolean consumeAll) {
         this.charSequence = charSequence;
         this.lexicalState = lexicalState;
         this.tokenType = tokenType;

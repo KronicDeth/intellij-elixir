@@ -4,9 +4,7 @@ import com.intellij.psi.tree.IElementType;
 import org.elixir_lang.ElixirFlexLexer;
 import org.elixir_lang.psi.ElixirTypes;
 import org.jetbrains.annotations.NotNull;
-import org.junit.Ignore;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Vector;
@@ -14,7 +12,6 @@ import java.util.Vector;
 /**
  * Created by luke.imhoff on 9/6/14.
  */
-@Ignore("abstract")
 public abstract class Test extends org.elixir_lang.elixir_flex_lexer.group.Test {
     /*
      * CONSTANTS
