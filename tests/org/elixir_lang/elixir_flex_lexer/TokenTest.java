@@ -4,8 +4,7 @@ import com.intellij.psi.tree.IElementType;
 
 import java.io.IOException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * Created by luke.imhoff on 9/8/14.
@@ -55,9 +54,9 @@ public abstract class TokenTest extends Test {
         lexer.advance();
 
         if (consumeAll) {
-            assertTrue("Failure: expected all of \"" + charSequence + "\" to be consumed", lexer.getTokenType() == null);
+            assertNull("Failure: expected all of \"" + charSequence + "\" to be consumed", lexer.getTokenType());
         } else {
-            assertTrue("Failure: expected all of \"" + charSequence + "\" not to be consumed", lexer.getTokenType() != null);
+            assertNotNull("Failure: expected all of \"" + charSequence + "\" not to be consumed", lexer.getTokenType());
         }
 
         assertEquals(lexicalState, lexer.getState());
