@@ -378,31 +378,38 @@ idea {
     }
 }
 
-tasks.register('getElixir') {
-    doLast {
-        def folder = new File(elixirPath as String)
+def elixirZipFile = file("${rootDir}/cache/Elixir.${elixirVersion}.zip")
 
-        if (!folder.isDirectory() || folder.list().size() == 0) {
-            download.run {
-                src "https://github.com/elixir-lang/elixir/archive/v${elixirVersion}.zip"
-                dest "${rootDir}/cache/Elixir.${elixirVersion}.zip"
-                overwrite false
-            }
-        }
+def downloadElixir = tasks.register('downloadElixir', Download) {
+    src "https://github.com/elixir-lang/elixir/archive/v${elixirVersion}.zip"
+    dest elixirZipFile
+    overwrite false
+}
 
-        def binFolder = new File("${elixirPath}/bin")
-        if (!binFolder.isDirectory() || folder.list().size() == 0) {
-            copy {
-                from zipTree("${rootDir}/cache/Elixir.${elixirVersion}.zip")
-                into "${rootDir}/cache/"
-            }
-
-            exec {
-                workingDir elixirPath
-                commandLine "make"
-            }
-        }
+def unzipElixir = tasks.register('unzipElixir', Copy) {
+    dependsOn(downloadElixir)
+    from(zipTree(elixirZipFile))
+    into(elixirPath)
+    eachFile { details ->
+        details.relativePath = new RelativePath(true, details.relativePath.segments.drop(1))
     }
+    // Only include files from within the expected root directory.
+    include "elixir-${elixirVersion}/**"
+
+    inputs.file(elixirZipFile)
+    outputs.dir(elixirPath)
+}
+
+def buildElixir = tasks.register('buildElixir', Exec) {
+    dependsOn(unzipElixir)
+    workingDir(elixirPath)
+    commandLine("make")
+    inputs.dir(elixirPath)
+    outputs.dir(file("${elixirPath}/bin"))
+}
+
+tasks.register('getElixir') {
+    dependsOn(buildElixir)
 }
 
 tasks.register('getQuoter') {
@@ -427,30 +434,17 @@ tasks.register('getQuoter') {
     }
 }
 
-tasks.register('getQuoterDeps') {
-    doLast {
-        exec {
-            workingDir quoterUnzippedPath
-            commandLine 'mix', 'do', 'local.rebar', '--force,', 'local.hex', '--force,', 'deps.get'
-            // standardOutput = System.out
-            // errorOutput = System.err
-        }
-    }
+tasks.register('getQuoterDeps', Exec) {
+    dependsOn getQuoter
+    workingDir quoterUnzippedPath
+    commandLine 'mix', 'do', 'local.rebar', '--force,', 'local.hex', '--force,', 'deps.get'
 }
 
-tasks.register('releaseQuoter') {
-    doLast {
-        def file = new File(quoterExe as String)
-
-        if (!file.canExecute()) {
-            exec {
-                workingDir quoterUnzippedPath
-                commandLine 'mix', 'do', 'local.rebar', '--force,', 'local.hex', '--force,', 'deps.get,', 'release'
-                // standardOutput = System.out
-                // errorOutput = System.err
-            }
-        }
-    }
+tasks.register('releaseQuoter', Exec) {
+    dependsOn getQuoterDeps
+    workingDir quoterUnzippedPath
+    commandLine 'mix', 'do', 'local.rebar', '--force,', 'local.hex', '--force,', 'deps.get,', 'release'
+    onlyIf { (!file(quoterExe as String).canExecute()) }
 }
 
 compileTestJava {
