@@ -20,10 +20,11 @@ plugins {
 
 // Function to fetch the latest EAP build number dynamically
 fun latestEapBuild(): String {
-    // 1) Prefer JetBrains Releases API to get a concrete numeric EAP build (e.g., 253.20558.101)
+    // Look at Release Candidates, then EAPs, then Normal releases
     val apiUris = listOf(
+        URI("https://data.services.jetbrains.com/products/releases?code=IIU&type=rc&latest=true&fields=build"),
         URI("https://data.services.jetbrains.com/products/releases?code=IIU&type=eap&latest=true&fields=build"),
-        URI("https://data.services.jetbrains.com/products/releases?code=IIU&type=eap&latest=true")
+        URI("https://data.services.jetbrains.com/products/releases?code=IIU&type=release&latest=true&fields=build")
     )
     for (uri in apiUris) {
         val json = kotlin.runCatching {
@@ -33,7 +34,9 @@ fun latestEapBuild(): String {
             val regex = """"build"\s*:\s*"([0-9.]+)"""".toRegex()
             val match = regex.find(json)
             if (match != null) {
-                return match.groupValues[1] // e.g., 253.20558.101
+                val selectedVersion = match.groupValues[1] // e.g., 253.20558.101
+                println("Version: $selectedVersion found at $uri")
+                return selectedVersion
             }
         }
     }
@@ -70,7 +73,10 @@ fun latestEapBuild(): String {
         }
         .lastOrNull()
 
-    if (numericEap != null) return numericEap
+    if (numericEap != null) {
+        println("Fallback Version: $numericEap found at $snapshotsUri")
+        return numericEap
+    }
 
     throw IllegalStateException("No numeric EAP build found from JetBrains API or snapshots metadata")
 }
