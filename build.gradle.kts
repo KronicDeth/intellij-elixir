@@ -119,6 +119,8 @@ version = "$pluginVersion$versionSuffix"
 
 allprojects {
     apply(plugin = "java")
+    apply(plugin = "com.adarshr.test-logger")
+
     configure<JavaPluginExtension> {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
@@ -126,20 +128,48 @@ allprojects {
     tasks.withType<JavaCompile> {
         options.encoding = "UTF-8"
     }
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        testImplementation("junit:junit:4.13.2")
+        testImplementation("org.opentest4j:opentest4j:1.3.0")
+    }
+
+    // Configure test-logger plugin for consistent console output across all projects
+    configure<com.adarshr.gradle.testlogger.TestLoggerExtension> {
+        theme = com.adarshr.gradle.testlogger.theme.ThemeType.MOCHA
+        showExceptions = true
+        showStackTraces = true
+        showFullStackTraces = false
+        showCauses = true
+        slowThreshold = 2000
+        showSummary = true
+        showStandardStreams = false
+        showPassedStandardStreams = false
+        showSkippedStandardStreams = false
+        showFailedStandardStreams = true
+    }
+
+    tasks.withType<Test> {
+        testLogging {
+            exceptionFormat = TestExceptionFormat.FULL
+        }
+    }
 }
 
 subprojects {
     apply(plugin = "org.jetbrains.intellij.platform.module")
+
     repositories {
-        mavenCentral()
         intellijPlatform {
             defaultRepositories()
         }
     }
-    dependencies {
-        testImplementation("junit:junit:4.13.2")
-        testImplementation("org.opentest4j:opentest4j:1.3.0")
 
+    dependencies {
         intellijPlatform {
             create(providers.gradleProperty("platformType"), provider { actualPlatformVersion })
 
@@ -303,25 +333,6 @@ tasks.named<Test>("test") {
     exclude("**/org/elixir_lang/parser_definition/ParsingTestCase.class")
     exclude("**/org/elixir_lang/parser_definition/matched_call_operation/ParsingTestCase.class")
     exclude("**/org/elixir_lang/parser_definition/matched_dot_operator_call_operation/ParsingTestCase.class")
-
-    testLogging {
-        exceptionFormat = TestExceptionFormat.FULL
-    }
-}
-
-// Configure test-logger plugin for better console output
-testlogger {
-    theme = com.adarshr.gradle.testlogger.theme.ThemeType.MOCHA
-    showExceptions = true
-    showStackTraces = true
-    showFullStackTraces = false
-    showCauses = true
-    slowThreshold = 2000
-    showSummary = true
-    showStandardStreams = false
-    showPassedStandardStreams = false
-    showSkippedStandardStreams = false
-    showFailedStandardStreams = true
 }
 
 // Get the list of platforms from gradle.properties
@@ -357,7 +368,6 @@ intellijPlatformTesting {
 
 repositories {
     maven { url = uri("https://maven-central.storage.googleapis.com") }
-    mavenCentral()
     intellijPlatform {
         defaultRepositories()
     }
@@ -379,9 +389,6 @@ dependencies {
     implementation(project(":jps-shared"))
     implementation(files("lib/OtpErlang.jar"))
     implementation(group = "commons-io", name = "commons-io", version = "2.21.0")
-
-    testImplementation("junit:junit:4.13.2")
-    testImplementation("org.opentest4j:opentest4j:1.3.0")
 }
 
 tasks.named("compileJava") {

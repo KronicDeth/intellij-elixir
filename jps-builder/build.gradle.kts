@@ -1,5 +1,3 @@
-import org.gradle.api.tasks.testing.logging.TestExceptionFormat
-
 tasks.jar {
     archiveFileName.set("jps-builder.jar")
 }
@@ -33,15 +31,6 @@ tasks.test {
     environment("ELIXIR_VERSION", elixirVersion)
 
     include("**/*Test.class")
-
-    testLogging {
-        events("passed", "skipped", "failed", "standardOut", "standardError")
-        exceptionFormat = TestExceptionFormat.FULL
-        showStandardStreams = true
-        showExceptions = true
-        showCauses = true
-        showStackTraces = true
-    }
 }
 
 dependencies {
