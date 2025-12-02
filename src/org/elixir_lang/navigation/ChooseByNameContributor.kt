@@ -74,7 +74,7 @@ open class ChooseByNameContributor(private val stubIndexKey: StubIndexKey<String
                     )
                 is ModuleImpl<*> -> items.add(element)
                 is CallDefinitionImpl<*> -> items.add(element)
-                else -> TODO()
+                else -> TODO("Unknown element: ${element.javaClass.name} in ChooseByNameContributor")
             }
         }
 
