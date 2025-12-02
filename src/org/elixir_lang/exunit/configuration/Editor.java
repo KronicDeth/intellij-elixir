@@ -2,9 +2,9 @@ package org.elixir_lang.exunit.configuration;
 
 import com.intellij.application.options.ModulesComboBox;
 import com.intellij.openapi.module.Module;
+import org.elixir_lang.configuration.EditorHelper;
 import org.elixir_lang.exunit.Configuration;
 import org.elixir_lang.exunit.configuration.editor.ParametersPanel;
-import org.elixir_lang.module.ElixirModuleType;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -28,17 +28,13 @@ public final class Editor extends com.intellij.openapi.options.SettingsEditor<Co
     }
 
     public void reset(@NotNull Configuration configuration) {
-        modulesComboBox.fillModules(configuration.getProject());
-        final Module module = configuration.getConfigurationModule().getModule();
-
-        if (module != null) {
-            setRunInModuleSelected(true);
-            modulesComboBox.setSelectedModule(module);
-        } else {
-            setRunInModuleSelected(false);
-        }
-
-        parametersPanel.reset(configuration);
+        EditorHelper.reset(
+                configuration.getProject(),
+                configuration.getConfigurationModule().getModule(),
+                modulesComboBox,
+                this::setRunInModuleSelected,
+                () -> parametersPanel.reset(configuration)
+        );
     }
 
     @Override
