@@ -194,11 +194,15 @@ abstract class Configurable: SearchableConfigurable, com.intellij.openapi.option
     }
 
     private fun updateSdkPanel(selectedValue: ProjectJdkImpl?) {
-        val selectedEditor = selectedValue?.let {
-            editorByProjectJdkImpl.computeIfAbsent(it, { Editor(projectSdksModel, history!!, it) })
-        }
+        ApplicationManager.getApplication().runWriteAction {
+            val selectedEditor = selectedValue?.let {
+                editorByProjectJdkImpl.computeIfAbsent(it) { key ->
+                    Editor(projectSdksModel, history!!, key)
+                }
+            }
 
-        sdkPanel.select(selectedEditor, true)
+            sdkPanel.select(selectedEditor, true)
+        }
     }
 }
 
