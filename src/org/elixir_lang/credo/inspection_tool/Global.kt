@@ -25,6 +25,7 @@ import com.intellij.psi.PsiManager
 import org.elixir_lang.Mix
 import org.elixir_lang.credo.Action
 import org.elixir_lang.jps.builder.ParametersList
+import org.elixir_lang.mix.Project
 import org.elixir_lang.notification.setup_sdk.Notifier
 import org.elixir_lang.sdk.elixir.Type.Companion.mostSpecificSdk
 import java.nio.file.Paths
@@ -48,7 +49,7 @@ class Global : GlobalInspectionTool() {
             .getInstance(module)
             .contentRoots
             .filter { virtualFile ->
-                virtualFile.findChild("mix.exs") != null
+                virtualFile.findChild(Project.MIX_EXS) != null
             }
             .map(VirtualFile::getPath)
             .toHashSet()
@@ -113,7 +114,7 @@ class Global : GlobalInspectionTool() {
                                 NotificationType.ERROR
                             )
                             .addAction(Action(project))
-                            .notify(project);
+                            .notify(project)
                     }
 
                     // lib/level_web/ui/empty_state.ex:1:11: R: Modules should have a @moduledoc tag.
@@ -160,7 +161,7 @@ class Global : GlobalInspectionTool() {
                                             end = start + 1
                                         } else {
                                             start = lineStartOffset
-                                            end = document.getLineEndOffset(lineNumber);
+                                            end = document.getLineEndOffset(lineNumber)
                                         }
 
                                         val refElement = globalContext.refManager.getReference(psiFile)
@@ -216,7 +217,7 @@ class Global : GlobalInspectionTool() {
         }
     }
 
-    private fun String.stripColor(): String = this.replace(Regex("\u001B\\[[;\\d]*m"), "");
+    private fun String.stripColor(): String = this.replace(Regex("\u001B\\[[;\\d]*m"), "")
     private fun String.toHTML(): String = this.replace("\n", "<br/>\n")
 
     override fun isGraphNeeded(): Boolean = true

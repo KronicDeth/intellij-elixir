@@ -9,6 +9,7 @@ import com.intellij.util.indexing.FileContent;
 import org.elixir_lang.facet.Configuration;
 import org.elixir_lang.facet.Type;
 import org.jetbrains.annotations.NotNull;
+import org.elixir_lang.mix.Project;
 
 public class FrameworkDetector extends FacetBasedFrameworkDetector<Facet, Configuration> {
     private static final String ID = "Elixir";
@@ -32,6 +33,6 @@ public class FrameworkDetector extends FacetBasedFrameworkDetector<Facet, Config
     @NotNull
     @Override
     public ElementPattern<FileContent> createSuitableFilePattern() {
-        return FileContentPattern.fileContent().withName("mix.exs");
+        return FileContentPattern.fileContent().withName(Project.MIX_EXS);
     }
 }

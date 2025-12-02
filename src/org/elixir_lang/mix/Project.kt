@@ -21,6 +21,7 @@ import java.io.EOFException
 import java.io.File
 
 object Project {
+    const val MIX_EXS = "mix.exs"
     private val LOG = Logger.getInstance(Project::class.java)
 
     fun addSourceDirToContent(
@@ -150,7 +151,7 @@ object Project {
 
     private fun createImportedOtpApp(appRoot: VirtualFile): OtpApp? =
         try {
-            appRoot.findChild("mix.exs")
+            appRoot.findChild(MIX_EXS)
         } catch (_: EOFException) {
             null
         }?.let {

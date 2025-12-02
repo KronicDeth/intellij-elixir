@@ -11,6 +11,7 @@ import com.intellij.psi.*
 import org.elixir_lang.espec.Configuration
 import org.elixir_lang.espec.Gatherer
 import org.elixir_lang.file.containsFileWithSuffix
+import org.elixir_lang.mix.Project
 import org.elixir_lang.psi.ElixirFile
 import org.elixir_lang.sdk.elixir.Type
 import org.elixir_lang.sdk.elixir.Type.Companion.mostSpecificSdk
@@ -193,7 +194,7 @@ private fun setupConfigurationFromContextImpl(
     }
 
 private fun workingDirectory(directory: PsiDirectory, basePath: String?): String? =
-    if (directory.findFile("mix.exs") != null) {
+    if (directory.findFile(Project.MIX_EXS) != null) {
         directory.virtualFile.path
     } else {
         directory.parent?.let { workingDirectory(it, basePath) } ?: basePath
@@ -208,4 +209,3 @@ private fun workingDirectory(element: PsiElement, basePath: String?): String? =
 
 private fun workingDirectory(file: PsiFile, basePath: String?): String? =
     workingDirectory(file.containingDirectory, basePath)
-
