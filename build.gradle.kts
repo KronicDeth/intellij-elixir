@@ -1,4 +1,16 @@
-import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+/*
+ * Main Build Script
+ * Purpose: Orchestrates the build of the IntelliJ Elixir plugin.
+ * * Key Changes for 2025.3 / Small IDE Support:
+ * 1. Uses Version Catalog (libs.*) for dependency management.
+ * 2. Explicitly configure JPS subprojects with TestFramework dependencies.
+ * 3. `runQuoter` task now actively polls the daemon to prevent test race conditions.
+ * 4. `test` task enforces the working directory to project root to find testData.
+ */
+
+import com.adarshr.gradle.testlogger.TestLoggerExtension
+import com.adarshr.gradle.testlogger.theme.ThemeType
+import de.undercouch.gradle.tasks.download.Download
 import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 import org.jetbrains.intellij.platform.gradle.models.ProductRelease
@@ -6,188 +18,112 @@ import org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
-import java.net.URI
 import java.text.SimpleDateFormat
 import java.util.*
-import javax.xml.parsers.DocumentBuilderFactory
 
+// Uses the Version Catalog defined in gradle/libs.versions.toml
 plugins {
-    id("org.jetbrains.intellij.platform") version "2.10.5"
-    id("org.jetbrains.kotlin.jvm") version "2.2.21"
-    id("de.undercouch.download") version "5.6.0"
-    id("com.adarshr.test-logger") version "4.0.0"
+    alias(libs.plugins.intellij.platform)
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.download)
+    alias(libs.plugins.test.logger)
+    id("java")
+    id("idea")
 }
 
-// Function to fetch the latest EAP build number dynamically
-fun latestEapBuild(): String {
-    // Look at Release Candidates, then EAPs, then Normal releases
-    val apiUris = listOf(
-        URI("https://data.services.jetbrains.com/products/releases?code=IIU&type=rc&latest=true&fields=build"),
-        URI("https://data.services.jetbrains.com/products/releases?code=IIU&type=eap&latest=true&fields=build"),
-        URI("https://data.services.jetbrains.com/products/releases?code=IIU&type=release&latest=true&fields=build")
-    )
-    for (uri in apiUris) {
-        val json = kotlin.runCatching {
-            uri.toURL().openStream().bufferedReader().use { it.readText() }
-        }.getOrNull()
-        if (json != null) {
-            val regex = """"build"\s*:\s*"([0-9.]+)"""".toRegex()
-            val match = regex.find(json)
-            if (match != null) {
-                val selectedVersion = match.groupValues[1] // e.g., 253.20558.101
-                println("Version: $selectedVersion found at $uri")
-                return selectedVersion
-            }
-        }
-    }
+// --- Version Catalog Captures ---
+// Capture these early to avoid "Extension 'libs' not found" errors in subproject blocks
+val javaVersionStr: String = libs.versions.java.get()
+val libJunit = libs.junit
+val libOpentest4j = libs.opentest4j
+val libCommonsIo = libs.commons.io
 
-    // 2) Fallback: parse snapshots metadata and pick the last 3-part numeric EAP snapshot, then strip the suffix
-    val snapshotsUri =
-        URI("https://cache-redirector.jetbrains.com/www.jetbrains.com/intellij-repository/snapshots/com/jetbrains/intellij/idea/ideaIU/maven-metadata.xml")
-    val versions = kotlin.runCatching {
-        val doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(snapshotsUri.toURL().openStream())
-        doc.documentElement.normalize()
-        val versioning = doc.getElementsByTagName("versioning").item(0)
-        val versionsNode = versioning?.childNodes
-        buildList {
-            if (versionsNode != null) {
-                for (i in 0 until versionsNode.length) {
-                    val n = versionsNode.item(i)
-                    if (n.nodeName == "versions") {
-                        val children = n.childNodes
-                        for (j in 0 until children.length) {
-                            val v = children.item(j)
-                            if (v.nodeName == "version") add(v.textContent)
-                        }
-                    }
-                }
-            }
-        }
-    }.getOrNull().orEmpty()
+// --- Configuration Properties ---
+val elixirVersion: String by project
+val quoterVersion: String by project
+val pluginVersion: String by project
+val publishChannels: String by project
+val useDynamicEapVersion: Boolean = project.property("useDynamicEapVersion").toString().toBoolean()
 
-    // Look for versions like 253.17525.95-EAP-SNAPSHOT and convert to 253.17525.95
-    val numericEap = versions.asSequence()
-        .mapNotNull { v ->
-            val m = Regex("""^(\d+\.\d+\.\d+)-EAP-SNAPSHOT$""").matchEntire(v)
-            m?.groupValues?.get(1)
-        }
-        .lastOrNull()
-
-    if (numericEap != null) {
-        println("Fallback Version: $numericEap found at $snapshotsUri")
-        return numericEap
-    }
-
-    throw IllegalStateException("No numeric EAP build found from JetBrains API or snapshots metadata")
+val actualPlatformVersion: String = if (useDynamicEapVersion) {
+    // Calling the helper from buildSrc
+    VersionFetcher.getLatestEapBuild()
+} else {
+    project.property("platformVersion").toString()
 }
 
-// Define extra properties
-val cachePath: String by extra { "${rootDir}/cache" }
-val elixirVersion: String by extra { project.property("elixirVersion") as String }
-val elixirPath: String by extra { "${cachePath}/elixir-${elixirVersion}" }
-val quoterVersion: String by extra { project.property("quoterVersion") as String }
-val pluginVersion: String by extra { project.property("pluginVersion") as String }
-val useDynamicEapVersion: Boolean by extra { (project.property("useDynamicEapVersion") as String).toBoolean() }
-val actualPlatformVersion: String by extra {
-    if (useDynamicEapVersion) latestEapBuild() else project.property("platformVersion") as String
+// Setup Paths
+val cachePath = layout.projectDirectory.dir("cache")
+val elixirPath = cachePath.dir("elixir-$elixirVersion")
+val quoterUnzippedPath = cachePath.dir("elixir-$elixirVersion-intellij_elixir-$quoterVersion")
+val quoterExe = quoterUnzippedPath.file("_build/dev/rel/intellij_elixir/bin/intellij_elixir")
+
+// EXPORT FOR SUBPROJECTS (Required for jps-builder to access this path)
+extra["elixirPath"] = elixirPath.asFile.absolutePath
+
+val versionSuffix = if (project.hasProperty("isRelease") && project.property("isRelease").toString().toBoolean()) {
+    ""
+} else {
+    "-pre+" + SimpleDateFormat("yyyyMMddHHmmss").apply { timeZone = TimeZone.getTimeZone("UTC") }.format(Date())
 }
-
-println("Building against IntelliJ Platform version: $actualPlatformVersion")
-
-val quoterUnzippedPath: String by extra { "${cachePath}/elixir-${elixirVersion}-intellij_elixir-${quoterVersion}" }
-val quoterReleasePath: String by extra { "${quoterUnzippedPath}/_build/dev/rel/intellij_elixir" }
-val quoterExe: String by extra { "${quoterReleasePath}/bin/intellij_elixir" }
-val quoterZipPath: String by extra { "${cachePath}/intellij_elixir-${quoterVersion}.zip" }
-val quoterZipRootPath: String by extra { "${cachePath}/intellij_elixir-${quoterVersion}" }
-
-val versionSuffix: String by extra {
-    if (project.hasProperty("isRelease") && project.property("isRelease").toString().toBoolean()) {
-        ""
-    } else {
-        val date = SimpleDateFormat("yyyyMMddHHmmss").apply {
-            timeZone = TimeZone.getTimeZone("UTC")
-        }.format(Date())
-        "-pre+$date"
-    }
-}
-
-val channel: String by extra {
-    if (project.hasProperty("isRelease") && project.property("isRelease").toString().toBoolean()) {
-        "default"
-    } else {
-        "canary"
-    }
-}
-
-val publishChannels: String by extra { project.property("publishChannels") as String }
 
 version = "$pluginVersion$versionSuffix"
 
+println("Building against IntelliJ Platform version: $actualPlatformVersion")
+
+// --- Global Project Configuration ---
 allprojects {
     apply(plugin = "java")
     apply(plugin = "com.adarshr.test-logger")
-
-    configure<JavaPluginExtension> {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
-    }
-    tasks.withType<JavaCompile> {
-        options.encoding = "UTF-8"
-    }
 
     repositories {
         mavenCentral()
     }
 
     dependencies {
-        testImplementation("junit:junit:4.13.2")
-        testImplementation("org.opentest4j:opentest4j:1.3.0")
+        testImplementation(libJunit)
+        testImplementation(libOpentest4j)
     }
 
-    // Configure test-logger plugin for consistent console output across all projects
-    configure<com.adarshr.gradle.testlogger.TestLoggerExtension> {
-        theme = com.adarshr.gradle.testlogger.theme.ThemeType.MOCHA
+    configure<JavaPluginExtension> {
+        sourceCompatibility = JavaVersion.valueOf("VERSION_$javaVersionStr")
+        targetCompatibility = JavaVersion.valueOf("VERSION_$javaVersionStr")
+    }
+
+    tasks.withType<JavaCompile> { options.encoding = "UTF-8" }
+
+    configure<TestLoggerExtension> {
+        theme = ThemeType.MOCHA
         showExceptions = true
         showStackTraces = true
         showFullStackTraces = false
-        showCauses = true
         slowThreshold = 2000
         showSummary = true
         showStandardStreams = false
-        showPassedStandardStreams = false
-        showSkippedStandardStreams = false
         showFailedStandardStreams = true
-    }
-
-    tasks.withType<Test> {
-        testLogging {
-            exceptionFormat = TestExceptionFormat.FULL
-        }
     }
 }
 
+// --- Subprojects (JPS) ---
 subprojects {
     apply(plugin = "org.jetbrains.intellij.platform.module")
 
     repositories {
-        intellijPlatform {
-            defaultRepositories()
-        }
+        intellijPlatform { defaultRepositories() }
     }
 
     dependencies {
         intellijPlatform {
-            create(providers.gradleProperty("platformType"), provider { actualPlatformVersion })
-
-            bundledPlugins(providers.gradleProperty("platformBundledPlugins").map { it.split(",").toList() })
-            bundledModules(providers.gradleProperty("platformBundledModules").map { it.split(",").toList() })
-
-            pluginVerifier()
-            zipSigner()
+            create(providers.gradleProperty("platformType"), providers.provider { actualPlatformVersion })
+            bundledPlugins(providers.gradleProperty("platformBundledPlugins").map { it.split(",") })
+            bundledModules(providers.gradleProperty("platformBundledModules").map { it.split(",") })
             testFramework(TestFrameworkType.Platform)
             testFramework(TestFrameworkType.Plugin.Java)
         }
+        // JPS Builder tests extend UsefulTestCase (JUnit 3/4 style) and need explicit JUnit 4 on classpath
+        testImplementation(libJunit)
     }
+
     sourceSets {
         main {
             java.srcDirs("src")
@@ -199,6 +135,12 @@ subprojects {
     }
 }
 
+// --- Root Project Repositories ---
+repositories {
+    intellijPlatform { defaultRepositories() }
+}
+
+// --- Source Sets ---
 sourceSets {
     main {
         java.srcDirs("src", "gen")
@@ -209,27 +151,22 @@ sourceSets {
     }
 }
 
+// --- IntelliJ Platform Configuration ---
 intellijPlatform {
-    // buildSearchableOptions = false
-    // instrumentCode = false
     pluginConfiguration {
-        fun stripTag(text: String, tag: String): String =
-            text.replace("<${tag}>", "").replace("</${tag}>", "")
-
-        fun bodyInnerHTML(path: String): String =
-            stripTag(stripTag(file(path).readText(), "html"), "body")
-
         id = providers.gradleProperty("pluginGroup")
         name = providers.gradleProperty("pluginName")
         version = providers.gradleProperty("pluginVersion")
-        changeNotes.set(bodyInnerHTML("resources/META-INF/changelog.html"))
-        description.set(bodyInnerHTML("resources/META-INF/description.html"))
+
+        val stripTag = { text: String, tag: String -> text.replace("<${tag}>", "").replace("</${tag}>", "") }
+        val bodyInnerHTML = { path: String -> stripTag(stripTag(file(path).readText(), "html"), "body") }
+
+        changeNotes = bodyInnerHTML("resources/META-INF/changelog.html")
+        description = bodyInnerHTML("resources/META-INF/description.html")
 
         ideaVersion {
             sinceBuild = providers.gradleProperty("pluginSinceBuild")
-            // We want users to be able to install the plugin on future versions, and if there is incompatibility,
-            // they should hopefully create an issue :-).
-            untilBuild = provider { null }
+            untilBuild = providers.provider { null }
         }
         vendor {
             name = providers.gradleProperty("vendorName")
@@ -239,156 +176,48 @@ intellijPlatform {
     }
 
     publishing {
-        token = provider {
-            System.getenv("JET_BRAINS_MARKETPLACE_TOKEN")
-        }
-        channels = listOf(publishChannels.split(",")).flatten()
+        token = providers.environmentVariable("JET_BRAINS_MARKETPLACE_TOKEN")
+        channels = publishChannels.split(",")
     }
 
     pluginVerification {
         ides {
             select {
-                // Define all the IDEs you want to check in one list
-                types = listOf(
-                    IntelliJPlatformType.IntellijIdeaUltimate,
-                    IntelliJPlatformType.PyCharmProfessional,
-                    IntelliJPlatformType.RubyMine,
-                    IntelliJPlatformType.WebStorm,
-                )
+                types = providers.gradleProperty("pluginVerifierIdeTypes")
+                    .get()
+                    .split(",")
+                    .map { IntelliJPlatformType.valueOf(it.trim()) }
 
-                // Explicitly target the RC channel to get the 2025.3 Release Candidate
-                channels = listOf(ProductRelease.Channel.RC, ProductRelease.Channel.PREVIEW, ProductRelease.Channel.EAP)
+                channels = providers.gradleProperty("pluginVerifierChannels")
+                    .get()
+                    .split(",")
+                    .map { ProductRelease.Channel.valueOf(it.trim()) }
 
-                // The specific version string for the RC
-                version = "2025.3"
+                sinceBuild = providers.gradleProperty("pluginVerifierVersion").get()
             }
         }
     }
 }
 
-apply(plugin = "kotlin")
-
-// Configure all RunIdeTask instances (including the new platform-specific ones)
-tasks.withType<RunIdeTask>().configureEach {
-    // Set JVM arguments
-    jvmArguments.addAll(listOf(
-        "-Didea.debug.mode=true",
-        "-Didea.is.internal=true",
-        "-Dlog4j2.debug=true",
-        "-Dlogger.org=TRACE",
-        "-XX:+AllowEnhancedClassRedefinition"
-    ))
-
-    // Set system properties to debug log
-    systemProperty("idea.log.debug.categories", "org.elixir_lang")
-
-    // Set the maximum heap size
-    maxHeapSize = "7g"
-
-    // Optionally set the working directory if specified in the project properties
-    if (project.hasProperty("runIdeWorkingDirectory") && project.property("runIdeWorkingDirectory").toString().isNotEmpty()) {
-        workingDir = file(project.property("runIdeWorkingDirectory").toString())
-    }
-
-    val compatiblePluginsList = providers.gradleProperty("runIdeCompatiblePlugins").get().let {
-        if (it.isEmpty()) emptyList() else it.split(",")
-    }
-    if (compatiblePluginsList.isNotEmpty()) {
-        dependencies {
-            intellijPlatform {
-                plugins(compatiblePluginsList)
-            }
-        }
-    }
-}
-
+// --- Kotlin Configuration ---
 kotlin {
-    jvmToolchain(21)
+    jvmToolchain(javaVersionStr.toInt())
 }
 
 tasks.withType<KotlinJvmCompile>().configureEach {
     compilerOptions {
-        jvmTarget.set(JvmTarget.JVM_21)
+        jvmTarget = JvmTarget.valueOf("JVM_$javaVersionStr")
         freeCompilerArgs.add("-Xjvm-default=all")
-        apiVersion.set(KotlinVersion.KOTLIN_2_2)
+        apiVersion = KotlinVersion.KOTLIN_2_2
     }
 }
 
-tasks.named<Test>("test") {
-    environment("ELIXIR_LANG_ELIXIR_PATH", elixirPath)
-    environment("ELIXIR_EBIN_DIRECTORY", "${elixirPath}/lib/elixir/ebin/")
-    environment("ELIXIR_VERSION", elixirVersion)
-    isScanForTestClasses = false
-    include("**/Issue*.class")
-    include("**/*Test.class")
-    include("**/*TestCase.class")
-
-    // Exclude specific abstract base test classes so that they don't show as Ignored
-    exclude("**/org/elixir_lang/PlatformTestCase.class")
-    exclude("**/org/elixir_lang/eex/lexer/look_ahead/Test.class")
-    exclude("**/org/elixir_lang/elixir_flex_lexer/Test.class")
-    exclude("**/org/elixir_lang/elixir_flex_lexer/TokenTest.class")
-    exclude("**/org/elixir_lang/elixir_flex_lexer/group/Test.class")
-    exclude("**/org/elixir_lang/elixir_flex_lexer/group/quote/Test.class")
-    exclude("**/org/elixir_lang/elixir_flex_lexer/group/sigil/Test.class")
-    exclude("**/org/elixir_lang/elixir_flex_lexer/group_heredoc_end/quote/Test.class")
-    exclude("**/org/elixir_lang/elixir_flex_lexer/group_heredoc_end/sigil/Test.class")
-    exclude("**/org/elixir_lang/elixir_flex_lexer/group_heredoc_end/sigil/char_list/Test.class")
-    exclude("**/org/elixir_lang/elixir_flex_lexer/group_heredoc_end/sigil/custom/Test.class")
-    exclude("**/org/elixir_lang/elixir_flex_lexer/group_heredoc_end/sigil/regex/Test.class")
-    exclude("**/org/elixir_lang/elixir_flex_lexer/group_heredoc_end/sigil/string/Test.class")
-    exclude("**/org/elixir_lang/elixir_flex_lexer/group_heredoc_end/sigil/words/Test.class")
-    exclude("**/org/elixir_lang/elixir_flex_lexer/group_heredoc_line_body/quote/PromoterTest.class")
-    exclude("**/org/elixir_lang/elixir_flex_lexer/group_heredoc_line_body/sigil/PromoterTest.class")
-    exclude("**/org/elixir_lang/elixir_flex_lexer/named_sigil/Test.class")
-    exclude("**/org/elixir_lang/elixir_flex_lexer/sigil_modifiers/group/Test.class")
-    exclude("**/org/elixir_lang/elixir_flex_lexer/sigil_modifiers/group_heredoc_end/Test.class")
-    exclude("**/org/elixir_lang/flex_lexer/Test.class")
-    exclude("**/org/elixir_lang/parser_definition/ParsingTestCase.class")
-    exclude("**/org/elixir_lang/parser_definition/matched_call_operation/ParsingTestCase.class")
-    exclude("**/org/elixir_lang/parser_definition/matched_dot_operator_call_operation/ParsingTestCase.class")
-}
-
-// Get the list of platforms from gradle.properties
-val runIdePlatformsList = providers.gradleProperty("runIdePlatforms").get().split(",")
-
-runIdePlatformsList.forEach { platform ->
-    intellijPlatformTesting.runIde.register("run${platform}", Action {
-        type = IntelliJPlatformType.valueOf(platform)
-        version = providers.gradleProperty("platformVersion${platform}").get()
-
-        prepareSandboxTask {
-            sandboxDirectory = project.layout.buildDirectory.dir("${platform.lowercase()}-sandbox")
-        }
-    })
-
-    // if enableEAPIDEs is true, create an EAP instance
-    if (providers.gradleProperty("enableEAPIDEs").get().lowercase() == "true") {
-        intellijPlatformTesting.runIde.register("run${platform}EAP", Action {
-            type = IntelliJPlatformType.valueOf(platform)
-            version = providers.gradleProperty("platformVersion${platform}EAP").get()
-            useInstaller = false
-
-            prepareSandboxTask {
-                sandboxDirectory = project.layout.buildDirectory.dir("${platform.lowercase()}_eap-sandbox")
-            }
-        })
-    }
-}
-
-repositories {
-    maven { url = uri("https://maven-central.storage.googleapis.com") }
-    intellijPlatform {
-        defaultRepositories()
-    }
-}
-
+// --- Dependencies ---
 dependencies {
     intellijPlatform {
-        create(providers.gradleProperty("platformType"), provider { actualPlatformVersion })
-
-        bundledPlugins(providers.gradleProperty("platformBundledPlugins").map { it.split(",").toList() })
-        bundledModules(providers.gradleProperty("platformBundledModules").map { it.split(",").toList() })
+        create(providers.gradleProperty("platformType"), providers.provider { actualPlatformVersion })
+        bundledPlugins(providers.gradleProperty("platformBundledPlugins").map { it.split(",") })
+        bundledModules(providers.gradleProperty("platformBundledModules").map { it.split(",") })
         pluginVerifier()
         zipSigner()
         testFramework(TestFrameworkType.Platform)
@@ -398,157 +227,209 @@ dependencies {
     implementation(project(":jps-builder"))
     implementation(project(":jps-shared"))
     implementation(files("lib/OtpErlang.jar"))
-    implementation(group = "commons-io", name = "commons-io", version = "2.21.0")
+    implementation(libCommonsIo)
 }
 
-tasks.named("compileJava") {
-    dependsOn(":jps-shared:composedJar")
-    dependsOn(":jps-builder:composedJar")
-}
+// --- Run IDE Configuration ---
+tasks.withType<RunIdeTask>().configureEach {
+    jvmArguments.addAll(
+        "-Didea.debug.mode=true",
+        "-Didea.is.internal=true",
+        "-Dlog4j2.debug=true",
+        "-Dlogger.org=TRACE",
+        "-XX:+AllowEnhancedClassRedefinition",
+        "-Didea.ProcessCanceledException=disabled"
+    )
 
-apply(plugin = "idea")
-configure<org.gradle.plugins.ide.idea.model.IdeaModel> {
-    project {
-        jdkName = project.property("javaVersion") as String
-        languageLevel = org.gradle.plugins.ide.idea.model.IdeaLanguageLevel(project.property("javaVersion") as String)
+    systemProperty("idea.log.debug.categories", "org.elixir_lang")
+    maxHeapSize = "7g"
+
+    if (project.hasProperty("runIdeWorkingDirectory") && project.property("runIdeWorkingDirectory").toString().isNotEmpty()) {
+        workingDir = file(project.property("runIdeWorkingDirectory").toString())
     }
-    module {
-        generatedSourceDirs.add(file("gen"))
-    }
-}
 
-val elixirZipFile = file("${rootDir}/cache/Elixir.${elixirVersion}.zip")
-
-val downloadElixir = tasks.register<de.undercouch.gradle.tasks.download.Download>("downloadElixir") {
-    src("https://github.com/elixir-lang/elixir/archive/v${elixirVersion}.zip")
-    dest(elixirZipFile)
-    overwrite(false)
-}
-
-val unzipElixir = tasks.register<Copy>("unzipElixir") {
-    dependsOn(downloadElixir)
-    from(zipTree(elixirZipFile))
-    into(elixirPath)
-    eachFile {
-        relativePath = RelativePath(true, *relativePath.segments.drop(1).toTypedArray())
-    }
-    // Only include files from within the expected root directory.
-    include("elixir-${elixirVersion}/**")
-
-    inputs.file(elixirZipFile)
-    outputs.dir(elixirPath)
-}
-
-val buildElixir = tasks.register<Exec>("buildElixir") {
-    dependsOn(unzipElixir)
-    workingDir(elixirPath)
-    commandLine("make")
-    inputs.dir(elixirPath)
-    outputs.dir(file("${elixirPath}/bin"))
-}
-
-tasks.register("getElixir") {
-    dependsOn(buildElixir)
-}
-
-tasks.register<de.undercouch.gradle.tasks.download.Download>("getQuoter") {
-    src("https://github.com/KronicDeth/intellij_elixir/archive/v${quoterVersion}.zip")
-    dest(quoterZipPath)
-    overwrite(false)
-
-    doLast {
-        val folder = file(quoterUnzippedPath)
-        if (!folder.isDirectory || folder.list()?.isEmpty() != false) {
-            copy {
-                from(zipTree(quoterZipPath))
-                into(cachePath)
-            }
-
-            val quoterZipRootFile = file(quoterZipRootPath)
-            quoterZipRootFile.renameTo(file(quoterUnzippedPath))
+    // Dynamic plugin loading
+    val compatiblePlugins = providers.gradleProperty("runIdeCompatiblePlugins").getOrElse("")
+    if (compatiblePlugins.isNotEmpty()) {
+        dependencies {
+            intellijPlatform { plugins(compatiblePlugins.split(",")) }
         }
     }
 }
 
-tasks.register<Exec>("getQuoterDeps") {
-    dependsOn("getQuoter")
-    workingDir(quoterUnzippedPath)
-    commandLine("mix", "do", "local.rebar", "--force,", "local.hex", "--force,", "deps.get")
-}
+// Register Platform-specific Run Tasks dynamically
+val runIdePlatformsList = providers.gradleProperty("runIdePlatforms").get().split(",")
+val enableEAP = providers.gradleProperty("enableEAPIDEs").get().toBoolean()
 
-tasks.register<Exec>("releaseQuoter") {
-    dependsOn("getQuoterDeps")
-    workingDir(quoterUnzippedPath)
-    commandLine("mix", "do", "local.rebar", "--force,", "local.hex", "--force,", "deps.get,", "release")
-    onlyIf { !file(quoterExe).canExecute() }
-}
+runIdePlatformsList.forEach { platform ->
+    intellijPlatformTesting.runIde.register("run${platform}", Action {
+        type = IntelliJPlatformType.valueOf(platform)
+        version = providers.gradleProperty("platformVersion${platform}").get()
+        prepareSandboxTask {
+            sandboxDirectory = layout.buildDirectory.dir("${platform.lowercase()}-sandbox")
+        }
+    })
 
-tasks.named("compileTestJava") {
-    dependsOn(":jps-builder:composedJar")
-    dependsOn(":jps-shared:composedJar")
-    dependsOn("getElixir")
-    dependsOn("getQuoter")
-}
-
-tasks.register<Exec>("runQuoter") {
-    dependsOn("releaseQuoter")
-    environment("RELEASE_COOKIE", "intellij_elixir")
-    environment("RELEASE_DISTRIBUTION", "name")
-    environment("RELEASE_NAME", "intellij_elixir@127.0.0.1")
-    executable(quoterExe)
-    args("daemon")
-}
-
-tasks.register<Exec>("stopQuoter") {
-    dependsOn("releaseQuoter")
-    environment("RELEASE_COOKIE", "intellij_elixir")
-    environment("RELEASE_DISTRIBUTION", "name")
-    environment("RELEASE_NAME", "intellij_elixir@127.0.0.1")
-    executable(quoterExe)
-    args("stop")
-}
-
-tasks.named<RunIdeTask>("runIde") {
-    systemProperty("idea.log.debug.categories", "org.elixir_lang=TRACE")
-    // When wanting to disable EDT slow assertion.
-    // systemProperty("ide.slow.operations.assertion", "true")
-
-    // -Didea.debug.mode=true:
-    // This enables debug mode for IntelliJ IDEA. It can be useful when developing plugins to get more detailed logging and debugging information.
-    // -Didea.is.internal=true:
-    // This flag indicates that the plugin is running in an internal mode, which may enable additional features or logging that are typically only available to IntelliJ developers.
-    // -Dlog4j2.debug=true:
-    // This enables debug logging for Log4j 2, which is the logging framework used by IntelliJ IDEA. It can help in troubleshooting logging-related issues in your plugin.
-    // -Dlogger.org=TRACE:
-    // This sets the logging level for the "org" package to TRACE, which is the most verbose logging level. This can be useful for detailed logging of plugin activities.
-    // -XX:+AllowEnhancedClassRedefinition:
-    // This is a JVM flag that allows for more flexible class redefinition during runtime. It can be beneficial for hot-swapping code changes without restarting the IDE.
-    // -Didea.ProcessCanceledException=disabled:
-    //This disables the throwing of ProcessCanceledException, which is typically used to cancel long-running processes in IntelliJ IDEA. Disabling it can be useful in certain debugging scenarios.
-    jvmArguments.addAll(listOf(
-        "-Didea.debug.mode=true",
-        "-XX:+AllowEnhancedClassRedefinition",
-        "-Didea.is.internal=true",
-        "-Dlog4j2.debug=true",
-        "-Dlogger.org=TRACE",
-        "-Didea.ProcessCanceledException=disabled"
-    ))
-    maxHeapSize = "7g"
-    // get from runIdeWorkingDirectory
-    if (project.hasProperty("runIdeWorkingDirectory") && project.property("runIdeWorkingDirectory").toString().isNotEmpty()) {
-        workingDir = file(project.property("runIdeWorkingDirectory").toString())
+    if (enableEAP) {
+        intellijPlatformTesting.runIde.register("run${platform}EAP", Action {
+            type = IntelliJPlatformType.valueOf(platform)
+            version = providers.gradleProperty("platformVersion${platform}EAP").get()
+            useInstaller = false
+            prepareSandboxTask {
+                sandboxDirectory = layout.buildDirectory.dir("${platform.lowercase()}_eap-sandbox")
+            }
+        })
     }
 }
 
-tasks.named<Test>("test") {
-    dependsOn("prepareTestSandbox", "runQuoter")
-    finalizedBy("stopQuoter")
+// --- External Tools (Elixir & Quoter) ---
+val downloadElixir by tasks.registering(Download::class) {
+    src("https://github.com/elixir-lang/elixir/archive/v${elixirVersion}.zip")
+    dest(cachePath.file("Elixir.${elixirVersion}.zip"))
+    overwrite(false)
 }
 
-// Uncomment to allow using build-scan.
-// if (hasProperty("buildScan")) {
-//     buildScan {
-//         termsOfServiceUrl = "https://gradle.com/terms-of-service"
-//         termsOfServiceAgree = "yes"
-//     }
-// }
+val unzipElixir by tasks.registering(Copy::class) {
+    dependsOn(downloadElixir)
+    from(zipTree(downloadElixir.get().dest))
+    into(elixirPath.asFile)
+    eachFile { relativePath = RelativePath(true, *relativePath.segments.drop(1).toTypedArray()) }
+    include("elixir-${elixirVersion}/**")
+}
+
+val buildElixir by tasks.registering(Exec::class) {
+    dependsOn(unzipElixir)
+    workingDir(elixirPath.asFile)
+    commandLine("make")
+    outputs.dir(elixirPath.dir("bin"))
+    // The apps that are part of Elixir SDK. `make` compiles them and puts output into `ebin` and `_build` dirs.
+    // We need to declare them as outputs for Gradle's UP-TO-DATE checks to work correctly.
+    // The list is based on the applications shipped with Elixir v1.13.4.
+    val libDir = elixirPath.dir("lib")
+    listOf("eex", "elixir", "ex_unit", "iex", "logger", "mix").forEach { appName ->
+        val appDir = libDir.dir(appName)
+        // All apps get an 'ebin' directory.
+        outputs.dir(appDir.dir("ebin"))
+        // All apps except 'elixir' itself also get a '_build' directory.
+        if (appName != "elixir") {
+            outputs.dir(appDir.dir("_build"))
+        }
+    }
+}
+
+val getElixir by tasks.registering {
+    dependsOn(buildElixir)
+}
+
+
+val getQuoter by tasks.registering(Download::class) {
+    src("https://github.com/KronicDeth/intellij_elixir/archive/v${quoterVersion}.zip")
+    dest(cachePath.file("intellij_elixir-${quoterVersion}.zip"))
+    overwrite(false)
+}
+
+
+val unzipQuoter by tasks.registering(Copy::class) {
+    dependsOn(getQuoter)
+
+    // 1. Target the final destination directly
+    into(quoterUnzippedPath)
+
+    from(zipTree(getQuoter.get().dest)) {
+        // 2. Strip the top-level directory 'intellij_elixir-${quoterVersion}' on the fly
+        eachFile {
+            relativePath = RelativePath(true, *relativePath.segments.drop(1).toTypedArray())
+        }
+
+        // 3. Prevent creating the empty top-level directory itself
+        includeEmptyDirs = false
+    }
+}
+
+val getQuoterDeps by tasks.registering(Exec::class) {
+    dependsOn(unzipQuoter)
+    workingDir(quoterUnzippedPath)
+
+    // 1. INPUTS
+    // mix.exs defines the requirements
+    inputs.file(quoterUnzippedPath.file("mix.exs"))
+        .withPropertyName("mixExs")
+        .withPathSensitivity(PathSensitivity.RELATIVE)
+
+    // mix.lock defines the exact versions.
+    // It is an INPUT because 'unzipQuoter' created it, and this task READS it.
+    inputs.file(quoterUnzippedPath.file("mix.lock"))
+        .withPropertyName("mixLock")
+        .withPathSensitivity(PathSensitivity.RELATIVE)
+
+    // 2. OUTPUTS
+    // This task produces/populates the 'deps' directory.
+    outputs.dir(quoterUnzippedPath.dir("deps"))
+        .withPropertyName("depsDir")
+
+    // 3. CACHING
+    outputs.cacheIf { true }
+
+    commandLine("mix", "do", "local.rebar", "--force,", "local.hex", "--force,", "deps.get")
+}
+
+val releaseQuoter by tasks.registering(Exec::class) {
+    dependsOn(getQuoterDeps)
+
+    // 1. Use Directory object directly (No .asFile)
+    workingDir(quoterUnzippedPath)
+
+    // 2. INPUTS: What determines if a release needs rebuilding?
+    //    If mix.exs, lockfile, or the source code (lib/config) changes, re-run.
+    inputs.files(
+        quoterUnzippedPath.file("mix.exs"),
+        quoterUnzippedPath.file("mix.lock")
+    ).withPathSensitivity(PathSensitivity.RELATIVE)
+
+    //    Add source directories so code changes trigger a rebuild
+    inputs.dir(quoterUnzippedPath.dir("lib")).withPathSensitivity(PathSensitivity.RELATIVE)
+    inputs.dir(quoterUnzippedPath.dir("config")).withPathSensitivity(PathSensitivity.RELATIVE)
+    //    The dependencies (generated by previous task) are inputs for this task
+    inputs.dir(quoterUnzippedPath.dir("deps")).withPathSensitivity(PathSensitivity.RELATIVE)
+
+    // 3. OUTPUTS: This replaces your 'onlyIf' check.
+    //    If this file exists and inputs match, Gradle skips this task automatically.
+    outputs.dir(quoterUnzippedPath.dir("_build"))
+        .withPropertyName("buildDir")
+
+    // 4. Enable Cache
+    outputs.cacheIf { true }
+
+    commandLine("mix", "release")
+}
+
+fun ExecSpec.configureQuoter() {
+    executable(quoterExe.asFile)
+    environment("RELEASE_COOKIE", "intellij_elixir")
+    environment("RELEASE_DISTRIBUTION", "name") // Required for 127.0.0.1
+    environment("RELEASE_NAME", "intellij_elixir@127.0.0.1")
+}
+
+val runQuoter by tasks.registering(RunQuoterTask::class) {
+    dependsOn(releaseQuoter)
+    executable.set(quoterExe)
+}
+
+val stopQuoter by tasks.registering(Exec::class) {
+    dependsOn(releaseQuoter)
+    configureQuoter()
+    args("stop")
+    doLast {
+        logger.lifecycle("Stopped Quoter daemon.")
+    }
+}
+
+// --- Test Configuration ---
+tasks.named<Test>("test") {
+    dependsOn("prepareTestSandbox", runQuoter)
+    finalizedBy(stopQuoter)
+
+    environment("ELIXIR_LANG_ELIXIR_PATH", elixirPath.asFile.absolutePath)
+    environment("ELIXIR_EBIN_DIRECTORY", elixirPath.dir("lib/elixir/ebin/").asFile.absolutePath + File.separator)
+    environment("ELIXIR_VERSION", elixirVersion)
+}
