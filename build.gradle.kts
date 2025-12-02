@@ -344,31 +344,27 @@ tasks.named<Test>("test") {
 // Get the list of platforms from gradle.properties
 val runIdePlatformsList = providers.gradleProperty("runIdePlatforms").get().split(",")
 
-intellijPlatformTesting {
-    runIde {
-        runIdePlatformsList.forEach { platform ->
-            create("run${platform}") {
-                type = IntelliJPlatformType.valueOf(platform)
-                version = providers.gradleProperty("platformVersion${platform}").get()
+runIdePlatformsList.forEach { platform ->
+    intellijPlatformTesting.runIde.register("run${platform}", Action {
+        type = IntelliJPlatformType.valueOf(platform)
+        version = providers.gradleProperty("platformVersion${platform}").get()
 
-                prepareSandboxTask {
-                    sandboxDirectory = project.layout.buildDirectory.dir("${platform.lowercase()}-sandbox")
-                }
-            }
-
-            // if enableEAPIDEs is true, create an EAP instance
-            if (providers.gradleProperty("enableEAPIDEs").get().lowercase() == "true") {
-                create("run${platform}EAP") {
-                    type = IntelliJPlatformType.valueOf(platform)
-                    version = providers.gradleProperty("platformVersion${platform}EAP").get()
-                    useInstaller = false
-
-                    prepareSandboxTask {
-                        sandboxDirectory = project.layout.buildDirectory.dir("${platform.lowercase()}_eap-sandbox")
-                    }
-                }
-            }
+        prepareSandboxTask {
+            sandboxDirectory = project.layout.buildDirectory.dir("${platform.lowercase()}-sandbox")
         }
+    })
+
+    // if enableEAPIDEs is true, create an EAP instance
+    if (providers.gradleProperty("enableEAPIDEs").get().lowercase() == "true") {
+        intellijPlatformTesting.runIde.register("run${platform}EAP", Action {
+            type = IntelliJPlatformType.valueOf(platform)
+            version = providers.gradleProperty("platformVersion${platform}EAP").get()
+            useInstaller = false
+
+            prepareSandboxTask {
+                sandboxDirectory = project.layout.buildDirectory.dir("${platform.lowercase()}_eap-sandbox")
+            }
+        })
     }
 }
 
