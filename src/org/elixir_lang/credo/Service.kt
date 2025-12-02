@@ -5,6 +5,7 @@ import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.Storage
 import com.intellij.openapi.project.Project
 
+@com.intellij.openapi.components.Service(com.intellij.openapi.components.Service.Level.PROJECT)
 @com.intellij.openapi.components.State(name = "Credo", storages = [Storage(value = "credo.xml")])
 class Service : PersistentStateComponent<State?> {
     private var state = State()
@@ -35,6 +36,7 @@ class Service : PersistentStateComponent<State?> {
 
     companion object {
         @JvmStatic
-        fun getInstance(project: Project): Service = project.getService(Service::class.java) ?: Service()
+        fun getInstance(project: Project): Service = project.getService(Service::class.java)
+            ?: error("Service not found. Make sure the @Service annotation is processed.")
     }
 }

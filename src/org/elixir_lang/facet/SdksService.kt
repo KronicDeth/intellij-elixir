@@ -1,9 +1,11 @@
 package org.elixir_lang.facet
 
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.components.Service
 import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl
 import com.intellij.openapi.roots.ui.configuration.projectRoot.ProjectSdksModel
 
+@Service
 class SdksService {
     private var model: ProjectSdksModel? = null
 
@@ -27,7 +29,7 @@ class SdksService {
         do {
             model = try {
                 ProjectSdksModel().apply { reset(null) }
-            } catch (e: AssertionError) {
+            } catch (_: AssertionError) {
                 null
             }
         } while (model == null)

@@ -1,15 +1,15 @@
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
+import org.jetbrains.intellij.platform.gradle.models.ProductRelease
 import org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
-import javax.xml.parsers.DocumentBuilderFactory
 import java.net.URI
 import java.text.SimpleDateFormat
-import java.util.TimeZone
-import java.util.Date
-import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import java.util.*
+import javax.xml.parsers.DocumentBuilderFactory
 
 plugins {
     id("org.jetbrains.intellij.platform") version "2.10.5"
@@ -247,13 +247,21 @@ intellijPlatform {
 
     pluginVerification {
         ides {
-            // https://www.jetbrains.com/idea/download/other.html
-            // Note: Using IntellijIdeaUltimate as IC is no longer available in 2025.3+
-//            create(IntelliJPlatformType.IntellijIdeaCommunity, "2024.2.6")
-//            create(IntelliJPlatformType.IntellijIdeaCommunity, "2024.3.6")
-//            create(IntelliJPlatformType.IntellijIdeaUltimate, "2025.2.1")
-            // Testing against 2025.3 EAP - using the same build we're compiling against
-            create(IntelliJPlatformType.IntellijIdeaUltimate, actualPlatformVersion)
+            select {
+                // Define all the IDEs you want to check in one list
+                types = listOf(
+                    IntelliJPlatformType.IntellijIdeaUltimate,
+                    IntelliJPlatformType.PyCharmProfessional,
+                    IntelliJPlatformType.RubyMine,
+                    IntelliJPlatformType.WebStorm,
+                )
+
+                // Explicitly target the RC channel to get the 2025.3 Release Candidate
+                channels = listOf(ProductRelease.Channel.RC, ProductRelease.Channel.PREVIEW, ProductRelease.Channel.EAP)
+
+                // The specific version string for the RC
+                version = "2025.3"
+            }
         }
     }
 }
