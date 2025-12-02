@@ -1,6 +1,6 @@
 package org.elixir_lang.parser_definition;
 
-public class EOLtoWhitespace extends ParsingTestCase {
+public class EOLtoWhitespaceTestCase extends ParsingTestCase {
    public void testAnd() {
       assertParsedAndQuotedCorrectly();
    }
