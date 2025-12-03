@@ -149,7 +149,7 @@
         <fileType name="BEAM" implementationClass="org.elixir_lang.beam.FileType" fieldName="INSTANCE" language="BEAM"
                   extensions="beam"/>
         <structureViewBuilder key="BEAM" factoryClass="org.elixir_lang.beam.StructureViewBuilderProvider"/>
-        <stubElementTypeHolder class="org.elixir_lang.beam.psi.stubs.ModuleStubElementTypes" externalIdPrefix="elixir.implementedProtocolName"/>
+        <stubElementTypeHolder class="org.elixir_lang.beam.psi.stubs.ModuleStubElementTypes" externalIdPrefix="beam."/>
         <syntaxHighlighter key="BEAM" factoryClass="org.elixir_lang.ElixirSyntaxHighlighterFactory"/>
 
         <!-- `.beam.asm` -->
