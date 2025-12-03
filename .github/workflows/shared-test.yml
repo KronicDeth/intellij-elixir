@@ -80,3 +80,12 @@ jobs:
 
       - name: Run Plugin Verifier
         run: ./gradlew --stacktrace verifyPlugin
+
+      - name: Upload Verify Reports
+        uses: actions/upload-artifact@v4
+        if: ${{ always() && inputs.upload-reports }}
+        with:
+          name: verify-plugin-reports
+          path: |
+            **/build/reports/pluginVerifier
+          retention-days: 30
