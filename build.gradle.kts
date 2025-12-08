@@ -64,7 +64,7 @@ extra["elixirPath"] = elixirPath.asFile.absolutePath
 val versionSuffix = if (project.hasProperty("isRelease") && project.property("isRelease").toString().toBoolean()) {
     ""
 } else {
-    "-pre+" + SimpleDateFormat("yyyyMMddHHmmss").apply { timeZone = TimeZone.getTimeZone("UTC") }.format(Date())
+    "-pre+$actualPlatformVersion-" + SimpleDateFormat("yyyyMMddHHmmss").apply { timeZone = TimeZone.getTimeZone("UTC") }.format(Date())
 }
 
 version = "$pluginVersion$versionSuffix"
