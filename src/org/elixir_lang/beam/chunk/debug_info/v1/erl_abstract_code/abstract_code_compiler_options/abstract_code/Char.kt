@@ -20,11 +20,11 @@ object Char {
         val codePoint = term.intValue()
 
         when (codePoint) {
-            '\\'.toInt() -> macroStringBuilder.append("\\\\")
-            '\n'.toInt() -> macroStringBuilder.append("\\n")
-            '\r'.toInt() -> macroStringBuilder.append("\\r")
-            ' '.toInt() -> macroStringBuilder.append("\\s")
-            '\t'.toInt() -> macroStringBuilder.append("\\t")
+            '\\'.code -> macroStringBuilder.append("\\\\")
+            '\n'.code -> macroStringBuilder.append("\\n")
+            '\r'.code -> macroStringBuilder.append("\\r")
+            ' '.code -> macroStringBuilder.append("\\s")
+            '\t'.code -> macroStringBuilder.append("\\t")
             else -> macroStringBuilder.appendCodePoint(codePoint)
         }
 

@@ -8,9 +8,7 @@ import com.intellij.openapi.module.ModifiableModuleModel
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.options.ConfigurationException
-import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
-import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.ProjectJdkTable
 import com.intellij.openapi.projectRoots.Sdk
@@ -42,11 +40,19 @@ class Builder : ProjectImportBuilder<OtpApp>() {
     private var myFoundOtpApps = emptyList<OtpApp>()
     private var mySelectedOtpApps = emptyList<OtpApp>()
     private var myIsImportingProject: Boolean = false
+    private var myNeedsScan: Boolean = false
 
     override fun getIcon(): Icon = Icons.PROJECT
     override fun getName(): String = "Mix"
     override fun isSuitableSdkType(sdkType: SdkTypeId): Boolean = sdkType === Type.instance
-    override fun getList(): List<OtpApp> = myFoundOtpApps
+    override fun getList(): List<OtpApp> {
+        // Perform deferred scanning if needed
+        if (myNeedsScan && myProjectRoot != null) {
+            scanProjectRoot(myProjectRoot!!)
+            myNeedsScan = false
+        }
+        return myFoundOtpApps
+    }
 
     @Throws(ConfigurationException::class)
     override fun setList(selectedOtpApps: List<OtpApp>?) {
@@ -62,13 +68,14 @@ class Builder : ProjectImportBuilder<OtpApp>() {
         myProjectRoot = null
         myFoundOtpApps = emptyList()
         mySelectedOtpApps = emptyList()
+        myNeedsScan = false
     }
 
     /**
      * check for reusing *.iml or *.eml
      *
      */
-    override fun validate(current: Project?, dest: Project): Boolean {
+    override fun validate(currentProject: Project?, project: Project): Boolean {
         if (!findIdeaModuleFiles(mySelectedOtpApps)) {
             return true
         }
@@ -151,23 +158,27 @@ class Builder : ProjectImportBuilder<OtpApp>() {
             return true
         }
 
+        myProjectRoot = projectRoot
+        myNeedsScan = true
+
+        // Return true to indicate the project root was set successfully
+        // Actual scanning is deferred until getList() is called
+        return true
+    }
+
+    private fun scanProjectRoot(projectRoot: VirtualFile) {
         val unitTestMode = ApplicationManager.getApplication().isUnitTestMode
 
-        myProjectRoot = projectRoot
         if (!unitTestMode && projectRoot is VirtualDirectoryImpl) {
             projectRoot.refreshAndFindChild("deps")
         }
 
-        ProgressManager.getInstance()
-            .run(object : Task.Modal(ProjectImportBuilder.getCurrentProject(), "Scanning Mix Projects", true) {
-                override fun run(indicator: ProgressIndicator) {
-                    myFoundOtpApps = org.elixir_lang.mix.Project.findOtpApps(projectRoot, indicator)
-                }
-            })
+        // Get the current progress indicator from the ambient coroutine context, or use a no-op indicator
+        // This works correctly whether called from EDT, background thread, or coroutine context
+        val indicator = ProgressManager.getInstance().progressIndicator ?: com.intellij.openapi.progress.EmptyProgressIndicator()
+        myFoundOtpApps = org.elixir_lang.mix.Project.findOtpApps(projectRoot, indicator)
 
         mySelectedOtpApps = myFoundOtpApps
-
-        return !myFoundOtpApps.isEmpty()
     }
 
     fun setIsImportingProject(isImportingProject: Boolean) {

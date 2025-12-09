@@ -4,10 +4,10 @@ import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 import org.elixir_lang.ElixirFlexLexer;
 import org.elixir_lang.psi.ElixirTypes;
+import org.jetbrains.annotations.NotNull;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -29,7 +29,7 @@ public class SigilTest extends TokenTest {
      */
 
     @Override
-    protected void start(CharSequence charSequence) {
+    protected void start(@NotNull CharSequence charSequence) {
         // start to trigger SIGIL state
         CharSequence fullCharSequence = "~" + charSequence;
         super.start(fullCharSequence);

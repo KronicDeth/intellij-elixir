@@ -1,7 +1,6 @@
 package org.elixir_lang.parser_definition;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
-import com.intellij.lang.Language;
 import com.intellij.lang.ParserDefinition;
 import com.intellij.psi.*;
 import org.elixir_lang.ElixirLanguage;
@@ -16,7 +15,6 @@ import java.util.List;
 /**
  * Created by luke.imhoff on 8/7/14.
  */
-@org.junit.Ignore("abstract")
 public abstract class ParsingTestCase extends com.intellij.testFramework.ParsingTestCase {
     public ParsingTestCase() {
         this("ex", new ElixirParserDefinition());
@@ -33,11 +31,6 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
     protected void assertParsedAndQuotedAroundError(boolean checkResult) {
         doTest(checkResult);
         assertQuotedAroundError();
-    }
-
-    protected void assertParsedAndQuotedAroundExit() {
-        doTest(true);
-        assertQuotedAroundExit();
     }
 
     protected void assertParsedAndQuotedCorrectly() {
@@ -61,15 +54,15 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
         Quoter.assertError(myFile);
     }
 
-    private List<PsiElement> localErrors(@NotNull Language language) {
+    private List<PsiElement> localErrors() {
         final FileViewProvider fileViewProvider = myFile.getViewProvider();
-        PsiFile root = fileViewProvider.getPsi(language);
+        PsiFile root = fileViewProvider.getPsi(ElixirLanguage.INSTANCE);
         final List<PsiElement> errorElementList = new LinkedList<>();
 
         root.accept(
                 new PsiRecursiveElementWalkingVisitor() {
                     @Override
-                    public void visitElement(PsiElement element) {
+                    public void visitElement(@NotNull PsiElement element) {
                         if (element instanceof PsiErrorElement) {
                             errorElementList.add(element);
                         }
@@ -83,21 +76,15 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
     }
 
     protected void assertWithLocalError() {
-        assertWithLocalError(ElixirLanguage.INSTANCE);
-    }
 
-    protected void assertWithLocalError(@NotNull Language language) {
-        List<PsiElement> errorElementList = localErrors(language);
+        List<PsiElement> errorElementList = localErrors();
 
-        assertTrue("No PsiErrorElements found in parsed file PSI", !errorElementList.isEmpty());
+        assertFalse("No PsiErrorElements found in parsed file PSI", errorElementList.isEmpty());
     }
 
     protected void assertWithoutLocalError() {
-        assertWithoutLocalError(ElixirLanguage.INSTANCE);
-    }
 
-    protected void assertWithoutLocalError(@NotNull Language language) {
-        List<PsiElement> errorElementList = localErrors(language);
+        List<PsiElement> errorElementList = localErrors();
 
         assertTrue("PsiErrorElements found in parsed file PSI", errorElementList.isEmpty());
     }
@@ -105,11 +92,6 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
     protected void assertQuotedAroundError() {
         assertInstanceOf(ElixirPsiImplUtil.quote(myFile), OtpErlangObject.class);
         Quoter.assertError(myFile);
-    }
-
-    protected void assertQuotedAroundExit() {
-        assertInstanceOf(ElixirPsiImplUtil.quote(myFile), OtpErlangObject.class);
-        Quoter.assertExit(myFile);
     }
 
     protected void assertQuotedCorrectly() {
@@ -126,15 +108,10 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
      *
      * @return {@code true} if on Travis CI; {@code false} otherwise
      */
-    protected boolean isTravis() {
+    protected boolean isNotTravis() {
         String travis = System.getenv("TRAVIS");
 
-        return travis != null && travis.equals("true");
-    }
-
-    @Override
-    protected boolean skipSpaces() {
-        return false;
+        return travis == null || !travis.equals("true");
     }
 
     @Override

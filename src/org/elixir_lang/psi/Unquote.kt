@@ -102,8 +102,16 @@ object Unquote {
                 }
                 // (..., parameter)
                 is ElixirParenthesesArguments -> true
+                // Transparent wrappers: keep walking upward
                 is ElixirTuple,
-                is ElixirAccessExpression -> treeWalkUpUnquotedVariable(parent, resolveState, keepProcessing)
+                is ElixirAccessExpression,
+                is ElixirStabBody,
+                is ElixirStab,
+                is QuotableArguments,
+                is QuotableKeywordList,
+                is Call -> treeWalkUpUnquotedVariable(parent, resolveState, keepProcessing)
+                // Stop quietly at file boundary
+                is com.intellij.psi.PsiFile -> true
                 else -> {
                     Logger.error(
                             Unquote::class.java,

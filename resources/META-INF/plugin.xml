@@ -1,4 +1,4 @@
-<idea-plugin version="2">
+<idea-plugin>
     <id>org.elixir_lang</id>
     <name>Elixir</name>
     <vendor email="Kronic.Deth@gmail.com">Elle Imhoff</vendor>
@@ -13,7 +13,7 @@
     <depends config-file="rich-platform-plugin.xml" optional="true">com.intellij.modules.java</depends>
 
     <extensionPoints>
-        <extensionPoint qualifiedName="org.elixir_lang.packageManager" interface="org.elixir_lang.PackageManager"
+        <extensionPoint name="packageManager" interface="org.elixir_lang.PackageManager"
                         dynamic="true"/>
     </extensionPoints>
 
@@ -22,7 +22,11 @@
     </extensions>
 
     <extensions defaultExtensionNs="com.intellij">
-<!--        <errorHandler implementation="org.elixir_lang.errorreport.Submitter"/>-->
+        <registryKey key="org.elixir_lang.injection.enableLiteralSigilInjection"
+                     defaultValue="false"
+                     description="Enables literal sigil injection, which allows the Elixir sigil ~S to work. WARNING: THIS IS CURRENTLY BUGGY AND CAUSING ISSUES WITH ~s"/>
+
+        <!--        <errorHandler implementation="org.elixir_lang.errorreport.Submitter"/>-->
         <errorHandler implementation="com.intellij.diagnostic.JetBrainsMarketplaceErrorReportSubmitter"/>
 
         <!-- `openProjectProcessor` for Small IDEs -->
@@ -32,8 +36,6 @@
         <sdkType implementation="org.elixir_lang.sdk.elixir.Type"/>
         <sdkType implementation="org.elixir_lang.sdk.erlang.Type"/>
 
-        <moduleConfigurationEditorProvider implementation="org.elixir_lang.module.DefaultModuleEditorsProvider"
-                                           order="first"/>
 
         <editorNotificationProvider implementation="org.elixir_lang.notification.setup_sdk.Provider"/>
         <notificationGroup displayType="BALLOON" id="Elixir"/>
@@ -95,15 +97,15 @@
                                  parentId="language.elixir"
                                  displayName="Internal Erlang SDKs"
                                  provider="org.elixir_lang.facet.sdks.erlang.Provider"/>
-        <applicationService serviceImplementation="org.elixir_lang.facet.SdksService"
-                            serviceInterface="org.elixir_lang.facet.SdksService"/>
         <projectConfigurable id="language.elixir"
                              parentId="language"
                              displayName="Elixir"
                              provider="org.elixir_lang.facet.configurable.Provider"/>
 
         <facetType implementation="org.elixir_lang.facet.Type"/>
-        <framework.detector implementation="org.elixir_lang.FrameworkDetector"/>
+
+        <applicationService serviceInterface="org.elixir_lang.configuration.BeforeRunTaskProvider"
+                            serviceImplementation="org.elixir_lang.configuration.DefaultBeforeRunTaskProvider"/>
 
         <!-- for template -->
         <internalFileTemplate name="Elixir Module"/>
@@ -114,7 +116,7 @@
 
         <!-- for liveTemplates -->
         <defaultLiveTemplates file="liveTemplates/Elixir"/>
-        <liveTemplateContext implementation="org.elixir_lang.templates.ElixirContextType"/>
+        <liveTemplateContext implementation="org.elixir_lang.templates.ElixirContextType" contextId="ELIXIR"/>
         <!-- end liveTemplates -->
 
         <additionalTextAttributes file="colorSchemes/ElixirDarcula.xml" scheme="Darcula"/>
@@ -134,8 +136,8 @@
                           level="WARNING"
                           shortName="Credo"/>
         // groupId/parentId "Errors" is Editor > Inspections
-        <projectConfigurable instance="org.elixir_lang.credo.Configurable" groupId="Errors" parentId="Errors"/>
-        <projectService serviceImplementation="org.elixir_lang.credo.Service"/>
+        <projectConfigurable instance="org.elixir_lang.credo.Configurable" groupId="Errors" parentId="Errors"
+                             displayName="Credo"/>
 
         <!-- <code>.beam</code> -->
         <gotoRelatedProvider implementation="org.elixir_lang.goto_decompiled.Provider"/>
@@ -147,7 +149,7 @@
         <fileType name="BEAM" implementationClass="org.elixir_lang.beam.FileType" fieldName="INSTANCE" language="BEAM"
                   extensions="beam"/>
         <structureViewBuilder key="BEAM" factoryClass="org.elixir_lang.beam.StructureViewBuilderProvider"/>
-        <stubElementTypeHolder class="org.elixir_lang.beam.psi.stubs.ModuleStubElementTypes"/>
+        <stubElementTypeHolder class="org.elixir_lang.beam.psi.stubs.ModuleStubElementTypes" externalIdPrefix="beam."/>
         <syntaxHighlighter key="BEAM" factoryClass="org.elixir_lang.ElixirSyntaxHighlighterFactory"/>
 
         <!-- `.beam.asm` -->
@@ -194,8 +196,7 @@
                                         implementationClass="org.elixir_lang.code_insight.line_marker_provider.Implementation"/>
 
         <!-- folding -->
-        <applicationService serviceInterface="org.elixir_lang.folding.ElixirFoldingSettings"
-                            serviceImplementation="org.elixir_lang.folding.ElixirFoldingSettings"/>
+        <applicationService serviceImplementation="org.elixir_lang.folding.ElixirFoldingSettings"/>
         <codeFoldingOptionsProvider instance="org.elixir_lang.folding.OptionsProvider"/>
         <lang.foldingBuilder language="Elixir" implementationClass="org.elixir_lang.folding.Builder"/>
 
@@ -215,8 +216,8 @@
         <lang.psiStructureViewFactory language="Elixir" implementationClass="org.elixir_lang.structure_view.Factory"/>
         <lang.quoteHandler language="Elixir" implementationClass="org.elixir_lang.QuoteHandler"/>
         <lang.syntaxHighlighterFactory
-                                       implementationClass="org.elixir_lang.ElixirSyntaxHighlighterFactory"
-                                       language="Elixir"/>
+                implementationClass="org.elixir_lang.ElixirSyntaxHighlighterFactory"
+                language="Elixir"/>
         <localInspection displayName="Ambiguous nested calls" enabledByDefault="true" groupName="Elixir"
                          implementationClass="org.elixir_lang.inspection.NoParenthesesManyStrict" language="Elixir"
                          level="ERROR" shortName="NoParenthesesManyStrict"/>
@@ -279,7 +280,7 @@
         <projectService serviceInterface="org.elixir_lang.dialyzer.service.DialyzerService"
                         serviceImplementation="org.elixir_lang.dialyzer.service.DialyzerServiceImpl"/>
         <projectConfigurable instance="org.elixir_lang.dialyzer.service.Configurable" groupId="Errors"
-                             parentId="Errors"/>
+                             parentId="Errors" displayName="Dialyzer"/>
     </extensions>
 
     <projectListeners>
@@ -301,7 +302,7 @@
             <separator/>
             <action id="Elixir.Help" class="org.elixir_lang.action.HelpAction" text="IntelliJ Elixir Help"/>
             <separator/>
-            <add-to-group group-id="HelpMenu" anchor="before" relative-to-action="ProductivityGuide"/>
+            <add-to-group group-id="HelpMenu" anchor="before" relative-to-action="LearnGroup"/>
         </group>
         <group id="Internal.Elixir" popup="true" internal="true" compact="true" text="Elixir">
             <action id="BEAM.BulkDecompilation" internal="true" class="BulkDecompilation"

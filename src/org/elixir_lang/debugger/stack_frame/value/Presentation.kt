@@ -164,8 +164,8 @@ class Presentation(private val myValue: Any) : XValuePresentation() {
             s.toString().all { isPrintable(it) }
 
         private fun isPrintable(c: Char): Boolean {
-            return (c.toInt() in 32..126
-                    || c == '\n' || c == '\r' || c == '\t' || c.toInt() == 11 || c == '\b' || c == '\u000c' || c.toInt() == 27 || c.toInt() == 7) /* bell */
+            return (c.code in 32..126
+                    || c == '\n' || c == '\r' || c == '\t' || c.code == 11 || c == '\b' || c == '\u000c' || c.code == 27 || c.code == 7) /* bell */
         }
 
         private fun renderErlangString(str: OtpErlangString, renderer: XValueTextRenderer) {

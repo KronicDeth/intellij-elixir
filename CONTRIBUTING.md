@@ -31,7 +31,7 @@
 6. In "Import Project from Gradle"
    1. Check "Use auto-import"
    2. Check "Create separate module per source set"
-   3. Ensure Gradle JVM is **AT LEAST** Java 1.7 / 7.  (Java 1.8 / 8 is recommended.)
+   3. Ensure Gradle JVM is **AT LEAST** Java 21+.
    Your import settings should look something like this:<br/>
    ![Gradle settings](/screenshots/contributing/gradle_settings.png?raw=true "Gradle settings")
    4. Click Finish

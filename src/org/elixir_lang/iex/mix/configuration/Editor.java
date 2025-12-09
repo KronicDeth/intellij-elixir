@@ -3,9 +3,9 @@ package org.elixir_lang.iex.mix.configuration;
 import com.intellij.application.options.ModulesComboBox;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.options.SettingsEditor;
+import org.elixir_lang.configuration.EditorHelper;
 import org.elixir_lang.iex.mix.Configuration;
 import org.elixir_lang.iex.mix.configuration.editor.ParametersPanel;
-import org.elixir_lang.module.ElixirModuleType;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -26,18 +26,13 @@ public final class Editor extends SettingsEditor<Configuration> {
     }
 
     public void reset(@NotNull Configuration configuration) {
-        modulesComboBox.fillModules(configuration.getProject());
-        final Module module = configuration.getConfigurationModule().getModule();
-
-
-        if (module != null) {
-            setRunInModuleSelected(true);
-            modulesComboBox.setSelectedModule(module);
-        } else {
-            setRunInModuleSelected(false);
-        }
-
-        parametersPanel.reset(configuration);
+        EditorHelper.reset(
+                configuration.getProject(),
+                configuration.getConfigurationModule().getModule(),
+                modulesComboBox,
+                this::setRunInModuleSelected,
+                () -> parametersPanel.reset(configuration)
+        );
     }
 
     @Override

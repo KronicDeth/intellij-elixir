@@ -16,6 +16,7 @@ import com.intellij.psi.codeStyle.ExternalFormatProcessor
 import org.elixir_lang.Elixir.elixirSdkHasErlangSdk
 import org.elixir_lang.Mix
 import org.elixir_lang.code_style.CodeStyleSettings
+import org.elixir_lang.mix.Project
 import org.elixir_lang.psi.ElixirFile
 import org.elixir_lang.sdk.elixir.Type.Companion.mostSpecificSdk
 import java.io.FileNotFoundException
@@ -82,7 +83,7 @@ class MixFormatExternalFormatProcessor : ExternalFormatProcessor {
                     }
                 }
                 ?.takeIf { contentRoot ->
-                    contentRoot.findChild("mix.exs") != null
+                    contentRoot.findChild(Project.MIX_EXS) != null
                 }
                 ?.path
 
