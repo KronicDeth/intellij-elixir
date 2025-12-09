@@ -41,9 +41,11 @@ val libCommonsIo = libs.commons.io
 // --- Configuration Properties ---
 val elixirVersion: String by project
 val quoterVersion: String by project
-val pluginVersion: String by project
-val publishChannels: String by project
+val basePluginVersion: String = providers.gradleProperty("pluginVersion").get()
 val useDynamicEapVersion: Boolean = project.property("useDynamicEapVersion").toString().toBoolean()
+
+// Publish channel: "default" for release, "canary" for pre-release
+val publishChannel: String = providers.gradleProperty("publishChannels").getOrElse("canary")
 
 val actualPlatformVersion: String = if (useDynamicEapVersion) {
     // Calling the helper from buildSrc
@@ -61,13 +63,21 @@ val quoterExe = quoterUnzippedPath.file("_build/dev/rel/intellij_elixir/bin/inte
 // EXPORT FOR SUBPROJECTS (Required for jps-builder to access this path)
 extra["elixirPath"] = elixirPath.asFile.absolutePath
 
-val versionSuffix = if (project.hasProperty("isRelease") && project.property("isRelease").toString().toBoolean()) {
-    ""
-} else {
-    "-pre+$actualPlatformVersion-" + SimpleDateFormat("yyyyMMddHHmmss").apply { timeZone = TimeZone.getTimeZone("UTC") }.format(Date())
+// Version suffix logic:
+// - "default" channel = no suffix (release build)
+// - explicit versionSuffix property = use that
+// - otherwise = "-pre+<timestamp>" (canary build)
+val versionSuffix: String = when {
+    publishChannel == "default" -> ""
+    providers.gradleProperty("versionSuffix").isPresent &&
+        providers.gradleProperty("versionSuffix").get().isNotEmpty() ->
+            "-${providers.gradleProperty("versionSuffix").get()}"
+    else -> "-pre+" + SimpleDateFormat("yyyyMMddHHmmss").apply {
+        timeZone = TimeZone.getTimeZone("UTC")
+    }.format(Date())
 }
 
-version = "$pluginVersion$versionSuffix"
+version = "$basePluginVersion$versionSuffix"
 
 println("Building against IntelliJ Platform version: $actualPlatformVersion")
 
@@ -153,10 +163,16 @@ sourceSets {
 
 // --- IntelliJ Platform Configuration ---
 intellijPlatform {
+    // Skip expensive tasks for canary builds
+    if (publishChannel == "canary") {
+        buildSearchableOptions = false
+        instrumentCode = false
+    }
+
     pluginConfiguration {
         id = providers.gradleProperty("pluginGroup")
         name = providers.gradleProperty("pluginName")
-        version = providers.gradleProperty("pluginVersion")
+        version = project.version.toString()
 
         val stripTag = { text: String, tag: String -> text.replace("<${tag}>", "").replace("</${tag}>", "") }
         val bodyInnerHTML = { path: String -> stripTag(stripTag(file(path).readText(), "html"), "body") }
@@ -177,7 +193,7 @@ intellijPlatform {
 
     publishing {
         token = providers.environmentVariable("JET_BRAINS_MARKETPLACE_TOKEN")
-        channels = publishChannels.split(",")
+        channels = listOf(publishChannel)
     }
 
     pluginVerification {
@@ -249,10 +265,13 @@ tasks.withType<RunIdeTask>().configureEach {
     }
 
     // Dynamic plugin loading
-    val compatiblePlugins = providers.gradleProperty("runIdeCompatiblePlugins").getOrElse("")
-    if (compatiblePlugins.isNotEmpty()) {
+    // Usage: -PrunIdeCompatiblePlugins="PsiViewer,com.google.ide-perf,org.jetbrains.action-tracker"
+    val compatiblePluginsList = providers.gradleProperty("runIdeCompatiblePlugins")
+        .getOrElse("")
+        .let { if (it.isEmpty()) emptyList() else it.split(",") }
+    if (compatiblePluginsList.isNotEmpty()) {
         dependencies {
-            intellijPlatform { plugins(compatiblePlugins.split(",")) }
+            intellijPlatform { plugins(compatiblePluginsList) }
         }
     }
 }
