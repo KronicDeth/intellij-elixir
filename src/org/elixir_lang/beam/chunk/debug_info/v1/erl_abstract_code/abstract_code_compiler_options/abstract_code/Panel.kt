@@ -4,6 +4,8 @@ package org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.EditorFactory
+import com.intellij.openapi.progress.runBlockingCancellable
+import com.intellij.openapi.application.edtWriteAction
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiFileFactory
@@ -204,8 +206,10 @@ class Panel(private val formsTree: Tree, project: Project): JPanel(GridLayout(1,
             else -> DEFAULT_TEXT
         }
 
-        ApplicationManager.getApplication().runWriteAction {
-            document.setText(text)
+        runBlockingCancellable {
+            edtWriteAction {
+                document.setText(text)
+            }
         }
     }
 

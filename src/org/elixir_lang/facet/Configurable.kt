@@ -3,9 +3,12 @@ package org.elixir_lang.facet
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.options.UnnamedConfigurable
 import com.intellij.openapi.projectRoots.Sdk
+import com.intellij.ui.components.JBLabel
 import org.elixir_lang.facet.sdk.ComboBox
+import java.awt.FlowLayout
 import javax.swing.JComponent
 import javax.swing.JPanel
+
 /**
  * Either project or module
  */
@@ -18,10 +21,22 @@ abstract class Configurable(val module: Module) : UnnamedConfigurable {
     private lateinit var rootPanel: JPanel
     private lateinit var sdkComboBox: ComboBox
 
-    // https://github.com/JetBrains/intellij-community/blob/84601d73c4ae4cc3615bcd73304e5b32e8ef8686/python/python-community-configure/src/com/jetbrains/python/configuration/PythonSdkDetailsDialog.java#L119-L159
-    override fun createComponent(): JComponent = rootPanel
+    override fun createComponent(): JComponent {
+        if (!::rootPanel.isInitialized) {
+            sdkComboBox = ComboBox()
+            rootPanel = JPanel(FlowLayout(FlowLayout.LEFT, 5, 0)).apply {
+                add(JBLabel("Elixir SDK:"))
+                add(sdkComboBox)
+            }
+        }
+        return rootPanel
+    }
 
     override fun isModified(): Boolean {
+        if (!::sdkComboBox.isInitialized) {
+            return false
+        }
+
         val existingInitialSdk = initSdk()?.let {
             projectSdksModel.findSdk(it.name)
         }
@@ -30,10 +45,14 @@ abstract class Configurable(val module: Module) : UnnamedConfigurable {
     }
 
     override fun apply() {
-        applySdk(sdkComboBox.selectedItem as Sdk?)
+        if (::sdkComboBox.isInitialized) {
+            applySdk(sdkComboBox.selectedItem as Sdk?)
+        }
     }
 
     override fun reset() {
-        sdkComboBox.selectedItem =  initSdk()?.let { projectSdksModel.findSdk(it.name) }
+        if (::sdkComboBox.isInitialized) {
+            sdkComboBox.selectedItem = initSdk()?.let { projectSdksModel.findSdk(it.name) }
+        }
     }
 }

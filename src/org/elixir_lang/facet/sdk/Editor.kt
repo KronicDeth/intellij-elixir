@@ -198,7 +198,7 @@ class Editor(private val sdkModel: SdkModel, private val history: History, priva
         for (type in sdkPathEditorByOrderRootType.keys) {
             sdkPathEditorByOrderRootType[type]?.reset(sdkModificator)
         }
-        sdkModificator.commitChanges()
+        ApplicationManager.getApplication().runWriteAction { sdkModificator.commitChanges() }
         setHomePathValue(FileUtil.toSystemDependentName(sdk.homePath ?: ""))
         _versionString = null
         homeFieldLabel.text = homeFieldLabelValue
