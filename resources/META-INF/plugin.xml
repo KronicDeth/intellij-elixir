@@ -11,6 +11,7 @@
     <depends>com.intellij.modules.lang</depends>
     <depends>org.intellij.plugins.markdown</depends>
     <depends config-file="rich-platform-plugin.xml" optional="true">com.intellij.modules.java</depends>
+    <depends config-file="optional/org.elixir_lang-withIntellijLang.xml" optional="true">org.intellij.intelliLang</depends>
 
     <extensionPoints>
         <extensionPoint name="packageManager" interface="org.elixir_lang.PackageManager"
@@ -28,6 +29,11 @@
 
         <!--        <errorHandler implementation="org.elixir_lang.errorreport.Submitter"/>-->
         <errorHandler implementation="com.intellij.diagnostic.JetBrainsMarketplaceErrorReportSubmitter"/>
+
+        <!-- Status Bar Widget -->
+        <statusBarWidgetFactory
+                id="ElixirSdkStatus"
+                implementation="org.elixir_lang.status_bar_widget.ElixirSdkStatusWidgetFactory"/>
 
         <!-- `openProjectProcessor` for Small IDEs -->
         <directoryProjectConfigurator implementation="org.elixir_lang.mix.project.DirectoryConfigurator"/>
@@ -101,6 +107,12 @@
                              parentId="language"
                              displayName="Elixir"
                              provider="org.elixir_lang.facet.configurable.Provider"/>
+
+        <projectConfigurable
+                parentId="language.elixir"
+                displayName="Elixir Experimental Settings"
+                id="org.elixir_lang.settings.ElixirExperimentalSettingsConfigurable"
+                instance="org.elixir_lang.settings.ElixirExperimentalSettingsConfigurable"/>
 
         <facetType implementation="org.elixir_lang.facet.Type"/>
 
@@ -300,9 +312,26 @@
         </group>
         <group id="LangElixir.HelpActions">
             <separator/>
-            <action id="Elixir.Help" class="org.elixir_lang.action.HelpAction" text="IntelliJ Elixir Help"/>
+            <action id="Elixir.Help" class="org.elixir_lang.action.HelpAction" text="IntelliJ Elixir Help" icon="AllIcons.Windows.Help"/>
             <separator/>
             <add-to-group group-id="HelpMenu" anchor="before" relative-to-action="LearnGroup"/>
+        </group>
+        <group id="LangElixir.SdkActions">
+            <separator/>
+            <action id="Elixir.RefreshActiveElixirSdk" class="org.elixir_lang.action.RefreshActiveElixirSdkAction"
+                    text="Refresh Active Elixir SDK"
+                    icon="AllIcons.General.Refresh"
+                    description="Refreshes classpath and documentation paths for the active Elixir/Erlang for Elixir SDK"/>
+            <action id="Elixir.RefreshAllElixirSdks" class="org.elixir_lang.action.RefreshAllElixirSdksAction"
+                    text="Refresh All Elixir SDKs"
+                    icon="AllIcons.General.Refresh"
+                    description="Refreshes classpath and documentation paths for all configured Elixir/Erlang SDKs"/>
+            <action id="Elixir.DeleteAllSdks" class="org.elixir_lang.action.DeleteAllSdksAction"
+                    text="Delete All Elixir/Erlang SDKs"
+                    icon="AllIcons.General.Remove"
+                    description="Removes all Elixir and Erlang SDKs from the IDE (useful in Small IDEs where SDKs can become corrupted)"/>
+            <separator/>
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
         </group>
         <group id="Internal.Elixir" popup="true" internal="true" compact="true" text="Elixir">
             <action id="BEAM.BulkDecompilation" internal="true" class="BulkDecompilation"

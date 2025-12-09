@@ -184,7 +184,6 @@
     </option>
     <option name="ELIXIR_SIGIL_UPPER_H">
         <value>
-            <option name="FOREGROUND" value="99186C" />
         </value>
     </option>
     <option name="ELIXIR_SIGIL_LOWER_I">
@@ -278,9 +277,9 @@
         </value>
     </option>
     <option name="ELIXIR_SIGIL_LOWER_R">
-        <value>
+<!--        <value>-->
             <option name="FOREGROUND" value="569918" />
-        </value>
+<!--        </value>-->
     </option>
     <option name="ELIXIR_SIGIL_UPPER_R">
         <value>
