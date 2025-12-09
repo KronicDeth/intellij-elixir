@@ -123,8 +123,9 @@ abstract class Configurable: SearchableConfigurable, com.intellij.openapi.option
             override fun sdkAdded(sdk: Sdk) {
                 LibraryTablesRegistrar.getInstance().libraryTable.let { libraryTable ->
                     ApplicationManager.getApplication().runWriteAction {
-                        libraryTable.createLibrary(sdk.name).modifiableModel.apply {
-                            addRoots(sdk)
+                            val library = libraryTable.getLibraryByName(sdk.name) ?: libraryTable.createLibrary(sdk.name)
+                            library.modifiableModel.apply {
+                                replaceRoots(sdk)
                             commit()
                         }
                     }
@@ -193,17 +194,21 @@ abstract class Configurable: SearchableConfigurable, com.intellij.openapi.option
     }
 
     private fun updateSdkPanel(selectedValue: ProjectJdkImpl?) {
-        val selectedEditor = selectedValue?.let {
-            editorByProjectJdkImpl.computeIfAbsent(it, { Editor(projectSdksModel, history!!, it) })
-        }
+        ApplicationManager.getApplication().runWriteAction {
+            val selectedEditor = selectedValue?.let {
+                editorByProjectJdkImpl.computeIfAbsent(it) { key ->
+                    Editor(projectSdksModel, history!!, key)
+                }
+            }
 
-        sdkPanel.select(selectedEditor, true)
+            sdkPanel.select(selectedEditor, true)
+        }
     }
 }
 
 private fun Library.ModifiableModel.addRoots(roots: Array<VirtualFile>) =
         roots.forEach {
-            addRoot(it, com.intellij.openapi.roots.OrderRootType.CLASSES)
+            addRoot(it, OrderRootType.CLASSES)
         }
 
 private fun Library.ModifiableModel.clearRoots() {

@@ -1,0 +1,49 @@
+package org.elixir_lang.beam.psi.stubs
+
+import com.intellij.lang.ASTNode
+import com.intellij.psi.stubs.IndexSink
+import com.intellij.psi.stubs.StubElement
+import com.intellij.psi.stubs.StubInputStream
+import com.intellij.psi.stubs.StubOutputStream
+import org.elixir_lang.beam.psi.CallDefinition
+import org.elixir_lang.beam.psi.CallDefinitionElement
+import org.elixir_lang.beam.psi.impl.CallDefinitionImpl
+import org.elixir_lang.beam.psi.impl.CallDefinitionStubImpl
+import org.elixir_lang.psi.stub.call.Deserialized
+import org.elixir_lang.psi.stub.type.Named.Companion.indexStubbic
+import java.io.IOException
+
+class CallDefinitionType(debugName: String) : ModuleElementType<CallDefinitionStub<*>, CallDefinition>(debugName) {
+    override fun createCompositeNode(): ASTNode = CallDefinitionElement(this)
+
+    override fun createPsi(stub: CallDefinitionStub<*>): CallDefinition = CallDefinitionImpl(stub)
+
+    @Throws(IOException::class)
+    override fun deserialize(stubInputStream: StubInputStream, parentStub: StubElement<*>): CallDefinitionStub<*> {
+        val deserialized = Deserialized.deserialize(stubInputStream)
+        val callDefinitionClauseArity = deserializeCallDefinitionClauseArity(stubInputStream)
+
+        return CallDefinitionStubImpl<CallDefinition>(
+            parentStub as ModuleStub<*>,
+            deserialized,
+            callDefinitionClauseArity
+        )
+    }
+
+    @Throws(IOException::class)
+    private fun deserializeCallDefinitionClauseArity(stubInputStream: StubInputStream): Int {
+        return Deserialized.readGuarded(stubInputStream) { it.readVarInt() }
+    }
+
+    @Throws(IOException::class)
+    override fun serialize(stub: CallDefinitionStub<*>, stubOutputStream: StubOutputStream) {
+        Deserialized.serialize(stubOutputStream, stub)
+        Deserialized.writeGuarded(stubOutputStream) { guardedStream ->
+            guardedStream.writeVarInt(stub.callDefinitionClauseHeadArity())
+        }
+    }
+
+    override fun indexStub(stub: CallDefinitionStub<*>, sink: IndexSink) {
+        indexStubbic(stub, sink)
+    }
+}

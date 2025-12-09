@@ -20,8 +20,12 @@ public class Deserialized {
     private static final int GUARD_LENGTH = 0;
     private static final Logger LOGGER = Logger.getInstance(Deserialized.class);
     /* Set > than experimentally observed valid values.  >= 15 is needed to accommodate `geo`'s 15 Protocol `impl`s for
-       `String.Chars` in https://github.com/KronicDeth/intellij-elixir/issues/2698.  */
-    private static final int SUSPECT_NAME_SET_SIZE = 20;
+       `String.Chars` in https://github.com/KronicDeth/intellij-elixir/issues/2698.
+       >= 25 is needed to accommodate `OpenApiSpex`'s 25 Protocol `impl`s for `Extendable` in
+        https://github.com/KronicDeth/intellij-elixir/pull/3717#issuecomment-3627833524 */
+    private static final int INFO_NAME_SET_SIZE = 30;
+    private static final int WARN_NAME_SET_SIZE = 60;
+    private static final int ERROR_NAME_SET_SIZE = 100;
 
     static {
         int i;
@@ -175,17 +179,17 @@ public class Deserialized {
         int nameSetSize = dataStream.readVarInt();
         assertGuard(dataStream, END);
 
-        if (nameSetSize >= SUSPECT_NAME_SET_SIZE) {
+        if (nameSetSize > ERROR_NAME_SET_SIZE) {
             int readAheadLength = BEGIN.length;
             StringBuilder stringBuilder = new StringBuilder("readNameSet nameSetSize (")
                     .append(nameSetSize)
-                    .append(") is suspect (>= ")
-                    .append(SUSPECT_NAME_SET_SIZE)
+                    .append(") is suspect (> ")
+                    .append(ERROR_NAME_SET_SIZE)
                     .append(").");
 
             if (readAheadLength == 0) {
                 stringBuilder = stringBuilder.append("StubIndex may be corrupt.");
-                LOGGER.warn(stringBuilder.toString());
+                LOGGER.error(stringBuilder.toString());
             } else {
                 byte[] readAhead = new byte[readAheadLength];
                 int bytesRead = dataStream.read(readAhead);
@@ -202,10 +206,9 @@ public class Deserialized {
         }
         Set<StringRef> nameSet = new THashSet<>(nameSetSize);
 
-        if (nameSetSize >= SUSPECT_NAME_SET_SIZE) {
-            StringBuilder stringBuilder = new StringBuilder("readNameSet nameSet of suspect (>= ")
-                    .append(SUSPECT_NAME_SET_SIZE)
-                    .append(") size (").append(nameSetSize).append("):\n");
+        if (nameSetSize > INFO_NAME_SET_SIZE) {
+            StringBuilder stringBuilder = new StringBuilder("readNameSet nameSet of size ")
+                    .append(nameSetSize).append(":\n");
 
             for (int i = 0; i < nameSetSize; i++) {
                 StringRef name = dataStream.readName();
@@ -221,7 +224,13 @@ public class Deserialized {
                 stringBuilder.append(i + 1).append(". ").append(nameString).append('\n');
             }
 
-            LOGGER.error(stringBuilder.toString());
+            if (nameSetSize > ERROR_NAME_SET_SIZE) {
+                LOGGER.error(stringBuilder.toString());
+            } else if (nameSetSize > WARN_NAME_SET_SIZE) {
+                LOGGER.warn(stringBuilder.toString());
+            } else {
+                LOGGER.info(stringBuilder.toString());
+            }
         } else {
             for (int i = 0; i < nameSetSize; i++) {
                 StringRef name = dataStream.readName();

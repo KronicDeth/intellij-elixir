@@ -1,62 +1,16 @@
 name: Test
 
-on: pull_request
+on: [ pull_request, workflow_dispatch ]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref }}
   cancel-in-progress: true
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        ideaVersion: [ "2024.2.6", "2024.3.6", "2025.2.1" ]
-
-    steps:
-      - uses: actions/checkout@v2
-      - name: Setup JBR 21
-        uses: actions/setup-java@v5
-        with:
-          distribution: 'jetbrains'
-          java-version: 21
-          cache: 'gradle'
-          package-type: 'jdk+jcef'
-      - name: Set up Elixir
-        uses: erlef/setup-beam@v1
-        with:
-          otp-version: 24.3.4.6
-          elixir-version:  1.13.4
-      - name: Export OTP_RELEASE
-        run: echo "OTP_RELEASE=24.3.4.6" >> $GITHUB_ENV
-      - name: Export ERLANG_SDK_HOME
-        run: echo "ERLANG_SDK_HOME=`erl -eval 'io:format("~s", [code:root_dir()]).' -noshell -run init stop`" >> $GITHUB_ENV
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-      - name: Export ideaVersion to gradle
-        run: echo "ORG_GRADLE_PROJECT_ideaVersion=${{matrix.ideaVersion}}" >> $GITHUB_ENV
-      - name: Compile Tests with Gradle
-        run: ./gradlew --stacktrace compileTestJava
-      - name: Get Elixir Source
-        run: ./gradlew --stacktrace getElixir
-      - name: Release Quoter
-        run: ./gradlew --stacktrace releaseQuoter
-      - name: Test with Gradle
-        run: ./gradlew --stacktrace test
-  verifyPlugin:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v2
-      - name: Setup JBR 21
-        uses: actions/setup-java@v5
-        with:
-          distribution: 'jetbrains'
-          java-version: 21
-          cache: 'gradle'
-          package-type: 'jdk+jcef'
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-      - name: Run Plugin Verifier
-        run: ./gradlew --stacktrace verifyPlugin
+  test-and-verify:
+    uses: ./.github/workflows/shared-test.yml
+    with:
+      elixir-version: '1.13.4'
+      otp-version: '24.3.4.6'
+      idea-version: '2024.3.6'
+      upload-reports: true

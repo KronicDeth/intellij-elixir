@@ -1,0 +1,91 @@
+name: Shared Test Workflow
+
+on:
+  workflow_call:
+    inputs:
+      elixir-version:
+        description: 'Elixir version to use'
+        required: false
+        type: string
+        default: '1.13.4'
+      otp-version:
+        description: 'OTP version to use'
+        required: false
+        type: string
+        default: '24.3.4.6'
+      idea-version:
+        description: 'IntelliJ IDEA version for testing'
+        required: false
+        type: string
+        default: '253.28294.169'
+      upload-reports:
+        description: 'Upload test reports as artifacts'
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Setup Build Environment
+        uses: ./.github/actions/setup-env
+        with:
+          elixir-version: ${{ inputs.elixir-version }}
+          otp-version: ${{ inputs.otp-version }}
+          idea-version: ${{ inputs.idea-version }}
+
+      - name: Compile Tests with Gradle
+        run: ./gradlew --stacktrace compileTestJava
+
+      - name: Get Elixir Source
+        run: ./gradlew --stacktrace getElixir
+
+      - name: Release Quoter
+        run: ./gradlew --stacktrace releaseQuoter
+
+      - name: Test with Gradle
+        run: ./gradlew --stacktrace test
+
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files: '**/build/test-results/**/*.xml'
+          check_name: Test Results
+
+      - name: Upload Test Reports
+        uses: actions/upload-artifact@v4
+        if: ${{ always() && inputs.upload-reports }}
+        with:
+          name: test-reports
+          path: |
+            **/build/reports/tests/**
+            **/build/test-results/**
+          retention-days: 30
+
+  verifyPlugin:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Setup Build Environment
+        uses: ./.github/actions/setup-env
+        with:
+          elixir-version: ''
+
+      - name: Run Plugin Verifier
+        run: ./gradlew --stacktrace verifyPlugin
+
+      - name: Upload Verify Reports
+        uses: actions/upload-artifact@v4
+        if: ${{ always() && inputs.upload-reports }}
+        with:
+          name: verify-plugin-reports
+          path: |
+            **/build/reports/pluginVerifier
+          retention-days: 30

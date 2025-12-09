@@ -2,19 +2,15 @@ package org.elixir_lang.eex.lexer.look_ahead;
 
 import com.intellij.psi.tree.IElementType;
 import org.elixir_lang.eex.lexer.LookAhead;
-import org.elixir_lang.eex.lexer.Flex;
-import org.elixir_lang.eex.psi.TokenType;
 import org.jetbrains.annotations.NotNull;
-import org.junit.Ignore;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 
-@Ignore("abstract")
-public class Test extends org.elixir_lang.flex_lexer.Test<LookAhead> {
-    public static class Lex {
+public abstract class Test extends org.elixir_lang.flex_lexer.Test<LookAhead> {
+    static class Lex {
         @NotNull
         final CharSequence text;
         @NotNull
@@ -37,8 +33,7 @@ public class Test extends org.elixir_lang.flex_lexer.Test<LookAhead> {
             return "\"" + text + "\" parses as " + tokenType + " and advances to state " + state;
         }
     }
-
-    public static class Sequence {
+    static class Sequence {
         @NotNull
         final Lex[] lexes;
         @NotNull
@@ -64,13 +59,13 @@ public class Test extends org.elixir_lang.flex_lexer.Test<LookAhead> {
      */
 
     @NotNull
-    public final Sequence sequence;
+    final Sequence sequence;
 
     /*
      * Constructors
      */
 
-    public Test(@NotNull Sequence sequence) {
+    Test(@NotNull Sequence sequence) {
         this.sequence = sequence;
     }
 

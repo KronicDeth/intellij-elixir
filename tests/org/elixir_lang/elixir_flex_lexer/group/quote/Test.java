@@ -2,7 +2,6 @@ package org.elixir_lang.elixir_flex_lexer.group.quote;
 
 import com.intellij.psi.tree.IElementType;
 import org.elixir_lang.ElixirFlexLexer;
-import org.junit.Ignore;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -11,7 +10,6 @@ import java.util.Vector;
 /**
  * Created by luke.imhoff on 9/6/14.
  */
-@Ignore("abstract")
 public abstract class Test extends org.elixir_lang.elixir_flex_lexer.group.Test {
     /*
      * Constants
@@ -47,7 +45,7 @@ public abstract class Test extends org.elixir_lang.elixir_flex_lexer.group.Test 
                 }
         );
 
-        Collection<Object[]> combinedData = new Vector<Object[]>();
+        Collection<Object[]> combinedData = new Vector<>();
         combinedData.addAll(commonData);
         combinedData.addAll(quoteData);
 

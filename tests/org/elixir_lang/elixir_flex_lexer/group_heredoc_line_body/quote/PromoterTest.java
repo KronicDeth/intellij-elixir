@@ -5,16 +5,13 @@ import org.elixir_lang.ElixirFlexLexer;
 import org.elixir_lang.elixir_flex_lexer.TokenTest;
 import org.elixir_lang.psi.ElixirTypes;
 import org.jetbrains.annotations.NotNull;
-import org.junit.Ignore;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 
 /**
  * Created by luke.imhoff on 9/6/14.
  */
-@Ignore("abstract")
 public abstract class PromoterTest extends TokenTest {
     /*
      * Constructors

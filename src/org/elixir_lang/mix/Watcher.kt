@@ -18,6 +18,7 @@ import com.intellij.psi.PsiManager
 import org.elixir_lang.DepsWatcher
 import org.elixir_lang.mix.library.Kind
 import org.elixir_lang.mix.watcher.TransitiveResolution.transitiveResolution
+import org.elixir_lang.mix.Project as MixProject
 
 /**
  * Watches the [module]'s `mix.exs` for changes to the `deps`, so that [com.intellij.openapi.roots.Libraries.Library]
@@ -33,7 +34,7 @@ class Watcher(private val project: Project) : BulkFileListener {
     }
 
     private fun contentsChanged(event: VFileContentChangeEvent) {
-        if (event.file.name == PackageManager.fileName) {
+        if (event.file.name == MixProject.MIX_EXS) {
             ModuleUtil.findModuleForFile(event.file, project)?.let { module ->
                 val eventFileParent = event.file.parent
                 val shouldSync =

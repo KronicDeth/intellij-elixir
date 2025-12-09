@@ -10,6 +10,7 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiFileFactory
 import com.intellij.psi.ResolveState
 import org.elixir_lang.ElixirScriptFileType
+import org.elixir_lang.mix.Project
 import org.elixir_lang.psi.CallDefinitionClause.isPublicFunction
 import org.elixir_lang.psi.CallDefinitionClause.nameArityInterval
 import org.elixir_lang.psi.ElixirAccessExpression
@@ -23,7 +24,7 @@ import java.nio.file.Paths
 private fun app(appMixFile: VirtualFile): String =
     try {
         app(appMixFile, text(appMixFile))
-    } catch (e: IOException) {
+    } catch (_: IOException) {
         appFromPath(appMixFile)
     }
 
@@ -73,17 +74,17 @@ private fun appFromPath(appMixFile: VirtualFile): String = Paths.get(appMixFile.
 fun <T> computeReadAction(computable: Computable<T>): T =
         ApplicationManager.getApplication().runReadAction(computable)
 
-private fun elixirFile(text: String): ElixirFile = computeReadAction(Computable {
+private fun elixirFile(text: String): ElixirFile = computeReadAction {
     val defaultProject = ProjectManager.getInstance().defaultProject
 
     PsiFileFactory
-            .getInstance(defaultProject)
-            .createFileFromText("mix.exs", ElixirScriptFileType.INSTANCE, text) as ElixirFile
-})
+        .getInstance(defaultProject)
+        .createFileFromText(Project.MIX_EXS, ElixirScriptFileType.INSTANCE, text) as ElixirFile
+}
 
-private fun text(virtualFile: VirtualFile): String = computeReadAction(Computable {
+private fun text(virtualFile: VirtualFile): String = computeReadAction {
     VfsUtil.loadText(virtualFile)
-})
+}
 
 class OtpApp(val root: VirtualFile, appMixFile: VirtualFile) {
     val deps = mutableSetOf<String>()

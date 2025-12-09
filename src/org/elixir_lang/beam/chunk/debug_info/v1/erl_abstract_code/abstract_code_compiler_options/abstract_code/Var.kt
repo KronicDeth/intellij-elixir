@@ -36,7 +36,7 @@ object Var {
                 else -> AbstractCode.error("unknown_name:", "var name is unknown", name)
             }
 
-    fun nameToString(name: OtpErlangAtom) = name.atomValue().decapitalize().escapeElixirKeyword()
+    fun nameToString(name: OtpErlangAtom) = name.atomValue().replaceFirstChar { it.lowercase() }.escapeElixirKeyword()
 
     private fun nameToMacroStringDeclaredScope(name: OtpErlangAtom, scope: Scope): MacroStringDeclaredScope {
         val varName = nameToString(name)
@@ -78,7 +78,7 @@ private fun String.escapeElixirKeyword(): String =
     if (KEYWORD_BLOCK_KEYWORD_SET.contains(this) || this == "end" || this == "fn" || this == "in" || this == "when"
         || this == "and"
     ) {
-        "erlangVariable${this.capitalize()}"
+        "erlangVariable${this.replaceFirstChar { it.uppercase() }}"
     } else {
         this
     }

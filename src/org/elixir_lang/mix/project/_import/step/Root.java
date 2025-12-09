@@ -47,10 +47,9 @@ public class Root extends ProjectImportWizardStep {
         String projectFileDirectory = context.getProjectFileDirectory();
         //noinspection DialogTitleCapitalization
         myProjectRootComponent.addBrowseFolderListener(
-                "Select mix.exs of a mix project to import",
-                "",
                 null,
                 FileChooserDescriptorFactory.createSingleFolderDescriptor()
+                        .withTitle("Select mix.exs of a mix project to import")
         );
 
         myProjectRootComponent.setText(projectFileDirectory); // provide project path
