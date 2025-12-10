@@ -1,4 +1,4 @@
-<idea-plugin>
+<idea-plugin require-restart="true">
     <id>org.elixir_lang</id>
     <name>Elixir</name>
     <vendor email="Kronic.Deth@gmail.com">Elle Imhoff</vendor>
