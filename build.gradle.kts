@@ -259,10 +259,13 @@ tasks.withType<RunIdeTask>().configureEach {
     }
 
     // Dynamic plugin loading
-    val compatiblePlugins = providers.gradleProperty("runIdeCompatiblePlugins").getOrElse("")
-    if (compatiblePlugins.isNotEmpty()) {
+    // Usage: -PrunIdeCompatiblePlugins="PsiViewer,com.google.ide-perf,org.jetbrains.action-tracker"
+    val compatiblePluginsList = providers.gradleProperty("runIdeCompatiblePlugins")
+        .getOrElse("")
+        .let { if (it.isEmpty()) emptyList() else it.split(",") }
+    if (compatiblePluginsList.isNotEmpty()) {
         dependencies {
-            intellijPlatform { plugins(compatiblePlugins.split(",")) }
+            intellijPlatform { compatiblePlugins(compatiblePluginsList) }
         }
     }
 }
