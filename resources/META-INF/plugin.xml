@@ -10,6 +10,8 @@
          on how to target different products -->
     <depends>com.intellij.modules.lang</depends>
     <depends>org.intellij.plugins.markdown</depends>
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.xml</depends>
     <depends config-file="rich-platform-plugin.xml" optional="true">com.intellij.modules.java</depends>
     <depends config-file="optional/org.elixir_lang-withIntellijLang.xml" optional="true">org.intellij.intelliLang</depends>
 
