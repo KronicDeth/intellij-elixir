@@ -43,6 +43,7 @@ val elixirVersion: String by project
 val quoterVersion: String by project
 val basePluginVersion: String = providers.gradleProperty("pluginVersion").get()
 val useDynamicEapVersion: Boolean = project.property("useDynamicEapVersion").toString().toBoolean()
+val skipSearchableOptions: Boolean = project.property("skipSearchableOptions").toString().toBoolean()
 
 // Publish channel: "default" for release, "canary" for pre-release
 val publishChannel: String = providers.gradleProperty("publishChannels").getOrElse("canary")
@@ -163,6 +164,10 @@ sourceSets {
 
 // --- IntelliJ Platform Configuration ---
 intellijPlatform {
+    if (skipSearchableOptions) {
+        buildSearchableOptions = false
+    }
+
     pluginConfiguration {
         id = providers.gradleProperty("pluginGroup")
         name = providers.gradleProperty("pluginName")
