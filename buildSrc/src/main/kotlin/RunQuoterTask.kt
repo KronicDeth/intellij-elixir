@@ -1,7 +1,9 @@
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 import org.gradle.process.ExecOperations
 import java.io.ByteArrayOutputStream
@@ -15,9 +17,13 @@ abstract class RunQuoterTask : DefaultTask() {
     @get:InputFile
     abstract val executable: RegularFileProperty
 
+    @get:Internal
+    abstract val tmpDir: DirectoryProperty
+
     @TaskAction
     fun run() {
         val exePath = executable.get().asFile.absolutePath
+        val releaseTmp = tmpDir.orNull?.asFile?.absolutePath
         val maxAttempts = 20
 
         logger.lifecycle("Starting Quoter daemon using: $exePath")
@@ -29,6 +35,7 @@ abstract class RunQuoterTask : DefaultTask() {
             environment("RELEASE_COOKIE", "intellij_elixir")
             environment("RELEASE_DISTRIBUTION", "name")
             environment("RELEASE_NAME", "intellij_elixir@127.0.0.1")
+            releaseTmp?.let { environment("RELEASE_TMP", it) }
             standardOutput = startOutput
             errorOutput = startOutput
             isIgnoreExitValue = true
@@ -56,6 +63,7 @@ abstract class RunQuoterTask : DefaultTask() {
                 environment("RELEASE_COOKIE", "intellij_elixir")
                 environment("RELEASE_DISTRIBUTION", "name")
                 environment("RELEASE_NAME", "intellij_elixir@127.0.0.1")
+                releaseTmp?.let { environment("RELEASE_TMP", it) }
                 standardOutput = pidStream
                 errorOutput = pidStream
                 isIgnoreExitValue = true
