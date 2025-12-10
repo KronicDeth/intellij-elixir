@@ -271,7 +271,7 @@ tasks.withType<RunIdeTask>().configureEach {
         .let { if (it.isEmpty()) emptyList() else it.split(",") }
     if (compatiblePluginsList.isNotEmpty()) {
         dependencies {
-            intellijPlatform { plugins(compatiblePluginsList) }
+            intellijPlatform { compatiblePlugins(compatiblePluginsList) }
         }
     }
 }
