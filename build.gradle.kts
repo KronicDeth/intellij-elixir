@@ -59,6 +59,7 @@ val cachePath = layout.projectDirectory.dir("cache")
 val elixirPath = cachePath.dir("elixir-$elixirVersion")
 val quoterUnzippedPath = cachePath.dir("elixir-$elixirVersion-intellij_elixir-$quoterVersion")
 val quoterExe = quoterUnzippedPath.file("_build/dev/rel/intellij_elixir/bin/intellij_elixir")
+val quoterTmpPath = cachePath.dir("quoter_tmp_$quoterVersion")
 
 // EXPORT FOR SUBPROJECTS (Required for jps-builder to access this path)
 extra["elixirPath"] = elixirPath.asFile.absolutePath
@@ -421,19 +422,28 @@ fun ExecSpec.configureQuoter() {
     environment("RELEASE_COOKIE", "intellij_elixir")
     environment("RELEASE_DISTRIBUTION", "name") // Required for 127.0.0.1
     environment("RELEASE_NAME", "intellij_elixir@127.0.0.1")
+    environment("RELEASE_TMP", quoterTmpPath.asFile.absolutePath)
 }
 
 val runQuoter by tasks.registering(RunQuoterTask::class) {
     dependsOn(releaseQuoter)
     executable.set(quoterExe)
+    tmpDir.set(quoterTmpPath)
+
 }
 
 val stopQuoter by tasks.registering(Exec::class) {
     dependsOn(releaseQuoter)
+    mustRunAfter(runQuoter)
     configureQuoter()
     args("stop")
+    isIgnoreExitValue = true
     doLast {
-        logger.lifecycle("Stopped Quoter daemon.")
+        if (executionResult.get().exitValue == 0) {
+            logger.lifecycle("Stopped Quoter daemon.")
+        } else {
+            logger.lifecycle("Quoter daemon was not running.")
+        }
     }
 }
 
