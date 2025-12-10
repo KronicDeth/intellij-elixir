@@ -345,6 +345,9 @@ val getQuoter by tasks.registering(Download::class) {
 val unzipQuoter by tasks.registering(Copy::class) {
     dependsOn(getQuoter)
 
+    // Prevent Gradle from snapshotting destination (may contain Erlang named pipes from previous runs)
+    doNotTrackState("Destination may contain named pipes from Erlang runtime")
+
     // 1. Target the final destination directly
     into(quoterUnzippedPath)
 
@@ -389,6 +392,9 @@ val getQuoterDeps by tasks.registering(Exec::class) {
 val releaseQuoter by tasks.registering(Exec::class) {
     dependsOn(getQuoterDeps)
 
+    // Prevent caching - _build directory may contain Erlang named pipes
+    doNotTrackState("Build directory contains Erlang named pipes that cannot be cached")
+
     // 1. Use Directory object directly (No .asFile)
     workingDir(quoterUnzippedPath)
 
@@ -409,9 +415,6 @@ val releaseQuoter by tasks.registering(Exec::class) {
     //    If this file exists and inputs match, Gradle skips this task automatically.
     outputs.dir(quoterUnzippedPath.dir("_build"))
         .withPropertyName("buildDir")
-
-    // 4. Enable Cache
-    outputs.cacheIf { true }
 
     commandLine("mix", "release")
 }
