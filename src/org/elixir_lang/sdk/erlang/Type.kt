@@ -2,6 +2,7 @@ package org.elixir_lang.sdk.erlang
 
 import com.intellij.execution.ExecutionException
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.edtWriteAction
 import com.intellij.openapi.application.writeAction
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.progress.runBlockingCancellable
@@ -127,8 +128,10 @@ class Type : SdkType("Erlang SDK for Elixir SDK") {
         } else {
             // Use coroutine-based approach for IntelliJ 2025.2+ compatibility when called independently
             runBlockingCancellable {
-                writeAction {
+                edtWriteAction {
+                    LOGGER.debug("Committing SDK changes for ${sdk.name}")
                     sdkModificator.commitChanges()
+                    LOGGER.debug("Committed SDK changes for ${sdk.name}")
                 }
             }
         }

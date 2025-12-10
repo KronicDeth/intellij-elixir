@@ -1,6 +1,7 @@
 package org.elixir_lang.facet.sdks
 
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.options.SearchableConfigurable
 import com.intellij.openapi.options.ex.ConfigurableCardPanel
 import com.intellij.openapi.projectRoots.Sdk
@@ -23,6 +24,8 @@ import org.elixir_lang.facet.SdksService
 import org.elixir_lang.facet.sdk.Editor
 import javax.swing.JComponent
 import javax.swing.JPanel
+
+private val LOG = logger<Configurable>()
 
 fun Library.ModifiableModel.addRoots(sdk: Sdk) =
         sdk
@@ -111,6 +114,7 @@ abstract class Configurable: SearchableConfigurable, com.intellij.openapi.option
     private fun addListeners() {
         val listener = object : SdkModel.Listener {
             override fun beforeSdkRemove(sdk: Sdk) {
+                LOG.debug("beforeSdkRemove(sdk.name='${sdk.name}')")
                 LibraryTablesRegistrar.getInstance().libraryTable.let { libraryTable ->
                     libraryTable.getLibraryByName(sdk.name)?.let { library ->
                         ApplicationManager.getApplication().runWriteAction {
@@ -121,11 +125,12 @@ abstract class Configurable: SearchableConfigurable, com.intellij.openapi.option
             }
 
             override fun sdkAdded(sdk: Sdk) {
+                LOG.debug("sdkAdded(sdk.name='${sdk.name}')")
                 LibraryTablesRegistrar.getInstance().libraryTable.let { libraryTable ->
                     ApplicationManager.getApplication().runWriteAction {
-                            val library = libraryTable.getLibraryByName(sdk.name) ?: libraryTable.createLibrary(sdk.name)
-                            library.modifiableModel.apply {
-                                replaceRoots(sdk)
+                        val library = libraryTable.getLibraryByName(sdk.name) ?: libraryTable.createLibrary(sdk.name)
+                        library.modifiableModel.apply {
+                            replaceRoots(sdk)
                             commit()
                         }
                     }
@@ -135,6 +140,7 @@ abstract class Configurable: SearchableConfigurable, com.intellij.openapi.option
             }
 
             override fun sdkChanged(sdk: Sdk, previousName: String) {
+                LOG.debug("sdkChanged(sdk.name='${sdk.name}', previousName='$previousName')")
                 if (sdk.name != previousName) {
                     LibraryTablesRegistrar.getInstance().libraryTable.getLibraryByName(previousName)?.let { library ->
                         ApplicationManager.getApplication().runWriteAction {
@@ -160,6 +166,7 @@ abstract class Configurable: SearchableConfigurable, com.intellij.openapi.option
             }
 
             override fun sdkHomeSelected(sdk: Sdk, newSdkHome: String) {
+                LOG.debug("sdkHomeSelected(sdk.name='${sdk.name}', newSdkHome='$newSdkHome')")
             }
         }
         projectSdksModel.addListener(listener)
@@ -194,21 +201,17 @@ abstract class Configurable: SearchableConfigurable, com.intellij.openapi.option
     }
 
     private fun updateSdkPanel(selectedValue: ProjectJdkImpl?) {
-        ApplicationManager.getApplication().runWriteAction {
-            val selectedEditor = selectedValue?.let {
-                editorByProjectJdkImpl.computeIfAbsent(it) { key ->
-                    Editor(projectSdksModel, history!!, key)
-                }
-            }
-
-            sdkPanel.select(selectedEditor, true)
+        val selectedEditor = selectedValue?.let {
+            editorByProjectJdkImpl.computeIfAbsent(it, { Editor(projectSdksModel, history!!, it) })
         }
+
+        sdkPanel.select(selectedEditor, true)
     }
 }
 
 private fun Library.ModifiableModel.addRoots(roots: Array<VirtualFile>) =
         roots.forEach {
-            addRoot(it, OrderRootType.CLASSES)
+            addRoot(it, com.intellij.openapi.roots.OrderRootType.CLASSES)
         }
 
 private fun Library.ModifiableModel.clearRoots() {
