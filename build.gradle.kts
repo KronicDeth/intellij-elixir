@@ -43,6 +43,7 @@ val elixirVersion: String by project
 val quoterVersion: String by project
 val basePluginVersion: String = providers.gradleProperty("pluginVersion").get()
 val useDynamicEapVersion: Boolean = project.property("useDynamicEapVersion").toString().toBoolean()
+val skipSearchableOptions: Boolean = project.property("skipSearchableOptions").toString().toBoolean()
 
 // Publish channel: "default" for release, "canary" for pre-release
 val publishChannel: String = providers.gradleProperty("publishChannels").getOrElse("canary")
@@ -164,6 +165,10 @@ sourceSets {
 
 // --- IntelliJ Platform Configuration ---
 intellijPlatform {
+    if (skipSearchableOptions) {
+        buildSearchableOptions = false
+    }
+
     pluginConfiguration {
         id = providers.gradleProperty("pluginGroup")
         name = providers.gradleProperty("pluginName")
@@ -346,6 +351,9 @@ val getQuoter by tasks.registering(Download::class) {
 val unzipQuoter by tasks.registering(Copy::class) {
     dependsOn(getQuoter)
 
+    // Prevent Gradle from snapshotting destination (may contain Erlang named pipes from previous runs)
+    doNotTrackState("Destination may contain named pipes from Erlang runtime")
+
     // 1. Target the final destination directly
     into(quoterUnzippedPath)
 
@@ -390,6 +398,9 @@ val getQuoterDeps by tasks.registering(Exec::class) {
 val releaseQuoter by tasks.registering(Exec::class) {
     dependsOn(getQuoterDeps)
 
+    // Prevent caching - _build directory may contain Erlang named pipes
+    doNotTrackState("Build directory contains Erlang named pipes that cannot be cached")
+
     // 1. Use Directory object directly (No .asFile)
     workingDir(quoterUnzippedPath)
 
@@ -410,9 +421,6 @@ val releaseQuoter by tasks.registering(Exec::class) {
     //    If this file exists and inputs match, Gradle skips this task automatically.
     outputs.dir(quoterUnzippedPath.dir("_build"))
         .withPropertyName("buildDir")
-
-    // 4. Enable Cache
-    outputs.cacheIf { true }
 
     commandLine("mix", "release")
 }
@@ -456,3 +464,12 @@ tasks.named<Test>("test") {
     environment("ELIXIR_EBIN_DIRECTORY", elixirPath.dir("lib/elixir/ebin/").asFile.absolutePath + File.separator)
     environment("ELIXIR_VERSION", elixirVersion)
 }
+
+// Uncomment to allow using build-scan.
+//if (hasProperty("buildScan")) {
+//    extensions.findByName("buildScan")?.withGroovyBuilder {
+//        setProperty("termsOfServiceUrl", "https://gradle.com/terms-of-service")
+//        setProperty("termsOfServiceAgree", "yes")
+//    }
+//}
+

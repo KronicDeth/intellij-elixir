@@ -36,20 +36,8 @@ class SdkAdditionalData :
      */
     @Throws(ConfigurationException::class)
     override fun checkValid(sdkModel: SdkModel) {
-        val erlangSdk = getErlangSdk()
-        if (erlangSdk == null) {
-            val availableErlangSdks = ProjectJdkTable.getInstance().allJdks.filter {
-                Type.staticIsValidDependency(it)
-            }
-
-            val message = if (availableErlangSdks.isEmpty()) {
-                "No Erlang SDK found. Please configure an Erlang SDK first, then configure this Elixir SDK."
-            } else {
-                val availableNames = availableErlangSdks.joinToString(", ") { it.name }
-                "No valid Erlang SDK configured for this Elixir SDK. Available Erlang SDKs: $availableNames"
-            }
-
-            throw ConfigurationException(message)
+        if (getErlangSdk() == null) {
+            throw ConfigurationException("Please configure the Erlang ERLANG_SDK_NAME")
         }
     }
 
@@ -66,13 +54,7 @@ class SdkAdditionalData :
         val sdk = getErlangSdk()
 
         if (sdk != null) {
-            // Double-check that the SDK still exists in the table before writing
-            val jdkTable = ProjectJdkTable.getInstance()
-            if (jdkTable.findJdk(sdk.name) != null) {
-                element.setAttribute(ERLANG_SDK_NAME, sdk.name)
-            }
-            // If SDK doesn't exist in table, don't write the attribute
-            // This prevents persisting references to deleted SDKs
+            element.setAttribute(ERLANG_SDK_NAME, sdk.name)
         }
     }
 
@@ -82,27 +64,14 @@ class SdkAdditionalData :
         if (erlangSdk == null) {
             if (erlangSdkName != null) {
                 erlangSdk = jdkTable.findJdk(erlangSdkName!!)
-                if (erlangSdk == null) {
-                    // Clear orphaned reference - SDK was deleted
-                    erlangSdkName = null
-                } else {
-                    // Found the SDK, clear the name since we have the reference
-                    erlangSdkName = null
-                }
+                erlangSdkName = null
             } else {
-                // Auto-discover if no specific SDK was configured
                 for (jdk in jdkTable.allJdks) {
                     if (Type.staticIsValidDependency(jdk)) {
                         erlangSdk = jdk
                         break
                     }
                 }
-            }
-        } else {
-            // Validate that the cached SDK still exists in the table
-            if (jdkTable.findJdk(erlangSdk!!.name) == null) {
-                // SDK was deleted, clear the reference
-                erlangSdk = null
             }
         }
 

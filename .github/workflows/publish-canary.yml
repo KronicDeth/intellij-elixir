@@ -1,23 +1,24 @@
 name: Publish to Canary
+
 on:
-#  release:
-#    types: [prereleased]
   workflow_dispatch:
 
 jobs:
   publish-to-canary:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
-      - name: Check out repository 💾
-        uses: actions/checkout@v5
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v6
 
-      - name: Setup Build Environment ☕
+      - name: Setup Build Environment
+        id: setup-env
         uses: ./.github/actions/setup-env
         with:
-          elixir-version: ''
+          skip-jcef: 'true'
 
-      - name: Download release asset 📦
-        id: download_asset
+      - name: Download Release Asset
+        id: download-release-asset
         uses: dsaltares/fetch-gh-release-asset@1.1.2
         with:
           repo: ${{ github.repository }}
@@ -25,8 +26,9 @@ jobs:
           file: intellij-elixir-${{ github.ref_name }}.zip
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Publish to Canary 🐣
+      - name: Publish to Canary
+        id: publish-canary
         env:
           JET_BRAINS_MARKETPLACE_TOKEN: ${{ secrets.JetBrainsMarketplaceToken }}
-        run: >
+        run: |
           ./gradlew publishPlugin -PdistributionFile=intellij-elixir-${{ github.ref_name }}.zip

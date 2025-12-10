@@ -1,8 +1,15 @@
-name: Shared Test Workflow
+name: Test
 
 on:
+  pull_request:
+  workflow_dispatch:
   workflow_call:
     inputs:
+      ref:
+        description: 'Git ref to checkout'
+        required: false
+        type: string
+        default: ''
       elixir-version:
         description: 'Elixir version to use'
         required: false
@@ -13,79 +20,109 @@ on:
         required: false
         type: string
         default: '24.3.4.6'
-      idea-version:
-        description: 'IntelliJ IDEA version for testing'
-        required: false
-        type: string
-        default: '253.28294.169'
       upload-reports:
         description: 'Upload test reports as artifacts'
         required: false
         type: boolean
         default: false
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
 jobs:
-  test:
+  matrix-setup:
     runs-on: ubuntu-latest
+    outputs:
+      idea-versions: '["253.28294.334", "252.28238.7", "251.29188.11", "243.28141.18"]'
+      # Versions: 2025.3, 2025.2.5, 2025.1.7, 2024.3.7
+    steps:
+      - run: echo "Defining idea-versions matrix"
+
+  test:
+    needs: matrix-setup
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        idea-version: ${{ fromJson(needs.matrix-setup.outputs.idea-versions) }}
 
     steps:
-      - uses: actions/checkout@v5
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.ref || github.ref }}
 
       - name: Setup Build Environment
+        id: setup-env
         uses: ./.github/actions/setup-env
         with:
-          elixir-version: ${{ inputs.elixir-version }}
-          otp-version: ${{ inputs.otp-version }}
-          idea-version: ${{ inputs.idea-version }}
+          elixir-version: ${{ inputs.elixir-version || '1.13.4' }}
+          otp-version: ${{ inputs.otp-version || '24.3.4.6' }}
+          idea-version: ${{ matrix.idea-version }}
+          gradle-cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
-      - name: Compile Tests with Gradle
-        run: ./gradlew --stacktrace compileTestJava
-
-      - name: Get Elixir Source
-        run: ./gradlew --stacktrace getElixir
-
-      - name: Release Quoter
-        run: ./gradlew --stacktrace releaseQuoter
-
-      - name: Test with Gradle
-        run: ./gradlew --stacktrace test
+      - name: Run Tests
+        id: test
+        run: ./gradlew --stacktrace check --scan
 
       - name: Publish Test Results
+        id: publish-test-results
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: always()
         with:
           files: '**/build/test-results/**/*.xml'
-          check_name: Test Results
+          check_name: Test Results (${{ matrix.idea-version }})
 
       - name: Upload Test Reports
+        id: upload-test-reports
         uses: actions/upload-artifact@v4
         if: ${{ always() && inputs.upload-reports }}
         with:
-          name: test-reports
+          name: test-reports-${{ matrix.idea-version }}
           path: |
             **/build/reports/tests/**
             **/build/test-results/**
           retention-days: 30
 
-  verifyPlugin:
-    runs-on: ubuntu-latest
+  verify-plugin:
+    needs: matrix-setup
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        idea-version: ${{ fromJson(needs.matrix-setup.outputs.idea-versions) }}
 
     steps:
-      - uses: actions/checkout@v5
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.ref || github.ref }}
 
       - name: Setup Build Environment
+        id: setup-env
         uses: ./.github/actions/setup-env
         with:
-          elixir-version: ''
+          idea-version: ${{ matrix.idea-version }}
+          gradle-cache-read-only: ${{ github.ref != 'refs/heads/main' }}
+          skip-jcef: 'true'
 
       - name: Run Plugin Verifier
+        id: verify-plugin
         run: ./gradlew --stacktrace verifyPlugin
 
       - name: Upload Verify Reports
+        id: upload-verify-reports
         uses: actions/upload-artifact@v4
         if: ${{ always() && inputs.upload-reports }}
         with:
-          name: verify-plugin-reports
+          name: verify-plugin-reports-${{ matrix.idea-version }}
           path: |
             **/build/reports/pluginVerifier
           retention-days: 30
