@@ -454,3 +454,12 @@ tasks.named<Test>("test") {
     environment("ELIXIR_EBIN_DIRECTORY", elixirPath.dir("lib/elixir/ebin/").asFile.absolutePath + File.separator)
     environment("ELIXIR_VERSION", elixirVersion)
 }
+
+// Uncomment to allow using build-scan.
+//if (hasProperty("buildScan")) {
+//    extensions.findByName("buildScan")?.withGroovyBuilder {
+//        setProperty("termsOfServiceUrl", "https://gradle.com/terms-of-service")
+//        setProperty("termsOfServiceAgree", "yes")
+//    }
+//}
+
