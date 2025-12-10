@@ -15,10 +15,6 @@ inputs:
     description: 'IntelliJ IDEA version to test against. Keep in sync with matrix-setup in shared-test.yml'
     required: false
     default: '253.28294.334'  # 2025.3 - should match first version in shared-test.yml
-  skip-jcef:
-    description: 'Skip JCEF package (set to true for release/verifyPlugin jobs). Default is false.'
-    required: false
-    default: 'false'
   gradle-cache-read-only:
     description: 'Use read-only Gradle cache (for non-main branches or matrix jobs). Default is true.'
     required: false
@@ -26,6 +22,10 @@ inputs:
   github-token:
     description: 'GitHub token for API access (required for setup-java to download JBR)'
     required: true
+  build-scan-publish:
+    description: 'Whether to publish Gradle build scans'
+    required: false
+    default: 'false'
 
 runs:
   using: composite
@@ -34,15 +34,15 @@ runs:
       id: free-disk-space
       uses: jlumbroso/free-disk-space@v1.3.1
       with:
-          tool-cache: false
-          large-packages: false
+        tool-cache: false
+        large-packages: false
 
     - name: Cache JetBrains JDK
       id: cache-jdk
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: /opt/hostedtoolcache/Java_JetBrains_*
-        key: jdk-${{ runner.os }}-${{ runner.arch }}-jetbrains-21-${{ inputs.skip-jcef == 'false' && 'jcef' || 'nojcef' }}
+        key: jdk-${{ runner.os }}-${{ runner.arch }}-jetbrains-21
 
     - name: Setup JBR 21
       id: setup-java
@@ -50,30 +50,23 @@ runs:
       with:
         distribution: 'jetbrains'
         java-version: 21
-        java-package: ${{ inputs.skip-jcef == 'false' && 'jdk+jcef' || 'jdk' }}
-      env:
-        GITHUB_TOKEN: ${{ inputs.github-token }}
+        java-package: 'jdk'
+        token: ${{ inputs.github-token }}
 
     - name: Setup Gradle
       id: setup-gradle
       uses: gradle/actions/setup-gradle@v5
       with:
-        cache-read-only: ${{ inputs.gradle-cache-read-only == 'true' }}
-        cache-overwrite-existing: false
-        gradle-home-cache-cleanup: true
+        cache-read-only: true
         add-job-summary-as-pr-comment: 'on-failure'
-#        # Exclude IntelliJ IDE downloads and extractions from cache (~10GB)
-#        # These are fast to re-download and would bloat the cache
-#        gradle-home-cache-excludes: |
-#          caches/modules-2/files-2.1/idea
-#          caches/*/transforms
-        build-scan-publish: true
+        build-scan-publish: ${{ inputs.build-scan-publish }}
         build-scan-terms-of-use-url: 'https://gradle.com/terms-of-service'
         build-scan-terms-of-use-agree: 'yes'
+        github-token: ${{ inputs.github-token }}
 
     - name: Restore Elixir cache
       id: cache-elixir-restore
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       with:
         path: |
           cache/elixir-${{ inputs.elixir-version }}-intellij_elixir-2.1.0/_build
@@ -105,7 +98,7 @@ runs:
     - name: Save Elixir cache
       id: cache-elixir-save
       if: always() && inputs.gradle-cache-read-only != 'true' && steps.cache-elixir-restore.outputs.cache-hit != 'true'
-      uses: actions/cache/save@v4
+      uses: actions/cache/save@v5
       with:
         path: |
           cache/elixir-${{ inputs.elixir-version }}-intellij_elixir-2.1.0/_build

@@ -65,7 +65,7 @@ jobs:
           elixir-version: ${{ inputs.elixir-version || '1.13.4' }}
           otp-version: ${{ inputs.otp-version || '24.3.4.6' }}
           idea-version: ${{ matrix.idea-version }}
-          gradle-cache-read-only: ${{ github.ref != 'refs/heads/main' }}
+          gradle-cache-read-only: true
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run Tests
@@ -111,13 +111,12 @@ jobs:
         uses: ./.github/actions/setup-env
         with:
           idea-version: ${{ matrix.idea-version }}
-          gradle-cache-read-only: ${{ github.ref != 'refs/heads/main' }}
-          skip-jcef: 'true'
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          build-scan-publish: true
 
       - name: Run Plugin Verifier
         id: verify-plugin
-        run: ./gradlew --stacktrace verifyPlugin
+        run: ./gradlew verifyPlugin
 
       - name: Upload Verify Reports
         id: upload-verify-reports
