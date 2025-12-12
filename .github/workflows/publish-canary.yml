@@ -16,6 +16,7 @@ jobs:
         uses: ./.github/actions/setup-env
         with:
           skip-jcef: 'true'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Download Release Asset
         id: download-release-asset

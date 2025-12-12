@@ -1,59 +1,60 @@
-# Not used until we have GITHUB_TOKEN fixed.
-#name: Release
-#
-#on:
-#  push:
-#    branches:
-#      - main
-#
-#jobs:
-#  test-and-verify:
-#    uses: ./.github/workflows/shared-test.yml
-#    with:
-#      elixir-version: '1.13.4'
-#      otp-version: '24.3.4.6'
-#
-#  release:
-#    needs: [ test-and-verify ]
-#    runs-on: ubuntu-22.04
-#    steps:
-#      - name: Checkout
-#        id: checkout
-#        uses: actions/checkout@v6
-#
-#      - name: Setup Build Environment
-#        id: setup-env
-#        uses: ./.github/actions/setup-env
-#        with:
-#          elixir-version: ''
-#          skip-jcef: 'true'
-#
-#      - name: Build with Gradle
-#        id: build-plugin
-#        run: ./gradlew buildPlugin --no-scan
-#
-#      - name: Prepare Release
-#        id: prepare-release
-#        run: |
-#          ASSET_PATH=$(ls -1 build/distributions/intellij-elixir-*.zip)
-#          ASSET_NAME=${ASSET_PATH#build/distributions/}
-#          VERSION_SUFFIX=${ASSET_NAME#intellij-elixir-}
-#          TAG="v${VERSION_SUFFIX%.zip}"
-#          echo "ASSET_PATH=$ASSET_PATH" >> $GITHUB_ENV
-#          echo "ASSET_NAME=$ASSET_NAME" >> $GITHUB_ENV
-#          echo "TAG=$TAG" >> $GITHUB_ENV
-#
-#      - name: Tag Commit
-#        id: tag-commit
-#        uses: hole19/git-tag-action@master
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#
-#      - name: Create Release
-#        id: create-release
-#        uses: softprops/action-gh-release@v2
-#        with:
-#          tag_name: ${{ env.TAG }}
-#          name: ${{ env.TAG }}
-#          prerelease: true
-#          files: ${{ env.ASSET_PATH }}
+Not used until we have GITHUB_TOKEN fixed.
+name: Release
+
+on:
+ push:
+   branches:
+     - main
+
+jobs:
+ test-and-verify:
+   uses: ./.github/workflows/shared-test.yml
+   with:
+     elixir-version: '1.13.4'
+     otp-version: '24.3.4.6'
+
+ release:
+   needs: [ test-and-verify ]
+   runs-on: ubuntu-22.04
+   steps:
+     - name: Checkout
+       id: checkout
+       uses: actions/checkout@v6
+
+     - name: Setup Build Environment
+       id: setup-env
+       uses: ./.github/actions/setup-env
+       with:
+         elixir-version: ''
+         skip-jcef: 'true'
+         github-token: ${{ secrets.GITHUB_TOKEN }}
+
+     - name: Build with Gradle
+       id: build-plugin
+       run: ./gradlew buildPlugin --no-scan
+
+     - name: Prepare Release
+       id: prepare-release
+       run: |
+         ASSET_PATH=$(ls -1 build/distributions/intellij-elixir-*.zip)
+         ASSET_NAME=${ASSET_PATH#build/distributions/}
+         VERSION_SUFFIX=${ASSET_NAME#intellij-elixir-}
+         TAG="v${VERSION_SUFFIX%.zip}"
+         echo "ASSET_PATH=$ASSET_PATH" >> $GITHUB_ENV
+         echo "ASSET_NAME=$ASSET_NAME" >> $GITHUB_ENV
+         echo "TAG=$TAG" >> $GITHUB_ENV
+
+     - name: Tag Commit
+       id: tag-commit
+       uses: hole19/git-tag-action@master
+       env:
+         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+     - name: Create Release
+       id: create-release
+       uses: softprops/action-gh-release@v2
+       with:
+         tag_name: ${{ env.TAG }}
+         name: ${{ env.TAG }}
+         prerelease: true
+         files: ${{ env.ASSET_PATH }}
