@@ -37,6 +37,13 @@ runs:
           tool-cache: false
           large-packages: false
 
+    - name: Cache JetBrains JDK
+      id: cache-jdk
+      uses: actions/cache@v4
+      with:
+        path: /opt/hostedtoolcache/Java_JetBrains_*
+        key: jdk-${{ runner.os }}-${{ runner.arch }}-jetbrains-21-${{ inputs.skip-jcef == 'false' && 'jcef' || 'nojcef' }}
+
     - name: Setup JBR 21
       id: setup-java
       uses: actions/setup-java@v5
