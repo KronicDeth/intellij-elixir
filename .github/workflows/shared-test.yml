@@ -82,7 +82,7 @@ jobs:
 
       - name: Upload Test Reports
         id: upload-test-reports
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: ${{ always() && inputs.upload-reports }}
         with:
           name: test-reports-${{ matrix.idea-version }}
@@ -120,7 +120,7 @@ jobs:
 
       - name: Upload Verify Reports
         id: upload-verify-reports
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: ${{ always() && inputs.upload-reports }}
         with:
           name: verify-plugin-reports-${{ matrix.idea-version }}
