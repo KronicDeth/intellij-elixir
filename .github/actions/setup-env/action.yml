@@ -23,6 +23,9 @@ inputs:
     description: 'Use read-only Gradle cache (for non-main branches or matrix jobs). Default is true.'
     required: false
     default: 'true'
+  github-token:
+    description: 'GitHub token for API access (required for setup-java to download JBR)'
+    required: true
 
 runs:
   using: composite
@@ -41,6 +44,8 @@ runs:
         distribution: 'jetbrains'
         java-version: 21
         java-package: ${{ inputs.skip-jcef == 'false' && 'jdk+jcef' || 'jdk' }}
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
 
     - name: Setup Gradle
       id: setup-gradle
