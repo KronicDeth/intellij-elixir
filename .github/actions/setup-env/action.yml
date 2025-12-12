@@ -52,6 +52,8 @@ runs:
         java-version: 21
         java-package: 'jdk'
         token: ${{ inputs.github-token }}
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
 
     - name: Setup Gradle
       id: setup-gradle
