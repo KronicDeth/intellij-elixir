@@ -24,8 +24,6 @@ jobs:
        id: setup-env
        uses: ./.github/actions/setup-env
        with:
-         elixir-version: ''
-         skip-jcef: 'true'
          github-token: ${{ secrets.GITHUB_TOKEN }}
 
      - name: Build with Gradle
