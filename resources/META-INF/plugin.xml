@@ -8,9 +8,12 @@
 
     <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
          on how to target different products -->
+    <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.lang</depends>
     <depends>org.intellij.plugins.markdown</depends>
+    <depends>com.intellij.modules.xml</depends>
     <depends config-file="rich-platform-plugin.xml" optional="true">com.intellij.modules.java</depends>
+    <depends config-file="optional/org.elixir_lang-withIntellijLang.xml" optional="true">org.intellij.intelliLang</depends>
 
     <extensionPoints>
         <extensionPoint name="packageManager" interface="org.elixir_lang.PackageManager"
@@ -22,9 +25,10 @@
     </extensions>
 
     <extensions defaultExtensionNs="com.intellij">
-        <registryKey key="org.elixir_lang.injection.enableLiteralSigilInjection"
-                     defaultValue="false"
-                     description="Enables literal sigil injection, which allows the Elixir sigil ~S to work. WARNING: THIS IS CURRENTLY BUGGY AND CAUSING ISSUES WITH ~s"/>
+        <!-- Status Bar Widget -->
+        <statusBarWidgetFactory
+                id="ElixirSdkStatus"
+                implementation="org.elixir_lang.status_bar_widget.ElixirSdkStatusWidgetFactory"/>
 
         <!--        <errorHandler implementation="org.elixir_lang.errorreport.Submitter"/>-->
         <errorHandler implementation="com.intellij.diagnostic.JetBrainsMarketplaceErrorReportSubmitter"/>
@@ -87,6 +91,12 @@
                   language="Elixir" extensions="ex"/>
         <fileType name="Elixir Script" implementationClass="org.elixir_lang.ElixirScriptFileType" fieldName="INSTANCE"
                   language="Elixir" extensions="exs"/>
+
+        <projectConfigurable
+                parentId="language.elixir"
+                displayName="Elixir Experimental Settings"
+                id="org.elixir_lang.settings.ElixirExperimentalSettingsConfigurable"
+                instance="org.elixir_lang.settings.ElixirExperimentalSettingsConfigurable"/>
 
         <!-- Facet -->
         <applicationConfigurable id="language.elixir.sdks.elixir"
@@ -270,7 +280,6 @@
 
         <lang.documentationProvider implementationClass="org.elixir_lang.documentation.ElixirDocumentationProvider"
                                     language="Elixir"/>
-        <multiHostInjector implementation="org.elixir_lang.injection.markdown.Injector"/>
 
         <!-- Dialyzer -->
         <globalInspection displayName="Dialyzer based inspections (Elixir)" shortName="Dialyzer"
@@ -300,9 +309,26 @@
         </group>
         <group id="LangElixir.HelpActions">
             <separator/>
-            <action id="Elixir.Help" class="org.elixir_lang.action.HelpAction" text="IntelliJ Elixir Help"/>
+            <action id="Elixir.Help" class="org.elixir_lang.action.HelpAction" text="IntelliJ Elixir Help" icon="AllIcons.Windows.Help" />
             <separator/>
-            <add-to-group group-id="HelpMenu" anchor="before" relative-to-action="LearnGroup"/>
+            <add-to-group group-id="HelpMenu" anchor="before" relative-to-action="ProductivityGuide"/>
+        </group>
+        <group id="LangElixir.SdkActions">
+            <separator/>
+            <action id="Elixir.RefreshActiveElixirSdk" class="org.elixir_lang.action.RefreshActiveElixirSdkAction"
+                    text="Refresh Active Elixir SDK"
+                    icon="AllIcons.General.Refresh"
+                    description="Refreshes classpath and documentation paths for the active Elixir/Erlang for Elixir SDK"/>
+            <action id="Elixir.RefreshAllElixirSdks" class="org.elixir_lang.action.RefreshAllElixirSdksAction"
+                    text="Refresh All Elixir SDKs"
+                    icon="AllIcons.General.Refresh"
+                    description="Refreshes classpath and documentation paths for all configured Elixir/Erlang SDKs"/>
+            <action id="Elixir.DeleteAllSdks" class="org.elixir_lang.action.DeleteAllSdksAction"
+                    text="Delete All Elixir/Erlang SDKs"
+                    icon="AllIcons.General.Remove"
+                    description="Removes all Elixir and Erlang SDKs from the IDE (useful in Small IDEs where SDKs can become corrupted)"/>
+            <separator/>
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
         </group>
         <group id="Internal.Elixir" popup="true" internal="true" compact="true" text="Elixir">
             <action id="BEAM.BulkDecompilation" internal="true" class="BulkDecompilation"

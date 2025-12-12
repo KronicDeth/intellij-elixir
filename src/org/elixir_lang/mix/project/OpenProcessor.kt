@@ -8,9 +8,9 @@ import com.intellij.projectImport.ProjectImportBuilder
 import com.intellij.projectImport.ProjectOpenProcessorBase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.elixir_lang.mix.Project as MixProject
 import org.elixir_lang.mix.project._import.Builder
 import com.intellij.openapi.project.Project as IdeaProject
+import org.elixir_lang.mix.Project as MixProject
 
 private val LOG = logger<OpenProcessor>()
 /**
@@ -20,6 +20,14 @@ class OpenProcessor : ProjectOpenProcessorBase<Builder>() {
     override val supportedExtensions = arrayOf(MixProject.MIX_EXS)
 
     override fun doGetBuilder(): Builder = ProjectImportBuilder.EXTENSIONS_POINT_NAME.findExtensionOrFail(Builder::class.java)
+
+    override fun canOpenProject(file: VirtualFile): Boolean {
+        return if (file.isDirectory) {
+            file.children?.any { it.name in supportedExtensions } ?: false
+        } else {
+            file.name in supportedExtensions
+        }
+    }
 
     override suspend fun openProjectAsync(
         virtualFile: VirtualFile,

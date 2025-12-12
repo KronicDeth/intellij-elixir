@@ -20,22 +20,23 @@ public class ElixirCompilerOptionsConfigurable extends CompilerConfigurable {
   private JCheckBox myWarningsAsErrorsCheckBox;
 
   private final ElixirCompilerSettings mySettings;
+  private boolean myUiInitialized = false;
 
   public ElixirCompilerOptionsConfigurable(Project project) {
     super(project);
 
     mySettings = ElixirCompilerSettings.getInstance(project);
-
-    setupUiListeners();
   }
 
   private void setupUiListeners(){
-    myRootPanel.addAncestorListener(new AncestorAdapter(){
-      @Override
-      public void ancestorAdded(AncestorEvent event) {
-        reset();
-      }
-    });
+    if (myRootPanel != null) {
+      myRootPanel.addAncestorListener(new AncestorAdapter(){
+        @Override
+        public void ancestorAdded(AncestorEvent event) {
+          reset();
+        }
+      });
+    }
   }
 
   @NotNull
@@ -51,6 +52,10 @@ public class ElixirCompilerOptionsConfigurable extends CompilerConfigurable {
 
   @Override
   public JComponent createComponent() {
+    if (!myUiInitialized) {
+      setupUiListeners();
+      myUiInitialized = true;
+    }
     return myRootPanel;
   }
 
