@@ -1,4 +1,3 @@
-Not used until we have GITHUB_TOKEN fixed.
 name: Release
 
 on:
