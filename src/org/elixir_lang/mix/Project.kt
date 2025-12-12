@@ -1,13 +1,12 @@
 package org.elixir_lang.mix
 
-import com.intellij.openapi.application.edtWriteAction
+import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.module.ModifiableModuleModel
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
-import com.intellij.openapi.progress.runBlockingCancellable
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ContentEntry
 import com.intellij.openapi.roots.ModifiableRootModel
@@ -85,14 +84,14 @@ object Project {
             val createdRootModels = otpApps.mapNotNull { createModuleForOtpApp(it, moduleModel, rootModelModifier) }
 
             if (createdRootModels.isNotEmpty()) {
-                runBlockingCancellable {
-                    edtWriteAction {
-                        for (rootModel in createdRootModels) {
-                            rootModel.commit()
-                        }
-
-                        moduleModel.commit()
+                // Use WriteAction.run since this is called from EDT via importToProject
+                // runBlockingCancellable is forbidden on EDT as it doesn't pump the event queue
+                WriteAction.run<Throwable> {
+                    for (rootModel in createdRootModels) {
+                        rootModel.commit()
                     }
+
+                    moduleModel.commit()
                 }
                 ProgressManager.getInstance()
                     .run(object : Task.Modal(project, "Scanning dependencies for Libraries", true) {
