@@ -596,6 +596,19 @@ ELIXIR_SDK_HOME
         val instance: Type
             get() = findInstance(Type::class.java)
 
+        /**
+         * Checks if the Elixir SDK's classpath contains entries from the Erlang SDK.
+         * This can be false when JetBrains settings persistence fails to save the SDK configuration.
+         *
+         * @return true if Erlang classpath entries are present in the Elixir SDK, false if missing
+         */
+        @JvmStatic
+        fun hasErlangClasspathInElixirSdk(elixirSdk: Sdk, erlangSdk: Sdk): Boolean {
+            val erlangHomePath = erlangSdk.homePath ?: return false
+            val classRoots = elixirSdk.rootProvider.getFiles(OrderRootType.CLASSES)
+            return classRoots.any { root -> root.path.startsWith(erlangHomePath) }
+        }
+
         fun getNonNullRelease(element: PsiElement): Release = getRelease(element) ?: Release.LATEST
 
         private fun getRelease(element: PsiElement): Release? = getRelease(mostSpecificSdk(element))

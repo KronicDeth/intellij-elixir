@@ -196,6 +196,9 @@ class ElixirSdkStatusWidget(@param:NotNull private val project: Project) : Statu
         if (hasErlangSdkIssues(erlangSdk)) {
             issues.add("Erlang SDK configuration issues")
         }
+        if (!Type.hasErlangClasspathInElixirSdk(elixirSdk, erlangSdk)) {
+            issues.add("Erlang SDK classpath entries missing - reopen SDK settings to fix")
+        }
 
         return if (issues.isEmpty()) {
             SdkStatus.Configured(elixirSdk, erlangSdk, elixirVersion)
