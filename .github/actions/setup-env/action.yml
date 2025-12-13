@@ -26,6 +26,10 @@ inputs:
     description: 'Whether to publish Gradle build scans'
     required: false
     default: 'false'
+  setup-elixir:
+    description: 'If true, will setup the Elixir environment, restore and cache Elixir build artifacts. Not needed for the verify-plugin job.'
+    required: false
+    default: 'true'
 
 runs:
   using: composite
@@ -68,6 +72,7 @@ runs:
 
     - name: Restore Elixir cache
       id: cache-elixir-restore
+      if: ${{ inputs.setup-elixir == 'true' }}
       uses: actions/cache/restore@v5
       with:
         path: |
@@ -79,11 +84,15 @@ runs:
 
     - name: Setup Elixir
       id: setup-elixir
+      if: ${{ inputs.setup-elixir == 'true' }}
       uses: erlef/setup-beam@v1
       with:
         otp-version: ${{ inputs.otp-version }}
         elixir-version: ${{ inputs.elixir-version }}
 
+    # This sets project properties, allowing us to override gradle.properties via environment variables,
+    # applying to all Gradle tasks. Means we don't need to do like `./gradlew -PplatformVersion=xxx`
+    # https://docs.gradle.org/current/userguide/build_environment.html#setting_a_project_property
     - name: Export Environment Variables
       id: export-environment-variables
       shell: bash
@@ -94,12 +103,12 @@ runs:
         fi
         chmod +x gradlew
         if [ -n "${{ inputs.idea-version }}" ]; then
-          echo "ORG_GRADLE_PROJECT_ideaVersion=${{ inputs.idea-version }}" >> $GITHUB_ENV
+          echo "ORG_GRADLE_PROJECT_platformVersion=${{ inputs.idea-version }}" >> $GITHUB_ENV
         fi
 
     - name: Save Elixir cache
       id: cache-elixir-save
-      if: always() && inputs.gradle-cache-read-only != 'true' && steps.cache-elixir-restore.outputs.cache-hit != 'true'
+      if: always() && inputs.gradle-cache-read-only != 'true' && steps.cache-elixir-restore.outputs.cache-hit != 'true' && inputs.setup-elixir == 'true'
       uses: actions/cache/save@v5
       with:
         path: |
