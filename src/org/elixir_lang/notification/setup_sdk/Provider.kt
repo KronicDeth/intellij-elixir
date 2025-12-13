@@ -4,19 +4,16 @@ import com.intellij.ide.actions.ShowSettingsUtilImpl
 import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.fileEditor.FileEditor
 import com.intellij.openapi.module.Module
+import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.module.ModuleType
-import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectBundle
 import com.intellij.openapi.roots.ui.configuration.ProjectSettingsService
 import com.intellij.openapi.roots.ui.configuration.SdkPopupFactory
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
 import com.intellij.ui.EditorNotificationPanel
 import com.intellij.ui.EditorNotificationProvider
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import org.elixir_lang.ElixirFileType
 import org.elixir_lang.ElixirLanguage
 import org.elixir_lang.sdk.ProcessOutput
@@ -28,35 +25,40 @@ class Provider : EditorNotificationProvider {
     override fun collectNotificationData(
         project: Project,
         file: VirtualFile,
-    ): Function<in FileEditor, out JComponent?> =
-        Function {
-            kotlinx.coroutines.runBlocking {
-                createNotificationPanel(file, project)
-            }
+    ): Function<in FileEditor, out JComponent?>? {
+        // Quick check without read action - file type check is thread-safe
+        if (file.fileType !is ElixirFileType) {
+            return null
         }
 
-    private suspend fun createNotificationPanel(
+        return Function {
+            createNotificationPanel(file, project)
+        }
+    }
+
+    private fun createNotificationPanel(
         virtualFile: VirtualFile,
         project: Project,
     ): EditorNotificationPanel? =
-        withContext(Dispatchers.Default) {
-            ReadAction.compute<EditorNotificationPanel?, Throwable> {
-                if (virtualFile.fileType is ElixirFileType) {
-                    PsiManager
-                        .getInstance(project)
-                        .findFile(virtualFile)
-                        ?.let { psiFile ->
-                            if (psiFile.language === ElixirLanguage &&
-                                Type.mostSpecificSdk(psiFile) == null
-                            ) {
-                                createPanel(project, psiFile)
-                            } else {
-                                null
-                            }
-                        }
-                } else {
-                    null
-                }
+        ReadAction.compute<EditorNotificationPanel?, Throwable> {
+            val psiFile = PsiManager.getInstance(project).findFile(virtualFile)
+
+            if (psiFile == null ||
+                psiFile.language !== ElixirLanguage ||
+                Type.mostSpecificSdk(psiFile) != null
+            ) {
+                return@compute null
+            }
+
+            // Avoid slow ModuleUtilCore.findModuleForPsiElement call
+            // Instead, check if there are any Elixir modules in the project
+            val elixirModule = ModuleManager.getInstance(project).modules
+                .find { ModuleType.get(it).id == "ELIXIR_MODULE" }
+
+            when {
+                elixirModule != null -> createModulePanel(project, elixirModule)
+                ProcessOutput.isSmallIde -> createSmallIDEFacetPanel(project)
+                else -> createProjectPanel(project)
             }
         }
 
@@ -98,14 +100,6 @@ private fun createSmallIDEFacetPanel(project: Project): EditorNotificationPanel 
         }
     }
 
-private fun createFacetPanel(project: Project): EditorNotificationPanel? =
-    if (ProcessOutput.isSmallIde) {
-        createSmallIDEFacetPanel(project)
-    } else {
-        // TODO Elixir Facet in non-Elixir module in IntelliJ
-        null
-    }
-
 private fun createModulePanel(
     project: Project,
     module: Module,
@@ -117,27 +111,6 @@ private fun createModulePanel(
             showModuleSettings(project, module)
         }
     }
-
-private fun createPanel(
-    project: Project,
-    psiFile: PsiFile,
-): EditorNotificationPanel? {
-    val module = ModuleUtilCore.findModuleForPsiElement(psiFile)
-
-    return when {
-        module != null -> {
-            // CANNOT use ModuleType.is(module, ElixirModuleType.getInstance()) as ElixirModuleType depends on
-            // JavaModuleBuilder and so only available in IntelliJ
-            if (ModuleType.get(module).id == "ELIXIR_MODULE") {
-                createModulePanel(project, module)
-            } else {
-                createFacetPanel(project)
-            }
-        }
-        ProcessOutput.isSmallIde -> createSmallIDEFacetPanel(project)
-        else -> createProjectPanel(project)
-    }
-}
 
 private fun createProjectPanel(project: Project): EditorNotificationPanel =
     EditorNotificationPanel().apply {
