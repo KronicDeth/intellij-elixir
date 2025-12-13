@@ -1,7 +1,8 @@
 package org.elixir_lang.mix
 
-import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.edtWriteAction
 import com.intellij.openapi.module.Module
+import kotlinx.coroutines.runBlocking
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.module.ModuleUtil
 import com.intellij.openapi.progress.ProgressIndicator
@@ -68,8 +69,8 @@ class Watcher(private val project: Project) : BulkFileListener {
 
     private fun syncLibraries(module: Module, deps: Collection<Dep>, progressIndicator: ProgressIndicator) {
         if (deps.isNotEmpty()) {
-            ApplicationManager.getApplication().invokeAndWait {
-                ApplicationManager.getApplication().runWriteAction {
+            runBlocking {
+                edtWriteAction {
                     val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
                     val moduleManager = ModuleManager.getInstance(project)
 

@@ -22,9 +22,7 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.platform.PlatformProjectOpenProcessor.Companion.runDirectoryProjectConfigurators
 import com.intellij.projectImport.ProjectAttachProcessor
 import com.intellij.util.PlatformUtils
-import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withTimeout
 import org.elixir_lang.DepsWatcher
 import org.elixir_lang.Facet
 import org.elixir_lang.mix.Project.addFolders
@@ -78,17 +76,8 @@ class DirectoryConfigurator : com.intellij.platform.DirectoryProjectConfigurator
                 LOG.debug("configuring root otp app: ${otpApp.name}")
                 configureRootOtpApp(project, otpApp)
             } else {
-                runBlocking {
-                    try {
-                        withTimeout(2000L) {
-                            LOG.debug("Not otp app root: ${otpApp.name}, configuring descendant otp app.")
-                            configureDescendantOtpApp(project, otpApp)
-                        }
-                    } catch (e: TimeoutCancellationException) {
-                        // Handle the timeout exception, e.g., log a warning or notify the user
-                        LOG.error("Timeout while configuring descendant OTP app: ${otpApp.name}", e)
-                    }
-                }
+                LOG.debug("Not otp app root: ${otpApp.name}, configuring descendant otp app.")
+                configureDescendantOtpApp(project, otpApp)
             }
         }
     }
@@ -112,7 +101,7 @@ class DirectoryConfigurator : com.intellij.platform.DirectoryProjectConfigurator
         }
     }
 
-    private suspend fun configureDescendantOtpApp(rootProject: Project, otpApp: OtpApp) {
+    private fun configureDescendantOtpApp(rootProject: Project, otpApp: OtpApp) {
         if (!PlatformUtils.isGoIde() && ProjectAttachProcessor.canAttachToProject()) {
             newProject(otpApp)?.let { otpAppProject ->
                 LOG.debug("attaching $otpAppProject to $rootProject")
@@ -143,7 +132,7 @@ class DirectoryConfigurator : com.intellij.platform.DirectoryProjectConfigurator
     /**
      * @return Only returns a project if it is new.
      */
-    private suspend fun newProject(otpApp: OtpApp): Project? {
+    private fun newProject(otpApp: OtpApp): Project? {
         val projectDir = Paths.get(FileUtil.toSystemDependentName(otpApp.root.path), Project.DIRECTORY_STORE_FOLDER)
         LOG.debug("Checking if $projectDir exists")
 
@@ -168,7 +157,11 @@ class DirectoryConfigurator : com.intellij.platform.DirectoryProjectConfigurator
                 )
                 ?.let { project ->
                     LOG.debug("runDirectoryProjectConfigurators for project: $project at $path")
-                    runDirectoryProjectConfigurators(path, project, false)
+                    // runDirectoryProjectConfigurators is a suspend function in 2025.3
+                    // Use runBlocking here specifically for this single call, not blocking the entire loop
+                    runBlocking {
+                        runDirectoryProjectConfigurators(projectFile = path, project = project, newProject = false, createModule = false)
+                    }
                     LOG.debug("runDirectoryProjectConfigurators complete for project: $project at $path")
 
                     LOG.debug("Saving settings for project: $project at $path")

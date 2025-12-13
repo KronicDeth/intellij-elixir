@@ -1,8 +1,9 @@
 package org.elixir_lang
 
 import com.intellij.ide.projectView.impl.ProjectRootsUtil.isModuleContentRoot
-import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.edtWriteAction
 import com.intellij.openapi.module.ModuleManager
+import kotlinx.coroutines.runBlocking
 import com.intellij.openapi.module.ModuleUtil
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
@@ -182,8 +183,8 @@ class DepsWatcher(val project: Project) : BulkFileListener {
 
     private fun syncLibraries(deps: Array<VirtualFile>, progressIndicator: ProgressIndicator) {
         if (deps.isNotEmpty()) {
-            ApplicationManager.getApplication().invokeAndWait {
-                ApplicationManager.getApplication().runWriteAction {
+            runBlocking {
+                edtWriteAction {
                     val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
 
                     syncLibraries(deps, libraryTable, progressIndicator)
@@ -329,8 +330,8 @@ class DepsWatcher(val project: Project) : BulkFileListener {
         }
 
         if (depsLibraries.isNotEmpty()) {
-            ApplicationManager.getApplication().invokeAndWait {
-                ApplicationManager.getApplication().runWriteAction {
+            runBlocking {
+                edtWriteAction {
                     depsLibraries.forEach { libraryTable.removeLibrary(it) }
                 }
             }
@@ -342,8 +343,8 @@ class DepsWatcher(val project: Project) : BulkFileListener {
         val depName = dep.name
 
         libraryTable.getLibraryByName(depName)?.let { library ->
-            ApplicationManager.getApplication().invokeAndWait {
-                ApplicationManager.getApplication().runWriteAction {
+            runBlocking {
+                edtWriteAction {
                     libraryTable.removeLibrary(library)
                 }
             }
