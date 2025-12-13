@@ -159,11 +159,25 @@ class Builder : ProjectImportBuilder<OtpApp>() {
         }
 
         myProjectRoot = projectRoot
-        myNeedsScan = true
+        // Only mark for scan if we don't already have pre-scanned results for this root
+        if (myFoundOtpApps.isEmpty()) {
+            myNeedsScan = true
+        }
 
         // Return true to indicate the project root was set successfully
         // Actual scanning is deferred until getList() is called
         return true
+    }
+
+    /**
+     * Set pre-scanned OTP apps to avoid slow I/O on EDT.
+     * Called from OpenProcessor.openProjectAsync() which runs in background.
+     */
+    fun setPreScannedApps(projectRoot: VirtualFile, apps: List<OtpApp>) {
+        myProjectRoot = projectRoot
+        myFoundOtpApps = apps
+        mySelectedOtpApps = apps
+        myNeedsScan = false
     }
 
     private fun scanProjectRoot(projectRoot: VirtualFile) {

@@ -3,6 +3,7 @@ package org.elixir_lang.mix.project
 import com.intellij.ide.util.projectWizard.WizardContext
 import com.intellij.openapi.application.EDT
 import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.progress.coroutineToIndicator
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.projectImport.ProjectImportBuilder
 import com.intellij.projectImport.ProjectOpenProcessorBase
@@ -34,6 +35,22 @@ class OpenProcessor : ProjectOpenProcessorBase<Builder>() {
         projectToClose: IdeaProject?,
         forceOpenInNewFrame: Boolean
     ): IdeaProject? {
+        val projectRoot = if (virtualFile.isDirectory) virtualFile else virtualFile.parent
+
+        // Pre-scan for OTP apps in background BEFORE switching to EDT
+        // This moves the slow VfsUtilCore.visitChildrenRecursively() off EDT
+        LOG.debug("Pre-scanning project root: ${projectRoot.path}")
+        val foundApps = withContext(Dispatchers.IO) {
+            coroutineToIndicator {
+                MixProject.findOtpApps(projectRoot, com.intellij.openapi.progress.ProgressManager.getInstance().progressIndicator
+                    ?: com.intellij.openapi.progress.EmptyProgressIndicator())
+            }
+        }
+        LOG.debug("Pre-scan found ${foundApps.size} OTP apps")
+
+        // Store pre-scanned results in the builder
+        builder.setPreScannedApps(projectRoot, foundApps)
+
         // Ensure EDT context for runBlockingModalWithRawProgressReporter in IntelliJ 2025.3
         // See: https://github.com/JetBrains/intellij-community/commit/59da423bd3fef56a7929838fb9bfeee5beae8785
         return withContext(Dispatchers.EDT) {
@@ -48,7 +65,7 @@ class OpenProcessor : ProjectOpenProcessorBase<Builder>() {
         wizardContext.projectName = projectRoot.name
         builder.setProjectRoot(projectRoot)
 
-        // Trigger deferred scanning and auto-select all found OTP apps
+        // Use pre-scanned results (no slow I/O on EDT)
         val foundApps = builder.list
         builder.setList(foundApps)
 
