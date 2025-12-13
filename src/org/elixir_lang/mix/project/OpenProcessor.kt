@@ -1,6 +1,7 @@
 package org.elixir_lang.mix.project
 
 import com.intellij.ide.util.projectWizard.WizardContext
+import com.intellij.openapi.application.EDT
 import com.intellij.openapi.application.UI
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.progress.coroutineToIndicator
@@ -52,8 +53,10 @@ class OpenProcessor : ProjectOpenProcessorBase<Builder>() {
         builder.setPreScannedApps(projectRoot, foundApps)
 
         // Ensure EDT context for runBlockingModalWithRawProgressReporter in IntelliJ 2025.3
+        // We need .EDT here..
         // See: https://github.com/JetBrains/intellij-community/commit/59da423bd3fef56a7929838fb9bfeee5beae8785
-        return withContext(Dispatchers.UI) {
+        @Suppress("ObsoleteDispatchersEdt")
+        return withContext(Dispatchers.EDT) {
             super.openProjectAsync(virtualFile, projectToClose, forceOpenInNewFrame)
         }
     }
