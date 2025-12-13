@@ -10,7 +10,11 @@ import org.elixir_lang.notification.setup_sdk.Notifier
 import org.elixir_lang.sdk.elixir.Type as ElixirSdkType
 import org.elixir_lang.sdk.erlang.Type as ErlangSdkType
 
-class RefreshAllElixirSdksAction : AnAction() {
+class RefreshAllElixirSdksAction : AnAction(
+    "Refresh All Elixir SDKs",
+    "Refresh classpath entries for all configured Elixir and Erlang SDKs",
+    null
+) {
 
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return

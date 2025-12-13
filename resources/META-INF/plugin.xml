@@ -334,6 +334,10 @@
             <action id="BEAM.BulkDecompilation" internal="true" class="BulkDecompilation"
                     text="BEAM Bulk Decompilation"
                     description="Decompiles all .beam files in the project, modules, and SDKs to check that all decompiled code is parsable as valid Elixir"/>
+            <action id="Elixir.AddDevelopmentSdks" internal="true"
+                    class="org.elixir_lang.action.AddDevelopmentSdksAction"
+                    text="Add SDKs (Development)"
+                    description="Adds Elixir/Erlang SDKs from Gradle properties (runIdeSdkErlangPath, runIdeSdkElixirPath)"/>
             <add-to-group group-id="Internal" anchor="first"/>
         </group>
     </actions>

@@ -264,6 +264,15 @@ tasks.withType<RunIdeTask>().configureEach {
         workingDir = file(project.property("runIdeWorkingDirectory").toString())
     }
 
+    // Development SDK paths - allows devs to auto-configure SDKs when running the plugin
+    // Usage: ./gradlew runIde -PrunIdeSdkErlangPath='/path/to/erlang' -PrunIdeSdkElixirPath='/path/to/elixir'
+    if (project.hasProperty("runIdeSdkErlangPath")) {
+        systemProperty("runIdeSdkErlangPath", project.property("runIdeSdkErlangPath").toString())
+    }
+    if (project.hasProperty("runIdeSdkElixirPath")) {
+        systemProperty("runIdeSdkElixirPath", project.property("runIdeSdkElixirPath").toString())
+    }
+
     // Dynamic plugin loading
     // Usage: -PrunIdeCompatiblePlugins="PsiViewer,com.google.ide-perf,org.jetbrains.action-tracker"
     val compatiblePluginsList = providers.gradleProperty("runIdeCompatiblePlugins")
