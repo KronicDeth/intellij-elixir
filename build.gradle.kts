@@ -1,10 +1,10 @@
 /*
  * Main Build Script
  * Purpose: Orchestrates the build of the IntelliJ Elixir plugin.
- * * Key Changes for 2025.3 / Small IDE Support:
+ * Key Changes for 2025.3 / Small IDE Support:
  * 1. Uses Version Catalog (libs.*) for dependency management.
  * 2. Explicitly configure JPS subprojects with TestFramework dependencies.
- * 3. `runQuoter` task now actively polls the daemon to prevent test race conditions.
+ * 3. QuoterService (BuildService) manages the Quoter daemon lifecycle with guaranteed cleanup.
  * 4. `test` task enforces the working directory to project root to find testData.
  */
 
@@ -428,40 +428,31 @@ val releaseQuoter by tasks.registering(Exec::class) {
     commandLine("mix", "release")
 }
 
-fun ExecSpec.configureQuoter() {
-    executable(quoterExe.asFile)
-    environment("RELEASE_COOKIE", "intellij_elixir")
-    environment("RELEASE_DISTRIBUTION", "name") // Required for 127.0.0.1
-    environment("RELEASE_NAME", "intellij_elixir@127.0.0.1")
-    environment("RELEASE_TMP", quoterTmpPath.asFile.absolutePath)
-}
-
-val runQuoter by tasks.registering(RunQuoterTask::class) {
-    dependsOn(releaseQuoter)
-    executable.set(quoterExe)
-    tmpDir.set(quoterTmpPath)
-
-}
-
-val stopQuoter by tasks.registering(Exec::class) {
-    dependsOn(releaseQuoter)
-    mustRunAfter(runQuoter)
-    configureQuoter()
-    args("stop")
-    isIgnoreExitValue = true
-    doLast {
-        if (executionResult.get().exitValue == 0) {
-            logger.lifecycle("Stopped Quoter daemon.")
-        } else {
-            logger.lifecycle("Quoter daemon was not running.")
-        }
+// Register the QuoterService - Gradle calls close() at build end regardless of failure
+// See: https://docs.gradle.org/current/userguide/build_services.html
+val quoterService = gradle.sharedServices.registerIfAbsent("quoter", QuoterService::class) {
+    parameters {
+        executable.set(quoterExe)
+        tmpDir.set(quoterTmpPath)
     }
 }
 
+val startQuoter by tasks.registering(StartQuoterTask::class) {
+    dependsOn(releaseQuoter)
+}
+
 // --- Test Configuration ---
+
+// ALL test tasks in ALL projects use the QuoterService (ensures cleanup on any failure)
+allprojects {
+    tasks.withType<Test>().configureEach {
+        dependsOn(startQuoter)
+        usesService(quoterService)
+    }
+}
+
 tasks.named<Test>("test") {
-    dependsOn("prepareTestSandbox", runQuoter)
-    finalizedBy(stopQuoter)
+    dependsOn("prepareTestSandbox")
 
     environment("ELIXIR_LANG_ELIXIR_PATH", elixirPath.asFile.absolutePath)
     environment("ELIXIR_EBIN_DIRECTORY", elixirPath.dir("lib/elixir/ebin/").asFile.absolutePath + File.separator)
