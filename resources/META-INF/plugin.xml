@@ -270,6 +270,8 @@
 
         <lang.documentationProvider implementationClass="org.elixir_lang.documentation.ElixirDocumentationProvider"
                                     language="Elixir"/>
+
+        <multiHostInjector implementation="org.elixir_lang.injection.ElixirSigilInjector"/>
         <multiHostInjector implementation="org.elixir_lang.injection.markdown.Injector"/>
 
         <!-- Dialyzer -->
@@ -281,6 +283,11 @@
                         serviceImplementation="org.elixir_lang.dialyzer.service.DialyzerServiceImpl"/>
         <projectConfigurable instance="org.elixir_lang.dialyzer.service.Configurable" groupId="Errors"
                              parentId="Errors" displayName="Dialyzer"/>
+    </extensions>
+
+    <extensions defaultExtensionNs="org.intellij.intelliLang">
+        <languageSupport language="Elixir" implementation="org.elixir_lang.injection.ElixirSigilInjectionSupport"/>
+        <injectionConfig config="elixirInjections.xml"/>
     </extensions>
 
     <projectListeners>
