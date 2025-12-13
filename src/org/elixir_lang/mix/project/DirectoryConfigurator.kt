@@ -168,7 +168,8 @@ class DirectoryConfigurator : com.intellij.platform.DirectoryProjectConfigurator
                 )
                 ?.let { project ->
                     LOG.debug("runDirectoryProjectConfigurators for project: $project at $path")
-                    runDirectoryProjectConfigurators(path, project, false)
+                    // @todo changed in 2025.3, to add createModule.
+                    runDirectoryProjectConfigurators(projectFile = path, project = project, newProject = false, createModule = false)
                     LOG.debug("runDirectoryProjectConfigurators complete for project: $project at $path")
 
                     LOG.debug("Saving settings for project: $project at $path")
