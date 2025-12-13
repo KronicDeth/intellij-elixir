@@ -1,16 +1,22 @@
 package org.elixir_lang.status_bar_widget
 
 import com.intellij.icons.AllIcons
+import com.intellij.ide.DataManager
+import com.intellij.openapi.actionSystem.ActionGroup
+import com.intellij.openapi.actionSystem.AnAction
+import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.ProjectJdkTable
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.ui.popup.JBPopup
+import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.wm.StatusBar
 import com.intellij.openapi.wm.StatusBarWidget
 import com.intellij.util.messages.MessageBusConnection
 import org.elixir_lang.Icons
+import org.elixir_lang.action.RefreshAllElixirSdksAction
 import org.elixir_lang.jps.HomePath
 import org.elixir_lang.sdk.elixir.Type
 import org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData
@@ -88,7 +94,21 @@ class ElixirSdkStatusWidget(@param:NotNull private val project: Project) : Statu
 
     override fun getIcon(): javax.swing.Icon? = getCurrentPresentation().icon
 
-    override fun getPopup(): JBPopup? = null
+    override fun getPopup(): JBPopup? {
+        val actionGroup = object : ActionGroup() {
+            override fun getChildren(e: AnActionEvent?): Array<AnAction> {
+                return arrayOf(RefreshAllElixirSdksAction())
+            }
+        }
+
+        return JBPopupFactory.getInstance().createActionGroupPopup(
+            "Elixir SDK",
+            actionGroup,
+            DataManager.getInstance().getDataContext(statusBar?.component),
+            JBPopupFactory.ActionSelectionAid.SPEEDSEARCH,
+            false
+        )
+    }
 
     override fun getTooltipText(): String = getCurrentPresentation().tooltip
 
