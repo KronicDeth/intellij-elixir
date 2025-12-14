@@ -46,6 +46,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           custom_tag: ${{ env.TAG }}
+          tag_prefix: ''
 
       - name: Create Release
         id: create_release
