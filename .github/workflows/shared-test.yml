@@ -38,8 +38,7 @@ jobs:
   matrix-setup:
     runs-on: ubuntu-latest
     outputs:
-      idea-versions: '["253.28294.334", "252.28238.7", "251.29188.11", "243.28141.18"]'
-      # Versions: 2025.3, 2025.2.5, 2025.1.7, 2024.3.7
+      idea-versions: '["2025.3", "LATEST-EAP-SNAPSHOT"]'
     steps:
       - run: echo "Defining idea-versions matrix"
 
@@ -90,14 +89,13 @@ jobs:
             **/build/reports/tests/**
             **/build/test-results/**
           retention-days: 30
+          include-hidden-files: true
+          overwrite: true
+          if-no-files-found: 'error'
 
-  verify-plugin:
-    needs: matrix-setup
+  build-plugin-for-verifier:
+    name: "Build Plugin for verifyPlugin"
     runs-on: ubuntu-22.04
-    strategy:
-      fail-fast: false
-      matrix:
-        idea-version: ${{ fromJson(needs.matrix-setup.outputs.idea-versions) }}
 
     steps:
       - name: Checkout
@@ -110,20 +108,59 @@ jobs:
         id: setup-env
         uses: ./.github/actions/setup-env
         with:
-          idea-version: ${{ matrix.idea-version }}
+          setup-elixir: false
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          build-scan-publish: true
+          idea-version: '2025.3'
 
-      - name: Run Plugin Verifier
+      - name: Build Plugin
+        id: build-plugin
+        run: ./gradlew buildPlugin
+
+      - name: Upload Plugin Artifact
+        id: upload-plugin
+        uses: actions/upload-artifact@v5
+        with:
+          name: plugin-artifact
+          path: build/distributions/*.zip
+          retention-days: 1
+
+  verify-plugin:
+    needs: build-plugin-for-verifier
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        ide-version: ['253.28294.334']
+
+    steps:
+      - name: Download Plugin Artifact
+        id: download-plugin
+        uses: actions/download-artifact@v4
+        with:
+          name: plugin-artifact
+          path: build/distributions
+
+      - name: Verify Plugin
         id: verify-plugin
-        run: ./gradlew verifyPlugin
+        uses: ChrisCarini/intellij-platform-plugin-verifier-action@latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          ide-versions: ideaIU:${{ matrix.ide-version }}
+
+      - name: Print Verification Output
+        id: print-verification-output
+        if: always()
+        run: |
+          echo "Verification log:"
+          cat "${{ steps.verify-plugin.outputs.verification-output-log-filename }}"
 
       - name: Upload Verify Reports
         id: upload-verify-reports
         uses: actions/upload-artifact@v5
         if: ${{ always() && inputs.upload-reports }}
         with:
-          name: verify-plugin-reports-${{ matrix.idea-version }}
+          name: verify-plugin-reports-${{ matrix.ide-version }}
           path: |
-            **/build/reports/pluginVerifier
+            ${{ steps.verify-plugin.outputs.verification-output-log-filename }}
           retention-days: 30

@@ -23,6 +23,7 @@ jobs:
         uses: ./.github/actions/setup-env
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          skip-searchable-options: 'false'
 
       - name: Build with Gradle
         id: build-plugin

@@ -1,5 +1,6 @@
 package org.elixir_lang.sdk.erlang_dependent
 
+import com.intellij.icons.AllIcons
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.options.ConfigurationException
 import com.intellij.openapi.projectRoots.AdditionalDataConfigurable
@@ -11,6 +12,7 @@ import com.intellij.openapi.util.Comparing
 import com.intellij.ui.SimpleListCellRenderer
 import com.intellij.util.ui.JBUI
 import org.elixir_lang.sdk.elixir.Type.Companion.addNewCodePathsFromInternErlangSdk
+import org.elixir_lang.sdk.elixir.Type.Companion.hasErlangClasspathInElixirSdk
 import org.elixir_lang.sdk.elixir.Type.Companion.removeCodePathsFromInternalErlangSdk
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
@@ -24,6 +26,10 @@ class AdditionalDataConfigurable(
     private val internalErlangSdkLabel = JLabel("Internal Erlang SDK:")
     private val internalErlangSdksComboBoxModel = DefaultComboBoxModel<Sdk?>()
     private val internalErlangSdksComboBox = ComboBox<Sdk>(internalErlangSdksComboBoxModel)
+    private val classpathWarningLabel = JLabel("Erlang classpath entries missing from Elixir SDK").apply {
+        icon = AllIcons.General.Warning
+        isVisible = false
+    }
     private val sdkModelListener: SdkModel.Listener
     private var elixirSdk: Sdk? = null
     private var modified = false
@@ -114,6 +120,22 @@ class AdditionalDataConfigurable(
                 0,
             ),
         )
+        wholePanel.add(
+            classpathWarningLabel,
+            GridBagConstraints(
+                0,
+                GridBagConstraints.RELATIVE,
+                2,
+                1,
+                1.0,
+                0.0,
+                GridBagConstraints.WEST,
+                GridBagConstraints.HORIZONTAL,
+                JBUI.insetsTop(8),
+                0,
+                0,
+            ),
+        )
         internalErlangSdksComboBox.setRenderer(
             object : SimpleListCellRenderer<Sdk>() {
                 override fun customize(
@@ -144,12 +166,18 @@ class AdditionalDataConfigurable(
                         internalErlangSdk,
                         sdkModificator,
                     )
+                    // Force save to work around JetBrains settings persistence bug
+                    ApplicationManager.getApplication().runWriteAction {
+                        sdkModificator.commitChanges()
+                    }
                     modified = true
+                    updateWarningLabel()
                 }
             }
         }
 
         modified = true
+        updateWarningLabel()
 
         return wholePanel
     }
@@ -216,6 +244,7 @@ class AdditionalDataConfigurable(
             }
 
             modified = false
+            updateWarningLabel()
         }
     }
 
@@ -252,5 +281,17 @@ class AdditionalDataConfigurable(
             }
         }
         updateJdkList()
+    }
+
+    private fun updateWarningLabel() {
+        val sdk = elixirSdk ?: run {
+            classpathWarningLabel.isVisible = false
+            return
+        }
+        val erlangSdk = (internalErlangSdksComboBox.selectedItem as? Sdk) ?: run {
+            classpathWarningLabel.isVisible = false
+            return
+        }
+        classpathWarningLabel.isVisible = !hasErlangClasspathInElixirSdk(sdk, erlangSdk)
     }
 }
