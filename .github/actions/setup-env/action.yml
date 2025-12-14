@@ -59,6 +59,22 @@ runs:
       env:
         GITHUB_TOKEN: ${{ inputs.github-token }}
 
+    # This sets project properties, allowing us to override gradle.properties via environment variables,
+    # applying to all Gradle tasks. Means we don't need to do like `./gradlew -PplatformVersion=xxx`
+    # Needed because we can't just use env, as we're in a composite action, and env set here won't propagate to
+    # later steps in the workflow that use this action.
+    # https://docs.gradle.org/current/userguide/build_environment.html#setting_a_project_property
+    - name: Export Environment Variables
+      id: export-environment-variables
+      shell: bash
+      run: |
+        if [ -n "${{ inputs.idea-version }}" ]; then
+          echo "ORG_GRADLE_PROJECT_platformVersion=${{ inputs.idea-version }}" >> $GITHUB_ENV
+          export ORG_GRADLE_PROJECT_platformVersion=${{ inputs.idea-version }}
+        fi
+        echo "ORG_GRADLE_PROJECT_skipSearchableOptions=false" >> $GITHUB_ENV
+        export ORG_GRADLE_PROJECT_skipSearchableOptions=false
+
     - name: Setup Gradle
       id: setup-gradle
       uses: gradle/actions/setup-gradle@v5
@@ -90,21 +106,13 @@ runs:
         otp-version: ${{ inputs.otp-version }}
         elixir-version: ${{ inputs.elixir-version }}
 
-    # This sets project properties, allowing us to override gradle.properties via environment variables,
-    # applying to all Gradle tasks. Means we don't need to do like `./gradlew -PplatformVersion=xxx`
-    # https://docs.gradle.org/current/userguide/build_environment.html#setting_a_project_property
-    - name: Export Environment Variables
-      id: export-environment-variables
+    - name: Export Elixir Environment Variables
+      id: export-elixir-environment-variables
+      if: ${{ inputs.setup-elixir == 'true' && inputs.elixir-version != '' }}
       shell: bash
       run: |
-        if [ -n "${{ inputs.elixir-version }}" ]; then
-          echo "OTP_RELEASE=${{ inputs.otp-version }}" >> $GITHUB_ENV
-          echo "ERLANG_SDK_HOME=$(erl -eval 'io:format("~s", [code:root_dir()]).' -noshell -run init stop)" >> $GITHUB_ENV
-        fi
-        chmod +x gradlew
-        if [ -n "${{ inputs.idea-version }}" ]; then
-          echo "ORG_GRADLE_PROJECT_platformVersion=${{ inputs.idea-version }}" >> $GITHUB_ENV
-        fi
+        echo "OTP_RELEASE=${{ inputs.otp-version }}" >> $GITHUB_ENV
+        echo "ERLANG_SDK_HOME=$(erl -eval 'io:format("~s", [code:root_dir()]).' -noshell -run init stop)" >> $GITHUB_ENV
 
     - name: Save Elixir cache
       id: cache-elixir-save

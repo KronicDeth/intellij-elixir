@@ -81,7 +81,7 @@ val versionSuffix: String = when {
 
 version = "$basePluginVersion$versionSuffix"
 
-println("Building against IntelliJ Platform version: $actualPlatformVersion")
+println("[elixir-build] platform=$actualPlatformVersion version=$version channel=$publishChannel dynamicEap=$useDynamicEapVersion skipSearchableOptions=$skipSearchableOptions quoterExe=$quoterExe quoterTmpPath=${quoterTmpPath.asFile.absolutePath}")
 
 // --- Global Project Configuration ---
 allprojects {

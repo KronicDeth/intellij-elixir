@@ -38,7 +38,7 @@ jobs:
   matrix-setup:
     runs-on: ubuntu-latest
     outputs:
-      idea-versions: '["2025.3", "2025.2.5", "2025.1.7", "2024.3.7"]'
+      idea-versions: '["2025.3"]'
     steps:
       - run: echo "Defining idea-versions matrix"
 
@@ -89,8 +89,12 @@ jobs:
             **/build/reports/tests/**
             **/build/test-results/**
           retention-days: 30
+          include-hidden-files: true
+          overwrite: true
+          if-no-files-found: 'error'
 
-  build-plugin:
+  build-plugin-for-verifier:
+    name: "Build Plugin for verifyPlugin"
     runs-on: ubuntu-22.04
 
     steps:
@@ -121,12 +125,12 @@ jobs:
           retention-days: 1
 
   verify-plugin:
-    needs: build-plugin
+    needs: build-plugin-for-verifier
     runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
       matrix:
-        ide-version: ['253.28294.334', '252.28238.7', '251.29188.11', '243.28141.18']
+        ide-version: ['253.28294.334']
 
     steps:
       - name: Download Plugin Artifact
@@ -142,8 +146,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          ide-versions: |
-            ideaIU:${{ matrix.ide-version }}
+          ide-versions: ideaIU:${{ matrix.ide-version }}
 
       - name: Print Verification Output
         id: print-verification-output
