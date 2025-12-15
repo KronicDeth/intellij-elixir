@@ -85,6 +85,12 @@ public class HomePath {
         mergeNameSubdirectories(homePathByVersion, Paths.get(System.getProperty("user.home"), ".asdf", "installs").toFile(), name, Function.identity());
     }
 
+    public static void mergeMise(@NotNull Map<Version, String> homePathByVersion,
+                                 @NotNull String name,
+                                 @NotNull Function<File, File> versionPathToHomePath) {
+        mergeNameSubdirectories(homePathByVersion, Paths.get(System.getProperty("user.home"), ".local", "share", "mise", "installs").toFile(), name, versionPathToHomePath);
+    }
+
     public static void mergeHomebrew(@NotNull Map<Version, String> homePathByVersion,
                                      @NotNull String name,
                                      @NotNull Function<File, File> versionPathToHomePath) {
@@ -177,5 +183,81 @@ public class HomePath {
                     return version2.compareTo(version1);
                 }
         );
+    }
+
+    /**
+     * Detects the source/manager of an SDK based on its home path.
+     *
+     * @param homePath the SDK home path
+     * @return the source name (e.g., "mise", "asdf", "Homebrew", "Nix") or null if unknown
+     */
+    @org.jetbrains.annotations.Nullable
+    public static String detectSource(@NotNull String homePath) {
+        if (homePath.contains("/.local/share/mise/installs/")) {
+            return "mise";
+        } else if (homePath.contains("/.asdf/installs/")) {
+            return "asdf";
+        } else if (homePath.contains("/usr/local/Cellar/") || homePath.contains("/opt/homebrew/Cellar/")) {
+            return "Homebrew";
+        } else if (homePath.contains("/nix/store/")) {
+            return "Nix";
+        } else if (homePath.contains("/otp/")) {
+            return "kerl";
+        } else if (new File(homePath, ".kerl_config").exists()) {
+            return "kerl";
+        }
+        return null;
+    }
+
+    /**
+     * Merges Erlang installations from kerl by running `kerl list installations`.
+     * Output format: "VERSION /path/to/installation"
+     */
+    public static void mergeKerl(@NotNull Map<Version, String> homePathByVersion,
+                                 @NotNull Function<File, File> versionPathToHomePath) {
+        // Check if kerl is available
+        if (!isCommandAvailable("kerl")) {
+            return;
+        }
+
+        try {
+            ProcessBuilder pb = new ProcessBuilder("kerl", "list", "installations");
+            pb.redirectErrorStream(true);
+            Process process = pb.start();
+
+            try (java.io.BufferedReader reader = new java.io.BufferedReader(
+                    new java.io.InputStreamReader(process.getInputStream()))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    // Format: "28.2 /Users/josh/bar"
+                    String[] parts = line.split(" ", 2);
+                    if (parts.length == 2) {
+                        String versionString = parts[0].trim();
+                        String path = parts[1].trim();
+                        File homePath = versionPathToHomePath.apply(new File(path));
+                        if (homePath.isDirectory()) {
+                            Version version = parseVersion(versionString);
+                            homePathByVersion.put(version, homePath.getAbsolutePath());
+                        }
+                    }
+                }
+            }
+
+            process.waitFor(5, java.util.concurrent.TimeUnit.SECONDS);
+        } catch (IOException | InterruptedException e) {
+            // kerl failed - silently ignore
+            LOGGER.debug("kerl list installations failed: " + e.getMessage());
+        }
+    }
+
+    private static boolean isCommandAvailable(@NotNull String command) {
+        try {
+            ProcessBuilder pb = new ProcessBuilder("which", command);
+            Process process = pb.start();
+            int exitCode = process.waitFor();
+            return exitCode == 0;
+        } catch (IOException | InterruptedException e) {
+            return false;
+        }
     }
 }

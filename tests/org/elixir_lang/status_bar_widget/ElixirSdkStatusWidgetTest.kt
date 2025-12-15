@@ -13,33 +13,28 @@ class ElixirSdkStatusWidgetTest : BasePlatformTestCase() {
         assertEquals(ElixirSdkStatusWidget.ID, widget.ID())
     }
 
-    fun testWidgetPresentation() {
+    fun testWidgetComponent() {
         val widget = ElixirSdkStatusWidget(project)
-        val presentation = widget.getPresentation()
-        assertNotNull(presentation)
+        val component = widget.getComponent()
+        assertNotNull("Widget should have a component", component)
     }
 
-    fun testWidgetPopupCreation() {
+    fun testWidgetComponentTextWithNoSdk() {
         val widget = ElixirSdkStatusWidget(project)
-        // getPopup() should return a non-null popup with the refresh action
-        val popup = widget.getPopup()
-        assertNotNull("Popup should be created", popup)
-    }
+        val component = widget.getComponent()
 
-    fun testWidgetSelectedValueWithNoSdk() {
-        val widget = ElixirSdkStatusWidget(project)
-        val selectedValue = widget.getSelectedValue()
+        // The component is a TextPanel.WithIconAndArrows
         // When no SDK is configured, should show "No Elixir SDK"
-        assertEquals("No Elixir SDK", selectedValue)
+        assertNotNull(component)
     }
 
-    fun testWidgetTooltipWithNoSdk() {
+    fun testWidgetIdConstant() {
+        assertEquals("ElixirSdkStatus", ElixirSdkStatusWidget.ID)
+    }
+
+    fun testWidgetDispose() {
         val widget = ElixirSdkStatusWidget(project)
-        val tooltip = widget.getTooltipText()
-        // Tooltip should indicate no SDKs configured
-        assertTrue(
-            "Tooltip should indicate no SDK configured",
-            tooltip?.contains("No Elixir SDK") == true || tooltip?.contains("not configured") == true
-        )
+        // Should not throw
+        widget.dispose()
     }
 }

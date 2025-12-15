@@ -2,11 +2,13 @@ package org.elixir_lang.action
 
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.projectRoots.ProjectJdkTable
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.platform.ide.progress.ModalTaskOwner
 import com.intellij.platform.ide.progress.runWithModalProgressBlocking
 import org.elixir_lang.notification.setup_sdk.Notifier
+import org.elixir_lang.status_bar_widget.ElixirSdkRefreshListener
 import org.elixir_lang.sdk.elixir.Type as ElixirSdkType
 import org.elixir_lang.sdk.erlang.Type as ErlangSdkType
 
@@ -70,6 +72,11 @@ class RefreshAllElixirSdksAction : AnAction(
                 }
             }
         }
+
+        // Notify listeners that SDKs have been refreshed (updates status widget)
+        ApplicationManager.getApplication().messageBus
+            .syncPublisher(ElixirSdkRefreshListener.TOPIC)
+            .sdksRefreshed()
 
         // Show success notification with counts
         Notifier.sdkRefreshSuccess(project, refreshedElixirCount, totalElixirSdks, refreshedErlangCount, totalErlangSdks)

@@ -98,8 +98,16 @@ class Type : org.elixir_lang.sdk.erlang_dependent.Type(SerializerExtension.ELIXI
 
     override fun getPresentableName(): String = "Elixir SDK"
 
-    override fun getVersionString(sdkHome: String): String =
-        Release.fromString(File(sdkHome).name)?.version() ?: "Unknown"
+    override fun getVersionString(sdkHome: String): String {
+        val source = HomePath.detectSource(sdkHome)
+        val version = Release.fromString(File(sdkHome).name)?.version() ?: "Unknown"
+        return buildString {
+            if (source != null) {
+                append(source).append(" ")
+            }
+            append("Elixir ").append(version)
+        }
+    }
 
     /**
      * Map of home paths to versions in descending version order so that newer versions are favored.
@@ -110,6 +118,12 @@ class Type : org.elixir_lang.sdk.erlang_dependent.Type(SerializerExtension.ELIXI
         val homePathByVersion: MutableMap<Version, String> = TreeMap(Comparator.reverseOrder())
         if (SystemInfo.isMac) {
             HomePath.mergeASDF(homePathByVersion, "elixir")
+            HomePath.mergeMise(
+                homePathByVersion,
+                "elixir",
+                java.util.function.Function
+                    .identity(),
+            )
             HomePath.mergeHomebrew(
                 homePathByVersion,
                 "elixir",
@@ -135,6 +149,12 @@ class Type : org.elixir_lang.sdk.erlang_dependent.Type(SerializerExtension.ELIXI
             } else if (SystemInfo.isLinux) {
                 putIfDirectory(homePathByVersion, HomePath.UNKNOWN_VERSION, LINUX_DEFAULT_HOME_PATH)
                 putIfDirectory(homePathByVersion, HomePath.UNKNOWN_VERSION, LINUX_MINT_HOME_PATH)
+                HomePath.mergeMise(
+                    homePathByVersion,
+                    "elixir",
+                    java.util.function.Function
+                        .identity(),
+                )
                 HomePath.mergeNixStore(
                     homePathByVersion,
                     NIX_PATTERN,
@@ -201,7 +221,21 @@ ELIXIR_SDK_HOME
     override fun suggestSdkName(
         currentSdkName: String?,
         sdkHome: String,
-    ): String = Release.fromString(File(sdkHome).name)?.toString() ?: "Elixir at $sdkHome"
+    ): String {
+        val source = HomePath.detectSource(sdkHome)
+        val version = Release.fromString(File(sdkHome).name)?.version()
+        return buildString {
+            if (source != null) {
+                append(source).append(" ")
+            }
+            append("Elixir ")
+            if (version != null) {
+                append(version)
+            } else {
+                append("at ").append(sdkHome)
+            }
+        }
+    }
 
     private fun validateSdkHomePath(virtualFile: VirtualFile) {
         val selectedPath = virtualFile.path
@@ -396,12 +430,17 @@ ELIXIR_SDK_HOME
             // Configure internal Erlang SDK - this will now create and fully setup the Erlang SDK synchronously
             configureInternalErlangSdk(sdk, sdkModificator)
 
-            // Use coroutine-based approach for final commit for IntelliJ 2025.2+ compatibility
-            runBlockingCancellable {
-                edtWriteAction {
-                    LOG.debug("Committing SDK changes for ${sdk.name}")
-                    sdkModificator.commitChanges()
-                    LOG.debug("Committed SDK changes for ${sdk.name}")
+            // Commit changes - check if we're already in a write action to avoid deadlock
+            if (ApplicationManager.getApplication().isWriteAccessAllowed) {
+                LOG.debug("Committing SDK changes for ${sdk.name} (already in write action)")
+                sdkModificator.commitChanges()
+            } else {
+                runBlockingCancellable {
+                    edtWriteAction {
+                        LOG.debug("Committing SDK changes for ${sdk.name}")
+                        sdkModificator.commitChanges()
+                        LOG.debug("Committed SDK changes for ${sdk.name}")
+                    }
                 }
             }
         }
@@ -541,29 +580,35 @@ ELIXIR_SDK_HOME
             erlangSdkType: SdkType,
             homePath: String,
         ): Sdk? {
+            // Check version string using homePath directly, not via SDK (which doesn't have path set yet)
+            val versionString = erlangSdkType.getVersionString(homePath)
+            if (versionString == null) {
+                LOG.warn("Cannot create Erlang SDK: getVersionString returned null for $homePath")
+                return null
+            }
+
             val sdkName = erlangSdkType.suggestSdkName("Default " + erlangSdkType.name, homePath)
             val projectJdkImpl = ProjectJdkImpl(sdkName, erlangSdkType)
-            var modificator = projectJdkImpl.sdkModificator
+            val modificator = projectJdkImpl.sdkModificator
             modificator.homePath = homePath
 
-            return if (projectJdkImpl.versionString != null) {
-                // First commit the basic SDK setup
+            // All SDK modifications require write action
+            // Check if we're already in a write action to avoid deadlock
+            if (ApplicationManager.getApplication().isWriteAccessAllowed) {
                 modificator.commitChanges()
-
-                // Add to SDK table and setup paths using coroutine-based approach
+                projectJdkTable.addJdk(projectJdkImpl)
+                erlangSdkType.setupSdkPaths(projectJdkImpl)
+            } else {
                 runBlockingCancellable {
                     edtWriteAction {
+                        modificator.commitChanges()
                         projectJdkTable.addJdk(projectJdkImpl)
-
-                        // Setup SDK paths - this will work properly within the write action
                         erlangSdkType.setupSdkPaths(projectJdkImpl)
                     }
                 }
-
-                projectJdkImpl
-            } else {
-                null
             }
+
+            return projectJdkImpl
         }
 
         private fun createDefaultErlangSdk(

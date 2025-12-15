@@ -2,18 +2,23 @@ package org.elixir_lang.status_bar_widget
 
 import com.intellij.icons.AllIcons
 import com.intellij.ide.DataManager
-import com.intellij.openapi.actionSystem.ActionGroup
+import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.actionSystem.DefaultActionGroup
+import com.intellij.openapi.actionSystem.ex.ActionUtil
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.ProjectJdkTable
 import com.intellij.openapi.projectRoots.Sdk
-import com.intellij.openapi.ui.popup.JBPopup
 import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.openapi.util.Disposer
+import com.intellij.openapi.wm.CustomStatusBarWidget
 import com.intellij.openapi.wm.StatusBar
 import com.intellij.openapi.wm.StatusBarWidget
+import com.intellij.openapi.wm.impl.status.TextPanel
+import com.intellij.ui.ClickListener
+import com.intellij.ui.awt.RelativePoint
 import com.intellij.util.messages.MessageBusConnection
 import org.elixir_lang.Icons
 import org.elixir_lang.action.RefreshAllElixirSdksAction
@@ -21,11 +26,13 @@ import org.elixir_lang.jps.HomePath
 import org.elixir_lang.sdk.elixir.Type
 import org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData
 import org.jetbrains.annotations.NotNull
+import java.awt.Point
+import java.awt.event.MouseEvent
+import javax.swing.JComponent
 
 private val LOG = logger<ElixirSdkStatusWidget>()
 
-class ElixirSdkStatusWidget(@param:NotNull private val project: Project) : StatusBarWidget,
-    StatusBarWidget.MultipleTextValuesPresentation {
+class ElixirSdkStatusWidget(@param:NotNull private val project: Project) : CustomStatusBarWidget {
 
     companion object {
         const val ID = "ElixirSdkStatus"
@@ -33,6 +40,20 @@ class ElixirSdkStatusWidget(@param:NotNull private val project: Project) : Statu
 
     private var statusBar: StatusBar? = null
     private var messageBusConnection: MessageBusConnection? = null
+
+    private val component: TextPanel.WithIconAndArrows by lazy {
+        val panel = TextPanel.WithIconAndArrows()
+        panel.border = StatusBarWidget.WidgetBorder.ICON
+
+        object : ClickListener() {
+            override fun onClick(event: MouseEvent, clickCount: Int): Boolean {
+                showPopup(event)
+                return true
+            }
+        }.installOn(panel, true)
+
+        panel
+    }
 
     // Cached widget presentation data - computed once per update
     @Volatile
@@ -73,7 +94,7 @@ class ElixirSdkStatusWidget(@param:NotNull private val project: Project) : Statu
 
     override fun ID(): String = ID
 
-    override fun getPresentation(): StatusBarWidget.WidgetPresentation = this
+    override fun getComponent(): JComponent = component
 
     override fun install(statusBar: StatusBar) {
         this.statusBar = statusBar
@@ -89,32 +110,51 @@ class ElixirSdkStatusWidget(@param:NotNull private val project: Project) : Statu
         LOG.debug("Disposed ElixirSdkStatusWidget")
     }
 
-    // MultipleTextValuesPresentation implementation
-    override fun getSelectedValue(): String = getCurrentPresentation().text
-
-    override fun getIcon(): javax.swing.Icon? = getCurrentPresentation().icon
-
-    override fun getPopup(): JBPopup? {
-        val actionGroup = object : ActionGroup() {
-            override fun getChildren(e: AnActionEvent?): Array<AnAction> {
-                return arrayOf(RefreshAllElixirSdksAction())
-            }
+    private fun showPopup(e: MouseEvent) {
+        val actionGroup = DefaultActionGroup().apply {
+            add(createAddSdkAction())
+            add(RefreshAllElixirSdksAction())
         }
 
-        return JBPopupFactory.getInstance().createActionGroupPopup(
+        val dataContext = DataManager.getInstance().getDataContext(component)
+        val popup = JBPopupFactory.getInstance().createActionGroupPopup(
             "Elixir SDK",
             actionGroup,
-            DataManager.getInstance().getDataContext(statusBar?.component),
+            dataContext,
             JBPopupFactory.ActionSelectionAid.SPEEDSEARCH,
             false
         )
+
+        // Position popup directly above the widget (same as CPU widget and EditorBasedStatusBarPopup)
+        val dimension = popup.content.preferredSize
+        val at = Point(0, -dimension.height)
+        popup.show(RelativePoint(e.component, at))
+
+        // Dispose popup when widget is disposed
+        Disposer.register(this, popup)
     }
 
-    override fun getTooltipText(): String = getCurrentPresentation().tooltip
+    private fun createAddSdkAction(): AnAction {
+        return object : AnAction("Add Elixir SDK...", "Open Project Structure to add an Elixir SDK", AllIcons.General.Add) {
+            override fun actionPerformed(e: AnActionEvent) {
+                // Open Project Structure dialog (File -> Project Structure)
+                val action = ActionManager.getInstance().getAction("ShowProjectStructureSettings")
+                if (action != null) {
+                    val dataContext = DataManager.getInstance().getDataContext(component)
+                    ActionUtil.invokeAction(action, dataContext, "ElixirSdkStatusWidget", null, null)
+                }
+            }
+        }
+    }
 
     private fun updateWidget() {
-        // Invalidate cached presentation when updating
         cachedPresentation = null
+        val presentation = getCurrentPresentation()
+
+        component.text = presentation.text
+        component.icon = presentation.icon
+        component.toolTipText = presentation.tooltip
+
         statusBar?.updateWidget(ID)
     }
 
@@ -136,7 +176,7 @@ class ElixirSdkStatusWidget(@param:NotNull private val project: Project) : Statu
             )
 
             is SdkStatus.Warning -> WidgetPresentation(
-                text = "Elixir: ${status.elixirVersion} ⚠",
+                text = "Elixir: ${status.elixirVersion} !",
                 icon = Icons.LANGUAGE,
                 tooltip = "Elixir SDK: ${status.elixirVersion} (Warning: ${status.issues.joinToString(", ")})"
             )
@@ -196,6 +236,11 @@ class ElixirSdkStatusWidget(@param:NotNull private val project: Project) : Statu
                     updateWidget()
                 }
             })
+
+        // Listen for SDK refresh events (from RefreshAllElixirSdksAction)
+        messageBusConnection?.subscribe(ElixirSdkRefreshListener.TOPIC, ElixirSdkRefreshListener {
+            updateWidget()
+        })
     }
 
     private fun detectSdkStatus(): SdkStatus {
