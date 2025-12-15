@@ -46,11 +46,18 @@ class Type : SdkType("Erlang SDK for Elixir SDK") {
             version: Release?,
         ): String =
             buildString {
+                val source = HomePath.detectSource(sdkHome)
+                if (source != null) {
+                    append(source).append(" ")
+                }
                 append("Erlang for Elixir ")
                 if (version != null) {
-                    append(version.otpRelease)
+                    // Use directory name for version if it's more specific (e.g., "28.3" vs "28")
+                    val dirVersion = File(sdkHome).name
+                    val displayVersion = if (dirVersion.startsWith(version.otpRelease)) dirVersion else version.otpRelease
+                    append(displayVersion)
                 } else {
-                    append(" at ").append(sdkHome)
+                    append("at ").append(sdkHome)
                 }
             }
 
@@ -78,6 +85,8 @@ class Type : SdkType("Erlang SDK for Elixir SDK") {
             when {
                 SystemInfo.isMac -> {
                     HomePath.mergeASDF(homePathByVersion, "erlang")
+                    HomePath.mergeMise(homePathByVersion, "erlang", java.util.function.Function.identity())
+                    HomePath.mergeKerl(homePathByVersion, java.util.function.Function.identity())
                     HomePath.mergeHomebrew(homePathByVersion, "erlang", VERSION_PATH_TO_HOME_PATH)
                     HomePath.mergeNixStore(homePathByVersion, NIX_PATTERN, VERSION_PATH_TO_HOME_PATH)
                 }
@@ -89,6 +98,8 @@ class Type : SdkType("Erlang SDK for Elixir SDK") {
                 SystemInfo.isLinux -> {
                     putIfDirectory(homePathByVersion, HomePath.UNKNOWN_VERSION, LINUX_DEFAULT_HOME_PATH)
                     putIfDirectory(homePathByVersion, HomePath.UNKNOWN_VERSION, LINUX_MINT_HOME_PATH)
+                    HomePath.mergeMise(homePathByVersion, "erlang", java.util.function.Function.identity())
+                    HomePath.mergeKerl(homePathByVersion, java.util.function.Function.identity())
                     HomePath.mergeTravisCIKerl(homePathByVersion) { it }
                     HomePath.mergeNixStore(homePathByVersion, NIX_PATTERN, VERSION_PATH_TO_HOME_PATH)
                 }
@@ -148,7 +159,19 @@ class Type : SdkType("Erlang SDK for Elixir SDK") {
         sdkHome: String,
     ): String = getDefaultSdkName(sdkHome, detectSdkVersion(sdkHome))
 
-    override fun getVersionString(sdkHome: String): String? = detectSdkVersion(sdkHome)?.otpRelease
+    override fun getVersionString(sdkHome: String): String? {
+        val detectedVersion = detectSdkVersion(sdkHome)?.otpRelease ?: return null
+        val source = HomePath.detectSource(sdkHome)
+        // Use directory name for version if it's more specific (e.g., "28.3" vs "28")
+        val dirVersion = File(sdkHome).name
+        val displayVersion = if (dirVersion.startsWith(detectedVersion)) dirVersion else detectedVersion
+        return buildString {
+            if (source != null) {
+                append(source).append(" ")
+            }
+            append("Erlang ").append(displayVersion)
+        }
+    }
 
     override fun createAdditionalDataConfigurable(
         sdkModel: SdkModel,

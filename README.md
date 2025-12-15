@@ -233,6 +233,11 @@ Table of Contents[![Backers on Open Collective](https://opencollective.com/intel
                   * [Time](#time)
                   * [Visibility](#visibility)
                * [Call to Element](#call-to-element)
+      * [Experimental Features](#experimental-features)
+         * [~H Sigil HTML Injection](#h-sigil-html-injection-support)
+            * [How to enable ~H sigil HTML Injection](#how-to-enable-h-sigil-html-injection)
+            * [Providing feedback and reporting issues for the ~H Sigil HTML Injection Experimental Feature](#providing-feedback-and-reporting-issues-for-the-h-sigil-html-injection-experimental-feature))
+            * [Removing the green background for Injected language fragments](#removing-the-green-background-for-injected-language-fragments)
       * [Installation](#installation)
          * [Stable releases](#stable-releases)
             * [Inside IDE using JetBrains repository](#inside-ide-using-jetbrains-repository)
@@ -5760,6 +5765,79 @@ The Visibility icons indicated whether the element is usable outside its definin
     </tr>
   </tbody>
 </table>
+
+## Experimental Features
+
+As we develop new functionality that requires additional testing and feedback, we offer an opt-in system for Experimental Features via the `Elixir Experimental Settings` page.
+
+You can view the currently available Experimental Features by navigating to `Languages & Frameworks` and selecting `Elixir Experimental Settings`, which is marked with the [BETA icon](https://plugins.jetbrains.com/docs/intellij/settings-guide.html#l6vycg_378). Alternatively, you can access it directly via [Settings | Languages & Frameworks | Elixir Experimental Settings](jetbrains://Idea/settings?name=Languages+%26+Frameworks--Elixir+Experimental+Settings).
+
+![Elixir Experimental Settings UI](/screenshots/experimental/elixir-experimental-settings-ui.png)
+
+### ~H Sigil HTML Injection Support
+
+**Experimental Feature – available from version 2024.3+ (243.21565.180) and later**
+
+When working with Phoenix Live View templates within the IntelliJ Elixir plugin, you'll notice that sigils such as `~H` are rendered as strings, which means that out of the box there is no HTML syntax highlighting or autocomplete when working with Phoenix Live View, which is used for writing HEEx templates inside source files. `HEEx` is a HTML-aware and component-friendly extension of Elixir Embedded language, this can make editing templates tedious.
+
+This Experimental Feature introduces preliminary HTML injection support within `~H` sigils, enabling HTML syntax highlighting and autocomplete.
+
+**Before, you would see this rendered as a string:**
+
+![~H shows as a string](/screenshots/experimental/h-sigil-html-before.png?raw=true "Shown as a string")
+
+**After enabling ~H Sigil HTML Injection:**
+
+![~H now shows with HTML injection](/screenshots/experimental/h-sigil-html.png?raw=true "HTML injection for autocomplete and syntax highlighting for the ~H sigil")
+
+> [!TIP]
+> The [Phoenix LiveView Documentation on sigil_H](https://hexdocs.pm/phoenix_live_view/1.0.3/Phoenix.Component.html#sigil_H/2) is a fantastic resource for understanding how the `~H` sigil works.
+
+**Note:** Elixir code completion within HTML attributes is not yet supported.
+
+However, it does open the door, thanks to [MultihostInjector](https://plugins.jetbrains.com/docs/intellij/language-injection.html#multihostinjector), we could possibly mix HTML+Elixir, allowing autocomplete of Elixir within HTML.. if anyone is daring enough to wrangle the MultihostInjector API!
+
+#### IntelliLang Plugin Requirement
+
+This functionality has a dependency on the [IntelliLang](https://plugins.jetbrains.com/plugin/13374-intellilang) plugin, which comes bundled with both IntelliJ Community/Ultimate, and other IDEs.
+
+However this is marked as an optional dependency for the plugin, and does not need to be enabled if you are not using the functionality. THe code won't run, and you won't see injections.
+
+More information about [Language Injections](https://www.jetbrains.com/help/idea/using-language-injections.html) is available in the IntelliJ IDEA documentation.
+
+#### How to Enable ~H Sigil HTML Injection
+
+To enable support for HTML syntax highlighting and autocomplete:
+
+1. Open [Settings](https://www.jetbrains.com/help/idea/configure-project-settings.html).
+2. Navigate to [Settings | Languages & Frameworks | Elixir Experimental Settings](jetbrains://Idea/settings?name=Languages+%26+Frameworks--Elixir+Experimental+Settings).
+3. Enable the **~H Sigil HTML Injection** feature.
+
+![Settings | Languages & Frameworks | Elixir Experimental Settings](/screenshots/experimental/elixir-experimental-settings-ui.png?raw=true "Elixir Experimental Settings UI")
+
+> [!NOTE]
+> This Experimental Feature is currently enabled on a **per-project** basis. We are considering adding application-level support or enabling it by default in future versions based on feedback
+
+#### Providing feedback and reporting issues for the ~H Sigil HTML Injection Experimental Feature
+
+Have feedback or encountered issues? Please share your thoughts, Exception Stacktraces on the dedicated [**\[Experimental Feature\] ~H Sigil HTML Injection #3678**](https://github.com/KronicDeth/intellij-elixir/issues/3678).
+
+#### Removing the Green Background for Injected Language Fragments
+
+By default, IntelliLang highlights injected content with a green background, which can be changed by within [Color Scheme settings](https://www.jetbrains.com/help/idea/settings-colors-and-fonts.html).
+
+However, note that this change will apply to **all injected language fragments**, not just `~H` sigils HTML injections.
+
+> We are investigating the use of [InjectionBackgroundSuppressor](https://github.com/JetBrains/intellij-community/blob/idea/243.21565.193/platform/analysis-impl/src/com/intellij/psi/impl/source/tree/injected/InjectionBackgroundSuppressor.java) to selectively disable background highlighting, but this is still a work in progress.
+
+If you're okay with disabling the background for all injections:
+
+1. Open [Settings](https://www.jetbrains.com/help/idea/configure-project-settings.html).
+2. Navigate to [Settings | Editor | Color Scheme | General](jetbrains://Idea/settings?name=Editor--Color+Scheme).
+3. Under the `Code` section, find `Injected Language Fragment`.
+4. Uncheck **Background** or change the colour to your preference.
+
+![How to remove the green background for Injected languge support](/screenshots/experimental/disable-injection-green-background.png?raw=true "Color Settings")
 
 ## Installation
 
