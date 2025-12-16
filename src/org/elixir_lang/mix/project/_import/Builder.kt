@@ -19,7 +19,7 @@ import com.intellij.openapi.roots.ui.configuration.ModulesProvider
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.openapi.vfs.newvfs.impl.VirtualDirectoryImpl
+import com.intellij.openapi.vfs.newvfs.NewVirtualFile
 import com.intellij.packaging.artifacts.ModifiableArtifactModel
 import com.intellij.projectImport.ProjectImportBuilder
 import org.elixir_lang.configuration.ElixirCompilerSettings
@@ -183,7 +183,7 @@ class Builder : ProjectImportBuilder<OtpApp>() {
     private fun scanProjectRoot(projectRoot: VirtualFile) {
         val unitTestMode = ApplicationManager.getApplication().isUnitTestMode
 
-        if (!unitTestMode && projectRoot is VirtualDirectoryImpl) {
+        if (!unitTestMode && projectRoot is NewVirtualFile) {
             projectRoot.refreshAndFindChild("deps")
         }
 
