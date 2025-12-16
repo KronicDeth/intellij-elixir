@@ -27,7 +27,7 @@ jobs:
 
       - name: Build with Gradle
         id: build-plugin
-        run: ./gradlew buildPlugin --no-scan
+        run: ./gradlew buildPlugin --no-scan -PpublishChannels=default -PisRelease=true
 
       - name: Export ASSET_PATH
         run: echo "ASSET_PATH=$(ls -1 build/distributions/intellij-elixir-*.zip)" >> $GITHUB_ENV
