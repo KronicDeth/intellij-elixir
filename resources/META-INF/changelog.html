@@ -1,16 +1,35 @@
 <html>
 <body>
 
-<h1>v22.0.0-EAP</h1>
+<h1>v22.0.0</h1>
 <ul>
+    <li>
+        <p>Incompatible Changes</p>
+        <ul>
+            <li>This release supports 2025.3+ IDEs only (253.xxx).</li>
+        </ul>
+    </li>
     <li>
         <p>Enhancements</p>
         <ul>
             <li>
-                <a href="https://github.com/KronicDeth/intellij-elixir/pull/3712">
-                    #3712 Support Jetbrains 2025.1+ (2025.2+), Upgrade Kotlin to 2.2.10, as it's deprecated in IntelliJ 2025.1+, various deprecations are also fixed,
-                    fixed adding Erlang/Elixir SDKs in 2025.1+ IDEs.
+                <a href="https://github.com/KronicDeth/intellij-elixir/pull/3696">
+                    #3696 HEEx support with .heex file type recognition, syntax highlighting for {@assigns} and {expressions}, relative component support (&lt;.component&gt; tags), and CSS/JavaScript injection in &lt;style&gt; and &lt;script&gt; tags.
+                </a> - <a href="https://github.com/mwnciau">@mwnciau</a>
+            </li>
+            <li>
+                Language Injection for literal sigils (~H, ~r, etc.) - <a href="https://github.com/polymorfiq">@polymorfiq</a>
+            </li>
+            <li>
+                <a href="https://github.com/KronicDeth/intellij-elixir/pull/3711">
+                    #3711 Status Bar Widget showing the current project's Elixir SDK version, and "Refresh Elixir SDK Classpaths" action to fix SDK classpath issues.
                 </a> - <a href="https://github.com/joshuataylor">@joshuataylor</a>
+            </li>
+            <li>
+                Compatibility fixes for 2025.1+ - <a href="https://github.com/sh41">@sh41</a>
+            </li>
+            <li>
+                Extensive EDT threading fixes for 2025.2+ compatibility.
             </li>
         </ul>
     </li>
