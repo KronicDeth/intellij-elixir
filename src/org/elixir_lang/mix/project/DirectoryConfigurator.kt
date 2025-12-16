@@ -21,7 +21,6 @@ import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.platform.PlatformProjectOpenProcessor.Companion.runDirectoryProjectConfigurators
 import com.intellij.projectImport.ProjectAttachProcessor
-import com.intellij.util.PlatformUtils
 import kotlinx.coroutines.runBlocking
 import org.elixir_lang.DepsWatcher
 import org.elixir_lang.Facet
@@ -102,7 +101,7 @@ class DirectoryConfigurator : com.intellij.platform.DirectoryProjectConfigurator
     }
 
     private fun configureDescendantOtpApp(rootProject: Project, otpApp: OtpApp) {
-        if (!PlatformUtils.isGoIde() && ProjectAttachProcessor.canAttachToProject()) {
+        if (System.getProperty("idea.platform.prefix") != "GoLand" && ProjectAttachProcessor.canAttachToProject()) {
             newProject(otpApp)?.let { otpAppProject ->
                 LOG.debug("attaching $otpAppProject to $rootProject")
                 attachToProject(rootProject, Paths.get(otpApp.root.path))
@@ -141,11 +140,11 @@ class DirectoryConfigurator : com.intellij.platform.DirectoryProjectConfigurator
             null
         } else {
             val path = otpApp.root.path.let { Paths.get(it) }
-            val openProjectTask = OpenProjectTask {
-                isNewProject = true
-                useDefaultProjectAsTemplate = false
-                projectName = otpApp.name
-            }
+            val openProjectTask = OpenProjectTask
+                .build()
+                .asNewProject()
+                .withProjectName(otpApp.name)
+                .copy(useDefaultProjectAsTemplate = false)
 
             LOG.debug("Creating new project at $path with isNewProject: ${openProjectTask.isNewProject} and useDefaultProjectAsTemplate: ${openProjectTask.useDefaultProjectAsTemplate} and projectName: ${openProjectTask.projectName}")
 
