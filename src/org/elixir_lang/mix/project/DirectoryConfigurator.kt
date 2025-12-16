@@ -47,7 +47,7 @@ class DirectoryConfigurator : com.intellij.platform.DirectoryProjectConfigurator
         var foundOtpApps: List<OtpApp> = emptyList()
         LOG.debug("configuring $baseDir for project $project, created with wizard: $isProjectCreatedWithWizard")
 
-        ProgressManager.getInstance().run(object : Task.Modal(project, "Scanning Mix Projects", true) {
+        ProgressManager.getInstance().run(object : Task.Backgroundable(project, "Scanning Mix Projects", true) {
             override fun run(indicator: ProgressIndicator) {
                 foundOtpApps = org.elixir_lang.mix.Project.findOtpApps(baseDir, indicator)
             }
@@ -92,7 +92,7 @@ class DirectoryConfigurator : com.intellij.platform.DirectoryProjectConfigurator
             }
 
             ProgressManager.getInstance()
-                .run(object : Task.Modal(project, "Scanning dependencies for Libraries", true) {
+                .run(object : Task.Backgroundable(project, "Scanning dependencies for Libraries", true) {
                     override fun run(indicator: ProgressIndicator) {
                         DepsWatcher(project).syncLibraries(indicator)
                     }
@@ -107,7 +107,7 @@ class DirectoryConfigurator : com.intellij.platform.DirectoryProjectConfigurator
                 attachToProject(rootProject, Paths.get(otpApp.root.path))
 
                 LOG.debug("scanning libraries for newly attached project for OTP app ${otpApp.name}")
-                ProgressManager.getInstance().run(object : Task.Modal(
+                ProgressManager.getInstance().run(object : Task.Backgroundable(
                     otpAppProject,
                     "Scanning mix.exs to connect libraries for newly attached project for OTP app ${otpApp.name}",
                     true
