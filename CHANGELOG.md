@@ -1,10 +1,19 @@
 # Changelog
 
-## v22.0.0 (Unreleased)
+## v22.0.0
+
+### Breaking changes
+* This release supports 2025.3+ IDEs only (253.xxx).
+
 ### Enhancements
-* [#3712](https://github.com/KronicDeth/intellij-elixir/pull/3712) - [@joshuataylor](https://github.com/joshuataylor)
-  * Upgrade Kotlin to 2.2.10, as it's deprecated in IntelliJ 2025.1+, various deprecations are also fixed.
-  * Fixed adding Erlang/Elixir SDKs in 2025.1+ IDEs.
+* [#3696](https://github.com/KronicDeth/intellij-elixir/pull/3696) - [@mwnciau](https://github.com/mwnciau)
+  * HEEx support with `.heex` file type recognition, syntax highlighting for `{@assigns}` and `{expressions}`, relative component support (`<.component>` tags), and CSS/JavaScript injection in `<style>` and `<script>` tags.
+* Language Injection for literal sigils (`~H`, `~r`, etc.) - [@polymorfiq](https://github.com/polymorfiq)
+* [#3711](https://github.com/KronicDeth/intellij-elixir/pull/3711) - [@joshuataylor](https://github.com/joshuataylor)
+  * Status Bar Widget showing the current project's Elixir SDK version.
+  * "Refresh Elixir SDK Classpaths" action to fix SDK classpath issues.
+* Compatibility fixes for 2025.1+ (understatement of changes, countless amount of changes to help improve things, thank you so micj) - [@sh41](https://github.com/sh41)
+* Extensive EDT threading fixes for 2025.2+ compatibility.
 
 ## v21.0.0
 ### Enhancements
