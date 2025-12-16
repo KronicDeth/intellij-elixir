@@ -7,7 +7,7 @@ import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.wm.StatusBar
 import com.intellij.openapi.wm.StatusBarWidget
 import com.intellij.openapi.wm.StatusBarWidgetFactory
-import com.intellij.openapi.wm.WindowManager
+import com.intellij.openapi.wm.impl.status.widget.StatusBarWidgetsManager
 import com.intellij.util.messages.MessageBusConnection
 import org.elixir_lang.settings.ElixirExperimentalSettings
 import org.elixir_lang.settings.ElixirExperimentalSettingsListener
@@ -62,46 +62,24 @@ class ElixirSdkStatusWidgetFactory : StatusBarWidgetFactory {
                     LOG.debug("Settings changed: statusBarWidget ${oldState.enableStatusBarWidget} -> ${newState.enableStatusBarWidget}")
                     if (oldState.enableStatusBarWidget != newState.enableStatusBarWidget) {
                         LOG.debug("Status bar widget setting changed, updating widget visibility")
-                        updateWidgetVisibility(newState.enableStatusBarWidget)
+                        updateWidgetVisibility()
                     }
                 }
             }
         )
     }
 
-    private fun updateWidgetVisibility(shouldShow: Boolean) {
+    private fun updateWidgetVisibility() {
         ApplicationManager.getApplication().invokeLater {
             for (project in ProjectManager.getInstance().openProjects) {
                 if (!project.isDisposed) {
-                    updateProjectWidget(project, shouldShow)
+                    updateProjectWidget(project)
                 }
             }
         }
     }
 
-    private fun updateProjectWidget(project: Project, shouldShow: Boolean) {
-        val statusBar = WindowManager.getInstance().getStatusBar(project)
-        if (statusBar != null) {
-            val widget = statusBar.getWidget(ElixirSdkStatusWidget.ID) as ElixirSdkStatusWidget?
-
-            LOG.debug("Project ${project.name}: widget exists=${widget != null}, shouldShow=$shouldShow")
-
-            when {
-                shouldShow && widget == null -> {
-                    LOG.debug("Adding widget for project: ${project.name}")
-                    val newWidget = createWidget(project)
-                    statusBar.addWidget(newWidget, "before Position")
-                }
-
-                !shouldShow && widget != null -> {
-                    LOG.debug("Removing widget for project: ${project.name}")
-                    statusBar.removeWidget(ElixirSdkStatusWidget.ID)
-                }
-
-                else -> {
-                    LOG.debug("Widget state already correct for project: ${project.name}")
-                }
-            }
-        }
+    private fun updateProjectWidget(project: Project) {
+        project.getService(StatusBarWidgetsManager::class.java)?.updateWidget(this)
     }
 }
