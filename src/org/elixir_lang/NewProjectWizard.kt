@@ -1,14 +1,15 @@
 package org.elixir_lang
 
-import com.intellij.ide.wizard.LanguageNewProjectWizard
-import com.intellij.ide.wizard.NewProjectWizardLanguageStep
 import com.intellij.ide.wizard.NewProjectWizardStep
+import com.intellij.ide.wizard.language.LanguageGeneratorNewProjectWizard
 import org.elixir_lang.new_project_wizard.Step
+import javax.swing.Icon
 
-class NewProjectWizard : LanguageNewProjectWizard {
+class NewProjectWizard : LanguageGeneratorNewProjectWizard {
     override val name: String = "Elixir"
+    override val icon: Icon = Icons.LANGUAGE
     override val ordinal: Int = Int.MAX_VALUE
 
-    override fun createStep(parent: NewProjectWizardLanguageStep): NewProjectWizardStep =
+    override fun createStep(parent: NewProjectWizardStep): NewProjectWizardStep =
         Step(parent)
 }
