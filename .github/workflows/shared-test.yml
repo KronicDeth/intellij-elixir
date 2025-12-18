@@ -81,7 +81,7 @@ jobs:
 
       - name: Upload Test Reports
         id: upload-test-reports
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         if: ${{ always() && inputs.upload-reports }}
         with:
           name: test-reports-${{ matrix.idea-version }}
@@ -118,7 +118,7 @@ jobs:
 
       - name: Upload Plugin Artifact
         id: upload-plugin
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: plugin-artifact
           path: build/distributions/*.zip
@@ -157,7 +157,7 @@ jobs:
 
       - name: Upload Verify Reports
         id: upload-verify-reports
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         if: ${{ always() && inputs.upload-reports }}
         with:
           name: verify-plugin-reports-${{ matrix.ide-version }}
