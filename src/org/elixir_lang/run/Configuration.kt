@@ -3,6 +3,7 @@ package org.elixir_lang.run
 import com.intellij.execution.CommonProgramRunConfigurationParameters
 import com.intellij.execution.ExternalizablePath
 import com.intellij.execution.configurations.ConfigurationFactory
+import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.configurations.ModuleBasedConfiguration
 import com.intellij.execution.configurations.ParametersList
 import com.intellij.openapi.module.ModuleManager
@@ -17,6 +18,10 @@ import org.elixir_lang.mix.ensureMostSpecificSdk
 import org.elixir_lang.run.configuration.Module
 import org.jdom.Element
 import java.io.File
+
+interface HasCommandLine {
+    fun commandLine(): GeneralCommandLine
+}
 
 fun ensureWorkingDirectory(project: Project) = project.basePath!!
 

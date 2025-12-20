@@ -22,6 +22,7 @@ import org.jdom.Element
 
 class Configuration(name: String, project: Project) :
         org.elixir_lang.run.Configuration(name, project, Factory),
+        HasCommandLine,
         Debuggable<Configuration>,
         RunConfigurationWithSuppressedDefaultRunAction,
         RunConfigurationWithSuppressedDefaultDebugAction {
@@ -89,7 +90,7 @@ class Configuration(name: String, project: Project) :
 
     var mixTestArgumentList: MutableList<String> = mutableListOf()
 
-    fun commandLine(): GeneralCommandLine {
+    override fun commandLine(): GeneralCommandLine {
         val workingDirectory = ensureWorkingDirectory()
         val module = ensureModule()
         val sdk = ensureMostSpecificSdk(module)
