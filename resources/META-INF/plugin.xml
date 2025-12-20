@@ -29,6 +29,7 @@
         <statusBarWidgetFactory
                 id="ElixirSdkStatus"
                 implementation="org.elixir_lang.status_bar_widget.ElixirSdkStatusWidgetFactory"/>
+        <backgroundPostStartupActivity implementation="org.elixir_lang.status_bar_widget.ElixirSdkStatusWidgetStartupActivity"/>
 
         <!--        <errorHandler implementation="org.elixir_lang.errorreport.Submitter"/>-->
         <errorHandler implementation="com.intellij.diagnostic.JetBrainsMarketplaceErrorReportSubmitter"/>
