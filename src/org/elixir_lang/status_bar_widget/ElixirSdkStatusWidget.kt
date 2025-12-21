@@ -245,7 +245,10 @@ class ElixirSdkStatusWidget(@param:NotNull private val project: Project) : Custo
 
     private fun detectSdkStatus(): SdkStatus {
         val elixirSdk = Type.mostSpecificSdk(project) ?: return SdkStatus.NotConfigured
-        val elixirVersion = elixirSdk.versionString ?: "Unknown"
+        val versionString = elixirSdk.versionString ?: "Unknown"
+
+        // Add WSL distribution suffix if this is a WSL SDK
+        val elixirVersion = org.elixir_lang.sdk.Type.appendWslSuffix(versionString, elixirSdk.homePath)
 
         if (!isValidSdk(elixirSdk)) {
             return SdkStatus.Partial(elixirSdk, elixirVersion, "Invalid Elixir SDK")
