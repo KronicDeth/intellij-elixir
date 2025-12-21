@@ -547,7 +547,7 @@ ELIXIR_SDK_HOME
         }
 
         private fun getDefaultDocumentationUrl(version: Release?): String? =
-            if (version == null) null else "http://elixir-lang.org/docs/stable/elixir/"
+            if (version == null) null else "https://elixir-lang.org/docs/stable/elixir/"
 
         private fun defaultErlangSdkHomePath(): String? =
             // Will suggest newest version, unlike `intellij-erlang`
