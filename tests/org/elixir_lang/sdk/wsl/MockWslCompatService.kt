@@ -17,8 +17,13 @@ class MockWslCompatService : WslCompatService {
             return false
         }
 
-        // In mock mode, check for WSL-like patterns
-        return path.startsWith("\\\\wsl$\\") || path.startsWith("//wsl$/")
+        // In mock mode, check for WSL-like patterns (both old and new formats)
+        // Old format: \\wsl$\Ubuntu\... or //wsl$/Ubuntu/...
+        // New format: \\wsl.localhost\Ubuntu-24.04\... or //wsl.localhost/Ubuntu-24.04/...
+        return path.startsWith("\\\\wsl$\\") ||
+               path.startsWith("//wsl$/") ||
+               path.startsWith("\\\\wsl.localhost\\") ||
+               path.startsWith("//wsl.localhost/")
     }
 
     override fun patchCommandLine(commandLine: GeneralCommandLine, sdkHome: String?): Boolean {
@@ -31,9 +36,17 @@ class MockWslCompatService : WslCompatService {
             return null
         }
 
-        // In mock mode, we don't return a real distribution
-        // Tests should mock this separately if needed
-        return null
+        // Return a mock distribution for testing
+        // Extract distribution name from path if possible
+        val distroName = when {
+            path?.contains("Ubuntu-24.04") == true -> "Ubuntu-24.04"
+            path?.contains("Ubuntu") == true -> "Ubuntu"
+            else -> "WSL"
+        }
+
+        return org.mockito.Mockito.mock(WSLDistribution::class.java).also {
+            org.mockito.Mockito.`when`(it.msId).thenReturn(distroName)
+        }
     }
 
     override fun parseWindowsUncPath(windowsUncPath: String?): String? {

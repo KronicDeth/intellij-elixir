@@ -229,7 +229,7 @@ class AdditionalDataConfigurable(
 
     @Throws(ConfigurationException::class)
     override fun apply() {
-        writeInternalErlangSdk(internalErlangSdksComboBox.selectedItem as Sdk)
+        writeInternalErlangSdk(internalErlangSdksComboBox.selectedItem as? Sdk)
         modified = false
     }
 

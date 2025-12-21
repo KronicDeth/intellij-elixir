@@ -1,6 +1,6 @@
 package org.elixir_lang.jps.sdk_type;
 
-import com.intellij.openapi.util.SystemInfo;
+import org.elixir_lang.jps.HomePath;
 import org.elixir_lang.jps.model.SdkProperties;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -24,12 +24,12 @@ public class Elixir extends JpsSdkType<SdkProperties> implements JpsElementTypeW
 
   @NotNull
   public static File getScriptInterpreterExecutable(@NotNull String sdkHome){
-    return getSdkExecutable(sdkHome, SCRIPT_INTERPRETER);
+    return new File(new File(sdkHome, "bin").getAbsolutePath(), HomePath.getExecutableFileName(sdkHome, SCRIPT_INTERPRETER, ".bat"));
   }
 
   @NotNull
   public static File getByteCodeCompilerExecutable(@NotNull String sdkHome){
-    return getSdkExecutable(sdkHome, BYTECODE_COMPILER);
+    return new File(new File(sdkHome, "bin").getAbsolutePath(), HomePath.getExecutableFileName(sdkHome, BYTECODE_COMPILER, ".bat"));
   }
 
   @NotNull
@@ -56,28 +56,15 @@ public class Elixir extends JpsSdkType<SdkProperties> implements JpsElementTypeW
 
   @NotNull
   public static File mixFile(@NotNull String sdkHome) {
-    return sdkScript(sdkHome, ELIXIR_TOOL_MIX);
+    return new File(new File(sdkHome, "bin").getAbsolutePath(), ELIXIR_TOOL_MIX);
   }
 
   @NotNull
   public static File getIExExecutable(@NotNull String sdkHome){
-    return getSdkExecutable(sdkHome, ELIXIR_TOOL_IEX);
+    return new File(new File(sdkHome, "bin").getAbsolutePath(), HomePath.getExecutableFileName(sdkHome, ELIXIR_TOOL_IEX, ".bat"));
   }
 
-  @NotNull
-  private static File getSdkExecutable(@NotNull String sdkHome, @NotNull String command){
-    return new File(new File(sdkHome, "bin").getAbsolutePath(), getExecutableFileName(command));
-  }
 
-  @NotNull
-  private static File sdkScript(@NotNull String sdkHome, @NotNull String command) {
-    return new File(new File(sdkHome, "bin").getAbsolutePath(), command);
-  }
-
-  @NotNull
-  public static String getExecutableFileName(@NotNull String executableName){
-    return SystemInfo.isWindows ? executableName + ".bat" : executableName;
-  }
 
   @NotNull
   @Override

@@ -3,6 +3,7 @@ package org.elixir_lang
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.openapi.projectRoots.Sdk
 import org.elixir_lang.jps.sdk_type.Elixir
+import org.elixir_lang.sdk.wsl.wslCompat
 
 object Mix {
     /**
@@ -30,6 +31,6 @@ object Mix {
 
     private fun addMix(commandLine: GeneralCommandLine, sdk: Sdk) {
         val mixPath = Elixir.mixPath(sdk.homePath)
-        commandLine.addParameter(mixPath)
+        commandLine.addParameter(wslCompat.maybeConvertPathForWsl(mixPath, sdk.homePath))
     }
 }

@@ -1,16 +1,18 @@
 package org.elixir_lang.jps;
 
+import com.intellij.execution.wsl.WslPath;
 import com.intellij.notification.NotificationGroupManager;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.util.Version;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -32,16 +34,20 @@ public class HomePath {
     public static void eachEbinPath(@NotNull String homePath, @NotNull Consumer<Path> ebinPathConsumer) {
         Path lib = Paths.get(homePath, "lib");
 
-        try (DirectoryStream<Path> libDirectoryStream = Files.newDirectoryStream(lib, path -> Files.isDirectory(path))) {
-            libDirectoryStream.forEach(
-                    app -> {
-                        try (DirectoryStream<Path> ebinDirectoryStream = Files.newDirectoryStream(app, "ebin")) {
-                            ebinDirectoryStream.forEach(ebinPathConsumer);
-                        } catch (IOException ioException) {
-                            LOGGER.error(ioException);
-                        }
+        // For WSL paths, newDirectoryStream translates them to Linux paths, and there's no way to stop it. It's also the
+        // most performant way of dealing with files so we prefer to keep it and then fix it with `resolve` to get back to the UNC path.
+        DirectoryStream.Filter<Path> filter = path -> wslSafeIsDirectory(lib, path);
+
+        try (DirectoryStream<Path> libDirectoryStream = Files.newDirectoryStream(lib, filter)) {
+            for (Path app : libDirectoryStream) {
+                try (DirectoryStream<Path> ebinDirectoryStream = Files.newDirectoryStream(app, "ebin")) {
+                    for (Path ebinPath : ebinDirectoryStream) {
+                        ebinPathConsumer.accept(ebinPath);
                     }
-            );
+                } catch (IOException ioException) {
+                    LOGGER.error("IOException processing app " + app, ioException);
+                }
+            }
         } catch (NoSuchFileException noSuchFileException) {
             NotificationGroupManager
                     .getInstance()
@@ -49,15 +55,31 @@ public class HomePath {
                     .createNotification(noSuchFileException.getFile() + " does not exist, so its ebin paths cannot be enumerated.", NotificationType.ERROR)
                     .notify();
         } catch (IOException ioException) {
-            LOGGER.error(ioException);
+            LOGGER.error("IOException opening DirectoryStream for lib", ioException);
         }
+    }
+
+    /**
+     * Translate files back to WSL UNC paths if appropriate before checking whether they are a directory
+     *
+     * @param basePath the parent path with full UNC
+     * @param path     the (maybe) translated path to check.
+     * @return boolean
+     */
+    private static boolean wslSafeIsDirectory(Path basePath, Path path) {
+        return Files.isDirectory(maybeTranslateToUnc(basePath, path));
+    }
+
+    private static Path maybeTranslateToUnc(Path basePath, Path path) {
+        return basePath.resolve(path.getFileName().toString());
     }
 
     public static boolean hasEbinPath(@NotNull String homePath) {
         Path lib = Paths.get(homePath, "lib");
         boolean hasEbinPath = false;
 
-        try (DirectoryStream<Path> libDirectoryStream = Files.newDirectoryStream(lib, path -> Files.isDirectory(path))) {
+        DirectoryStream.Filter<Path> filter = path -> wslSafeIsDirectory(lib, path);
+        try (DirectoryStream<Path> libDirectoryStream = Files.newDirectoryStream(lib, filter)) {
             for (Path app : libDirectoryStream) {
                 try (DirectoryStream<Path> ebinDirectoryStream = Files.newDirectoryStream(app, "ebin")) {
                     if (ebinDirectoryStream.iterator().hasNext()) {
@@ -202,19 +224,24 @@ public class HomePath {
      */
     @org.jetbrains.annotations.Nullable
     public static String detectSource(@NotNull String homePath) {
-        if (homePath.contains("/.local/share/mise/installs/")) {
+        String posixPath = com.intellij.openapi.util.io.FileUtil.toSystemIndependentName(homePath);
+
+        if (posixPath.contains("/.local/share/mise/installs/")) {
             return "mise";
-        } else if (homePath.contains("/.asdf/installs/")) {
+        }
+        if (posixPath.contains("/.asdf/installs/")) {
             return "asdf";
-        } else if (homePath.contains("/usr/local/Cellar/") || homePath.contains("/opt/homebrew/Cellar/")) {
+        }
+        if (posixPath.contains("/usr/local/Cellar/") || posixPath.contains("/opt/homebrew/Cellar/")) {
             return "Homebrew";
-        } else if (homePath.contains("/nix/store/")) {
+        }
+        if (posixPath.contains("/nix/store/")) {
             return "Nix";
-        } else if (homePath.contains("/otp/")) {
-            return "kerl";
-        } else if (new File(homePath, ".kerl_config").exists()) {
+        }
+        if (posixPath.contains("/otp/") || new File(homePath, ".kerl_config").exists()) {
             return "kerl";
         }
+
         return null;
     }
 
@@ -268,5 +295,14 @@ public class HomePath {
         } catch (IOException | InterruptedException e) {
             return false;
         }
+    }
+
+    @NotNull
+    public static String getExecutableFileName(@Nullable String sdkHome, @NotNull String executableName, @NotNull String windowsExt) {
+        // WSL paths should not have .bat extension even on Windows
+        if (sdkHome != null && WslPath.isWslUncPath(sdkHome)) {
+            return executableName;
+        }
+        return SystemInfo.isWindows ? executableName + windowsExt : executableName;
     }
 }

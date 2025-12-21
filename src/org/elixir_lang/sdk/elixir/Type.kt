@@ -10,21 +10,20 @@ import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.openapi.progress.runBlockingCancellable
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.project.ProjectBundle
+import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.projectRoots.*
 import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl
 import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.util.InvalidDataException
-import com.intellij.openapi.util.SystemInfo
 import com.intellij.openapi.util.Version
 import com.intellij.openapi.util.WriteExternalException
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
+import com.intellij.openapi.vfs.toNioPathOrNull
 import com.intellij.psi.PsiElement
-import com.intellij.util.system.CpuArch
 import gnu.trove.THashSet
 import org.apache.commons.io.FilenameUtils
 import org.elixir_lang.Facet
@@ -33,12 +32,14 @@ import org.elixir_lang.jps.HomePath
 import org.elixir_lang.jps.model.SerializerExtension
 import org.elixir_lang.jps.sdk_type.Elixir
 import org.elixir_lang.sdk.ProcessOutput
+import org.elixir_lang.sdk.SdkHomeScan
 import org.elixir_lang.sdk.Type.ebinPathChainVirtualFile
 import org.elixir_lang.sdk.erlang_dependent.AdditionalDataConfigurable
 import org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData
+import org.elixir_lang.sdk.wsl.wslCompat
 import org.jdom.Element
 import org.jetbrains.annotations.Contract
-import org.jetbrains.annotations.TestOnly
+import org.jetbrains.annotations.Unmodifiable
 import java.io.File
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -183,6 +184,7 @@ ELIXIR_SDK_HOME
     ): String {
         val source = HomePath.detectSource(sdkHome)
         val version = Release.fromString(File(sdkHome).name)?.version()
+        val wslInstance = wslCompat.getDistributionByWindowsUncPath(sdkHome)?.msId
         return buildString {
             if (source != null) {
                 append(source).append(" ")
@@ -192,6 +194,10 @@ ELIXIR_SDK_HOME
                 append(version)
             } else {
                 append("at ").append(sdkHome)
+            }
+
+            if (wslInstance != null) {
+                append(" (WSL: ").append(wslInstance).append(")")
             }
         }
     }
@@ -395,6 +401,7 @@ ELIXIR_SDK_HOME
         }
 
         private fun configureSdkPaths(sdk: Sdk) {
+            LOG.info("Configuring SDK paths for ${sdk.name}")
             val sdkModificator = sdk.sdkModificator
 
             // Configure base paths
@@ -403,7 +410,7 @@ ELIXIR_SDK_HOME
             addSourcePaths(sdkModificator)
 
             // Configure internal Erlang SDK - this will now create and fully setup the Erlang SDK synchronously
-            configureInternalErlangSdk(sdk, sdkModificator)
+            val erlangSdk = configureInternalErlangSdk(sdk, sdkModificator)
 
             // Commit changes - check if we're already in a write action to avoid deadlock
             if (ApplicationManager.getApplication().isWriteAccessAllowed) {
@@ -418,18 +425,30 @@ ELIXIR_SDK_HOME
                     }
                 }
             }
+            LOG.info("SDK paths configured for ${sdk.name} (Erlang SDK: ${erlangSdk?.name ?: "none"})")
         }
 
         private fun configureInternalErlangSdk(
             elixirSdk: Sdk,
             elixirSdkModificator: SdkModificator,
         ): Sdk? {
-            val erlangSdk = defaultErlangSdk()
+            // First, check if an Erlang SDK was explicitly set via UserData
+            // This happens when creating a new Elixir SDK right after creating its Erlang SDK
+            val explicitErlangSdk = elixirSdk.getUserData(ERLANG_SDK_KEY)
+
+            val erlangSdk = explicitErlangSdk ?: defaultErlangSdk()
+
             if (erlangSdk != null) {
                 val sdkAdditionData: com.intellij.openapi.projectRoots.SdkAdditionalData =
                     SdkAdditionalData(erlangSdk, elixirSdk)
                 elixirSdkModificator.sdkAdditionalData = sdkAdditionData
+
                 addNewCodePathsFromInternErlangSdk(elixirSdk, erlangSdk, elixirSdkModificator)
+
+                // Clear the UserData after use
+                elixirSdk.putUserData(ERLANG_SDK_KEY, null)
+            } else {
+                LOG.warn("No Erlang SDK found, Elixir SDK will be incomplete")
             }
             return erlangSdk
         }
@@ -509,9 +528,11 @@ ELIXIR_SDK_HOME
                 if (path.endsWith("lib")) {
                     expandedInternalRootList = ArrayList()
                     val parentPath = Paths.get(path).parent.toString()
+                    val isWslUncPath = wslCompat.isWslUncPath(parentPath)
                     HomePath.eachEbinPath(parentPath) { ebinPath: Path? ->
                         ebinPathChainVirtualFile(
                             ebinPath!!,
+                            isWslUncPath
                         ) { virtualFile: VirtualFile? ->
                             virtualFile?.let { expandedInternalRootList.add(it) }
                         }
@@ -588,15 +609,34 @@ ELIXIR_SDK_HOME
 
         private fun defaultErlangSdk(): Sdk? {
             val projectJdkTable = ProjectJdkTable.getInstance()
+
+            // Primary SDK type (external "Erlang SDK" if available, otherwise built-in)
             val erlangSdkType = erlangSdkType()
+
             val mostRecentErlangSdk = projectJdkTable.findMostRecentSdkOfType(erlangSdkType)
-            return mostRecentErlangSdk
-                ?: createDefaultErlangSdk(projectJdkTable, erlangSdkType)
+
+            if (mostRecentErlangSdk != null) {
+                return mostRecentErlangSdk
+            }
+
+            // If external "Erlang SDK" plugin is installed but no SDK of that type exists,
+            // also check for our built-in "Erlang SDK for Elixir SDK" type
+            val builtInErlangSdkType = findInstance(org.elixir_lang.sdk.erlang.Type::class.java)
+            if (erlangSdkType != builtInErlangSdkType) {
+                val builtInErlangSdk = projectJdkTable.findMostRecentSdkOfType(builtInErlangSdkType)
+                if (builtInErlangSdk != null) {
+                    return builtInErlangSdk
+                }
+            }
+
+            val createdSdk = createDefaultErlangSdk(projectJdkTable, erlangSdkType)
+            return createdSdk
         }
 
         @JvmStatic
         val instance: Type
             get() = findInstance(Type::class.java)
+
 
         /**
          * Checks if the Elixir SDK's classpath contains entries from the Erlang SDK.
