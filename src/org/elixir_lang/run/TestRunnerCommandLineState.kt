@@ -1,40 +1,30 @@
-package org.elixir_lang.tests
+package org.elixir_lang.run
 
 import com.intellij.execution.DefaultExecutionResult
 import com.intellij.execution.ExecutionException
 import com.intellij.execution.ExecutionResult
 import com.intellij.execution.Executor
-import com.intellij.execution.configurations.CommandLineState
-import com.intellij.execution.process.ColoredProcessHandler
+import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.process.ProcessHandler
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.execution.runners.ProgramRunner
 import com.intellij.execution.testframework.autotest.ToggleAutoTestAction
 import com.intellij.execution.testframework.sm.SMTestRunnerConnectionUtil
-import com.intellij.platform.ide.progress.runWithModalProgressBlocking
-import org.elixir_lang.console.ElixirConsoleUtil
-import org.elixir_lang.run.Configuration
-import org.elixir_lang.run.HasCommandLine
 import com.intellij.execution.testframework.sm.runner.SMTRunnerConsoleProperties
+import org.elixir_lang.console.ElixirConsoleUtil
 
 
-abstract class TestCommandLineState<T>(environment: ExecutionEnvironment, private val configuration: T) :
-        CommandLineState(environment) where T : Configuration, T : HasCommandLine {
+abstract class TestRunnerCommandLineState<T>(environment: ExecutionEnvironment, configuration: T) :
+    WslSafeCommandLineState<T>(environment, configuration) where T : Configuration, T : HasCommandLine {
 
     protected abstract val TEST_FRAMEWORK_NAME: String
     protected abstract fun createTestConsoleProperties(executor: Executor): SMTRunnerConsoleProperties
 
-    override fun startProcess(): ProcessHandler {
-        val commandLine = configuration.commandLine()
+    override val modalProgressMessage: String
+        get() = "Starting $TEST_FRAMEWORK_NAME tests"
 
-        // Create process in background thread to avoid EDT violations with WSL command line patching
-        // WSLDistribution.patchCommandLine() requires background thread context
-        val process = runWithModalProgressBlocking(configuration.project, "Starting $TEST_FRAMEWORK_NAME tests") {
-            commandLine.createProcess()
-        }
-
-        return ColoredProcessHandler(process, commandLine.commandLineString)
-    }
+    override fun createProcessHandler(process: Process, commandLine: GeneralCommandLine): ProcessHandler =
+        ElixirProcessHandler(process, commandLine.commandLineString)
 
     @Throws(ExecutionException::class)
     override fun execute(executor: Executor, runner: ProgramRunner<*>): ExecutionResult {

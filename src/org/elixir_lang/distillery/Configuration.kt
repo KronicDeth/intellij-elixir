@@ -28,7 +28,7 @@ class Configuration(name: String, project: Project, configurationFactory: Config
     org.elixir_lang.run.Configuration(name, project, configurationFactory),
     Debuggable<Configuration>,
     RunConfigurationWithSuppressedDefaultRunAction,
-    RunConfigurationWithSuppressedDefaultDebugAction {
+    RunConfigurationWithSuppressedDefaultDebugAction, HasCommandLine {
     override val cookie: String?
         get() = vmArgsPath?.let(::vmArgsPathToCookie)
 
@@ -167,7 +167,7 @@ class Configuration(name: String, project: Project, configurationFactory: Config
             }
         }
 
-    fun commandLine(): GeneralCommandLine {
+    override fun commandLine(): GeneralCommandLine {
         val workingDirectory = ensureWorkingDirectory()
         val commandLine = Distillery.commandLine(
             pty = pty,
@@ -247,7 +247,6 @@ class Configuration(name: String, project: Project, configurationFactory: Config
 private const val CODE_LOADING_MODE = "CODE_LOADING_MODE"
 private const val ERL_OPTS = "ERL_OPTS"
 private const val EXTRA_OPTS = "EXTRA_OPTS"
-private const val NAME = "NAME"
 private const val PIPE_DIR = "PIPE_DIR"
 private const val RELEASE_CONFIG_DIR = "RELEASE_CONFIG_DIR"
 private const val RUNNER_LOG_DIR = "RUNNER_LOG_DIR"

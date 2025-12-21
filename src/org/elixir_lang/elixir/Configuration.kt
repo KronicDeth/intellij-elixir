@@ -23,7 +23,7 @@ class Configuration(name: String, project: Project, configurationFactory: Config
         org.elixir_lang.run.Configuration(name, project, configurationFactory),
         Debuggable<Configuration>,
         RunConfigurationWithSuppressedDefaultRunAction,
-        RunConfigurationWithSuppressedDefaultDebugAction {
+        RunConfigurationWithSuppressedDefaultDebugAction, HasCommandLine {
     override val cookie: String? = null
     override var inheritApplicationModuleFilters: Boolean = true
     override var moduleFilterList: MutableList<ModuleFilter> = mutableListOf()
@@ -65,7 +65,7 @@ class Configuration(name: String, project: Project, configurationFactory: Config
 
     var elixirArgumentList: MutableList<String> = mutableListOf()
 
-    fun commandLine(): GeneralCommandLine {
+    override fun commandLine(): GeneralCommandLine {
         val workingDirectory = ensureWorkingDirectory()
         val module = ensureModule()
         val sdk = ensureMostSpecificSdk(module)

@@ -21,16 +21,16 @@ import org.jdom.Element
  */
 open class Configuration(name: String, project: Project, configurationFactory: ConfigurationFactory) :
         org.elixir_lang.run.Configuration(name, project, configurationFactory),
-        Debuggable<org.elixir_lang.mix.Configuration>,
+        Debuggable<Configuration>,
         RunConfigurationWithSuppressedDefaultRunAction,
-        RunConfigurationWithSuppressedDefaultDebugAction {
+        RunConfigurationWithSuppressedDefaultDebugAction, HasCommandLine {
     override val cookie: String? = null
     override var inheritApplicationModuleFilters: Boolean = true
     override var moduleFilterList: MutableList<ModuleFilter> = mutableListOf()
     override val nodeName: String? = null
 
     override fun debuggedConfiguration(name: String, cookie: String): Configuration {
-        val debugged = org.elixir_lang.mix.Configuration(this.name, project, factory!!)
+        val debugged = Configuration(this.name, project, factory!!)
 
         debugged.erlArgumentList.addAll(erlArgumentList)
         debugged.erlArgumentList.addAll(arrayOf("-name", name))
@@ -79,7 +79,7 @@ open class Configuration(name: String, project: Project, configurationFactory: C
 
     private var mixArgumentList: MutableList<String> = mutableListOf()
 
-    fun commandLine(): GeneralCommandLine {
+    override fun commandLine(): GeneralCommandLine {
         val workingDirectory = ensureWorkingDirectory()
         val module = ensureModule()
         val sdk = ensureMostSpecificSdk(module)
@@ -90,9 +90,9 @@ open class Configuration(name: String, project: Project, configurationFactory: C
     }
 
     override fun getConfigurationEditor(): SettingsEditor<out RunConfiguration> =
-            SettingsEditorGroup<org.elixir_lang.mix.Configuration>().apply {
+            SettingsEditorGroup<Configuration>().apply {
                 this.addEditor("Configuration", org.elixir_lang.mix.configuration.Editor())
-                this.addEditor("Interpreted Modules", org.elixir_lang.debugger.configuration.interpreted_modules.Editor<org.elixir_lang.mix.Configuration>())
+                this.addEditor("Interpreted Modules", org.elixir_lang.debugger.configuration.interpreted_modules.Editor<Configuration>())
             }
 
     /**
