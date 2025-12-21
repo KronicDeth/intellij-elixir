@@ -128,10 +128,8 @@ subprojects {
     dependencies {
         intellijPlatform {
             create(providers.gradleProperty("platformType"), providers.provider { actualPlatformVersion })
-            bundledPlugins(providers.gradleProperty("platformBundledPlugins").map { it.split(",") })
-            bundledModules(providers.gradleProperty("platformBundledModules").map { it.split(",") })
+            bundledPlugins("com.intellij.java")
             testFramework(TestFrameworkType.Platform)
-            testFramework(TestFrameworkType.Plugin.Java)
         }
         // JPS Builder tests extend UsefulTestCase (JUnit 3/4 style) and need explicit JUnit 4 on classpath
         testImplementation(libJunit)
