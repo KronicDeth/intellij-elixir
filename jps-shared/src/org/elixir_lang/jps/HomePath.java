@@ -4,14 +4,13 @@ import com.intellij.notification.NotificationGroupManager;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.Version;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.Map;
-import java.util.TreeMap;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -21,9 +20,10 @@ public class HomePath {
     private static final String HEAD_PREFIX = "HEAD-";
     public static final String LINUX_MINT_HOME_PATH = "/usr/lib";
     public static final String LINUX_DEFAULT_HOME_PATH = "/usr/local/lib";
+    public static final String NIX_STORE_PATH = "/nix/store";
     public static final Version UNKNOWN_VERSION = new Version(0, 0, 0);
     private static final File HOMEBREW_ROOT = new File("/usr/local/Cellar");
-    private static final File NIX_STORE = new File("/nix/store/");
+    private static final File NIX_STORE = new File(NIX_STORE_PATH);
     private static final Logger LOGGER = Logger.getInstance(HomePath.class);
 
     private HomePath() {
@@ -82,13 +82,19 @@ public class HomePath {
     }
 
     public static void mergeASDF(@NotNull Map<Version, String> homePathByVersion, @NotNull String name) {
-        mergeNameSubdirectories(homePathByVersion, Paths.get(System.getProperty("user.home"), ".asdf", "installs").toFile(), name, Function.identity());
+        mergeASDF(homePathByVersion, name, System.getProperty("user.home"));
     }
 
-    public static void mergeMise(@NotNull Map<Version, String> homePathByVersion,
-                                 @NotNull String name,
-                                 @NotNull Function<File, File> versionPathToHomePath) {
-        mergeNameSubdirectories(homePathByVersion, Paths.get(System.getProperty("user.home"), ".local", "share", "mise", "installs").toFile(), name, versionPathToHomePath);
+    public static void mergeASDF(@NotNull Map<Version, String> homePathByVersion, @NotNull String name, @NotNull String userHome) {
+        mergeNameSubdirectories(homePathByVersion, Paths.get(userHome, ".asdf", "installs").toFile(), name, Function.identity());
+    }
+
+    public static void mergeMise(@NotNull Map<Version, String> homePathByVersion, @NotNull String name) {
+        mergeMise(homePathByVersion, name, System.getProperty("user.home"));
+    }
+
+    public static void mergeMise(@NotNull Map<Version, String> homePathByVersion, @NotNull String name, @NotNull String userHome) {
+        mergeNameSubdirectories(homePathByVersion, Paths.get(userHome, ".local", "share", "mise", "installs").toFile(), name, Function.identity());
     }
 
     public static void mergeHomebrew(@NotNull Map<Version, String> homePathByVersion,
@@ -141,9 +147,17 @@ public class HomePath {
     public static void mergeNixStore(@NotNull Map<Version, String> homePathByVersion,
                                      @NotNull Pattern nixPattern,
                                      @NotNull Function<File, File> versionPathToHomePath) {
-        if (NIX_STORE.isDirectory()) {
+        mergeNixStore(homePathByVersion, nixPattern, versionPathToHomePath, NIX_STORE.getAbsolutePath());
+    }
+
+    public static void mergeNixStore(@NotNull Map<Version, String> homePathByVersion,
+                                     @NotNull Pattern nixPattern,
+                                     @NotNull Function<File, File> versionPathToHomePath,
+                                     @NotNull String nixStorePath) {
+        File nixStore = new File(nixStorePath);
+        if (nixStore.isDirectory()) {
             //noinspection ResultOfMethodCallIgnored
-            NIX_STORE.listFiles(
+            nixStore.listFiles(
                     (dir, name) -> {
                         Matcher matcher = nixPattern.matcher(name);
                         boolean accept = false;
@@ -170,19 +184,14 @@ public class HomePath {
         final String userHome = System.getProperty("user.home");
 
         if (userHome != null) {
-            mergeNameSubdirectories(homePathByVersion, new File(userHome), "otp", versionPathToHomePath);
+            mergeTravisCIKerl(homePathByVersion, versionPathToHomePath, userHome);
         }
     }
 
-    @Contract(pure = true)
-    @NotNull
-    public static Map<Version, String> homePathByVersion() {
-        return new TreeMap<>(
-                (version1, version2) -> {
-                    // compare version2 to version1 to produce descending instead of ascending order.
-                    return version2.compareTo(version1);
-                }
-        );
+    public static void mergeTravisCIKerl(@NotNull Map<Version, String> homePathByVersion,
+                                         @NotNull Function<File, File> versionPathToHomePath,
+                                         @NotNull String userHome) {
+        mergeNameSubdirectories(homePathByVersion, new File(userHome), "otp", versionPathToHomePath);
     }
 
     /**

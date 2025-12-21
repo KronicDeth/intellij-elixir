@@ -3,23 +3,28 @@ package org.elixir_lang.sdk.erlang
 import com.intellij.execution.ExecutionException
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.edtWriteAction
-import com.intellij.openapi.application.writeAction
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.fileChooser.FileChooserDescriptor
 import com.intellij.openapi.progress.runBlockingCancellable
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.projectRoots.SdkModel
 import com.intellij.openapi.projectRoots.SdkModificator
 import com.intellij.openapi.projectRoots.SdkType
 import com.intellij.openapi.roots.OrderRootType
-import com.intellij.openapi.util.SystemInfo
 import com.intellij.openapi.util.Version
+import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.openapi.vfs.toNioPathOrNull
 import com.intellij.util.containers.ContainerUtil
 import org.elixir_lang.jps.HomePath
 import org.elixir_lang.jps.sdk_type.Erlang
 import org.elixir_lang.sdk.SdkHomeScan
 import org.elixir_lang.sdk.erlang_dependent.AdditionalDataConfigurable
+import org.elixir_lang.sdk.wsl.wslCompat
 import org.jdom.Element
 import java.io.File
+import java.nio.file.Path
 
 class Type : SdkType("Erlang SDK for Elixir SDK") {
     private val releaseBySdkHome: MutableMap<String, Release> = ContainerUtil.createWeakMap()
@@ -38,7 +43,6 @@ class Type : SdkType("Erlang SDK for Elixir SDK") {
         private val NIX_PATTERN = HomePath.nixPattern("erlang")
         private const val LINUX_MINT_HOME_PATH = "${HomePath.LINUX_MINT_HOME_PATH}/erlang"
         private const val LINUX_DEFAULT_HOME_PATH = "${HomePath.LINUX_DEFAULT_HOME_PATH}/erlang"
-        private val VERSION_PATH_TO_HOME_PATH: (File) -> File = { versionPath -> File(versionPath, "lib/erlang") }
         private val LOGGER = Logger.getInstance(Type::class.java)
 
         @JvmStatic
@@ -124,43 +128,12 @@ class Type : SdkType("Erlang SDK for Elixir SDK") {
 
         @JvmStatic
         fun homePathByVersion(): Map<Version, String> {
-            val homePathByVersion = HomePath.homePathByVersion().toMutableMap()
-
-            when {
-                SystemInfo.isMac -> {
-                    HomePath.mergeASDF(homePathByVersion, "erlang")
-                    HomePath.mergeMise(homePathByVersion, "erlang", java.util.function.Function.identity())
-                    HomePath.mergeKerl(homePathByVersion, java.util.function.Function.identity())
-                    HomePath.mergeHomebrew(homePathByVersion, "erlang", VERSION_PATH_TO_HOME_PATH)
-                    HomePath.mergeNixStore(homePathByVersion, NIX_PATTERN, VERSION_PATH_TO_HOME_PATH)
-                }
-
-                SystemInfo.isWindows -> {
-                    putIfDirectory(homePathByVersion, HomePath.UNKNOWN_VERSION, WINDOWS_DEFAULT_HOME_PATH)
-                }
-
-                SystemInfo.isLinux -> {
-                    putIfDirectory(homePathByVersion, HomePath.UNKNOWN_VERSION, LINUX_DEFAULT_HOME_PATH)
-                    putIfDirectory(homePathByVersion, HomePath.UNKNOWN_VERSION, LINUX_MINT_HOME_PATH)
-                    HomePath.mergeMise(homePathByVersion, "erlang", java.util.function.Function.identity())
-                    HomePath.mergeKerl(homePathByVersion, java.util.function.Function.identity())
-                    HomePath.mergeTravisCIKerl(homePathByVersion) { it }
-                    HomePath.mergeNixStore(homePathByVersion, NIX_PATTERN, VERSION_PATH_TO_HOME_PATH)
-                }
-            }
-
-            return homePathByVersion
+            return SdkHomeScan.homePathByVersion(null, createConfig())
         }
 
-        private fun putIfDirectory(
-            homePathByVersion: MutableMap<Version, String>,
-            version: Version,
-            homePath: String,
-        ) {
-            val homeFile = File(homePath)
-            if (homeFile.isDirectory) {
-                homePathByVersion[version] = homePath
-            }
+        @JvmStatic
+        fun homePathByVersion(path: Path?): Map<Version, String> {
+            return SdkHomeScan.homePathByVersion(path, createConfig())
         }
     }
 
@@ -170,6 +143,9 @@ class Type : SdkType("Erlang SDK for Elixir SDK") {
                 type ==
                 org.elixir_lang.sdk.Type
                     .documentationRootType()
+
+    override fun getHomeChooserDescriptor(): FileChooserDescriptor =
+        org.elixir_lang.sdk.Type.createHomeChooserDescriptor(presentableName, ::validateSdkHomePath)
 
     override fun setupSdkPaths(sdk: Sdk) {
         val sdkModificator = sdk.sdkModificator
@@ -197,6 +173,14 @@ class Type : SdkType("Erlang SDK for Elixir SDK") {
     override fun suggestHomePaths(): Collection<String> = homePathByVersion().values
 
     override fun isValidSdkHome(path: String): Boolean = Erlang.getByteCodeInterpreterExecutable(path).canExecute()
+    override fun suggestHomePath(path: Path): String? {
+        return homePathByVersion(path).values.firstOrNull()
+    }
+
+    override fun suggestHomePaths(project: Project?): Collection<String> {
+        return homePathByVersion(project?.guessProjectDir()?.toNioPathOrNull()).values
+    }
+
 
     override fun suggestSdkName(
         currentSdkName: String?,

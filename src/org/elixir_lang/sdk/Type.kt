@@ -43,4 +43,28 @@ object Type {
 
         return rootType
     }
+
+    /**
+     * Creates a home chooser descriptor for SDK configuration with validation.
+     *
+     * @param presentableName The presentable name of the SDK type (from SdkType.getPresentableName())
+     * @param validateSdkHomePath Function to validate the selected path, should throw an exception if invalid
+     * @return FileChooserDescriptor configured for SDK home selection
+     */
+    @JvmStatic
+    fun createHomeChooserDescriptor(
+        presentableName: String,
+        validateSdkHomePath: (VirtualFile) -> Unit
+    ): FileChooserDescriptor {
+        val descriptor: FileChooserDescriptor =
+            object : FileChooserDescriptor(false, true, false, false, false, false) {
+                override fun validateSelectedFiles(files: Array<VirtualFile>) {
+                    files.firstOrNull()?.let {
+                        validateSdkHomePath(it)
+                    }
+                }
+            }
+        descriptor.title = ProjectBundle.message("sdk.configure.home.title", presentableName)
+        return descriptor
+    }
 }

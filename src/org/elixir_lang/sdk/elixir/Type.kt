@@ -82,16 +82,8 @@ class Type : org.elixir_lang.sdk.erlang_dependent.Type(SerializerExtension.ELIXI
 
     override fun getDefaultDocumentationUrl(sdk: Sdk): String? = getDefaultDocumentationUrl(getRelease(sdk))
 
-    override fun getHomeChooserDescriptor(): FileChooserDescriptor {
-        val descriptor: FileChooserDescriptor =
-            object : FileChooserDescriptor(false, true, false, false, false, false) {
-                override fun validateSelectedFiles(files: Array<VirtualFile>) {
-                    files.firstOrNull()?.let { validateSdkHomePath(it) }
-                }
-            }
-        descriptor.title = ProjectBundle.message("sdk.configure.home.title", presentableName)
-        return descriptor
-    }
+    override fun getHomeChooserDescriptor(): FileChooserDescriptor =
+        org.elixir_lang.sdk.Type.createHomeChooserDescriptor(presentableName, ::validateSdkHomePath)
 
     override fun getIcon(): Icon = Icons.LANGUAGE
 
@@ -113,56 +105,19 @@ class Type : org.elixir_lang.sdk.erlang_dependent.Type(SerializerExtension.ELIXI
      *
      * @return Map
      */
-    private fun homePathByVersion(): Map<Version, String> {
-        val homePathByVersion: MutableMap<Version, String> = TreeMap(Comparator.reverseOrder())
-        if (SystemInfo.isMac) {
-            HomePath.mergeASDF(homePathByVersion, "elixir")
-            HomePath.mergeMise(
-                homePathByVersion,
-                "elixir",
-                java.util.function.Function
-                    .identity(),
-            )
-            HomePath.mergeHomebrew(
-                homePathByVersion,
-                "elixir",
-                java.util.function.Function
-                    .identity(),
-            )
-            HomePath.mergeNixStore(
-                homePathByVersion,
-                NIX_PATTERN,
-                java.util.function.Function
-                    .identity(),
-            )
-        } else {
-            val sdkPath: String
-            if (SystemInfo.isWindows) {
-                sdkPath =
-                    if (CpuArch.CURRENT.width == 32) {
-                        WINDOWS_32BIT_DEFAULT_HOME_PATH
-                    } else {
-                        WINDOWS_64BIT_DEFAULT_HOME_PATH
-                    }
-                homePathByVersion[HomePath.UNKNOWN_VERSION] = sdkPath
-            } else if (SystemInfo.isLinux) {
-                putIfDirectory(homePathByVersion, HomePath.UNKNOWN_VERSION, LINUX_DEFAULT_HOME_PATH)
-                putIfDirectory(homePathByVersion, HomePath.UNKNOWN_VERSION, LINUX_MINT_HOME_PATH)
-                HomePath.mergeMise(
-                    homePathByVersion,
-                    "elixir",
-                    java.util.function.Function
-                        .identity(),
-                )
-                HomePath.mergeNixStore(
-                    homePathByVersion,
-                    NIX_PATTERN,
-                    java.util.function.Function
-                        .identity(),
-                )
-            }
-        }
-        return homePathByVersion
+    private fun homePathByVersion(path: Path?): Map<Version, String> {
+        return SdkHomeScan.homePathByVersion(path, SdkHomeScan.Config(
+            toolName = "elixir",
+            nixPattern = NIX_PATTERN,
+            linuxDefaultPath = LINUX_DEFAULT_HOME_PATH,
+            linuxMintPath = LINUX_MINT_HOME_PATH,
+            windowsDefaultPath = WINDOWS_64BIT_DEFAULT_HOME_PATH,
+            windows32BitPath = WINDOWS_32BIT_DEFAULT_HOME_PATH,
+            homebrewTransform = null,  // identity
+            nixTransform = null,  // identity
+            kerlTransform = null,  // TODO: Investigate if Elixir supports kerl builds
+            travisCIKerlTransform = null  // TODO: Verify Travis CI kerl for Elixir
+        ))
     }
 
     private fun invalidSdkHomeException(virtualFile: VirtualFile): Exception =
@@ -206,16 +161,21 @@ ELIXIR_SDK_HOME
         configureSdkPaths(sdk)
     }
 
+
+    @Deprecated("Deprecated in Java")
     override fun suggestHomePath(): String? {
-        val iterator = suggestHomePaths().iterator()
-        var suggestedHomePath: String? = null
-        if (iterator.hasNext()) {
-            suggestedHomePath = iterator.next()
-        }
-        return suggestedHomePath
+        @Suppress("DEPRECATION")
+        return suggestHomePaths().firstOrNull()
     }
 
-    override fun suggestHomePaths(): Collection<String> = homePathByVersion().values
+    override fun suggestHomePath(path: Path): String? {
+        return homePathByVersion(path).values.firstOrNull()
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun suggestHomePaths(): Collection<String> = homePathByVersion(null).values
+    override fun suggestHomePaths(project: Project?): @Unmodifiable Collection<String> =
+        homePathByVersion(project?.guessProjectDir()?.toNioPathOrNull()).values
 
     override fun suggestSdkName(
         currentSdkName: String?,
@@ -238,20 +198,19 @@ ELIXIR_SDK_HOME
 
     private fun validateSdkHomePath(virtualFile: VirtualFile) {
         val selectedPath = virtualFile.path
-        var valid = isValidSdkHome(selectedPath)
+
+        val valid = isValidSdkHome(selectedPath)
         if (!valid) {
-            valid = isValidSdkHome(adjustSelectedSdkHome(selectedPath))
-            if (!valid) {
-                throw invalidSdkHomeException(virtualFile)
-            }
+            throw invalidSdkHomeException(virtualFile)
         }
     }
 
     override fun createAdditionalDataConfigurable(
         sdkModel: SdkModel,
         sdkModificator: SdkModificator,
-    ): com.intellij.openapi.projectRoots.AdditionalDataConfigurable =
-        AdditionalDataConfigurable(sdkModel, sdkModificator)
+    ): com.intellij.openapi.projectRoots.AdditionalDataConfigurable {
+        return AdditionalDataConfigurable(sdkModel, sdkModificator)
+    }
 
     override fun saveAdditionalData(
         additionalData: com.intellij.openapi.projectRoots.SdkAdditionalData,
@@ -484,13 +443,12 @@ ELIXIR_SDK_HOME
             codePathsFromInternalErlangSdk(
                 elixirSdk,
                 internalErlangSdk,
-                elixirSdkModificator,
-                { sdkModificator, configuredRoots, expandedInternalRoot, type ->
-                    if (expandedInternalRoot !in configuredRoots) {
-                        sdkModificator.addRoot(expandedInternalRoot, type)
-                    }
-                },
-            )
+                elixirSdkModificator
+            ) { sdkModificator, configuredRoots, expandedInternalRoot, type ->
+                if (expandedInternalRoot !in configuredRoots) {
+                    sdkModificator.addRoot(expandedInternalRoot, type)
+                }
+            }
         }
 
         @JvmStatic
@@ -502,11 +460,10 @@ ELIXIR_SDK_HOME
             codePathsFromInternalErlangSdk(
                 elixirSdk,
                 internalErlangSdk,
-                elixirSdkModificator,
-                { sdkModificator, _, expandedInternalRoot, type ->
-                    sdkModificator.removeRoot(expandedInternalRoot, type)
-                },
-            )
+                elixirSdkModificator
+            ) { sdkModificator, _, expandedInternalRoot, type ->
+                sdkModificator.removeRoot(expandedInternalRoot, type)
+            }
         }
 
         private fun codePathsFromInternalErlangSdk(
@@ -566,22 +523,6 @@ ELIXIR_SDK_HOME
                 expandedInternalRootList = listOf(internalRoot)
             }
             return expandedInternalRootList
-        }
-
-        @JvmStatic
-        @TestOnly
-        fun createMockSdk(
-            sdkHome: String,
-            release: Release,
-        ): Sdk {
-            val sdk: Sdk = ProjectJdkImpl(release.toString(), instance)
-            val sdkModificator = sdk.sdkModificator
-            sdkModificator.homePath = sdkHome
-            sdkModificator.versionString =
-                getVersionString(release) // must be set after home path, otherwise setting home path clears the version string
-            ApplicationManager.getApplication().runWriteAction { sdkModificator.commitChanges() }
-            configureSdkPaths(sdk)
-            return sdk
         }
 
         private fun getDefaultDocumentationUrl(version: Release?): String? =
@@ -670,10 +611,6 @@ ELIXIR_SDK_HOME
             return classRoots.any { root -> root.path.startsWith(erlangHomePath) }
         }
 
-        fun getNonNullRelease(element: PsiElement): Release = getRelease(element) ?: Release.LATEST
-
-        private fun getRelease(element: PsiElement): Release? = getRelease(mostSpecificSdk(element))
-
         @JvmStatic
         @Contract("null -> null")
         fun getRelease(sdk: Sdk?): Release? =
@@ -683,19 +620,6 @@ ELIXIR_SDK_HOME
             } else {
                 null
             }
-
-        private fun getVersionString(version: Release?): String? = version?.toString()
-
-        private fun putIfDirectory(
-            homePathByVersion: MutableMap<Version, String>,
-            @Suppress("SameParameterValue") version: Version,
-            homePath: String,
-        ) {
-            val homeFile = File(homePath)
-            if (homeFile.isDirectory) {
-                homePathByVersion[version] = homePath
-            }
-        }
 
         private fun moduleSdk(module: Module): Sdk? = sdk(ModuleRootManager.getInstance(module).sdk)
 
