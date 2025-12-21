@@ -16,6 +16,7 @@ import com.intellij.openapi.util.Version
 import com.intellij.util.containers.ContainerUtil
 import org.elixir_lang.jps.HomePath
 import org.elixir_lang.jps.sdk_type.Erlang
+import org.elixir_lang.sdk.SdkHomeScan
 import org.elixir_lang.sdk.erlang_dependent.AdditionalDataConfigurable
 import org.jdom.Element
 import java.io.File
@@ -39,6 +40,49 @@ class Type : SdkType("Erlang SDK for Elixir SDK") {
         private const val LINUX_DEFAULT_HOME_PATH = "${HomePath.LINUX_DEFAULT_HOME_PATH}/erlang"
         private val VERSION_PATH_TO_HOME_PATH: (File) -> File = { versionPath -> File(versionPath, "lib/erlang") }
         private val LOGGER = Logger.getInstance(Type::class.java)
+
+        @JvmStatic
+        private fun createConfig() = SdkHomeScan.Config(
+            toolName = "erlang",
+            nixPattern = NIX_PATTERN,
+            linuxDefaultPath = LINUX_DEFAULT_HOME_PATH,
+            linuxMintPath = LINUX_MINT_HOME_PATH,
+            windowsDefaultPath = WINDOWS_DEFAULT_HOME_PATH,
+            windows32BitPath = null,
+            homebrewTransform = { versionPath -> File(versionPath, "lib/erlang") },
+            nixTransform = { versionPath -> File(versionPath, "lib/erlang") },
+            kerlTransform = { it },
+            travisCIKerlTransform = { it }
+        )
+
+        @JvmStatic
+        internal fun setupSdkTableListener() {
+            val messageBus = ApplicationManager.getApplication().messageBus
+            messageBus.connect().subscribe(com.intellij.openapi.projectRoots.ProjectJdkTable.JDK_TABLE_TOPIC,
+                object : com.intellij.openapi.projectRoots.ProjectJdkTable.Listener {
+                    override fun jdkRemoved(jdk: Sdk) {
+                        // When an Erlang SDK is removed, clean up project references
+                        if (jdk.sdkType is Type) {
+                            cleanupProjectReferences(jdk)
+                        }
+                    }
+                })
+        }
+
+        private fun cleanupProjectReferences(deletedSdk: Sdk) {
+            LOGGER.warn("Erlang SDK removed: ${deletedSdk.name}, cleaning up project references")
+            com.intellij.openapi.project.ProjectManager.getInstance().openProjects.forEach { project ->
+                val projectRootManager = com.intellij.openapi.roots.ProjectRootManager.getInstance(project)
+                if (projectRootManager.projectSdk == deletedSdk) {
+                    ApplicationManager.getApplication().invokeLater {
+                        ApplicationManager.getApplication().runWriteAction {
+                            projectRootManager.projectSdk = null
+                            LOGGER.warn("Cleared removed Erlang SDK '${deletedSdk.name}' from project '${project.name}'")
+                        }
+                    }
+                }
+            }
+        }
 
         @JvmStatic
         fun getDefaultSdkName(

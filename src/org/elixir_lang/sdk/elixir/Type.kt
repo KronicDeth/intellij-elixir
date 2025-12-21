@@ -42,7 +42,6 @@ import org.jetbrains.annotations.TestOnly
 import java.io.File
 import java.nio.file.Path
 import java.nio.file.Paths
-import java.util.*
 import javax.swing.Icon
 
 class Type : org.elixir_lang.sdk.erlang_dependent.Type(SerializerExtension.ELIXIR_SDK_TYPE_ID) {
@@ -290,27 +289,44 @@ ELIXIR_SDK_HOME
         private const val WINDOWS_32BIT_DEFAULT_HOME_PATH = "C:\\Program Files\\Elixir"
         private const val WINDOWS_64BIT_DEFAULT_HOME_PATH = "C:\\Program Files (x86)\\Elixir"
 
-        init {
-            setupSdkTableListener()
-        }
-
-        private fun setupSdkTableListener() {
+        @JvmStatic
+        internal fun setupSdkTableListener() {
             val messageBus = ApplicationManager.getApplication().messageBus
             messageBus.connect().subscribe(ProjectJdkTable.JDK_TABLE_TOPIC, object : ProjectJdkTable.Listener {
                 override fun jdkRemoved(jdk: Sdk) {
                     // When an Erlang SDK is removed, clean up any Elixir SDKs that reference it
-                    if (org.elixir_lang.sdk.erlang_dependent.Type.staticIsValidDependency(jdk)) {
+                    if (staticIsValidDependency(jdk)) {
                         cleanupOrphanedElixirSdkReferences(jdk)
+                    }
+
+                    // When an Elixir SDK is removed, clean up project references
+                    if (jdk.sdkType is Type) {
+                        cleanupProjectReferences(jdk)
                     }
                 }
 
                 override fun jdkNameChanged(jdk: Sdk, previousName: String) {
                     // When an Erlang SDK is renamed, update any Elixir SDKs that reference the old name
-                    if (org.elixir_lang.sdk.erlang_dependent.Type.staticIsValidDependency(jdk)) {
+                    if (staticIsValidDependency(jdk)) {
                         updateElixirSdkReferencesAfterRename(jdk, previousName)
                     }
                 }
             })
+        }
+
+        private fun cleanupProjectReferences(deletedSdk: Sdk) {
+            LOG.info("Elixir SDK removed: ${deletedSdk.name}, cleaning up project references")
+            com.intellij.openapi.project.ProjectManager.getInstance().openProjects.forEach { project ->
+                val projectRootManager = ProjectRootManager.getInstance(project)
+                if (projectRootManager.projectSdk == deletedSdk) {
+                    ApplicationManager.getApplication().invokeLater {
+                        ApplicationManager.getApplication().runWriteAction {
+                            projectRootManager.projectSdk = null
+                            LOG.info("Cleared removed Elixir SDK '${deletedSdk.name}' from project '${project.name}'")
+                        }
+                    }
+                }
+            }
         }
 
         private fun cleanupOrphanedElixirSdkReferences(deletedErlangSdk: Sdk) {

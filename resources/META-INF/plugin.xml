@@ -31,6 +31,8 @@
                 implementation="org.elixir_lang.status_bar_widget.ElixirSdkStatusWidgetFactory"/>
         <backgroundPostStartupActivity implementation="org.elixir_lang.status_bar_widget.ElixirSdkStatusWidgetStartupActivity"/>
 
+        <postStartupActivity implementation="org.elixir_lang.sdk.SdkTableListenerStartupActivity"/>
+
         <!--        <errorHandler implementation="org.elixir_lang.errorreport.Submitter"/>-->
         <errorHandler implementation="com.intellij.diagnostic.JetBrainsMarketplaceErrorReportSubmitter"/>
 
@@ -117,6 +119,11 @@
 
         <applicationService serviceInterface="org.elixir_lang.configuration.BeforeRunTaskProvider"
                             serviceImplementation="org.elixir_lang.configuration.DefaultBeforeRunTaskProvider"/>
+
+        <!-- WSL Support Service -->
+        <applicationService serviceInterface="org.elixir_lang.sdk.wsl.WslCompatService"
+                            serviceImplementation="org.elixir_lang.sdk.wsl.WslCompatServiceImpl"/>
+
 
         <!-- for template -->
         <internalFileTemplate name="Elixir Module"/>
@@ -312,7 +319,7 @@
             <separator/>
             <action id="Elixir.Help" class="org.elixir_lang.action.HelpAction" text="IntelliJ Elixir Help" icon="AllIcons.Windows.Help" />
             <separator/>
-            <add-to-group group-id="HelpMenu" anchor="before" relative-to-action="ProductivityGuide"/>
+            <add-to-group group-id="HelpMenu" anchor="last"/>
         </group>
         <group id="LangElixir.SdkActions">
             <separator/>
