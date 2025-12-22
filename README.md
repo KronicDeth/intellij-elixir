@@ -83,9 +83,9 @@ Table of Contents[![Backers on Open Collective](https://opencollective.com/intel
             * [Matching](#matching)
          * [Dialyzer](#dialyzer)
            * [Inspection](#inspection-1)
-         * [Embedded Elixir (EEx) Templates <a href="/resources/icons/file/eex.svg" target="_blank" rel="noopener noreferrer"><img src="/resources/icons/file/eex.svg" alt="" style="max-width:100\x;"></a>](#embedded-elixir-eex-templates-)
+         * [Embedded Elixir (EEx) Templates <a href="/resources/icons/file/eex.svg" target="_blank" rel="noopener noreferrer"><img src="/resources/icons/file/eex.svg" alt="EEx file icon" style="max-width:100\x;"></a>](#embedded-elixir-eex-templates-)
             * [Advanced configuration](#advanced-configuration)
-         * [Live Embedded Elixir (LEEx) Templates <a href="/resources/icons/file/eex.svg" target="_blank" rel="noopener noreferrer"><img src="/resources/icons/file/eex.svg" alt="" style="max-width:100\x;"></a>](#live-embedded-elixir-leex-templates-)
+         * [Live Embedded Elixir (LEEx) Templates <a href="/resources/icons/file/eex.svg" target="_blank" rel="noopener noreferrer"><img src="/resources/icons/file/eex.svg" alt="LEEx file icon" style="max-width:100\x;"></a>](#live-embedded-elixir-leex-templates-)
             * [Advanced configuration](#advanced-configuration-1)
          * [Building/Compiling](#buildingcompiling)
             * [Settings](#settings)
@@ -105,7 +105,7 @@ Table of Contents[![Backers on Open Collective](https://opencollective.com/intel
             * [Elixir <a href="/resources/icons/run/elixir.svg" target="_blank" rel="noopener noreferrer"><img src="/resources/icons/run/elixir.svg" alt="Elixir Drop" title="Elixir Icon" style="max-width:100\x;"></a>](#elixir-)
                * [Running](#running-1)
                * [Debugging](#debugging-1)
-            * [IEx (Interactive Elixir) <a href="/resources/icons/run/iex.svg" target="_blank" rel="noopener noreferrer"><img src="/resources/icons/run/iex.svg" alt="" style="max-width:100\x;"></a>](#iex-interactive-elixir-)
+            * [IEx (Interactive Elixir) <a href="/resources/icons/run/iex.svg" target="_blank" rel="noopener noreferrer"><img src="/resources/icons/run/iex.svg" alt="IEx icon" style="max-width:100\x;"></a>](#iex-interactive-elixir-)
                * [Running](#running-2)
                * [Debugging](#debugging-2)
             * [Mix Tasks <a href="/resources/icons/run/mix.svg" target="_blank" rel="noopener noreferrer"><img src="/resources/icons/run/mix.svg" alt="Elixir Drop mixed in a round-bottom flask" title="Mix Icon" style="max-width:100\x;"></a>](#mix-tasks-)
@@ -114,7 +114,7 @@ Table of Contents[![Backers on Open Collective](https://opencollective.com/intel
             * [IEx Mix <a href="/resources/icons/run/iex/mix.svg" target="_blank" rel="noopener noreferrer"><img src="/resources/icons/run/iex/mix.svg" alt="IEx Mix" title="IEx Mix" style="max-width:100\x;"></a>](#iex-mix-)
                * [Running](#running-4)
                * [Debugging](#debugging-4)
-            * [mix espec <a href="/resources/icons/run/mix/test.svg" target="_blank" rel="noopener noreferrer"><img src="/resources/icons/run/mix/test.svg" alt="" style="max-width:100\x;"></a>](#mix-espec-)
+            * [mix espec <a href="/resources/icons/run/mix/test.svg" target="_blank" rel="noopener noreferrer"><img src="/resources/icons/run/mix/test.svg" alt="Mix test icon" style="max-width:100\x;"></a>](#mix-espec-)
                * [Using graphical formatter](#using-graphical-formatter)
                * [Creating mix espce Run Configurations Manually](#creating-mix-espce-run-configurations-manually)
                * [Running](#running-5)
@@ -123,7 +123,7 @@ Table of Contents[![Backers on Open Collective](https://opencollective.com/intel
                   * [Creating/Running mix espec Run Configurations from directory](#creatingrunning-mix-espec-run-configurations-from-directory)
                   * [Creating/Running mix espec Run Configurations from file](#creatingrunning-mix-espec-run-configurations-from-file)
                   * [Creating/Running mix espec Run Configurations from line](#creatingrunning-mix-espec-run-configurations-from-line)
-            * [mix test <a href="/resources/icons/run/mix/test.svg" target="_blank" rel="noopener noreferrer"><img src="/resources/icons/run/mix/test.svg" alt="" style="max-width:100\x;"></a>](#mix-test-)
+            * [mix test <a href="/resources/icons/run/mix/test.svg" target="_blank" rel="noopener noreferrer"><img src="/resources/icons/run/mix/test.svg" alt="Mix test icon" style="max-width:100\x;"></a>](#mix-test-)
                * [Creating mix test Run Configurations Manually](#creating-mix-test-run-configurations-manually)
                * [Running](#running-6)
                * [Debugging](#debugging-6)
@@ -625,10 +625,10 @@ Syntax highlighting of lexer tokens and semantic annotating of parser elements c
       <td></td>
       <td><code>String</code></td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/default/Alias.png?raw=true"/>
+        <img alt="Alias color scheme in default theme" src="screenshots/preferences/editor/colors_and_fonts/default/Alias.png?raw=true"/>
       </td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Alias.png?raw=true"/>
+        <img alt="Alias color scheme in Darcula theme" src="screenshots/preferences/editor/colors_and_fonts/darcula/Alias.png?raw=true"/>
       </td>
     </tr>
     <tr>
@@ -642,10 +642,10 @@ Syntax highlighting of lexer tokens and semantic annotating of parser elements c
         </ul>
       </td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/default/Atom.png?raw=true"/>
+        <img alt="Atom color scheme in default theme" src="screenshots/preferences/editor/colors_and_fonts/default/Atom.png?raw=true"/>
       </td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Atom.png?raw=true"/>
+        <img alt="Atom color scheme in Darcula theme" src="screenshots/preferences/editor/colors_and_fonts/darcula/Atom.png?raw=true"/>
       </td>
     </tr>
     <tr>
@@ -659,10 +659,10 @@ Syntax highlighting of lexer tokens and semantic annotating of parser elements c
         </ul>
       </td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/default/Braces%20and%20Operators/Bit.png?raw=true"/>
+        <img alt="Bit operator color scheme in default theme" src="screenshots/preferences/editor/colors_and_fonts/default/Braces%20and%20Operators/Bit.png?raw=true"/>
       </td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Braces%20and%20Operators/Bit.png?raw=true"/>
+        <img alt="Bit operator color scheme in Darcula theme" src="screenshots/preferences/editor/colors_and_fonts/darcula/Braces%20and%20Operators/Bit.png?raw=true"/>
       </td>
     </tr>
     <tr>
@@ -676,10 +676,10 @@ Syntax highlighting of lexer tokens and semantic annotating of parser elements c
         </ul>
       </td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/default/Braces%20and%20Operators/Braces.png?raw=true"/>
+        <img alt="Braces color scheme in default theme" src="screenshots/preferences/editor/colors_and_fonts/default/Braces%20and%20Operators/Braces.png?raw=true"/>
       </td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Braces%20and%20Operators/Braces.png?raw=true"/>
+        <img alt="Braces color scheme in Darcula theme" src="screenshots/preferences/editor/colors_and_fonts/darcula/Braces%20and%20Operators/Braces.png?raw=true"/>
       </td>
     </tr>
     <tr>
@@ -693,10 +693,10 @@ Syntax highlighting of lexer tokens and semantic annotating of parser elements c
         </ul>
       </td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/default/Braces%20and%20Operators/Brackets.png?raw=true"/>
+        <img alt="Brackets color scheme in default theme" src="screenshots/preferences/editor/colors_and_fonts/default/Braces%20and%20Operators/Brackets.png?raw=true"/>
       </td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Braces%20and%20Operators/Brackets.png?raw=true"/>
+        <img alt="Brackets color scheme in Darcula theme" src="screenshots/preferences/editor/colors_and_fonts/darcula/Braces%20and%20Operators/Brackets.png?raw=true"/>
       </td>
     </tr>
     <tr>
@@ -705,10 +705,10 @@ Syntax highlighting of lexer tokens and semantic annotating of parser elements c
       <td></td>
       <td><code>?</code></td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/default/Braces%20and%20Operators/Character%20Token.png?raw=true"/>
+        <img alt="Character Token color scheme in default theme" src="screenshots/preferences/editor/colors_and_fonts/default/Braces%20and%20Operators/Character%20Token.png?raw=true"/>
       </td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Braces%20and%20Operators/Character%20Token.png?raw=true"/>
+        <img alt="Character Token color scheme in Darcula theme" src="screenshots/preferences/editor/colors_and_fonts/darcula/Braces%20and%20Operators/Character%20Token.png?raw=true"/>
       </td>
     </tr>
     <tr>
@@ -717,10 +717,10 @@ Syntax highlighting of lexer tokens and semantic annotating of parser elements c
       <td></td>
       <td><code>,</code></td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/default/Braces%20and%20Operators/Comma.png?raw=true"/>
+        <img alt="Comma color scheme in default theme" src="screenshots/preferences/editor/colors_and_fonts/default/Braces%20and%20Operators/Comma.png?raw=true"/>
       </td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Braces%20and%20Operators/Comma.png?raw=true"/>
+        <img alt="Comma color scheme in Darcula theme" src="screenshots/preferences/editor/colors_and_fonts/darcula/Braces%20and%20Operators/Comma.png?raw=true"/>
       </td>
     </tr>
     <tr>
@@ -729,10 +729,10 @@ Syntax highlighting of lexer tokens and semantic annotating of parser elements c
       <td></td>
       <td><code>.</code></td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/default/Braces%20and%20Operators/Dot.png?raw=true"/>
+        <img alt="Dot operator color scheme in default theme" src="screenshots/preferences/editor/colors_and_fonts/default/Braces%20and%20Operators/Dot.png?raw=true"/>
       </td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Braces%20and%20Operators/Dot.png?raw=true"/>
+        <img alt="Dot operator color scheme in Darcula theme" src="screenshots/preferences/editor/colors_and_fonts/darcula/Braces%20and%20Operators/Dot.png?raw=true"/>
       </td>
     </tr>
     <tr>
@@ -746,10 +746,10 @@ Syntax highlighting of lexer tokens and semantic annotating of parser elements c
         </ul>
       </td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/default/Braces%20and%20Operators/Interpolation.png?raw=true"/>
+        <img alt="Interpolation color scheme in default theme" src="screenshots/preferences/editor/colors_and_fonts/default/Braces%20and%20Operators/Interpolation.png?raw=true"/>
       </td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Braces%20and%20Operators/Interpolation.png?raw=true"/>
+        <img alt="Interpolation color scheme in Darcula theme" src="screenshots/preferences/editor/colors_and_fonts/darcula/Braces%20and%20Operators/Interpolation.png?raw=true"/>
       </td>
     </tr>
     <tr>
@@ -763,10 +763,10 @@ Syntax highlighting of lexer tokens and semantic annotating of parser elements c
         </ul>
       </td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/default/Braces%20and%20Operators/Maps%20and%20Structs/Maps.png?raw=true"/>
+        <img alt="Maps color scheme in default theme" src="screenshots/preferences/editor/colors_and_fonts/default/Braces%20and%20Operators/Maps%20and%20Structs/Maps.png?raw=true"/>
       </td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Braces%20and%20Operators/Maps%20and%20Structs/Maps.png?raw=true"/>
+        <img alt="Maps color scheme in Darcula theme" src="screenshots/preferences/editor/colors_and_fonts/darcula/Braces%20and%20Operators/Maps%20and%20Structs/Maps.png?raw=true"/>
       </td>
     </tr>
     <tr>
@@ -780,10 +780,10 @@ Syntax highlighting of lexer tokens and semantic annotating of parser elements c
           <li><code>}</code></li>
         </ul></td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/default/Braces%20and%20Operators/Maps%20and%20Structs/Structs.png?raw=true"/>
+        <img alt="Structs color scheme in default theme" src="screenshots/preferences/editor/colors_and_fonts/default/Braces%20and%20Operators/Maps%20and%20Structs/Structs.png?raw=true"/>
       </td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Braces%20and%20Operators/Maps%20and%20Structs/Structs.png?raw=true"/>
+        <img alt="Structs color scheme in Darcula theme" src="screenshots/preferences/editor/colors_and_fonts/darcula/Braces%20and%20Operators/Maps%20and%20Structs/Structs.png?raw=true"/>
       </td>
     </tr>
     <tr>
@@ -804,10 +804,10 @@ Syntax highlighting of lexer tokens and semantic annotating of parser elements c
         </ul>
       </td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/default/Braces%20and%20Operators/Operation%20Sign.png?raw=true"/>
+        <img alt="Operation Sign color scheme in default theme" src="screenshots/preferences/editor/colors_and_fonts/default/Braces%20and%20Operators/Operation%20Sign.png?raw=true"/>
       </td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Braces%20and%20Operators/Operation%20Sign.png?raw=true"/>
+        <img alt="Operation Sign color scheme in Darcula theme" src="screenshots/preferences/editor/colors_and_fonts/darcula/Braces%20and%20Operators/Operation%20Sign.png?raw=true"/>
       </td>
     </tr>
     <tr>
@@ -821,10 +821,10 @@ Syntax highlighting of lexer tokens and semantic annotating of parser elements c
         </ul>
       </td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/default/Braces%20and%20Operators/Parentheses.png?raw=true"/>
+        <img alt="Parentheses color scheme in default theme" src="screenshots/preferences/editor/colors_and_fonts/default/Braces%20and%20Operators/Parentheses.png?raw=true"/>
       </td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Braces%20and%20Operators/Parentheses.png?raw=true"/>
+        <img alt="Parentheses color scheme in Darcula theme" src="screenshots/preferences/editor/colors_and_fonts/darcula/Braces%20and%20Operators/Parentheses.png?raw=true"/>
       </td>
     </tr>
     <tr>
@@ -833,10 +833,10 @@ Syntax highlighting of lexer tokens and semantic annotating of parser elements c
       <td></td>
       <td><code>;</code></td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/default/Braces%20and%20Operators/Semicolon.png?raw=true"/>
+        <img alt="Semicolon color scheme in default theme" src="screenshots/preferences/editor/colors_and_fonts/default/Braces%20and%20Operators/Semicolon.png?raw=true"/>
       </td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Braces%20and%20Operators/Semicolon.png?raw=true"/>
+        <img alt="Semicolon color scheme in Darcula theme" src="screenshots/preferences/editor/colors_and_fonts/darcula/Braces%20and%20Operators/Semicolon.png?raw=true"/>
       </td>
     </tr>
     <tr>
@@ -845,10 +845,10 @@ Syntax highlighting of lexer tokens and semantic annotating of parser elements c
       <td></td>
       <td><code>inspect</code></td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/default/Calls/Function.png?raw=true"/>*Only the Italic attribute
+        <img alt="Function call color scheme in default theme" src="screenshots/preferences/editor/colors_and_fonts/default/Calls/Function.png?raw=true"/>*Only the Italic attribute
       </td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Calls/Function.png?raw=true"/>*Only the Italic attribute
+        <img alt="Function call color scheme in Darcula theme" src="screenshots/preferences/editor/colors_and_fonts/darcula/Calls/Function.png?raw=true"/>*Only the Italic attribute
       </td>
     </tr>
     <tr>
@@ -857,10 +857,10 @@ Syntax highlighting of lexer tokens and semantic annotating of parser elements c
       <td></td>
       <td><code>inspect</code></td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/default/Calls/Macro.png?raw=true"/>*Only the Bold and Italic attributes
+        <img alt="Macro call color scheme in default theme" src="screenshots/preferences/editor/colors_and_fonts/default/Calls/Macro.png?raw=true"/>*Only the Bold and Italic attributes
       </td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Calls/Macro.png?raw=true"/>*Only the Bold and Italic attributes
+        <img alt="Macro call color scheme in Darcula theme" src="screenshots/preferences/editor/colors_and_fonts/darcula/Calls/Macro.png?raw=true"/>*Only the Bold and Italic attributes
       </td>
     </tr>
     <tr>
@@ -885,10 +885,10 @@ Syntax highlighting of lexer tokens and semantic annotating of parser elements c
         </ul>
       </td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/default/Calls/Predefined.png?raw=true"/>*Only the Foreground attribute
+        <img alt="Predefined call color scheme in default theme" src="screenshots/preferences/editor/colors_and_fonts/default/Calls/Predefined.png?raw=true"/>*Only the Foreground attribute
       </td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Calls/Predefined.png?raw=true"/>*Only the Foreground attribute
+        <img alt="Predefined call color scheme in Darcula theme" src="screenshots/preferences/editor/colors_and_fonts/darcula/Calls/Predefined.png?raw=true"/>*Only the Foreground attribute
       </td>
     </tr>
     <tr>
@@ -897,10 +897,10 @@ Syntax highlighting of lexer tokens and semantic annotating of parser elements c
       <td></td>
       <td><code># Numbers</code></td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/default/Comment.png?raw=true"/>
+        <img alt="Comment color scheme in default theme" src="screenshots/preferences/editor/colors_and_fonts/default/Comment.png?raw=true"/>
       </td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Comment.png?raw=true"/>
+        <img alt="Comment color scheme in Darcula theme" src="screenshots/preferences/editor/colors_and_fonts/darcula/Comment.png?raw=true"/>
       </td>
     </tr>
     <tr>
@@ -909,10 +909,10 @@ Syntax highlighting of lexer tokens and semantic annotating of parser elements c
       <td></td>
       <td><code>end</code></td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/default/Keywords.png?raw=true"/>
+        <img alt="Keywords color scheme in default theme" src="screenshots/preferences/editor/colors_and_fonts/default/Keywords.png?raw=true"/>
       </td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Keywords.png?raw=true"/>
+        <img alt="Keywords color scheme in Darcula theme" src="screenshots/preferences/editor/colors_and_fonts/darcula/Keywords.png?raw=true"/>
       </td>
     </tr>
     <tr>
@@ -921,10 +921,10 @@ Syntax highlighting of lexer tokens and semantic annotating of parser elements c
       <td></td>
       <td><code>@custom_attr</code></td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/default/Module%20Attributes.png?raw=true"/>
+        <img alt="Module Attributes color scheme in default theme" src="screenshots/preferences/editor/colors_and_fonts/default/Module%20Attributes.png?raw=true"/>
       </td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Module%20Attributes.png?raw=true"/>
+        <img alt="Module Attributes color scheme in Darcula theme" src="screenshots/preferences/editor/colors_and_fonts/darcula/Module%20Attributes.png?raw=true"/>
       </td>
     </tr>
     <tr>
@@ -933,10 +933,10 @@ Syntax highlighting of lexer tokens and semantic annotating of parser elements c
       <td></td>
       <td><code>@doc</code></td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/default/Module%20Attributes/Documentation.png?raw=true"/>
+        <img alt="Documentation attribute color scheme in default theme" src="screenshots/preferences/editor/colors_and_fonts/default/Module%20Attributes/Documentation.png?raw=true"/>
       </td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Module%20Attributes/Documentation.png?raw=true"/>
+        <img alt="Documentation attribute color scheme in Darcula theme" src="screenshots/preferences/editor/colors_and_fonts/darcula/Module%20Attributes/Documentation.png?raw=true"/>
       </td>
     </tr>
     <tr>
@@ -945,10 +945,10 @@ Syntax highlighting of lexer tokens and semantic annotating of parser elements c
       <td>Text</td>
       <td><code>Simple module docstring</code></td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/default/Module%20Attributes/Documentation/Text.png?raw=true"/>
+        <img alt="Documentation text color scheme in default theme" src="screenshots/preferences/editor/colors_and_fonts/default/Module%20Attributes/Documentation/Text.png?raw=true"/>
       </td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Module%20Attributes/Documentation/Text.png?raw=true"/>
+        <img alt="Documentation text color scheme in Darcula theme" src="screenshots/preferences/editor/colors_and_fonts/darcula/Module%20Attributes/Documentation/Text.png?raw=true"/>
       </td>
     </tr>
     <tr>
@@ -957,10 +957,10 @@ Syntax highlighting of lexer tokens and semantic annotating of parser elements c
       <td>Callback</td>
       <td><code>func</code></td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/default/Module%20Attributes/Types/Callback.png?raw=true"/>
+        <img alt="Callback type color scheme in default theme" src="screenshots/preferences/editor/colors_and_fonts/default/Module%20Attributes/Types/Callback.png?raw=true"/>
       </td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Module%20Attributes/Types/Callback.png?raw=true"/>
+        <img alt="Callback type color scheme in Darcula theme" src="screenshots/preferences/editor/colors_and_fonts/darcula/Module%20Attributes/Types/Callback.png?raw=true"/>
       </td>
     </tr>
     <tr>
@@ -969,10 +969,10 @@ Syntax highlighting of lexer tokens and semantic annotating of parser elements c
       <td>Specification</td>
       <td><code>func</code></td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/default/Module%20Attributes/Types/Specification.png?raw=true"/>
+        <img alt="Specification type color scheme in default theme" src="screenshots/preferences/editor/colors_and_fonts/default/Module%20Attributes/Types/Specification.png?raw=true"/>
       </td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Module%20Attributes/Types/Specification.png?raw=true"/>
+        <img alt="Specification type color scheme in Darcula theme" src="screenshots/preferences/editor/colors_and_fonts/darcula/Module%20Attributes/Types/Specification.png?raw=true"/>
       </td>
     </tr>
     <tr>
@@ -981,10 +981,10 @@ Syntax highlighting of lexer tokens and semantic annotating of parser elements c
       <td>Type</td>
       <td><code>parameterized</code></td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/default/Module%20Attributes/Types/Type.png?raw=true"/>
+        <img alt="Type definition color scheme in default theme" src="screenshots/preferences/editor/colors_and_fonts/default/Module%20Attributes/Types/Type.png?raw=true"/>
       </td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Module%20Attributes/Types/Type.png?raw=true"/>
+        <img alt="Type definition color scheme in Darcula theme" src="screenshots/preferences/editor/colors_and_fonts/darcula/Module%20Attributes/Types/Type.png?raw=true"/>
       </td>
     </tr>
     <tr>
@@ -993,10 +993,10 @@ Syntax highlighting of lexer tokens and semantic annotating of parser elements c
       <td>Type Parameter</td>
       <td><code>type_parameter</code></td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/default/Module%20Attributes/Types/Type%20Parameter.png?raw=true"/>
+        <img alt="Type Parameter color scheme in default theme" src="screenshots/preferences/editor/colors_and_fonts/default/Module%20Attributes/Types/Type%20Parameter.png?raw=true"/>
       </td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Module%20Attributes/Types/Type%20Parameter.png?raw=true"/>
+        <img alt="Type Parameter color scheme in Darcula theme" src="screenshots/preferences/editor/colors_and_fonts/darcula/Module%20Attributes/Types/Type%20Parameter.png?raw=true"/>
       </td>
     </tr>
     <tr>
@@ -1011,10 +1011,10 @@ Syntax highlighting of lexer tokens and semantic annotating of parser elements c
         </ul>
       </td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/default/Numbers/Base%20Prefix/Non-Decimal.png?raw=true"/>
+        <img alt="Non-Decimal base prefix color scheme in default theme" src="screenshots/preferences/editor/colors_and_fonts/default/Numbers/Base%20Prefix/Non-Decimal.png?raw=true"/>
       </td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Numbers/Base%20Prefix/Non-Decimal.png?raw=true"/>
+        <img alt="Non-Decimal base prefix color scheme in Darcula theme" src="screenshots/preferences/editor/colors_and_fonts/darcula/Numbers/Base%20Prefix/Non-Decimal.png?raw=true"/>
       </td>
     </tr>
     <tr>
@@ -1028,10 +1028,10 @@ Syntax highlighting of lexer tokens and semantic annotating of parser elements c
         </ul>
       </td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/default/Numbers/Base%20Prefix/Obsolete%20Non-Decimal.png?raw=true"/>
+        <img alt="Obsolete Non-Decimal base prefix color scheme in default theme" src="screenshots/preferences/editor/colors_and_fonts/default/Numbers/Base%20Prefix/Obsolete%20Non-Decimal.png?raw=true"/>
       </td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Numbers/Base%20Prefix/Obsolete%20Non-Decimal.png?raw=true"/>
+        <img alt="Obsolete Non-Decimal base prefix color scheme in Darcula theme" src="screenshots/preferences/editor/colors_and_fonts/darcula/Numbers/Base%20Prefix/Obsolete%20Non-Decimal.png?raw=true"/>
       </td>
     </tr>
     <tr>
@@ -1046,10 +1046,10 @@ Syntax highlighting of lexer tokens and semantic annotating of parser elements c
         </ul>
       </td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/default/Numbers/Decimal%20Exponent%2C%20Mark%2C%20and%20Separator.png?raw=true"/>
+        <img alt="Decimal Exponent, Mark, and Separator color scheme in default theme" src="screenshots/preferences/editor/colors_and_fonts/default/Numbers/Decimal%20Exponent%2C%20Mark%2C%20and%20Separator.png?raw=true"/>
       </td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Numbers/Decimal%20Exponent%2C%20Mark%2C%20and%20Separator.png?raw=true"/>
+        <img alt="Decimal Exponent, Mark, and Separator color scheme in Darcula theme" src="screenshots/preferences/editor/colors_and_fonts/darcula/Numbers/Decimal%20Exponent%2C%20Mark%2C%20and%20Separator.png?raw=true"/>
       </td>
     </tr>
     <tr>
@@ -1065,10 +1065,10 @@ Syntax highlighting of lexer tokens and semantic annotating of parser elements c
         </ul>
       </td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/default/Numbers/Digits/Invalid.png?raw=true"/>
+        <img alt="Invalid digits color scheme in default theme" src="screenshots/preferences/editor/colors_and_fonts/default/Numbers/Digits/Invalid.png?raw=true"/>
       </td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Numbers/Digits/Invalid.png?raw=true"/>
+        <img alt="Invalid digits color scheme in Darcula theme" src="screenshots/preferences/editor/colors_and_fonts/darcula/Numbers/Digits/Invalid.png?raw=true"/>
       </td>
     </tr>
     <tr>
@@ -1084,10 +1084,10 @@ Syntax highlighting of lexer tokens and semantic annotating of parser elements c
         </ul>
       </td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/default/Numbers/Digits/Valid.png?raw=true"/>
+        <img alt="Valid digits color scheme in default theme" src="screenshots/preferences/editor/colors_and_fonts/default/Numbers/Digits/Valid.png?raw=true"/>
       </td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Numbers/Digits/Valid.png?raw=true"/>
+        <img alt="Valid digits color scheme in Darcula theme" src="screenshots/preferences/editor/colors_and_fonts/darcula/Numbers/Digits/Valid.png?raw=true"/>
       </td>
     </tr>
     <tr>
@@ -1098,10 +1098,10 @@ Syntax highlighting of lexer tokens and semantic annotating of parser elements c
         <code>'This is a list'</code>
       </td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/default/Textual/Character%20List.png?raw=true"/>
+        <img alt="Character List color scheme in default theme" src="screenshots/preferences/editor/colors_and_fonts/default/Textual/Character%20List.png?raw=true"/>
       </td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Textual/Character%20List.png?raw=true"/>
+        <img alt="Character List color scheme in Darcula theme" src="screenshots/preferences/editor/colors_and_fonts/darcula/Textual/Character%20List.png?raw=true"/>
       </td>
     </tr>
     <tr>
@@ -1112,10 +1112,10 @@ Syntax highlighting of lexer tokens and semantic annotating of parser elements c
         <code>\x{12}</code>
       </td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/default/Textual/Escape%20Sequence.png?raw=true"/>
+        <img alt="Escape Sequence color scheme in default theme" src="screenshots/preferences/editor/colors_and_fonts/default/Textual/Escape%20Sequence.png?raw=true"/>
       </td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Textual/Escape%20Sequence.png?raw=true"/>
+        <img alt="Escape Sequence color scheme in Darcula theme" src="screenshots/preferences/editor/colors_and_fonts/darcula/Textual/Escape%20Sequence.png?raw=true"/>
       </td>
     </tr>
     <tr>
@@ -1131,10 +1131,10 @@ Syntax highlighting of lexer tokens and semantic annotating of parser elements c
         </ul>
       </td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/default/Textual/Sigil.png?raw=true"/>
+        <img alt="Sigil color scheme in default theme" src="screenshots/preferences/editor/colors_and_fonts/default/Textual/Sigil.png?raw=true"/>
       </td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Textual/Sigil.png?raw=true"/>
+        <img alt="Sigil color scheme in Darcula theme" src="screenshots/preferences/editor/colors_and_fonts/darcula/Textual/Sigil.png?raw=true"/>
       </td>
     </tr>
     <tr>
@@ -1145,10 +1145,10 @@ Syntax highlighting of lexer tokens and semantic annotating of parser elements c
         <code>"Hello world"</code>
       </td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/default/Textual/String.png?raw=true"/>
+        <img alt="String color scheme in default theme" src="screenshots/preferences/editor/colors_and_fonts/default/Textual/String.png?raw=true"/>
       </td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Textual/String.png?raw=true"/>
+        <img alt="String color scheme in Darcula theme" src="screenshots/preferences/editor/colors_and_fonts/darcula/Textual/String.png?raw=true"/>
       </td>
     </tr>
     <tr>
@@ -1159,10 +1159,10 @@ Syntax highlighting of lexer tokens and semantic annotating of parser elements c
         <code>_</code>
       </td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/default/Variables/Ignored.png?raw=true"/>
+        <img alt="Ignored variables color scheme in default theme" src="screenshots/preferences/editor/colors_and_fonts/default/Variables/Ignored.png?raw=true"/>
       </td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Variables/Ignored.png?raw=true"/>
+        <img alt="Ignored variables color scheme in Darcula theme" src="screenshots/preferences/editor/colors_and_fonts/darcula/Variables/Ignored.png?raw=true"/>
       </td>
     </tr>
     <tr>
@@ -1174,13 +1174,12 @@ Syntax highlighting of lexer tokens and semantic annotating of parser elements c
           <li><code>a</code></li>
           <li><code>b</code></li>
         </ul>
-
       </td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/default/Variables/Parameter.png?raw=true"/>
+        <img alt="Parameter variables color scheme in default theme" src="screenshots/preferences/editor/colors_and_fonts/default/Variables/Parameter.png?raw=true"/>
       </td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Variables/Parameter.png?raw=true"/>
+        <img alt="Parameter variables color scheme in Darcula theme" src="screenshots/preferences/editor/colors_and_fonts/darcula/Variables/Parameter.png?raw=true"/>
       </td>
     </tr>
     <tr>
@@ -1191,10 +1190,10 @@ Syntax highlighting of lexer tokens and semantic annotating of parser elements c
         <code>pid</code>
       </td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/default/Variables/Variable.png?raw=true"/>
+        <img alt="Variable color scheme in default theme" src="screenshots/preferences/editor/colors_and_fonts/default/Variables/Variable.png?raw=true"/>
       </td>
       <td>
-        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Variables/Variable.png?raw=true"/>
+        <img alt="Variable color scheme in Darcula theme" src="screenshots/preferences/editor/colors_and_fonts/darcula/Variables/Variable.png?raw=true"/>
       </td>
     </tr>
   </tbody>
@@ -1897,7 +1896,7 @@ To view the list of all breakpoints and their properties, do one of the followin
 To view properties of a single breakpoint
 
 * Right-Click a breakpoint icon in the left gutter of the editor.
-  <img src="screenshots/debugger/breakpoints/Properties.png?raw=true"/>
+  <img alt="Breakpoint properties dialog" src="screenshots/debugger/breakpoints/Properties.png?raw=true"/>
 
 ##### Configuring Breakpoints
 
@@ -1954,7 +1953,7 @@ Line breakpoints can be set on executable lines. Comments, declarations and empt
 
 ##### Disabling Line Breakpoints
 
-When you temporarily disable or enable a breakpoint, its icon changes from <img src="screenshots/debugger/breakpoints/Enabled.png?raw=true"/> to <img src="screenshots/debugger/breakpoints/Disabled.png?raw=true"/> and vice versa.
+When you temporarily disable or enable a breakpoint, its icon changes from <img alt="Enabled breakpoint icon" src="screenshots/debugger/breakpoints/Enabled.png?raw=true"/> to <img alt="Disabled breakpoint icon" src="screenshots/debugger/breakpoints/Disabled.png?raw=true"/> and vice versa.
 
 1. Place the caret at the desired line with a breakpoint.
 2. Do one of the following:
@@ -2006,7 +2005,7 @@ It takes awhile, once the debugged process is started to configure the [debugger
 ##### Processes
 
 <figure>
-  <img src="screenshots/debugger/Processes.png?raw=true"/>
+  <img alt="Debugger processes panel" src="screenshots/debugger/Processes.png?raw=true"/>
   <br/>
   <figcaption>
     The "Thread" drop-down lists the current processes in the local
@@ -2018,7 +2017,7 @@ It takes awhile, once the debugged process is started to configure the [debugger
 ##### Frames
 
 <figure>
-  <img src="screenshots/debugger/Frames.png?raw=true"/>
+  <img alt="Debugger frames panel" src="screenshots/debugger/Frames.png?raw=true"/>
   <br/>
   <figcaption>
     The Frames for the current process can be navigated up and down
@@ -2034,7 +2033,7 @@ It takes awhile, once the debugged process is started to configure the [debugger
 When changing frames or jumping to definitions, you can lose track of where the debugger is paused.  To get back to the current execution point, do one of the following:
 1. Run > Show Execution Point.
 2. `Alt+F10`
-3. Click <img src="screenshots/debugger/Show%20Execution%20Point.png?raw=true"/> on the stepping toolbar of the Debug tool window.
+3. Click <img alt="Show Execution Point button" src="screenshots/debugger/Show%20Execution%20Point.png?raw=true"/> on the stepping toolbar of the Debug tool window.
 
 ##### Variables
 
@@ -2108,10 +2107,10 @@ Errors in the code will report back as a `result` tuple with an `:EXIT` tag.  Th
 
 | Action               | Icon                                                                    | Shortcut   | Description                                                                                                                                                                                                                                                                                  |
 |----------------------|-------------------------------------------------------------------------|------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Show Execution Point | <img src="screenshots/debugger/Show%20Execution%20Point.png?raw=true"/> | `Alt+F10`  | Click this button to highlight the current execution point in the editor and show the corresponding stack frame in the Frames pane.                                                                                                                                                          |
-| Step Over            | <img src="screenshots/debugger/stepping/Step%20Over.png?raw=true"/>     | `F8`       | Click this button to execute the program until the next line in the current function or file, skipping the function referenced at the current execution point (if any). If the current line is the last one in the function, execution steps to the line executed right after this function. |
-| Step Into            | <img src="screenshots/debugger/stepping/Step%20Into.png?raw=true"/>     | `F7`       | Click this button to have the debugger step into the function called at the current execution point.                                                                                                                                                                                         |
-| Step Out             | <img src="screenshots/debugger/stepping/Step%20Out.png?raw=true"/>      | `Shift+F8` | Click this button to have the debugger step out of the current function, to the line executed right after it.                                                                                                                                                                                |
+| Show Execution Point | <img alt="Show Execution Point button" src="screenshots/debugger/Show%20Execution%20Point.png?raw=true"/> | `Alt+F10`  | Click this button to highlight the current execution point in the editor and show the corresponding stack frame in the Frames pane.                                                                                                                                                          |
+| Step Over            | <img alt="Step Over button" src="screenshots/debugger/stepping/Step%20Over.png?raw=true"/>     | `F8`       | Click this button to execute the program until the next line in the current function or file, skipping the function referenced at the current execution point (if any). If the current line is the last one in the function, execution steps to the line executed right after this function. |
+| Step Into            | <img alt="Step Into button" src="screenshots/debugger/stepping/Step%20Into.png?raw=true"/>     | `F7`       | Click this button to have the debugger step into the function called at the current execution point.                                                                                                                                                                                         |
+| Step Out             | <img alt="Step Out button" src="screenshots/debugger/stepping/Step%20Out.png?raw=true"/>      | `Shift+F8` | Click this button to have the debugger step out of the current function, to the line executed right after it.                                                                                                                                                                                |
 
 ### Delimiters
 
@@ -5938,7 +5937,7 @@ If the plugin encounters an error, there is a custom error handler registered, s
 ## Contributors
 
 This project exists thanks to all the people who contribute. [[Contribute](CONTRIBUTING.md)].
-<a href="https://github.com/KronicDeth/intellij-elixir/graphs/contributors"><img src="https://opencollective.com/intellij-elixir/contributors.svg?width=890&button=false" /></a>
+<a href="https://github.com/KronicDeth/intellij-elixir/graphs/contributors"><img alt="Contributors" src="https://opencollective.com/intellij-elixir/contributors.svg?width=890&button=false" /></a>
 
 ## Donations
 
@@ -6160,21 +6159,19 @@ I'd like to thank those who have donated to help support this project as GitHub 
 
 Thank you to all our backers! 🙏 [[Become a backer](https://opencollective.com/intellij-elixir#backer)]
 
-<a href="https://opencollective.com/intellij-elixir#backers" target="_blank"><img src="https://opencollective.com/intellij-elixir/backers.svg?width=890"></a>
+<a href="https://opencollective.com/intellij-elixir#backers" target="_blank"><img alt="Backers" src="https://opencollective.com/intellij-elixir/backers.svg?width=890"></a>
 
 #### Sponsors
 
 Support this project by becoming a sponsor. Your logo will show up here with a link to your website. [[Become a sponsor](https://opencollective.com/intellij-elixir#sponsor)]
 
-<a href="https://opencollective.com/intellij-elixir/sponsor/0/website" target="_blank"><img src="https://opencollective.com/intellij-elixir/sponsor/0/avatar.svg"></a>
-<a href="https://opencollective.com/intellij-elixir/sponsor/1/website" target="_blank"><img src="https://opencollective.com/intellij-elixir/sponsor/1/avatar.svg"></a>
-<a href="https://opencollective.com/intellij-elixir/sponsor/2/website" target="_blank"><img src="https://opencollective.com/intellij-elixir/sponsor/2/avatar.svg"></a>
-<a href="https://opencollective.com/intellij-elixir/sponsor/3/website" target="_blank"><img src="https://opencollective.com/intellij-elixir/sponsor/3/avatar.svg"></a>
-<a href="https://opencollective.com/intellij-elixir/sponsor/4/website" target="_blank"><img src="https://opencollective.com/intellij-elixir/sponsor/4/avatar.svg"></a>
-<a href="https://opencollective.com/intellij-elixir/sponsor/5/website" target="_blank"><img src="https://opencollective.com/intellij-elixir/sponsor/5/avatar.svg"></a>
-<a href="https://opencollective.com/intellij-elixir/sponsor/6/website" target="_blank"><img src="https://opencollective.com/intellij-elixir/sponsor/6/avatar.svg"></a>
-<a href="https://opencollective.com/intellij-elixir/sponsor/7/website" target="_blank"><img src="https://opencollective.com/intellij-elixir/sponsor/7/avatar.svg"></a>
-<a href="https://opencollective.com/intellij-elixir/sponsor/8/website" target="_blank"><img src="https://opencollective.com/intellij-elixir/sponsor/8/avatar.svg"></a>
-<a href="https://opencollective.com/intellij-elixir/sponsor/9/website" target="_blank"><img src="https://opencollective.com/intellij-elixir/sponsor/9/avatar.svg"></a>
-
-
+<a href="https://opencollective.com/intellij-elixir/sponsor/0/website" target="_blank"><img alt="Sponsor 0" src="https://opencollective.com/intellij-elixir/sponsor/0/avatar.svg"></a>
+<a href="https://opencollective.com/intellij-elixir/sponsor/1/website" target="_blank"><img alt="Sponsor 1" src="https://opencollective.com/intellij-elixir/sponsor/1/avatar.svg"></a>
+<a href="https://opencollective.com/intellij-elixir/sponsor/2/website" target="_blank"><img alt="Sponsor 2" src="https://opencollective.com/intellij-elixir/sponsor/2/avatar.svg"></a>
+<a href="https://opencollective.com/intellij-elixir/sponsor/3/website" target="_blank"><img alt="Sponsor 3" src="https://opencollective.com/intellij-elixir/sponsor/3/avatar.svg"></a>
+<a href="https://opencollective.com/intellij-elixir/sponsor/4/website" target="_blank"><img alt="Sponsor 4" src="https://opencollective.com/intellij-elixir/sponsor/4/avatar.svg"></a>
+<a href="https://opencollective.com/intellij-elixir/sponsor/5/website" target="_blank"><img alt="Sponsor 5" src="https://opencollective.com/intellij-elixir/sponsor/5/avatar.svg"></a>
+<a href="https://opencollective.com/intellij-elixir/sponsor/6/website" target="_blank"><img alt="Sponsor 6" src="https://opencollective.com/intellij-elixir/sponsor/6/avatar.svg"></a>
+<a href="https://opencollective.com/intellij-elixir/sponsor/7/website" target="_blank"><img alt="Sponsor 7" src="https://opencollective.com/intellij-elixir/sponsor/7/avatar.svg"></a>
+<a href="https://opencollective.com/intellij-elixir/sponsor/8/website" target="_blank"><img alt="Sponsor 8" src="https://opencollective.com/intellij-elixir/sponsor/8/avatar.svg"></a>
+<a href="https://opencollective.com/intellij-elixir/sponsor/9/website" target="_blank"><img alt="Sponsor 9" src="https://opencollective.com/intellij-elixir/sponsor/9/avatar.svg"></a>
