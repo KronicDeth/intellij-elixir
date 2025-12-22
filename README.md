@@ -43,12 +43,12 @@ Table of Contents[![Backers on Open Collective](https://opencollective.com/intel
             * [Regions](#regions)
          * [Commenter](#commenter)
          * [Credo](#credo)
-            * [Annotator](#annotator)
-               * [Enable](#enable)
-               * [Disable](#disable)
             * [Inspection](#inspection)
                * [Batch Mode](#batch-mode)
             * [Configuration](#configuration)
+            * [Annotator](#annotator)
+               * [Disable Explanation](#disable-explanation)
+               * [Disable inspection](#disable-inspection)
          * [Debugger](#debugger)
             * [Steps](#steps)
             * [Basics](#basics)
@@ -255,7 +255,6 @@ Table of Contents[![Backers on Open Collective](https://opencollective.com/intel
       * [Donations](#donations)
          * [Work Time](#work-time)
          * [Donors](#donors)
-         * [Patrons](#patrons)
          * [Backers](#backers)
          * [Sponsors](#sponsors)
 
@@ -291,39 +290,39 @@ Once you have your IDE of choice installed, you can [install this plugin](#insta
 
 ## Features
 
-| Feature                                     | [Rich](#ides) | [Small](#ides) | Alternative                                                                           |
-|---------------------------------------------|---------------|----------------|---------------------------------------------------------------------------------------|
-| Project                                     | Yes           | No             | 1. Open directory<br/>2. [Setup the SDK](#small-ides)                                |
-| Project Structure                           | Automatic     | Manual         |                                                                                       |
-| Project Settings                            | Yes           | No             |                                                                                       |
-| Module Settings                             | Yes           | No             |                                                                                       |
-| New Elixir File                             | Yes           | Yes            |                                                                                       |
-| Syntax Highlighting and Semantic Annotation | Yes           | Yes            |                                                                                       |
-| Grammar Parsing                             | Yes           | Yes            |                                                                                       |
-| Inspections                                 | Yes           | Yes            |                                                                                       |
-| Quick Fixes                                 | Yes           | Yes            |                                                                                       |
-| Code Folding                                | Yes           | Yes            |                                                                                       |
-| Commenter                                   | Yes           | Yes            |                                                                                       |
-| Debugger                                    | Yes           | Yes            |                                                                                       |
-| Delimiters                                  | Yes           | Yes            |                                                                                       |
-| Embedded Elixir (EEx) Templates             | Yes           | Yes            |                                                                                       |
-| Building/Compiling                          | Yes           | No             | Build/compile as part `mix` run configurations only                                   |
-| Live Templates                              | Yes           | Yes            |                                                                                       |
-| Documentation                               | Yes           | Yes            |                                                                                       |
-| Run Configurations                          | Yes           | Yes            |                                                                                       |
-| Completion                                  | Yes           | Yes            |                                                                                       |
-| Decompilation                               | Yes           | Yes            |                                                                                       |
-| Go To Declaration                           | Yes           | Yes            |                                                                                       |
-| Formatting                                  | Yes           | Yes            |                                                                                       |
-| Go To Related                               | Yes           | Yes            |                                                                                       |
-| Go To Symbol                                | Yes           | Yes            |                                                                                       |
-| Go To Test                                  | Yes           | Yes            |                                                                                       |
-| Go To Test Subject                          | Yes           | Yes            |                                                                                       |
-| Find Usage                                  | Yes           | Yes            |                                                                                       |
-| Live Embedded Elixir (LEEx) Templates       | Yes           | Yes            |                                                                                       |
-| Refactor                                    | Yes           | Yes            |                                                                                       |
-| SDK                                         | Yes           | Yes            |                                                                                       |
-| Structure                                   | Yes           | Yes            |                                                                                       |
+| Feature                                     | [Rich](#ides) | [Small](#ides) | Alternative                                           |
+|---------------------------------------------|---------------|----------------|-------------------------------------------------------|
+| Project                                     | Yes           | No             | 1. Open directory<br/>2. [Setup the SDK](#small-ides) |
+| Project Structure                           | Automatic     | Manual         |                                                       |
+| Project Settings                            | Yes           | No             |                                                       |
+| Module Settings                             | Yes           | No             |                                                       |
+| New Elixir File                             | Yes           | Yes            |                                                       |
+| Syntax Highlighting and Semantic Annotation | Yes           | Yes            |                                                       |
+| Grammar Parsing                             | Yes           | Yes            |                                                       |
+| Inspections                                 | Yes           | Yes            |                                                       |
+| Quick Fixes                                 | Yes           | Yes            |                                                       |
+| Code Folding                                | Yes           | Yes            |                                                       |
+| Commenter                                   | Yes           | Yes            |                                                       |
+| Debugger                                    | Yes           | Yes            |                                                       |
+| Delimiters                                  | Yes           | Yes            |                                                       |
+| Embedded Elixir (EEx) Templates             | Yes           | Yes            |                                                       |
+| Building/Compiling                          | Yes           | No             | Build/compile as part `mix` run configurations only   |
+| Live Templates                              | Yes           | Yes            |                                                       |
+| Documentation                               | Yes           | Yes            |                                                       |
+| Run Configurations                          | Yes           | Yes            |                                                       |
+| Completion                                  | Yes           | Yes            |                                                       |
+| Decompilation                               | Yes           | Yes            |                                                       |
+| Go To Declaration                           | Yes           | Yes            |                                                       |
+| Formatting                                  | Yes           | Yes            |                                                       |
+| Go To Related                               | Yes           | Yes            |                                                       |
+| Go To Symbol                                | Yes           | Yes            |                                                       |
+| Go To Test                                  | Yes           | Yes            |                                                       |
+| Go To Test Subject                          | Yes           | Yes            |                                                       |
+| Find Usage                                  | Yes           | Yes            |                                                       |
+| Live Embedded Elixir (LEEx) Templates       | Yes           | Yes            |                                                       |
+| Refactor                                    | Yes           | Yes            |                                                       |
+| SDK                                         | Yes           | Yes            |                                                       |
+| Structure                                   | Yes           | Yes            |                                                       |
 
 ### Project
 <b>
@@ -356,7 +355,7 @@ If you've already created a `mix` project, you can load it as an Elixir project 
 9. Click Finish after you select SDK name from the Project SDK list.
 10. The "Mix project root" will be filled in with the selected directory.
 11. (Optional) Uncheck "Fetch dependencies with mix" if you don't want to run `mix deps.get` when importing the project
-   * If "Fetch dependencies with mix" is checked both `mix local.hex --force` and `mix deps.get` will be run.
+    * If "Fetch dependencies with mix" is checked both `mix local.hex --force` and `mix deps.get` will be run.
 12. Click Next
 13. All directories with `mix.exs` files will be selected as "Mix projects to import".  To import just the main project and not its dependencies, click Unselect All.
 14. Check the box next to the project root to use only its `mix.exs`.  (It will likely be the first checkbox at the top.)
@@ -377,16 +376,16 @@ If you've already created a (non-`mix`) project, you can load it as an Elixir pr
 9. You'll be prompted with a list of detected Elixir project roots to add to the project.  Each root contains a
    `mix.exs`.  Uncheck any project roots that you don't want added.
 10. Click Next.
-10. Select a Project SDK directory by clicking Configure.
-11. The plugin will automatically find the newest version of Elixir installed. (**NOTE: SDK detection only works for
+11. Select a Project SDK directory by clicking Configure.
+12. The plugin will automatically find the newest version of Elixir installed. (**NOTE: SDK detection only works for
     Linux, homebrew installs on OSX, and Windows.  [Open an issue](https://github.com/KronicDeth/intellij-elixir/issues)
     with information about Elixir install locations on your operating system and package manager to have SDK detection
     added for it.**)
-12. If the automatic detection doesn't find your Elixir SDK or you want to use an older version, manually select select
+13. If the automatic detection doesn't find your Elixir SDK or you want to use an older version, manually select select
     the directory above the `bin` directory containing `elixir`, `elixirc`, `iex`, and `mix`.
-13. Click Next after you select SDK name from the Project SDK list.
-14. Click Finish on the framework page.  (*No framework detection is implemented yet for Elixir.*)
-15. Choose whether to open in a New Window or in This Window.
+14. Click Next after you select SDK name from the Project SDK list.
+15. Click Finish on the framework page.  (*No framework detection is implemented yet for Elixir.*)
+16. Choose whether to open in a New Window or in This Window.
 
 #### New
 
@@ -402,8 +401,8 @@ If you want to create a basic (non-`mix`) Elixir project with a `lib` directory,
 4. Select a Project SDK directory by clicking Configure.
 
    ![Project SDK](/screenshots/features/project/SDK.png?raw=true "Project SDK")
-4. Select a Project SDK directory by clicking Configure.
-5. The plugin will automatically find the newest version of Elixir installed.
+5. Select a Project SDK directory by clicking Configure.
+6. The plugin will automatically find the newest version of Elixir installed.
    * macOS / OSX
      * Homebrew (`/usr/local/Cellar/elixir`)
      * Nix (`/nix/store`)
@@ -414,14 +413,14 @@ If you want to create a basic (non-`mix`) Elixir project with a `lib` directory,
      * 32-bit (`C:\Program Files\Elixir`)
      * 64-bit (`C:\Program Files (x86)\Elixir`)
      * (**NOTE: SDK detection only works for [Open an issue](https://github.com/KronicDeth/intellij-elixir/issues) with information about Elixir install locations on your operating system and package manager to have SDK detection added for it.**)
-6. If the automatic detection doesn't find your Elixir SDK or you want to use an older version, manually select select the directory above the `bin` directory containing `elixir`, `elixirc`, `iex`, and `mix`.  If the `bin`, `lib,` or `src` directory is incorrectly selected, it will be corrected to the parent directory.
-7. Click Next after you select SDK name from the Project SDK list.
-8. Change the `Project name` to the name your want for the project
+7. If the automatic detection doesn't find your Elixir SDK or you want to use an older version, manually select select the directory above the `bin` directory containing `elixir`, `elixirc`, `iex`, and `mix`.  If the `bin`, `lib,` or `src` directory is incorrectly selected, it will be corrected to the parent directory.
+8. Click Next after you select SDK name from the Project SDK list.
+9. Change the `Project name` to the name your want for the project
    ![File > New > Project > Settings](/screenshots/features/project/new/Settings.png?raw=true "New Elixir Project Settings")
-9. (Optionally) change the `Project location` if the directory does not match what you want
-10. (Optionally) expand `More Settings` to change the `Module name`, `Content root`, `Module file location`, and/or `Project format`.  The defaults derived from the `Project name` and `Project location` should work for most projects.
-11. Click Finish
-12. Choose whether to open in a New Window or in This Window.
+10. (Optionally) change the `Project location` if the directory does not match what you want
+11. (Optionally) expand `More Settings` to change the `Module name`, `Content root`, `Module file location`, and/or `Project format`.  The defaults derived from the `Project name` and `Project location` should work for most projects.
+12. Click Finish
+13. Choose whether to open in a New Window or in This Window.
     ![File > New > Project > Window](/screenshots/features/project/new/Settings.png?raw=true "Open Project in New Window or This Window")
 
 ### Project Structure
@@ -873,7 +872,6 @@ Syntax highlighting of lexer tokens and semantic annotating of parser elements c
           <li>
             <code>Kernel</code>
             <ul>
-            <ul>
               <li>functions</li>
               <li>macros</li>
             </ul>
@@ -884,7 +882,7 @@ Syntax highlighting of lexer tokens and semantic annotating of parser elements c
               <li>macros</li>
             </ul>
           </li>
-        <ul>
+        </ul>
       </td>
       <td>
         <img src="screenshots/preferences/editor/colors_and_fonts/default/Calls/Predefined.png?raw=true"/>*Only the Foreground attribute
@@ -1754,11 +1752,14 @@ The Inspections Result Tool Pane will open and show results as each file is proc
   </tbody>
 </table>
 
+#### Annotator
 If you want to limit the performance impact of the credo annotator because `mix credo` spikes your CPU, you can limit the number of `mix credo` runs to 1 per open file by disabling the Explanation tooltip
 
+##### Disable Explanation
 1. Preferences > Editor > Inspections > Credo
 2. Uncheck "Include Explanation"
 
+##### Disable inspection
 If you don't want the annotator to run at all on open editors, then you can disable the paired inspection
 
 1. Preferences > Editor > Inspections
@@ -1861,7 +1862,7 @@ You can customize these module patterns as an application setting.
 If you want to customize the modules to ignore on a per-Run-Configuration basis, you can set an environment variable in the Run Configuration.
 
 | Variable                           | Example    | Description                     |
-| -----------------------------------|------------| --------------------------------|
+|------------------------------------|------------|---------------------------------|
 | INTELLIJ\_ELIXIR\_DEBUG\_BLACKLIST | iconv,some | Excluding modules from debugger |
 
 *Notice: If you want non `Elixir.` module in blacklist, write it with: `:`. This rule applies only to module atoms.*
@@ -2134,7 +2135,7 @@ the delimiter is only completed if when used for sigils.
 |                 | `<<`  | `>>`   |
 | `~<sigil-name>` | `<`   | `>`    |
 | `~<sigil-name>` | `/`   | `/`    |
-| `~<sigil-name>` | `|`   | `|`    |
+| `~<sigil-name>` | `\|`  | `\|`   |
 
 #### Matching
 
@@ -2154,7 +2155,7 @@ All delimiters that are auto-inserted are also matched for highlighting
 | `<<`  | `>>`  |
 | `<`   | `>`   |
 | `/`   | `/`   |
-| `|`   | `|`   |
+| `\|`  | `\|`  |
 
 ### Dialyzer
 
@@ -2618,11 +2619,11 @@ Code in code blocks (indented 4 spaces) are marked as Elixir language, so all th
 
 This includes highlighting reads and writes of variables
 
-![](screenshots/features/documentation/editor/Variable Usage.png)
+![](screenshots/features/documentation/editor/Variable%20Usage.png)
 
 and Go To Definition for calls
 
-![](screenshots/features/documentation/editor/Go To Definition.png)
+![](screenshots/features/documentation/editor/Go%20To%20Definition.png)
 
 ##### Toggling Editor to Rendered
 
@@ -2631,7 +2632,7 @@ and Go To Definition for calls
 2. Click the "Toggle Rendered View" button in the gutter next to the editor.
    ![](screenshots/features/documentation/editor/Toggle%20Editor%20to%20Rendered%20View.png)
 3. Rendered View will be shown
-   ![](screenshots/features/documentation/rendered_view/HTML Rendered View.png)
+   ![](screenshots/features/documentation/rendered_view/HTML%20Rendered%20View.png)
 
 #### Rendered View
 
@@ -2643,18 +2644,18 @@ In the rendered view, aliases are clickable and navigatable.
 
 Clicking the links will show the documentation for module.
 
-![](screenshots/features/documentation/rendered_view/alias_link/Quick Documentation.png)
+![](screenshots/features/documentation/rendered_view/alias_link/Quick%20Documentation.png)
 
 Using Go To Definition (Cmd+Click) on the link will take you to the module definition.
 
-![](screenshots/features/documentation/rendered_view/alias_link/Go To Definition.png)
+![](screenshots/features/documentation/rendered_view/alias_link/Go%20To%20Definition.png)
 
 ##### Toggling Rendered to Editor
 
 1. Start with the Rendered View
-   ![](screenshots/features/documentation/rendered_view/HTML Rendered View.png)
+   ![](screenshots/features/documentation/rendered_view/HTML%20Rendered%20View.png)
 2. Click the "Toggle Rendered View" button in the gutter next to the editor.
-   ![](screenshots/features/documentation/rendered_view/Toggle Rendered View to Editor.png)
+   ![](screenshots/features/documentation/rendered_view/Toggle%20Rendered%20View%20to%20Editor.png)
 3. Editor will be shown
    ![](screenshots/features/documentation/editor/Markdown%20Editor.png)
 
@@ -2701,7 +2702,7 @@ You can get documentation for functions and macros that have a `@doc`, aliases o
 [Distillery](https://github.com/bitwalker/distillery)'s `mix release` produces a [CLI](https://en.wikipedia.org/wiki/Command-line_interface) for running the release.
 
 1. Build the release: `mix release`
-   ```shell
+   ```console
    ==> Release successfully built!
        You can run it in one of the following ways:
          Interactive: _build/ENV/rel/NAME/bin/NAME console
@@ -2799,8 +2800,8 @@ Although it is exceedingly rare, as most Elixir projects use `mix`, it is suppor
 4. Fill in the "`elixir` arguments".
 5. (Optionally) fill in "`erl` arguments" with arguments to `erl` before it runs `elixir`.
 6. Fill in the "Working directory"
-  * Type the absolute path to the directory.
-  * Select the path using directory picker by clicking the `...` button
+    * Type the absolute path to the directory.
+    * Select the path using directory picker by clicking the `...` button
 7. (Optionally) click the `...` button on the "Environment variables" line to add environment variables.
 8. Click "OK" to save the Run Configuration and close the dialog
 
@@ -2839,8 +2840,8 @@ With the Run Configuration defined, you can either Run or Debug `elixir`
 4. (Optionally) fill in "`iex` arguments" with arguments to `iex`.
 5. (Optionally) full in "`erl` arguments" with arguments to `erl` before it runs `iex`.
 6. Fill in the "Working directory"
-  * Type the absolute path to the directory.
-  * Select the path using directory picker by clicking the `...` button
+    * Type the absolute path to the directory.
+    * Select the path using directory picker by clicking the `...` button
 7. (Optionally) click the `...` button on the "Environment variables" line to add environment variables.
 8. Click "OK" to save the Run Configuration and close the dialog
 
@@ -2879,8 +2880,8 @@ Much like `rake` tasks in Rubymine, this plugin can run `mix` tasks.
 5. (Optionally) fill in "`elixir` arguments" with arguments to `elixir` before it runs `mix`.
 6. (Optionally) fill in "`erl` arguments" with arguments to `erl` before it runs `elixir`.
 7. Fill in the "Working directory"
-  * Type the absolute path to the directory.
-  * Select the path using directory picker by clicking the `...` button
+    * Type the absolute path to the directory.
+    * Select the path using directory picker by clicking the `...` button
 8. (Optionally) click the `...` button on the "Environment variables" line to add environment variables.
 9. Click "OK" to save the Run Configuration and close the dialog
 
@@ -2923,8 +2924,8 @@ If you want to run `iex` in the context of the project, you need to run `iex -S 
 5. (Optionally) fill in "`iex` arguments" with arguments to `iex` before `-S mix`.
 6. (Optionally) full in "`erl` arguments" with arguments to `erl` before it runs `iex`.
 7. Fill in the "Working directory"
-  * Type the absolute path to the directory.
-  * Select the path using directory picker by clicking the `...` button
+    * Type the absolute path to the directory.
+    * Select the path using directory picker by clicking the `...` button
 8. (Optionally) click the `...` button on the "Environment variables" line to add environment variables.
 9. Click "OK" to save the Run Configuration and close the dialog
 
@@ -3051,15 +3052,15 @@ While you can create `Elixir Mix ESpec` run configurations manually using the `R
 The context menu must know that the the directory, file, or line you are right-clicking is a test.  It does this by checking if the current directory or an ancestor is marked as a Test Sources Root and contains or is a `*_spec.exs` file(s)
 
 1. In the Project pane, ensure your OTP application's `espec` directory is marked as a Test Sources Root
-  1. Check if the `espec` directory is green.  If it is, it is likely a Test Sources Root.  This color may differ in different themes, so to be sure you can check the context menu
-  2. Right-click the `test` directory.
-  3. Hover over "Mark Directory As &gt;"
-     * If "Unmark as Test Sources Root" is shown, then the directory is already configured correctly, and create from context will work.
+2. Check if the `espec` directory is green.  If it is, it is likely a Test Sources Root.  This color may differ in different themes, so to be sure you can check the context menu
+3. Right-click the `test` directory.
+4. Hover over "Mark Directory As &gt;"
+   * If "Unmark as Test Sources Root" is shown, then the directory is already configured correctly, and create from context will work.
 
-       ![Mark Directory As &gt; Unmark as Test Sources Root](/screenshots/features/run_debug_configurations/mix_espec/mark_directory_as/Unmark%20as%20Test%20Sources%20Root.png?raw=true "Unmark Directory as Test Sources Root")
-     * If "Test Sources Root" is shown, then the directory need to be configured by clicking that entry
+     ![Mark Directory As &gt; Unmark as Test Sources Root](/screenshots/features/run_debug_configurations/mix_espec/mark_directory_as/Unmark%20as%20Test%20Sources%20Root.png?raw=true "Unmark Directory as Test Sources Root")
+   * If "Test Sources Root" is shown, then the directory need to be configured by clicking that entry
 
-       ![Mark Directory As &gt; Test Sources Root](/screenshots/features/run_debug_configurations/mix_espec/mark_directory_as/Test%20Sources%20Root.png?raw=true "Mark Directory as Test Sources Root")
+     ![Mark Directory As &gt; Test Sources Root](/screenshots/features/run_debug_configurations/mix_espec/mark_directory_as/Test%20Sources%20Root.png?raw=true "Mark Directory as Test Sources Root")
 
 ###### Creating/Running `mix espec` Run Configurations from directory
 
@@ -3162,15 +3163,15 @@ While you can create `Elixir Mix ExUnit` run configurations manually using the `
 The context menu must know that the the directory, file, or line you are right-clicking is a test.  It does this by checking if the current directory or an ancestor is marked as a Test Sources Root.
 
 1. In the Project pane, ensure your OTP application's `test` directory is marked as a Test Sources Root
-  1. Check if the `test` directory is green.  If it is, it is likely a Test Sources Root.  This color may differ in different themes, so to be sure you can check the context menu
-  2. Right-click the `test` directory.
-  3. Hover over "Mark Directory As &gt;"
-     * If "Unmark as Test Sources Root" is shown, then the directory is already configured correctly, and create from context will work.
+2. Check if the `test` directory is green.  If it is, it is likely a Test Sources Root.  This color may differ in different themes, so to be sure you can check the context menu
+3. Right-click the `test` directory.
+4. Hover over "Mark Directory As &gt;"
+   * If "Unmark as Test Sources Root" is shown, then the directory is already configured correctly, and create from context will work.
 
-       ![Mark Directory As &gt; Unmark as Test Sources Root](/screenshots/features/run_debug_configurations/mix_test/mark_directory_as/Unmark%20as%20Test%20Sources%20Root.png?raw=true "Unmark Directory as Test Sources Root")
-     * If "Test Sources Root" is shown, then the directory need to be configured by clicking that entry
+     ![Mark Directory As &gt; Unmark as Test Sources Root](/screenshots/features/run_debug_configurations/mix_test/mark_directory_as/Unmark%20as%20Test%20Sources%20Root.png?raw=true "Unmark Directory as Test Sources Root")
+   * If "Test Sources Root" is shown, then the directory need to be configured by clicking that entry
 
-       ![Mark Directory As &gt; Test Sources Root](/screenshots/features/run_debug_configurations/mix_test/mark_directory_as/Test%20Sources%20Root.png?raw=true "Mark Directory as Test Sources Root")
+     ![Mark Directory As &gt; Test Sources Root](/screenshots/features/run_debug_configurations/mix_test/mark_directory_as/Test%20Sources%20Root.png?raw=true "Mark Directory as Test Sources Root")
 
 ###### Creating/Running `mix test` Run Configurations from directory
 
@@ -3474,8 +3475,8 @@ By default as many references to other chunks and references to other parts of `
     </tr>
     <tr>
       <td>Inline Strings</td>
-      <td>Looks up <code>bit_length<code> and <code>byte_offset</code> into `StrT` chunk as their CharList value if supported by operation as value to <code>string</code> argument name</td>
-      <td><code>bit_length<code> and <code>byte_offset</code>arguments are left as is</td>
+      <td>Looks up <code>bit_length</code> and <code>byte_offset</code> into `StrT` chunk as their CharList value if supported by operation as value to <code>string</code> argument name</td>
+      <td><code>bit_length</code> and <code>byte_offset</code>arguments are left as is</td>
     </tr>
     <tr>
       <td>Show Argument Names</td>
@@ -3674,10 +3675,10 @@ Confusingly, in the `Code` chunk sometimes the `literal(N)` term is used to enco
 
 The `LitT` tab shows a table with the columns
 
-| Column | Description                                                    | Source  |
-|:-------|:---------------------------------------------------------------|:--------|
-| #      | 0-based index used by references in the `Code` chunk.          | Derived |
-| Term   | The equivalent of `raw |&gt; binary_to_term() |&gt; inspect()` | Raw     |
+| Column | Description                                                | Source  |
+|:-------|:-----------------------------------------------------------|:--------|
+| #      | 0-based index used by references in the `Code` chunk.      | Derived |
+| Term   | The equivalent of `raw \|> binary_to_term() \|> inspect()` | Raw     |
 
 ![LitT Table](screenshots/features/beam_files/beam_chunks/litt/tab/Table.png?raw=true)
 
@@ -3840,7 +3841,7 @@ which is generated from the `for` in
 
 Functions and macros can have names that aren't valid identifier names, so the decompiler has special handlers to detect these invalid identifiers and escape them to make decompiled code that is parsable as valid Elixir.
 
-<table cellspacing="0" cellpadding="0">
+<table  style="border-spacing: 0; border-collapse: collapse;">
   <thead>
   <tr>
     <td>Handler</td>
@@ -4343,7 +4344,7 @@ new lines use the internal formatter until the next full file format uses `mix f
 2. Editor > Code Style > Elixir
 3. Click the `mix format` tab
 4. Expand the General group
-4. Uncheck "Format files with `mix format`".
+5. Uncheck "Format files with `mix format`".
 
 #### Format on Save
 
@@ -4761,7 +4762,7 @@ To configure the Elixir Facet SDK
 
 1. Open Preferences > Languages & Frameworks > Elixir
 2. Select a previously created Elixir SDK from the SDK combo box.
-  * If there is no Elixir SDK, you can [create one](#elixir-sdks) first.
+   * If there is no Elixir SDK, you can [create one](#elixir-sdks) first.
 3. Click Apply to save the Preferences changes or OK to save and close.
 
 ##### Elixir SDKs
@@ -4868,7 +4869,7 @@ The buttons in the Structure tool are broken into 4 categories:
         Whether the element visible outside its defining module:
         <ol>
           <li>Public</li>
-          <li><None</li>
+          <li>None</li>
           <li>Private</li>
         </ol>
       </td>
@@ -4914,8 +4915,8 @@ The providers add nodes not in the text of the file, but that will appear in the
         Show Used
       </td>
       <td>
-        In Modules that `use <Alias>` or `use <Alias>, arg`, the elements from the last `quote` block in the
-        `__using__/1` for `<Alias>` are injected.
+        In Modules that `use &lt;Alias&gt;` or `use &lt;Alias&gt;, arg`, the elements from the last `quote` block in the
+        `__using__/1` for `&lt;Alias&gt;` are injected.
       </td>
     </tr>
   </tbody>
@@ -5316,7 +5317,7 @@ The Visibility icons indicated whether the element is usable outside its definin
         %<code>RELATIVE_ALIAS</code>{}
       </td>
       <td>
-        Exceptions are defined as structs, so any <code>defexception<code> also defines a struct with the same name.
+        Exceptions are defined as structs, so any <code>defexception</code> also defines a struct with the same name.
       </td>
     </tr>
     <tr>
@@ -5734,7 +5735,7 @@ The Visibility icons indicated whether the element is usable outside its definin
         %<code>RELATIVE_ALIAS</code>{}
       </td>
       <td>
-        Structs have the same <code>RELATIVE_ALIAS<code> as their parent Module.
+        Structs have the same <code>RELATIVE_ALIAS</code> as their parent Module.
       </td>
     </tr>
     <tr>
@@ -5765,6 +5766,7 @@ The Visibility icons indicated whether the element is usable outside its definin
     </tr>
   </tbody>
 </table>
+</b>
 
 ## Experimental Features
 
@@ -5867,7 +5869,7 @@ If you're okay with disabling the background for all injections:
 3. Install plugin from disk...
 4. Select the downloaded zip.
 5. Apply
-7. Restart the IDE.
+6. Restart the IDE.
 
 ### Canary releases
 
@@ -5910,7 +5912,7 @@ With the `canary` repository setup:
 3. Install plugin from disk...
 4. Select the downloaded zip.
 5. Apply
-7. Restart the IDE.
+6. Restart the IDE.
 
 ## Screenshots
 
@@ -5944,19 +5946,19 @@ Donating through GitHub will get the most money to the project as GitHub current
 
 
 
-| Name    | Service        | Button                                                                                                                                                                                                                                                                                                                                                        |
-|:--------|:---------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Sponsor | GitHub         | [:heart: Sponsor](https://github.com/sponsors/KronicDeth)
-| Donor   | PayPal         | [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=Kronic%2eDeth%40gmail%2ecom&lc=US&item_name=Elixir%20plugin%20for%20IntelliJ%20IDEA&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_LG%2egif%3aNonHosted)  |
-| Patron  | Patreon        | <a href="https://www.patreon.com/bePatron?u=4678158" data-patreon-widget-type="become-patron-button">Become a Patron!</a>                                                                                                                                                                                                                                     |
-| Backer  | OpenCollective | [[Become a backer](https://opencollective.com/intellij-elixir#backer)]                                                                                                                                                                                                                                                                                        |
-| Sponsor | OpenCollective | [[Become a sponsor](https://opencollective.com/intellij-elixir#sponsor)]                                                                                                                                                                                                                                                                                      |
+| Name    | Service        | Button                                                                                                                                                                                                                                                                                              |
+|:--------|:---------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Sponsor | GitHub         | [:heart: Sponsor](https://github.com/sponsors/KronicDeth)                                                                                                                                                                                                                                           |
+| Donor   | PayPal         | [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=Kronic%2eDeth%40gmail%2ecom&lc=US&item_name=Elixir%20plugin%20for%20IntelliJ%20IDEA&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_LG%2egif%3aNonHosted) |
+| Patron  | Patreon        | <a href="https://www.patreon.com/bePatron?u=4678158" data-patreon-widget-type="become-patron-button">Become a Patron!</a>                                                                                                                                                                           |
+| Backer  | OpenCollective | [[Become a backer](https://opencollective.com/intellij-elixir#backer)]                                                                                                                                                                                                                              |
+| Sponsor | OpenCollective | [[Become a sponsor](https://opencollective.com/intellij-elixir#sponsor)]                                                                                                                                                                                                                            |
 
 ## Historical Statistics
 
 These stats are for one time donations or monthly contributions for scheduled donations.
 
-| Stat    | Amount  |
+| Stat    |  Amount |
 |:--------|--------:|
 | Minimum |   $1.00 |
 | Median  |   $6.25 |
