@@ -10,7 +10,7 @@ import com.intellij.platform.ide.progress.runWithModalProgressBlocking
 abstract class WslSafeCommandLineState<T>(
     environment: ExecutionEnvironment,
     protected val configuration: T
-) : CommandLineState(environment) where T : Configuration, T : HasCommandLine {
+) : CommandLineState(environment) where T : Configuration {
 
     protected open val modalProgressMessage: String = "Starting ${configuration.name}"
 
@@ -20,7 +20,6 @@ abstract class WslSafeCommandLineState<T>(
 
         try {
             // Create process in background thread to avoid EDT violations with WSL command line patching
-            // WSLDistribution.patchCommandLine() requires background thread context
             val process = runWithModalProgressBlocking(configuration.project, modalProgressMessage) {
                 commandLine.createProcess()
             }

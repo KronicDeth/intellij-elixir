@@ -23,7 +23,7 @@ open class Configuration(name: String, project: Project, configurationFactory: C
         org.elixir_lang.run.Configuration(name, project, configurationFactory),
         Debuggable<Configuration>,
         RunConfigurationWithSuppressedDefaultRunAction,
-        RunConfigurationWithSuppressedDefaultDebugAction, HasCommandLine {
+        RunConfigurationWithSuppressedDefaultDebugAction {
     override val cookie: String? = null
     override var inheritApplicationModuleFilters: Boolean = true
     override var moduleFilterList: MutableList<ModuleFilter> = mutableListOf()

@@ -1,6 +1,5 @@
 package org.elixir_lang.sdk.wsl;
 
-import com.intellij.execution.configurations.GeneralCommandLine;
 import com.intellij.execution.wsl.WSLDistribution;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -110,26 +109,6 @@ public class ElixirWslSdkTest extends BasePlatformTestCase {
         Mockito.verify(mockService, Mockito.times(1)).isWslUncPath(testPath);
         Mockito.verify(mockService, Mockito.times(1)).isWslUncPath(null);
     }
-
-    /**
-     * Command line patching can be mocked with Mockito.
-     */
-    public void testPatchCommandLine_CanBeMocked() {
-        WslCompatService mockService = Mockito.mock(WslCompatService.class);
-        GeneralCommandLine commandLine = new GeneralCommandLine();
-        String sdkHome = "\\\\wsl$\\Ubuntu\\usr\\lib\\elixir";
-
-        // When: Configuring mock to simulate successful patching
-        Mockito.when(mockService.patchCommandLine(commandLine, sdkHome)).thenReturn(true);
-
-        // Then: Mock returns configured value
-        boolean patched = mockService.patchCommandLine(commandLine, sdkHome);
-        assertTrue("Mock should indicate successful patching", patched);
-
-        // Verify the method was called
-        Mockito.verify(mockService).patchCommandLine(commandLine, sdkHome);
-    }
-
     /**
      * Distribution retrieval can be mocked with Mockito.
      */
@@ -289,22 +268,6 @@ public class ElixirWslSdkTest extends BasePlatformTestCase {
     }
 
     /**
-     * Command line patching returns false for non-WSL paths.
-     */
-    public void testPatchCommandLine_ReturnsFalseForNonWslPaths() {
-        // Given: A non-WSL SDK home
-        WslCompatService service = getWslCompat();
-        GeneralCommandLine commandLine = new GeneralCommandLine();
-        String localPath = "/usr/local/lib/erlang";
-
-        // When: Attempting to patch
-        boolean patched = service.patchCommandLine(commandLine, localPath);
-
-        // Then: Should return false (no patching needed)
-        assertFalse("Non-WSL paths should not be patched", patched);
-    }
-
-    /**
      * WSL service handles distribution lookup gracefully without throwing exceptions.
      */
     public void testGetDistribution_HandlesWslPathsGracefully() {
@@ -340,49 +303,6 @@ public class ElixirWslSdkTest extends BasePlatformTestCase {
         assertTrue("Should choose directories", descriptor.isChooseFolders());
         assertFalse("Should not choose files", descriptor.isChooseFiles());
     }
-
-    /**
-     * Command line patching delegates to platform API.
-     */
-    public void testPatchCommandLine_UsesPlatformApi() {
-        WslCompatService mockService = Mockito.mock(WslCompatService.class);
-        com.intellij.execution.configurations.GeneralCommandLine commandLine =
-            new com.intellij.execution.configurations.GeneralCommandLine();
-        String wslSdkHome = "\\\\wsl.localhost\\Ubuntu-24.04\\usr\\lib\\erlang";
-
-        // Configure mock to report as WSL path
-        Mockito.when(mockService.isWslUncPath(wslSdkHome)).thenReturn(true);
-        Mockito.when(mockService.patchCommandLine(commandLine, wslSdkHome)).thenReturn(true);
-
-        // When: Patching command line
-        boolean patched = mockService.patchCommandLine(commandLine, wslSdkHome);
-
-        // Then: Should succeed
-        assertTrue("patchCommandLine should succeed for WSL paths", patched);
-
-        // Verify the correct method was called
-        Mockito.verify(mockService, Mockito.times(1)).patchCommandLine(commandLine, wslSdkHome);
-    }
-
-    /**
-     * Command line patching uses platform API for consistency.
-     */
-    public void testMethodConsistency_UsesPlatformApi() {
-        WslCompatService service = getWslCompat();
-
-        // patchCommandLine uses IntelliJ's platform API (WSLDistribution.patchCommandLine)
-        com.intellij.execution.configurations.GeneralCommandLine cmd1 =
-            new com.intellij.execution.configurations.GeneralCommandLine();
-
-        String nonWslPath = "/usr/local/bin";
-
-        // Should return false for non-WSL paths (fail-safe behavior)
-        assertFalse("patchCommandLine should return false for non-WSL",
-            service.patchCommandLine(cmd1, nonWslPath));
-
-        // This documents that patchCommandLine gracefully handles non-WSL paths
-    }
-
 
     /**
      * Mock service returns expected user home directory.

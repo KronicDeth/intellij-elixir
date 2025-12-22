@@ -3,6 +3,7 @@ package org.elixir_lang.sdk.wsl
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.wsl.WSLDistribution
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.util.Key
 
 /**
  * Service wrapper for WSL (Windows Subsystem for Linux Integration).
@@ -10,10 +11,34 @@ import com.intellij.openapi.application.ApplicationManager
  * This service provides an abstraction layer over the IntelliJ Platform legacy WSL API
  * (com.intellij.execution.wsl), enabling:
  * 1. Detection of WSL paths (e.g., \\wsl$\Ubuntu\usr\bin\elixir)
- * 2. Command-line patching to execute commands via wsl.exe
+ * 2. Path conversion for command-line arguments and environment variables
  * 3. Testability through mocking in CI environments without WSL
  *
+ * ## Architecture
+ *
+ * WSL path conversion is automatically applied via the WslAwareCommandLine subclass.
+ * All command lines constructed through the plugin's factory methods (Mix.commandLine(),
+ * Elixir.commandLine(), IEx.commandLine()) use WslAwareCommandLine, which converts
+ * paths right before process creation.
+ *
+ * This ensures:
+ * - External tools (Credo, Dialyzer, Mix Format, New Project Wizard) get WSL support
+ * - Run Configurations (Mix, IEx, ExUnit, ESpec, Elixir, Distillery) get WSL support
+ * - Parameters added AFTER factory methods return are still converted
+ * - Conversion happens once, at the last possible moment
+ *
+ * ## Usage Example
+ *
+ * ```kotlin
+ * // Factory methods return WslAwareCommandLine instances:
+ * val commandLine = Mix.commandLine(env, workDir, sdk)
+ * commandLine.addParameters("--extra", "params")  // These will be converted too
+ * commandLine.createProcess()  // Conversion happens here
+ * ```
+ *
  * Implementation uses the Legacy WSL API to avoid the large refactor required by the Targets API.
+ *
+ * @see org.elixir_lang.run.WslAwareCommandLine
  */
 interface WslCompatService {
     /**
@@ -25,16 +50,22 @@ interface WslCompatService {
     fun isWslUncPath(path: String?): Boolean
 
     /**
-     * Patches a command line to execute via WSL if the SDK home is in WSL.
+     * Converts WSL UNC paths and Windows drive paths embedded in command line arguments and environment
+     * variables to POSIX paths for WSL execution.
      *
-     * This method modifies the GeneralCommandLine to wrap the execution through wsl.exe,
-     * translating Windows paths to Linux paths as needed.
+     * When running commands in WSL, paths need to be converted so the WSL executable can understand them.
+     * This method detects WSL context from the command line's working directory and performs conversions.
      *
-     * @param commandLine the IntelliJ Platform GeneralCommandLine to patch
-     * @param sdkHome the SDK home path (used to determine WSL distribution)
-     * @return true if the command line was patched for WSL execution, false if no patching was needed
+     * Examples of conversions in arguments and environment variables:
+     * - `--path=\\wsl$\Ubuntu\home\user` → `--path=/home/user`
+     * - `--map=\\wsl$\Ubuntu\home\user\dir1:\\wsl$\Ubuntu\home\user\dir2` → `--map=/home/user/dir1:/home/user/dir2`
+     * - `\\wsl.localhost\Ubuntu\home\user\file.txt` → `/home/user/file.txt`
+     * - `C:/Users/steve/file.txt` → `/mnt/c/Users/steve/file.txt`
+     * - `D:\data\file.txt` → `/mnt/d/data/file.txt`
+     *
+     * @param commandLine The command line to convert (modified in place)
      */
-    fun patchCommandLine(commandLine: GeneralCommandLine, sdkHome: String?): Boolean
+    fun convertCommandLineArgumentsForWsl(commandLine: GeneralCommandLine)
 
     /**
      * Gets the WSL distribution for a given path.
@@ -121,3 +152,14 @@ interface WslCompatService {
  */
 val wslCompat: WslCompatService
     get() = ApplicationManager.getApplication().getService(WslCompatService::class.java)
+
+/**
+ * Key used to track whether a GeneralCommandLine runs on WSL.
+ * - null: Not yet determined (will check workDir and exePath)
+ * - true: Runs on WSL (apply conversion)
+ * - false: Does not run on WSL (skip conversion)
+ *
+ * This allows nested calls to wslCompatCommandLine to work correctly by
+ * avoiding redundant WSL detection checks.
+ */
+val RUNS_ON_WSL = Key.create<Boolean>("RUNS_ON_WSL")

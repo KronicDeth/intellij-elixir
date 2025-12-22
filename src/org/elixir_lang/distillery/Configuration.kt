@@ -28,7 +28,7 @@ class Configuration(name: String, project: Project, configurationFactory: Config
     org.elixir_lang.run.Configuration(name, project, configurationFactory),
     Debuggable<Configuration>,
     RunConfigurationWithSuppressedDefaultRunAction,
-    RunConfigurationWithSuppressedDefaultDebugAction, HasCommandLine {
+    RunConfigurationWithSuppressedDefaultDebugAction {
     override val cookie: String?
         get() = vmArgsPath?.let(::vmArgsPathToCookie)
 

@@ -15,7 +15,7 @@ import org.elixir_lang.console.ElixirConsoleUtil
 
 
 abstract class TestRunnerCommandLineState<T>(environment: ExecutionEnvironment, configuration: T) :
-    WslSafeCommandLineState<T>(environment, configuration) where T : Configuration, T : HasCommandLine {
+    WslSafeCommandLineState<T>(environment, configuration) where T : Configuration {
 
     protected abstract val TEST_FRAMEWORK_NAME: String
     protected abstract fun createTestConsoleProperties(executor: Executor): SMTRunnerConsoleProperties

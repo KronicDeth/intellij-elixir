@@ -11,6 +11,7 @@ Table of Contents[![Backers on Open Collective](https://opencollective.com/intel
             * [New](#new)
          * [Project Structure](#project-structure)
          * [Project Settings](#project-settings)
+         * [Windows Subsystem for Linux (WSL) Support](#windows-subsystem-for-linux-wsl-support)
          * [Module Settings](#module-settings)
             * [Sources](#sources)
             * [Paths](#paths)
@@ -442,6 +443,26 @@ If you want to create a basic (non-`mix`) Elixir project with a `lib` directory,
 The Project Settings include
 * Project Name
 * Project SDK
+
+#### SDK Setup Known Limitations
+
+When setting up Elixir and Erlang SDKs for the first time:
+
+* **Click OK directly** after configuring both SDKs - this will properly save all settings
+* **Avoid clicking Apply then OK** - this workflow has a known issue where the project SDK may not be saved correctly
+
+### Windows Subsystem for Linux (WSL) Support
+
+The plugin supports running Elixir, Mix, and IEx commands within WSL. This includes:
+
+* **Run Configurations**: All Mix, ExUnit, ESpec, Elixir, and IEx run configurations are fully compatible with WSL.
+* **External Tools**: background tools like Credo inspections, Dialyzer, Mix Format, and the New Project Wizard automatically use WSL when your project is located on a WSL partition.
+* **Path Conversion**: Windows UNC paths (e.g., `\\wsl$\Ubuntu\...`) and Windows drive paths are automatically converted to POSIX paths when executing commands in WSL.
+
+#### WSL Limitations
+
+* **JPS Builder**: The built-in IntelliJ compiler (JPS) does **not** support WSL. This means "Build > Build Project" will not work if your SDK or project is in WSL. 
+  * **Workaround**: Use a **Mix Run Configuration** with the `compile` task to build your project in WSL.
 
 ### Module Settings
 

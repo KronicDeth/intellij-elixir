@@ -22,7 +22,6 @@ import org.jdom.Element
 
 class Configuration(name: String, project: Project) :
         org.elixir_lang.run.Configuration(name, project, Factory),
-        HasCommandLine,
         Debuggable<Configuration>,
         RunConfigurationWithSuppressedDefaultRunAction,
         RunConfigurationWithSuppressedDefaultDebugAction {

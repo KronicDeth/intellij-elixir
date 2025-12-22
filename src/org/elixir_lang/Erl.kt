@@ -5,7 +5,6 @@ import com.intellij.openapi.projectRoots.ProjectJdkTable
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.roots.OrderRootType
 import org.elixir_lang.jps.sdk_type.Erlang
-import org.elixir_lang.sdk.wsl.wslCompat
 import java.io.FileNotFoundException
 
 object Erl {
@@ -30,7 +29,7 @@ object Erl {
     private fun exePath(erlangSdk: Sdk): String {
         val homePath = erlangSdk.homePath ?: throw FileNotFoundException("Erlang SDK home path is not set")
         val exePath = Erlang.homePathToErlExePath(homePath)
-        return wslCompat.maybeConvertPathForWsl(exePath, homePath)
+        return exePath
     }
 
     /**
@@ -54,12 +53,11 @@ object Erl {
 }
 
 fun Sdk.ebinDirectories(): kotlin.collections.List<String> {
-    val sdkHomePath = homePath
     return try {
         rootProvider.getFiles(OrderRootType.CLASSES)
             .mapNotNull { virtualFile ->
                 val canonicalPath = virtualFile.canonicalPath ?: return@mapNotNull null
-                wslCompat.maybeConvertPathForWsl(canonicalPath, sdkHomePath)
+                canonicalPath
             }
     } catch (_: AssertionError) {
         // rootProvider may be disposed, try reloading SDK from table once
@@ -71,12 +69,11 @@ fun Sdk.ebinDirectories(): kotlin.collections.List<String> {
 }
 
 private fun Sdk.tryReloadSdkEbinDirectories(): kotlin.collections.List<String> {
-    val sdkHomePath = homePath
     return try {
         ProjectJdkTable.getInstance().findJdk(name)?.rootProvider?.getFiles(OrderRootType.CLASSES)
             ?.mapNotNull { virtualFile ->
                 val canonicalPath = virtualFile.canonicalPath ?: return@mapNotNull null
-                wslCompat.maybeConvertPathForWsl(canonicalPath, sdkHomePath)
+                canonicalPath
             } ?: emptyList()
     } catch (_: Exception) {
         // If reload also fails, return empty list to avoid infinite recursion

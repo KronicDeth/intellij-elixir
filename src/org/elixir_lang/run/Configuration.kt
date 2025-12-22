@@ -19,10 +19,6 @@ import org.elixir_lang.run.configuration.Module
 import org.jdom.Element
 import java.io.File
 
-interface HasCommandLine {
-    fun commandLine(): GeneralCommandLine
-}
-
 fun ensureWorkingDirectory(project: Project) = project.basePath!!
 
 fun ensureWorkingDirectory(project: Project, module: com.intellij.openapi.module.Module?): String {
@@ -45,10 +41,8 @@ fun ensureWorkingDirectory(module: com.intellij.openapi.module.Module): String =
 fun List<String>.toArguments(): String? {
     val joined = ParametersList.join(this)
 
-    return if (joined.isBlank()) {
+    return joined.ifBlank {
         null
-    } else {
-        joined
     }
 }
 
@@ -200,8 +194,10 @@ abstract class Configuration(name: String, project: Project, configurationFactor
         _envs.putAll(envs)
     }
 
+    abstract fun commandLine(): GeneralCommandLine
+
     fun ensureModule(): com.intellij.openapi.module.Module =
-            configurationModule.module ?: ensureWorkingDirectory().let { ensureModule(it, project) }
+            configurationModule.module ?: ensureModule(ensureWorkingDirectory(), project)
 
     override fun getWorkingDirectory(): String? = ExternalizablePath.localPathValue(workingDirectoryURL)
 
