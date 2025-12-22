@@ -258,6 +258,13 @@ ELIXIR_SDK_HOME
         internal fun setupSdkTableListener() {
             val messageBus = ApplicationManager.getApplication().messageBus
             messageBus.connect().subscribe(ProjectJdkTable.JDK_TABLE_TOPIC, object : ProjectJdkTable.Listener {
+                override fun jdkAdded(jdk: Sdk) {
+                    // When an Elixir SDK is added, auto-set it as the project SDK if appropriate
+                    if (jdk.sdkType is Type) {
+                        autoSetProjectSdkIfNeeded(jdk)
+                    }
+                }
+
                 override fun jdkRemoved(jdk: Sdk) {
                     // When an Erlang SDK is removed, clean up any Elixir SDKs that reference it
                     if (staticIsValidDependency(jdk)) {
@@ -294,6 +301,66 @@ ELIXIR_SDK_HOME
             }
         }
 
+        private fun autoSetProjectSdkIfNeeded(newElixirSdk: Sdk) {
+            LOG.debug("Auto-set check for newly added Elixir SDK: ${newElixirSdk.name}")
+
+            // Get all non-disposed projects
+            val openProjects = com.intellij.openapi.project.ProjectManager.getInstance().openProjects.filter {
+                !it.isDisposed
+            }
+
+            // Only auto-set if exactly one project is open
+            // This ensures we don't accidentally set the wrong project's SDK
+            val project = when (openProjects.size) {
+                0 -> {
+                    LOG.debug("No open projects, skipping auto-set")
+                    return
+                }
+                1 -> openProjects.first()
+                else -> {
+                    LOG.debug("Multiple projects open (${openProjects.size}), skipping auto-set to avoid ambiguity")
+                    return
+                }
+            }
+
+            val projectRootManager = ProjectRootManager.getInstance(project)
+            val currentProjectSdk = projectRootManager.projectSdk
+
+            // Only auto-set if current SDK is null or (is Elixir and invalid)
+            val shouldAutoSet = if (currentProjectSdk == null) {
+                LOG.debug("Project '${project.name}' has no SDK, will auto-set to '${newElixirSdk.name}'")
+                true
+            } else if (currentProjectSdk.sdkType !is Type) {
+                // Don't replace non-Elixir SDKs (Java, Python, etc.)
+                LOG.debug("Project '${project.name}' has non-Elixir SDK '${currentProjectSdk.name}', skipping auto-set")
+                false
+            } else {
+                // Current SDK is Elixir - check if it's valid
+                val isValid = try {
+                    val additionalData = currentProjectSdk.sdkAdditionalData as? SdkAdditionalData
+                    val erlangSdk = additionalData?.getErlangSdk()
+                    erlangSdk != null
+                } catch (e: Exception) {
+                    LOG.debug("Error checking validity of current SDK: ${e.message}")
+                    false
+                }
+
+                if (!isValid) {
+                    LOG.debug("Project '${project.name}' SDK '${currentProjectSdk.name}' is invalid, will auto-set to '${newElixirSdk.name}'")
+                }
+                !isValid
+            }
+
+            if (shouldAutoSet) {
+                ApplicationManager.getApplication().invokeLater {
+                    ApplicationManager.getApplication().runWriteAction {
+                        projectRootManager.projectSdk = newElixirSdk
+                        LOG.info("Auto-set project '${project.name}' SDK to '${newElixirSdk.name}'")
+                    }
+                }
+            }
+        }
+
         private fun cleanupOrphanedElixirSdkReferences(deletedErlangSdk: Sdk) {
             val projectJdkTable = ProjectJdkTable.getInstance()
             val elixirSdks = projectJdkTable.allJdks.filter { it.sdkType is Type }
@@ -304,12 +371,21 @@ ELIXIR_SDK_HOME
                     val currentErlangSdk = additionalData.getErlangSdk()
                     if (currentErlangSdk?.name == deletedErlangSdk.name) {
                         LOG.info("Clearing orphaned Erlang SDK reference '${deletedErlangSdk.name}' from Elixir SDK '${elixirSdk.name}'")
-                        additionalData.setErlangSdk(null)
 
-                        // Try to auto-assign a new Erlang SDK if available
-                        val newErlangSdk = additionalData.getErlangSdk() // Will auto-discover
+                        // Use SDK modificator to properly update additional data
+                        val modificator = elixirSdk.sdkModificator
+                        val newAdditionalData = SdkAdditionalData(null, elixirSdk)
+
+                        // Try to auto-discover a new Erlang SDK
+                        val newErlangSdk = newAdditionalData.getErlangSdk()
                         if (newErlangSdk != null) {
                             LOG.info("Auto-assigned new Erlang SDK '${newErlangSdk.name}' to Elixir SDK '${elixirSdk.name}'")
+                            newAdditionalData.setErlangSdk(newErlangSdk)
+                        }
+
+                        modificator.sdkAdditionalData = newAdditionalData
+                        ApplicationManager.getApplication().runWriteAction {
+                            modificator.commitChanges()
                         }
                     }
                 }
@@ -327,7 +403,14 @@ ELIXIR_SDK_HOME
                     val currentErlangSdk = additionalData.getErlangSdk()
                     if (currentErlangSdk?.name == previousName) {
                         LOG.info("Updating Erlang SDK reference from '${previousName}' to '${renamedErlangSdk.name}' in Elixir SDK '${elixirSdk.name}'")
-                        additionalData.setErlangSdk(renamedErlangSdk)
+
+                        // Use SDK modificator to properly update additional data
+                        val modificator = elixirSdk.sdkModificator
+                        val newAdditionalData = SdkAdditionalData(renamedErlangSdk, elixirSdk)
+                        modificator.sdkAdditionalData = newAdditionalData
+                        ApplicationManager.getApplication().runWriteAction {
+                            modificator.commitChanges()
+                        }
                     }
                 }
             }
@@ -432,16 +515,23 @@ ELIXIR_SDK_HOME
             elixirSdk: Sdk,
             elixirSdkModificator: SdkModificator,
         ): Sdk? {
+            // Check if additional data is already set (happens when SDK was just created)
+            val existingAdditionalData = elixirSdk.sdkAdditionalData as? SdkAdditionalData
+            val existingErlangSdk = existingAdditionalData?.getErlangSdk()
+
             // First, check if an Erlang SDK was explicitly set via UserData
             // This happens when creating a new Elixir SDK right after creating its Erlang SDK
             val explicitErlangSdk = elixirSdk.getUserData(ERLANG_SDK_KEY)
 
-            val erlangSdk = explicitErlangSdk ?: defaultErlangSdk()
+            val erlangSdk = explicitErlangSdk ?: existingErlangSdk ?: defaultErlangSdk()
 
             if (erlangSdk != null) {
-                val sdkAdditionData: com.intellij.openapi.projectRoots.SdkAdditionalData =
-                    SdkAdditionalData(erlangSdk, elixirSdk)
-                elixirSdkModificator.sdkAdditionalData = sdkAdditionData
+                // Only set additional data if it's not already set
+                if (existingAdditionalData == null || existingErlangSdk == null) {
+                    val sdkAdditionData: com.intellij.openapi.projectRoots.SdkAdditionalData =
+                        SdkAdditionalData(erlangSdk, elixirSdk)
+                    elixirSdkModificator.sdkAdditionalData = sdkAdditionData
+                }
 
                 addNewCodePathsFromInternErlangSdk(elixirSdk, erlangSdk, elixirSdkModificator)
 
