@@ -234,13 +234,6 @@ class AdditionalDataConfigurable(
     }
 
     private fun writeInternalErlangSdk(erlangSdk: Sdk?) {
-        writeInternalErlangSdk(elixirSdk!!.sdkModificator, erlangSdk)
-    }
-
-    private fun writeInternalErlangSdk(
-        sdkModificator: SdkModificator,
-        erlangSdk: Sdk?,
-    ) {
         val sdkAdditionData =
             SdkAdditionalData(
                 erlangSdk,
@@ -248,8 +241,6 @@ class AdditionalDataConfigurable(
             )
         sdkModificator.sdkAdditionalData = sdkAdditionData
         ApplicationManager.getApplication().runWriteAction { sdkModificator.commitChanges() }
-
-        this.sdkModificator.commitChanges()
     }
 
     override fun reset() {

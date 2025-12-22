@@ -205,9 +205,16 @@ abstract class Type protected constructor(name: String) : DependentSdkType(name)
                 SdkConfigurationUtil.createSdk(sdkModel.sdks.toList(), home!!, sdkType, null, null)
 
             // If creating an Elixir SDK and we have a specific Erlang SDK to use,
-            // store it for use during configureSdkPaths
-            if (erlangSdkToUse != null) {
+            // store it for use during configureSdkPaths AND set additional data immediately
+            if (erlangSdkToUse != null && sdkType is org.elixir_lang.sdk.elixir.Type) {
                 newSdk.putUserData(ERLANG_SDK_KEY, erlangSdkToUse)
+
+                // Set additional data immediately to avoid workspace model mismatch
+                ApplicationManager.getApplication().runWriteAction {
+                    val modificator = newSdk.sdkModificator
+                    modificator.sdkAdditionalData = org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData(erlangSdkToUse, newSdk)
+                    modificator.commitChanges()
+                }
             }
 
             sdkCreatedCallback.accept(newSdk)

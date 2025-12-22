@@ -25,6 +25,8 @@ class SdkAdditionalData :
     constructor(erlangSdk: Sdk?, elixirSdk: Sdk) {
         this.erlangSdk = erlangSdk
         this.elixirSdk = elixirSdk
+        // Also store the SDK name for persistence
+        this.erlangSdkName = erlangSdk?.name
     }
 
     // readExternal
@@ -44,7 +46,7 @@ class SdkAdditionalData :
     override fun checkValid(sdkModel: SdkModel) {
         LOG.debug("checkValid called for Elixir SDK: ${elixirSdk.name} (homePath: ${elixirSdk.homePath})")
 
-        val erlangSdk = getErlangSdk()
+        val erlangSdk = getErlangSdk(sdkModel)
 
         if (erlangSdk == null) {
             val availableErlangSdks = ProjectJdkTable.getInstance().allJdks.filter {
@@ -75,16 +77,12 @@ class SdkAdditionalData :
 
     @Throws(WriteExternalException::class)
     fun writeExternal(element: Element) {
-        val sdk = getErlangSdk()
+        // Use the stored name directly if available
+        // This ensures we can persist newly created SDKs that aren't in the global table yet
+        val nameToWrite = erlangSdkName ?: erlangSdk?.name
 
-        if (sdk != null) {
-            // Double-check that the SDK still exists in the table before writing
-            val jdkTable = ProjectJdkTable.getInstance()
-            if (jdkTable.findJdk(sdk.name) != null) {
-                element.setAttribute(ERLANG_SDK_NAME, sdk.name)
-            }
-            // If SDK doesn't exist in table, don't write the attribute
-            // This prevents persisting references to deleted SDKs
+        if (nameToWrite != null) {
+            element.setAttribute(ERLANG_SDK_NAME, nameToWrite)
         }
     }
 
@@ -102,46 +100,45 @@ class SdkAdditionalData :
         val jdkTable = ProjectJdkTable.getInstance()
         val elixirName = elixirSdk.name
 
-        // 1. Validate cached SDK
+        // 1. Check cached SDK (but don't mutate the cache)
         erlangSdk?.let { selected ->
             val selectedName = selected.name
             val exists = (sdkModel?.sdks?.any { it.name == selectedName } == true) || (jdkTable.findJdk(selectedName) != null)
-            if (!exists) {
-                LOG.debug("[$elixirName] selected Erlang SDK '$selectedName' no longer exists, clearing reference")
-                erlangSdk = null
+            if (exists) {
+                return selected
             } else {
-                return erlangSdk
+                LOG.debug("[$elixirName] Cached Erlang SDK '$selectedName' no longer exists, will look up by name")
+                // Don't clear cache here - would violate read-only contract after commit
             }
         }
 
         // 2. Lookup by name if configured
         erlangSdkName?.let { name ->
             LOG.debug("[$elixirName] Looking up Erlang SDK by name: $name")
-            erlangSdk = sdkModel?.sdks?.find { it.name == name }
+            val foundSdk = sdkModel?.sdks?.find { it.name == name }
                 ?: jdkTable.findJdk(name)
 
-            if (erlangSdk != null) {
+            if (foundSdk != null) {
                 LOG.debug("[$elixirName] Found Erlang SDK '$name'")
-                erlangSdkName = null
+                return foundSdk
             } else {
-                LOG.debug("[$elixirName] Erlang SDK '$name' not found, clearing orphaned reference")
-                erlangSdkName = null
+                LOG.debug("[$elixirName] Erlang SDK '$name' not found in table")
+                // Don't clear erlangSdkName here - would violate read-only contract
             }
-            return erlangSdk
         }
 
         // 3. Auto-discovery fallback
         LOG.debug("[$elixirName] No Erlang SDK name configured, auto-discovering...")
-        erlangSdk = findSdk(sdkModel) { Type.staticIsValidDependency(it) }
+        val discoveredSdk = findSdk(sdkModel) { Type.staticIsValidDependency(it) }
             ?: findSdk(jdkTable) { Type.staticIsValidDependency(it) }
 
-        if (erlangSdk != null) {
-            LOG.debug("[$elixirName] Auto-discovered Erlang SDK '${erlangSdk?.name}'")
+        if (discoveredSdk != null) {
+            LOG.debug("[$elixirName] Auto-discovered Erlang SDK '${discoveredSdk.name}'")
         } else {
             LOG.debug("[$elixirName] No valid Erlang SDK found for auto-discovery")
         }
 
-        return erlangSdk
+        return discoveredSdk
     }
 
     private fun findSdk(source: Any?, predicate: (Sdk) -> Boolean): Sdk? {
