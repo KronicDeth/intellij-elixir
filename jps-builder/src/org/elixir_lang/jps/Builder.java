@@ -390,6 +390,7 @@ public class Builder extends TargetBuilder<SourceRootDescriptor, Target> {
 
     private static void addMix(@NotNull GeneralCommandLine commandLine, @NotNull JpsSdk<SdkProperties> sdk) throws MissingHomePath {
         String mixPath = Elixir.mixPath(sdk);
+        Elixir.maybeUpdateMixHome(commandLine.getEnvironment(), sdk.getHomePath());
         commandLine.addParameter(mixPath);
     }
 

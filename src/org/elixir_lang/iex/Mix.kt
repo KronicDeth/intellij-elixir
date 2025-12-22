@@ -12,7 +12,10 @@ object Mix {
             erlArgumentList: List<String>,
             iexArgumentList: List<String>
     ): GeneralCommandLine {
-        val commandLine = org.elixir_lang.IEx.commandLine(environment, workingDirectory, elixirSdk, erlArgumentList)
+        val updatedEnvironment = environment.toMutableMap()
+        Elixir.maybeUpdateMixHome(updatedEnvironment, elixirSdk.homePath)
+
+        val commandLine = org.elixir_lang.IEx.commandLine(updatedEnvironment, workingDirectory, elixirSdk, erlArgumentList)
         commandLine.addParameters(iexArgumentList)
         addMix(commandLine, elixirSdk)
 
