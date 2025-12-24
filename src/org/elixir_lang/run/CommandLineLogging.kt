@@ -27,8 +27,16 @@ internal fun formatCommandLineForLogging(commandLine: GeneralCommandLine, prefix
     // Show only user-added environment variables (ones explicitly set on this command line)
     val userEnvVars = commandLine.environment
     if (userEnvVars.isNotEmpty()) {
-        builder.append("  Environment variables:\n")
+        builder.append("  Extra Environment variables:\n")
         userEnvVars.entries.sortedBy { it.key }.forEach { (key, value) ->
+            builder.append("    $key=$value\n")
+        }
+    }
+
+    val systemEnvVars = commandLine.parentEnvironment
+    if (systemEnvVars.isNotEmpty()) {
+        builder.append("  System Environment variables:\n")
+        systemEnvVars.entries.sortedBy { it.key }.forEach { (key, value) ->
             builder.append("    $key=$value\n")
         }
     }
