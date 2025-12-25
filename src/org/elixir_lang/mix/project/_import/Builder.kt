@@ -8,7 +8,6 @@ import com.intellij.openapi.module.ModifiableModuleModel
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.options.ConfigurationException
-import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.ProjectJdkTable
 import com.intellij.openapi.projectRoots.Sdk
@@ -80,20 +79,28 @@ class Builder : ProjectImportBuilder<OtpApp>() {
             return true
         }
 
-        val resultCode =
-            Messages.showYesNoCancelDialog(ApplicationInfoEx.getInstanceEx().fullApplicationName + " module files found:\n\n" +
-                                                   StringUtil.join(myFoundOtpApps, { importedOtpApp ->
-                                                       val ideaModuleFile = importedOtpApp.ideaModuleFile
-                                                       if (ideaModuleFile != null) "    " + ideaModuleFile.path + "\n" else ""
-                                                   }, "") + "\nWould you like to reuse them?",
-                                           "Module files found",
-                                           Messages.getQuestionIcon()
+        val resultCodeRef = java.util.concurrent.atomic.AtomicInteger(Messages.CANCEL)
+        ApplicationManager.getApplication().invokeAndWait {
+            resultCodeRef.set(
+                Messages.showYesNoCancelDialog(
+                    ApplicationInfoEx.getInstanceEx().fullApplicationName + " module files found:\n\n" +
+                            StringUtil.join(myFoundOtpApps, { importedOtpApp ->
+                                val ideaModuleFile = importedOtpApp.ideaModuleFile
+                                if (ideaModuleFile != null) "    " + ideaModuleFile.path + "\n" else ""
+                            }, "") + "\nWould you like to reuse them?",
+                    "Module Files Found",
+                    Messages.getQuestionIcon()
+                )
             )
+        }
+        val resultCode = resultCodeRef.get()
 
         return when (resultCode) {
             Messages.YES -> true
             Messages.NO -> try {
-                deleteIdeaModuleFiles(mySelectedOtpApps)
+                ApplicationManager.getApplication().invokeAndWait {
+                    deleteIdeaModuleFiles(mySelectedOtpApps)
+                }
                 true
             } catch (e: IOException) {
                 LOG.error(e)
@@ -183,16 +190,17 @@ class Builder : ProjectImportBuilder<OtpApp>() {
     private fun scanProjectRoot(projectRoot: VirtualFile) {
         val unitTestMode = ApplicationManager.getApplication().isUnitTestMode
 
-        if (!unitTestMode && projectRoot is NewVirtualFile) {
-            projectRoot.refreshAndFindChild("deps")
+        // Run the scanning in a modal task to avoid EDT slow operations
+        val task = object : com.intellij.openapi.progress.Task.Modal(null, "Scanning for Mix Projects", true) {
+            override fun run(indicator: com.intellij.openapi.progress.ProgressIndicator) {
+                if (!unitTestMode && projectRoot is NewVirtualFile) {
+                    projectRoot.refreshAndFindChild("deps")
+                }
+                myFoundOtpApps = org.elixir_lang.mix.Project.findOtpApps(projectRoot, indicator)
+                mySelectedOtpApps = myFoundOtpApps
+            }
         }
-
-        // Get the current progress indicator from the ambient coroutine context, or use a no-op indicator
-        // This works correctly whether called from EDT, background thread, or coroutine context
-        val indicator = ProgressManager.getInstance().progressIndicator ?: com.intellij.openapi.progress.EmptyProgressIndicator()
-        myFoundOtpApps = org.elixir_lang.mix.Project.findOtpApps(projectRoot, indicator)
-
-        mySelectedOtpApps = myFoundOtpApps
+        com.intellij.openapi.progress.ProgressManager.getInstance().run(task)
     }
 
     fun setIsImportingProject(isImportingProject: Boolean) {
