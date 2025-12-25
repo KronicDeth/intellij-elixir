@@ -1,7 +1,7 @@
 package org.elixir_lang.sdk.wsl
 
-import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.wsl.WSLDistribution
+import com.intellij.openapi.diagnostic.Logger
 
 /**
  * Mock implementation of WslCompatService for testing purposes.
@@ -11,9 +11,10 @@ import com.intellij.execution.wsl.WSLDistribution
  * is used, while in tests this mock can be injected.
  */
 class MockWslCompatService : WslCompatService {
+    override val log = Logger.getInstance(MockWslCompatService::class.java)
 
     override fun isWslUncPath(path: String?): Boolean {
-        if (path == null) {
+        if (path.isNullOrEmpty()) {
             return false
         }
 
@@ -96,11 +97,6 @@ class MockWslCompatService : WslCompatService {
         return "/home/testuser"
     }
 
-    override fun getWslUserHomeUncPath(distribution: WSLDistribution): String? {
-        val wslUserHome = getWslUserHome(distribution)
-        return convertLinuxPathToWindowsUnc(distribution, wslUserHome)
-    }
-
     override fun convertLinuxPathToWindowsUnc(distribution: WSLDistribution, linuxPath: String?): String? {
         if (linuxPath.isNullOrEmpty()) {
             return null
@@ -110,110 +106,22 @@ class MockWslCompatService : WslCompatService {
         return "\\\\wsl.localhost\\${distribution.msId}$linuxPath"
     }
 
-    override fun maybeConvertPathForWsl(path: String, sdkHomePath: String?): String {
-        return path
-    }
-
-    override fun convertCommandLineArgumentsForWsl(commandLine: GeneralCommandLine) {
-        val distribution = determineWslDistribution(commandLine) ?: return
-
-        commandLine.withExePath(convertWslPathsInString(commandLine.exePath, distribution))
-
-        // Convert command line parameters
-        val originalParams = commandLine.parametersList.list
-        val convertedParams = originalParams.map { param ->
-            convertWslPathsInString(param, distribution)
-        }
-        commandLine.parametersList.clearAll()
-        commandLine.parametersList.addAll(convertedParams)
-
-        // Convert environment variables
-        val convertedEnv = commandLine.environment.mapValues { (_, value) ->
-            convertWslPathsInString(value, distribution)
-        }
-        commandLine.environment.clear()
-        commandLine.environment.putAll(convertedEnv)
-    }
-
-    private fun determineWslDistribution(commandLine: GeneralCommandLine): WSLDistribution? {
-        val runsOnWsl = commandLine.getUserData(RUNS_ON_WSL)
-
-        return when (runsOnWsl) {
-            false -> null
-            true -> getDistributionFromWorkDirectory(commandLine)
-            null -> detectWslAndGetDistribution(commandLine)
-        }
-    }
-
-    private fun getDistributionFromWorkDirectory(commandLine: GeneralCommandLine): WSLDistribution? {
-        val workDirectory = commandLine.workDirectory?.toString()
-        return getDistributionByWindowsUncPath(workDirectory)
-    }
-
-    private fun detectWslAndGetDistribution(commandLine: GeneralCommandLine): WSLDistribution? {
-        val workDirectory = commandLine.workDirectory?.toString()
-        val workDirectoryDistribution = getDistributionByWindowsUncPath(workDirectory)
-
-        if (workDirectoryDistribution == null) {
-            commandLine.putUserData(RUNS_ON_WSL, false)
-            return null
+    override fun convertSingleWslPath(windowsPath: String, distribution: WSLDistribution): String? {
+        // Mock implementation uses simple string manipulation
+        // For UNC paths, use parseWindowsUncPath
+        if (isWslUncPath(windowsPath)) {
+            return parseWindowsUncPath(windowsPath)
         }
 
-        val exePath = commandLine.exePath
-        val exePathDistribution = getDistributionByWindowsUncPath(exePath)
-
-        if (exePathDistribution == null) {
-            commandLine.putUserData(RUNS_ON_WSL, false)
-            return null
-        }
-
-        if (exePathDistribution.msId != workDirectoryDistribution.msId) {
-            commandLine.putUserData(RUNS_ON_WSL, false)
-            return null
-        }
-
-        commandLine.putUserData(RUNS_ON_WSL, true)
-        return workDirectoryDistribution
-    }
-
-    private fun convertWslPathsInString(input: String, distribution: WSLDistribution): String {
-        var result = input
-
-        // Convert Windows drive paths (C:/, D:\) to WSL mount paths (/mnt/c/, /mnt/d/)
-        // Matches drive letter followed by colon and path, stopping at whitespace or invalid chars
-        val drivePattern = Regex("""([A-Za-z]):([\\/][^\s<>:"|?*]*)""")
-        val driveMatches = drivePattern.findAll(result).toList()
-
-        // Process in reverse order to maintain string indices
-        for (match in driveMatches.reversed()) {
+        // For drive paths (C:/, D:\), convert to /mnt/c/, /mnt/d/
+        val drivePattern = Regex("""([A-Za-z]):([\\/].*)""")
+        val match = drivePattern.matchEntire(windowsPath)
+        if (match != null) {
             val driveLetter = match.groupValues[1].lowercase()
             val pathPart = match.groupValues[2].replace('\\', '/')
-            val wslPath = "/mnt/$driveLetter$pathPart"
-            result = result.substring(0, match.range.first) + wslPath + result.substring(match.range.last + 1)
+            return "/mnt/$driveLetter$pathPart"
         }
 
-        // Convert WSL UNC paths to POSIX paths
-        // Regex pattern to match WSL UNC paths
-        val pattern = Regex("""([\\/]{2}wsl(?:\$|\.localhost)[\\/][^\\/]+[\\/][^<>:"|?*]+)""", RegexOption.IGNORE_CASE)
-        val matches = pattern.findAll(result).toList()
-
-        // Process matches in reverse order to maintain correct string indices
-        for (match in matches.reversed()) {
-            val uncPath = match.groupValues[1]
-
-            // Verify the distribution matches
-            val pathDistribution = getDistributionByWindowsUncPath(uncPath)
-            if (pathDistribution?.msId != distribution.msId) {
-                continue
-            }
-
-            // Convert the UNC path to POSIX
-            val posixPath = parseWindowsUncPath(uncPath)
-            if (posixPath != null) {
-                result = result.substring(0, match.range.first) + posixPath + result.substring(match.range.last + 1)
-            }
-        }
-
-        return result
+        return null
     }
 }

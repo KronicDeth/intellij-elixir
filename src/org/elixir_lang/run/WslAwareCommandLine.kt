@@ -44,20 +44,15 @@ private val LOG = Logger.getInstance(WslAwareCommandLine::class.java)
  * ```
  *
  * @see GeneralCommandLine
- * @see org.elixir_lang.sdk.wsl.WslCompatService.convertCommandLineArgumentsForWsl
+ * @see org.elixir_lang.sdk.wsl.WslCompatService.convertProcessBuilderArgumentsForWsl
  */
 open class WslAwareCommandLine : GeneralCommandLine {
     constructor() : super()
 
     @Throws(IOException::class)
     override fun createProcess(processBuilder: ProcessBuilder): Process {
-        // Apply WSL path conversion right before creating the process
-        // This catches ALL parameters regardless of when they were added
-        // Using the protected method (same extension point as PtyCommandLine)
-        wslCompat.convertCommandLineArgumentsForWsl(this)
-
-        LOG.debug(formatCommandLineForLogging(this))
-
+        wslCompat.convertProcessBuilderArgumentsForWsl(processBuilder, this)
+        LOG.debug(formatCommandLineForLogging(processBuilder, "Command line"))
         return super.createProcess(processBuilder)
     }
 }

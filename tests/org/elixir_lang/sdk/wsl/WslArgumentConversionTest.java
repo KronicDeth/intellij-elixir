@@ -5,6 +5,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.testFramework.ServiceContainerUtil;
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 
@@ -108,13 +109,14 @@ public class WslArgumentConversionTest extends BasePlatformTestCase {
         commandLine.addParameter("--config=\\\\wsl$\\Ubuntu\\etc\\config");
         commandLine.addParameter("run");
 
-        service.convertCommandLineArgumentsForWsl(commandLine);
+        ProcessBuilder processBuilder = toProcessBuilder(commandLine);
+        service.convertProcessBuilderArgumentsForWsl(processBuilder, commandLine);
 
-        List<String> params = commandLine.getParametersList().getList();
-        assertEquals(3, params.size());
-        assertEquals("--path=/home/user", params.get(0));
-        assertEquals("--config=/etc/config", params.get(1));
-        assertEquals("run", params.get(2));
+        List<String> params = processBuilder.command();
+        assertEquals(4, params.size());
+        assertEquals("--path=/home/user", params.get(1));
+        assertEquals("--config=/etc/config", params.get(2));
+        assertEquals("run", params.get(3));
     }
 
     /**
@@ -131,9 +133,10 @@ public class WslArgumentConversionTest extends BasePlatformTestCase {
             commandLine.addParameter(input);
         }
 
-        service.convertCommandLineArgumentsForWsl(commandLine);
+        ProcessBuilder processBuilder = toProcessBuilder(commandLine);
+        service.convertProcessBuilderArgumentsForWsl(processBuilder, commandLine);
 
-        List<String> params = commandLine.getParametersList().getList();
+        List<String> params = processBuilder.command().stream().skip(1).toList();
         assertEquals(Arrays.asList(inputs), params);
     }
 
@@ -151,10 +154,11 @@ public class WslArgumentConversionTest extends BasePlatformTestCase {
         commandLine.setWorkDirectory("/tmp/project");
         commandLine.addParameter(expected);
 
-        service.convertCommandLineArgumentsForWsl(commandLine);
+        ProcessBuilder processBuilder = toProcessBuilder(commandLine);
+        service.convertProcessBuilderArgumentsForWsl(processBuilder, commandLine);
 
-        List<String> params = commandLine.getParametersList().getList();
-        assertEquals(expected, params.getFirst());
+        List<String> params = processBuilder.command();
+        assertEquals(expected, params.get(1));
     }
 
     /**
@@ -198,10 +202,11 @@ public class WslArgumentConversionTest extends BasePlatformTestCase {
         commandLine.setWorkDirectory(WSL_WORK_DIR);
         // No parameters
 
-        service.convertCommandLineArgumentsForWsl(commandLine);
+        ProcessBuilder processBuilder = toProcessBuilder(commandLine);
+        service.convertProcessBuilderArgumentsForWsl(processBuilder, commandLine);
 
-        List<String> params = commandLine.getParametersList().getList();
-        assertEquals(0, params.size());
+        List<String> params = processBuilder.command();
+        assertEquals(1, params.size());
     }
 
     /**
@@ -308,10 +313,11 @@ public class WslArgumentConversionTest extends BasePlatformTestCase {
         commandLine.getEnvironment().put("MYPATH", "C:/Users/steve/bin");
         commandLine.getEnvironment().put("DATADIR", "D:\\data\\files");
 
-        service.convertCommandLineArgumentsForWsl(commandLine);
+        ProcessBuilder processBuilder = toProcessBuilder(commandLine);
+        service.convertProcessBuilderArgumentsForWsl(processBuilder, commandLine);
 
-        assertEquals("/mnt/c/Users/steve/bin", commandLine.getEnvironment().get("MYPATH"));
-        assertEquals("/mnt/d/data/files", commandLine.getEnvironment().get("DATADIR"));
+        assertEquals("/mnt/c/Users/steve/bin", processBuilder.environment().get("MYPATH"));
+        assertEquals("/mnt/d/data/files", processBuilder.environment().get("DATADIR"));
     }
 
     /**
@@ -336,12 +342,13 @@ public class WslArgumentConversionTest extends BasePlatformTestCase {
         commandLine.addParameter("c:/lowercase");
         commandLine.addParameter("C:/uppercase");
 
-        service.convertCommandLineArgumentsForWsl(commandLine);
+        ProcessBuilder processBuilder = toProcessBuilder(commandLine);
+        service.convertProcessBuilderArgumentsForWsl(processBuilder, commandLine);
 
-        List<String> params = commandLine.getParametersList().getList();
-        assertEquals(2, params.size());
-        assertEquals("/mnt/c/lowercase", params.get(0));
-        assertEquals("/mnt/c/uppercase", params.get(1));
+        List<String> params = processBuilder.command();
+        assertEquals(3, params.size());
+        assertEquals("/mnt/c/lowercase", params.get(1));
+        assertEquals("/mnt/c/uppercase", params.get(2));
     }
 
     /**
@@ -356,10 +363,11 @@ public class WslArgumentConversionTest extends BasePlatformTestCase {
         commandLine.setWorkDirectory(WSL_WORK_DIR);
         commandLine.addParameter("--version");
 
-        service.convertCommandLineArgumentsForWsl(commandLine);
+        ProcessBuilder processBuilder = toProcessBuilder(commandLine);
+        service.convertProcessBuilderArgumentsForWsl(processBuilder, commandLine);
 
-        assertEquals("/usr/bin/elixir", commandLine.getExePath());
-        assertEquals("--version", commandLine.getParametersList().getList().getFirst());
+        assertEquals("/usr/bin/elixir", processBuilder.command().getFirst());
+        assertEquals("--version", processBuilder.command().get(1));
     }
 
     /**
@@ -376,11 +384,12 @@ public class WslArgumentConversionTest extends BasePlatformTestCase {
         commandLine.setWorkDirectory(WSL_WORK_DIR);
         commandLine.addParameter(originalParam);
 
-        service.convertCommandLineArgumentsForWsl(commandLine);
+        ProcessBuilder processBuilder = toProcessBuilder(commandLine);
+        service.convertProcessBuilderArgumentsForWsl(processBuilder, commandLine);
 
         // Nothing should be converted because exePath is not WSL UNC
-        assertEquals(exePath, commandLine.getExePath());
-        assertEquals(originalParam, commandLine.getParametersList().getList().getFirst());
+        assertEquals(exePath, processBuilder.command().getFirst());
+        assertEquals(originalParam, processBuilder.command().get(1));
     }
 
     /**
@@ -398,11 +407,12 @@ public class WslArgumentConversionTest extends BasePlatformTestCase {
         commandLine.setWorkDirectory(workDir);
         commandLine.addParameter(originalParam);
 
-        service.convertCommandLineArgumentsForWsl(commandLine);
+        ProcessBuilder processBuilder = toProcessBuilder(commandLine);
+        service.convertProcessBuilderArgumentsForWsl(processBuilder, commandLine);
 
         // Nothing should be converted because distributions don't match
-        assertEquals(exePath, commandLine.getExePath());
-        assertEquals(originalParam, commandLine.getParametersList().getList().getFirst());
+        assertEquals(exePath, processBuilder.command().getFirst());
+        assertEquals(originalParam, processBuilder.command().get(1));
     }
 
     /**
@@ -416,9 +426,10 @@ public class WslArgumentConversionTest extends BasePlatformTestCase {
         commandLine.setExePath(exePath);
         commandLine.setWorkDirectory(WSL_WORK_DIR);
 
-        service.convertCommandLineArgumentsForWsl(commandLine);
+        ProcessBuilder processBuilder = toProcessBuilder(commandLine);
+        service.convertProcessBuilderArgumentsForWsl(processBuilder, commandLine);
 
-        assertEquals("/usr/bin/elixir", commandLine.getExePath());
+        assertEquals("/usr/bin/elixir", processBuilder.command().getFirst());
     }
 
     /**
@@ -435,9 +446,10 @@ public class WslArgumentConversionTest extends BasePlatformTestCase {
         commandLine.setWorkDirectory(workDir);
         commandLine.addParameter("--version");
 
-        service.convertCommandLineArgumentsForWsl(commandLine);
+        ProcessBuilder processBuilder = toProcessBuilder(commandLine);
+        service.convertProcessBuilderArgumentsForWsl(processBuilder, commandLine);
 
-        assertEquals("/usr/bin/elixir", commandLine.getExePath());
+        assertEquals("/usr/bin/elixir", processBuilder.command().getFirst());
     }
 
     /**
@@ -451,9 +463,10 @@ public class WslArgumentConversionTest extends BasePlatformTestCase {
         commandLine.setExePath(exePath);
         commandLine.setWorkDirectory(WSL_WORK_DIR);
 
-        service.convertCommandLineArgumentsForWsl(commandLine);
+        ProcessBuilder processBuilder = toProcessBuilder(commandLine);
+        service.convertProcessBuilderArgumentsForWsl(processBuilder, commandLine);
 
-        assertEquals("/mnt/c/tools/elixir.bat", commandLine.getExePath());
+        assertEquals("/mnt/c/tools/elixir.bat", processBuilder.command().getFirst());
     }
 
     // Helper methods
@@ -470,7 +483,7 @@ public class WslArgumentConversionTest extends BasePlatformTestCase {
      */
     private void assertSingleArgumentConverted(String workDir, String input, String expected) {
         WslCompatService service = getWslCompat();
-        GeneralCommandLine commandLine = new GeneralCommandLine();
+
 
         // Set exePath to match the working directory distribution for consistency
         // Extract distribution from workDir and create a matching exePath
@@ -482,15 +495,27 @@ public class WslArgumentConversionTest extends BasePlatformTestCase {
         } else {
             exePath = "\\\\wsl$\\Ubuntu\\usr\\bin\\elixir";
         }
-
+        GeneralCommandLine commandLine = new GeneralCommandLine();
         commandLine.setExePath(exePath);
         commandLine.setWorkDirectory(workDir);
         commandLine.addParameter(input);
+        ProcessBuilder processBuilder = toProcessBuilder(commandLine);
 
-        service.convertCommandLineArgumentsForWsl(commandLine);
+        service.convertProcessBuilderArgumentsForWsl(processBuilder, commandLine);
 
-        List<String> params = commandLine.getParametersList().getList();
-        assertEquals(1, params.size());
-        assertEquals(expected, params.getFirst());
+        List<String> params = processBuilder.command();
+        assertEquals(2, params.size());
+        assertEquals(expected, params.getLast());
+    }
+
+    // This is a small cheat to access the process builder without actually running the command line in tests
+    private ProcessBuilder toProcessBuilder(GeneralCommandLine commandLine) {
+        try {
+            Method method = commandLine.getClass().getDeclaredMethod("toProcessBuilder", List.class);
+            method.setAccessible(true);
+            return (ProcessBuilder) method.invoke(commandLine, commandLine.getCommandLineList(null));
+        } catch (ReflectiveOperationException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

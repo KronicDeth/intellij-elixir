@@ -1,19 +1,18 @@
 package org.elixir_lang.run
 
-import com.intellij.execution.configurations.GeneralCommandLine
-
 /**
  * Formats a command line for debug logging with:
  * - Command and arguments on separate lines with proper indentation
- * - Only user-added environment variables (not all system env vars)
+ * - Environment variables
  * - Working directory
  */
-internal fun formatCommandLineForLogging(commandLine: GeneralCommandLine, prefix: String = "Command line"): String {
+internal fun formatCommandLineForLogging(processBuilder: ProcessBuilder, prefix: String = "Command line"): String {
     val builder = StringBuilder()
 
     // Get the command list (exe + arguments) - this is WSL-aware after conversion
-    val commandList = commandLine.getCommandLineList(null)
+    val commandList = processBuilder.command()
 
+    builder.append("WARNING, THIS MAY LOG SENSITIVE INFORMATION\n")
     builder.append("$prefix:\n")
     builder.append("  Executable: ${commandList.firstOrNull() ?: "<none>"}\n")
 
@@ -24,25 +23,22 @@ internal fun formatCommandLineForLogging(commandLine: GeneralCommandLine, prefix
         }
     }
 
-    // Show only user-added environment variables (ones explicitly set on this command line)
-    val userEnvVars = commandLine.environment
+    val userEnvVars = processBuilder.environment()
+    val sensitivePatterns = listOf("pass", "token", "secret", "auth", "sig", "key")
     if (userEnvVars.isNotEmpty()) {
-        builder.append("  Extra Environment variables:\n")
-        userEnvVars.entries.sortedBy { it.key }.forEach { (key, value) ->
-            builder.append("    $key=$value\n")
-        }
-    }
-
-    val systemEnvVars = commandLine.parentEnvironment
-    if (systemEnvVars.isNotEmpty()) {
-        builder.append("  System Environment variables:\n")
-        systemEnvVars.entries.sortedBy { it.key }.forEach { (key, value) ->
-            builder.append("    $key=$value\n")
+        builder.append("  Environment variables:\n")
+        userEnvVars.entries.sortedBy { it.key }.forEach { (name, value) ->
+            val redactedValue = if (sensitivePatterns.any { name.contains(it, ignoreCase = true) }) {
+                "<REDACTED>"
+            } else {
+                value
+            }
+            builder.append("    $name=$redactedValue\n")
         }
     }
 
     // Show working directory
-    val workDir = commandLine.workDirectory
+    val workDir = processBuilder.directory()
     if (workDir != null) {
         builder.append("  Working directory: ${workDir.path}\n")
     }
