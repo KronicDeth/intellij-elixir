@@ -1,11 +1,11 @@
 package org.elixir_lang.mix.project._import.step;
 
 import com.intellij.execution.ExecutionException;
-import com.intellij.execution.Platform;
 import com.intellij.execution.configurations.GeneralCommandLine;
-import com.intellij.execution.process.OSProcessHandler;
-import com.intellij.execution.process.ProcessAdapter;
 import com.intellij.execution.process.ProcessEvent;
+import com.intellij.execution.process.ProcessHandler;
+import com.intellij.execution.process.ProcessHandlerFactory;
+import com.intellij.execution.process.ProcessListener;
 import com.intellij.execution.process.ProcessTerminatedListener;
 import com.intellij.ide.util.projectWizard.WizardContext;
 import com.intellij.openapi.application.ApplicationManager;
@@ -87,14 +87,13 @@ public class Root extends ProjectImportWizardStep {
                         generalCommandLine.addParameters(taskParameters);
 
                         try {
-                            OSProcessHandler handler = new OSProcessHandler(
-                                    generalCommandLine.createProcess(),
-                                    generalCommandLine.getPreparedCommandLine(Platform.current())
-                            );
+                            // Use ColoredProcessHandler to automatically strip ANSI escape codes
+                            ProcessHandler handler = ProcessHandlerFactory.getInstance()
+                                    .createColoredProcessHandler(generalCommandLine);
                             handler.addProcessListener(
-                                    new ProcessAdapter() {
+                                    new ProcessListener() {
                                         @Override
-                                        public void onTextAvailable(ProcessEvent event, Key outputType) {
+                                        public void onTextAvailable(@NotNull ProcessEvent event, @NotNull Key outputType) {
                                             String text = event.getText();
                                             indicator.setText2(text);
                                         }
