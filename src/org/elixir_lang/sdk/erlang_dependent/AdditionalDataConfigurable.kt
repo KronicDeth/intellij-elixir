@@ -8,12 +8,13 @@ import com.intellij.openapi.projectRoots.AdditionalDataConfigurable
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.projectRoots.SdkModel
 import com.intellij.openapi.projectRoots.SdkModificator
+import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.ui.ComboBox
 import com.intellij.openapi.util.Comparing
 import com.intellij.ui.SimpleListCellRenderer
 import com.intellij.util.ui.JBUI
 import org.elixir_lang.sdk.elixir.Type.Companion.addNewCodePathsFromInternErlangSdk
-import org.elixir_lang.sdk.elixir.Type.Companion.hasErlangClasspathInElixirSdk
+import org.elixir_lang.sdk.elixir.Type.Companion.hasErlangClasspathInRoots
 import org.elixir_lang.sdk.elixir.Type.Companion.removeCodePathsFromInternalErlangSdk
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
@@ -31,10 +32,11 @@ class AdditionalDataConfigurable(
         icon = AllIcons.General.Warning
         isVisible = false
     }
-    private val saveHintLabel = JLabel("After changing the Erlang SDK, save settings and reopen this dialog to see updates").apply {
-        icon = AllIcons.General.Information
-        isVisible = false
-    }
+    private val saveHintLabel =
+        JLabel("After changing the Erlang SDK, save settings and reopen this dialog to see updates").apply {
+            icon = AllIcons.General.Information
+            isVisible = false
+        }
     private val sdkModelListener: SdkModel.Listener
     private var elixirSdk: Sdk? = null
     private var modified = false
@@ -178,23 +180,28 @@ class AdditionalDataConfigurable(
             if (!freeze) {
                 val stateChange = itemEvent.stateChange
                 val internalErlangSdk = itemEvent.item as Sdk
+                val myElixirSdk = elixirSdk ?: return@addItemListener
 
                 if (stateChange == ItemEvent.DESELECTED) {
+                    // Update UI path editors only. The actual SDK will be updated when the user
+                    // clicks Apply, via Editor.apply() which calls pathEditor.apply(sdkModificator).
+                    // The sdkModificator parameter is a UI-only wrapper that updates the path editors
+                    // displayed in the dialog tabs.
                     removeCodePathsFromInternalErlangSdk(
-                        elixirSdk!!,
+                        myElixirSdk,
                         internalErlangSdk,
                         sdkModificator,
                     )
                 } else if (stateChange == ItemEvent.SELECTED) {
+                    // Update UI path editors only. The actual SDK will be updated when the user
+                    // clicks Apply, via Editor.apply() which calls pathEditor.apply(sdkModificator).
+                    // The sdkModificator parameter is a UI-only wrapper that updates the path editors
+                    // displayed in the dialog tabs.
                     addNewCodePathsFromInternErlangSdk(
-                        elixirSdk!!,
+                        myElixirSdk,
                         internalErlangSdk,
                         sdkModificator,
                     )
-                    // Force save to work around JetBrains settings persistence bug
-                    ApplicationManager.getApplication().runWriteAction {
-                        sdkModificator.commitChanges()
-                    }
                     modified = true
                     // Show hint to save and reopen
                     saveHintLabel.isVisible = true
@@ -234,13 +241,23 @@ class AdditionalDataConfigurable(
     }
 
     private fun writeInternalErlangSdk(erlangSdk: Sdk?) {
+        val myElixirSdk = elixirSdk ?: return
         val sdkAdditionData =
             SdkAdditionalData(
                 erlangSdk,
-                elixirSdk!!,
+                myElixirSdk,
             )
-        sdkModificator.sdkAdditionalData = sdkAdditionData
-        ApplicationManager.getApplication().runWriteAction { sdkModificator.commitChanges() }
+
+        // We must get a fresh modificator from the Elixir SDK itself, not use the constructor parameter. The
+        // sdkModificator passed to the constructor is a UI-only wrapper (EditedSdkModificator from Editor.kt or
+        // com.intellij.openapi.projectRoots.ui.SdkEditor.EditedSdkModificator) that is designed for managing classpath
+        // roots in the UI. It throws UnsupportedOperationException on setSdkAdditionalData() and has an empty
+        // commitChanges() implementation. To actually persist additional data, we need a real modificator from the SDK.
+        val mySdkModificator = myElixirSdk.sdkModificator
+        mySdkModificator.sdkAdditionalData = sdkAdditionData
+        ApplicationManager.getApplication().runWriteAction {
+            mySdkModificator.commitChanges()
+        }
     }
 
     override fun reset() {
@@ -251,10 +268,10 @@ class AdditionalDataConfigurable(
         freeze = true
         updateJdkList()
         LOG.debug("[$sdkName] Populated combo box with ${internalErlangSdksComboBoxModel.size} Erlang SDKs")
-        freeze = false
 
         if (sdk == null) {
             LOG.debug("[$sdkName] No Elixir SDK set, skipping Erlang SDK selection")
+            freeze = false
             return
         }
 
@@ -264,10 +281,12 @@ class AdditionalDataConfigurable(
                 LOG.debug("[$sdkName] Has SdkAdditionalData, looking up Erlang SDK (erlangSdkName=${additionalData.getErlangSdkName()})")
                 additionalData.getErlangSdk(sdkModel)
             }
+
             null -> {
                 LOG.debug("[$sdkName] sdkAdditionalData is null, auto-discovering Erlang SDK from model")
                 findFirstErlangSdkInModel()
             }
+
             else -> {
                 LOG.debug("[$sdkName] sdkAdditionalData is ${additionalData::class.java.simpleName}, auto-discovering Erlang SDK from model")
                 findFirstErlangSdkInModel()
@@ -292,6 +311,9 @@ class AdditionalDataConfigurable(
         } else {
             LOG.debug("[$sdkName] No Erlang SDK found to select")
         }
+
+        // Release freeze after setting selectedIndex to avoid triggering ItemListener during reset
+        freeze = false
 
         modified = false
         saveHintLabel.isVisible = false
@@ -355,7 +377,7 @@ class AdditionalDataConfigurable(
     }
 
     private fun updateWarningLabel() {
-        val sdk = elixirSdk ?: run {
+        if (elixirSdk == null) {
             classpathWarningLabel.isVisible = false
             return
         }
@@ -363,7 +385,11 @@ class AdditionalDataConfigurable(
             classpathWarningLabel.isVisible = false
             return
         }
-        classpathWarningLabel.isVisible = !hasErlangClasspathInElixirSdk(sdk, erlangSdk)
+        // Check if Erlang classpath is in the UI modificator (not the persisted SDK).
+        // This allows the warning to update immediately when the user changes the Erlang SDK selection,
+        // even before clicking Apply. The sdkModificator reads from the UI path editors.
+        val classRoots = sdkModificator.getRoots(OrderRootType.CLASSES)
+        classpathWarningLabel.isVisible = !hasErlangClasspathInRoots(classRoots, erlangSdk)
     }
 
     companion object {

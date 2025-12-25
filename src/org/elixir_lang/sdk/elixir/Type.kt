@@ -107,18 +107,20 @@ class Type : org.elixir_lang.sdk.erlang_dependent.Type(SerializerExtension.ELIXI
      * @return Map
      */
     private fun homePathByVersion(path: Path?): Map<Version, String> {
-        return SdkHomeScan.homePathByVersion(path, SdkHomeScan.Config(
-            toolName = "elixir",
-            nixPattern = NIX_PATTERN,
-            linuxDefaultPath = LINUX_DEFAULT_HOME_PATH,
-            linuxMintPath = LINUX_MINT_HOME_PATH,
-            windowsDefaultPath = WINDOWS_64BIT_DEFAULT_HOME_PATH,
-            windows32BitPath = WINDOWS_32BIT_DEFAULT_HOME_PATH,
-            homebrewTransform = null,  // identity
-            nixTransform = null,  // identity
-            kerlTransform = null,  // TODO: Investigate if Elixir supports kerl builds
-            travisCIKerlTransform = null  // TODO: Verify Travis CI kerl for Elixir
-        ))
+        return SdkHomeScan.homePathByVersion(
+            path, SdkHomeScan.Config(
+                toolName = "elixir",
+                nixPattern = NIX_PATTERN,
+                linuxDefaultPath = LINUX_DEFAULT_HOME_PATH,
+                linuxMintPath = LINUX_MINT_HOME_PATH,
+                windowsDefaultPath = WINDOWS_64BIT_DEFAULT_HOME_PATH,
+                windows32BitPath = WINDOWS_32BIT_DEFAULT_HOME_PATH,
+                homebrewTransform = null,  // identity
+                nixTransform = null,  // identity
+                kerlTransform = null,  // TODO: Investigate if Elixir supports kerl builds
+                travisCIKerlTransform = null  // TODO: Verify Travis CI kerl for Elixir
+            )
+        )
     }
 
     private fun invalidSdkHomeException(virtualFile: VirtualFile): Exception =
@@ -316,6 +318,7 @@ ELIXIR_SDK_HOME
                     LOG.debug("No open projects, skipping auto-set")
                     return
                 }
+
                 1 -> openProjects.first()
                 else -> {
                     LOG.debug("Multiple projects open (${openProjects.size}), skipping auto-set to avoid ambiguity")
@@ -736,8 +739,13 @@ ELIXIR_SDK_HOME
          */
         @JvmStatic
         fun hasErlangClasspathInElixirSdk(elixirSdk: Sdk, erlangSdk: Sdk): Boolean {
-            val erlangHomePath = erlangSdk.homePath ?: return false
             val classRoots = elixirSdk.rootProvider.getFiles(OrderRootType.CLASSES)
+            return hasErlangClasspathInRoots(classRoots, erlangSdk)
+        }
+
+        @JvmStatic
+        fun hasErlangClasspathInRoots(classRoots: Array<VirtualFile>, erlangSdk: Sdk): Boolean {
+            val erlangHomePath = erlangSdk.homePath ?: return false
             return classRoots.any { root -> root.path.startsWith(erlangHomePath) }
         }
 
