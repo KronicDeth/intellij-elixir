@@ -15,11 +15,11 @@ import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.wm.CustomStatusBarWidget
 import com.intellij.openapi.wm.StatusBar
-import com.intellij.openapi.wm.StatusBarWidget
 import com.intellij.openapi.wm.impl.status.TextPanel
 import com.intellij.ui.ClickListener
 import com.intellij.ui.awt.RelativePoint
 import com.intellij.util.messages.MessageBusConnection
+import com.intellij.util.ui.JBUI
 import org.elixir_lang.Icons
 import org.elixir_lang.action.RefreshAllElixirSdksAction
 import org.elixir_lang.jps.HomePath
@@ -43,7 +43,7 @@ class ElixirSdkStatusWidget(@param:NotNull private val project: Project) : Custo
 
     private val component: TextPanel.WithIconAndArrows by lazy {
         val panel = TextPanel.WithIconAndArrows()
-        panel.border = StatusBarWidget.WidgetBorder.ICON
+        panel.border = JBUI.CurrentTheme.StatusBar.Widget.iconBorder()
 
         object : ClickListener() {
             override fun onClick(event: MouseEvent, clickCount: Int): Boolean {
@@ -140,8 +140,7 @@ class ElixirSdkStatusWidget(@param:NotNull private val project: Project) : Custo
                 // Open Project Structure dialog (File -> Project Structure)
                 val action = ActionManager.getInstance().getAction("ShowProjectStructureSettings")
                 if (action != null) {
-                    val dataContext = DataManager.getInstance().getDataContext(component)
-                    ActionUtil.invokeAction(action, dataContext, "ElixirSdkStatusWidget", null, null)
+                    ActionUtil.performAction(action, e)
                 }
             }
         }
