@@ -42,12 +42,19 @@ val libMockitoCore = libs.mockito.core
 // --- Configuration Properties ---
 val elixirVersion: String by project
 val quoterVersion: String by project
-val basePluginVersion: String = providers.gradleProperty("pluginVersion").get()
-val useDynamicEapVersion: Boolean = project.property("useDynamicEapVersion").toString().toBoolean()
-val skipSearchableOptions: Boolean = project.property("skipSearchableOptions").toString().toBoolean()
 
 // Publish channel: "default" for release, "canary" for pre-release
 val publishChannel: String = providers.gradleProperty("publishChannels").getOrElse("canary")
+
+// Calculate the plugin version, for canary builds, the patch is bumped to the next version
+// so that the IDE's plugin manager doesn't offer to "update" it to the released version.
+val basePluginVersion: String = PluginVersion.getBaseVersion(
+    providers.gradleProperty("pluginVersion").get(),
+    publishChannel
+)
+val useDynamicEapVersion: Boolean = project.property("useDynamicEapVersion").toString().toBoolean()
+val skipSearchableOptions: Boolean = project.property("skipSearchableOptions").toString().toBoolean()
+
 
 val actualPlatformVersion: String = if (useDynamicEapVersion) {
     // Calling the helper from buildSrc
@@ -467,6 +474,13 @@ tasks.named<Test>("test") {
     jvmArgs("-javaagent:${mockitoAgent.asPath}")
 }
 
+tasks.named<Zip>("buildPlugin") {
+    doLast {
+        println("Note: Timestamps in version strings and filenames of build artifacts do not change on every build due to gradle config caching.")
+        println("Built artifact path: ${archiveFile.get().asFile.absolutePath}")
+    }
+}
+
 // Uncomment to allow using build-scan.
 //if (hasProperty("buildScan")) {
 //    extensions.findByName("buildScan")?.withGroovyBuilder {
@@ -474,4 +488,3 @@ tasks.named<Test>("test") {
 //        setProperty("termsOfServiceAgree", "yes")
 //    }
 //}
-
