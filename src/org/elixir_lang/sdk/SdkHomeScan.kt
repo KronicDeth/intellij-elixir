@@ -124,6 +124,8 @@ object SdkHomeScan {
             putIfDirectory(homePathByVersion, HomePath.UNKNOWN_VERSION, it)
         }
 
+        HomePath.mergeElixirInstallScript(homePathByVersion, config.toolName)
+
         // WSL distributions
         homePathByVersionWSLs(path, homePathByVersion, config)
 
@@ -143,6 +145,7 @@ object SdkHomeScan {
 
         HomePath.mergeASDF(homePathByVersion, config.toolName)
         HomePath.mergeMise(homePathByVersion, config.toolName)
+        HomePath.mergeElixirInstallScript(homePathByVersion, config.toolName)
 
         if (config.kerlTransform != null) {
             HomePath.mergeKerl(homePathByVersion, config.kerlTransform.toJavaFunction())
@@ -210,6 +213,7 @@ object SdkHomeScan {
         if (wslUserHome != null) {
             HomePath.mergeASDF(homePathByVersion, config.toolName, wslUserHome)
             HomePath.mergeMise(homePathByVersion, config.toolName, wslUserHome)
+            HomePath.mergeElixirInstallScript(homePathByVersion, config.toolName, wslUserHome)
 
             if (config.travisCIKerlTransform != null) {
                 HomePath.mergeTravisCIKerl(homePathByVersion, config.travisCIKerlTransform.toJavaFunction(), wslUserHome)

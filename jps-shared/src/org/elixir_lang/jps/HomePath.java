@@ -119,6 +119,15 @@ public class HomePath {
         mergeNameSubdirectories(homePathByVersion, Paths.get(userHome, ".local", "share", "mise", "installs").toFile(), name, Function.identity());
     }
 
+    // Installed by https://elixir-lang.org/install.html#install-scripts
+    public static void mergeElixirInstallScript(@NotNull Map<Version, String> homePathByVersion, @NotNull String name) {
+        mergeElixirInstallScript(homePathByVersion, name, System.getProperty("user.home"));
+    }
+
+    public static void mergeElixirInstallScript(@NotNull Map<Version, String> homePathByVersion, @NotNull String name, @NotNull String userHome) {
+        mergeNameSubdirectories(homePathByVersion, Paths.get(userHome, ".elixir-install", "installs").toFile(), name, Function.identity());
+    }
+
     public static void mergeHomebrew(@NotNull Map<Version, String> homePathByVersion,
                                      @NotNull String name,
                                      @NotNull Function<File, File> versionPathToHomePath) {
