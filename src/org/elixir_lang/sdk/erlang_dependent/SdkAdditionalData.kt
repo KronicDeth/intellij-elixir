@@ -74,6 +74,8 @@ class SdkAdditionalData :
     override fun checkValid(sdkModel: SdkModel) {
         LOG.debug("checkValid called for Elixir SDK: ${elixirSdk.name} (homePath: ${elixirSdk.homePath})")
 
+        // Allow auto-discovery during validation - if the configured SDK is missing,
+        // we'll find another one automatically
         val erlangSdk = getErlangSdk(sdkModel)
 
         if (erlangSdk == null) {

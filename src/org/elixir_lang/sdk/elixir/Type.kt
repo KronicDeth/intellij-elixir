@@ -1,6 +1,7 @@
 package org.elixir_lang.sdk.elixir
 
 import com.intellij.facet.FacetManager
+import com.intellij.notification.NotificationAction
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.application.edtWriteAction
@@ -8,6 +9,7 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.fileChooser.FileChooserDescriptor
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleUtilCore
+import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.progress.runBlockingCancellable
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.guessProjectDir
@@ -16,6 +18,7 @@ import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl
 import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.roots.ProjectRootManager
+import com.intellij.openapi.roots.ui.configuration.ProjectJdksConfigurable
 import com.intellij.openapi.util.InvalidDataException
 import com.intellij.openapi.util.Version
 import com.intellij.openapi.util.WriteExternalException
@@ -365,56 +368,76 @@ ELIXIR_SDK_HOME
         }
 
         private fun cleanupOrphanedElixirSdkReferences(deletedErlangSdk: Sdk) {
+            val deletedName = deletedErlangSdk.name
+            LOG.info("Erlang SDK '$deletedName' removed, checking for orphaned Elixir SDK references")
+
             val projectJdkTable = ProjectJdkTable.getInstance()
             val elixirSdks = projectJdkTable.allJdks.filter { it.sdkType is Type }
 
-            for (elixirSdk in elixirSdks) {
+            // Use getErlangSdkName() to check stored reference without triggering auto-discovery
+            val orphanedElixirSdks = elixirSdks.filter { elixirSdk ->
                 val additionalData = elixirSdk.sdkAdditionalData as? SdkAdditionalData
-                if (additionalData != null) {
-                    val currentErlangSdk = additionalData.getErlangSdk()
-                    if (currentErlangSdk?.name == deletedErlangSdk.name) {
-                        LOG.info("Clearing orphaned Erlang SDK reference '${deletedErlangSdk.name}' from Elixir SDK '${elixirSdk.name}'")
+                additionalData?.getErlangSdkName() == deletedName
+            }
 
-                        // Use SDK modificator to properly update additional data
-                        val modificator = elixirSdk.sdkModificator
-                        val newAdditionalData = SdkAdditionalData(null, elixirSdk)
+            if (orphanedElixirSdks.isEmpty()) {
+                return
+            }
 
-                        // Try to auto-discover a new Erlang SDK
-                        val newErlangSdk = newAdditionalData.getErlangSdk()
-                        if (newErlangSdk != null) {
-                            LOG.info("Auto-assigned new Erlang SDK '${newErlangSdk.name}' to Elixir SDK '${elixirSdk.name}'")
-                            newAdditionalData.setErlangSdk(newErlangSdk)
-                        }
+            LOG.warn("Erlang SDK '$deletedName' was deleted and is referenced by ${orphanedElixirSdks.size} Elixir SDK(s)")
+            orphanedElixirSdks.forEach {
+                LOG.warn("Elixir SDK '${it.name}' references deleted Erlang SDK '$deletedName'")
+            }
 
-                        modificator.sdkAdditionalData = newAdditionalData
-                        ApplicationManager.getApplication().runWriteAction {
-                            modificator.commitChanges()
-                        }
-                    }
+            // Show warning notification instructing user to reconfigure
+            ApplicationManager.getApplication().invokeLater {
+                val notificationGroup = com.intellij.notification.NotificationGroupManager.getInstance()
+                    .getNotificationGroup("Elixir")
+
+                val dependentNames = orphanedElixirSdks.joinToString("<br>") { "  • <b>${it.name}</b>" }
+                val message = buildString {
+                    append("Erlang SDK '<b>$deletedName</b>' was deleted.<br><br>")
+                    append("The following Elixir SDKs reference it and must be reconfigured:<br>")
+                    append(dependentNames)
+                    append("<br><br>")
+                    append("Please open Project Structure and select a different Erlang SDK<br>")
+                    append("for each of these Elixir SDKs.")
                 }
+
+                val notification = notificationGroup.createNotification(
+                    "Erlang SDK Deleted",
+                    message,
+                    com.intellij.notification.NotificationType.WARNING
+                )
+                notification.addAction(NotificationAction.create("Open \"Project Structure\" dialog") { _, _ ->
+                    ShowSettingsUtil.getInstance().showSettingsDialog(null, ProjectJdksConfigurable::class.java)
+                })
+
+                notification.notify(null)
             }
         }
 
         private fun updateElixirSdkReferencesAfterRename(renamedErlangSdk: Sdk, previousName: String) {
-            LOG.debug("Updating Elixir SDK references from '$previousName' to '${renamedErlangSdk.name}'")
+            val newName = renamedErlangSdk.name
+            LOG.info("Erlang SDK renamed from '$previousName' to '$newName'")
+
             val projectJdkTable = ProjectJdkTable.getInstance()
             val elixirSdks = projectJdkTable.allJdks.filter { it.sdkType is Type }
 
             for (elixirSdk in elixirSdks) {
-                val additionalData = elixirSdk.sdkAdditionalData as? SdkAdditionalData
-                if (additionalData != null) {
-                    val currentErlangSdk = additionalData.getErlangSdk()
-                    if (currentErlangSdk?.name == previousName) {
-                        LOG.info("Updating Erlang SDK reference from '${previousName}' to '${renamedErlangSdk.name}' in Elixir SDK '${elixirSdk.name}'")
+                val additionalData = elixirSdk.sdkAdditionalData as? SdkAdditionalData ?: continue
 
-                        // Use SDK modificator to properly update additional data
-                        val modificator = elixirSdk.sdkModificator
-                        val newAdditionalData = SdkAdditionalData(renamedErlangSdk, elixirSdk)
-                        modificator.sdkAdditionalData = newAdditionalData
-                        ApplicationManager.getApplication().runWriteAction {
-                            modificator.commitChanges()
-                        }
-                    }
+                // Use getErlangSdkName() to check stored reference
+                if (additionalData.getErlangSdkName() != previousName) continue
+
+                LOG.info("Updating Elixir SDK '${elixirSdk.name}' reference from '$previousName' to '$newName'")
+
+                val modificator = elixirSdk.sdkModificator
+                val newAdditionalData = SdkAdditionalData(renamedErlangSdk, elixirSdk)
+                modificator.sdkAdditionalData = newAdditionalData
+
+                ApplicationManager.getApplication().runWriteAction {
+                    modificator.commitChanges()
                 }
             }
         }
