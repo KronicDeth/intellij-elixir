@@ -1,23 +1,19 @@
 package org.elixir_lang.beam
 
-import junit.framework.TestCase.assertEquals
+import org.elixir_lang.PlatformTestCase
 import org.elixir_lang.beam.Beam.Companion.from
 import org.elixir_lang.beam.chunk.CallDefinitions.Companion.macroNameAritySortedSetByMacro
 import org.elixir_lang.psi.call.name.Function.DEF
 import org.elixir_lang.psi.call.name.Function.DEFP
-import org.junit.After
 import org.junit.Assert
-import org.junit.Before
-import org.junit.Test
 import java.io.BufferedInputStream
 import java.io.DataInputStream
 import java.io.FileInputStream
 
-class BeamTest {
+class BeamTest: PlatformTestCase() {
     private var ebinDirectory: String? = null
 
-    @Test
-    fun elixirModule() {
+    fun testElixirModule() {
         val beam = beam("Elixir.Kernel")
         Assert.assertNotNull(beam)
         val atoms = beam!!.atoms()
@@ -37,8 +33,7 @@ class BeamTest {
         Assert.assertEquals(1, nodes[1].arity)
     }
 
-    @Test
-    fun erlangModule() {
+    fun testErlangModule() {
         val beam = beam("elixir_interpolation")
         Assert.assertNotNull(beam)
         val atoms = beam!!.atoms()
@@ -75,15 +70,16 @@ class BeamTest {
         return from(dataInputStream, path)
     }
 
-    @Before
-    fun setEbinDirectory() {
+
+    override fun setUp() {
+        super.setUp()
         val ebinDirectory = System.getenv("ELIXIR_EBIN_DIRECTORY")
         Assert.assertNotNull("ELIXIR_EBIN_DIRECTORY is not set", ebinDirectory)
         this.ebinDirectory = ebinDirectory
     }
 
-    @After
-    fun cleanEbinDirectory() {
+    override fun tearDown() {
+        super.tearDown()
         ebinDirectory = null
     }
 }

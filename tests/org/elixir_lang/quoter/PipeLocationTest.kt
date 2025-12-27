@@ -7,7 +7,7 @@ import java.io.File
  * Verifies that the quoter daemon creates pipes in cache/quoter_tmp_*
  * instead of inside _build/ (which breaks Gradle caching).
  */
-class PipeLocationTest : TestCase() {
+class PipeLocationTest : PlatformTestCase() {
 
     fun testPipesNotInBuildDirectory() {
         val projectRoot = File(System.getProperty("user.dir"))

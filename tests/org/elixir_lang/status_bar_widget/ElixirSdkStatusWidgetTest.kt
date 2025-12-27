@@ -1,11 +1,11 @@
 package org.elixir_lang.status_bar_widget
 
-import com.intellij.testFramework.fixtures.BasePlatformTestCase
+import org.elixir_lang.PlatformTestCase
 
 /**
  * Tests for ElixirSdkStatusWidget functionality.
  */
-class ElixirSdkStatusWidgetTest : BasePlatformTestCase() {
+class ElixirSdkStatusWidgetTest : PlatformTestCase() {
 
     fun testWidgetCreation() {
         val widget = ElixirSdkStatusWidget(project)
