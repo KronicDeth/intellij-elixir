@@ -1,16 +1,31 @@
 /*
  * Main Build Script
  * Purpose: Orchestrates the build of the IntelliJ Elixir plugin.
- * Key Changes for 2025.3 / Small IDE Support:
- * 1. Uses Version Catalog (libs.*) for dependency management.
- * 2. Explicitly configure JPS subprojects with TestFramework dependencies.
- * 3. QuoterService (BuildService) manages the Quoter daemon lifecycle with guaranteed cleanup.
- * 4. `test` task enforces the working directory to project root to find testData.
+ *
+ * Platform Support:
+ * - POSIX (Linux, macOS): Full support
+ * - Windows: Full support (Git Bash, MSYS2, WSL, or native)
+ *
+ * Key Components:
+ * 1. ElixirService (BuildService): Manages Elixir installation and build
+ * 2. QuoterService (BuildService): Manages Quoter daemon lifecycle with guaranteed cleanup
+ * 3. Platform abstraction: Automatic detection and platform-specific implementations
+ * 4. Tasks: Thin wrappers for CI caching and developer discoverability
+ *
+ * Version Catalog: Uses libs.* for dependency management (gradle/libs.versions.toml)
+ * Configuration Cache: Fully compatible with Gradle configuration cache
  */
 
 import com.adarshr.gradle.testlogger.TestLoggerExtension
 import com.adarshr.gradle.testlogger.theme.ThemeType
 import de.undercouch.gradle.tasks.download.Download
+import elixir.ElixirService
+import quoter.QuoterService
+import quoter.tasks.GetQuoterDepsTask
+import quoter.tasks.ReleaseQuoterTask
+import quoter.tasks.StartQuoterTask
+import versioning.PluginVersion
+import versioning.VersionFetcher
 import org.jetbrains.intellij.platform.gradle.Constants
 import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
@@ -52,7 +67,7 @@ val quoterVersion: String by project
 // Publish channel: "default" for release, "canary" for pre-release
 val publishChannel: String = providers.gradleProperty("publishChannels").getOrElse("canary")
 
-// Calculate the plugin version, for canary builds, the patch is bumped to the next version
+// Calculate the plugin version; for canary builds, the patch is bumped to the next version
 // so that the IDE's plugin manager doesn't offer to "update" it to the released version.
 val basePluginVersion: String = PluginVersion.getBaseVersion(
     providers.gradleProperty("pluginVersion").get(),
@@ -70,11 +85,11 @@ val actualPlatformVersion: String = if (useDynamicEapVersion) {
 }
 
 // Setup Paths
-val cachePath = layout.projectDirectory.dir("cache")
-val elixirPath = cachePath.dir("elixir-$elixirVersion")
-val quoterUnzippedPath = cachePath.dir("elixir-$elixirVersion-intellij_elixir-$quoterVersion")
-val quoterExe = quoterUnzippedPath.file("_build/dev/rel/intellij_elixir/bin/intellij_elixir")
-val quoterTmpPath = cachePath.dir("quoter_tmp_$quoterVersion")
+val cachePath: Directory = layout.projectDirectory.dir("cache")
+val elixirPath: Directory = cachePath.dir("elixir-$elixirVersion")
+val quoterUnzippedPath: Directory = cachePath.dir("elixir-$elixirVersion-intellij_elixir-$quoterVersion")
+val quoterExe: RegularFile = quoterUnzippedPath.file("_build/dev/rel/intellij_elixir/bin/intellij_elixir")
+val quoterTmpPath: Directory = cachePath.dir("quoter_tmp_$quoterVersion")
 
 // EXPORT FOR SUBPROJECTS (Required for jps-builder to access this path)
 extra["elixirPath"] = elixirPath.asFile.absolutePath
@@ -241,7 +256,7 @@ tasks.withType<KotlinJvmCompile>().configureEach {
 }
 
 // --- Mockito Agent Configuration (Root project only) ---
-val mockitoAgent = configurations.create("mockitoAgent")
+val mockitoAgent: Configuration = configurations.create("mockitoAgent")
 
 // --- Dependencies ---
 dependencies {
@@ -282,7 +297,7 @@ tasks.withType<RunIdeTask>().configureEach {
         workingDir = file(project.property("runIdeWorkingDirectory").toString())
     }
 
-    // Development SDK paths - allows devs to auto-configure SDKs when running the plugin
+    // Development SDK paths - allows devs to autoconfigure SDKs when running the plugin
     // Usage: ./gradlew runIde -PrunIdeSdkErlangPath='/path/to/erlang' -PrunIdeSdkElixirPath='/path/to/elixir'
     if (project.hasProperty("runIdeSdkErlangPath")) {
         systemProperty("runIdeSdkErlangPath", project.property("runIdeSdkErlangPath").toString())
@@ -392,66 +407,59 @@ val unzipQuoter by tasks.registering(Copy::class) {
     }
 }
 
-val getQuoterDeps by tasks.registering(Exec::class) {
-    dependsOn(unzipQuoter)
+val getQuoterDeps by tasks.registering(GetQuoterDepsTask::class) {
+    dependsOn(unzipQuoter, buildElixir)
     workingDir(quoterUnzippedPath)
 
-    // 1. INPUTS
-    // mix.exs defines the requirements
+    // Configure the task
+    quoterDir.set(quoterUnzippedPath)
+    depsDir.set(quoterUnzippedPath.dir("deps"))
+
+    // INPUTS: mix.exs and mix.lock define requirements
     inputs.file(quoterUnzippedPath.file("mix.exs"))
         .withPropertyName("mixExs")
         .withPathSensitivity(PathSensitivity.RELATIVE)
-
-    // mix.lock defines the exact versions.
-    // It is an INPUT because 'unzipQuoter' created it, and this task READS it.
     inputs.file(quoterUnzippedPath.file("mix.lock"))
         .withPropertyName("mixLock")
         .withPathSensitivity(PathSensitivity.RELATIVE)
-
-    // 2. OUTPUTS
-    // This task produces/populates the 'deps' directory.
-    outputs.dir(quoterUnzippedPath.dir("deps"))
-        .withPropertyName("depsDir")
-
-    // 3. CACHING
-    outputs.cacheIf { true }
-
-    commandLine("mix", "do", "local.rebar", "--force,", "local.hex", "--force,", "deps.get")
 }
 
-val releaseQuoter by tasks.registering(Exec::class) {
+val releaseQuoter by tasks.registering(ReleaseQuoterTask::class) {
     dependsOn(getQuoterDeps)
-
-    // 1. Use Directory object directly (No .asFile)
     workingDir(quoterUnzippedPath)
 
-    // 2. INPUTS: What determines if a release needs rebuilding?
-    //    If mix.exs, lockfile, or the source code (lib/config) changes, re-run.
+    // Configure the task
+    quoterDir.set(quoterUnzippedPath)
+    buildDir.set(quoterUnzippedPath.dir("_build"))
+
+    // INPUTS: mix.exs, lockfile, source code, and dependencies
     inputs.files(
         quoterUnzippedPath.file("mix.exs"),
         quoterUnzippedPath.file("mix.lock")
     ).withPathSensitivity(PathSensitivity.RELATIVE)
-
-    //    Add source directories so code changes trigger a rebuild
     inputs.dir(quoterUnzippedPath.dir("lib")).withPathSensitivity(PathSensitivity.RELATIVE)
     inputs.dir(quoterUnzippedPath.dir("config")).withPathSensitivity(PathSensitivity.RELATIVE)
-    //    The dependencies (generated by previous task) are inputs for this task
     inputs.dir(quoterUnzippedPath.dir("deps")).withPathSensitivity(PathSensitivity.RELATIVE)
+}
 
-    // 3. OUTPUTS: This replaces your 'onlyIf' check.
-    //    If this file exists and inputs match, Gradle skips this task automatically.
-    outputs.dir(quoterUnzippedPath.dir("_build"))
-        .withPropertyName("buildDir")
-
-    commandLine("mix", "release")
+// Register ElixirService - manages Elixir installation and build
+val elixirService = gradle.sharedServices.registerIfAbsent("elixir", ElixirService::class) {
+    val versionString = elixirVersion
+    parameters {
+        elixirVersion.set(versionString)
+        projectDir.set(layout.projectDirectory)
+    }
 }
 
 // Register the QuoterService - Gradle calls close() at build end regardless of failure
+// Depends on ElixirService for Mix commands
 // See: https://docs.gradle.org/current/userguide/build_services.html
 val quoterService = gradle.sharedServices.registerIfAbsent("quoter", QuoterService::class) {
+    val elixirSvc = elixirService
     parameters {
         executable.set(quoterExe)
         tmpDir.set(quoterTmpPath)
+        elixirService.set(elixirSvc)
     }
 }
 
@@ -466,6 +474,54 @@ allprojects {
     tasks.withType<Test>().configureEach {
         dependsOn(startQuoter)
         usesService(quoterService)
+
+        // Validate Erlang is available before running tests
+        doFirst {
+            // Skip check if ERLANG_SDK_HOME is explicitly set
+            val erlangSdkHome = System.getenv("ERLANG_SDK_HOME")
+            if (erlangSdkHome == null || erlangSdkHome.isEmpty()) {
+                val erlCommand = if (System.getProperty("os.name").lowercase().contains("windows")) "erl.exe" else "erl"
+                try {
+                    val process = ProcessBuilder(erlCommand, "-version")
+                        .redirectErrorStream(true)
+                        .start()
+                    val exitCode = process.waitFor()
+                    if (exitCode != 0) {
+                        throw GradleException(
+                            """
+                            |Erlang/OTP not found or failed to run.
+                            |Tests require Erlang to be installed and on PATH.
+                            |
+                            |Options:
+                            |  1. Download from: https://www.erlang.org/downloads
+                            |  2. Install via Chocolatey: choco install erlang
+                            |  3. Set ERLANG_SDK_HOME environment variable to your Erlang installation directory
+                            |
+                            |The jps-builder tests auto-detect Erlang by running '$erlCommand -eval' command.
+                            """.trimMargin()
+                        )
+                    }
+                    logger.lifecycle("Erlang found: $erlCommand is available on PATH")
+                } catch (e: java.io.IOException) {
+                    throw GradleException(
+                        """
+                        |Erlang/OTP executable '$erlCommand' not found on PATH.
+                        |Tests require Erlang to be installed and on PATH.
+                        |
+                        |Options:
+                        |  1. Download from: https://www.erlang.org/downloads
+                        |  2. Install via Chocolatey: choco install erlang
+                        |  3. Set ERLANG_SDK_HOME environment variable to your Erlang installation directory
+                        |
+                        |The jps-builder tests auto-detect Erlang by running '$erlCommand -eval' command.
+                        """.trimMargin(),
+                        e
+                    )
+                }
+            } else {
+                logger.lifecycle("Using ERLANG_SDK_HOME from environment: $erlangSdkHome")
+            }
+        }
     }
 }
 
