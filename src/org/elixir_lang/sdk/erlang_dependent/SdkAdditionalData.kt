@@ -161,19 +161,7 @@ class SdkAdditionalData :
             }
             LOG.debug("[$elixirName] Erlang SDK '$name' not found")
         }
-
-        // 3. Auto-discovery fallback
-        LOG.debug("[$elixirName] Auto-discovering Erlang SDK...")
-        val discovered = autoDiscoverErlangSdk(sdkModel)
-        if (discovered != null) {
-            LOG.debug("[$elixirName] Auto-discovered Erlang SDK '${discovered.name}'")
-            cachedErlangSdk = discovered
-            // Note: Don't update erlangSdkName here - that would silently change
-            // the user's configuration. Let validation prompt them to fix it.
-        } else {
-            LOG.debug("[$elixirName] No valid Erlang SDK found")
-        }
-        return discovered
+        return null
     }
 
     private fun isValidAndExists(sdk: Sdk, sdkModel: SdkModel?): Boolean {
@@ -189,11 +177,5 @@ class SdkAdditionalData :
         // Check SdkModel first (for unsaved SDKs in dialogs)
         return sdkModel?.sdks?.find { it.name == name && Type.staticIsValidDependency(it) }
             ?: jdkTable.findJdk(name)?.takeIf { Type.staticIsValidDependency(it) }
-    }
-
-    private fun autoDiscoverErlangSdk(sdkModel: SdkModel?): Sdk? {
-        val jdkTable = ProjectJdkTable.getInstance()
-        return sdkModel?.sdks?.find { Type.staticIsValidDependency(it) }
-            ?: jdkTable.allJdks.find { Type.staticIsValidDependency(it) }
     }
 }
