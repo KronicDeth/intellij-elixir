@@ -12,6 +12,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -27,6 +28,15 @@ public class HomePath {
     private static final File HOMEBREW_ROOT = new File("/usr/local/Cellar");
     private static final File NIX_STORE = new File(NIX_STORE_PATH);
     private static final Logger LOGGER = Logger.getInstance(HomePath.class);
+
+    public static final String SOURCE_NAME_ASDF = "asdf";
+    public static final String SOURCE_NAME_MISE = "mise";
+    public static final String SOURCE_NAME_ELIXIR_INSTALL = "elixir-install";
+    public static final String SOURCE_NAME_HOMEBREW = "Homebrew";
+    public static final String SOURCE_NAME_NIX = "Nix";
+    public static final String SOURCE_NAME_KERL = "kerl";
+
+    public static final List<String> VERSION_MANAGERS = List.of(SOURCE_NAME_ASDF, SOURCE_NAME_MISE, SOURCE_NAME_ELIXIR_INSTALL);
 
     private HomePath() {
     }
@@ -236,19 +246,22 @@ public class HomePath {
         String posixPath = com.intellij.openapi.util.io.FileUtil.toSystemIndependentName(homePath);
 
         if (posixPath.contains("/.local/share/mise/installs/")) {
-            return "mise";
+            return SOURCE_NAME_MISE;
         }
         if (posixPath.contains("/.asdf/installs/")) {
-            return "asdf";
+            return SOURCE_NAME_ASDF;
+        }
+        if (posixPath.contains("/.elixir-install/")) {
+            return SOURCE_NAME_ELIXIR_INSTALL;
         }
         if (posixPath.contains("/usr/local/Cellar/") || posixPath.contains("/opt/homebrew/Cellar/")) {
-            return "Homebrew";
+            return SOURCE_NAME_HOMEBREW;
         }
         if (posixPath.contains("/nix/store/")) {
-            return "Nix";
+            return SOURCE_NAME_NIX;
         }
         if (posixPath.contains("/otp/") || new File(homePath, ".kerl_config").exists()) {
-            return "kerl";
+            return SOURCE_NAME_KERL;
         }
 
         return null;

@@ -42,6 +42,7 @@ object SdkHomeScan {
         val linuxMintPath: String,
         val windowsDefaultPath: String?,
         val windows32BitPath: String? = null,
+        val elixirInstallScriptDirName: String,
 
         // Path transformations (null = identity for homebrew/nix, skip for kerl)
         val homebrewTransform: ((File) -> File)? = null,
@@ -113,6 +114,12 @@ object SdkHomeScan {
         homePathByVersion: MutableMap<Version, String>,
         config: Config
     ): Map<Version, String> {
+        if (wslCompat.isWslUncPath(path.toString())) {
+            // WSL distributions
+            homePathByVersionWSLs(path, homePathByVersion, config)
+            return homePathByVersion
+        }
+
         // Native Windows paths - select based on CPU architecture
         val windowsPath = if (CpuArch.CURRENT.width == 32) {
             config.windows32BitPath ?: config.windowsDefaultPath
@@ -124,10 +131,7 @@ object SdkHomeScan {
             putIfDirectory(homePathByVersion, HomePath.UNKNOWN_VERSION, it)
         }
 
-        HomePath.mergeElixirInstallScript(homePathByVersion, config.toolName)
-
-        // WSL distributions
-        homePathByVersionWSLs(path, homePathByVersion, config)
+        HomePath.mergeElixirInstallScript(homePathByVersion, config.elixirInstallScriptDirName)
 
         return homePathByVersion
     }
@@ -145,7 +149,7 @@ object SdkHomeScan {
 
         HomePath.mergeASDF(homePathByVersion, config.toolName)
         HomePath.mergeMise(homePathByVersion, config.toolName)
-        HomePath.mergeElixirInstallScript(homePathByVersion, config.toolName)
+        HomePath.mergeElixirInstallScript(homePathByVersion, config.elixirInstallScriptDirName)
 
         if (config.kerlTransform != null) {
             HomePath.mergeKerl(homePathByVersion, config.kerlTransform.toJavaFunction())
@@ -213,7 +217,7 @@ object SdkHomeScan {
         if (wslUserHome != null) {
             HomePath.mergeASDF(homePathByVersion, config.toolName, wslUserHome)
             HomePath.mergeMise(homePathByVersion, config.toolName, wslUserHome)
-            HomePath.mergeElixirInstallScript(homePathByVersion, config.toolName, wslUserHome)
+            HomePath.mergeElixirInstallScript(homePathByVersion, config.elixirInstallScriptDirName, wslUserHome)
 
             if (config.travisCIKerlTransform != null) {
                 HomePath.mergeTravisCIKerl(homePathByVersion, config.travisCIKerlTransform.toJavaFunction(), wslUserHome)

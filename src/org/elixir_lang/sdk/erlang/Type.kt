@@ -52,6 +52,7 @@ class Type : SdkType("Erlang SDK for Elixir SDK") {
             linuxMintPath = LINUX_MINT_HOME_PATH,
             windowsDefaultPath = WINDOWS_DEFAULT_HOME_PATH,
             windows32BitPath = null,
+            elixirInstallScriptDirName = "otp",
             homebrewTransform = { versionPath -> File(versionPath, "lib/erlang") },
             nixTransform = { versionPath -> File(versionPath, "lib/erlang") },
             kerlTransform = { it },
