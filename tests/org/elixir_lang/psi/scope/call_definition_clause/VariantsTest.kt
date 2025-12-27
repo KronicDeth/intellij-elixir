@@ -4,10 +4,10 @@ import com.intellij.codeInsight.completion.CompletionType
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.codeInsight.lookup.LookupElementPresentation
-import com.intellij.testFramework.fixtures.BasePlatformTestCase
+import org.elixir_lang.PlatformTestCase
 import org.elixir_lang.psi.call.Call
 
-class VariantsTest : BasePlatformTestCase() {
+class VariantsTest : PlatformTestCase() {
     fun testIssue453() {
         myFixture.configureByFiles("defmodule.ex")
         myFixture.complete(CompletionType.BASIC)

@@ -1,14 +1,11 @@
 package org.elixir_lang.sdk.erlang_dependent
 
-import com.intellij.openapi.projectRoots.ProjectJdkTable
 import com.intellij.openapi.projectRoots.Sdk
-import com.intellij.openapi.projectRoots.SdkModel
-import com.intellij.openapi.projectRoots.SdkModificator
 import com.intellij.openapi.projectRoots.SdkTypeId
+import org.elixir_lang.PlatformTestCase
 import org.jdom.Element
-import org.junit.Assert.*
-import org.junit.Test
-import org.mockito.Mockito.*
+import org.mockito.Mockito.mock
+import org.mockito.Mockito.`when`
 
 /**
  * Unit tests for SdkAdditionalData Phase 1 refactoring.
@@ -17,13 +14,11 @@ import org.mockito.Mockito.*
  * Integration tests with actual SDK creation/deletion should be done manually
  * or in a full IDE test environment.
  */
-class SdkAdditionalDataTest {
+class SdkAdditionalDataTest: PlatformTestCase() {
 
     /**
-     * Test Case 1: New SDK Creation
      * Verify that creating SdkAdditionalData with an Erlang SDK sets both name and cache.
      */
-    @Test
     fun testNewSdkCreation_SetsNameAndCache() {
         val elixirSdk = createMockSdk("Elixir 1.15.0")
         val erlangSdk = createMockSdk("Erlang 26.0")
@@ -37,10 +32,8 @@ class SdkAdditionalDataTest {
     }
 
     /**
-     * Test Case 2: setErlangSdk Updates Both Name and Cache
      * Verify that setErlangSdk() updates both the name and cache atomically.
      */
-    @Test
     fun testSetErlangSdk_UpdatesNameAndCache() {
         val elixirSdk = createMockSdk("Elixir 1.15.0")
         val erlangSdk1 = createMockSdk("Erlang 25.0")
@@ -57,10 +50,8 @@ class SdkAdditionalDataTest {
     }
 
     /**
-     * Test Case 3: setErlangSdk with null
      * Verify that setting null clears both name and cache.
      */
-    @Test
     fun testSetErlangSdk_WithNull_ClearsNameAndCache() {
         val elixirSdk = createMockSdk("Elixir 1.15.0")
         val erlangSdk = createMockSdk("Erlang 26.0")
@@ -76,10 +67,8 @@ class SdkAdditionalDataTest {
     }
 
     /**
-     * Test Case 4: readExternal Loads Name Only
      * Verify that readExternal() loads only the name and clears the cache.
      */
-    @Test
     fun testReadExternal_LoadsNameAndClearsCache() {
         val elixirSdk = createMockSdk("Elixir 1.15.0")
         val additionalData = SdkAdditionalData(elixirSdk)
@@ -95,10 +84,8 @@ class SdkAdditionalDataTest {
     }
 
     /**
-     * Test Case 5: writeExternal Persists Name Only
      * Verify that writeExternal() persists only the name.
      */
-    @Test
     fun testWriteExternal_PersistsNameOnly() {
         val elixirSdk = createMockSdk("Elixir 1.15.0")
         val erlangSdk = createMockSdk("Erlang 26.0")
@@ -113,10 +100,8 @@ class SdkAdditionalDataTest {
     }
 
     /**
-     * Test Case 6: writeExternal with null name
      * Verify that writeExternal() doesn't write anything if name is null.
      */
-    @Test
     fun testWriteExternal_WithNullName_WritesNothing() {
         val elixirSdk = createMockSdk("Elixir 1.15.0")
         val additionalData = SdkAdditionalData(elixirSdk)
@@ -129,10 +114,8 @@ class SdkAdditionalDataTest {
     }
 
     /**
-     * Test Case 7: clone Creates Independent Copy
      * Verify that clone() creates a new instance with the same name but no shared cache.
      */
-    @Test
     fun testClone_CreatesIndependentCopy() {
         val elixirSdk = createMockSdk("Elixir 1.15.0")
         val erlangSdk = createMockSdk("Erlang 26.0")
@@ -150,10 +133,8 @@ class SdkAdditionalDataTest {
     }
 
     /**
-     * Test Case 8: getErlangSdkName Returns Name Without Lookup
      * Verify that getErlangSdkName() returns the stored name without triggering SDK lookup.
      */
-    @Test
     fun testGetErlangSdkName_ReturnsNameWithoutLookup() {
         val elixirSdk = createMockSdk("Elixir 1.15.0")
         val additionalData = SdkAdditionalData(elixirSdk)

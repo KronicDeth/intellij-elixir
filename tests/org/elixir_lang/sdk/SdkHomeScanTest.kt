@@ -1,6 +1,6 @@
 package org.elixir_lang.sdk
 
-import com.intellij.testFramework.fixtures.BasePlatformTestCase
+import org.elixir_lang.PlatformTestCase
 import org.elixir_lang.jps.HomePath
 import java.io.File
 import java.nio.file.Paths
@@ -14,7 +14,7 @@ import java.nio.file.Paths
  * - WSL distribution filtering
  * - Integration with mocked file systems
  */
-class SdkHomeScanTest : BasePlatformTestCase() {
+class SdkHomeScanTest : PlatformTestCase() {
 
     // ========== Config Validation Tests ==========
 

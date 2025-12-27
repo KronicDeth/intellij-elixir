@@ -3,7 +3,7 @@ package org.elixir_lang.sdk.wsl;
 import com.intellij.execution.configurations.GeneralCommandLine;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.testFramework.ServiceContainerUtil;
-import com.intellij.testFramework.fixtures.BasePlatformTestCase;
+import org.elixir_lang.PlatformTestCase;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -17,7 +17,7 @@ import static org.elixir_lang.sdk.wsl.WslCompatServiceKt.getWslCompat;
  * <p>Tests verify that embedded Windows UNC paths in wsl$ or wsl.localhost format
  * are correctly converted to POSIX paths when running commands in WSL.</p>
  */
-public class WslArgumentConversionTest extends BasePlatformTestCase {
+public class WslArgumentConversionTest extends PlatformTestCase {
 
     private static final String WSL_WORK_DIR = "\\\\wsl$\\Ubuntu\\home\\user\\project";
 
@@ -408,7 +408,17 @@ public class WslArgumentConversionTest extends BasePlatformTestCase {
         commandLine.addParameter(originalParam);
 
         ProcessBuilder processBuilder = toProcessBuilder(commandLine);
-        service.convertProcessBuilderArgumentsForWsl(processBuilder, commandLine);
+        kotlin.Pair<Boolean, String> result = captureLoggedWarning(
+                "org.elixir_lang.sdk.wsl.MockWslCompatService",
+                () ->{
+                    service.convertProcessBuilderArgumentsForWsl(processBuilder, commandLine);
+                    return true;
+                }
+        );
+        String warning = result.getSecond();
+        assertNotNull("Expected warning about mismatched distributions", warning);
+        assertTrue("Warning should mention 'does not match exePath distribution'",
+                warning.contains("does not match exePath distribution"));
 
         // Nothing should be converted because distributions don't match
         assertEquals(exePath, processBuilder.command().getFirst());

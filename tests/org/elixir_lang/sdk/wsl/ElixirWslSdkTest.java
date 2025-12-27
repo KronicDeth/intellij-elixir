@@ -4,7 +4,7 @@ import com.intellij.execution.wsl.WSLDistribution;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.testFramework.ServiceContainerUtil;
-import com.intellij.testFramework.fixtures.BasePlatformTestCase;
+import org.elixir_lang.PlatformTestCase;
 import org.mockito.Mockito;
 
 import static org.elixir_lang.sdk.wsl.WslCompatServiceKt.getWslCompat;
@@ -17,7 +17,7 @@ import static org.elixir_lang.sdk.wsl.WslCompatServiceKt.getWslCompat;
  * <p>
  * Tests replace the real WslCompatService with MockWslCompatService to avoid platform-specific behavior.
  */
-public class ElixirWslSdkTest extends BasePlatformTestCase {
+public class ElixirWslSdkTest extends PlatformTestCase {
 
     @Override
     protected void setUp() throws Exception {
@@ -351,7 +351,11 @@ public class ElixirWslSdkTest extends BasePlatformTestCase {
 
         // Test WSL path - use forward slashes which work cross-platform
         String wslPath = "//wsl$/Ubuntu/usr/lib/erlang";
-        String suggestedName = erlangSdkType.suggestSdkName(null, wslPath);
+        kotlin.Pair<String, String> result = captureLoggedWarning(
+                "org.elixir_lang.sdk.erlang.Type",
+                () -> erlangSdkType.suggestSdkName(null, wslPath)
+        );
+        String suggestedName = result.getFirst();
 
         // Should contain "WSL:" indicating it's a WSL SDK (even if distribution can't be resolved)
         assertTrue("Erlang SDK name should contain 'WSL:' for WSL paths",
@@ -363,8 +367,11 @@ public class ElixirWslSdkTest extends BasePlatformTestCase {
 
         // Test local path - should NOT include WSL suffix
         String localPath = "/usr/lib/erlang";
-        String localName = erlangSdkType.suggestSdkName(null, localPath);
-
+        kotlin.Pair<String, String> localResult = captureLoggedWarning(
+                "org.elixir_lang.sdk.erlang.Type",
+                () -> erlangSdkType.suggestSdkName(null, localPath)
+        );
+        String localName = localResult.getFirst();
         assertFalse("Erlang SDK name should NOT contain 'WSL:' for local paths",
             localName.contains("WSL:"));
     }
@@ -380,14 +387,23 @@ public class ElixirWslSdkTest extends BasePlatformTestCase {
         String wslPath = "//wsl$/Ubuntu/home/user/sdk";
 
         String elixirName = elixirSdkType.suggestSdkName(null, wslPath);
-        String erlangName = erlangSdkType.suggestSdkName(null, wslPath);
 
-        // Both should use "WSL:" prefix for consistency (even if distribution name can't be resolved)
-        assertTrue("Elixir SDK should use 'WSL:' prefix", elixirName.contains("WSL:"));
-        assertTrue("Erlang SDK should use 'WSL:' prefix", erlangName.contains("WSL:"));
+        // This line emits a warning - capture it
+        kotlin.Pair<String, String> result = captureLoggedWarning(
+            "org.elixir_lang.sdk.erlang.Type",
+            () -> erlangSdkType.suggestSdkName(null, wslPath)
+        );
+        String erlangName = result.getFirst();
+        String warning = result.getSecond();
 
         // Both should be formatted as "(WSL: ...)"
         assertTrue("Elixir SDK should use '(WSL:' format", elixirName.contains("(WSL:"));
         assertTrue("Erlang SDK should use '(WSL:' format", erlangName.contains("(WSL:"));
+
+        // Assert the expected warning was logged
+        assertNotNull("Expected warning about missing Erlang executable", warning);
+        assertTrue("Warning should mention 'Can't detect Erlang version'",
+                   warning.contains("Can't detect Erlang version"));
+        assertTrue("Warning should mention 'is missing'", warning.contains("is missing"));
     }
 }
