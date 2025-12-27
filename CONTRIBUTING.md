@@ -48,9 +48,57 @@
 
 Gradle will handle all dependency management, including fetching the Intellij IDEA platform specified in `gradle.properties`, so you can use a normal JDK instead of setting up an "Intellij Platform Plugin SDK".
 
-**NOTE:** The tests require some additional dependencies which Gradle will fetch for you. You must have Elixir and Hex installed for Gradle to compile some of the dependencies for running the tests. You can run individual JUnit tests via the JUnit run configuration type, but note that some tests require additional setup which the Gradle `test` task does for you, and these tests won't work when run outside Gradle without some additional work. See `build.gradle` for details.
+**NOTE:** The tests require Erlang, Elixir, and Hex installed. The `jps-builder:test` task discovers your Erlang installation by running `erl -eval 'io:format("~s", [code:root_dir()]).'` - ensure `erl` (or `erl.exe` on Windows) is on your PATH. You can set `ERLANG_SDK_HOME` and `ELIXIR_EBIN_DIRECTORY` environment variables to override auto-detection. You can run individual JUnit tests via the JUnit run configuration type, but note that some tests require additional setup which the Gradle `test` task does for you, and these tests won't work when run outside Gradle without some additional work. See `build.gradle.kts` for details.
 
 **NOTE:** If you're having trouble running the plugin against Intellij IDEA 14.1 on Mac, see this [comment](https://github.com/KronicDeth/intellij-elixir/pull/504#issuecomment-284275036).
+
+### Windows Development Setup
+
+#### Prerequisites
+- **Build Environment**: Git Bash, MSYS2, WSL, or native Windows
+- **Erlang/OTP**: **Required for running tests** (not just building)
+  - Download from: https://www.erlang.org/downloads (OTP 24.3+ recommended)
+  - Or via Chocolatey: `choco install erlang`
+  - **IMPORTANT**: Must be on PATH (`erl.exe` command must work)
+  - Tests will auto-detect Erlang installation via `erl -eval` command
+  - Alternative: Set `ERLANG_SDK_HOME` environment variable to override auto-detection
+- **Elixir**: Required for running tests
+  - Download from: https://elixir-lang.org/install.html#windows
+  - Or via Chocolatey: `choco install elixir`
+  - Or use GitHub Actions approach with `erlef/setup-beam` (installs both Erlang and Elixir)
+- **Make**: Required for building Elixir from source
+  - Via Chocolatey: `choco install make`
+  - Via Git Bash: Included by default
+  - Via MSYS2: `pacman -S make`
+- **Java 21+**: JetBrains Runtime or any Java 21+ distribution
+
+#### Building on Windows
+```bash
+# Full build with tests
+./gradlew test
+
+# Build plugin only (no tests)
+./gradlew buildPlugin
+```
+
+#### Platform Support
+The build system automatically detects your platform:
+- **Windows**: Uses `.bat` executables for Elixir commands, ProcessBuilder for daemon management
+- **Linux/macOS**: Uses standard executables, native daemon support
+
+#### Troubleshooting
+
+**Quoter fails to start on Windows:**
+- Check that no antivirus is blocking the process
+- Verify no orphaned Erlang processes: `tasklist | findstr erl`
+- Kill orphaned processes: `taskkill /F /IM erl.exe`
+
+**Elixir build fails:**
+- Ensure `make` is on PATH: `make --version`
+- Try running in Git Bash (not PowerShell/cmd)
+
+**Path with spaces warning:**
+- Cosmetic only - Erlang installed in "Program Files" shows warnings but works correctly
 
 ### From command line
 > Let's assume that you don't have much knowledge of the Java/Kotlin ecosystem, and just want to help contribute some changes.
@@ -152,3 +200,8 @@ Then regenerate the table of contents using `doctoc`
 doctoc .
 ```
 
+## Developing on Windows. 
+
+1. [Install Chocolatey](https://chocolatey.org/install)
+2. From an elevated PowerShell prompt `choco install make`
+3. 
