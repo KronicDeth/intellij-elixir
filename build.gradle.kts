@@ -37,16 +37,24 @@ val javaVersionStr: String = libs.versions.java.get()
 val libJunit = libs.junit
 val libOpentest4j = libs.opentest4j
 val libCommonsIo = libs.commons.io
+val libMockitoCore = libs.mockito.core
 
 // --- Configuration Properties ---
 val elixirVersion: String by project
 val quoterVersion: String by project
-val basePluginVersion: String = providers.gradleProperty("pluginVersion").get()
-val useDynamicEapVersion: Boolean = project.property("useDynamicEapVersion").toString().toBoolean()
-val skipSearchableOptions: Boolean = project.property("skipSearchableOptions").toString().toBoolean()
 
 // Publish channel: "default" for release, "canary" for pre-release
 val publishChannel: String = providers.gradleProperty("publishChannels").getOrElse("canary")
+
+// Calculate the plugin version, for canary builds, the patch is bumped to the next version
+// so that the IDE's plugin manager doesn't offer to "update" it to the released version.
+val basePluginVersion: String = PluginVersion.getBaseVersion(
+    providers.gradleProperty("pluginVersion").get(),
+    publishChannel
+)
+val useDynamicEapVersion: Boolean = project.property("useDynamicEapVersion").toString().toBoolean()
+val skipSearchableOptions: Boolean = project.property("skipSearchableOptions").toString().toBoolean()
+
 
 val actualPlatformVersion: String = if (useDynamicEapVersion) {
     // Calling the helper from buildSrc
@@ -127,10 +135,8 @@ subprojects {
     dependencies {
         intellijPlatform {
             create(providers.gradleProperty("platformType"), providers.provider { actualPlatformVersion })
-            bundledPlugins(providers.gradleProperty("platformBundledPlugins").map { it.split(",") })
-            bundledModules(providers.gradleProperty("platformBundledModules").map { it.split(",") })
+            bundledPlugins("com.intellij.java")
             testFramework(TestFrameworkType.Platform)
-            testFramework(TestFrameworkType.Plugin.Java)
         }
         // JPS Builder tests extend UsefulTestCase (JUnit 3/4 style) and need explicit JUnit 4 on classpath
         testImplementation(libJunit)
@@ -228,6 +234,9 @@ tasks.withType<KotlinJvmCompile>().configureEach {
     }
 }
 
+// --- Mockito Agent Configuration (Root project only) ---
+val mockitoAgent = configurations.create("mockitoAgent")
+
 // --- Dependencies ---
 dependencies {
     intellijPlatform {
@@ -244,6 +253,9 @@ dependencies {
     implementation(project(":jps-shared"))
     implementation(files("lib/OtpErlang.jar"))
     implementation(libCommonsIo)
+
+    testImplementation(libMockitoCore)
+    mockitoAgent(libMockitoCore) { isTransitive = false }
 }
 
 // --- Run IDE Configuration ---
@@ -457,6 +469,16 @@ tasks.named<Test>("test") {
     environment("ELIXIR_LANG_ELIXIR_PATH", elixirPath.asFile.absolutePath)
     environment("ELIXIR_EBIN_DIRECTORY", elixirPath.dir("lib/elixir/ebin/").asFile.absolutePath + File.separator)
     environment("ELIXIR_VERSION", elixirVersion)
+
+    // Add Mockito as javaagent to avoid dynamic loading warnings (root project only)
+    jvmArgs("-javaagent:${mockitoAgent.asPath}")
+}
+
+tasks.named<Zip>("buildPlugin") {
+    doLast {
+        println("Note: Timestamps in version strings and filenames of build artifacts do not change on every build due to gradle config caching.")
+        println("Built artifact path: ${archiveFile.get().asFile.absolutePath}")
+    }
 }
 
 // Uncomment to allow using build-scan.
@@ -466,4 +488,3 @@ tasks.named<Test>("test") {
 //        setProperty("termsOfServiceAgree", "yes")
 //    }
 //}
-
