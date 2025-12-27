@@ -1,6 +1,7 @@
 package org.elixir_lang.quoter
 
-import junit.framework.TestCase
+import com.intellij.util.system.OS
+import org.elixir_lang.PlatformTestCase
 import java.io.File
 
 /**
@@ -34,6 +35,12 @@ class PipeLocationTest : PlatformTestCase() {
     }
 
     fun testPipesInQuoterTmpDirectory() {
+        // Skip on Windows - named pipes via --pipe-to are not supported
+        // See: https://github.com/elixir-lang/elixir/blob/2cd8a57b37011319b36b15c6765ab36c5f245bc7/bin/elixir.bat#L63
+        if (OS.CURRENT == OS.Windows) {
+            return
+        }
+
         val projectRoot = File(System.getProperty("user.dir"))
         val cacheDir = File(projectRoot, "cache")
 
