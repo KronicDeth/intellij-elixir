@@ -83,10 +83,10 @@ public class Elixir extends JpsSdkType<SdkProperties> implements JpsElementTypeW
     String homePath = ensureHomePath(maybeHomePath);
     String source = org.elixir_lang.jps.HomePath.detectSource(homePath);
 
-    // Only set MIX_HOME for asdf and mise installations
+    // Only set MIX_HOME for installations that are version managers with a known directory layout.
     // These version managers install to version-specific directories and expect MIX_HOME
     // to be set relative to the installation directory
-    if ("asdf".equals(source) || "mise".equals(source)) {
+    if (HomePath.VERSION_MANAGERS.contains(source)) {
       File mixFile = mixFile(homePath);
       // MIX_HOME = $(dirname mixPath)/../.mix
       return new File(mixFile.getParentFile().getParent(), ".mix").getAbsolutePath();

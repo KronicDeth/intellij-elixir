@@ -118,6 +118,7 @@ class Type : org.elixir_lang.sdk.erlang_dependent.Type(SerializerExtension.ELIXI
                 linuxMintPath = LINUX_MINT_HOME_PATH,
                 windowsDefaultPath = WINDOWS_64BIT_DEFAULT_HOME_PATH,
                 windows32BitPath = WINDOWS_32BIT_DEFAULT_HOME_PATH,
+                elixirInstallScriptDirName = "elixir",
                 homebrewTransform = null,  // identity
                 nixTransform = null,  // identity
                 kerlTransform = null,  // TODO: Investigate if Elixir supports kerl builds

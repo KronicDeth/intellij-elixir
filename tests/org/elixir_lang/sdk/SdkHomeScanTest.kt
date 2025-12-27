@@ -172,7 +172,8 @@ class SdkHomeScanTest : BasePlatformTestCase() {
             homebrewTransform = null,
             nixTransform = null,
             kerlTransform = null,
-            travisCIKerlTransform = null
+            travisCIKerlTransform = null,
+            elixirInstallScriptDirName = "test"
         )
 
         assertEquals("test", config.toolName)
@@ -195,7 +196,8 @@ class SdkHomeScanTest : BasePlatformTestCase() {
             homebrewTransform = testTransform,
             nixTransform = testTransform,
             kerlTransform = testTransform,
-            travisCIKerlTransform = testTransform
+            travisCIKerlTransform = testTransform,
+            elixirInstallScriptDirName = "test"
         )
 
         assertNotNull(config.homebrewTransform)
@@ -216,7 +218,8 @@ class SdkHomeScanTest : BasePlatformTestCase() {
         homebrewTransform = null,
         nixTransform = null,
         kerlTransform = null,
-        travisCIKerlTransform = null
+        travisCIKerlTransform = null,
+        elixirInstallScriptDirName = "elixir"
     )
 
     private fun createErlangConfig() = SdkHomeScan.Config(
@@ -229,6 +232,7 @@ class SdkHomeScanTest : BasePlatformTestCase() {
         homebrewTransform = { File(it, "lib/erlang") },
         nixTransform = { File(it, "lib/erlang") },
         kerlTransform = { it },
-        travisCIKerlTransform = { it }
+        travisCIKerlTransform = { it },
+        elixirInstallScriptDirName = "otp"
     )
 }
