@@ -6,14 +6,12 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.Presentation
 import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.projectRoots.ProjectJdkTable
-import com.intellij.testFramework.fixtures.BasePlatformTestCase
-import org.elixir_lang.sdk.elixir.Type as ElixirSdkType
-import org.elixir_lang.sdk.erlang.Type as ErlangSdkType
+import org.elixir_lang.PlatformTestCase
 
 /**
  * Tests for AddDevelopmentSdksAction.
  */
-class AddDevelopmentSdksActionTest : BasePlatformTestCase() {
+class AddDevelopmentSdksActionTest : PlatformTestCase() {
 
     private var originalErlangPath: String? = null
     private var originalElixirPath: String? = null

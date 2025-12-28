@@ -16,8 +16,11 @@ object Mix {
             erlParameters: kotlin.collections.List<String> = emptyList(),
             elixirParameters: kotlin.collections.List<String> = emptyList()
     ): GeneralCommandLine {
+        val updatedEnvironment = environment.toMutableMap()
+        Elixir.maybeUpdateMixHome(updatedEnvironment, elixirSdk.homePath)
+
         val commandLine = org.elixir_lang.Elixir.commandLine(
-                environment,
+                updatedEnvironment,
                 workingDirectory,
                 elixirSdk,
                 erlParameters

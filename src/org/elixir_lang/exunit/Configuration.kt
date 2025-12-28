@@ -89,7 +89,7 @@ class Configuration(name: String, project: Project) :
 
     var mixTestArgumentList: MutableList<String> = mutableListOf()
 
-    fun commandLine(): GeneralCommandLine {
+    override fun commandLine(): GeneralCommandLine {
         val workingDirectory = ensureWorkingDirectory()
         val module = ensureModule()
         val sdk = ensureMostSpecificSdk(module)
