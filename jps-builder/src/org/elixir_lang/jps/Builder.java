@@ -43,11 +43,11 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.AccessDeniedException;
 import java.util.*;
+
+import static com.intellij.util.io.URLUtil.extractPath;
 
 /**
  * <a href="https://github.com/ignatov/intellij-erlang/blob/master/jps-plugin/src/org/intellij/erlang/jps/builder/ErlangBuilder.java">...</a>
@@ -104,10 +104,14 @@ public class Builder extends TargetBuilder<SourceRootDescriptor, Target> {
         JpsSdk<SdkProperties> sdk = BuilderUtil.getSdk(context, module);
 
         for (String contentRootUrl : module.getContentRootsList().getUrls()) {
-            String contentRootPath = new URL(contentRootUrl).getPath();
+            String contentRootPath = extractPath(contentRootUrl);
             File contentRootDir = new File(contentRootPath);
+
             File mixConfigFile = new File(contentRootDir, MIX_CONFIG_FILE_NAME);
-            if (!mixConfigFile.exists()) continue;
+
+            if (!mixConfigFile.exists()) {
+                continue;
+            }
 
             String task = target.isTests() ? "test" : "compile";
             runMix(sdk, module, contentRootPath, task, compilerOptions, context);
@@ -248,12 +252,8 @@ public class Builder extends TargetBuilder<SourceRootDescriptor, Target> {
         File outputDirectory = getBuildOutputDirectory(module, forTests, context);
         commandLine.addParameters(ADD_PATH_TO_FRONT_OF_CODE_PATH, outputDirectory.getPath());
         for (String rootUrl : module.getContentRootsList().getUrls()) {
-            try {
-                String path = new URL(rootUrl).getPath();
-                commandLine.addParameters(ADD_PATH_TO_FRONT_OF_CODE_PATH, path);
-            } catch (MalformedURLException e) {
-                context.processMessage(new CompilerMessage(ElIXIRC_NAME, BuildMessage.Kind.ERROR, "Failed to find content root for module: " + module.getName()));
-            }
+            String path = extractPath(rootUrl);
+            commandLine.addParameters(ADD_PATH_TO_FRONT_OF_CODE_PATH, path);
         }
     }
 
@@ -326,7 +326,7 @@ public class Builder extends TargetBuilder<SourceRootDescriptor, Target> {
 
             assert url.startsWith(URL_PREFIX);
 
-            String path = url.substring(URL_PREFIX.length());
+            String path = extractPath(url);
 
             commandLine.addParameters("-pa", path);
         }
