@@ -21,7 +21,6 @@ import com.intellij.ui.awt.RelativePoint
 import com.intellij.util.messages.MessageBusConnection
 import com.intellij.util.ui.JBUI
 import org.elixir_lang.Icons
-import org.elixir_lang.action.RefreshAllElixirSdksAction
 import org.elixir_lang.jps.HomePath
 import org.elixir_lang.sdk.elixir.Type
 import org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData
@@ -113,7 +112,9 @@ class ElixirSdkStatusWidget(@param:NotNull private val project: Project) : Custo
     private fun showPopup(e: MouseEvent) {
         val actionGroup = DefaultActionGroup().apply {
             add(createAddSdkAction())
-            add(RefreshAllElixirSdksAction())
+            val actionManager = ActionManager.getInstance()
+            actionManager.getAction("Elixir.RefreshAllElixirSdks")?.let { add(it) }
+            actionManager.getAction("Elixir.InstallMixDependencies")?.let { add(it) }
         }
 
         val dataContext = DataManager.getInstance().getDataContext(component)
