@@ -127,21 +127,21 @@ class Builder : ProjectImportBuilder<OtpApp>() {
                 compilerModuleExt.inheritCompilerOutputPath(false)
                 val ideaModuleDir = otpApp.root
 
-                val _buildDir = if (myProjectRoot != null && myProjectRoot == ideaModuleDir) {
+                val buildDir = if (myProjectRoot != null && myProjectRoot == ideaModuleDir) {
                     ideaModuleDir
                 } else {
                     ideaModuleDir.parent.parent
                 }
 
                 compilerModuleExt.setCompilerOutputPath(
-                    _buildDir!!.toString() + StringUtil.replace(
+                    buildDir!!.toString() + StringUtil.replace(
                         "/_build/dev/lib/" + otpApp.name + "/ebin",
                         "/",
                         File.separator
                     )
                 )
                 compilerModuleExt.setCompilerOutputPathForTests(
-                    _buildDir.toString() + StringUtil.replace(
+                    buildDir.toString() + StringUtil.replace(
                         "/_build/test/lib/" + otpApp.name + "/ebin",
                         "/",
                         File.separator
@@ -160,9 +160,9 @@ class Builder : ProjectImportBuilder<OtpApp>() {
         return createModules
     }
 
-    fun setProjectRoot(projectRoot: VirtualFile): Boolean {
+    fun setProjectRoot(projectRoot: VirtualFile) {
         if (projectRoot == myProjectRoot) {
-            return true
+            return
         }
 
         myProjectRoot = projectRoot
@@ -170,10 +170,6 @@ class Builder : ProjectImportBuilder<OtpApp>() {
         if (myFoundOtpApps.isEmpty()) {
             myNeedsScan = true
         }
-
-        // Return true to indicate the project root was set successfully
-        // Actual scanning is deferred until getList() is called
-        return true
     }
 
     /**
