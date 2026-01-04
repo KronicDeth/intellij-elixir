@@ -1,42 +1,25 @@
 package org.elixir_lang.mix.project._import.step;
 
-import com.intellij.execution.ExecutionException;
-import com.intellij.execution.configurations.GeneralCommandLine;
-import com.intellij.execution.process.ProcessEvent;
-import com.intellij.execution.process.ProcessHandler;
-import com.intellij.execution.process.ProcessHandlerFactory;
-import com.intellij.execution.process.ProcessListener;
-import com.intellij.execution.process.ProcessTerminatedListener;
+
 import com.intellij.ide.util.projectWizard.WizardContext;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
-import com.intellij.openapi.progress.ProgressIndicator;
-import com.intellij.openapi.progress.ProgressManager;
-import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
-import com.intellij.openapi.util.Key;
-import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.projectImport.ProjectImportWizardStep;
-import org.elixir_lang.Mix;
 import org.elixir_lang.mix.project._import.Builder;
+import org.elixir_lang.mix.runner.MixTaskRunner;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
-
 /**
- * https://github.com/ignatov/intellij-erlang/blob/master/src/org/intellij/erlang/rebar/importWizard/RebarProjectRootStep.java
+ * <a href="https://github.com/ignatov/intellij-erlang/blob/master/src/org/intellij/erlang/rebar/importWizard/RebarProjectRootStep.java">...</a>
  */
 public class Root extends ProjectImportWizardStep {
-    private static final Logger LOG = Logger.getInstance(Builder.class);
-    private static final boolean ourEnabled = !SystemInfo.isWindows;
     private JCheckBox myGetDepsCheckbox;
     private JPanel myPanel;
     private TextFieldWithBrowseButton myProjectRootComponent;
@@ -53,68 +36,11 @@ public class Root extends ProjectImportWizardStep {
         );
 
         myProjectRootComponent.setText(projectFileDirectory); // provide project path
-
-        myGetDepsCheckbox.setVisible(ourEnabled);
-    }
-
-    private static void fetchDependencies(@NotNull final String workingDirectory, @NotNull final Sdk sdk) {
-        mixTask(workingDirectory, sdk, "Fetching dependencies", "deps.get");
     }
 
     /**
      * private methods
      */
-
-    private static void mixTask(@NotNull final String workingDirectory,
-                                @NotNull final Sdk sdk,
-                                @SuppressWarnings("SameParameterValue") @NotNull final String title,
-                                @SuppressWarnings("SameParameterValue") @NotNull final String task,
-                                @NotNull final String... taskParameters) {
-        ProgressManager.getInstance().run(
-                new Task.Modal(null, title, true) {
-                    @Override
-                    public void run(@NotNull final ProgressIndicator indicator) {
-                        indicator.setIndeterminate(true);
-
-                        GeneralCommandLine generalCommandLine = Mix.commandLine(
-                                emptyMap(),
-                                workingDirectory,
-                                sdk,
-                                emptyList(),
-                                emptyList()
-                        );
-                        generalCommandLine.addParameter(task);
-                        generalCommandLine.addParameters(taskParameters);
-
-                        try {
-                            // Use ColoredProcessHandler to automatically strip ANSI escape codes
-                            ProcessHandler handler = ProcessHandlerFactory.getInstance()
-                                    .createColoredProcessHandler(generalCommandLine);
-                            handler.addProcessListener(
-                                    new ProcessListener() {
-                                        @Override
-                                        public void onTextAvailable(@NotNull ProcessEvent event, @NotNull Key outputType) {
-                                            String text = event.getText();
-                                            indicator.setText2(text);
-                                        }
-                                    }
-                            );
-                            ProcessTerminatedListener.attach(handler);
-                            handler.startNotify();
-                            handler.waitFor();
-                            indicator.setText2("Refreshing");
-                        } catch (ExecutionException e) {
-                            LOG.warn(e);
-                        }
-                    }
-                }
-        );
-    }
-
-    private static void updateHex(@NotNull final String workingDirectory,
-                                  @NotNull final Sdk sdk) {
-        mixTask(workingDirectory, sdk, "Updating hex", "local.hex", "--force");
-    }
 
     @Override
     @NotNull
@@ -161,14 +87,17 @@ public class Root extends ProjectImportWizardStep {
             Sdk sdk = getWizardContext().getProjectJdk();
 
             if (sdk != null) {
-                updateHex(workingDirectory, sdk);
-                fetchDependencies(workingDirectory, sdk);
+                // Ignore result - errors are logged by MixTaskRunner
+                MixTaskRunner.updateHex(null, workingDirectory, sdk);
+                MixTaskRunner.updateRebar(null, workingDirectory, sdk);
+                MixTaskRunner.fetchDependencies(null, workingDirectory, sdk);
             }
         }
 
         Builder builder = getBuilder();
         builder.setIsImportingProject(getWizardContext().isCreatingNewProject());
 
-        return builder.setProjectRoot(projectRoot);
+        builder.setProjectRoot(projectRoot);
+        return true;
     }
 }
