@@ -32,6 +32,7 @@
         <backgroundPostStartupActivity implementation="org.elixir_lang.status_bar_widget.ElixirSdkStatusWidgetStartupActivity"/>
 
         <postStartupActivity implementation="org.elixir_lang.sdk.SdkTableListenerStartupActivity"/>
+        <postStartupActivity implementation="org.elixir_lang.mix.DepsCheckerStartupActivity"/>
 
         <!--        <errorHandler implementation="org.elixir_lang.errorreport.Submitter"/>-->
         <errorHandler implementation="com.intellij.diagnostic.JetBrainsMarketplaceErrorReportSubmitter"/>
@@ -242,7 +243,7 @@
         <localInspection displayName="Ambiguous parentheses" enabledByDefault="true" groupName="Elixir"
                          implementationClass="org.elixir_lang.inspection.NoParenthesesStrict" language="Elixir"
                          level="ERROR" shortName="NoParenthesesStrict"/>
-        <localInspection displayName="Keywords Not At End" enabledByDefault="true"
+        <localInspection displayName="Keywords not at end" enabledByDefault="true"
                          groupName="Elixir" implementationClass="org.elixir_lang.inspection.KeywordsNotAtEnd"
                          language="Elixir" level="ERROR" shortName="KeywordsNotAtEnd"/>
         <localInspection displayName="Keyword pair colon (:) used in type spec instead of type operator (::)"
@@ -309,7 +310,7 @@
         <group id="LangElixir.NewActions">
             <separator/>
             <action id="Elixir.NewFile" class="org.elixir_lang.create_module.Action"
-                    text="Elixir File" description="Create new Elixir Module"/>
+                    text="Elixir File" description="Create new Elixir module"/>
             <separator/>
 
             <!--suppress PluginXmlValidity -->
@@ -335,6 +336,12 @@
                     text="Delete All Elixir/Erlang SDKs"
                     icon="AllIcons.General.Remove"
                     description="Removes all Elixir and Erlang SDKs from the IDE (useful in Small IDEs where SDKs can become corrupted)"/>
+            <separator/>
+            <!--suppress PluginXmlCapitalization -->
+            <action id="Elixir.InstallMixDependencies" class="org.elixir_lang.action.InstallMixDependenciesAction"
+                    text="Install Mix Dependencies (hex, rebar, deps.get)"
+                    icon="org.elixir_lang.mix.configuration.Icons.TYPE"
+                    description="Installs hex, rebar, and fetches Mix dependencies"/>
             <separator/>
             <add-to-group group-id="ToolsMenu" anchor="last"/>
         </group>
