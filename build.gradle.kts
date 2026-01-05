@@ -20,12 +20,6 @@ import com.adarshr.gradle.testlogger.TestLoggerExtension
 import com.adarshr.gradle.testlogger.theme.ThemeType
 import de.undercouch.gradle.tasks.download.Download
 import elixir.ElixirService
-import quoter.QuoterService
-import quoter.tasks.GetQuoterDepsTask
-import quoter.tasks.ReleaseQuoterTask
-import quoter.tasks.StartQuoterTask
-import versioning.PluginVersion
-import versioning.VersionFetcher
 import org.jetbrains.intellij.platform.gradle.Constants
 import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
@@ -34,6 +28,12 @@ import org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
+import quoter.QuoterService
+import quoter.tasks.GetQuoterDepsTask
+import quoter.tasks.ReleaseQuoterTask
+import quoter.tasks.StartQuoterTask
+import versioning.PluginVersion
+import versioning.VersionFetcher
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -188,6 +188,27 @@ sourceSets {
     test {
         java.srcDir("tests")
     }
+    create("testUI", Action<SourceSet> {
+        kotlin.srcDir("testUI/kotlin")
+        resources.srcDir("testUI/resources")
+        compileClasspath += sourceSets["main"].output + sourceSets["test"].output
+        runtimeClasspath += sourceSets["main"].output + sourceSets["test"].output
+    })
+}
+
+idea {
+    module {
+        testSources.from(sourceSets["testUI"].kotlin.srcDirs)
+        testResources.from(sourceSets["testUI"].resources.srcDirs)
+    }
+}
+
+val testUIImplementation: Configuration by configurations.getting {
+    extendsFrom(configurations.testImplementation.get())
+}
+
+val testUIRuntimeOnly: Configuration by configurations.getting {
+    extendsFrom(configurations.testRuntimeOnly.get())
 }
 
 // --- IntelliJ Platform Configuration ---
@@ -240,6 +261,10 @@ intellijPlatform {
             }
         }
     }
+    sourceSets {
+        val testUI: SourceSet by project.sourceSets
+        add(testUI)
+    }
 }
 
 // --- Kotlin Configuration ---
@@ -250,7 +275,7 @@ kotlin {
 tasks.withType<KotlinJvmCompile>().configureEach {
     compilerOptions {
         jvmTarget = JvmTarget.valueOf("JVM_$javaVersionStr")
-        freeCompilerArgs.add("-Xjvm-default=all")
+        freeCompilerArgs.add("-jvm-default=enable")
         apiVersion = KotlinVersion.KOTLIN_2_2
     }
 }
@@ -268,6 +293,9 @@ dependencies {
         zipSigner()
         testFramework(TestFrameworkType.Platform)
         testFramework(TestFrameworkType.Plugin.Java)
+        // UI Test framework dependencies
+        testFramework(TestFrameworkType.Starter, configurationName = "testUIImplementation")
+        testFramework(TestFrameworkType.JUnit5, configurationName = "testUIImplementation")
     }
 
     implementation(project(":jps-builder"))
@@ -277,6 +305,15 @@ dependencies {
 
     testImplementation(libMockitoCore)
     mockitoAgent(libMockitoCore) { isTransitive = false }
+
+    // UI Test dependencies
+    testUIImplementation(libs.kodein.di.jvm)
+    testUIImplementation(libs.kotlinx.coroutines.core.jvm)
+
+    // JUnit 5 is required for UI tests
+    testUIImplementation(libs.junit.jupiter)
+    testUIRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
 }
 
 // --- Run IDE Configuration ---
@@ -472,8 +509,6 @@ val startQuoter by tasks.registering(StartQuoterTask::class) {
 // ALL test tasks in ALL projects use the QuoterService (ensures cleanup on any failure)
 allprojects {
     tasks.withType<Test>().configureEach {
-        dependsOn(startQuoter)
-        usesService(quoterService)
 
         // Validate Erlang is available before running tests
         doFirst {
@@ -526,7 +561,8 @@ allprojects {
 }
 
 tasks.named<Test>("test") {
-    dependsOn("prepareTestSandbox")
+    dependsOn("prepareTestSandbox", startQuoter)
+    usesService(quoterService)
 
     environment("ELIXIR_LANG_ELIXIR_PATH", elixirPath.asFile.absolutePath)
     environment("ELIXIR_EBIN_DIRECTORY", elixirPath.dir("lib/elixir/ebin/").asFile.absolutePath + File.separator)
@@ -541,6 +577,83 @@ tasks.named<Zip>("buildPlugin") {
         println("Note: Timestamps in version strings and filenames of build artifacts do not change on every build due to gradle config caching.")
         println("Built artifact path: ${archiveFile.get().asFile.absolutePath}")
     }
+}
+
+
+/**
+ * Helper function to get SDK path from mise.
+ * Requires mise to be installed and available in PATH.
+ *
+ * @param tool The tool name (e.g., "erlang", "elixir")
+ * @return The absolute path to the tool installation
+ * @throws GradleException if mise is not installed or tool not found
+ */
+fun getMiseSdkPath(tool: String): Provider<String> {
+    return providers.exec {
+        commandLine("mise", "where", tool)
+    }.standardOutput.asText.map { it.trim() }.orElse(
+        providers.provider {
+            throw GradleException(
+                """
+                |Failed to get path for '$tool' from mise.
+                |
+                |UI tests require mise to be installed and configured with .tool-versions.
+                |
+                |Installation:
+                |  Linux/macOS: curl https://mise.run | sh
+                |  Windows: https://mise.jdx.dev/getting-started.html#windows
+                |
+                |Setup:
+                |  1. Install mise
+                |  2. Run: mise install inside the project directory
+                |  3. Verify: mise where $tool
+                |
+                |See: https://mise.jdx.dev/
+                """.trimMargin()
+            )
+        }
+    )
+}
+
+tasks.register<Test>("testUI") {
+    dependsOn(tasks.buildPlugin, tasks.prepareSandbox, unzipQuoter)
+    description = "Runs only the UI tests that start the IDE"
+    group = "verification"
+
+    testClassesDirs = sourceSets["testUI"].output.classesDirs
+    classpath = sourceSets["testUI"].runtimeClasspath
+
+    useJUnitPlatform()
+
+    // UI tests should run sequentially (not in parallel) to avoid conflicts
+    maxParallelForks = 1
+
+    // Increase memory for UI tests
+    minHeapSize = "1g"
+    maxHeapSize = "4g"
+
+    systemProperty("path.to.build.plugin", tasks.buildPlugin.get().archiveFile.get().asFile.absolutePath)
+    systemProperty("idea.home.path", tasks.prepareTestSandbox.get().getDestinationDir().parentFile.absolutePath)
+    systemProperty("uiPlatformBuildVersion", actualPlatformVersion)
+    systemProperty("projectPath", unzipQuoter.get().destinationDir.absolutePath)
+
+    // Disable IntelliJ test listener that conflicts with standard JUnit
+    systemProperty("idea.test.cyclic.buffer.size", "0")
+
+    // Get SDK paths from mise (reads .tool-versions) at execution time
+    doFirst {
+        systemProperty("erlangSdkPath", getMiseSdkPath("erlang").get())
+        systemProperty("elixirSdkPath", getMiseSdkPath("elixir").get())
+    }
+
+    // Add required JVM arguments
+    jvmArgumentProviders += CommandLineArgumentProvider {
+        mutableListOf(
+            "--add-opens=java.base/java.lang=ALL-UNNAMED",
+            "--add-opens=java.desktop/javax.swing=ALL-UNNAMED"
+        )
+    }
+
 }
 
 // Uncomment to allow using build-scan.
