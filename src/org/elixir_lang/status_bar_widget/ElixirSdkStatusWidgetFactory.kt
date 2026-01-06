@@ -1,26 +1,15 @@
 package org.elixir_lang.status_bar_widget
 
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.wm.StatusBar
 import com.intellij.openapi.wm.StatusBarWidget
 import com.intellij.openapi.wm.StatusBarWidgetFactory
-import com.intellij.openapi.wm.impl.status.widget.StatusBarWidgetsManager
-import com.intellij.util.messages.MessageBusConnection
 import org.elixir_lang.settings.ElixirExperimentalSettings
-import org.elixir_lang.settings.ElixirExperimentalSettingsListener
 
 private val LOG = logger<ElixirSdkStatusWidgetFactory>()
 
 class ElixirSdkStatusWidgetFactory : StatusBarWidgetFactory {
-    private var messageBusConnection: MessageBusConnection? = null
-
-    init {
-        setupSettingsListener()
-    }
-    
     override fun getId(): String = ElixirSdkStatusWidget.ID
 
     override fun getDisplayName(): String = "Elixir SDK Status"
@@ -45,41 +34,8 @@ class ElixirSdkStatusWidgetFactory : StatusBarWidgetFactory {
     // Mark this widget as configurable so users can enable/disable it
     override fun isConfigurable(): Boolean = true
 
-    // isEnabledByDefault checks the experimental settings for each project
-    override fun isEnabledByDefault(): Boolean {
-        // Since this is called without a project context, return false
-        // The actual availability is determined by isAvailable(project)
-        return false
-    }
-
-    private fun setupSettingsListener() {
-        val messageBus = ApplicationManager.getApplication().messageBus
-        messageBusConnection = messageBus.connect()
-        messageBusConnection?.subscribe(
-            ElixirExperimentalSettings.SETTINGS_CHANGED_TOPIC,
-            object : ElixirExperimentalSettingsListener {
-                override fun settingsChanged(oldState: ElixirExperimentalSettings.State, newState: ElixirExperimentalSettings.State) {
-                    LOG.debug("Settings changed: statusBarWidget ${oldState.enableStatusBarWidget} -> ${newState.enableStatusBarWidget}")
-                    if (oldState.enableStatusBarWidget != newState.enableStatusBarWidget) {
-                        LOG.debug("Status bar widget setting changed, updating widget visibility")
-                        updateWidgetVisibility()
-                    }
-                }
-            }
-        )
-    }
-
-    private fun updateWidgetVisibility() {
-        ApplicationManager.getApplication().invokeLater {
-            for (project in ProjectManager.getInstance().openProjects) {
-                if (!project.isDisposed) {
-                    updateProjectWidget(project)
-                }
-            }
-        }
-    }
-
-    private fun updateProjectWidget(project: Project) {
-        project.getService(StatusBarWidgetsManager::class.java)?.updateWidget(this)
-    }
+    // if the experimental setting is enabled, make it so the widget immediately appears in the status bar
+    // this was previously set to false, which required the user to enable it in project settings, and then enable
+    // it again on the status bar.
+    override fun isEnabledByDefault(): Boolean =  true
 }
