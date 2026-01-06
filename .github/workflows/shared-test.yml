@@ -53,6 +53,7 @@ jobs:
         idea-version: ${{ fromJson(needs.matrix-setup.outputs.idea-versions) }}
 
     steps:
+
       - name: Checkout
         id: checkout
         uses: actions/checkout@v6
@@ -68,6 +69,27 @@ jobs:
           idea-version: ${{ matrix.idea-version }}
           gradle-cache-read-only: true
           github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Debug Maven Central access
+        run: |
+          echo "=== DNS / Network / TLS info ==="
+          ip -4 addr || true
+          uname -a
+          echo "Java version:"
+          java -version || true
+          
+          echo
+          echo "=== HTTP HEAD to POM (show headers) ==="
+          curl -vI 'https://repo.maven.apache.org/maven2/commons-io/commons-io/2.21.0/commons-io-2.21.0.pom' || true
+          
+          echo
+          echo "=== HTTP GET to POM (show first 200 bytes) ==="
+          curl -v 'https://repo.maven.apache.org/maven2/commons-io/commons-io/2.21.0/commons-io-2.21.0.pom' -m 20 -sS -o /tmp/commons.pom || true
+          head -c 200 /tmp/commons.pom || true
+          
+          echo
+          echo "=== Try resolving dependency via Gradle (info) ==="
+          ./gradlew --no-daemon --refresh-dependencies dependencies --configuration compileClasspath --info || true
 
       - name: Run Tests
         id: test
