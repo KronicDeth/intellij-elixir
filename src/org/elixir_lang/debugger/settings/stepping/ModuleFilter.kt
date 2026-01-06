@@ -17,5 +17,5 @@ class ModuleFilter(enabled: Boolean = true, pattern: String = "") {
     override fun equals(other: Any?) =
             other is ModuleFilter && enabled == other.enabled && pattern == other.pattern
 
-    override fun hashCode() = Objects.hashCode(arrayOf(enabled, pattern))
+    override fun hashCode() = Objects.hash(enabled, pattern)
 }
