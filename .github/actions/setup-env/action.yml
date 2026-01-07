@@ -40,6 +40,9 @@ runs:
   steps:
     - name: Free Disk Space
       id: free-disk-space
+      ## Windows runners appear to have plenty of free space on D:
+      ## and this action doesn't work on Windows.
+      if: runner.os == 'Linux'
       uses: jlumbroso/free-disk-space@v1.3.1
       with:
         tool-cache: false

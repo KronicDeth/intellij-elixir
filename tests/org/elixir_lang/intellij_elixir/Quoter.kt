@@ -9,6 +9,7 @@ import org.elixir_lang.Keyword.isKeyword
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil
 import org.elixir_lang.psi.impl.ParentImpl.elixirString
 import org.hamcrest.CoreMatchers
+import org.hamcrest.MatcherAssert
 import org.jetbrains.annotations.Contract
 import org.junit.Assert
 import org.junit.ComparisonFailure
@@ -54,7 +55,7 @@ object Quoter {
         } catch (e: OtpErlangExit) {
             exception = e
         }
-        Assert.assertThat(exception, CoreMatchers.instanceOf(OtpErlangExit::class.java))
+        MatcherAssert.assertThat(exception, CoreMatchers.instanceOf(OtpErlangExit::class.java))
     }
 
     @Contract("null -> fail")
@@ -135,8 +136,8 @@ object Quoter {
                 it.toInt() == 0x0A -> {
                     "\\n"
                 }
-                CharUtils.isAsciiPrintable(it.toChar()) -> {
-                    it.toChar().toString()
+                CharUtils.isAsciiPrintable(it.toInt().toChar()) -> {
+                    it.toInt().toChar().toString()
                 }
                 else -> {
                     String.format("\\x%02X", it)

@@ -44,13 +44,16 @@ jobs:
 
   test:
     needs: matrix-setup
-    runs-on: ubuntu-22.04
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
+        # Stay with windows-2022 until https://github.com/erlef/setup-beam/commit/b94e7d372a9ef22d376b75a9374a7adeb0e2ea94 is released.
+        os: [ubuntu-22.04, windows-2022]
         idea-version: ${{ fromJson(needs.matrix-setup.outputs.idea-versions) }}
 
     steps:
+
       - name: Checkout
         id: checkout
         uses: actions/checkout@v6
@@ -67,24 +70,55 @@ jobs:
           gradle-cache-read-only: true
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Debug Maven Central access
+        run: |
+          echo "=== DNS / Network / TLS info ==="
+          ip -4 addr || true
+          uname -a
+          echo "Java version:"
+          java -version || true
+          
+          echo
+          echo "=== HTTP HEAD to POM (show headers) ==="
+          curl -vI 'https://repo.maven.apache.org/maven2/commons-io/commons-io/2.21.0/commons-io-2.21.0.pom' || true
+          
+          echo
+          echo "=== HTTP GET to POM (show first 200 bytes) ==="
+          curl -v 'https://repo.maven.apache.org/maven2/commons-io/commons-io/2.21.0/commons-io-2.21.0.pom' -m 20 -sS -o /tmp/commons.pom || true
+          head -c 200 /tmp/commons.pom || true
+          
+          echo
+          echo "=== Try resolving dependency via Gradle (info) ==="
+          ./gradlew --no-daemon --refresh-dependencies dependencies --configuration compileClasspath --info || true
+
       - name: Run Tests
         id: test
         run: ./gradlew --stacktrace check --scan
 
       - name: Publish Test Results
-        id: publish-test-results
+        id: publish-test-results-linux
         uses: EnricoMi/publish-unit-test-result-action@v2
-        if: always()
+        if: always() && runner.os == 'Linux'
         with:
           files: '**/build/test-results/**/*.xml'
-          check_name: Test Results (${{ matrix.idea-version }})
+          check_name: Test Results (${{ matrix.os }}, ${{ matrix.idea-version }})
+          report_suite_logs: "error"
+
+      - name: Publish Test Results
+        id: publish-test-results-windows
+        uses: EnricoMi/publish-unit-test-result-action/windows@v2
+        if: always() && runner.os == 'Windows'
+        with:
+          files: '**/build/test-results/**/*.xml'
+          check_name: Test Results (${{ matrix.os }}, ${{ matrix.idea-version }})
+          report_suite_logs: "error"
 
       - name: Upload Test Reports
         id: upload-test-reports
         uses: actions/upload-artifact@v6
         if: ${{ always() && inputs.upload-reports }}
         with:
-          name: test-reports-${{ matrix.idea-version }}
+          name: test-reports-${{ matrix.os }}-${{ matrix.idea-version }}
           path: |
             **/build/reports/tests/**
             **/build/test-results/**

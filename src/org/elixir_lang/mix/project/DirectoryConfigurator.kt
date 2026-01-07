@@ -19,6 +19,7 @@ import com.intellij.openapi.roots.ModuleRootModificationUtil
 import com.intellij.openapi.util.Ref
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.platform.DirectoryProjectConfigurator
 import com.intellij.platform.PlatformProjectOpenProcessor.Companion.runDirectoryProjectConfigurators
 import com.intellij.projectImport.ProjectAttachProcessor
 import kotlinx.coroutines.runBlocking
@@ -33,7 +34,7 @@ import kotlin.io.path.exists
 /**
  * Used in Small IDEs like Rubymine/Webstorm that don't support [OpenProcessor].
  */
-class DirectoryConfigurator : com.intellij.platform.DirectoryProjectConfigurator {
+class DirectoryConfigurator : DirectoryProjectConfigurator {
     companion object {
         private val LOG = Logger.getInstance(DirectoryConfigurator::class.java)
     }
@@ -47,7 +48,7 @@ class DirectoryConfigurator : com.intellij.platform.DirectoryProjectConfigurator
         var foundOtpApps: List<OtpApp> = emptyList()
         LOG.debug("configuring $baseDir for project $project, created with wizard: $isProjectCreatedWithWizard")
 
-        ProgressManager.getInstance().run(object : Task.Backgroundable(project, "Scanning Mix Projects", true) {
+        ProgressManager.getInstance().run(object : Task.Backgroundable(project, "Scanning Mix projects", true) {
             override fun run(indicator: ProgressIndicator) {
                 foundOtpApps = org.elixir_lang.mix.Project.findOtpApps(baseDir, indicator)
             }
@@ -60,7 +61,7 @@ class DirectoryConfigurator : com.intellij.platform.DirectoryProjectConfigurator
             NotificationGroupManager.getInstance()
                 .getNotificationGroup("Elixir")
                 .createNotification(
-                    "Umbrella App Detected",
+                    "Umbrella App detected",
                     "Elixir Umbrella app detected, please use the Project Wizard to properly configure it when using an IDE like RubyMine.",
                     NotificationType.WARNING
                 )
