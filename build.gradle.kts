@@ -19,6 +19,7 @@
 import com.adarshr.gradle.testlogger.TestLoggerExtension
 import com.adarshr.gradle.testlogger.theme.ThemeType
 import de.undercouch.gradle.tasks.download.Download
+import deps.registerResolveExternalDependenciesTasksForAllProjects
 import elixir.ElixirService
 import quoter.QuoterService
 import quoter.tasks.GetQuoterDepsTask
@@ -459,6 +460,8 @@ val quoterService = gradle.sharedServices.registerIfAbsent("quoter", QuoterServi
 val startQuoter by tasks.registering(StartQuoterTask::class) {
     dependsOn(releaseQuoter)
 }
+
+registerResolveExternalDependenciesTasksForAllProjects()
 
 // --- Test Configuration ---
 
