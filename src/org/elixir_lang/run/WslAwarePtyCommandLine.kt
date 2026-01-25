@@ -1,8 +1,11 @@
 package org.elixir_lang.run
 
 import com.intellij.execution.configurations.PtyCommandLine
+import com.intellij.openapi.diagnostic.Logger
 import org.elixir_lang.sdk.wsl.wslCompat
 import java.io.IOException
+
+private val LOG = Logger.getInstance(WslAwarePtyCommandLine::class.java)
 
 /**
  * A PtyCommandLine subclass that automatically applies WSL path conversion
@@ -21,6 +24,7 @@ open class WslAwarePtyCommandLine : PtyCommandLine {
     @Throws(IOException::class)
     override fun createProcess(processBuilder: ProcessBuilder): Process {
         wslCompat.convertProcessBuilderArgumentsForWsl(processBuilder, this)
+        LOG.debug(formatCommandLineForLogging(processBuilder, "Command line"))
         return super.createProcess(processBuilder)
     }
 }

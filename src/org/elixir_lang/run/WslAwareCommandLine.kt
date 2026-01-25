@@ -1,8 +1,11 @@
 package org.elixir_lang.run
 
 import com.intellij.execution.configurations.GeneralCommandLine
+import com.intellij.openapi.diagnostic.Logger
 import org.elixir_lang.sdk.wsl.wslCompat
 import java.io.IOException
+
+private val LOG = Logger.getInstance(WslAwareCommandLine::class.java)
 
 /**
  * A GeneralCommandLine subclass that automatically applies WSL path conversion
@@ -49,6 +52,7 @@ open class WslAwareCommandLine : GeneralCommandLine {
     @Throws(IOException::class)
     override fun createProcess(processBuilder: ProcessBuilder): Process {
         wslCompat.convertProcessBuilderArgumentsForWsl(processBuilder, this)
+        LOG.debug(formatCommandLineForLogging(processBuilder, "Command line"))
         return super.createProcess(processBuilder)
     }
 }
