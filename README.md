@@ -11,6 +11,7 @@ Table of Contents[![Backers on Open Collective](https://opencollective.com/intel
             * [New](#new)
          * [Project Structure](#project-structure)
          * [Project Settings](#project-settings)
+         * [Windows Subsystem for Linux (WSL) Support](#windows-subsystem-for-linux-wsl-support)
          * [Module Settings](#module-settings)
             * [Sources](#sources)
             * [Paths](#paths)
@@ -442,6 +443,29 @@ If you want to create a basic (non-`mix`) Elixir project with a `lib` directory,
 The Project Settings include
 * Project Name
 * Project SDK
+
+#### SDK Setup Known Limitations
+
+When setting up Elixir and Erlang SDKs for the first time:
+
+* **Setup SDKs before importing your Elixir project**
+* **Auto-detect SDKs**: The plugin will attempt to automatically detect the SDKs based on the currently open project directory, not the directory that you are importing. To setup SDKs on a WSL instance, open any project, or even an empty directory in WSL first.
+* **Click OK directly** after configuring Erlang, then reopen the Project Structure dialog to configure Elixir - this will properly save all settings
+* **Avoid clicking Apply then OK** - this workflow has a known issue where the project SDK may not be saved correctly
+
+### Windows Subsystem for Linux (WSL) Support
+
+The plugin supports running Elixir, Mix, and IEx commands within WSL. This includes:
+
+* **Run Configurations**: All Mix, ExUnit, ESpec, Elixir, and IEx run configurations are fully compatible with WSL.
+* **External Tools**: background tools like Credo inspections, Dialyzer, Mix Format, and the New Project Wizard automatically use WSL when your project is located on a WSL partition.
+* **Path Conversion**: Windows UNC paths (e.g., `\\wsl$\Ubuntu\...`) and Windows drive paths are automatically converted to POSIX paths when executing commands in WSL.
+
+#### WSL Limitations
+
+* **New Project Wizard**: SDK selection is based on the location of the currently open project, not the new project. To select a WSL based SDK during the New Project Wizard, open any WSL project or directory in the IDE first. 
+* **SDKs and Project must all be on the same WSL Distribution**: You cannot use a WSL based SDK with a non-WSL project, and vice versa. You can use the `/mnt/c` drive to access Windows files from WSL, but the performance is terrible. 
+* **Performance**: Running the IDE in Windows with a WSL project is slower than running the IDE directly in the WSL instance. This is a limitation of the IDE, not specific to the Elixir plugin.  
 
 ### Module Settings
 
