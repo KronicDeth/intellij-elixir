@@ -19,10 +19,8 @@ import org.jetbrains.jps.model.library.sdk.JpsSdk;
 import org.jetbrains.jps.model.module.JpsModule;
 import org.jetbrains.jps.util.JpsPathUtil;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.nio.file.Files;
 
 
 /**
@@ -32,6 +30,53 @@ public class BuilderTest extends JpsBuildTestCase {
     private static final String TEST_MODULE_NAME = "m";
     private JpsSdk<SdkProperties> elixirSdk;
     private static String otpReleaseVersion = null;
+
+
+    /**
+     * Executes Erlang code by writing it to a temp escript file.
+     * This avoids command-line parsing issues on Windows.
+     */
+    private static String executeErlangCode(String erlangCode) throws IOException, InterruptedException {
+        File tempScript = Files.createTempFile("erl_exec_", ".erl").toFile();
+        tempScript.deleteOnExit();
+
+        try (FileWriter writer = new FileWriter(tempScript)) {
+            writer.write("#!/usr/bin/env escript\n");
+            writer.write("%%! -noshell\n");
+            writer.write("main(_) -> " + erlangCode + "\n");
+        }
+
+        String escriptCmd = System.getProperty("os.name").toLowerCase().contains("windows") ? "escript.exe" : "escript";
+        ProcessBuilder pb = new ProcessBuilder(escriptCmd, tempScript.getAbsolutePath());
+        Process process = pb.start();
+
+        StringBuilder stdout = new StringBuilder();
+        StringBuilder stderr = new StringBuilder();
+
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                stdout.append(line).append("\n");
+            }
+        }
+
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                stderr.append(line).append("\n");
+            }
+        }
+
+        int exitCode = process.waitFor();
+        //noinspection ResultOfMethodCallIgnored
+        tempScript.delete();
+
+        if (exitCode != 0) {
+            throw new RuntimeException("Erlang execution failed. Exit code: " + exitCode + "\nSTDERR: " + stderr);
+        }
+
+        return stdout.toString().trim();
+    }
 
     /**
      * Retrieves the OTP Release version, eg 24.3.4.6
@@ -53,26 +98,14 @@ public class BuilderTest extends JpsBuildTestCase {
         }
 
         try {
-            Process process = Runtime.getRuntime().exec(new String[]{
-                    "erl",
-                    "-eval",
-                    "{ok, Version} = file:read_file(filename:join([code:root_dir(), \"releases\", erlang:system_info(otp_release), \"OTP_VERSION\"])), io:fwrite(Version), halt().",
-                    "-noshell"
-            });
-
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-                otpRelease = reader.readLine();
-            }
-
-            int exitCode = process.waitFor();
-            if (exitCode != 0) {
-                throw new RuntimeException("Failed to get OTP release. Exit code: " + exitCode);
-            }
+            otpRelease = executeErlangCode(
+                    "{ok, Version} = file:read_file(filename:join([code:root_dir(), \"releases\", erlang:system_info(otp_release), \"OTP_VERSION\"])), io:fwrite(Version), halt()."
+            );
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException("Failed to get OTP release", e);
         }
 
-        if (otpRelease == null || otpRelease.isEmpty()) {
+        if (otpRelease.isEmpty()) {
             throw new RuntimeException("Failed to get OTP release");
         }
 
@@ -102,26 +135,12 @@ public class BuilderTest extends JpsBuildTestCase {
         }
 
         try {
-            Process process = Runtime.getRuntime().exec(new String[]{
-                    "erl",
-                    "-eval",
-                    "io:format(\"~s~n\", [code:root_dir()]), halt().",
-                    "-noshell"
-            });
-
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-                erlangSdkHome = reader.readLine();
-            }
-
-            int exitCode = process.waitFor();
-            if (exitCode != 0) {
-                throw new RuntimeException("Failed to get Erlang SDK home. Exit code: " + exitCode);
-            }
+            erlangSdkHome = executeErlangCode("io:format(\"~s~n\", [code:root_dir()]), halt().");
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException("Failed to get Erlang SDK home", e);
         }
 
-        if (erlangSdkHome == null || erlangSdkHome.isEmpty()) {
+        if (erlangSdkHome.isEmpty()) {
             throw new RuntimeException("Failed to get Erlang SDK home");
         }
 
@@ -190,7 +209,7 @@ public class BuilderTest extends JpsBuildTestCase {
         assertNotNull(FileUtil.findFileInProvidedPath(absolutePath, "Elixir.MixCompiled.beam"));
     }
 
-    private JpsSdk<SdkProperties> addElixirSdk(@NotNull JpsSdk erlangSdk) {
+    private JpsSdk<SdkProperties> addElixirSdk(@NotNull JpsSdk<?> erlangSdk) {
         JpsTypedLibrary<JpsSdk<SdkProperties>> elixirTypedLibrary = myModel
                 .getGlobal()
                 .addSdk("Elixir " + elixirVersion(), elixirSdkHome(), elixirVersion(), Elixir.INSTANCE);
