@@ -59,6 +59,7 @@ val javaVersionStr: String = libs.versions.java.get()
 val libJunit = libs.junit
 val libOpentest4j = libs.opentest4j
 val libCommonsIo = libs.commons.io
+val libMockitoCore = libs.mockito.core
 
 // --- Configuration Properties ---
 val elixirVersion: String by project
@@ -274,6 +275,9 @@ dependencies {
     implementation(project(":jps-shared"))
     implementation(files("lib/OtpErlang.jar"))
     implementation(libCommonsIo)
+
+    testImplementation(libMockitoCore)
+    mockitoAgent(libMockitoCore) { isTransitive = false }
 }
 
 // --- Run IDE Configuration ---
@@ -530,6 +534,9 @@ tasks.named<Test>("test") {
     environment("ELIXIR_LANG_ELIXIR_PATH", elixirPath.asFile.absolutePath)
     environment("ELIXIR_EBIN_DIRECTORY", elixirPath.dir("lib/elixir/ebin/").asFile.absolutePath + File.separator)
     environment("ELIXIR_VERSION", elixirVersion)
+
+    // Add Mockito as javaagent to avoid dynamic loading warnings (root project only)
+    jvmArgs("-javaagent:${mockitoAgent.asPath}")
 }
 
 tasks.named<Zip>("buildPlugin") {
