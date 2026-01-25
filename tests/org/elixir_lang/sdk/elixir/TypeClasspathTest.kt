@@ -5,7 +5,7 @@ import com.intellij.openapi.projectRoots.ProjectJdkTable
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl
 import com.intellij.openapi.roots.OrderRootType
-import com.intellij.testFramework.fixtures.BasePlatformTestCase
+import org.elixir_lang.PlatformTestCase
 import org.elixir_lang.sdk.erlang.Type as ErlangSdkType
 
 /**
@@ -14,7 +14,7 @@ import org.elixir_lang.sdk.erlang.Type as ErlangSdkType
  * This tests the validation logic that checks whether Erlang SDK classpath
  * entries are properly added to an Elixir SDK's classpath.
  */
-class TypeClasspathTest : BasePlatformTestCase() {
+class TypeClasspathTest : PlatformTestCase() {
 
     private var elixirSdk: Sdk? = null
     private var erlangSdk: Sdk? = null

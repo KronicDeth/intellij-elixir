@@ -1,3 +1,6 @@
+package quoter.tasks
+
+import quoter.QuoterService
 import org.gradle.api.DefaultTask
 import org.gradle.api.provider.Property
 import org.gradle.api.services.ServiceReference
