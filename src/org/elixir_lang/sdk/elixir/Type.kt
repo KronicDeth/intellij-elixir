@@ -9,7 +9,6 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.fileChooser.FileChooserDescriptor
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleUtilCore
-import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.progress.runBlockingCancellable
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.guessProjectDir
@@ -18,7 +17,6 @@ import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl
 import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.roots.ProjectRootManager
-import com.intellij.openapi.roots.ui.configuration.ProjectJdksConfigurable
 import com.intellij.openapi.util.InvalidDataException
 import com.intellij.openapi.util.Version
 import com.intellij.openapi.util.WriteExternalException
@@ -400,7 +398,8 @@ ELIXIR_SDK_HOME
                     append("The following Elixir SDKs reference it and must be reconfigured:<br>")
                     append(dependentNames)
                     append("<br><br>")
-                    append("Please open Project Structure and select a different Erlang SDK<br>")
+                    val settingsTarget = SdkSettingsOpener.getInstance().targetName()
+                    append("Please configure the Elixir SDKs in $settingsTarget and select a different Erlang SDK<br>")
                     append("for each of these Elixir SDKs.")
                 }
 
@@ -409,8 +408,8 @@ ELIXIR_SDK_HOME
                     message,
                     com.intellij.notification.NotificationType.WARNING
                 )
-                notification.addAction(NotificationAction.create("Open \"Project Structure\" dialog") { _, _ ->
-                    ShowSettingsUtil.getInstance().showSettingsDialog(null, ProjectJdksConfigurable::class.java)
+                notification.addAction(NotificationAction.create("Configure Elixir SDKs") { event, _ ->
+                    SdkSettingsOpener.getInstance().open(event)
                 })
 
                 notification.notify(null)

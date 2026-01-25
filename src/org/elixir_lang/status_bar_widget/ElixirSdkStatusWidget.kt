@@ -2,11 +2,7 @@ package org.elixir_lang.status_bar_widget
 
 import com.intellij.icons.AllIcons
 import com.intellij.ide.DataManager
-import com.intellij.openapi.actionSystem.ActionManager
-import com.intellij.openapi.actionSystem.AnAction
-import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.actionSystem.DefaultActionGroup
-import com.intellij.openapi.actionSystem.ex.ActionUtil
+import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.ProjectJdkTable
@@ -22,6 +18,7 @@ import com.intellij.util.messages.MessageBusConnection
 import com.intellij.util.ui.JBUI
 import org.elixir_lang.Icons
 import org.elixir_lang.jps.HomePath
+import org.elixir_lang.sdk.elixir.SdkSettingsOpener
 import org.elixir_lang.sdk.elixir.Type
 import org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData
 import org.jetbrains.annotations.NotNull
@@ -136,13 +133,27 @@ class ElixirSdkStatusWidget(@param:NotNull private val project: Project) : Custo
     }
 
     private fun createAddSdkAction(): AnAction {
-        return object : AnAction("Add Elixir SDK...", "Open Project Structure to add an Elixir SDK", AllIcons.General.Add) {
+
+        return object : AnAction("Configure Elixir SDKs...", "", AllIcons.General.Add) {
             override fun actionPerformed(e: AnActionEvent) {
-                // Open Project Structure dialog (File -> Project Structure)
-                val action = ActionManager.getInstance().getAction("ShowProjectStructureSettings")
-                if (action != null) {
-                    ActionUtil.performAction(action, e)
+                SdkSettingsOpener.getInstance().open(e)
+            }
+
+            override fun getActionUpdateThread(): ActionUpdateThread = ActionUpdateThread.BGT
+
+            override fun update(e: AnActionEvent) {
+                val status = detectSdkStatus()
+                val isConfigured = status !is SdkStatus.NotConfigured
+                val text = if (isConfigured) "Configure Elixir SDKs..." else "Add Elixir SDK..."
+                val targetName = SdkSettingsOpener.getInstance().targetName()
+                val description = if (isConfigured) {
+                    "Configure Elixir SDKs in $targetName"
+                } else {
+                    "Open $targetName to add an Elixir SDK"
                 }
+
+                e.presentation.text = text
+                e.presentation.description = description
             }
         }
     }

@@ -124,6 +124,8 @@
         <!-- WSL Support Service -->
         <applicationService serviceInterface="org.elixir_lang.sdk.wsl.WslCompatService"
                             serviceImplementation="org.elixir_lang.sdk.wsl.WslCompatServiceImpl"/>
+        <applicationService serviceInterface="org.elixir_lang.sdk.elixir.SdkSettingsOpener"
+                            serviceImplementation="org.elixir_lang.sdk.elixir.SettingsSdkSettingsOpener"/>
 
 
         <!-- for template -->
@@ -324,6 +326,11 @@
         </group>
         <group id="LangElixir.SdkActions">
             <separator/>
+            <action id="Elixir.OpenElixirSdkSettings"
+                    class="org.elixir_lang.action.OpenElixirSdkSettingsAction"
+                    text="Configure Elixir SDKs"
+                    icon="AllIcons.General.Settings"
+                    description="Open Settings to configure Elixir SDKs"/>
             <action id="Elixir.RefreshActiveElixirSdk" class="org.elixir_lang.action.RefreshActiveElixirSdkAction"
                     text="Refresh Active Elixir SDK"
                     icon="AllIcons.General.Refresh"
