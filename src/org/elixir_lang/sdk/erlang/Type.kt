@@ -41,6 +41,36 @@ class Type : SdkType("Erlang SDK for Elixir SDK") {
         private val LOGGER = Logger.getInstance(Type::class.java)
 
         @JvmStatic
+        internal fun setupSdkTableListener() {
+            val messageBus = ApplicationManager.getApplication().messageBus
+            messageBus.connect().subscribe(
+                com.intellij.openapi.projectRoots.ProjectJdkTable.JDK_TABLE_TOPIC,
+                object : com.intellij.openapi.projectRoots.ProjectJdkTable.Listener {
+                    override fun jdkRemoved(jdk: Sdk) {
+                        if (jdk.sdkType is Type) {
+                            cleanupProjectReferences(jdk)
+                        }
+                    }
+                }
+            )
+        }
+
+        private fun cleanupProjectReferences(deletedSdk: Sdk) {
+            LOGGER.warn("Erlang SDK removed: ${deletedSdk.name}, cleaning up project references")
+            com.intellij.openapi.project.ProjectManager.getInstance().openProjects.forEach { project ->
+                val projectRootManager = com.intellij.openapi.roots.ProjectRootManager.getInstance(project)
+                if (projectRootManager.projectSdk == deletedSdk) {
+                    ApplicationManager.getApplication().invokeLater {
+                        ApplicationManager.getApplication().runWriteAction {
+                            projectRootManager.projectSdk = null
+                            LOGGER.warn("Cleared removed Erlang SDK '${deletedSdk.name}' from project '${project.name}'")
+                        }
+                    }
+                }
+            }
+        }
+
+        @JvmStatic
         fun getDefaultSdkName(
             sdkHome: String,
             version: Release?,
