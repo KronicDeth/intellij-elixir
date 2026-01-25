@@ -12,7 +12,6 @@ import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.progress.runBlockingCancellable
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.project.ProjectBundle
 import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.projectRoots.*
 import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl
@@ -40,6 +39,7 @@ import org.elixir_lang.sdk.SdkHomeScan
 import org.elixir_lang.sdk.Type.ebinPathChainVirtualFile
 import org.elixir_lang.sdk.erlang_dependent.AdditionalDataConfigurable
 import org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData
+import org.elixir_lang.sdk.wsl.wslCompat
 import org.jdom.Element
 import org.jetbrains.annotations.Contract
 import org.jetbrains.annotations.Unmodifiable
@@ -86,16 +86,8 @@ class Type : org.elixir_lang.sdk.erlang_dependent.Type(SerializerExtension.ELIXI
 
     override fun getDefaultDocumentationUrl(sdk: Sdk): String? = getDefaultDocumentationUrl(getRelease(sdk))
 
-    override fun getHomeChooserDescriptor(): FileChooserDescriptor {
-        val descriptor: FileChooserDescriptor =
-            object : FileChooserDescriptor(false, true, false, false, false, false) {
-                override fun validateSelectedFiles(files: Array<VirtualFile>) {
-                    files.firstOrNull()?.let { validateSdkHomePath(it) }
-                }
-            }
-        descriptor.title = ProjectBundle.message("sdk.configure.home.title", presentableName)
-        return descriptor
-    }
+    override fun getHomeChooserDescriptor(): FileChooserDescriptor =
+        org.elixir_lang.sdk.Type.createHomeChooserDescriptor(presentableName, ::validateSdkHomePath)
 
     override fun getIcon(): Icon = Icons.LANGUAGE
 
@@ -197,6 +189,7 @@ ELIXIR_SDK_HOME
     ): String {
         val source = HomePath.detectSource(sdkHome)
         val version = Release.fromString(File(sdkHome).name)?.version()
+        val wslInstance = wslCompat.getDistributionByWindowsUncPath(sdkHome)?.msId
         return buildString {
             if (source != null) {
                 append(source).append(" ")
@@ -207,17 +200,19 @@ ELIXIR_SDK_HOME
             } else {
                 append("at ").append(sdkHome)
             }
+
+            if (wslInstance != null) {
+                append(" (WSL: ").append(wslInstance).append(")")
+            }
         }
     }
 
     private fun validateSdkHomePath(virtualFile: VirtualFile) {
         val selectedPath = virtualFile.path
-        var valid = isValidSdkHome(selectedPath)
+
+        val valid = isValidSdkHome(selectedPath)
         if (!valid) {
-            valid = isValidSdkHome(adjustSelectedSdkHome(selectedPath))
-            if (!valid) {
-                throw invalidSdkHomeException(virtualFile)
-            }
+            throw invalidSdkHomeException(virtualFile)
         }
     }
 
@@ -753,6 +748,7 @@ ELIXIR_SDK_HOME
         @JvmStatic
         val instance: Type
             get() = findInstance(Type::class.java)
+
 
         /**
          * Checks if the Elixir SDK's classpath contains entries from the Erlang SDK.
