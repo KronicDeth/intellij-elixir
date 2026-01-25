@@ -38,7 +38,7 @@ object Notifier {
                 NotificationType.ERROR
             )
             .addAction(Action(project, module))
-            .notify(project);
+            .notify(project)
     }
 
 
@@ -78,7 +78,7 @@ object Notifier {
             .getInstance()
             .getNotificationGroup("Elixir")
             .createNotification(
-                "Elixir SDK Paths Refreshed",
+                "Elixir SDK paths refreshed",
                 message,
                 NotificationType.INFORMATION
             )
@@ -102,8 +102,70 @@ object Notifier {
             .getInstance()
             .getNotificationGroup("Elixir")
             .createNotification(
-                "Elixir SDK Refresh Failed",
+                "Elixir SDK refresh failed",
                 "Failed to refresh SDK paths: $errorMessage",
+                NotificationType.ERROR
+            )
+            .notify(project)
+    }
+
+    // Mix Dependencies notification methods
+    fun mixDepsOutdated(project: Project) {
+        NotificationGroupManager
+            .getInstance()
+            .getNotificationGroup("Elixir")
+            .createNotification(
+                "Mix dependencies outdated",
+                "The deps/ is folder missing or mix.lock is newer than the deps/ folder",
+                NotificationType.WARNING
+            )
+            .addAction(org.elixir_lang.notification.mix_deps.InstallAction())
+            .notify(project)
+    }
+
+    fun mixDepsInstallSuccess(project: Project) {
+        NotificationGroupManager
+            .getInstance()
+            .getNotificationGroup("Elixir")
+            .createNotification(
+                "Mix dependencies installed",
+                "Successfully installed hex, rebar, and fetched dependencies",
+                NotificationType.INFORMATION
+            )
+            .notify(project)
+    }
+
+    fun mixDepsInstallError(project: Project, errorMessage: String) {
+        NotificationGroupManager
+            .getInstance()
+            .getNotificationGroup("Elixir")
+            .createNotification(
+                "Mix Dependencies installation failed",
+                "Failed to install dependencies: $errorMessage",
+                NotificationType.ERROR
+            )
+            .notify(project)
+    }
+
+    fun mixDepsNoSdk(project: Project) {
+        NotificationGroupManager
+            .getInstance()
+            .getNotificationGroup("Elixir")
+            .createNotification(
+                "No Elixir SDK found",
+                "Please configure an Elixir SDK for this project before installing dependencies",
+                NotificationType.ERROR
+            )
+            .notify(project)
+    }
+
+    fun mixDepsError(project: Project, errorMessage: String) {
+        NotificationGroupManager
+            .getInstance()
+            .getNotificationGroup("Elixir")
+            .createNotification(
+                "Mix dependencies error",
+                errorMessage,
                 NotificationType.ERROR
             )
             .notify(project)

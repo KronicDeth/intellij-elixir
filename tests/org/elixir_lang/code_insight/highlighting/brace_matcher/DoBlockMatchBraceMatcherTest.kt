@@ -2,10 +2,10 @@ package org.elixir_lang.code_insight.highlighting.brace_matcher
 
 import com.intellij.codeInsight.highlighting.BraceMatchingUtil
 import com.intellij.openapi.editor.ex.EditorEx
-import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import org.elixir_lang.ElixirFileType
+import org.elixir_lang.PlatformTestCase
 
-class DoBlockMatchBraceMatcherTest : BasePlatformTestCase() {
+class DoBlockMatchBraceMatcherTest : PlatformTestCase() {
 
     fun testDoBlockDiagnostic() {
         myFixture.configureByFile("do_block.ex")
