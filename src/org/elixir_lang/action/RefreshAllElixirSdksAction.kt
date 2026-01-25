@@ -50,23 +50,23 @@ class RefreshAllElixirSdksAction : AnAction(
         ) {
             val elixirSdkType = ElixirSdkType.instance
 
-            // Refresh all Elixir SDKs
-            for (elixirSdk in allElixirSdks) {
+            // Refresh all Erlang SDKs first so that the Elixir refresh picks up the freshest paths.
+            for (erlangSdk in allErlangSdks) {
                 try {
-                    refreshSingleElixirSdk(elixirSdk, elixirSdkType)
-                    refreshedElixirCount++
-                } catch (ex: Exception) {
+                    refreshSingleErlangSdk(erlangSdk, erlangSdk.sdkType as ErlangSdkType)
+                    refreshedErlangCount++
+                } catch (_: Exception) {
                     // Continue with other SDKs if one fails
                     continue
                 }
             }
 
-            // Refresh all Erlang SDKs
-            for (erlangSdk in allErlangSdks) {
+            // Refresh all Elixir SDKs
+            for (elixirSdk in allElixirSdks) {
                 try {
-                    refreshSingleErlangSdk(erlangSdk, erlangSdk.sdkType as ErlangSdkType)
-                    refreshedErlangCount++
-                } catch (ex: Exception) {
+                    refreshSingleElixirSdk(elixirSdk, elixirSdkType)
+                    refreshedElixirCount++
+                } catch (_: Exception) {
                     // Continue with other SDKs if one fails
                     continue
                 }
