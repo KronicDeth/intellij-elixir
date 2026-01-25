@@ -31,5 +31,16 @@
         <applicationService serviceInterface="org.elixir_lang.configuration.BeforeRunTaskProvider"
                             serviceImplementation="org.elixir_lang.configuration.JpsBeforeRunTaskProvider"
                             overrides="true"/>
+        <applicationService serviceInterface="org.elixir_lang.sdk.elixir.SdkSettingsOpener"
+                            serviceImplementation="org.elixir_lang.sdk.elixir.ProjectStructureSdkSettingsOpener"
+                            overrides="true"/>
     </extensions>
+    <actions>
+        <!--suppress PluginXmlCapitalization -->
+        <action id="Elixir.OpenElixirProjectStructureSdks"
+                class="org.elixir_lang.action.OpenElixirProjectStructureSdksAction"
+                text="Configure Elixir SDKs"
+                icon="AllIcons.General.ProjectStructure"
+                description="Configure Elixir SDKs in Project Structure"/>
+    </actions>
 </idea-plugin>

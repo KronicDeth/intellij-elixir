@@ -3,13 +3,12 @@ package org.elixir_lang.code_insight.completion.contributor;
 import com.intellij.codeInsight.completion.CompletionType;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementPresentation;
-import com.intellij.testFramework.fixtures.BasePlatformTestCase;
+import org.elixir_lang.PlatformTestCase;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class CallDefinitionClauseTest extends BasePlatformTestCase {
+public class CallDefinitionClauseTest extends PlatformTestCase {
     /*
      * Tests
      */
@@ -81,6 +80,7 @@ public class CallDefinitionClauseTest extends BasePlatformTestCase {
         LookupElement[] lookupElements = myFixture.getLookupElements();
 
         LookupElementPresentation lookupElementPresentation = new LookupElementPresentation();
+        assertNotNull(lookupElements);
         lookupElements[0].renderElement(lookupElementPresentation);
         assertEquals("source", lookupElementPresentation.getItemText());
         assertEquals(" (defdelegate.ex defmodule Defdelegate)", lookupElementPresentation.getTailText());
@@ -109,6 +109,7 @@ public class CallDefinitionClauseTest extends BasePlatformTestCase {
         LookupElement[] lookupElements = myFixture.getLookupElements();
 
         LookupElementPresentation lookupElementPresentation = new LookupElementPresentation();
+        assertNotNull(lookupElements);
         lookupElements[0].renderElement(lookupElementPresentation);
         assertEquals("function_from_file_sample", lookupElementPresentation.getItemText());
         assertEquals(" (eex_function.ex defmodule EExFunction)", lookupElementPresentation.getTailText());
@@ -133,6 +134,7 @@ public class CallDefinitionClauseTest extends BasePlatformTestCase {
         LookupElement[] lookupElements = myFixture.getLookupElements();
 
         LookupElementPresentation lookupElementPresentation = new LookupElementPresentation();
+        assertNotNull(lookupElements);
         lookupElements[0].renderElement(lookupElementPresentation);
         assertEquals("exception", lookupElementPresentation.getItemText());
         assertEquals("(message)", lookupElementPresentation.getTailText());
@@ -162,6 +164,7 @@ public class CallDefinitionClauseTest extends BasePlatformTestCase {
         LookupElement[] lookupElements = myFixture.getLookupElements();
 
         LookupElementPresentation lookupElementPresentation = new LookupElementPresentation();
+        assertNotNull(lookupElements);
         lookupElements[0].renderElement(lookupElementPresentation);
         assertEquals("error_text", lookupElementPresentation.getItemText());
         assertEquals("()", lookupElementPresentation.getTailText());

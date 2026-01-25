@@ -1,17 +1,13 @@
 package org.elixir_lang.code_insight.highlighting.brace_matcher;
 
-import com.intellij.codeInsight.highlighting.BraceMatcher;
 import com.intellij.codeInsight.highlighting.BraceMatchingUtil;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.editor.highlighter.HighlighterIterator;
 import com.intellij.openapi.fileTypes.FileType;
-import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import org.elixir_lang.ElixirFileType;
+import org.elixir_lang.PlatformTestCase;
 
-import static com.intellij.codeInsight.highlighting.BraceMatchingUtil.getBraceMatcher;
-
-public class Issue443 extends BasePlatformTestCase {
+public class Issue443Test extends PlatformTestCase {
     /*
      * Tests
      */
@@ -51,7 +47,7 @@ public class Issue443 extends BasePlatformTestCase {
         Editor editor = myFixture.getEditor();
         CharSequence text = editor.getDocument().getCharsSequence();
         FileType fileType = ElixirFileType.INSTANCE;
-        HighlighterIterator iterator = ((EditorEx) editor).getHighlighter().createIterator(offset);
+        HighlighterIterator iterator = editor.getHighlighter().createIterator(offset);
 
         return BraceMatchingUtil.isLBraceToken(iterator, text, fileType);
     }

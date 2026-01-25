@@ -3,10 +3,10 @@ package org.elixir_lang.reference.module.`as`
 import com.intellij.codeInsight.completion.CompletionType
 import com.intellij.openapi.util.Disposer
 import com.intellij.psi.PsiPolyVariantReference
-import com.intellij.testFramework.fixtures.BasePlatformTestCase
+import org.elixir_lang.PlatformTestCase
 import org.elixir_lang.psi.QualifiedAlias
 
-class NestedTest : BasePlatformTestCase() {
+class NestedTest : PlatformTestCase() {
     fun testCompletion() {
         myFixture.configureByFiles("completion.ex", "suffix.ex", "nested.ex")
         myFixture.complete(CompletionType.BASIC, 1)
