@@ -1,0 +1,48 @@
+# Treat everything as text by default and normalize to LF.
+* text=auto eol=lf
+
+###############################################################################
+# WINDOWS COMPATIBILITY OVERRIDE
+###############################################################################
+# Force CRLF for files that Windows Command Prompt specifically requires.
+*.bat           text eol=crlf
+*.cmd           text eol=crlf
+*.ps1           text eol=crlf
+
+# Protect CRLF Test Data - These MUST remain CRLF or the tests will fail
+*WithCRLF.eex binary
+EOLWindows.ex binary
+
+###############################################################################
+# BINARY LIST
+###############################################################################
+# We use the 'binary' macro (shorthand for -text -diff -merge).
+
+# --- Images ---
+*.{jpg,JPG,jpeg,JPEG,png,PNG,gif,GIF,webp,WEBP,ico,ICO,svgz,SVGZ} binary
+*.{psd,PSD,ai,AI,eps,EPS,tif,TIF,tiff,TIFF,raw,RAW} binary
+
+# --- Audio & Video ---
+*.{mp3,MP3,wav,WAV,ogg,OGG,flac,FLAC,m4a,M4A} binary
+*.{mp4,MP4,mov,MOV,avi,AVI,mkv,MKV,webm,WEBM,flv,FLV} binary
+
+# --- Compiled Assets & Virtual Machines ---
+*.{exe,EXE,dll,DLL,so,SO,dylib,DYLIB} binary
+*.{bin,BIN,dat,DAT,iso,ISO,vmdk,VMDK} binary
+*.{beam,BEAM,pyc,PYC,class,CLASS} binary
+
+# --- Archives & Compressed Files ---
+*.{zip,ZIP,7z,7Z,rar,RAR,tar,TAR,gz,GZ,bz2,BZ2} binary
+*.{jar,JAR,war,WAR,ear,EAR} binary
+
+# --- Fonts ---
+*.{ttf,TTF,otf,OTF,woff,WOFF,woff2,WOFF2,eot,EOT} binary
+
+# --- Documents (Office & PDF) ---
+# Note: These are ZIP-based formats; Git must not touch them.
+*.{pdf,PDF,doc,DOC,docx,DOCX,xls,XLS,xlsx,XLSX,ppt,PPT,pptx,PPTX} binary
+
+# --- IDE & Database Specific ---
+*.{sqlite,SQLITE,db,DB} binary
+*.{pbxproj,PBXPROJ} binary
+
