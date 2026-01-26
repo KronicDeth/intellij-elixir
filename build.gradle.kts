@@ -316,8 +316,8 @@ dependencies {
         testFramework(TestFrameworkType.JUnit5, configurationName = "testUIImplementation")
     }
 
-    implementation(project(":jps-builder"))
     implementation(project(":jps-shared"))
+    runtimeOnly(project(":jps-builder"))
     implementation(files("lib/OtpErlang.jar"))
     implementation(libCommonsIo)
 
