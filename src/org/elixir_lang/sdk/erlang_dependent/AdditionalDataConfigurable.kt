@@ -369,7 +369,12 @@ class AdditionalDataConfigurable(
 
                 if (erlangSdk != null && erlangSdk.name == previousName) {
                     LOG.debug("[updateErlangSdkList] Updating ${currentSdk.name} to use renamed Erlang SDK")
-                    sdkAdditionalData.setErlangSdk(sdk)
+                    val newAdditionalData = SdkAdditionalData(sdk, currentSdk)
+                    val modificator = currentSdk.sdkModificator
+                    modificator.sdkAdditionalData = newAdditionalData
+                    ApplicationManager.getApplication().runWriteAction {
+                        modificator.commitChanges()
+                    }
                 }
             }
         }
