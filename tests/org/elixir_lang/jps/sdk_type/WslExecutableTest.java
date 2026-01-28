@@ -2,7 +2,7 @@ package org.elixir_lang.jps.sdk_type;
 
 import com.intellij.openapi.util.SystemInfo;
 import junit.framework.TestCase;
-import org.elixir_lang.jps.HomePath;
+import org.elixir_lang.sdk.HomePath;
 
 import java.io.File;
 public class WslExecutableTest extends TestCase {
@@ -12,7 +12,7 @@ public class WslExecutableTest extends TestCase {
      */
     public void testErlang_GetByteCodeInterpreterExecutable() {
         String sdkHome = SystemInfo.isWindows ? "C:\\Erlang" : "/usr/lib/erlang";
-        File executable = Erlang.getByteCodeInterpreterExecutable(sdkHome);
+        File executable = Erlang.getByteCodeInterpreterExecutable(sdkHome, false);
 
         assertTrue("Path should include bin", executable.getPath().contains("bin"));
         String expectedName = SystemInfo.isWindows ? "erl.exe" : "erl";
