@@ -21,7 +21,7 @@ import java.util.List;
 
 /**
  * Created by zyuyou on 2015/5/27.
- * https://github.com/ignatov/intellij-erlang/blob/master/jps-shared/src/org/intellij/erlang/jps/model/JpsErlangModelSerializerExtension.java
+ * <a href="https://github.com/ignatov/intellij-erlang/blob/master/jps-shared/src/org/intellij/erlang/jps/model/JpsErlangModelSerializerExtension.java">...</a>
  */
 public class SerializerExtension extends JpsModelSerializerExtension {
     public static final Logger LOGGER = Logger.getInstance(SerializerExtension.class);
@@ -41,11 +41,14 @@ public class SerializerExtension extends JpsModelSerializerExtension {
     @NotNull
     @Override
     public List<JpsSdkPropertiesSerializer<SdkProperties>> getSdkPropertiesSerializers() {
-        return Collections.singletonList(new JpsSdkPropertiesSerializer<SdkProperties>(ELIXIR_SDK_TYPE_ID, Elixir.INSTANCE) {
+        return Collections.singletonList(new JpsSdkPropertiesSerializer<>(ELIXIR_SDK_TYPE_ID, Elixir.INSTANCE) {
             @NotNull
             @Override
             public SdkProperties loadProperties(@Nullable Element propertiesElement) {
                 String erlangSdkName = null;
+                String mixHome = null;
+                String mixHomeReplacePrefix = null;
+                boolean wslUncPath = false;
 
                 if (propertiesElement != null) {
                     @Nullable Attribute erlangSdkNameAttribute = propertiesElement.getAttribute("erlang-sdk-name");
@@ -53,9 +56,24 @@ public class SerializerExtension extends JpsModelSerializerExtension {
                     if (erlangSdkNameAttribute != null) {
                         erlangSdkName = erlangSdkNameAttribute.getValue();
                     }
+
+                    @Nullable Attribute mixHomeAttribute = propertiesElement.getAttribute("mix-home");
+                    if (mixHomeAttribute != null) {
+                        mixHome = mixHomeAttribute.getValue();
+                    }
+
+                    @Nullable Attribute mixHomeReplacePrefixAttribute = propertiesElement.getAttribute("mix-home-replace-prefix");
+                    if (mixHomeReplacePrefixAttribute != null) {
+                        mixHomeReplacePrefix = mixHomeReplacePrefixAttribute.getValue();
+                    }
+
+                    @Nullable Attribute wslUncPathAttribute = propertiesElement.getAttribute("wsl-unc-path");
+                    if (wslUncPathAttribute != null) {
+                        wslUncPath = Boolean.parseBoolean(wslUncPathAttribute.getValue());
+                    }
                 }
 
-                return new SdkProperties(erlangSdkName);
+                return new SdkProperties(erlangSdkName, mixHome, mixHomeReplacePrefix, wslUncPath);
             }
 
             @Override
