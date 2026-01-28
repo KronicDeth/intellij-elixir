@@ -159,7 +159,8 @@ public class Builder extends TargetBuilder<SourceRootDescriptor, Target> {
         // get executable
         JpsModule module = target.getModule();
         JpsSdk<SdkProperties> sdk = BuilderUtil.getSdk(context, module);
-        File executable = Elixir.getByteCodeCompilerExecutable(sdk.getHomePath());
+        SdkProperties sdkProperties = sdk.getSdkProperties();
+        File executable = Elixir.getByteCodeCompilerExecutable(sdk.getHomePath(), sdkProperties);
 
         List<String> compileFilePaths = getCompileFilePaths(module, target, context, absolutePaths);
 
@@ -277,19 +278,22 @@ public class Builder extends TargetBuilder<SourceRootDescriptor, Target> {
 
     /*** doBuildWithMix related private methods */
     @NotNull
-    private static String erlangSdkLibraryToErlExePath(@NotNull JpsLibrary erlangSdkLibrary) throws FileNotFoundException, AccessDeniedException {
-        return erlangJpsSdkToErlExePath((JpsSdk) erlangSdkLibrary.getProperties());
+    private static String erlangSdkLibraryToErlExePath(@NotNull JpsLibrary erlangSdkLibrary, boolean wslUncPath)
+            throws FileNotFoundException, AccessDeniedException {
+        return erlangJpsSdkToErlExePath((JpsSdk) erlangSdkLibrary.getProperties(), wslUncPath);
     }
 
     @NotNull
-    private static String erlangSdkNameToErlExePath(@NotNull String erlangSdkName, @NotNull JpsModule module) throws LibraryNotFound, FileNotFoundException, AccessDeniedException {
+    private static String erlangSdkNameToErlExePath(@NotNull String erlangSdkName,
+                                                    @NotNull JpsModule module,
+                                                    boolean wslUncPath) throws LibraryNotFound, FileNotFoundException, AccessDeniedException {
         JpsLibraryCollection libraryCollection = module.getProject().getModel().getGlobal().getLibraryCollection();
         JpsLibrary erlangSdkLibrary = libraryCollection.findLibrary(erlangSdkName);
 
         String erlExePath;
 
         if (erlangSdkLibrary != null) {
-            erlExePath = erlangSdkLibraryToErlExePath(erlangSdkLibrary);
+            erlExePath = erlangSdkLibraryToErlExePath(erlangSdkLibrary, wslUncPath);
         } else {
             throw new LibraryNotFound(erlangSdkName);
         }
@@ -298,12 +302,12 @@ public class Builder extends TargetBuilder<SourceRootDescriptor, Target> {
     }
 
     @NotNull
-    public static String erlangHomePathToErlExePath(@Nullable String erlangHomePath) throws
+    public static String erlangHomePathToErlExePath(@Nullable String erlangHomePath, boolean wslUncPath) throws
             AccessDeniedException, FileNotFoundException {
         String erlExePath;
 
         if (erlangHomePath != null) {
-            erlExePath = Erlang.homePathToErlExePath(erlangHomePath);
+            erlExePath = Erlang.homePathToErlExePath(erlangHomePath, wslUncPath);
         } else {
             throw new FileNotFoundException("Erlang SDK home path is not set");
         }
@@ -312,9 +316,10 @@ public class Builder extends TargetBuilder<SourceRootDescriptor, Target> {
     }
 
     @NotNull
-    private static String erlangJpsSdkToErlExePath(@NotNull JpsSdk erlangSdk) throws FileNotFoundException, AccessDeniedException {
+    private static String erlangJpsSdkToErlExePath(@NotNull JpsSdk erlangSdk, boolean wslUncPath)
+            throws FileNotFoundException, AccessDeniedException {
         String erlangHomePath = erlangSdk.getHomePath();
-        return erlangHomePathToErlExePath(erlangHomePath);
+        return erlangHomePathToErlExePath(erlangHomePath, wslUncPath);
     }
 
     private static void prependCodePaths(@NotNull GeneralCommandLine commandLine, @NotNull JpsSdk sdk) {
@@ -336,7 +341,7 @@ public class Builder extends TargetBuilder<SourceRootDescriptor, Target> {
     private static String sdkPropertiesToErlExePath(@NotNull SdkProperties sdkProperties, @NotNull JpsModule module) throws ErlangSdkNameMissing, FileNotFoundException, AccessDeniedException, LibraryNotFound {
         String erlangSdkName = sdkProperties.ensureErlangSdkName();
 
-        return erlangSdkNameToErlExePath(erlangSdkName, module);
+        return erlangSdkNameToErlExePath(erlangSdkName, module, sdkProperties.isWslUncPath());
     }
 
     @NotNull
@@ -373,7 +378,7 @@ public class Builder extends TargetBuilder<SourceRootDescriptor, Target> {
 
     private static void addMix(@NotNull GeneralCommandLine commandLine, @NotNull JpsSdk<SdkProperties> sdk) throws MissingHomePath {
         String mixPath = Elixir.mixPath(sdk);
-        Elixir.maybeUpdateMixHome(commandLine.getEnvironment(), sdk.getHomePath());
+        Elixir.maybeUpdateMixHome(commandLine.getEnvironment(), sdk.getSdkProperties());
         commandLine.addParameter(mixPath);
     }
 
