@@ -17,7 +17,7 @@ import com.intellij.ui.awt.RelativePoint
 import com.intellij.util.messages.MessageBusConnection
 import com.intellij.util.ui.JBUI
 import org.elixir_lang.Icons
-import org.elixir_lang.jps.HomePath
+import org.elixir_lang.sdk.HomePath
 import org.elixir_lang.sdk.elixir.SdkSettingsOpener
 import org.elixir_lang.sdk.elixir.Type
 import org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData

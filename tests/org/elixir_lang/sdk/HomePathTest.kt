@@ -1,4 +1,4 @@
-package org.elixir_lang.jps
+package org.elixir_lang.sdk
 
 import com.intellij.openapi.util.SystemInfo
 import org.elixir_lang.PlatformTestCase
