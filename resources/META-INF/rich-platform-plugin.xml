@@ -21,15 +21,28 @@
         <projectOpenProcessor implementation="org.elixir_lang.mix.project.OpenProcessor"/>
 
         <!-- Specifies semicolon-separated list of paths which should be added to the classpath of the compile server -->
-        <compileServer.plugin classpath="jps-builder.jar;jps-shared.jar"/>
+        <compileServer.plugin classpath="intellij-elixir.jps-builder.jar;intellij-elixir.jps-shared.jar"/>
 
         <!-- project compiler configurable -->
         <projectConfigurable instance="org.elixir_lang.configuration.ElixirCompilerOptionsConfigurable"
                              parentId="project.propCompiler" id="Elixir Compiler" displayName="Elixir Compiler"/>
         <projectService serviceImplementation="org.elixir_lang.configuration.ElixirCompilerSettings"/>
 
+        <postStartupActivity implementation="org.elixir_lang.sdk.SdkTableListenerStartupActivity"/>
+
         <applicationService serviceInterface="org.elixir_lang.configuration.BeforeRunTaskProvider"
                             serviceImplementation="org.elixir_lang.configuration.JpsBeforeRunTaskProvider"
                             overrides="true"/>
+        <applicationService serviceInterface="org.elixir_lang.sdk.elixir.SdkSettingsOpener"
+                            serviceImplementation="org.elixir_lang.sdk.elixir.ProjectStructureSdkSettingsOpener"
+                            overrides="true"/>
     </extensions>
+    <actions>
+        <!--suppress PluginXmlCapitalization -->
+        <action id="Elixir.OpenElixirProjectStructureSdks"
+                class="org.elixir_lang.action.OpenElixirProjectStructureSdksAction"
+                text="Configure Elixir SDKs"
+                icon="AllIcons.General.ProjectStructure"
+                description="Configure Elixir SDKs in Project Structure"/>
+    </actions>
 </idea-plugin>

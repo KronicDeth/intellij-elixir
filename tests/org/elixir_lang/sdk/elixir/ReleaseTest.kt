@@ -1,14 +1,13 @@
 package org.elixir_lang.sdk.elixir
 
-import org.junit.Assert.*
-import org.junit.Test
+import org.elixir_lang.PlatformTestCase
+import org.junit.Assert.assertNotEquals
 
 /**
  * Tests for Elixir Release parsing and formatting.
  */
-class ReleaseTest {
+class ReleaseTest: PlatformTestCase() {
 
-    @Test
     fun testFromString_simpleVersion() {
         val release = Release.fromString("1.15.7")
         assertNotNull(release)
@@ -16,7 +15,6 @@ class ReleaseTest {
         assertEquals("15", release.minor)
     }
 
-    @Test
     fun testFromString_versionWithOtp() {
         val release = Release.fromString("1.15.7-otp-26")
         assertNotNull(release)
@@ -24,7 +22,6 @@ class ReleaseTest {
         assertEquals("15", release.minor)
     }
 
-    @Test
     fun testFromString_majorOnly() {
         val release = Release.fromString("1")
         assertNotNull(release)
@@ -32,32 +29,27 @@ class ReleaseTest {
         assertNull(release.minor)
     }
 
-    @Test
     fun testFromString_invalid() {
         assertNull(Release.fromString("invalid"))
         assertNull(Release.fromString(""))
         assertNull(Release.fromString(null))
     }
 
-    @Test
     fun testVersion_simple() {
         val release = Release.fromString("1.15.7")
         assertEquals("1.15.7", release!!.version())
     }
 
-    @Test
     fun testVersion_withOtp() {
         val release = Release.fromString("1.15.7-otp-26")
         assertEquals("1.15.7-otp-26", release!!.version())
     }
 
-    @Test
     fun testToString_includesElixirPrefix() {
         val release = Release.fromString("1.15.7")
         assertEquals("Elixir 1.15.7", release!!.toString())
     }
 
-    @Test
     fun testToString_vs_version() {
         // toString() includes "Elixir" prefix, version() does not
         val release = Release.fromString("1.15.7")
@@ -66,28 +58,24 @@ class ReleaseTest {
         assertFalse(release.version().contains("Elixir"))
     }
 
-    @Test
     fun testCompareTo_greaterMajor() {
         val older = Release.fromString("1.14.0")
         val newer = Release.fromString("2.0.0")
         assertTrue(newer!! > older!!)
     }
 
-    @Test
     fun testCompareTo_greaterMinor() {
         val older = Release.fromString("1.14.0")
         val newer = Release.fromString("1.15.0")
         assertTrue(newer!! > older!!)
     }
 
-    @Test
     fun testCompareTo_greaterPatch() {
         val older = Release.fromString("1.15.6")
         val newer = Release.fromString("1.15.7")
         assertTrue(newer!! > older!!)
     }
 
-    @Test
     fun testCompareTo_equal() {
         val a = Release.fromString("1.15.7")
         val b = Release.fromString("1.15.7")

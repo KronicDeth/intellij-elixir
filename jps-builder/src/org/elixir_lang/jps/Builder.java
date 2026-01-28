@@ -43,15 +43,15 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.AccessDeniedException;
 import java.util.*;
 
+import static com.intellij.util.io.URLUtil.extractPath;
+
 /**
- * https://github.com/ignatov/intellij-erlang/blob/master/jps-plugin/src/org/intellij/erlang/jps/builder/ErlangBuilder.java
- * https://github.com/ignatov/intellij-erlang/tree/master/jps-plugin/src/org/intellij/erlang/jps/rebar
+ * <a href="https://github.com/ignatov/intellij-erlang/blob/master/jps-plugin/src/org/intellij/erlang/jps/builder/ErlangBuilder.java">...</a>
+ * <a href="https://github.com/ignatov/intellij-erlang/tree/master/jps-plugin/src/org/intellij/erlang/jps/rebar">...</a>
  */
 public class Builder extends TargetBuilder<SourceRootDescriptor, Target> {
     public static final String BUILDER_NAME = "Elixir Builder";
@@ -100,17 +100,20 @@ public class Builder extends TargetBuilder<SourceRootDescriptor, Target> {
     private static void doBuildWithMix(Target target,
                                        CompileContext context,
                                        JpsModule module,
-                                       CompilerOptions compilerOptions) throws ProjectBuildException, IOException {
+                                       CompilerOptions compilerOptions) throws ProjectBuildException {
         JpsSdk<SdkProperties> sdk = BuilderUtil.getSdk(context, module);
 
         for (String contentRootUrl : module.getContentRootsList().getUrls()) {
-            String contentRootPath = new URL(contentRootUrl).getPath();
+            String contentRootPath = extractPath(contentRootUrl);
             File contentRootDir = new File(contentRootPath);
+
             File mixConfigFile = new File(contentRootDir, MIX_CONFIG_FILE_NAME);
-            if (!mixConfigFile.exists()) continue;
+
+            if (!mixConfigFile.exists()) {
+                continue;
+            }
 
             String task = target.isTests() ? "test" : "compile";
-
             runMix(sdk, module, contentRootPath, task, compilerOptions, context);
         }
     }
@@ -156,7 +159,8 @@ public class Builder extends TargetBuilder<SourceRootDescriptor, Target> {
         // get executable
         JpsModule module = target.getModule();
         JpsSdk<SdkProperties> sdk = BuilderUtil.getSdk(context, module);
-        File executable = Elixir.getByteCodeCompilerExecutable(sdk.getHomePath());
+        SdkProperties sdkProperties = sdk.getSdkProperties();
+        File executable = Elixir.getByteCodeCompilerExecutable(sdk.getHomePath(), sdkProperties);
 
         List<String> compileFilePaths = getCompileFilePaths(module, target, context, absolutePaths);
 
@@ -179,15 +183,13 @@ public class Builder extends TargetBuilder<SourceRootDescriptor, Target> {
             return getCompileFilePathsDefault(module, target);
         }
 
-        List<String> absolutePathList = new ArrayList<>(absolutePaths);
-
         // force build files
-        return absolutePathList;
+        return new ArrayList<>(absolutePaths);
     }
 
     @NotNull
     private static List<String> getCompileFilePathsDefault(@NotNull JpsModule module, @NotNull Target target) {
-        CommonProcessors.CollectProcessor<File> exFilesCollector = new CommonProcessors.CollectProcessor<File>() {
+        CommonProcessors.CollectProcessor<File> exFilesCollector = new CommonProcessors.CollectProcessor<>() {
             @Override
             protected boolean accept(File file) {
                 return !file.isDirectory() && FileUtilRt.extensionEquals(file.getName(), ELIXIR_SOURCE_EXTENSION);
@@ -235,8 +237,7 @@ public class Builder extends TargetBuilder<SourceRootDescriptor, Target> {
         addedModules.add(module);
 
         for (JpsDependencyElement dependency : module.getDependenciesList().getDependencies()) {
-            if (!(dependency instanceof JpsModuleDependency)) continue;
-            JpsModuleDependency moduleDependency = (JpsModuleDependency) dependency;
+            if (!(dependency instanceof JpsModuleDependency moduleDependency)) continue;
             JpsModule depModule = moduleDependency.getModule();
             if (depModule != null) {
                 collectDependentModules(depModule, addedModules, addedModuleNames);
@@ -252,12 +253,8 @@ public class Builder extends TargetBuilder<SourceRootDescriptor, Target> {
         File outputDirectory = getBuildOutputDirectory(module, forTests, context);
         commandLine.addParameters(ADD_PATH_TO_FRONT_OF_CODE_PATH, outputDirectory.getPath());
         for (String rootUrl : module.getContentRootsList().getUrls()) {
-            try {
-                String path = new URL(rootUrl).getPath();
-                commandLine.addParameters(ADD_PATH_TO_FRONT_OF_CODE_PATH, path);
-            } catch (MalformedURLException e) {
-                context.processMessage(new CompilerMessage(ElIXIRC_NAME, BuildMessage.Kind.ERROR, "Failed to find content root for module: " + module.getName()));
-            }
+            String path = extractPath(rootUrl);
+            commandLine.addParameters(ADD_PATH_TO_FRONT_OF_CODE_PATH, path);
         }
     }
 
@@ -280,33 +277,23 @@ public class Builder extends TargetBuilder<SourceRootDescriptor, Target> {
     }
 
     /*** doBuildWithMix related private methods */
-
-    @Nullable
-    private static String elixirSdkToElixirExePath(@NotNull JpsSdk elixirSdk) {
-        String elixirHomePath = elixirSdk.getHomePath();
-        String elixirExePath = null;
-
-        if (elixirHomePath != null) {
-            elixirExePath = Elixir.homePathToElixirExePath(elixirHomePath);
-        }
-
-        return elixirExePath;
+    @NotNull
+    private static String erlangSdkLibraryToErlExePath(@NotNull JpsLibrary erlangSdkLibrary, boolean wslUncPath)
+            throws FileNotFoundException, AccessDeniedException {
+        return erlangJpsSdkToErlExePath((JpsSdk) erlangSdkLibrary.getProperties(), wslUncPath);
     }
 
     @NotNull
-    private static String erlangSdkLibraryToErlExePath(@NotNull JpsLibrary erlangSdkLibrary) throws FileNotFoundException, AccessDeniedException {
-        return erlangJpsSdkToErlExePath((JpsSdk) erlangSdkLibrary.getProperties());
-    }
-
-    @NotNull
-    private static String erlangSdkNameToErlExePath(@NotNull String erlangSdkName, @NotNull JpsModule module) throws LibraryNotFound, FileNotFoundException, AccessDeniedException {
+    private static String erlangSdkNameToErlExePath(@NotNull String erlangSdkName,
+                                                    @NotNull JpsModule module,
+                                                    boolean wslUncPath) throws LibraryNotFound, FileNotFoundException, AccessDeniedException {
         JpsLibraryCollection libraryCollection = module.getProject().getModel().getGlobal().getLibraryCollection();
         JpsLibrary erlangSdkLibrary = libraryCollection.findLibrary(erlangSdkName);
 
         String erlExePath;
 
         if (erlangSdkLibrary != null) {
-            erlExePath = erlangSdkLibraryToErlExePath(erlangSdkLibrary);
+            erlExePath = erlangSdkLibraryToErlExePath(erlangSdkLibrary, wslUncPath);
         } else {
             throw new LibraryNotFound(erlangSdkName);
         }
@@ -315,12 +302,12 @@ public class Builder extends TargetBuilder<SourceRootDescriptor, Target> {
     }
 
     @NotNull
-    public static String erlangHomePathToErlExePath(@Nullable String erlangHomePath) throws
+    public static String erlangHomePathToErlExePath(@Nullable String erlangHomePath, boolean wslUncPath) throws
             AccessDeniedException, FileNotFoundException {
         String erlExePath;
 
         if (erlangHomePath != null) {
-            erlExePath = Erlang.homePathToErlExePath(erlangHomePath);
+            erlExePath = Erlang.homePathToErlExePath(erlangHomePath, wslUncPath);
         } else {
             throw new FileNotFoundException("Erlang SDK home path is not set");
         }
@@ -329,9 +316,10 @@ public class Builder extends TargetBuilder<SourceRootDescriptor, Target> {
     }
 
     @NotNull
-    private static String erlangJpsSdkToErlExePath(@NotNull JpsSdk erlangSdk) throws FileNotFoundException, AccessDeniedException {
+    private static String erlangJpsSdkToErlExePath(@NotNull JpsSdk erlangSdk, boolean wslUncPath)
+            throws FileNotFoundException, AccessDeniedException {
         String erlangHomePath = erlangSdk.getHomePath();
-        return erlangHomePathToErlExePath(erlangHomePath);
+        return erlangHomePathToErlExePath(erlangHomePath, wslUncPath);
     }
 
     private static void prependCodePaths(@NotNull GeneralCommandLine commandLine, @NotNull JpsSdk sdk) {
@@ -343,7 +331,7 @@ public class Builder extends TargetBuilder<SourceRootDescriptor, Target> {
 
             assert url.startsWith(URL_PREFIX);
 
-            String path = url.substring(URL_PREFIX.length(), url.length());
+            String path = extractPath(url);
 
             commandLine.addParameters("-pa", path);
         }
@@ -353,7 +341,7 @@ public class Builder extends TargetBuilder<SourceRootDescriptor, Target> {
     private static String sdkPropertiesToErlExePath(@NotNull SdkProperties sdkProperties, @NotNull JpsModule module) throws ErlangSdkNameMissing, FileNotFoundException, AccessDeniedException, LibraryNotFound {
         String erlangSdkName = sdkProperties.ensureErlangSdkName();
 
-        return erlangSdkNameToErlExePath(erlangSdkName, module);
+        return erlangSdkNameToErlExePath(erlangSdkName, module, sdkProperties.isWslUncPath());
     }
 
     @NotNull
@@ -390,6 +378,7 @@ public class Builder extends TargetBuilder<SourceRootDescriptor, Target> {
 
     private static void addMix(@NotNull GeneralCommandLine commandLine, @NotNull JpsSdk<SdkProperties> sdk) throws MissingHomePath {
         String mixPath = Elixir.mixPath(sdk);
+        Elixir.maybeUpdateMixHome(commandLine.getEnvironment(), sdk.getSdkProperties());
         commandLine.addParameter(mixPath);
     }
 
@@ -499,7 +488,9 @@ public class Builder extends TargetBuilder<SourceRootDescriptor, Target> {
             return true;
         });
 
-        if (absolutePathsToCompile.isEmpty() && !holder.hasRemovedFiles()) return;
+        if (absolutePathsToCompile.isEmpty() && !holder.hasRemovedFiles()) {
+            return;
+        }
 
         JpsModule module = target.getModule();
         JpsProject project = module.getProject();
@@ -520,4 +511,5 @@ public class Builder extends TargetBuilder<SourceRootDescriptor, Target> {
     public String getPresentableName() {
         return BUILDER_NAME;
     }
+
 }

@@ -3,6 +3,7 @@ package org.elixir_lang
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.openapi.projectRoots.Sdk
 import org.elixir_lang.jps.sdk_type.Elixir
+import org.elixir_lang.sdk.HomePath
 
 object Mix {
     /**
@@ -16,8 +17,11 @@ object Mix {
             erlParameters: kotlin.collections.List<String> = emptyList(),
             elixirParameters: kotlin.collections.List<String> = emptyList()
     ): GeneralCommandLine {
+        val updatedEnvironment = environment.toMutableMap()
+        HomePath.maybeUpdateMixHome(updatedEnvironment, elixirSdk.homePath)
+
         val commandLine = org.elixir_lang.Elixir.commandLine(
-                environment,
+                updatedEnvironment,
                 workingDirectory,
                 elixirSdk,
                 erlParameters

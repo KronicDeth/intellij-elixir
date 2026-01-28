@@ -30,3 +30,7 @@ jps-shared/out
 libs/
 .intellijPlatform
 /.kotlin
+CLAUDE.md
+/.claude
+/.ai
+/.run

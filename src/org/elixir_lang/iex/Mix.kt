@@ -3,6 +3,7 @@ package org.elixir_lang.iex
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.openapi.projectRoots.Sdk
 import org.elixir_lang.jps.sdk_type.Elixir
+import org.elixir_lang.sdk.HomePath
 
 object Mix {
     fun commandLine(
@@ -12,7 +13,10 @@ object Mix {
             erlArgumentList: List<String>,
             iexArgumentList: List<String>
     ): GeneralCommandLine {
-        val commandLine = org.elixir_lang.IEx.commandLine(environment, workingDirectory, elixirSdk, erlArgumentList)
+        val updatedEnvironment = environment.toMutableMap()
+        HomePath.maybeUpdateMixHome(updatedEnvironment, elixirSdk.homePath)
+
+        val commandLine = org.elixir_lang.IEx.commandLine(updatedEnvironment, workingDirectory, elixirSdk, erlArgumentList)
         commandLine.addParameters(iexArgumentList)
         addMix(commandLine, elixirSdk)
 

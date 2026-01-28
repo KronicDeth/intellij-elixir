@@ -1,10 +1,10 @@
 package org.elixir_lang.reference.module
 
 import com.intellij.psi.PsiPolyVariantReference
-import com.intellij.testFramework.fixtures.BasePlatformTestCase
+import org.elixir_lang.PlatformTestCase
 import org.elixir_lang.psi.ElixirAlias
 
-class AsTest : BasePlatformTestCase() {
+class AsTest : PlatformTestCase() {
     /*
      * Tests
      */
