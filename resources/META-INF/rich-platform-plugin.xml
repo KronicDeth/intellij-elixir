@@ -28,6 +28,8 @@
                              parentId="project.propCompiler" id="Elixir Compiler" displayName="Elixir Compiler"/>
         <projectService serviceImplementation="org.elixir_lang.configuration.ElixirCompilerSettings"/>
 
+        <postStartupActivity implementation="org.elixir_lang.sdk.SdkTableListenerStartupActivity"/>
+
         <applicationService serviceInterface="org.elixir_lang.configuration.BeforeRunTaskProvider"
                             serviceImplementation="org.elixir_lang.configuration.JpsBeforeRunTaskProvider"
                             overrides="true"/>
