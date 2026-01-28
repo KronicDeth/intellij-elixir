@@ -20,7 +20,11 @@ import org.jetbrains.jps.model.module.JpsModule;
 import org.jetbrains.jps.util.JpsPathUtil;
 
 import java.io.*;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.function.Consumer;
 
 
 /**
@@ -214,7 +218,7 @@ public class BuilderTest extends JpsBuildTestCase {
                 .getGlobal()
                 .addSdk("Elixir " + elixirVersion(), elixirSdkHome(), elixirVersion(), Elixir.INSTANCE);
 
-        HomePath.eachEbinPath(elixirSdkHome(), ebinPath ->
+        eachEbinPath(elixirSdkHome(), ebinPath ->
                 elixirTypedLibrary.addRoot(
                         JpsPathUtil.pathToUrl(ebinPath.toAbsolutePath().toString()),
                         JpsOrderRootType.COMPILED
@@ -236,7 +240,7 @@ public class BuilderTest extends JpsBuildTestCase {
         JpsTypedLibrary<JpsSdk<JpsDummyElement>> erlangTypedLibrary = myModel
                 .getGlobal()
                 .addSdk("Erlang for Elixir " + otpRelease(), homePath, otpRelease(), Erlang.INSTANCE);
-        HomePath.eachEbinPath(homePath,
+        eachEbinPath(homePath,
                 ebinPath ->
                 erlangTypedLibrary.addRoot(
                         JpsPathUtil.pathToUrl(ebinPath.toAbsolutePath().toString()),
@@ -259,6 +263,25 @@ public class BuilderTest extends JpsBuildTestCase {
                                                          @Nullable String testOutputPath,
                                                          JpsSdk<T> sdk) {
         return super.addModule(moduleName, srcPaths, outputPath, testOutputPath, sdk, ModuleType.INSTANCE);
+    }
+
+    private static void eachEbinPath(@NotNull String homePath, @NotNull Consumer<Path> ebinPathConsumer) {
+        Path lib = Paths.get(homePath, "lib");
+
+        if (!Files.isDirectory(lib)) {
+            return;
+        }
+
+        try (DirectoryStream<Path> libDirectoryStream = Files.newDirectoryStream(lib, Files::isDirectory)) {
+            for (Path app : libDirectoryStream) {
+                Path ebin = app.resolve("ebin");
+                if (Files.isDirectory(ebin)) {
+                    ebinPathConsumer.accept(ebin);
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to enumerate ebin paths under " + lib, e);
+        }
     }
 
     @Override
