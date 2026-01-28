@@ -52,7 +52,7 @@ open class WslAwareCommandLine : GeneralCommandLine {
     @Throws(IOException::class)
     override fun createProcess(processBuilder: ProcessBuilder): Process {
         wslCompat.convertProcessBuilderArgumentsForWsl(processBuilder, this)
-        LOG.debug(formatCommandLineForLogging(processBuilder, "Command line"))
+        LOG.trace(formatCommandLineForLogging(processBuilder, "Command line"))
         return super.createProcess(processBuilder)
     }
 }
