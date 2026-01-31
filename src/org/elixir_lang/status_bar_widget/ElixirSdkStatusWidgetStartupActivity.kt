@@ -1,6 +1,7 @@
 package org.elixir_lang.status_bar_widget
 
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
@@ -8,6 +9,7 @@ import com.intellij.openapi.startup.ProjectActivity
 import com.intellij.openapi.wm.impl.status.widget.StatusBarWidgetsManager
 import org.elixir_lang.settings.ElixirExperimentalSettings
 import org.elixir_lang.settings.ElixirExperimentalSettingsListener
+import org.elixir_lang.util.ElixirProjectDisposable
 
 private val LOG = logger<ElixirSdkStatusWidgetStartupActivity>()
 
@@ -19,7 +21,7 @@ class ElixirSdkStatusWidgetStartupActivity : ProjectActivity, DumbAware {
         refreshWidgetVisibility(project)
 
         // Listen for future setting changes
-        val connection = project.messageBus.connect()
+        val connection = project.messageBus.connect(project.service<ElixirProjectDisposable>())
         connection.subscribe(
             ElixirExperimentalSettings.SETTINGS_CHANGED_TOPIC,
             object : ElixirExperimentalSettingsListener {
