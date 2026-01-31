@@ -21,12 +21,6 @@ import com.adarshr.gradle.testlogger.theme.ThemeType
 import de.undercouch.gradle.tasks.download.Download
 import deps.registerResolveExternalDependenciesTasksForAllProjects
 import elixir.ElixirService
-import quoter.QuoterService
-import quoter.tasks.GetQuoterDepsTask
-import quoter.tasks.ReleaseQuoterTask
-import quoter.tasks.StartQuoterTask
-import versioning.PluginVersion
-import versioning.VersionFetcher
 import org.jetbrains.intellij.platform.gradle.Constants
 import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
@@ -35,6 +29,12 @@ import org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
+import quoter.QuoterService
+import quoter.tasks.GetQuoterDepsTask
+import quoter.tasks.ReleaseQuoterTask
+import quoter.tasks.StartQuoterTask
+import versioning.PluginVersion
+import versioning.VersionFetcher
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -46,6 +46,11 @@ plugins {
     alias(libs.plugins.test.logger)
     id("java")
     id("idea")
+}
+
+project.configurations.all {
+    exclude(Constants.Configurations.Dependencies.BUNDLED_MODULE_GROUP, "com.intellij.kubernetes")
+    exclude(Constants.Configurations.Dependencies.BUNDLED_PLUGIN_GROUP, "com.intellij.kubernetes")
 }
 
 // --- Version Catalog Captures ---
@@ -151,10 +156,8 @@ subprojects {
     dependencies {
         intellijPlatform {
             create(providers.gradleProperty("platformType"), providers.provider { actualPlatformVersion })
-            bundledPlugins(providers.gradleProperty("platformBundledPlugins").map { it.split(",") })
-            bundledModules(providers.gradleProperty("platformBundledModules").map { it.split(",") })
+            bundledPlugins("com.intellij.java")
             testFramework(TestFrameworkType.Platform)
-            testFramework(TestFrameworkType.Plugin.Java)
         }
         // JPS Builder tests extend UsefulTestCase (JUnit 3/4 style) and need explicit JUnit 4 on classpath
         testImplementation(libJunit)
