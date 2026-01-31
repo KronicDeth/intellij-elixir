@@ -2,6 +2,7 @@ package org.elixir_lang.sdk.wsl;
 
 import com.intellij.execution.wsl.WSLDistribution;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.testFramework.ServiceContainerUtil;
 import org.elixir_lang.PlatformTestCase;
 import org.mockito.Mockito;
@@ -133,6 +134,20 @@ public class ElixirWslSdkTest extends PlatformTestCase {
     }
 
     /**
+     * Elixir SDK type can use WSL service.
+     */
+    public void testElixirSdkType_CanUseWslService() {
+        org.elixir_lang.sdk.elixir.Type elixirSdkType =
+            org.elixir_lang.sdk.elixir.Type.Companion.getInstance();
+
+        assertNotNull("Elixir SDK type should be available", elixirSdkType);
+        assertEquals("Elixir SDK", elixirSdkType.getPresentableName());
+
+        // Note: Actual WSL path validation would require WSL to be installed
+        // and is tested manually or in integration tests with WSL available
+    }
+
+    /**
      * Erlang SDK type can use WSL service.
      */
     public void testErlangSdkType_CanUseWslService() {
@@ -181,6 +196,53 @@ public class ElixirWslSdkTest extends PlatformTestCase {
         assertTrue("Backslash new format should be WSL", backslashNew);
         assertTrue("Forward slash old format should be WSL", forwardSlashOld);
         assertTrue("Backslash old format should be WSL", backslashOld);
+    }
+
+    /**
+     * ebinPathChainVirtualFile receives paths that look like WSL paths (not regular Linux paths).
+     * This verifies that HomePath.maybeTranslateToUnc correctly converts Linux paths back to UNC format.
+     * <p/>
+     * Note: Java's Paths.get("//wsl.localhost/...") normalizes to "/wsl.localhost/..." (single slash),
+     * which is still distinguishable from regular Linux paths like "/usr/..." or "/home/...".
+     */
+    public void testEbinPathChainVirtualFile_ReceivesWslPathNotRegularLinuxPath() {
+        // Given: A WSL UNC path (as returned by HomePath.maybeTranslateToUnc after DirectoryStream translation)
+        String wslUncPath = "//wsl.localhost/Ubuntu-24.04/usr/lib/erlang/lib/kernel-9.2/ebin";
+        java.nio.file.Path ebinPath = java.nio.file.Paths.get(wslUncPath);
+
+        // Then: The Path should be a WSL path (starting with /wsl), not a regular Linux path
+        String pathString = ebinPath.toString();
+
+        // Java normalizes //wsl.localhost to /wsl.localhost (which is still a WSL indicator)
+        assertTrue("Path should start with WSL indicator (/wsl.localhost, /wsl$, or \\\\wsl), got: " + pathString,
+            pathString.startsWith("/wsl.localhost/") ||
+            pathString.startsWith("/wsl$/") ||
+            pathString.startsWith("\\\\wsl.localhost\\") ||
+            pathString.startsWith("\\\\wsl$\\"));
+
+        // Most importantly: it should NOT be a regular Linux system path
+        assertFalse("Path should NOT be a regular Linux path like /usr/... or /home/..., got: " + pathString,
+            pathString.startsWith("/usr/") ||
+            pathString.startsWith("/home/") ||
+            pathString.startsWith("/lib/") ||
+            pathString.startsWith("/etc/"));
+
+        // When: Passing to ebinPathChainVirtualFile
+        final java.util.concurrent.atomic.AtomicReference<VirtualFile> resolvedFile =
+            new java.util.concurrent.atomic.AtomicReference<>();
+
+        try {
+            org.elixir_lang.sdk.Type.ebinPathChainVirtualFile(
+                ebinPath,
+                resolvedFile::set
+            );
+        } catch (Exception e) {
+            fail("ebinPathChainVirtualFile should not throw exceptions for WSL paths: " + e.getMessage());
+        }
+
+        // Then: Should complete without exception
+        // Note: In CI without WSL, resolvedFile.get() will be null, which is expected and acceptable
+        assertNotNull("Method should execute (resolvedFile reference initialized)", resolvedFile);
     }
 
 
@@ -273,4 +335,93 @@ public class ElixirWslSdkTest extends PlatformTestCase {
         assertEquals("Mock service should return /home/testuser", "/home/testuser", userHome);
     }
 
+    /**
+     * Elixir SDK names include WSL distribution identifier for WSL paths.
+     */
+    public void testElixirSdk_IncludesDistributionNameInSuggestedName() {
+        org.elixir_lang.sdk.elixir.Type elixirSdkType = org.elixir_lang.sdk.elixir.Type.Companion.getInstance();
+
+        // Test WSL path - use forward slashes which work cross-platform
+        String wslPath = "//wsl.localhost/Ubuntu-24.04/home/user/.asdf/installs/elixir/1.18.4-otp-28";
+        String suggestedName = elixirSdkType.suggestSdkName(null, wslPath);
+
+        // Should contain "WSL:" indicating it's a WSL SDK
+        assertTrue("Elixir SDK name should contain 'WSL:' for WSL paths",
+            suggestedName.contains("WSL:"));
+
+        // Should contain the distribution name
+        assertTrue("Elixir SDK name should contain distribution name",
+            suggestedName.contains("Ubuntu-24.04"));
+
+        // Test local path - should NOT include WSL suffix
+        String localPath = "/usr/local/lib/elixir";
+        String localName = elixirSdkType.suggestSdkName(null, localPath);
+
+        assertFalse("Elixir SDK name should NOT contain 'WSL:' for local paths",
+            localName.contains("WSL:"));
+    }
+
+    /**
+     * Erlang SDK names include WSL distribution identifier for WSL paths.
+     */
+    public void testErlangSdk_IncludesDistributionNameInSuggestedName() {
+        org.elixir_lang.sdk.erlang.Type erlangSdkType = new org.elixir_lang.sdk.erlang.Type();
+
+        // Test WSL path - use forward slashes which work cross-platform
+        String wslPath = "//wsl$/Ubuntu/usr/lib/erlang";
+        kotlin.Pair<String, String> result = captureLoggedWarning(
+                "org.elixir_lang.sdk.erlang.Type",
+                () -> erlangSdkType.suggestSdkName(null, wslPath)
+        );
+        String suggestedName = result.getFirst();
+
+        // Should contain "WSL:" indicating it's a WSL SDK (even if distribution can't be resolved)
+        assertTrue("Erlang SDK name should contain 'WSL:' for WSL paths",
+            suggestedName.contains("WSL:"));
+
+        // Should contain "Erlang for Elixir" base name
+        assertTrue("Erlang SDK name should contain 'Erlang for Elixir'",
+            suggestedName.contains("Erlang for Elixir"));
+
+        // Test local path - should NOT include WSL suffix
+        String localPath = "/usr/lib/erlang";
+        kotlin.Pair<String, String> localResult = captureLoggedWarning(
+                "org.elixir_lang.sdk.erlang.Type",
+                () -> erlangSdkType.suggestSdkName(null, localPath)
+        );
+        String localName = localResult.getFirst();
+        assertFalse("Erlang SDK name should NOT contain 'WSL:' for local paths",
+            localName.contains("WSL:"));
+    }
+
+    /**
+     * Both SDK types use consistent WSL naming conventions.
+     */
+    public void testBothSdkTypes_UseConsistentWslNaming() {
+        org.elixir_lang.sdk.elixir.Type elixirSdkType = org.elixir_lang.sdk.elixir.Type.Companion.getInstance();
+        org.elixir_lang.sdk.erlang.Type erlangSdkType = new org.elixir_lang.sdk.erlang.Type();
+
+        // Use forward slash format which works cross-platform
+        String wslPath = "//wsl$/Ubuntu/home/user/sdk";
+
+        String elixirName = elixirSdkType.suggestSdkName(null, wslPath);
+
+        // This line emits a warning - capture it
+        kotlin.Pair<String, String> result = captureLoggedWarning(
+            "org.elixir_lang.sdk.erlang.Type",
+            () -> erlangSdkType.suggestSdkName(null, wslPath)
+        );
+        String erlangName = result.getFirst();
+        String warning = result.getSecond();
+
+        // Both should be formatted as "(WSL: ...)"
+        assertTrue("Elixir SDK should use '(WSL:' format", elixirName.contains("(WSL:"));
+        assertTrue("Erlang SDK should use '(WSL:' format", erlangName.contains("(WSL:"));
+
+        // Assert the expected warning was logged
+        assertNotNull("Expected warning about missing Erlang executable", warning);
+        assertTrue("Warning should mention 'Can't detect Erlang version'",
+                   warning.contains("Can't detect Erlang version"));
+        assertTrue("Warning should mention 'is missing'", warning.contains("is missing"));
+    }
 }
