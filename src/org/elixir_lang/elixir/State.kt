@@ -3,18 +3,20 @@ package org.elixir_lang.elixir
 import com.intellij.execution.ExecutionException
 import com.intellij.execution.ExecutionResult
 import com.intellij.execution.Executor
-import com.intellij.execution.configurations.CommandLineState
+import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.filters.TextConsoleBuilderImpl
-import com.intellij.execution.process.KillableColoredProcessHandler
 import com.intellij.execution.process.ProcessHandler
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.execution.runners.ProgramRunner
 import com.intellij.execution.ui.ConsoleView
 import org.elixir_lang.console.ElixirConsoleUtil
 import org.elixir_lang.notification.setup_sdk.Notifier
+import org.elixir_lang.run.ElixirProcessHandler
+import org.elixir_lang.run.WslSafeCommandLineState
 
-class State(environment: ExecutionEnvironment, private val configuration: Configuration) :
-    CommandLineState(environment) {
+class State(environment: ExecutionEnvironment, configuration: Configuration) :
+    WslSafeCommandLineState<Configuration>(environment, configuration) {
+
     @Throws(ExecutionException::class)
     override fun execute(executor: Executor, runner: ProgramRunner<*>): ExecutionResult {
         val consoleBuilder = object : TextConsoleBuilderImpl(configuration.project) {
@@ -28,24 +30,10 @@ class State(environment: ExecutionEnvironment, private val configuration: Config
         return super.execute(executor, runner)
     }
 
-    @Throws(ExecutionException::class)
-    override fun startProcess(): ProcessHandler =
-        processHandler().apply {
-            /* KillProcessSoftly kills with SIGINT, but SIGINT will just bring up the BREAK VM control menu in iex,
-               which we don't want, so kill violently with SIGKILL immediately. */
-            setShouldKillProcessSoftly(false)
-        }
+    override fun createProcessHandler(process: Process, commandLine: GeneralCommandLine): ProcessHandler =
+        ElixirProcessHandler(process, commandLine.commandLineString)
 
-    @Throws(ExecutionException::class)
-    private fun processHandler(): KillableColoredProcessHandler {
-        val commandLine = configuration.commandLine()
-
-        try {
-            return KillableColoredProcessHandler(commandLine)
-        } catch (e: ExecutionException) {
-            Notifier.mixSettings(configuration.ensureModule(), e)
-
-            throw e
-        }
+    override fun handleExecutionException(e: ExecutionException) {
+        Notifier.mixSettings(configuration.ensureModule(), e)
     }
 }

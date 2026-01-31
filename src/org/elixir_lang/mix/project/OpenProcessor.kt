@@ -2,7 +2,6 @@ package org.elixir_lang.mix.project
 
 import com.intellij.ide.util.projectWizard.WizardContext
 import com.intellij.openapi.application.EDT
-import com.intellij.openapi.application.UI
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.progress.coroutineToIndicator
 import com.intellij.openapi.vfs.VirtualFile
@@ -71,6 +70,10 @@ class OpenProcessor : ProjectOpenProcessorBase<Builder>() {
         // Use pre-scanned results (no slow I/O on EDT)
         val foundApps = builder.list
         builder.setList(foundApps)
+
+        // Mark as importing project so Builder.commit() enables Mix compiler
+        // This matches the behavior of the Import Wizard
+        builder.setIsImportingProject(true)
 
         return true
     }

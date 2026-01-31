@@ -280,7 +280,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ide-version: ['253.28294.334']
+        ide-version: ['ideaIU:253.28294.334', 'rubymine:2025.3']
 
     steps:
       - name: Download Plugin Artifact
@@ -296,7 +296,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          ide-versions: ideaIU:${{ matrix.ide-version }}
+          ide-versions: ${{ matrix.ide-version }}
 
       - name: Print Verification Output
         id: print-verification-output

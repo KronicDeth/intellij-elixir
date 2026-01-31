@@ -30,7 +30,9 @@
                 id="ElixirSdkStatus"
                 implementation="org.elixir_lang.status_bar_widget.ElixirSdkStatusWidgetFactory"/>
         <backgroundPostStartupActivity implementation="org.elixir_lang.status_bar_widget.ElixirSdkStatusWidgetStartupActivity"/>
+
         <postStartupActivity implementation="org.elixir_lang.sdk.SdkTableListenerStartupActivity"/>
+        <postStartupActivity implementation="org.elixir_lang.mix.DepsCheckerStartupActivity"/>
 
         <!--        <errorHandler implementation="org.elixir_lang.errorreport.Submitter"/>-->
         <errorHandler implementation="com.intellij.diagnostic.JetBrainsMarketplaceErrorReportSubmitter"/>
@@ -122,6 +124,9 @@
         <!-- WSL Support Service -->
         <applicationService serviceInterface="org.elixir_lang.sdk.wsl.WslCompatService"
                             serviceImplementation="org.elixir_lang.sdk.wsl.WslCompatServiceImpl"/>
+        <applicationService serviceInterface="org.elixir_lang.sdk.elixir.SdkSettingsOpener"
+                            serviceImplementation="org.elixir_lang.sdk.elixir.SettingsSdkSettingsOpener"/>
+
 
         <!-- for template -->
         <internalFileTemplate name="Elixir Module"/>
@@ -321,6 +326,11 @@
         </group>
         <group id="LangElixir.SdkActions">
             <separator/>
+            <action id="Elixir.OpenElixirSdkSettings"
+                    class="org.elixir_lang.action.OpenElixirSdkSettingsAction"
+                    text="Configure Elixir SDKs"
+                    icon="AllIcons.General.Settings"
+                    description="Open Settings to configure Elixir SDKs"/>
             <action id="Elixir.RefreshActiveElixirSdk" class="org.elixir_lang.action.RefreshActiveElixirSdkAction"
                     text="Refresh Active Elixir SDK"
                     icon="AllIcons.General.Refresh"
@@ -333,6 +343,12 @@
                     text="Delete All Elixir/Erlang SDKs"
                     icon="AllIcons.General.Remove"
                     description="Removes all Elixir and Erlang SDKs from the IDE (useful in Small IDEs where SDKs can become corrupted)"/>
+            <separator/>
+            <!--suppress PluginXmlCapitalization -->
+            <action id="Elixir.InstallMixDependencies" class="org.elixir_lang.action.InstallMixDependenciesAction"
+                    text="Install Mix Dependencies (hex, rebar, deps.get)"
+                    icon="org.elixir_lang.mix.configuration.Icons.TYPE"
+                    description="Installs hex, rebar, and fetches Mix dependencies"/>
             <separator/>
             <add-to-group group-id="ToolsMenu" anchor="last"/>
         </group>
