@@ -120,20 +120,42 @@ The build system automatically detects your platform:
 > Let's assume that you don't have much knowledge of the Java/Kotlin ecosystem, and just want to help contribute some changes.
 > Here are some tips on how make your changes and test them without hopefully too much fuss,
 
-To launch an IDE, you can run
+To launch an IDE, you can use [runIde](https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin-tasks.html#runIde),
+which will launch IntelliJ IDEA:
+
 ```sh
-./gradlew runIntelliJCommunity
+./gradlew runIntellijIdea
 ```
 
-Or from one of the following IDEs:
+#### Testing in other IDEs
 
-- runIntelliJCommunity
-- runIntelliJUltimate
-- runPyCharmCommunity
-- runPyCharmProfessional
-- runRubyMine
-- runRustRover
-- runWebStorm
+> [!IMPORTANT]
+> In the 2025 release, JetBrains "unified" the Professional and Community editions of IntelliJ IDEA into a single edition.
+> See [The Unified IntelliJ IDEA: More Free Features, a Better Experience, Smoother Flow](https://blog.jetbrains.com/idea/2025/12/intellij-idea-unified-release/)
+> Other IDEs, such as [PyCharm](https://www.jetbrains.com/help/pycharm/unified-pycharm.html) was also unified into a single edition.
+
+To test another IDE, you can use one of the following tasks:
+
+- `runIntellijIdea` / `runIntellijIdeaEAP`
+- `runRubyMine` / `runRubyMineEAP`
+- `runWebStorm` / `runWebStormEAP`
+- `runPyCharm` / `runPyCharmEAP`
+- `runRustRover` / `runRustRoverEAP`
+- `runCLion` / `runCLionEAP`
+- `runGoLand` / `runGoLandEAP`
+
+#### Running the latest EAP snapshot
+
+To use `runIde` or `runPyCharm` etc with the latest EAP snapshot, you need to pass the `useDynamicEapVersion` gradle property
+when running the task (or Run Configuration in IntelliJ IDEA).
+
+For example, to launch the latest RubyMine EAP:
+
+```sh
+./gradlew runRubyMineEAP -PuseDynamicEapVersion=true
+```
+
+#### Testing
 
 To run all tests `./gradlew test`.
 

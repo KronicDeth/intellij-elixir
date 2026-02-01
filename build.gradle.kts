@@ -74,13 +74,13 @@ val basePluginVersion: String = PluginVersion.getBaseVersion(
     providers.gradleProperty("pluginVersion").get(),
     publishChannel
 )
+
 val useDynamicEapVersion: Boolean = project.property("useDynamicEapVersion").toString().toBoolean()
 val skipSearchableOptions: Boolean = project.property("skipSearchableOptions").toString().toBoolean()
 
-
 val actualPlatformVersion: String = if (useDynamicEapVersion) {
     // Calling the helper from buildSrc
-    VersionFetcher.getLatestEapBuild()
+    VersionFetcher.getLatestEapBuild(platformType = providers.gradleProperty("platformType").get() ?: "IU")
 } else {
     project.property("platformVersion").toString()
 }
@@ -111,7 +111,7 @@ val versionSuffix: String = when {
 
 version = "$basePluginVersion$versionSuffix"
 
-println("[elixir-build] platform=$actualPlatformVersion version=$version channel=$publishChannel dynamicEap=$useDynamicEapVersion skipSearchableOptions=$skipSearchableOptions quoterExe=$quoterExe quoterTmpPath=${quoterTmpPath.asFile.absolutePath}")
+logger.lifecycle("[elixir-build] platform=$actualPlatformVersion version=$version channel=$publishChannel dynamicEap=$useDynamicEapVersion skipSearchableOptions=$skipSearchableOptions quoterExe=$quoterExe quoterTmpPath=${quoterTmpPath.asFile.absolutePath}")
 
 // --- Global Project Configuration ---
 allprojects {
@@ -392,8 +392,24 @@ tasks.withType<RunIdeTask>().configureEach {
     }
 }
 
-// Register Platform-specific Run Tasks dynamically
-val runIdePlatformsList = providers.gradleProperty("runIdePlatforms").get().split(",")
+// In gradle.properties, define platform versions like:
+//
+// platformVersionIntellijIdeaEAP=261-EAP-SNAPSHOT
+// platformVersionIntellijIdea=2025.3.2
+//
+// excluding the base "platformVersion" and EAP variants (handled separately below).
+//
+// You can also then run with either gradlew (CLI) or using a Run Configuration in IntelliJ IDEA via:
+// `gradlew runRubyMine -PplatformVersionRubyMine=2025.2` to override a specific platform version at runtime,
+// which is useful for testing against multiple IDE versions without changing the build script.
+val platformVersionPrefix = "platformVersion"
+val runIdePlatformsList: List<String> = project.properties.keys
+    .filter { it.startsWith(platformVersionPrefix) && it.length > platformVersionPrefix.length }
+    .map { it.removePrefix(platformVersionPrefix) }
+    .filter { !it.endsWith("EAP") }
+    .sorted()
+
+// Reduces having to download the IDEs when testing.
 val enableEAP = providers.gradleProperty("enableEAPIDEs").get().toBoolean()
 
 runIdePlatformsList.forEach { platform ->
@@ -405,10 +421,23 @@ runIdePlatformsList.forEach { platform ->
         }
     })
 
-    if (enableEAP) {
+    if (enableEAP && project.hasProperty("platformVersion${platform}EAP")) {
+        // If EAP is enabled in gradle.properties, and useDynamicEapVersion is enabled,
+        // use the major version with "-EAP-SNAPSHOT" suffix.
+        // Otherwise, use the specified EAP version.
+        val platformVersionEAPValue = providers.gradleProperty("platformVersion${platform}EAP").get()
+        val idePlatformTypeCode = IntelliJPlatformType.valueOf(platform)
+        val ideEapVersion: String = if (useDynamicEapVersion) {
+            val foundIdeVersion = VersionFetcher.getLatestEapBuild(platformType = idePlatformTypeCode.code)
+            // Get the Major version, by splitting at the first dot, then appending "-EAP-SNAPSHOT"
+            val majorVersion = foundIdeVersion.split(".").firstOrNull() ?: foundIdeVersion
+            "$majorVersion-EAP-SNAPSHOT"
+        } else {
+            platformVersionEAPValue
+        }
         intellijPlatformTesting.runIde.register("run${platform}EAP", Action {
-            type = IntelliJPlatformType.valueOf(platform)
-            version = providers.gradleProperty("platformVersion${platform}EAP").get()
+            type = idePlatformTypeCode
+            version = ideEapVersion
             useInstaller = false
             prepareSandboxTask {
                 sandboxDirectory = layout.buildDirectory.dir("${platform.lowercase()}_eap-sandbox")
