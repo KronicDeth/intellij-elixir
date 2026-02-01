@@ -31,7 +31,7 @@ import com.intellij.driver.sdk.ui.components.elements.dialog
 private fun cleanIdeaFiles(projectPath: String) {
     step("Clean existing IntelliJ configuration and Mix build files") {
         val projectDir = java.io.File(projectPath)
-        val pathsToClean = listOf(".idea", "intellij_elixir.iml", "deps", "_build")
+        val pathsToClean = listOf(".idea", "intellij_elixir.iml", "deps", "_build", "out")
 
         pathsToClean.forEach { path ->
             val file = java.io.File(projectDir, path)

@@ -8,8 +8,10 @@ import com.intellij.driver.sdk.ui.components.common.welcomeScreen
 import com.intellij.driver.sdk.ui.components.elements.balloon
 import com.intellij.driver.sdk.ui.components.elements.popupMenu
 import com.intellij.ide.starter.driver.engine.runIdeWithDriver
+import org.elixir_lang.notification.setup_sdk.Notifier.MIX_DEPS_OUTDATED_TITLE
 import org.elixir_lang.ui.framework.core.*
 import org.elixir_lang.ui.framework.ultimate.activateUltimateLicense
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import kotlin.time.Duration.Companion.minutes
 
@@ -20,19 +22,18 @@ import kotlin.time.Duration.Companion.minutes
  * 1. License activation (Ultimate only)
  * 2. SDK configuration (Erlang and Elixir)
  * 3. Project import
- * 4. Mix dependencies installation
+ * 4. Mix deps installation
  * 5. Running tests via the IDE
  */
 class UltimateProjectImportTest {
 
     @Test
-    fun `import Elixir project with license activation and dependency installation`() {
-        step("Run test: import Elixir project with license activation and dependency installation") {
+    fun `import Elixir project with license activation and deps installation`() {
+        step("Run test: import Elixir project with license activation and deps installation") {
             val ctx = IdeTestContext.setupTestContext("UltimateProjectImportTest")
 
-            ctx.runIdeWithDriver()
-                .useDriverAndCloseIde {
-                    ensureIdeInForeground()
+            ctx.runIdeWithDriver().useDriverAndCloseIde {
+                    ensureWelcomeScreenInForeground()
                     activateUltimateLicense()
 
                     welcomeScreen {
@@ -49,12 +50,12 @@ class UltimateProjectImportTest {
                         )
                     }
                     openProjectAt(IdeTestContext.projectPath)
-
-                    step("Install Mix dependencies") {
+                    ensureIdeInForeground()
+                    step("Install Mix deps") {
                         ideFrame {
-                            val notificationBalloon = balloon("Mix dependencies outdated")
+                            val notificationBalloon = balloon(MIX_DEPS_OUTDATED_TITLE)
                             // Notification actions appear as ActionLink components in the balloon
-                            val installButton = notificationBalloon.x { byVisibleText("Install Mix dependencies") }
+                            val installButton = notificationBalloon.x { byVisibleText("Install deps") }
                             installButton.click()
                             waitUntilReady()
                         }
@@ -73,6 +74,13 @@ class UltimateProjectImportTest {
                             runToolWindow {
                                 waitContainsText("2 tests passed", null, true, 5.minutes)
                             }
+                        }
+                    }
+                    step("Verify deps watcher isn't showing anymore") {
+                        ideFrame {
+                            waitUntilReady()
+                            val notificationBalloon = balloon(MIX_DEPS_OUTDATED_TITLE)
+                            assertTrue(notificationBalloon.notPresent())
                         }
                     }
                 }
