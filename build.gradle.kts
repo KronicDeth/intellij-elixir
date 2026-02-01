@@ -425,7 +425,7 @@ val releaseQuoter by tasks.registering(Exec::class) {
     outputs.dir(quoterUnzippedPath.dir("_build"))
         .withPropertyName("buildDir")
 
-    commandLine("mix", "release")
+    commandLine("mix", "do", "local.rebar", "--force,", "local.hex", "--force,", "release")
 }
 
 // Register the QuoterService - Gradle calls close() at build end regardless of failure
@@ -466,4 +466,3 @@ tasks.named<Test>("test") {
 //        setProperty("termsOfServiceAgree", "yes")
 //    }
 //}
-
