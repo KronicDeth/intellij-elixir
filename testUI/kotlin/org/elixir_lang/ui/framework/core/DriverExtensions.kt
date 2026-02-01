@@ -188,7 +188,6 @@ fun Driver.ensureIdeInForeground() = step("Bring IDE window to foreground") {
         }
     }
 
-    var focused = false
     val appIcon = withContext { utility(AppIcon::class).getInstance() }
     runCatching {
         ideFrame {
@@ -201,17 +200,23 @@ fun Driver.ensureIdeInForeground() = step("Bring IDE window to foreground") {
             toFront()
             requestFocusFromIde(project)
         }
-        focused = true
     }
+}
 
-    if (!focused) {
-        runCatching {
-            welcomeScreen {
-                val window = driver.cast(component, Window::class)
-                appIcon.requestFocus(window)
-                window.requestFocus()
-                toFront()
-            }
+fun Driver.ensureWelcomeScreenInForeground() = step("Bring Welcome Screen to foreground") {
+    if (SystemInfo.isWindows) {
+        // Allow the IDE to request focus even when the app is inactive on Windows.
+        withContext {
+            utility(WinFocusStealer::class).setFocusStealingEnabled(true)
+        }
+    }
+    val appIcon = withContext { utility(AppIcon::class).getInstance() }
+    runCatching {
+        welcomeScreen {
+            val window = driver.cast(component, Window::class)
+            appIcon.requestFocus(window)
+            window.requestFocus()
+            toFront()
         }
     }
 }
