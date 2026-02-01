@@ -33,6 +33,10 @@ import quoter.QuoterService
 import quoter.tasks.GetQuoterDepsTask
 import quoter.tasks.ReleaseQuoterTask
 import quoter.tasks.StartQuoterTask
+import sdk.ElixirErlangSdkArgumentProvider
+import sdk.ErlangAvailabilityCheckAction
+import sdk.PrepareElixirSdkTask
+import sdk.ResolveElixirErlangSdksTask
 import versioning.PluginVersion
 import versioning.VersionFetcher
 import java.text.SimpleDateFormat
@@ -367,9 +371,7 @@ tasks.withType<RunIdeTask>().configureEach {
     val isUltimateTask = name.contains("IntellijIdeaUltimate")
     if ((isRunIdeTask && platformTypeValue == "IU") || isUltimateTask) {
         // Ensure required-plugins mode keeps Ultimate enabled for IU runs.
-        jvmArgumentProviders += CommandLineArgumentProvider {
-            listOf("-Didea.required.plugins.id=$requiredPluginsId")
-        }
+        jvmArguments.add("-Didea.required.plugins.id=$requiredPluginsId")
     }
 
     if (project.hasProperty("runIdeWorkingDirectory") && project.property("runIdeWorkingDirectory").toString().isNotEmpty()) {
@@ -449,42 +451,18 @@ runIdePlatformsList.forEach { platform ->
 }
 
 // --- External Tools (Elixir & Quoter) ---
-val downloadElixir by tasks.registering(Download::class) {
-    src("https://github.com/elixir-lang/elixir/archive/v${elixirVersion}.zip")
-    dest(cachePath.file("Elixir.${elixirVersion}.zip"))
-    overwrite(false)
-}
-
-val unzipElixir by tasks.registering(Copy::class) {
-    dependsOn(downloadElixir)
-    from(zipTree(downloadElixir.get().dest))
-    into(elixirPath.asFile)
-    eachFile { relativePath = RelativePath(true, *relativePath.segments.drop(1).toTypedArray()) }
-    include("elixir-${elixirVersion}/**")
-}
-
-val buildElixir by tasks.registering(Exec::class) {
-    dependsOn(unzipElixir)
-    workingDir(elixirPath.asFile)
-    commandLine("make")
-    outputs.dir(elixirPath.dir("bin"))
-    // The apps that are part of Elixir SDK. `make` compiles them and puts output into `ebin` and `_build` dirs.
-    // We need to declare them as outputs for Gradle's UP-TO-DATE checks to work correctly.
-    // The list is based on the applications shipped with Elixir v1.13.4.
-    val libDir = elixirPath.dir("lib")
-    listOf("eex", "elixir", "ex_unit", "iex", "logger", "mix").forEach { appName ->
-        val appDir = libDir.dir(appName)
-        // All apps get an 'ebin' directory.
-        outputs.dir(appDir.dir("ebin"))
-        // All apps except 'elixir' itself also get a '_build' directory.
-        if (appName != "elixir") {
-            outputs.dir(appDir.dir("_build"))
-        }
-    }
+val expectedElixirVersion = elixirVersion
+val prepareElixirSdk by tasks.registering(PrepareElixirSdkTask::class) {
+    description = "Downloads and builds Elixir from source if needed"
+    group = "verification"
+    elixirVersion.set(expectedElixirVersion)
+    projectDir.set(layout.projectDirectory)
+    elixirHome.set(elixirPath)
+    markerFile.set(elixirPath.file(".installed"))
 }
 
 val getElixir by tasks.registering {
-    dependsOn(buildElixir)
+    dependsOn(prepareElixirSdk)
 }
 
 
@@ -513,7 +491,7 @@ val unzipQuoter by tasks.registering(Copy::class) {
 }
 
 val getQuoterDeps by tasks.registering(GetQuoterDepsTask::class) {
-    dependsOn(unzipQuoter, buildElixir)
+    dependsOn(unzipQuoter, prepareElixirSdk)
     workingDir(quoterUnzippedPath)
 
     // Configure the task
@@ -579,54 +557,8 @@ registerResolveExternalDependenciesTasksForAllProjects()
 // ALL test tasks in ALL projects use the QuoterService (ensures cleanup on any failure)
 allprojects {
     tasks.withType<Test>().configureEach {
-
-        // Validate Erlang is available before running tests
-        doFirst {
-            // Skip check if ERLANG_SDK_HOME is explicitly set
-            val erlangSdkHome = System.getenv("ERLANG_SDK_HOME")
-            if (erlangSdkHome == null || erlangSdkHome.isEmpty()) {
-                val erlCommand = if (System.getProperty("os.name").lowercase().contains("windows")) "erl.exe" else "erl"
-                try {
-                    val process = ProcessBuilder(erlCommand, "-version")
-                        .redirectErrorStream(true)
-                        .start()
-                    val exitCode = process.waitFor()
-                    if (exitCode != 0) {
-                        throw GradleException(
-                            """
-                            |Erlang/OTP not found or failed to run.
-                            |Tests require Erlang to be installed and on PATH.
-                            |
-                            |Options:
-                            |  1. Download from: https://www.erlang.org/downloads
-                            |  2. Install via Chocolatey: choco install erlang
-                            |  3. Set ERLANG_SDK_HOME environment variable to your Erlang installation directory
-                            |
-                            |The jps-builder tests auto-detect Erlang by running '$erlCommand -eval' command.
-                            """.trimMargin()
-                        )
-                    }
-                    logger.lifecycle("Erlang found: $erlCommand is available on PATH")
-                } catch (e: java.io.IOException) {
-                    throw GradleException(
-                        """
-                        |Erlang/OTP executable '$erlCommand' not found on PATH.
-                        |Tests require Erlang to be installed and on PATH.
-                        |
-                        |Options:
-                        |  1. Download from: https://www.erlang.org/downloads
-                        |  2. Install via Chocolatey: choco install erlang
-                        |  3. Set ERLANG_SDK_HOME environment variable to your Erlang installation directory
-                        |
-                        |The jps-builder tests auto-detect Erlang by running '$erlCommand -eval' command.
-                        """.trimMargin(),
-                        e
-                    )
-                }
-            } else {
-                logger.lifecycle("Using ERLANG_SDK_HOME from environment: $erlangSdkHome")
-            }
-        }
+        // Validate Erlang is available before running tests.
+        doFirst(ErlangAvailabilityCheckAction())
     }
 }
 
@@ -650,43 +582,20 @@ tasks.named<Zip>("buildPlugin") {
 }
 
 
-/**
- * Helper function to get SDK path from mise.
- * Requires mise to be installed and available in PATH.
- *
- * @param tool The tool name (e.g., "erlang", "elixir")
- * @return The absolute path to the tool installation
- * @throws GradleException if mise is not installed or tool not found
- */
-fun getMiseSdkPath(tool: String): Provider<String> {
-    return providers.exec {
-        commandLine("mise", "where", tool)
-    }.standardOutput.asText.map { it.trim() }.orElse(
-        providers.provider {
-            throw GradleException(
-                """
-                |Failed to get path for '$tool' from mise.
-                |
-                |UI tests require mise to be installed and configured with .tool-versions.
-                |
-                |Installation:
-                |  Linux/macOS: curl https://mise.run | sh
-                |  Windows: https://mise.jdx.dev/getting-started.html#windows
-                |
-                |Setup:
-                |  1. Install mise
-                |  2. Run: mise install inside the project directory
-                |  3. Verify: mise where $tool
-                |
-                |See: https://mise.jdx.dev/
-                """.trimMargin()
-            )
-        }
-    )
+val sdkPropertiesFile = layout.buildDirectory.file("elixir-erlang-sdks.properties")
+
+val resolveElixirErlangSdks by tasks.registering(ResolveElixirErlangSdksTask::class) {
+    description = "Resolves Erlang and Elixir SDKs for testing"
+    group = "verification"
+    projectDir.set(layout.projectDirectory)
+    toolVersionsFile.set(layout.projectDirectory.file(".tool-versions"))
+    gradlePropertiesFile.set(layout.projectDirectory.file("gradle.properties"))
+    elixirVersion.set(expectedElixirVersion)
+    outputFile.set(sdkPropertiesFile)
 }
 
 tasks.register<Test>("testUI") {
-    dependsOn(tasks.buildPlugin, tasks.prepareSandbox, unzipQuoter)
+    dependsOn(tasks.buildPlugin, tasks.prepareSandbox, unzipQuoter, resolveElixirErlangSdks)
     description = "Runs only the UI tests that start the IDE"
     group = "verification"
 
@@ -706,23 +615,19 @@ tasks.register<Test>("testUI") {
     systemProperty("idea.home.path", tasks.prepareTestSandbox.get().getDestinationDir().parentFile.absolutePath)
     systemProperty("uiPlatformBuildVersion", actualPlatformVersion)
     systemProperty("projectPath", unzipQuoter.get().destinationDir.absolutePath)
+    // Keep Allure outputs under build/ instead of the repo root.
+    systemProperty("allure.results.directory", layout.buildDirectory.dir("results/allure").get().asFile.absolutePath)
 
     // Disable IntelliJ test listener that conflicts with standard JUnit
     systemProperty("idea.test.cyclic.buffer.size", "0")
 
-    // Get SDK paths from mise (reads .tool-versions) at execution time
-    doFirst {
-        systemProperty("erlangSdkPath", getMiseSdkPath("erlang").get())
-        systemProperty("elixirSdkPath", getMiseSdkPath("elixir").get())
-    }
+    jvmArgumentProviders += ElixirErlangSdkArgumentProvider(sdkPropertiesFile.get().asFile)
 
     // Add required JVM arguments
-    jvmArgumentProviders += CommandLineArgumentProvider {
-        mutableListOf(
-            "--add-opens=java.base/java.lang=ALL-UNNAMED",
-            "--add-opens=java.desktop/javax.swing=ALL-UNNAMED"
-        )
-    }
+    jvmArgs(
+        "--add-opens=java.base/java.lang=ALL-UNNAMED",
+        "--add-opens=java.desktop/javax.swing=ALL-UNNAMED"
+    )
 
 }
 
