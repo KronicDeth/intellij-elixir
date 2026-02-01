@@ -38,7 +38,7 @@ jobs:
   matrix-setup:
     runs-on: ubuntu-latest
     outputs:
-      idea-versions: '["2025.3.2", "LATEST-EAP-SNAPSHOT"]'
+      idea-versions: '["2025.3.2"]'
     steps:
       - run: echo "Defining idea-versions matrix"
 
