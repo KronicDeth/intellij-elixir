@@ -32,6 +32,7 @@ class UltimateProjectImportTest {
 
             ctx.runIdeWithDriver()
                 .useDriverAndCloseIde {
+                    ensureIdeInForeground()
                     activateUltimateLicense()
 
                     welcomeScreen {
