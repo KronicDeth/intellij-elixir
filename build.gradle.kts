@@ -217,6 +217,11 @@ intellijPlatform {
     if (skipSearchableOptions) {
         buildSearchableOptions = false
     }
+    // Disable auto-reload by default: it is noisy during runIde and has been unreliable.
+    // Re-enable via `ideaAutoReload=true` in `gradle.properties` or `-PideaAutoReload=true`.
+    autoReload = providers.gradleProperty("ideaAutoReload")
+        .map { it.toBoolean() }
+        .orElse(false)
 
     pluginConfiguration {
         id = providers.gradleProperty("pluginGroup")
@@ -265,6 +270,15 @@ intellijPlatform {
     sourceSets {
         val testUI: SourceSet by project.sourceSets
         add(testUI)
+    }
+}
+
+intellijPlatformTesting.runIde.configureEach {
+    plugins {
+        // Run-IDE sandbox only: Kubernetes plugin consistently fails on startup.
+        disablePlugin("com.intellij.kubernetes")
+        // Run-IDE sandbox only: Sass plugin logs missing color scheme resources.
+        disablePlugin("org.jetbrains.plugins.sass")
     }
 }
 
@@ -331,6 +345,31 @@ tasks.withType<RunIdeTask>().configureEach {
     systemProperty("idea.log.debug.categories", "org.elixir_lang")
     maxHeapSize = "7g"
 
+    val compatiblePluginsList = providers.gradleProperty("runIdeCompatiblePlugins")
+        .getOrElse("")
+        .split(",")
+        .map { it.trim() }
+        .filter { it.isNotEmpty() }
+
+    // runIde uses "required plugins" mode; for IU builds that can drop com.intellij.modules.ultimate,
+    // which cascades into bundled plugin dependency warnings. Force Ultimate to stay required,
+    // and include any compatible plugins so they can load under required-plugins mode.
+    val requiredPluginsId = listOf(
+        providers.gradleProperty("pluginGroup").get(),
+        "com.intellij.modules.ultimate"
+    ).plus(compatiblePluginsList)
+        .distinct()
+        .joinToString(",")
+    val platformTypeValue = providers.gradleProperty("platformType").get()
+    val isRunIdeTask = name == "runIde"
+    val isUltimateTask = name.contains("IntellijIdeaUltimate")
+    if ((isRunIdeTask && platformTypeValue == "IU") || isUltimateTask) {
+        // Ensure required-plugins mode keeps Ultimate enabled for IU runs.
+        jvmArgumentProviders += CommandLineArgumentProvider {
+            listOf("-Didea.required.plugins.id=$requiredPluginsId")
+        }
+    }
+
     if (project.hasProperty("runIdeWorkingDirectory") && project.property("runIdeWorkingDirectory").toString().isNotEmpty()) {
         workingDir = file(project.property("runIdeWorkingDirectory").toString())
     }
@@ -346,9 +385,6 @@ tasks.withType<RunIdeTask>().configureEach {
 
     // Dynamic plugin loading
     // Usage: -PrunIdeCompatiblePlugins="PsiViewer,com.google.ide-perf,org.jetbrains.action-tracker"
-    val compatiblePluginsList = providers.gradleProperty("runIdeCompatiblePlugins")
-        .getOrElse("")
-        .let { if (it.isEmpty()) emptyList() else it.split(",") }
     if (compatiblePluginsList.isNotEmpty()) {
         dependencies {
             intellijPlatform { compatiblePlugins(compatiblePluginsList) }
