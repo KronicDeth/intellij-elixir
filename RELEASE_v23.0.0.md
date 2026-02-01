@@ -142,7 +142,7 @@ Some behind the scenes features, which is really nice!
 
 - Windows development - Platform-aware build services, Gradle tasks, and run configurations for developing the plugin on Windows. Updated `CONTRIBUTING.md` with Windows setup instructions.
 - CI improvements - Fork-safe Gradle caching (~4.5 GB cache) to reduce Maven dependency downloads, Maven Central access diagnostics.
-- UI test infrastructure - IntelliJ IDE Starter-based UI tests under `testUI/` for automated IDE testing, including Ultimate-only tests for license activation and project import flows.
+- Experimental UI test infrastructure - IntelliJ IDE Starter-based UI tests under `testUI/` for automated IDE testing, including Ultimate-only tests for license activation and project import flows.
 - Documentation - README updated with WSL setup instructions, configuration steps, and troubleshooting guidance.
 
 ## Installation steps
