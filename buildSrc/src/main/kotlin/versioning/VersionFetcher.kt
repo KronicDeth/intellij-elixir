@@ -9,12 +9,13 @@ import javax.xml.parsers.DocumentBuilderFactory
  * Moved from the main build.gradle.kts to improve readability and separation of concerns.
  */
 object VersionFetcher {
-    fun getLatestEapBuild(): String {
-        // Look at Release Candidates, then EAPs, then Normal releases
+    // get platformType from gradle properties or default to "IU"
+    fun getLatestEapBuild(platformType: String = "IU"): String {
+        // Note that the order below is incorrect, as EAPs should be preferred over RCs, and RCs over Releases.
         val apiUris = listOf(
-            URI("https://data.services.jetbrains.com/products/releases?code=IIU&type=rc&latest=true&fields=build"),
-            URI("https://data.services.jetbrains.com/products/releases?code=IIU&type=eap&latest=true&fields=build"),
-            URI("https://data.services.jetbrains.com/products/releases?code=IIU&type=release&latest=true&fields=build")
+            URI("https://data.services.jetbrains.com/products/releases?code=$platformType&type=eap&latest=true&fields=build"),
+            URI("https://data.services.jetbrains.com/products/releases?code=$platformType&type=rc&latest=true&fields=build"),
+            URI("https://data.services.jetbrains.com/products/releases?code=$platformType&type=release&latest=true&fields=build")
         )
 
         for (uri in apiUris) {
