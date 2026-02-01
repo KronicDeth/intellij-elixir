@@ -38,7 +38,7 @@ jobs:
   matrix-setup:
     runs-on: ubuntu-latest
     outputs:
-      idea-versions: '["2025.3", "LATEST-EAP-SNAPSHOT"]'
+      idea-versions: '["2025.3.2", "LATEST-EAP-SNAPSHOT"]'
     steps:
       - run: echo "Defining idea-versions matrix"
 
@@ -226,7 +226,7 @@ jobs:
     env:
       GRADLE_USER_HOME: ${{ github.workspace }}/.gradle
       GRADLE_CACHE_SCOPE: ${{ github.event.pull_request.head.repo.id || github.repository_id }}
-      GRADLE_CACHE_IDE_VERSION: '2025.3'
+      GRADLE_CACHE_IDE_VERSION: '2025.3.2'
 
     steps:
       - name: Checkout
@@ -260,7 +260,7 @@ jobs:
         with:
           setup-elixir: false
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          idea-version: '2025.3'
+          idea-version: '2025.3.2'
 
       - name: Build Plugin
         id: build-plugin
@@ -280,7 +280,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ide-version: ['ideaIU:253.28294.334', 'rubymine:2025.3']
+        ide-version: ['ideaIU:253.30387.90', 'rubymine:2025.3.2']
 
     steps:
       - name: Download Plugin Artifact

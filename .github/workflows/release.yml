@@ -16,7 +16,7 @@ jobs:
     env:
       GRADLE_USER_HOME: ${{ github.workspace }}/.gradle
       GRADLE_CACHE_SCOPE: ${{ github.event.pull_request.head.repo.id || github.repository_id }}
-      GRADLE_CACHE_IDE_VERSION: '2025.3'
+      GRADLE_CACHE_IDE_VERSION: '2025.3.2'
     steps:
       - name: Checkout
         id: checkout

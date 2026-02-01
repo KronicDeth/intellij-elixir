@@ -14,7 +14,7 @@ inputs:
   idea-version:
     description: 'IntelliJ IDEA version to test against. Keep in sync with matrix-setup in shared-test.yml'
     required: false
-    default: '253.28294.334'  # 2025.3 - should match first version in shared-test.yml
+    default: '253.30387.90'  # 2025.3.2 - should match first version in shared-test.yml
   gradle-cache-read-only:
     description: 'Controls whether CI should save caches (used to gate Elixir cache saving). Gradle caching is handled in workflows.'
     required: false
@@ -71,6 +71,12 @@ runs:
     # Needed because we can't just use env, as we're in a composite action, and env set here won't propagate to
     # later steps in the workflow that use this action.
     # https://docs.gradle.org/current/userguide/build_environment.html#setting_a_project_property
+    #
+    # We could use https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin-faq.html#how-to-check-the-latest-available-eap-release , but
+    # it's wrong and doesn't actually work?
+    # See also https://github.com/JetBrains/intellij-platform-gradle-plugin/issues/1628
+    #
+    # We want to find the latest "public" EAP, also called [nextversion](https://www.jetbrains.com/idea/nextversion/)
     - name: Export Environment Variables
       id: export-environment-variables
       shell: bash
