@@ -1,16 +1,21 @@
 package org.elixir_lang.ui.framework.core
 
 import com.intellij.driver.client.Driver
+import com.intellij.driver.client.Remote
 import com.intellij.driver.sdk.step
-import com.intellij.driver.sdk.ui.Finder
+import com.intellij.driver.sdk.ui.*
 import com.intellij.driver.sdk.ui.components.UiComponent
 import com.intellij.driver.sdk.ui.components.common.IdeaFrameUI
-import com.intellij.driver.sdk.ui.components.elements.*
+import com.intellij.driver.sdk.ui.components.common.ideFrame
+import com.intellij.driver.sdk.ui.components.common.welcomeScreen
+import com.intellij.driver.sdk.ui.components.elements.JComboBoxUiComponent
+import com.intellij.driver.sdk.ui.components.elements.JListUiComponent
+import com.intellij.driver.sdk.ui.components.elements.actionButton
+import com.intellij.driver.sdk.ui.components.elements.jBlist
 import com.intellij.driver.sdk.ui.components.idea.ProjectStructureUI
-import com.intellij.driver.sdk.ui.should
-import com.intellij.driver.sdk.ui.ui
-import com.intellij.driver.sdk.ui.xQuery
+import com.intellij.driver.sdk.ui.remote.Window
 import com.intellij.driver.sdk.waitForIndicators
+import com.intellij.openapi.util.SystemInfo
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -160,3 +165,53 @@ fun Finder.projectStructure(code: ProjectStructureUI.() -> Unit = {}): ProjectSt
     x(ProjectStructureUI::class.java) {
         contains(byTitle("Project Structure"))
     }.apply(code)
+
+@Remote("com.intellij.ui.WinFocusStealer")
+private interface WinFocusStealer {
+    fun setFocusStealingEnabled(value: Boolean)
+}
+
+@Remote("com.intellij.ui.AppIcon")
+private interface AppIcon {
+    fun getInstance(): AppIcon
+    fun requestFocus(window: Window?)
+}
+
+/**
+ * Ensures the IDE window is foregrounded so input events are delivered reliably.
+ */
+fun Driver.ensureIdeInForeground() = step("Bring IDE window to foreground") {
+    if (SystemInfo.isWindows) {
+        // Allow the IDE to request focus even when the app is inactive on Windows.
+        withContext {
+            utility(WinFocusStealer::class).setFocusStealingEnabled(true)
+        }
+    }
+
+    var focused = false
+    val appIcon = withContext { utility(AppIcon::class).getInstance() }
+    runCatching {
+        ideFrame {
+            if (isMinimized()) {
+                unminimize()
+            }
+            val window = driver.cast(component, Window::class)
+            appIcon.requestFocus(window)
+            window.requestFocus()
+            toFront()
+            requestFocusFromIde(project)
+        }
+        focused = true
+    }
+
+    if (!focused) {
+        runCatching {
+            welcomeScreen {
+                val window = driver.cast(component, Window::class)
+                appIcon.requestFocus(window)
+                window.requestFocus()
+                toFront()
+            }
+        }
+    }
+}
