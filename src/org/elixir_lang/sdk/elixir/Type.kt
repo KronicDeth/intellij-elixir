@@ -29,9 +29,8 @@ import gnu.trove.THashSet
 import org.apache.commons.io.FilenameUtils
 import org.elixir_lang.Facet
 import org.elixir_lang.Icons
-import org.elixir_lang.jps.HomePath
 import org.elixir_lang.jps.model.SerializerExtension
-import org.elixir_lang.jps.sdk_type.Elixir
+import org.elixir_lang.sdk.HomePath
 import org.elixir_lang.sdk.ProcessOutput
 import org.elixir_lang.sdk.SdkHomeScan
 import org.elixir_lang.sdk.Type.ebinPathChainVirtualFile
@@ -151,15 +150,20 @@ ELIXIR_SDK_HOME
         }
 
     override fun isValidSdkHome(path: String): Boolean {
-        val elixir = Elixir.getScriptInterpreterExecutable(path)
-        val elixirc = Elixir.getByteCodeCompilerExecutable(path)
-        val iex = Elixir.getIExExecutable(path)
-        val mix = Elixir.mixFile(path)
+        val elixir = elixirExecutable(path, "elixir")
+        val elixirc = elixirExecutable(path, "elixirc")
+        val iex = elixirExecutable(path, "iex")
+        val mix = File(File(path, "bin"), "mix")
         return elixir.canExecute() &&
                 elixirc.canExecute() &&
                 iex.canExecute() &&
                 mix.canRead() &&
                 HomePath.hasEbinPath(path)
+    }
+
+    private fun elixirExecutable(sdkHome: String, executableName: String): File {
+        val fileName = HomePath.getExecutableFileName(sdkHome, executableName, ".bat")
+        return File(File(sdkHome, "bin"), fileName)
     }
 
     override fun setupSdkPaths(sdk: Sdk) {

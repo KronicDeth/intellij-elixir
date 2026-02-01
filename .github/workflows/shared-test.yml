@@ -280,7 +280,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ide-version: ['ideaIU:253.28294.334', 'rubymine:2025.3']
+        ide-version: ['ideaIU:253.28294.334']
 
     steps:
       - name: Download Plugin Artifact

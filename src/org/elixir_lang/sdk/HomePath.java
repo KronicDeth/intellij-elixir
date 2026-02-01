@@ -1,4 +1,4 @@
-package org.elixir_lang.jps;
+package org.elixir_lang.sdk;
 
 import com.intellij.execution.wsl.WslPath;
 import com.intellij.notification.NotificationGroupManager;
@@ -245,7 +245,7 @@ public class HomePath {
      * @param homePath the SDK home path
      * @return the source name (e.g., "mise", "asdf", "Homebrew", "Nix") or null if unknown
      */
-    @org.jetbrains.annotations.Nullable
+    @Nullable
     public static String detectSource(@NotNull String homePath) {
         String posixPath = com.intellij.openapi.util.io.FileUtil.toSystemIndependentName(homePath);
 
@@ -269,6 +269,67 @@ public class HomePath {
         }
 
         return null;
+    }
+
+    @Nullable
+    public static String mixHome(@Nullable String homePath) {
+        if (homePath == null) {
+            return null;
+        }
+
+        String source = detectSource(homePath);
+        if (source == null || !VERSION_MANAGERS.contains(source)) {
+            return null;
+        }
+
+        File binDir = new File(homePath, "bin");
+        File parentDir = binDir.getParentFile();
+        if (parentDir == null) {
+            return null;
+        }
+
+        return new File(parentDir, ".mix").getAbsolutePath();
+    }
+
+    @Nullable
+    public static String mixHomeReplacePrefix(@Nullable String source) {
+        if (SOURCE_NAME_MISE.equals(source)) {
+            return "/.local/share/mise/installs/";
+        }
+        if (SOURCE_NAME_ASDF.equals(source)) {
+            return "/.asdf/installs/";
+        }
+        if (SOURCE_NAME_ELIXIR_INSTALL.equals(source)) {
+            return "/.elixir-install/installs/";
+        }
+        return null;
+    }
+
+    public static boolean shouldReplaceMixHome(@Nullable String existingMixHome, @Nullable String replacePrefix) {
+        if (existingMixHome == null) {
+            return true;
+        }
+        if (replacePrefix == null) {
+            return false;
+        }
+
+        String posixPath = com.intellij.openapi.util.io.FileUtil.toSystemIndependentName(existingMixHome);
+        return posixPath.contains(replacePrefix);
+    }
+
+    public static void maybeUpdateMixHome(@NotNull Map<String, String> environment, @Nullable String homePath) {
+        String mixHome = mixHome(homePath);
+        if (mixHome == null) {
+            return;
+        }
+
+        String source = detectSource(homePath);
+        String replacePrefix = mixHomeReplacePrefix(source);
+        String existingMixHome = environment.get("MIX_HOME");
+        if (shouldReplaceMixHome(existingMixHome, replacePrefix)) {
+            environment.put("MIX_HOME", mixHome);
+            environment.put("MIX_ARCHIVES", mixHome + File.separator + "archives");
+        }
     }
 
     /**

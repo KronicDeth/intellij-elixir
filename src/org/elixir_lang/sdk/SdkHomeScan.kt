@@ -5,7 +5,6 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.util.Version
 import com.intellij.util.system.CpuArch
 import com.intellij.util.system.OS
-import org.elixir_lang.jps.HomePath
 import org.elixir_lang.sdk.wsl.wslCompat
 import java.io.File
 import java.nio.file.Path
