@@ -130,7 +130,7 @@ The Mix project import flow is also faster and more robust -- OTP apps are pre-s
 
 ### Deps Watcher Deadlock ([#3761](https://github.com/KronicDeth/intellij-elixir/pull/3761))
 
-Fixed a deadlock that occurred when the `/deps` directory was deleted while the deps watcher was active. This also fixes JPS Builder module name handling that had been broken since September 2024.
+Fixed a deadlock that occurred when the `/deps` directory was deleted while the deps watcher was active. This also fixes JPS Builder module name handling that had been broken since September 2025.
 
 ### Regex Sigil Interpolation ([#3765](https://github.com/KronicDeth/intellij-elixir/pull/3765))
 
