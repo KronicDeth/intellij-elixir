@@ -1549,6 +1549,31 @@ object QuotableImpl {
         )
     }
 
+    @JvmStatic
+    fun quotedFunctionCallFromInterpolation(
+        module: String,
+        identifier: String,
+        metadata: OtpErlangList,
+        vararg arguments: OtpErlangObject
+    ): OtpErlangTuple {
+        val quotedQualifiedIdentifier = quotedFunctionCall(
+            ".",
+            metadata,
+            OtpErlangAtom(module),
+            OtpErlangAtom(identifier)
+        )
+
+        val metadataObjectsList = metadata.elements().toMutableList()
+        metadataObjectsList.add(0, keywordTuple("from_interpolation", true))
+
+
+        return quotedFunctionCall(
+            quotedQualifiedIdentifier,
+            OtpErlangList(metadataObjectsList.toTypedArray()),
+            *arguments
+        )
+    }
+
     /*
      * Erlang will automatically stringify a list that is just a list of LATIN-1 printable code
      * points.
