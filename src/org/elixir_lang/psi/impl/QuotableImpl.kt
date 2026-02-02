@@ -338,7 +338,7 @@ object QuotableImpl {
         return quotedFunctionCall(
                 "Elixir.Access",
                 "get",
-                metadata(bracketArguments),
+                bracketOperationMetadata(bracketArguments),
                 quotedContainer,
                 quotedBracketArguments
         )
@@ -488,7 +488,7 @@ object QuotableImpl {
         return quotedFunctionCall(
                 "Elixir.Access",
                 "get",
-                metadata(bracketArguments),
+                bracketOperationMetadata(bracketArguments),
                 quotedContainer,
                 quotedBracketArguments
         )
@@ -559,7 +559,7 @@ object QuotableImpl {
         return quotedFunctionCall(
                 "Elixir.Access",
                 "get",
-                metadata(bracketArguments),
+                bracketOperationMetadata(bracketArguments),
                 quotedMatchedExpression,
                 quotedBracketArguments
         )
@@ -788,7 +788,7 @@ object QuotableImpl {
         return quotedFunctionCall(
                 "Elixir.Access",
                 "get",
-                metadata(bracketArguments),
+                bracketOperationMetadata(bracketArguments),
                 quotedContainer,
                 quotedBracketArguments
         )
@@ -894,7 +894,7 @@ object QuotableImpl {
         return quotedFunctionCall(
                 "Elixir.Access",
                 "get",
-                metadata(bracketArguments),
+                bracketOperationMetadata(bracketArguments),
                 quotedContainer,
                 quotedBracketArguments
         )
@@ -1507,6 +1507,14 @@ object QuotableImpl {
     fun metadata(operator: Operator): OtpErlangList = metadata(operator.operatorTokenNode())
     @JvmStatic
     fun metadata(element: PsiElement): OtpErlangList = metadata(element.node)
+
+    @JvmStatic
+    fun bracketOperationMetadata(element: PsiElement): OtpErlangList = OtpErlangList(
+        arrayOf<OtpErlangObject>(
+            keywordTuple("from_brackets", true),
+            lineNumberKeywordTuple(element.node)
+        )
+    )
 
     @JvmStatic
     fun quotedFunctionCall(
