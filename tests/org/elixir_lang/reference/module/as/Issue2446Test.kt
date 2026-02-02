@@ -1,9 +1,9 @@
 package org.elixir_lang.reference.module.`as`
 
 import com.intellij.codeInsight.completion.CompletionType
-import com.intellij.testFramework.fixtures.BasePlatformTestCase
+import org.elixir_lang.PlatformTestCase
 
-class Issue2446Test : BasePlatformTestCase() {
+class Issue2446Test : PlatformTestCase() {
     fun testCompletion() {
         myFixture.configureByFiles("index.ex", "asd_xS@ps.ex")
         myFixture.complete(CompletionType.BASIC, 1)

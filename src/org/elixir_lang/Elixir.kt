@@ -18,7 +18,7 @@ object Elixir {
     ): GeneralCommandLine {
         val erlangSdk = elixirSdkToEnsuredErlangSdk(elixirSdk)
         val commandLine =
-            org.elixir_lang.Erl.commandLine(
+            Erl.commandLine(
                 pty = false,
                 environment = environment,
                 workingDirectory = workingDirectory,

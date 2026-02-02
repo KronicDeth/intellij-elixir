@@ -6,10 +6,27 @@ on:
 jobs:
   publish-to-canary:
     runs-on: ubuntu-22.04
+    env:
+      GRADLE_USER_HOME: ${{ github.workspace }}/.gradle
+      GRADLE_CACHE_SCOPE: ${{ github.event.pull_request.head.repo.id || github.repository_id }}
+      GRADLE_CACHE_IDE_VERSION: '2025.3.2'
     steps:
       - name: Checkout
         id: checkout
         uses: actions/checkout@v6
+
+      - name: Restore Gradle cache
+        id: gradle-cache-restore
+        uses: actions/cache/restore@v5
+        with:
+          path: |
+            ${{ env.GRADLE_USER_HOME }}/caches
+            ${{ env.GRADLE_USER_HOME }}/wrapper
+            ${{ env.GRADLE_USER_HOME }}/notifications
+          key: gradle-${{ runner.os }}-${{ runner.arch }}-${{ env.GRADLE_CACHE_SCOPE }}-${{ env.GRADLE_CACHE_IDE_VERSION }}-${{ hashFiles('build.gradle.kts', 'settings.gradle.kts', 'gradle.properties', 'gradle/libs.versions.toml', 'gradle/wrapper/gradle-wrapper.properties', 'buildSrc/build.gradle.kts', 'buildSrc/settings.gradle.kts') }}
+          restore-keys: |
+            gradle-${{ runner.os }}-${{ runner.arch }}-${{ env.GRADLE_CACHE_SCOPE }}-${{ env.GRADLE_CACHE_IDE_VERSION }}-
+            gradle-${{ runner.os }}-${{ runner.arch }}-${{ env.GRADLE_CACHE_SCOPE }}-
 
       - name: Setup Build Environment
         id: setup-env
@@ -33,3 +50,14 @@ jobs:
           JET_BRAINS_MARKETPLACE_TOKEN: ${{ secrets.JetBrainsMarketplaceToken }}
         run: |
           ./gradlew publishPlugin -PdistributionFile=intellij-elixir-${{ github.ref_name }}.zip
+
+      - name: Save Gradle cache
+        id: gradle-cache-save
+        if: always() && steps.gradle-cache-restore.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v5
+        with:
+          path: |
+            ${{ env.GRADLE_USER_HOME }}/caches
+            ${{ env.GRADLE_USER_HOME }}/wrapper
+            ${{ env.GRADLE_USER_HOME }}/notifications
+          key: ${{ steps.gradle-cache-restore.outputs.cache-primary-key }}

@@ -3,6 +3,7 @@ package org.elixir_lang.run
 import com.intellij.execution.CommonProgramRunConfigurationParameters
 import com.intellij.execution.ExternalizablePath
 import com.intellij.execution.configurations.ConfigurationFactory
+import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.configurations.ModuleBasedConfiguration
 import com.intellij.execution.configurations.ParametersList
 import com.intellij.openapi.module.ModuleManager
@@ -40,10 +41,8 @@ fun ensureWorkingDirectory(module: com.intellij.openapi.module.Module): String =
 fun List<String>.toArguments(): String? {
     val joined = ParametersList.join(this)
 
-    return if (joined.isBlank()) {
+    return joined.ifBlank {
         null
-    } else {
-        joined
     }
 }
 
@@ -195,8 +194,10 @@ abstract class Configuration(name: String, project: Project, configurationFactor
         _envs.putAll(envs)
     }
 
+    abstract fun commandLine(): GeneralCommandLine
+
     fun ensureModule(): com.intellij.openapi.module.Module =
-            configurationModule.module ?: ensureWorkingDirectory().let { ensureModule(it, project) }
+            configurationModule.module ?: ensureModule(ensureWorkingDirectory(), project)
 
     override fun getWorkingDirectory(): String? = ExternalizablePath.localPathValue(workingDirectoryURL)
 

@@ -2,11 +2,7 @@ package org.elixir_lang.status_bar_widget
 
 import com.intellij.icons.AllIcons
 import com.intellij.ide.DataManager
-import com.intellij.openapi.actionSystem.ActionManager
-import com.intellij.openapi.actionSystem.AnAction
-import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.actionSystem.DefaultActionGroup
-import com.intellij.openapi.actionSystem.ex.ActionUtil
+import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.ProjectJdkTable
@@ -15,14 +11,14 @@ import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.wm.CustomStatusBarWidget
 import com.intellij.openapi.wm.StatusBar
-import com.intellij.openapi.wm.StatusBarWidget
 import com.intellij.openapi.wm.impl.status.TextPanel
 import com.intellij.ui.ClickListener
 import com.intellij.ui.awt.RelativePoint
 import com.intellij.util.messages.MessageBusConnection
+import com.intellij.util.ui.JBUI
 import org.elixir_lang.Icons
-import org.elixir_lang.action.RefreshAllElixirSdksAction
 import org.elixir_lang.jps.HomePath
+import org.elixir_lang.sdk.elixir.SdkSettingsOpener
 import org.elixir_lang.sdk.elixir.Type
 import org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData
 import org.jetbrains.annotations.NotNull
@@ -43,7 +39,7 @@ class ElixirSdkStatusWidget(@param:NotNull private val project: Project) : Custo
 
     private val component: TextPanel.WithIconAndArrows by lazy {
         val panel = TextPanel.WithIconAndArrows()
-        panel.border = StatusBarWidget.WidgetBorder.ICON
+        panel.border = JBUI.CurrentTheme.StatusBar.Widget.iconBorder()
 
         object : ClickListener() {
             override fun onClick(event: MouseEvent, clickCount: Int): Boolean {
@@ -113,7 +109,9 @@ class ElixirSdkStatusWidget(@param:NotNull private val project: Project) : Custo
     private fun showPopup(e: MouseEvent) {
         val actionGroup = DefaultActionGroup().apply {
             add(createAddSdkAction())
-            add(RefreshAllElixirSdksAction())
+            val actionManager = ActionManager.getInstance()
+            actionManager.getAction("Elixir.RefreshAllElixirSdks")?.let { add(it) }
+            actionManager.getAction("Elixir.InstallMixDependencies")?.let { add(it) }
         }
 
         val dataContext = DataManager.getInstance().getDataContext(component)
@@ -135,14 +133,27 @@ class ElixirSdkStatusWidget(@param:NotNull private val project: Project) : Custo
     }
 
     private fun createAddSdkAction(): AnAction {
-        return object : AnAction("Add Elixir SDK...", "Open Project Structure to add an Elixir SDK", AllIcons.General.Add) {
+
+        return object : AnAction("Configure Elixir SDKs...", "", AllIcons.General.Add) {
             override fun actionPerformed(e: AnActionEvent) {
-                // Open Project Structure dialog (File -> Project Structure)
-                val action = ActionManager.getInstance().getAction("ShowProjectStructureSettings")
-                if (action != null) {
-                    val dataContext = DataManager.getInstance().getDataContext(component)
-                    ActionUtil.invokeAction(action, dataContext, "ElixirSdkStatusWidget", null, null)
+                SdkSettingsOpener.getInstance().open(e)
+            }
+
+            override fun getActionUpdateThread(): ActionUpdateThread = ActionUpdateThread.BGT
+
+            override fun update(e: AnActionEvent) {
+                val status = detectSdkStatus()
+                val isConfigured = status !is SdkStatus.NotConfigured
+                val text = if (isConfigured) "Configure Elixir SDKs..." else "Add Elixir SDK..."
+                val targetName = SdkSettingsOpener.getInstance().targetName()
+                val description = if (isConfigured) {
+                    "Configure Elixir SDKs in $targetName"
+                } else {
+                    "Open $targetName to add an Elixir SDK"
                 }
+
+                e.presentation.text = text
+                e.presentation.description = description
             }
         }
     }
@@ -245,7 +256,10 @@ class ElixirSdkStatusWidget(@param:NotNull private val project: Project) : Custo
 
     private fun detectSdkStatus(): SdkStatus {
         val elixirSdk = Type.mostSpecificSdk(project) ?: return SdkStatus.NotConfigured
-        val elixirVersion = elixirSdk.versionString ?: "Unknown"
+        val versionString = elixirSdk.versionString ?: "Unknown"
+
+        // Add WSL distribution suffix if this is a WSL SDK
+        val elixirVersion = org.elixir_lang.sdk.Type.appendWslSuffix(versionString, elixirSdk.homePath)
 
         if (!isValidSdk(elixirSdk)) {
             return SdkStatus.Partial(elixirSdk, elixirVersion, "Invalid Elixir SDK")

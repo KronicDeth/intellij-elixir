@@ -22,7 +22,7 @@ import org.jdom.Element
 
 class Configuration(name: String, project: Project) :
         org.elixir_lang.run.Configuration(name, project, Factory),
-        Debuggable<org.elixir_lang.espec.Configuration>,
+        Debuggable<Configuration>,
         RunConfigurationWithSuppressedDefaultRunAction,
         RunConfigurationWithSuppressedDefaultDebugAction {
     override val cookie: String? = null
@@ -89,7 +89,7 @@ class Configuration(name: String, project: Project) :
 
     var mixESpecArgumentList: MutableList<String> = mutableListOf()
 
-    fun commandLine(): GeneralCommandLine {
+    override fun commandLine(): GeneralCommandLine {
         val workingDirectory = ensureWorkingDirectory()
         val module = ensureModule()
         val sdk = ensureMostSpecificSdk(module)

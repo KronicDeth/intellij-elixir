@@ -31,6 +31,9 @@
                 implementation="org.elixir_lang.status_bar_widget.ElixirSdkStatusWidgetFactory"/>
         <backgroundPostStartupActivity implementation="org.elixir_lang.status_bar_widget.ElixirSdkStatusWidgetStartupActivity"/>
 
+        <postStartupActivity implementation="org.elixir_lang.sdk.SdkTableListenerStartupActivity"/>
+        <postStartupActivity implementation="org.elixir_lang.mix.DepsCheckerStartupActivity"/>
+
         <!--        <errorHandler implementation="org.elixir_lang.errorreport.Submitter"/>-->
         <errorHandler implementation="com.intellij.diagnostic.JetBrainsMarketplaceErrorReportSubmitter"/>
 
@@ -117,6 +120,13 @@
 
         <applicationService serviceInterface="org.elixir_lang.configuration.BeforeRunTaskProvider"
                             serviceImplementation="org.elixir_lang.configuration.DefaultBeforeRunTaskProvider"/>
+
+        <!-- WSL Support Service -->
+        <applicationService serviceInterface="org.elixir_lang.sdk.wsl.WslCompatService"
+                            serviceImplementation="org.elixir_lang.sdk.wsl.WslCompatServiceImpl"/>
+        <applicationService serviceInterface="org.elixir_lang.sdk.elixir.SdkSettingsOpener"
+                            serviceImplementation="org.elixir_lang.sdk.elixir.SettingsSdkSettingsOpener"/>
+
 
         <!-- for template -->
         <internalFileTemplate name="Elixir Module"/>
@@ -235,7 +245,7 @@
         <localInspection displayName="Ambiguous parentheses" enabledByDefault="true" groupName="Elixir"
                          implementationClass="org.elixir_lang.inspection.NoParenthesesStrict" language="Elixir"
                          level="ERROR" shortName="NoParenthesesStrict"/>
-        <localInspection displayName="Keywords Not At End" enabledByDefault="true"
+        <localInspection displayName="Keywords not at end" enabledByDefault="true"
                          groupName="Elixir" implementationClass="org.elixir_lang.inspection.KeywordsNotAtEnd"
                          language="Elixir" level="ERROR" shortName="KeywordsNotAtEnd"/>
         <localInspection displayName="Keyword pair colon (:) used in type spec instead of type operator (::)"
@@ -302,7 +312,7 @@
         <group id="LangElixir.NewActions">
             <separator/>
             <action id="Elixir.NewFile" class="org.elixir_lang.create_module.Action"
-                    text="Elixir File" description="Create new Elixir Module"/>
+                    text="Elixir File" description="Create new Elixir module"/>
             <separator/>
 
             <!--suppress PluginXmlValidity -->
@@ -312,10 +322,15 @@
             <separator/>
             <action id="Elixir.Help" class="org.elixir_lang.action.HelpAction" text="IntelliJ Elixir Help" icon="AllIcons.Windows.Help" />
             <separator/>
-            <add-to-group group-id="HelpMenu" anchor="before" relative-to-action="ProductivityGuide"/>
+            <add-to-group group-id="HelpMenu" anchor="last"/>
         </group>
         <group id="LangElixir.SdkActions">
             <separator/>
+            <action id="Elixir.OpenElixirSdkSettings"
+                    class="org.elixir_lang.action.OpenElixirSdkSettingsAction"
+                    text="Configure Elixir SDKs"
+                    icon="AllIcons.General.Settings"
+                    description="Open Settings to configure Elixir SDKs"/>
             <action id="Elixir.RefreshActiveElixirSdk" class="org.elixir_lang.action.RefreshActiveElixirSdkAction"
                     text="Refresh Active Elixir SDK"
                     icon="AllIcons.General.Refresh"
@@ -328,6 +343,12 @@
                     text="Delete All Elixir/Erlang SDKs"
                     icon="AllIcons.General.Remove"
                     description="Removes all Elixir and Erlang SDKs from the IDE (useful in Small IDEs where SDKs can become corrupted)"/>
+            <separator/>
+            <!--suppress PluginXmlCapitalization -->
+            <action id="Elixir.InstallMixDependencies" class="org.elixir_lang.action.InstallMixDependenciesAction"
+                    text="Install Mix Dependencies (hex, rebar, deps.get)"
+                    icon="org.elixir_lang.mix.configuration.Icons.TYPE"
+                    description="Installs hex, rebar, and fetches Mix dependencies"/>
             <separator/>
             <add-to-group group-id="ToolsMenu" anchor="last"/>
         </group>

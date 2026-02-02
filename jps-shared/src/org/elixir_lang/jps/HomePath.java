@@ -1,17 +1,19 @@
 package org.elixir_lang.jps;
 
+import com.intellij.execution.wsl.WslPath;
 import com.intellij.notification.NotificationGroupManager;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.util.Version;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
+import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -21,10 +23,20 @@ public class HomePath {
     private static final String HEAD_PREFIX = "HEAD-";
     public static final String LINUX_MINT_HOME_PATH = "/usr/lib";
     public static final String LINUX_DEFAULT_HOME_PATH = "/usr/local/lib";
+    public static final String NIX_STORE_PATH = "/nix/store";
     public static final Version UNKNOWN_VERSION = new Version(0, 0, 0);
     private static final File HOMEBREW_ROOT = new File("/usr/local/Cellar");
-    private static final File NIX_STORE = new File("/nix/store/");
+    private static final File NIX_STORE = new File(NIX_STORE_PATH);
     private static final Logger LOGGER = Logger.getInstance(HomePath.class);
+
+    public static final String SOURCE_NAME_ASDF = "asdf";
+    public static final String SOURCE_NAME_MISE = "mise";
+    public static final String SOURCE_NAME_ELIXIR_INSTALL = "elixir-install";
+    public static final String SOURCE_NAME_HOMEBREW = "Homebrew";
+    public static final String SOURCE_NAME_NIX = "Nix";
+    public static final String SOURCE_NAME_KERL = "kerl";
+
+    public static final List<String> VERSION_MANAGERS = List.of(SOURCE_NAME_ASDF, SOURCE_NAME_MISE, SOURCE_NAME_ELIXIR_INSTALL);
 
     private HomePath() {
     }
@@ -32,16 +44,24 @@ public class HomePath {
     public static void eachEbinPath(@NotNull String homePath, @NotNull Consumer<Path> ebinPathConsumer) {
         Path lib = Paths.get(homePath, "lib");
 
-        try (DirectoryStream<Path> libDirectoryStream = Files.newDirectoryStream(lib, path -> Files.isDirectory(path))) {
-            libDirectoryStream.forEach(
-                    app -> {
-                        try (DirectoryStream<Path> ebinDirectoryStream = Files.newDirectoryStream(app, "ebin")) {
-                            ebinDirectoryStream.forEach(ebinPathConsumer);
-                        } catch (IOException ioException) {
-                            LOGGER.error(ioException);
-                        }
+        // For WSL paths, newDirectoryStream translates them to Linux paths, and there's no way to stop it. It's also the
+        // most performant way of dealing with files so we prefer to keep it and then fix it with `resolve` to get back to the UNC path.
+        DirectoryStream.Filter<Path> filter = path -> wslSafeIsDirectory(lib, path);
+
+        try (DirectoryStream<Path> libDirectoryStream = Files.newDirectoryStream(lib, filter)) {
+            for (Path app : libDirectoryStream) {
+                // Translate app path back to UNC
+                Path uncApp = maybeTranslateToUnc(lib, app);
+                try (DirectoryStream<Path> ebinDirectoryStream = Files.newDirectoryStream(uncApp, "ebin")) {
+                    for (Path ebinPath : ebinDirectoryStream) {
+                        // Translate ebinPath back to UNC before passing to consumer
+                        Path uncEbinPath = maybeTranslateToUnc(uncApp, ebinPath);
+                        ebinPathConsumer.accept(uncEbinPath);
                     }
-            );
+                } catch (IOException ioException) {
+                    LOGGER.error("IOException processing app " + uncApp, ioException);
+                }
+            }
         } catch (NoSuchFileException noSuchFileException) {
             NotificationGroupManager
                     .getInstance()
@@ -49,15 +69,31 @@ public class HomePath {
                     .createNotification(noSuchFileException.getFile() + " does not exist, so its ebin paths cannot be enumerated.", NotificationType.ERROR)
                     .notify();
         } catch (IOException ioException) {
-            LOGGER.error(ioException);
+            LOGGER.error("IOException opening DirectoryStream for lib", ioException);
         }
+    }
+
+    /**
+     * Translate files back to WSL UNC paths if appropriate before checking whether they are a directory
+     *
+     * @param basePath the parent path with full UNC
+     * @param path     the (maybe) translated path to check.
+     * @return boolean
+     */
+    private static boolean wslSafeIsDirectory(Path basePath, Path path) {
+        return Files.isDirectory(maybeTranslateToUnc(basePath, path));
+    }
+
+    private static Path maybeTranslateToUnc(Path basePath, Path path) {
+        return basePath.resolve(path.getFileName().toString());
     }
 
     public static boolean hasEbinPath(@NotNull String homePath) {
         Path lib = Paths.get(homePath, "lib");
         boolean hasEbinPath = false;
 
-        try (DirectoryStream<Path> libDirectoryStream = Files.newDirectoryStream(lib, path -> Files.isDirectory(path))) {
+        DirectoryStream.Filter<Path> filter = path -> wslSafeIsDirectory(lib, path);
+        try (DirectoryStream<Path> libDirectoryStream = Files.newDirectoryStream(lib, filter)) {
             for (Path app : libDirectoryStream) {
                 try (DirectoryStream<Path> ebinDirectoryStream = Files.newDirectoryStream(app, "ebin")) {
                     if (ebinDirectoryStream.iterator().hasNext()) {
@@ -82,13 +118,28 @@ public class HomePath {
     }
 
     public static void mergeASDF(@NotNull Map<Version, String> homePathByVersion, @NotNull String name) {
-        mergeNameSubdirectories(homePathByVersion, Paths.get(System.getProperty("user.home"), ".asdf", "installs").toFile(), name, Function.identity());
+        mergeASDF(homePathByVersion, name, System.getProperty("user.home"));
     }
 
-    public static void mergeMise(@NotNull Map<Version, String> homePathByVersion,
-                                 @NotNull String name,
-                                 @NotNull Function<File, File> versionPathToHomePath) {
-        mergeNameSubdirectories(homePathByVersion, Paths.get(System.getProperty("user.home"), ".local", "share", "mise", "installs").toFile(), name, versionPathToHomePath);
+    public static void mergeASDF(@NotNull Map<Version, String> homePathByVersion, @NotNull String name, @NotNull String userHome) {
+        mergeNameSubdirectories(homePathByVersion, Paths.get(userHome, ".asdf", "installs").toFile(), name, Function.identity());
+    }
+
+    public static void mergeMise(@NotNull Map<Version, String> homePathByVersion, @NotNull String name) {
+        mergeMise(homePathByVersion, name, System.getProperty("user.home"));
+    }
+
+    public static void mergeMise(@NotNull Map<Version, String> homePathByVersion, @NotNull String name, @NotNull String userHome) {
+        mergeNameSubdirectories(homePathByVersion, Paths.get(userHome, ".local", "share", "mise", "installs").toFile(), name, Function.identity());
+    }
+
+    // Installed by https://elixir-lang.org/install.html#install-scripts
+    public static void mergeElixirInstallScript(@NotNull Map<Version, String> homePathByVersion, @NotNull String name) {
+        mergeElixirInstallScript(homePathByVersion, name, System.getProperty("user.home"));
+    }
+
+    public static void mergeElixirInstallScript(@NotNull Map<Version, String> homePathByVersion, @NotNull String name, @NotNull String userHome) {
+        mergeNameSubdirectories(homePathByVersion, Paths.get(userHome, ".elixir-install", "installs").toFile(), name, Function.identity());
     }
 
     public static void mergeHomebrew(@NotNull Map<Version, String> homePathByVersion,
@@ -141,9 +192,17 @@ public class HomePath {
     public static void mergeNixStore(@NotNull Map<Version, String> homePathByVersion,
                                      @NotNull Pattern nixPattern,
                                      @NotNull Function<File, File> versionPathToHomePath) {
-        if (NIX_STORE.isDirectory()) {
+        mergeNixStore(homePathByVersion, nixPattern, versionPathToHomePath, NIX_STORE.getAbsolutePath());
+    }
+
+    public static void mergeNixStore(@NotNull Map<Version, String> homePathByVersion,
+                                     @NotNull Pattern nixPattern,
+                                     @NotNull Function<File, File> versionPathToHomePath,
+                                     @NotNull String nixStorePath) {
+        File nixStore = new File(nixStorePath);
+        if (nixStore.isDirectory()) {
             //noinspection ResultOfMethodCallIgnored
-            NIX_STORE.listFiles(
+            nixStore.listFiles(
                     (dir, name) -> {
                         Matcher matcher = nixPattern.matcher(name);
                         boolean accept = false;
@@ -170,19 +229,14 @@ public class HomePath {
         final String userHome = System.getProperty("user.home");
 
         if (userHome != null) {
-            mergeNameSubdirectories(homePathByVersion, new File(userHome), "otp", versionPathToHomePath);
+            mergeTravisCIKerl(homePathByVersion, versionPathToHomePath, userHome);
         }
     }
 
-    @Contract(pure = true)
-    @NotNull
-    public static Map<Version, String> homePathByVersion() {
-        return new TreeMap<>(
-                (version1, version2) -> {
-                    // compare version2 to version1 to produce descending instead of ascending order.
-                    return version2.compareTo(version1);
-                }
-        );
+    public static void mergeTravisCIKerl(@NotNull Map<Version, String> homePathByVersion,
+                                         @NotNull Function<File, File> versionPathToHomePath,
+                                         @NotNull String userHome) {
+        mergeNameSubdirectories(homePathByVersion, new File(userHome), "otp", versionPathToHomePath);
     }
 
     /**
@@ -193,19 +247,27 @@ public class HomePath {
      */
     @org.jetbrains.annotations.Nullable
     public static String detectSource(@NotNull String homePath) {
-        if (homePath.contains("/.local/share/mise/installs/")) {
-            return "mise";
-        } else if (homePath.contains("/.asdf/installs/")) {
-            return "asdf";
-        } else if (homePath.contains("/usr/local/Cellar/") || homePath.contains("/opt/homebrew/Cellar/")) {
-            return "Homebrew";
-        } else if (homePath.contains("/nix/store/")) {
-            return "Nix";
-        } else if (homePath.contains("/otp/")) {
-            return "kerl";
-        } else if (new File(homePath, ".kerl_config").exists()) {
-            return "kerl";
+        String posixPath = com.intellij.openapi.util.io.FileUtil.toSystemIndependentName(homePath);
+
+        if (posixPath.contains("/.local/share/mise/installs/")) {
+            return SOURCE_NAME_MISE;
         }
+        if (posixPath.contains("/.asdf/installs/")) {
+            return SOURCE_NAME_ASDF;
+        }
+        if (posixPath.contains("/.elixir-install/")) {
+            return SOURCE_NAME_ELIXIR_INSTALL;
+        }
+        if (posixPath.contains("/usr/local/Cellar/") || posixPath.contains("/opt/homebrew/Cellar/")) {
+            return SOURCE_NAME_HOMEBREW;
+        }
+        if (posixPath.contains("/nix/store/")) {
+            return SOURCE_NAME_NIX;
+        }
+        if (posixPath.contains("/otp/") || new File(homePath, ".kerl_config").exists()) {
+            return SOURCE_NAME_KERL;
+        }
+
         return null;
     }
 
@@ -259,5 +321,14 @@ public class HomePath {
         } catch (IOException | InterruptedException e) {
             return false;
         }
+    }
+
+    @NotNull
+    public static String getExecutableFileName(@Nullable String sdkHome, @NotNull String executableName, @NotNull String windowsExt) {
+        // WSL paths should not have .bat extension even on Windows
+        if (sdkHome != null && WslPath.isWslUncPath(sdkHome)) {
+            return executableName;
+        }
+        return SystemInfo.isWindows ? executableName + windowsExt : executableName;
     }
 }

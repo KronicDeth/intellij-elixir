@@ -1,9 +1,8 @@
 package org.elixir_lang
 
 import com.intellij.ide.projectView.impl.ProjectRootsUtil.isModuleContentRoot
-import com.intellij.openapi.application.edtWriteAction
+import com.intellij.openapi.components.service
 import com.intellij.openapi.module.ModuleManager
-import kotlinx.coroutines.runBlocking
 import com.intellij.openapi.module.ModuleUtil
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
@@ -16,12 +15,14 @@ import com.intellij.openapi.roots.libraries.Library
 import com.intellij.openapi.roots.libraries.LibraryTable
 import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.openapi.vfs.newvfs.BulkFileListener
 import com.intellij.openapi.vfs.newvfs.events.VFileCreateEvent
 import com.intellij.openapi.vfs.newvfs.events.VFileDeleteEvent
 import com.intellij.openapi.vfs.newvfs.events.VFileEvent
 import org.elixir_lang.mix.Watcher
 import org.elixir_lang.mix.library.Kind
+import org.elixir_lang.util.DebouncedBulkFileListener
+import org.elixir_lang.util.ElixirProjectDisposable
+import org.elixir_lang.util.WriteActions.runWriteAction
 import java.net.URI
 
 /**
@@ -30,15 +31,20 @@ import java.net.URI
  * * `deps/APPLICATION/{c_src,lib,priv,src}` - sources
  * * `_build/ENVIRONMENT/{consolidated,lib/APPLICATION/ebin` - classes
  */
-class DepsWatcher(val project: Project) : BulkFileListener {
-    override fun after(events: MutableList<out VFileEvent>) {
-        events.forEach { vFileEvent ->
-            when (vFileEvent) {
-                is VFileDeleteEvent -> fileDeleted(vFileEvent)
-                is VFileCreateEvent -> fileCreated(vFileEvent)
-            }
+class DepsWatcher(val project: Project) : DebouncedBulkFileListener(project.service<ElixirProjectDisposable>(), MERGE_DELAY_MS) {
+    private val pendingLock = Any()
+    private val pendingDeleteAllDepsUrls = mutableSetOf<String>()
+    private val pendingDeleteLibraryNames = mutableSetOf<String>()
+    private val pendingSyncDepsRoots = mutableSetOf<VirtualFile>()
+    private val pendingSyncDepRoots = mutableSetOf<VirtualFile>()
+    private var pendingSyncAll = false
+
+    override fun enqueue(event: VFileEvent): Boolean =
+        when (event) {
+            is VFileDeleteEvent -> fileDeleted(event)
+            is VFileCreateEvent -> fileCreated(event)
+            else -> false
         }
-    }
 
     /**
      * If a file is deleted, it is need to determine whether it affect no deps, 1 dep, or all deps.
@@ -48,13 +54,14 @@ class DepsWatcher(val project: Project) : BulkFileListener {
      *
      * Other deletes cause syncs in [syncLibraries]
      */
-    private fun fileDeleted(event: VFileDeleteEvent) {
-        if (event.file.let { file -> file.name == "deps" && isModuleContentRoot(file.parent, project) }) {
-            deleteAllLibraries(event.file)
-        } else if (event.file.parent?.let { parent -> parent.name == "deps" && isModuleContentRoot(parent.parent, project) } == true) {
-            deleteLibrary(event.file)
-        } else {
-            syncLibraries(event)
+    private fun fileDeleted(event: VFileDeleteEvent): Boolean {
+        val file = event.file
+
+        return when {
+            file.name == "deps" && isModuleContentRoot(file.parent, project) -> queueDeleteAllLibraries(file.url)
+            file.parent?.let { parent -> parent.name == "deps" && isModuleContentRoot(parent.parent, project) } == true ->
+                queueDeleteLibrary(file.name)
+            else -> syncLibraries(event)
         }
     }
 
@@ -66,23 +73,15 @@ class DepsWatcher(val project: Project) : BulkFileListener {
      *
      * Other creates cause syncs in [syncLibraries]
      */
-    private fun fileCreated(event: VFileCreateEvent) {
-        event.file?.let { file ->
-            if (file.name == "deps" && isModuleContentRoot(event.parent, project)) {
-                ProgressManager.getInstance().run(object : Task.Backgroundable(project, "Syncing Libraries in deps", true) {
-                    override fun run(indicator: ProgressIndicator) {
-                        syncLibraries(file, indicator)
-                    }
-                })
-            } else if (event.parent.let { parent -> parent.name == "deps" && isModuleContentRoot(parent.parent, project) }) {
-                ProgressManager.getInstance().run(object : Task.Backgroundable(project, "Syncing Library in deps/${file.name}", true) {
-                    override fun run(indicator: ProgressIndicator) {
-                        syncLibrary(file, indicator)
-                    }
-                })
-            } else {
-                syncLibraries(file)
-            }
+    private fun fileCreated(event: VFileCreateEvent): Boolean {
+        val file = event.file ?: return false
+
+        return if (file.name == "deps" && isModuleContentRoot(event.parent, project)) {
+            queueSyncDepsRoot(file)
+        } else if (event.parent.let { parent -> parent.name == "deps" && isModuleContentRoot(parent.parent, project) }) {
+            queueSyncDepRoot(file)
+        } else {
+            syncLibraries(event)
         }
     }
 
@@ -97,76 +96,187 @@ class DepsWatcher(val project: Project) : BulkFileListener {
      * * `_build/ENVIRONMENT/lib/APPLICATION` - syncLibrary(deps/APPLICATION)
      * * `_build/ENVIRONMENT/lib/APPLICATION/ebin` - syncLibrary(deps/APPLICATION)
      */
-    private fun syncLibraries(event: VFileEvent) {
-        event.file?.let(this::syncLibraries)
+    private fun syncLibraries(event: VFileEvent): Boolean {
+        val file = event.file ?: return false
+
+        return queueSyncFor(file)
     }
 
     fun syncLibraries(virtualFile: VirtualFile) {
+        when (val request = syncRequestFor(virtualFile)) {
+            SyncRequest.All -> scheduleSyncAll()
+            is SyncRequest.Dep -> scheduleSyncDep(request.depRoot)
+            null -> Unit
+        }
+    }
+
+    private fun syncRequestFor(virtualFile: VirtualFile): SyncRequest? {
         val fileName = virtualFile.name
-        virtualFile.parent?.let { parent ->
-            if (fileName == "_build" && isModuleContentRoot(parent, project)) {
-                ProgressManager.getInstance().run(object : Task.Backgroundable(project, "Syncing Libraries in _build", true) {
-                    override fun run(indicator: ProgressIndicator) {
-                        syncLibraries(indicator)
+        val parent = virtualFile.parent ?: return null
+
+        if (fileName == "_build" && isModuleContentRoot(parent, project)) {
+            return SyncRequest.All
+        }
+
+        val grandParent = parent.parent ?: return null
+
+        if (parent.name == "_build" && isModuleContentRoot(grandParent, project)) {
+            return SyncRequest.All
+        }
+
+        val greatGrandParent = grandParent.parent ?: return null
+
+        if (fileName in arrayOf("consolidated", "lib") && grandParent.name == "_build" && isModuleContentRoot(greatGrandParent, project)) {
+            return SyncRequest.All
+        }
+
+        if (fileName in SOURCE_NAMES && grandParent.name == "deps" && isModuleContentRoot(greatGrandParent, project)) {
+            return SyncRequest.Dep(parent)
+        }
+
+        val greatGreatGrandParent = greatGrandParent.parent ?: return null
+
+        if (parent.name == "lib" && greatGrandParent.name == "_build" && isModuleContentRoot(greatGreatGrandParent, project)) {
+            val dep = greatGreatGrandParent.findChild("deps")?.findChild(fileName)
+            return dep?.let { SyncRequest.Dep(it) }
+        }
+
+        if (fileName == "ebin" && grandParent.name == "lib" && greatGreatGrandParent.name == "_build" &&
+            isModuleContentRoot(greatGreatGrandParent.parent, project)) {
+            val dep = greatGreatGrandParent.parent?.findChild("deps")?.findChild(parent.name)
+            return dep?.let { SyncRequest.Dep(it) }
+        }
+
+        return null
+    }
+
+    private fun queueDeleteAllLibraries(depsUrl: String): Boolean {
+        synchronized(pendingLock) {
+            pendingDeleteAllDepsUrls.add(depsUrl)
+        }
+
+        return true
+    }
+
+    private fun queueDeleteLibrary(depName: String): Boolean {
+        synchronized(pendingLock) {
+            pendingDeleteLibraryNames.add(depName)
+        }
+
+        return true
+    }
+
+    private fun queueSyncDepsRoot(depsRoot: VirtualFile): Boolean {
+        synchronized(pendingLock) {
+            pendingSyncDepsRoots.add(depsRoot)
+        }
+
+        return true
+    }
+
+    private fun queueSyncDepRoot(depRoot: VirtualFile): Boolean {
+        synchronized(pendingLock) {
+            pendingSyncDepRoots.add(depRoot)
+        }
+
+        return true
+    }
+
+    private fun queueSyncFor(file: VirtualFile): Boolean {
+        return when (val request = syncRequestFor(file)) {
+            SyncRequest.All -> queueSyncAll()
+            is SyncRequest.Dep -> queueSyncDepRoot(request.depRoot)
+            null -> false
+        }
+    }
+
+    private fun queueSyncAll(): Boolean {
+        synchronized(pendingLock) {
+            pendingSyncAll = true
+            pendingSyncDepsRoots.clear()
+            pendingSyncDepRoots.clear()
+        }
+
+        return true
+    }
+
+    override fun flushPending() {
+        // TODO: SingleAlarm flush runs on EDT; consider moving library-table scans to a pooled thread.
+        val deleteAllDepsUrls: Set<String>
+        val deleteLibraryNames: Set<String>
+        val syncAll: Boolean
+        val syncDepsRoots: Set<VirtualFile>
+        val syncDepRoots: Set<VirtualFile>
+
+        synchronized(pendingLock) {
+            deleteAllDepsUrls = pendingDeleteAllDepsUrls.toSet()
+            deleteLibraryNames = pendingDeleteLibraryNames.toSet()
+            syncAll = pendingSyncAll
+            syncDepsRoots = pendingSyncDepsRoots.toSet()
+            syncDepRoots = pendingSyncDepRoots.toSet()
+
+            pendingDeleteAllDepsUrls.clear()
+            pendingDeleteLibraryNames.clear()
+            pendingSyncAll = false
+            pendingSyncDepsRoots.clear()
+            pendingSyncDepRoots.clear()
+        }
+
+        deleteAllDepsUrls.forEach { deleteAllLibraries(it) }
+        deleteLibraryNames.forEach { deleteLibrary(it) }
+
+        if (syncAll) {
+            scheduleSyncAll()
+        } else {
+            scheduleSyncRequests(syncDepsRoots, syncDepRoots)
+        }
+    }
+
+    private fun scheduleSyncAll() {
+        ProgressManager.getInstance().run(object : Task.Backgroundable(project, "Syncing Elixir libraries", true) {
+            override fun run(indicator: ProgressIndicator) {
+                syncLibraries(indicator)
+            }
+        })
+    }
+
+    private fun scheduleSyncRequests(
+        depsRoots: Set<VirtualFile>,
+        depRoots: Set<VirtualFile>
+    ) {
+        val validDepsRoots = depsRoots.filter { it.isValid }.toSet()
+        val validDepRoots = depRoots
+            .filter { it.isValid }
+            .filterNot { depRoot -> validDepsRoots.any { it == depRoot.parent } }
+            .toSet()
+
+        if (validDepsRoots.isEmpty() && validDepRoots.isEmpty()) {
+            return
+        }
+
+        ProgressManager.getInstance().run(object : Task.Backgroundable(project, "Syncing Elixir libraries", true) {
+            override fun run(indicator: ProgressIndicator) {
+                for (depsRoot in validDepsRoots) {
+                    if (indicator.isCanceled) {
+                        break
                     }
-                })
-            } else {
-                parent.parent?.let { grandParent ->
-                    if (parent.name == "_build" && isModuleContentRoot(grandParent, project)) {
-                        ProgressManager.getInstance().run(object : Task.Backgroundable(project, "Syncing Libraries in _build/$fileName", true) {
-                            override fun run(indicator: ProgressIndicator) {
-                                syncLibraries(indicator)
-                            }
-                        })
-                    } else {
-                        grandParent.parent?.let { greatGrandParent ->
-                            if (fileName in arrayOf("consolidated", "lib") && grandParent.name == "_build" && isModuleContentRoot(greatGrandParent, project)) {
-                                ProgressManager.getInstance().run(object : Task.Backgroundable(project, "Syncing Libraries in _build/${parent.name}/$fileName", true) {
-                                    override fun run(indicator: ProgressIndicator) {
-                                        syncLibraries(indicator)
-                                    }
-                                })
-                            } else if (fileName in SOURCE_NAMES && grandParent.name == "deps" && isModuleContentRoot(greatGrandParent, project)) {
-                                ProgressManager.getInstance().run(object : Task.Backgroundable(project, "Syncing Library in deps/${parent.name}", true) {
-                                    override fun run(indicator: ProgressIndicator) {
-                                        syncLibrary(parent, indicator)
-                                    }
-                                })
-                            } else {
-                                greatGrandParent.parent?.let { greatGreatGrandParent ->
-                                    if (parent.name == "lib" && greatGrandParent.name == "_build" && isModuleContentRoot(greatGreatGrandParent, project)) {
-                                        greatGreatGrandParent
-                                                .findChild("deps")
-                                                ?.findChild(fileName)
-                                                ?.let {
-                                                    ProgressManager.getInstance().run(object : Task.Backgroundable(project, "Syncing Library in _build/${grandParent.name}/lib/$fileName", true) {
-                                                        override fun run(indicator: ProgressIndicator) {
-                                                            syncLibrary(it, indicator)
-                                                        }
-                                                    })
-                                                }
-                                    } else if (fileName == "ebin" && grandParent.name == "lib" && greatGreatGrandParent.name == "_build" && isModuleContentRoot(greatGreatGrandParent.parent, project)) {
-                                        greatGreatGrandParent
-                                                .parent
-                                                .findChild("deps")
-                                                ?.findChild(parent.name)
-                                                ?.let {
-                                                    ProgressManager.getInstance().run(object : Task.Backgroundable(project, "Syncing Library in _build/lib/${parent.name}/ebin", true) {
-                                                        override fun run(indicator: ProgressIndicator) {
-                                                            syncLibrary(it, indicator)
-                                                        }
-                                                    })
-                                                }
-                                    } else {
-                                        null
-                                    }
-                                }
-                            }
-                        }
+
+                    syncLibraries(depsRoot, indicator)
+                }
+
+                for (depRoot in validDepRoots) {
+                    if (indicator.isCanceled) {
+                        break
                     }
+
+                    syncLibrary(depRoot, indicator)
                 }
             }
-        }
+        })
+    }
+
+    private fun scheduleSyncDep(depRoot: VirtualFile) {
+        scheduleSyncRequests(emptySet(), setOf(depRoot))
     }
 
     fun syncLibraries(progressIndicator: ProgressIndicator) {
@@ -174,21 +284,20 @@ class DepsWatcher(val project: Project) : BulkFileListener {
                 .getInstance(project)
                 .contentRootsFromAllModules
                 .mapNotNull { it.findChild("deps") }
-                .map { syncLibraries(it, progressIndicator) }
+                .forEach { syncLibraries(it, progressIndicator) }
     }
 
     private fun syncLibrary(dep: VirtualFile, progressIndicator: ProgressIndicator) = syncLibraries(arrayOf(dep), progressIndicator)
 
-    private fun syncLibraries(deps: VirtualFile, progressIndicator: ProgressIndicator) = deps.children.let { syncLibraries(it, progressIndicator) }
+    private fun syncLibraries(deps: VirtualFile, progressIndicator: ProgressIndicator) =
+        syncLibraries(deps.children, progressIndicator)
 
     private fun syncLibraries(deps: Array<VirtualFile>, progressIndicator: ProgressIndicator) {
         if (deps.isNotEmpty()) {
-            runBlocking {
-                edtWriteAction {
-                    val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
+            runWriteAction {
+                val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
 
-                    syncLibraries(deps, libraryTable, progressIndicator)
-                }
+                syncLibraries(deps, libraryTable, progressIndicator)
             }
 
             for (module in ModuleManager.getInstance(project).modules) {
@@ -308,7 +417,7 @@ class DepsWatcher(val project: Project) : BulkFileListener {
         libraryModifiableModel.commit()
     }
 
-    private fun deleteAllLibraries(deps: VirtualFile) {
+    private fun deleteAllLibraries(depsUrl: String) {
         val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
 
         val depsLibraries = libraryTable.libraries.filter { library ->
@@ -316,7 +425,7 @@ class DepsWatcher(val project: Project) : BulkFileListener {
             val urls = library.getUrls(OrderRootType.SOURCES)
 
             if (urls.isNotEmpty()) {
-                val prefixURI = URI(deps.url)
+                val prefixURI = URI(depsUrl)
 
                 urls.all { url ->
                     val uri = URI(url)
@@ -330,27 +439,28 @@ class DepsWatcher(val project: Project) : BulkFileListener {
         }
 
         if (depsLibraries.isNotEmpty()) {
-            runBlocking {
-                edtWriteAction {
-                    depsLibraries.forEach { libraryTable.removeLibrary(it) }
-                }
+            runWriteAction {
+                depsLibraries.forEach { libraryTable.removeLibrary(it) }
             }
         }
     }
 
-    private fun deleteLibrary(dep: VirtualFile) {
+    private fun deleteLibrary(depName: String) {
         val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
-        val depName = dep.name
 
         libraryTable.getLibraryByName(depName)?.let { library ->
-            runBlocking {
-                edtWriteAction {
-                    libraryTable.removeLibrary(library)
-                }
+            runWriteAction {
+                libraryTable.removeLibrary(library)
             }
         }
     }
 
 }
 
+private sealed class SyncRequest {
+    object All : SyncRequest()
+    data class Dep(val depRoot: VirtualFile) : SyncRequest()
+}
+
+private const val MERGE_DELAY_MS = 250
 private val SOURCE_NAMES = arrayOf("c_src", "lib", "priv", "src")

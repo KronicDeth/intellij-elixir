@@ -1,16 +1,27 @@
 /*
  * Main Build Script
  * Purpose: Orchestrates the build of the IntelliJ Elixir plugin.
- * Key Changes for 2025.3 / Small IDE Support:
- * 1. Uses Version Catalog (libs.*) for dependency management.
- * 2. Explicitly configure JPS subprojects with TestFramework dependencies.
- * 3. QuoterService (BuildService) manages the Quoter daemon lifecycle with guaranteed cleanup.
- * 4. `test` task enforces the working directory to project root to find testData.
+ *
+ * Platform Support:
+ * - POSIX (Linux, macOS): Full support
+ * - Windows: Full support (Git Bash, MSYS2, WSL, or native)
+ *
+ * Key Components:
+ * 1. ElixirService (BuildService): Manages Elixir installation and build
+ * 2. QuoterService (BuildService): Manages Quoter daemon lifecycle with guaranteed cleanup
+ * 3. Platform abstraction: Automatic detection and platform-specific implementations
+ * 4. Tasks: Thin wrappers for CI caching and developer discoverability
+ *
+ * Version Catalog: Uses libs.* for dependency management (gradle/libs.versions.toml)
+ * Configuration Cache: Fully compatible with Gradle configuration cache
  */
 
 import com.adarshr.gradle.testlogger.TestLoggerExtension
 import com.adarshr.gradle.testlogger.theme.ThemeType
 import de.undercouch.gradle.tasks.download.Download
+import deps.registerResolveExternalDependenciesTasksForAllProjects
+import elixir.ElixirService
+import org.jetbrains.intellij.platform.gradle.Constants
 import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 import org.jetbrains.intellij.platform.gradle.models.ProductRelease
@@ -18,6 +29,12 @@ import org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
+import quoter.QuoterService
+import quoter.tasks.GetQuoterDepsTask
+import quoter.tasks.ReleaseQuoterTask
+import quoter.tasks.StartQuoterTask
+import versioning.PluginVersion
+import versioning.VersionFetcher
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -31,36 +48,49 @@ plugins {
     id("idea")
 }
 
+project.configurations.all {
+    exclude(Constants.Configurations.Dependencies.BUNDLED_MODULE_GROUP, "com.intellij.kubernetes")
+    exclude(Constants.Configurations.Dependencies.BUNDLED_PLUGIN_GROUP, "com.intellij.kubernetes")
+}
+
 // --- Version Catalog Captures ---
 // Capture these early to avoid "Extension 'libs' not found" errors in subproject blocks
 val javaVersionStr: String = libs.versions.java.get()
 val libJunit = libs.junit
 val libOpentest4j = libs.opentest4j
 val libCommonsIo = libs.commons.io
+val libMockitoCore = libs.mockito.core
 
 // --- Configuration Properties ---
 val elixirVersion: String by project
 val quoterVersion: String by project
-val basePluginVersion: String = providers.gradleProperty("pluginVersion").get()
-val useDynamicEapVersion: Boolean = project.property("useDynamicEapVersion").toString().toBoolean()
-val skipSearchableOptions: Boolean = project.property("skipSearchableOptions").toString().toBoolean()
 
 // Publish channel: "default" for release, "canary" for pre-release
 val publishChannel: String = providers.gradleProperty("publishChannels").getOrElse("canary")
 
+// Calculate the plugin version; for canary builds, the patch is bumped to the next version
+// so that the IDE's plugin manager doesn't offer to "update" it to the released version.
+val basePluginVersion: String = PluginVersion.getBaseVersion(
+    providers.gradleProperty("pluginVersion").get(),
+    publishChannel
+)
+
+val useDynamicEapVersion: Boolean = project.property("useDynamicEapVersion").toString().toBoolean()
+val skipSearchableOptions: Boolean = project.property("skipSearchableOptions").toString().toBoolean()
+
 val actualPlatformVersion: String = if (useDynamicEapVersion) {
     // Calling the helper from buildSrc
-    VersionFetcher.getLatestEapBuild()
+    VersionFetcher.getLatestEapBuild(platformType = providers.gradleProperty("platformType").get() ?: "IU")
 } else {
     project.property("platformVersion").toString()
 }
 
 // Setup Paths
-val cachePath = layout.projectDirectory.dir("cache")
-val elixirPath = cachePath.dir("elixir-$elixirVersion")
-val quoterUnzippedPath = cachePath.dir("elixir-$elixirVersion-intellij_elixir-$quoterVersion")
-val quoterExe = quoterUnzippedPath.file("_build/dev/rel/intellij_elixir/bin/intellij_elixir")
-val quoterTmpPath = cachePath.dir("quoter_tmp_$quoterVersion")
+val cachePath: Directory = layout.projectDirectory.dir("cache")
+val elixirPath: Directory = cachePath.dir("elixir-$elixirVersion")
+val quoterUnzippedPath: Directory = cachePath.dir("elixir-$elixirVersion-intellij_elixir-$quoterVersion")
+val quoterExe: RegularFile = quoterUnzippedPath.file("_build/dev/rel/intellij_elixir/bin/intellij_elixir")
+val quoterTmpPath: Directory = cachePath.dir("quoter_tmp_$quoterVersion")
 
 // EXPORT FOR SUBPROJECTS (Required for jps-builder to access this path)
 extra["elixirPath"] = elixirPath.asFile.absolutePath
@@ -81,7 +111,7 @@ val versionSuffix: String = when {
 
 version = "$basePluginVersion$versionSuffix"
 
-println("[elixir-build] platform=$actualPlatformVersion version=$version channel=$publishChannel dynamicEap=$useDynamicEapVersion skipSearchableOptions=$skipSearchableOptions quoterExe=$quoterExe quoterTmpPath=${quoterTmpPath.asFile.absolutePath}")
+logger.lifecycle("[elixir-build] platform=$actualPlatformVersion version=$version channel=$publishChannel dynamicEap=$useDynamicEapVersion skipSearchableOptions=$skipSearchableOptions quoterExe=$quoterExe quoterTmpPath=${quoterTmpPath.asFile.absolutePath}")
 
 // --- Global Project Configuration ---
 allprojects {
@@ -127,10 +157,8 @@ subprojects {
     dependencies {
         intellijPlatform {
             create(providers.gradleProperty("platformType"), providers.provider { actualPlatformVersion })
-            bundledPlugins(providers.gradleProperty("platformBundledPlugins").map { it.split(",") })
-            bundledModules(providers.gradleProperty("platformBundledModules").map { it.split(",") })
+            bundledPlugins("com.intellij.java")
             testFramework(TestFrameworkType.Platform)
-            testFramework(TestFrameworkType.Plugin.Java)
         }
         // JPS Builder tests extend UsefulTestCase (JUnit 3/4 style) and need explicit JUnit 4 on classpath
         testImplementation(libJunit)
@@ -161,6 +189,27 @@ sourceSets {
     test {
         java.srcDir("tests")
     }
+    create("testUI", Action<SourceSet> {
+        kotlin.srcDir("testUI/kotlin")
+        resources.srcDir("testUI/resources")
+        compileClasspath += sourceSets["main"].output + sourceSets["test"].output
+        runtimeClasspath += sourceSets["main"].output + sourceSets["test"].output
+    })
+}
+
+idea {
+    module {
+        testSources.from(sourceSets["testUI"].kotlin.srcDirs)
+        testResources.from(sourceSets["testUI"].resources.srcDirs)
+    }
+}
+
+val testUIImplementation: Configuration by configurations.getting {
+    extendsFrom(configurations.testImplementation.get())
+}
+
+val testUIRuntimeOnly: Configuration by configurations.getting {
+    extendsFrom(configurations.testRuntimeOnly.get())
 }
 
 // --- IntelliJ Platform Configuration ---
@@ -168,6 +217,11 @@ intellijPlatform {
     if (skipSearchableOptions) {
         buildSearchableOptions = false
     }
+    // Disable auto-reload by default: it is noisy during runIde and has been unreliable.
+    // Re-enable via `ideaAutoReload=true` in `gradle.properties` or `-PideaAutoReload=true`.
+    autoReload = providers.gradleProperty("ideaAutoReload")
+        .map { it.toBoolean() }
+        .orElse(false)
 
     pluginConfiguration {
         id = providers.gradleProperty("pluginGroup")
@@ -213,6 +267,19 @@ intellijPlatform {
             }
         }
     }
+    sourceSets {
+        val testUI: SourceSet by project.sourceSets
+        add(testUI)
+    }
+}
+
+intellijPlatformTesting.runIde.configureEach {
+    plugins {
+        // Run-IDE sandbox only: Kubernetes plugin consistently fails on startup.
+        disablePlugin("com.intellij.kubernetes")
+        // Run-IDE sandbox only: Sass plugin logs missing color scheme resources.
+        disablePlugin("org.jetbrains.plugins.sass")
+    }
 }
 
 // --- Kotlin Configuration ---
@@ -223,10 +290,13 @@ kotlin {
 tasks.withType<KotlinJvmCompile>().configureEach {
     compilerOptions {
         jvmTarget = JvmTarget.valueOf("JVM_$javaVersionStr")
-        freeCompilerArgs.add("-Xjvm-default=all")
+        freeCompilerArgs.add("-jvm-default=enable")
         apiVersion = KotlinVersion.KOTLIN_2_2
     }
 }
+
+// --- Mockito Agent Configuration (Root project only) ---
+val mockitoAgent: Configuration = configurations.create("mockitoAgent")
 
 // --- Dependencies ---
 dependencies {
@@ -238,12 +308,27 @@ dependencies {
         zipSigner()
         testFramework(TestFrameworkType.Platform)
         testFramework(TestFrameworkType.Plugin.Java)
+        // UI Test framework dependencies
+        testFramework(TestFrameworkType.Starter, configurationName = "testUIImplementation")
+        testFramework(TestFrameworkType.JUnit5, configurationName = "testUIImplementation")
     }
 
     implementation(project(":jps-builder"))
     implementation(project(":jps-shared"))
     implementation(files("lib/OtpErlang.jar"))
     implementation(libCommonsIo)
+
+    testImplementation(libMockitoCore)
+    mockitoAgent(libMockitoCore) { isTransitive = false }
+
+    // UI Test dependencies
+    testUIImplementation(libs.kodein.di.jvm)
+    testUIImplementation(libs.kotlinx.coroutines.core.jvm)
+
+    // JUnit 5 is required for UI tests
+    testUIImplementation(libs.junit.jupiter)
+    testUIRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
 }
 
 // --- Run IDE Configuration ---
@@ -260,11 +345,36 @@ tasks.withType<RunIdeTask>().configureEach {
     systemProperty("idea.log.debug.categories", "org.elixir_lang")
     maxHeapSize = "7g"
 
+    val compatiblePluginsList = providers.gradleProperty("runIdeCompatiblePlugins")
+        .getOrElse("")
+        .split(",")
+        .map { it.trim() }
+        .filter { it.isNotEmpty() }
+
+    // runIde uses "required plugins" mode; for IU builds that can drop com.intellij.modules.ultimate,
+    // which cascades into bundled plugin dependency warnings. Force Ultimate to stay required,
+    // and include any compatible plugins so they can load under required-plugins mode.
+    val requiredPluginsId = listOf(
+        providers.gradleProperty("pluginGroup").get(),
+        "com.intellij.modules.ultimate"
+    ).plus(compatiblePluginsList)
+        .distinct()
+        .joinToString(",")
+    val platformTypeValue = providers.gradleProperty("platformType").get()
+    val isRunIdeTask = name == "runIde"
+    val isUltimateTask = name.contains("IntellijIdeaUltimate")
+    if ((isRunIdeTask && platformTypeValue == "IU") || isUltimateTask) {
+        // Ensure required-plugins mode keeps Ultimate enabled for IU runs.
+        jvmArgumentProviders += CommandLineArgumentProvider {
+            listOf("-Didea.required.plugins.id=$requiredPluginsId")
+        }
+    }
+
     if (project.hasProperty("runIdeWorkingDirectory") && project.property("runIdeWorkingDirectory").toString().isNotEmpty()) {
         workingDir = file(project.property("runIdeWorkingDirectory").toString())
     }
 
-    // Development SDK paths - allows devs to auto-configure SDKs when running the plugin
+    // Development SDK paths - allows devs to autoconfigure SDKs when running the plugin
     // Usage: ./gradlew runIde -PrunIdeSdkErlangPath='/path/to/erlang' -PrunIdeSdkElixirPath='/path/to/elixir'
     if (project.hasProperty("runIdeSdkErlangPath")) {
         systemProperty("runIdeSdkErlangPath", project.property("runIdeSdkErlangPath").toString())
@@ -275,9 +385,6 @@ tasks.withType<RunIdeTask>().configureEach {
 
     // Dynamic plugin loading
     // Usage: -PrunIdeCompatiblePlugins="PsiViewer,com.google.ide-perf,org.jetbrains.action-tracker"
-    val compatiblePluginsList = providers.gradleProperty("runIdeCompatiblePlugins")
-        .getOrElse("")
-        .let { if (it.isEmpty()) emptyList() else it.split(",") }
     if (compatiblePluginsList.isNotEmpty()) {
         dependencies {
             intellijPlatform { compatiblePlugins(compatiblePluginsList) }
@@ -285,8 +392,24 @@ tasks.withType<RunIdeTask>().configureEach {
     }
 }
 
-// Register Platform-specific Run Tasks dynamically
-val runIdePlatformsList = providers.gradleProperty("runIdePlatforms").get().split(",")
+// In gradle.properties, define platform versions like:
+//
+// platformVersionIntellijIdeaEAP=261-EAP-SNAPSHOT
+// platformVersionIntellijIdea=2025.3.2
+//
+// excluding the base "platformVersion" and EAP variants (handled separately below).
+//
+// You can also then run with either gradlew (CLI) or using a Run Configuration in IntelliJ IDEA via:
+// `gradlew runRubyMine -PplatformVersionRubyMine=2025.2` to override a specific platform version at runtime,
+// which is useful for testing against multiple IDE versions without changing the build script.
+val platformVersionPrefix = "platformVersion"
+val runIdePlatformsList: List<String> = project.properties.keys
+    .filter { it.startsWith(platformVersionPrefix) && it.length > platformVersionPrefix.length }
+    .map { it.removePrefix(platformVersionPrefix) }
+    .filter { !it.endsWith("EAP") }
+    .sorted()
+
+// Reduces having to download the IDEs when testing.
 val enableEAP = providers.gradleProperty("enableEAPIDEs").get().toBoolean()
 
 runIdePlatformsList.forEach { platform ->
@@ -298,10 +421,23 @@ runIdePlatformsList.forEach { platform ->
         }
     })
 
-    if (enableEAP) {
+    if (enableEAP && project.hasProperty("platformVersion${platform}EAP")) {
+        // If EAP is enabled in gradle.properties, and useDynamicEapVersion is enabled,
+        // use the major version with "-EAP-SNAPSHOT" suffix.
+        // Otherwise, use the specified EAP version.
+        val platformVersionEAPValue = providers.gradleProperty("platformVersion${platform}EAP").get()
+        val idePlatformTypeCode = IntelliJPlatformType.valueOf(platform)
+        val ideEapVersion: String = if (useDynamicEapVersion) {
+            val foundIdeVersion = VersionFetcher.getLatestEapBuild(platformType = idePlatformTypeCode.code)
+            // Get the Major version, by splitting at the first dot, then appending "-EAP-SNAPSHOT"
+            val majorVersion = foundIdeVersion.split(".").firstOrNull() ?: foundIdeVersion
+            "$majorVersion-EAP-SNAPSHOT"
+        } else {
+            platformVersionEAPValue
+        }
         intellijPlatformTesting.runIde.register("run${platform}EAP", Action {
-            type = IntelliJPlatformType.valueOf(platform)
-            version = providers.gradleProperty("platformVersion${platform}EAP").get()
+            type = idePlatformTypeCode
+            version = ideEapVersion
             useInstaller = false
             prepareSandboxTask {
                 sandboxDirectory = layout.buildDirectory.dir("${platform.lowercase()}_eap-sandbox")
@@ -374,66 +510,59 @@ val unzipQuoter by tasks.registering(Copy::class) {
     }
 }
 
-val getQuoterDeps by tasks.registering(Exec::class) {
-    dependsOn(unzipQuoter)
+val getQuoterDeps by tasks.registering(GetQuoterDepsTask::class) {
+    dependsOn(unzipQuoter, buildElixir)
     workingDir(quoterUnzippedPath)
 
-    // 1. INPUTS
-    // mix.exs defines the requirements
+    // Configure the task
+    quoterDir.set(quoterUnzippedPath)
+    depsDir.set(quoterUnzippedPath.dir("deps"))
+
+    // INPUTS: mix.exs and mix.lock define requirements
     inputs.file(quoterUnzippedPath.file("mix.exs"))
         .withPropertyName("mixExs")
         .withPathSensitivity(PathSensitivity.RELATIVE)
-
-    // mix.lock defines the exact versions.
-    // It is an INPUT because 'unzipQuoter' created it, and this task READS it.
     inputs.file(quoterUnzippedPath.file("mix.lock"))
         .withPropertyName("mixLock")
         .withPathSensitivity(PathSensitivity.RELATIVE)
-
-    // 2. OUTPUTS
-    // This task produces/populates the 'deps' directory.
-    outputs.dir(quoterUnzippedPath.dir("deps"))
-        .withPropertyName("depsDir")
-
-    // 3. CACHING
-    outputs.cacheIf { true }
-
-    commandLine("mix", "do", "local.rebar", "--force,", "local.hex", "--force,", "deps.get")
 }
 
-val releaseQuoter by tasks.registering(Exec::class) {
+val releaseQuoter by tasks.registering(ReleaseQuoterTask::class) {
     dependsOn(getQuoterDeps)
-
-    // 1. Use Directory object directly (No .asFile)
     workingDir(quoterUnzippedPath)
 
-    // 2. INPUTS: What determines if a release needs rebuilding?
-    //    If mix.exs, lockfile, or the source code (lib/config) changes, re-run.
+    // Configure the task
+    quoterDir.set(quoterUnzippedPath)
+    buildDir.set(quoterUnzippedPath.dir("_build"))
+
+    // INPUTS: mix.exs, lockfile, source code, and dependencies
     inputs.files(
         quoterUnzippedPath.file("mix.exs"),
         quoterUnzippedPath.file("mix.lock")
     ).withPathSensitivity(PathSensitivity.RELATIVE)
-
-    //    Add source directories so code changes trigger a rebuild
     inputs.dir(quoterUnzippedPath.dir("lib")).withPathSensitivity(PathSensitivity.RELATIVE)
     inputs.dir(quoterUnzippedPath.dir("config")).withPathSensitivity(PathSensitivity.RELATIVE)
-    //    The dependencies (generated by previous task) are inputs for this task
     inputs.dir(quoterUnzippedPath.dir("deps")).withPathSensitivity(PathSensitivity.RELATIVE)
+}
 
-    // 3. OUTPUTS: This replaces your 'onlyIf' check.
-    //    If this file exists and inputs match, Gradle skips this task automatically.
-    outputs.dir(quoterUnzippedPath.dir("_build"))
-        .withPropertyName("buildDir")
-
-    commandLine("mix", "release", "intellij_elixir", "--overwrite", "--force")
+// Register ElixirService - manages Elixir installation and build
+val elixirService = gradle.sharedServices.registerIfAbsent("elixir", ElixirService::class) {
+    val versionString = elixirVersion
+    parameters {
+        elixirVersion.set(versionString)
+        projectDir.set(layout.projectDirectory)
+    }
 }
 
 // Register the QuoterService - Gradle calls close() at build end regardless of failure
+// Depends on ElixirService for Mix commands
 // See: https://docs.gradle.org/current/userguide/build_services.html
 val quoterService = gradle.sharedServices.registerIfAbsent("quoter", QuoterService::class) {
+    val elixirSvc = elixirService
     parameters {
         executable.set(quoterExe)
         tmpDir.set(quoterTmpPath)
+        elixirService.set(elixirSvc)
     }
 }
 
@@ -441,22 +570,158 @@ val startQuoter by tasks.registering(StartQuoterTask::class) {
     dependsOn(releaseQuoter)
 }
 
+registerResolveExternalDependenciesTasksForAllProjects()
+
 // --- Test Configuration ---
 
 // ALL test tasks in ALL projects use the QuoterService (ensures cleanup on any failure)
 allprojects {
     tasks.withType<Test>().configureEach {
-        dependsOn(startQuoter)
-        usesService(quoterService)
+
+        // Validate Erlang is available before running tests
+        doFirst {
+            // Skip check if ERLANG_SDK_HOME is explicitly set
+            val erlangSdkHome = System.getenv("ERLANG_SDK_HOME")
+            if (erlangSdkHome == null || erlangSdkHome.isEmpty()) {
+                val erlCommand = if (System.getProperty("os.name").lowercase().contains("windows")) "erl.exe" else "erl"
+                try {
+                    val process = ProcessBuilder(erlCommand, "-version")
+                        .redirectErrorStream(true)
+                        .start()
+                    val exitCode = process.waitFor()
+                    if (exitCode != 0) {
+                        throw GradleException(
+                            """
+                            |Erlang/OTP not found or failed to run.
+                            |Tests require Erlang to be installed and on PATH.
+                            |
+                            |Options:
+                            |  1. Download from: https://www.erlang.org/downloads
+                            |  2. Install via Chocolatey: choco install erlang
+                            |  3. Set ERLANG_SDK_HOME environment variable to your Erlang installation directory
+                            |
+                            |The jps-builder tests auto-detect Erlang by running '$erlCommand -eval' command.
+                            """.trimMargin()
+                        )
+                    }
+                    logger.lifecycle("Erlang found: $erlCommand is available on PATH")
+                } catch (e: java.io.IOException) {
+                    throw GradleException(
+                        """
+                        |Erlang/OTP executable '$erlCommand' not found on PATH.
+                        |Tests require Erlang to be installed and on PATH.
+                        |
+                        |Options:
+                        |  1. Download from: https://www.erlang.org/downloads
+                        |  2. Install via Chocolatey: choco install erlang
+                        |  3. Set ERLANG_SDK_HOME environment variable to your Erlang installation directory
+                        |
+                        |The jps-builder tests auto-detect Erlang by running '$erlCommand -eval' command.
+                        """.trimMargin(),
+                        e
+                    )
+                }
+            } else {
+                logger.lifecycle("Using ERLANG_SDK_HOME from environment: $erlangSdkHome")
+            }
+        }
     }
 }
 
 tasks.named<Test>("test") {
-    dependsOn("prepareTestSandbox")
+    dependsOn("prepareTestSandbox", startQuoter)
+    usesService(quoterService)
 
     environment("ELIXIR_LANG_ELIXIR_PATH", elixirPath.asFile.absolutePath)
     environment("ELIXIR_EBIN_DIRECTORY", elixirPath.dir("lib/elixir/ebin/").asFile.absolutePath + File.separator)
     environment("ELIXIR_VERSION", elixirVersion)
+
+    // Add Mockito as javaagent to avoid dynamic loading warnings (root project only)
+    jvmArgs("-javaagent:${mockitoAgent.asPath}")
+}
+
+tasks.named<Zip>("buildPlugin") {
+    doLast {
+        println("Note: Timestamps in version strings and filenames of build artifacts do not change on every build due to gradle config caching.")
+        println("Built artifact path: ${archiveFile.get().asFile.absolutePath}")
+    }
+}
+
+
+/**
+ * Helper function to get SDK path from mise.
+ * Requires mise to be installed and available in PATH.
+ *
+ * @param tool The tool name (e.g., "erlang", "elixir")
+ * @return The absolute path to the tool installation
+ * @throws GradleException if mise is not installed or tool not found
+ */
+fun getMiseSdkPath(tool: String): Provider<String> {
+    return providers.exec {
+        commandLine("mise", "where", tool)
+    }.standardOutput.asText.map { it.trim() }.orElse(
+        providers.provider {
+            throw GradleException(
+                """
+                |Failed to get path for '$tool' from mise.
+                |
+                |UI tests require mise to be installed and configured with .tool-versions.
+                |
+                |Installation:
+                |  Linux/macOS: curl https://mise.run | sh
+                |  Windows: https://mise.jdx.dev/getting-started.html#windows
+                |
+                |Setup:
+                |  1. Install mise
+                |  2. Run: mise install inside the project directory
+                |  3. Verify: mise where $tool
+                |
+                |See: https://mise.jdx.dev/
+                """.trimMargin()
+            )
+        }
+    )
+}
+
+tasks.register<Test>("testUI") {
+    dependsOn(tasks.buildPlugin, tasks.prepareSandbox, unzipQuoter)
+    description = "Runs only the UI tests that start the IDE"
+    group = "verification"
+
+    testClassesDirs = sourceSets["testUI"].output.classesDirs
+    classpath = sourceSets["testUI"].runtimeClasspath
+
+    useJUnitPlatform()
+
+    // UI tests should run sequentially (not in parallel) to avoid conflicts
+    maxParallelForks = 1
+
+    // Increase memory for UI tests
+    minHeapSize = "1g"
+    maxHeapSize = "4g"
+
+    systemProperty("path.to.build.plugin", tasks.buildPlugin.get().archiveFile.get().asFile.absolutePath)
+    systemProperty("idea.home.path", tasks.prepareTestSandbox.get().getDestinationDir().parentFile.absolutePath)
+    systemProperty("uiPlatformBuildVersion", actualPlatformVersion)
+    systemProperty("projectPath", unzipQuoter.get().destinationDir.absolutePath)
+
+    // Disable IntelliJ test listener that conflicts with standard JUnit
+    systemProperty("idea.test.cyclic.buffer.size", "0")
+
+    // Get SDK paths from mise (reads .tool-versions) at execution time
+    doFirst {
+        systemProperty("erlangSdkPath", getMiseSdkPath("erlang").get())
+        systemProperty("elixirSdkPath", getMiseSdkPath("elixir").get())
+    }
+
+    // Add required JVM arguments
+    jvmArgumentProviders += CommandLineArgumentProvider {
+        mutableListOf(
+            "--add-opens=java.base/java.lang=ALL-UNNAMED",
+            "--add-opens=java.desktop/javax.swing=ALL-UNNAMED"
+        )
+    }
+
 }
 
 // Uncomment to allow using build-scan.
@@ -466,4 +731,3 @@ tasks.named<Test>("test") {
 //        setProperty("termsOfServiceAgree", "yes")
 //    }
 //}
-
