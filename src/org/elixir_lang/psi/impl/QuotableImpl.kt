@@ -969,6 +969,12 @@ object QuotableImpl {
                     callMetadata,
                     *quotedBlockArguments
             )
+        } else if (identifierText == "...") {
+            // For some reason, as of 1.19, ellipsis in @spec are considered a function call.
+            quoted = quotedFunctionCall(
+                identifierText,
+                callMetadata
+            )
         } else {
             /* @note quotedFunctionCall cannot be used here because in the 3-tuple for function calls, the elements are
               {name, metadata, arguments}, while for an ambiguous call or variable, the elements are
