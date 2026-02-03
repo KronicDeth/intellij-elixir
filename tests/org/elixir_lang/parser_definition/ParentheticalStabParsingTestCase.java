@@ -81,6 +81,10 @@ public class ParentheticalStabParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
+    public void testStabWithNotOrExclamation() {
+        assertParsedAndQuotedCorrectly(false);
+    }
+
     public void testSpliceOnStab() {
         assertParsedAndQuotedCorrectly();
     }
