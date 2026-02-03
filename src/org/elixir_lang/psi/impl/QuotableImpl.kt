@@ -1845,7 +1845,7 @@ object QuotableImpl {
                     if (Macro.isLocalCall(quotedChild)) {
                         // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L547
                         when ((quotedChild as OtpErlangTuple).elementAt(0)) {
-                            EXCLAMATION_POINT, NOT, UNQUOTE_SPLICING ->
+                            UNQUOTE_SPLICING ->
                                 QuotableImpl.blockFunctionCall(quotedChildren, metadata)
                             else ->
                                 quotedChild
