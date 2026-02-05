@@ -6166,7 +6166,7 @@ I'd like to thank those who have donated to help support this project as GitHub 
 * Richard Giraud ([@RGENT](https://github.com/RGENT))  
 * Samir Bouaked ([@sbouaked](https://github.com/sbouaked))
 * Nitin Gupta ([@nitingupta910](https://github.com/nitingupta910))
-* Steve Wagner ([@ciroque](https://github.com/ciroque))
+* user Wagner ([@ciroque](https://github.com/ciroque))
 * Adrian Philipp ([@adri](https://github.com/adri))
 * William De Melo Gueiros ([@williamgueiros](https://github.com/williamgueiros))
 * César Salazar Hernández ([@cesarslzr](https://github.com/cesarslzr))
