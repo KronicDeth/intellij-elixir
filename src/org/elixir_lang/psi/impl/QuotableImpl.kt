@@ -5,7 +5,6 @@ package org.elixir_lang.psi.impl
 import com.ericsson.otp.erlang.*
 import com.intellij.lang.ASTNode
 import com.intellij.openapi.application.runReadAction
-import com.intellij.openapi.util.Computable
 import com.intellij.psi.*
 import com.intellij.psi.impl.source.tree.Factory
 import com.intellij.psi.tree.IElementType
@@ -59,7 +58,7 @@ fun ElixirStabBody.quote(metadata: OtpErlangList): OtpErlangObject =
                 }
                 .map { it as Quotable }
                 .map { it.quote() }
-                .let { QuotableImpl.buildBlock(it.toList(), metadata) }
+                .let { QuotableImpl.buildBlock(it.toList(), metadata, this.node) }
 
 object QuotableImpl {
     private val AMBIGUOUS_OP = OtpErlangAtom("ambiguous_op")
@@ -1841,7 +1840,7 @@ object QuotableImpl {
      * @param quotedChildren
      */
     @Contract(pure = true)
-    internal fun buildBlock(quotedChildren: List<OtpErlangObject>, metadata: OtpErlangList): OtpErlangObject =
+    internal fun buildBlock(quotedChildren: List<OtpErlangObject>, metadata: OtpErlangList, node: ASTNode? = null): OtpErlangObject =
             when (quotedChildren.size) {
                 0 -> NIL
                 1 -> {
@@ -1853,6 +1852,13 @@ object QuotableImpl {
                         when ((quotedChild as OtpErlangTuple).elementAt(0)) {
                             UNQUOTE_SPLICING ->
                                 QuotableImpl.blockFunctionCall(quotedChildren, metadata)
+                            EXCLAMATION_POINT, NOT -> {
+                                if (node?.elementType == ElixirTypes.STAB_BODY && node.treeParent?.elementType !== ElixirTypes.STAB_OPERATION) {
+                                    QuotableImpl.blockFunctionCall(quotedChildren, otpErlangList())
+                                } else {
+                                    quotedChild
+                                }
+                            }
                             else ->
                                 quotedChild
                         }
