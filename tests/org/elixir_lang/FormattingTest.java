@@ -1,5 +1,6 @@
 package org.elixir_lang;
 
+import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.codeStyle.CodeStyleSettingsManager;
@@ -615,7 +616,7 @@ public class FormattingTest extends PlatformTestCase {
     public void testPipelineMatchAlignment() {
         String path = "pipeline_match_alignment.ex";
 
-        myFixture.configureByFile(path);
+        configureByFile(path);;
 
         reformatFixture();
 
@@ -1111,7 +1112,7 @@ public class FormattingTest extends PlatformTestCase {
     public void testStructKeysAreNormalIndented() {
         String path = "struct_keys_are_normal_indented.ex";
 
-        myFixture.configureByFile(path);
+        configureByFile(path);;
 
         reformatFixture();
 
@@ -1168,7 +1169,7 @@ public class FormattingTest extends PlatformTestCase {
     public void testUnmatchedQualifedParenthesesCallArgumentIndent() {
         String path = "unmatched_qualifed_parentheses_call_argument_indent.ex";
 
-        myFixture.configureByFile(path);
+        configureByFile(path);;
 
         reformatFixture();
 
@@ -1183,7 +1184,7 @@ public class FormattingTest extends PlatformTestCase {
      * Asserts that {@code path} will not change when reformatted.
      */
     private void assertFormatted(@NotNull String path, @Nullable Runnable runnable) {
-        myFixture.configureByFile(path);
+        configureByFile(path);
 
         if (runnable != null) {
             runnable.run();
@@ -1192,6 +1193,15 @@ public class FormattingTest extends PlatformTestCase {
         reformatFixture();
 
         myFixture.checkResultByFile(path);
+    }
+
+    private void configureByFile(@NotNull String path) {
+        CommandProcessor.getInstance().executeCommand(
+                getProject(),
+                () -> myFixture.configureByFile(path),
+                "ConfigureByFile",
+                "CONFIGURE"
+        );
     }
 
     private void reformatFixture() {
