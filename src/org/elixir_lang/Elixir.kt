@@ -24,9 +24,7 @@ object Elixir {
                 workingDirectory = workingDirectory,
                 erlangSdk = erlangSdk,
             )
-        // MUST be before `addElixir` because it ends with `-extra` which turns off argument parsing for `erl`
-        commandLine.addParameters(erlArgumentList)
-        addElixir(commandLine, elixirSdk, erlangSdk)
+        ElixirCliBase.addElixirBaseArguments(commandLine, elixirSdk, erlangSdk, erlArgumentList)
 
         return commandLine
     }
@@ -50,20 +48,6 @@ object Elixir {
         val elixirEbinDirectories = elixirSdk.ebinDirectories()
         val erlangEbinDirectories = erlangSdk.ebinDirectories()
         prependNewCodePaths(commandLine, elixirEbinDirectories, erlangEbinDirectories)
-    }
-
-    /**
-     * Keep in-suync with [org.elixir_lang.jps.Builder.addElixir]
-     */
-    private fun addElixir(
-        commandLine: GeneralCommandLine,
-        elixirSdk: Sdk,
-        erlangSdk: Sdk,
-    ) {
-        prependNewCodePaths(commandLine, elixirSdk, erlangSdk)
-        commandLine.addParameters("-noshell", "-s", "elixir", "start_cli")
-        commandLine.addParameters("-elixir", "ansi_enabled", "true")
-        commandLine.addParameter("-extra")
     }
 
     private fun prependNewCodePaths(

@@ -372,8 +372,7 @@ public class Builder extends TargetBuilder<SourceRootDescriptor, Target> {
     }
 
     private static void addElixir(@NotNull GeneralCommandLine commandLine) {
-        commandLine.addParameters("-noshell", "-s", "elixir", "start_cli");
-        commandLine.addParameter("-extra");
+        ElixirCliBase.addElixirBaseArguments(commandLine);
     }
 
     private static void addMix(@NotNull GeneralCommandLine commandLine, @NotNull JpsSdk<SdkProperties> sdk) throws MissingHomePath {
