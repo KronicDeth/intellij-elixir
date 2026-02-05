@@ -109,7 +109,7 @@ The build system automatically detects your platform:
 **getQuoterDeps fails in PowerShell (erl not found):**
 - Run the task from Git Bash so `/usr/bin/sh` sees a full PATH.
 - Example:
-  - `cd /c/Users/steve/IdeaProjects/intellij-elixir`
+  - `cd /c/Users/user/IdeaProjects/intellij-elixir`
   - `./gradlew.bat getQuoterDeps --rerun-tasks --no-build-cache --no-configuration-cache`
 - If needed, add Erlang to Git Bash PATH, e.g. `export PATH="/c/Program Files/erl-24.3.4.6/bin:$PATH"`.
 
