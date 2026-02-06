@@ -50,10 +50,6 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
         assertParsed("lib/eex/lib/eex/smart_engine.ex", Parse.CORRECT);
     }
 
-    public void testEexTokenizer() {
-        assertParsed("lib/eex/lib/eex/tokenizer.ex", Parse.CORRECT);
-    }
-
     public void testAccess() {
         assertParsed("lib/elixir/lib/access.ex", Parse.CORRECT);
     }
@@ -226,8 +222,16 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
         assertParsed("lib/elixir/lib/module.ex", Parse.CORRECT);
     }
 
-    public void testModuleLocalsTracker() {
-        assertParsed("lib/elixir/lib/module/locals_tracker.ex", Parse.CORRECT);
+    public void testModuleBehaviour() {
+        assertParsed("lib/elixir/lib/module/behaviour.ex", Parse.CORRECT);
+    }
+
+    public void testModuleParallelChecker() {
+        assertParsed("lib/elixir/lib/module/parallel_checker.ex", Parse.CORRECT);
+    }
+
+    public void testModuleTypes() {
+        assertParsed("lib/elixir/lib/module/types.ex", Parse.CORRECT);
     }
 
     public void testNode() {
@@ -410,8 +414,12 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
         assertParsed("lib/iex/lib/iex/app.ex", Parse.CORRECT);
     }
 
-    public void testIexCli() {
-        assertParsed("lib/iex/lib/iex/cli.ex", Parse.CORRECT);
+    public void testIexAutocomplete() {
+        assertParsed("lib/iex/lib/iex/autocomplete.ex", Parse.CORRECT);
+    }
+
+    public void testIexBroker() {
+        assertParsed("lib/iex/lib/iex/broker.ex", Parse.CORRECT);
     }
 
     public void testIexConfig() {
@@ -428,6 +436,22 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
 
     public void testIexHistory() {
         assertParsed("lib/iex/lib/iex/history.ex", Parse.CORRECT);
+    }
+
+    public void testIexInfo() {
+        assertParsed("lib/iex/lib/iex/info.ex", Parse.CORRECT);
+    }
+
+    public void testIexIntrospection() {
+        assertParsed("lib/iex/lib/iex/introspection.ex", Parse.CORRECT);
+    }
+
+    public void testIexMixListener() {
+        assertParsed("lib/iex/lib/iex/mix_listener.ex", Parse.CORRECT);
+    }
+
+    public void testIexPry() {
+        assertParsed("lib/iex/lib/iex/pry.ex", Parse.CORRECT);
     }
 
     public void testIexServer() {
@@ -447,7 +471,7 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
     }
 
     public void testLoggerConfig() {
-        assertParsed("lib/logger/lib/logger/config.ex", Parse.CORRECT);
+        assertParsed("lib/logger/lib/logger/backends/config.ex", Parse.CORRECT);
     }
 
     public void testLoggerFormatter() {
@@ -463,7 +487,7 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
     }
 
     public void testLoggerWatcher() {
-        assertParsed("lib/logger/lib/logger/watcher.ex", Parse.CORRECT);
+        assertParsed("lib/logger/lib/logger/backends/watcher.ex", Parse.CORRECT);
     }
 
     public void testMix() {
@@ -526,8 +550,16 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
         assertParsed("lib/mix/lib/mix/rebar.ex", Parse.CORRECT);
     }
 
-    public void testMixPublicKey() {
-        assertParsed("lib/mix/lib/mix/public_key.ex", Parse.CORRECT);
+    public void testMixProjectStack() {
+        assertParsed("lib/mix/lib/mix/project_stack.ex", Parse.CORRECT);
+    }
+
+    public void testMixRelease() {
+        assertParsed("lib/mix/lib/mix/release.ex", Parse.CORRECT);
+    }
+
+    public void testMixPubsub() {
+        assertParsed("lib/mix/lib/mix/pubsub.ex", Parse.CORRECT);
     }
 
     public void testMixRemoteConverger() {
@@ -676,10 +708,6 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
 
     public void testMixTasksLocalHex() {
         assertParsed("lib/mix/lib/mix/tasks/local.hex.ex", Parse.CORRECT);
-    }
-
-    public void testMixTasksLocalPublicKeys() {
-        assertParsed("lib/mix/lib/mix/tasks/local.public_keys.ex", Parse.CORRECT);
     }
 
     public void testMixTasksLocalRebar() {
