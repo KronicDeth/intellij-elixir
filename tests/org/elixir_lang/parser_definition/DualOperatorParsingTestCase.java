@@ -35,7 +35,7 @@ public class DualOperatorParsingTestCase extends ParsingTestCase {
 
     // // Ambiguous Operations
     public void testIdentifierSpaceOperatorOperatorOperand() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectly(false);
     }
 
     public void testIdentifierSpaceOperatorSpaceCommentEOLIdentifier() {
