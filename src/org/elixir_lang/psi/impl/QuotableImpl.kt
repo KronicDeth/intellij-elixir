@@ -1894,7 +1894,9 @@ object QuotableImpl {
                             UNQUOTE_SPLICING ->
                                 QuotableImpl.blockFunctionCall(quotedChildren, metadata)
                             EXCLAMATION_POINT, NOT -> {
-                                if (node?.elementType == ElixirTypes.STAB_BODY && node.treeParent?.elementType !== ElixirTypes.STAB_OPERATION) {
+                                if (
+                                    node?.treeParent?.treePrev?.text.equals("(")
+                                ) {
                                     QuotableImpl.blockFunctionCall(quotedChildren, otpErlangList())
                                 } else {
                                     quotedChild
