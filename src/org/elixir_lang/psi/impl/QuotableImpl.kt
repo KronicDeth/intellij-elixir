@@ -102,12 +102,53 @@ object QuotableImpl {
         // this is not valid Elixir quoting, but something needs to be there for quoting to work
         NIL
 
-        return quotedFunctionCall(
+        return if (isAmbiguous(operator, infix.rightOperand())){
+            quotedFunctionCall(
+                OtpErlangAtom(infix.leftOperand()?.text),
+                otpErlangList(
+                    OtpErlangTuple(arrayOf(OtpErlangAtom("ambiguous_op"), NIL)),
+                    lineNumberKeywordTuple(infix.node) ),
+                quotedFunctionCall(
+                    quotedOperator,
+                    metadata(operator),
+                    quotedRightOperand
+                )
+            )
+        } else {
+            quotedFunctionCall(
                 quotedOperator,
                 metadata(operator),
                 quotedLeftOperand,
                 quotedRightOperand
-        )
+            )
+        }
+
+    }
+
+    private val UNAMBIGUOUS_OPERATORS = arrayOf("++", "--")
+    private val AMBIGUOUS_FOR_ALL = arrayOf("(", "[", "<", "{", "%")
+    private val AMBIGUOUS_FOR_PLUS = arrayOf(*AMBIGUOUS_FOR_ALL, "-")
+    private val AMBIGUOUS_FOR_MINUS = arrayOf(*AMBIGUOUS_FOR_ALL, "+")
+
+    @Contract(pure = true)
+    @JvmStatic
+    fun isAmbiguous(operator: Operator, rightOperand: PsiElement?): Boolean {
+        if (UNAMBIGUOUS_OPERATORS.contains(operator.text)) {
+            return false
+        }
+
+        if (operator.nextSibling is PsiWhiteSpace) {
+            return false
+        }
+
+        val nextChar = rightOperand?.text?.first().toString()
+        if (operator.text.equals("+")) {
+            return AMBIGUOUS_FOR_PLUS.contains(nextChar)
+        } else if (operator.text.equals("-")) {
+            return AMBIGUOUS_FOR_MINUS.contains(nextChar)
+        }
+
+        return false
     }
 
     @Contract(pure = true)
