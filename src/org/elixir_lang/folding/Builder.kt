@@ -256,7 +256,7 @@ class Builder : FoldingBuilderEx() {
                                         ): Boolean {
                                             val moduleAttributeName = atNonNumericOperation.moduleAttributeName()
                                             val foldingGroup =
-                                                foldingGroupByModuleAttributeName.computeIfAbsent(moduleAttributeName) { debugName: String? ->
+                                                foldingGroupByModuleAttributeName.computeIfAbsent(moduleAttributeName) { debugName: String ->
                                                     FoldingGroup.newGroup(debugName)
                                                 }
                                             foldingDescriptorList.add(
