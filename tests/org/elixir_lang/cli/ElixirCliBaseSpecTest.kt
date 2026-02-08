@@ -6,6 +6,7 @@ import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.roots.RootProvider
 import com.intellij.openapi.vfs.VirtualFile
 import org.elixir_lang.ElixirCliBase
+import org.elixir_lang.ElixirCliDryRun
 import org.elixir_lang.PlatformTestCase
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
@@ -35,26 +36,28 @@ class ElixirCliBaseSpecTest : PlatformTestCase() {
     }
 
     private fun buildActualTokens(entry: SpecEntry): List<String>? {
-        val elixirSdk = createMockSdk(entry.version, entry.paPaths)
+        val homePath = entry.mixPath?.let { mixPath ->
+            Paths.get(mixPath).parent?.parent?.toString()
+        }
+        val elixirSdk = createMockSdk(entry.version, entry.paPaths, homePath)
         val erlangSdk = createMockSdk(null, emptyList())
         val commandLine = GeneralCommandLine()
 
-        return when (entry.tool) {
-            "elixir" -> {
-                ElixirCliBase.addElixirBaseArguments(commandLine, elixirSdk, erlangSdk, emptyList())
-                commandLine.parametersList.list
-            }
-            "mix" -> {
-                ElixirCliBase.addElixirBaseArguments(commandLine, elixirSdk, erlangSdk, emptyList())
-                entry.mixPath?.let { commandLine.addParameter(it) }
-                commandLine.parametersList.list
-            }
-            "iex" -> {
-                ElixirCliBase.addIExBaseArguments(commandLine, elixirSdk, erlangSdk, emptyList())
-                commandLine.parametersList.list
-            }
+        val tool = when (entry.tool) {
+            "elixir" -> ElixirCliDryRun.Tool.ELIXIR
+            "mix" -> ElixirCliDryRun.Tool.MIX
+            "iex" -> ElixirCliDryRun.Tool.IEX
             else -> null
-        }
+        } ?: return null
+
+        ElixirCliBase.addFallbackArguments(
+            tool = tool,
+            commandLine = commandLine,
+            elixirSdk = elixirSdk,
+            erlangSdk = erlangSdk,
+            erlArgumentList = emptyList(),
+        )
+        return commandLine.parametersList.list
     }
 
     private fun findMissingFeatures(entry: SpecEntry, actualTokens: List<String>): List<String> {
@@ -96,7 +99,12 @@ class ElixirCliBaseSpecTest : PlatformTestCase() {
             missing.add("+iex")
         }
         entry.mixPath?.let { mixPath ->
-            if (!actualTokens.contains(mixPath)) {
+            val normalizedActual = actualTokens.map { it.replace('\\', '/') }
+            val normalizedMixPath = mixPath.replace('\\', '/')
+            val hasMixPath = normalizedActual.any { actual ->
+                actual == normalizedMixPath || actual.endsWith(normalizedMixPath)
+            }
+            if (!hasMixPath) {
                 missing.add("mix_path")
             }
         }
@@ -174,9 +182,10 @@ class ElixirCliBaseSpecTest : PlatformTestCase() {
         return if (extraIndex >= 0 && extraIndex + 1 < tokens.size) tokens[extraIndex + 1] else null
     }
 
-    private fun createMockSdk(version: String?, ebinPaths: List<String>): Sdk {
+    private fun createMockSdk(version: String?, ebinPaths: List<String>, homePath: String? = null): Sdk {
         val sdk = mock(Sdk::class.java)
         `when`(sdk.versionString).thenReturn(version)
+        `when`(sdk.homePath).thenReturn(homePath)
 
         val rootProvider = mock(RootProvider::class.java)
         val virtualFiles = ebinPaths.map { path ->

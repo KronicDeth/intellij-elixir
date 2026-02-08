@@ -11,7 +11,7 @@ import com.intellij.openapi.diagnostic.Logger
  * is used, while in tests this mock can be injected.
  */
 class MockWslCompatService : WslCompatService {
-    override val log = Logger.getInstance(MockWslCompatService::class.java)
+    override val logger = Logger.getInstance(MockWslCompatService::class.java)
 
     override fun isWslUncPath(path: String?): Boolean {
         if (path.isNullOrEmpty()) {
