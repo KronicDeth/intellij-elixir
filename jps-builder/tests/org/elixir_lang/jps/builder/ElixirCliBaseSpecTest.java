@@ -1,7 +1,7 @@
-package org.elixir_lang.jps;
+package org.elixir_lang.jps.builder;
 
 import com.intellij.testFramework.UsefulTestCase;
-import org.elixir_lang.jps.builder.GeneralCommandLine;
+import org.elixir_lang.jps.builder.execution.GeneralCommandLine;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.charset.StandardCharsets;
@@ -10,6 +10,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class ElixirCliBaseSpecTest extends UsefulTestCase {
@@ -68,21 +69,22 @@ public class ElixirCliBaseSpecTest extends UsefulTestCase {
     @NotNull
     private static Path findSpecPath() {
         Path relative = Paths.get("testData", "org", "elixir_lang", "cli", "elixir_cli_base_args.txt");
-        Path current = Paths.get("").toAbsolutePath();
 
-        for (Path dir = current; dir != null; dir = dir.getParent()) {
+        Path dir = Paths.get("").toAbsolutePath();
+        while (dir != null) {
             Path candidate = dir.resolve(relative);
             if (Files.exists(candidate)) {
                 return candidate;
             }
+            dir = dir.getParent();
         }
 
-        return current.resolve(relative);
+        return relative.toAbsolutePath();
     }
 
     private static List<String> buildActualTokens() {
         GeneralCommandLine commandLine = new GeneralCommandLine();
-        ElixirCliBase.addElixirBaseArguments(commandLine);
+        ElixirCliBase.addElixirFallbackArguments(commandLine, Collections.emptyList());
         return commandLine.getParametersList().getList();
     }
 
@@ -106,6 +108,8 @@ public class ElixirCliBaseSpecTest extends UsefulTestCase {
         return false;
     }
 
+    // Test helper keeps explicit parameter for readability.
+    @SuppressWarnings("SameParameterValue")
     private static List<String> dropWhile(List<String> tokens, String token) {
         if (tokens.isEmpty()) {
             return tokens;
@@ -116,6 +120,8 @@ public class ElixirCliBaseSpecTest extends UsefulTestCase {
         return tokens.subList(1, tokens.size());
     }
 
+    // Test helper keeps explicit parameter for readability.
+    @SuppressWarnings("SameParameterValue")
     private static List<String> dropTrailing(List<String> tokens, String token) {
         if (tokens.isEmpty()) {
             return tokens;

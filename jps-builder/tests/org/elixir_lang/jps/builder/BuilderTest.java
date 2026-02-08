@@ -1,22 +1,20 @@
-package org.elixir_lang.jps;
+package org.elixir_lang.jps.builder;
 
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.util.PathUtilRt;
-import org.elixir_lang.jps.compiler_options.Extension;
-import org.elixir_lang.jps.model.ModuleType;
-import org.elixir_lang.jps.model.SdkProperties;
-import org.elixir_lang.jps.sdk_type.Elixir;
-import org.elixir_lang.jps.sdk_type.Erlang;
+import org.elixir_lang.jps.builder.compiler_options.Extension;
+import org.elixir_lang.jps.builder.model.SdkProperties;
+import org.elixir_lang.jps.builder.sdk_type.Elixir;
+import org.elixir_lang.jps.builder.sdk_type.Erlang;
+import org.elixir_lang.jps.shared.CompilerOptions;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.jps.incremental.messages.BuildMessage;
 import org.jetbrains.jps.model.JpsDummyElement;
-import org.jetbrains.jps.model.JpsElement;
 import org.jetbrains.jps.model.library.JpsLibrary;
 import org.jetbrains.jps.model.library.JpsLibraryRoot;
 import org.jetbrains.jps.model.library.JpsOrderRootType;
 import org.jetbrains.jps.model.library.JpsTypedLibrary;
 import org.jetbrains.jps.model.library.sdk.JpsSdk;
-import org.jetbrains.jps.model.module.JpsModule;
 import org.jetbrains.jps.util.JpsPathUtil;
 
 import java.io.*;
@@ -187,37 +185,189 @@ public class BuilderTest extends JpsBuildTestCase {
                 new String[]{PathUtilRt.getParentPath(depFile)},
                 getAbsolutePath("_build/dev"),
                 getAbsolutePath("_build/test"),
-                elixirSdk,
-                ModuleType.INSTANCE
+                elixirSdk
         );
-        rebuildAll();
+        BuildResult rebuildResult = doBuild(CompileScopeTestBuilder.rebuild().all());
+        assertSuccessfulWithLogs(rebuildResult);
+        assertCompiled("lib/simple.ex");
         String absolutePath = getAbsolutePath("_build/dev/");
         assertNotNull(FileUtil.findFileInProvidedPath(absolutePath,"Elixir.Simple.beam"));
+
+        BuildResult makeResult = doBuild(CompileScopeTestBuilder.make().all());
+        assertSuccessfulWithLogs(makeResult);
+        makeResult.assertUpToDate();
+        checkMappingsAreSameAfterRebuild(makeResult);
     }
 
     public void testMix() throws IOException {
         CompilerOptions compilerOptions = Extension.getOrCreateExtension(myModel.getProject()).getOptions();
         compilerOptions.useMixCompiler = true;
+        compilerOptions.useMixToolingBootstrap = false;
 
+        setupMixProject();
+        BuildResult result = doBuild(CompileScopeTestBuilder.rebuild().all());
+        assertSuccessfulWithLogs(result);
+        assertCompiled(mixCompiledPaths());
+        assertMixCompiled();
+
+        BuildResult makeResult = doBuild(CompileScopeTestBuilder.make().all());
+        assertSuccessfulWithLogs(makeResult);
+        makeResult.assertUpToDate();
+        checkMappingsAreSameAfterRebuild(makeResult);
+    }
+
+    public void testElixircWarningsAsErrors() {
+        CompilerOptions compilerOptions = Extension.getOrCreateExtension(myModel.getProject()).getOptions();
+        compilerOptions.useMixCompiler = false;
+        compilerOptions.warningsAsErrorsEnabled = false;
+
+        String depFile = createFile("lib/warn.ex", warningModuleSource());
+        addModule(
+                TEST_MODULE_NAME,
+                new String[]{PathUtilRt.getParentPath(depFile)},
+                getAbsolutePath("_build/dev"),
+                getAbsolutePath("_build/test"),
+                elixirSdk
+        );
+        BuildResult warningResult = doBuild(CompileScopeTestBuilder.rebuild().all());
+        assertSuccessfulWithLogs(warningResult);
+        assertTrue("Expected warnings from unused variable", hasWarningMessage(warningResult));
+
+        compilerOptions.warningsAsErrorsEnabled = true;
+        change(depFile);
+        BuildResult errorResult = doBuild(CompileScopeTestBuilder.make().all());
+        errorResult.assertFailed();
+    }
+
+    public void testMixWarningsAsErrors() throws IOException {
+        CompilerOptions compilerOptions = Extension.getOrCreateExtension(myModel.getProject()).getOptions();
+        compilerOptions.useMixCompiler = true;
+        compilerOptions.useMixToolingBootstrap = false;
+        compilerOptions.warningsAsErrorsEnabled = false;
+
+        setupMixProject();
+        String warnFile = createFile("lib/warn.ex", warningModuleSource());
+        BuildResult warningResult = doBuild(CompileScopeTestBuilder.rebuild().all());
+        assertSuccessfulWithLogs(warningResult);
+        assertTrue("Expected warnings from unused variable", hasWarningMessage(warningResult));
+
+        compilerOptions.warningsAsErrorsEnabled = true;
+        change(warnFile);
+        BuildResult errorResult = doBuild(CompileScopeTestBuilder.make().all());
+        errorResult.assertFailed();
+    }
+
+    public void testElixircDeletesSource() {
+        CompilerOptions compilerOptions = Extension.getOrCreateExtension(myModel.getProject()).getOptions();
+        compilerOptions.useMixCompiler = false;
+
+        String depFile = createFile("lib/delete_me.ex", "defmodule DeleteMe do def foo() do :ok end end");
+        addModule(
+                TEST_MODULE_NAME,
+                new String[]{PathUtilRt.getParentPath(depFile)},
+                getAbsolutePath("_build/dev"),
+                getAbsolutePath("_build/test"),
+                elixirSdk
+        );
+        BuildResult rebuildResult = doBuild(CompileScopeTestBuilder.rebuild().all());
+        assertSuccessfulWithLogs(rebuildResult);
+
+        File deleteFile = new File(depFile);
+        assertTrue("Failed to delete " + depFile, FileUtil.delete(deleteFile));
+
+        BuildResult makeResult = doBuild(CompileScopeTestBuilder.make().all());
+        assertSuccessfulWithLogs(makeResult);
+        checkMappingsAreSameAfterRebuild(makeResult);
+    }
+
+    public void testMixDeletesSource() throws IOException {
+        CompilerOptions compilerOptions = Extension.getOrCreateExtension(myModel.getProject()).getOptions();
+        compilerOptions.useMixCompiler = true;
+        compilerOptions.useMixToolingBootstrap = false;
+
+        setupMixProject();
+        BuildResult rebuildResult = doBuild(CompileScopeTestBuilder.rebuild().all());
+        assertSuccessfulWithLogs(rebuildResult);
+
+        File deleteFile = new File(getAbsolutePath("lib/mix_compiled.ex"));
+        assertTrue("Failed to delete " + deleteFile, FileUtil.delete(deleteFile));
+
+        BuildResult makeResult = doBuild(CompileScopeTestBuilder.make().all());
+        assertSuccessfulWithLogs(makeResult);
+        checkMappingsAreSameAfterRebuild(makeResult);
+    }
+
+    public void testMixWithToolingBootstrap() throws IOException {
+        CompilerOptions compilerOptions = Extension.getOrCreateExtension(myModel.getProject()).getOptions();
+        compilerOptions.useMixCompiler = true;
+        compilerOptions.useMixToolingBootstrap = true;
+
+        setupMixProject();
+        BuildResult result = doBuild(CompileScopeTestBuilder.rebuild().all());
+        assertSuccessfulWithLogs(result);
+        assertCompiled(mixCompiledPaths());
+        assertMixCompiled();
+
+        BuildResult makeResult = doBuild(CompileScopeTestBuilder.make().all());
+        assertSuccessfulWithLogs(makeResult);
+        makeResult.assertUpToDate();
+        checkMappingsAreSameAfterRebuild(makeResult);
+    }
+
+    private void setupMixProject() throws IOException {
         FileUtil.copyDirContent(new File("testData/mix_compiled"), getOrCreateProjectDir());
         addModule(
                 "mix_compiled",
                 new String[]{getOrCreateProjectDir().getAbsolutePath()},
                 getAbsolutePath("_build/dev"),
                 getAbsolutePath("_build/test"),
-                elixirSdk,
-                ModuleType.INSTANCE
+                elixirSdk
         );
-        rebuildAll();
+    }
+
+    private void assertMixCompiled() {
         String absolutePath = getAbsolutePath("_build/dev/lib/mix_compiled/ebin/");
         assertNotNull(FileUtil.findFileInProvidedPath(absolutePath, "Elixir.MixCompiled.beam"));
     }
 
+    private static String[] mixCompiledPaths() {
+        return new String[] {
+                "lib/mix_compiled.ex"
+        };
+    }
+
+    private static boolean hasWarningMessage(BuildResult result) {
+        if (!result.getMessages(BuildMessage.Kind.WARNING).isEmpty()) {
+            return true;
+        }
+
+        for (BuildMessage message : result.getMessages(BuildMessage.Kind.INFO)) {
+            if (message.getMessageText().contains("warning:")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static String warningModuleSource() {
+        return """
+                defmodule Warn do
+                  require Logger
+                  def foo do
+                    unused = 1
+                    :ok
+                  end
+                end
+                """;
+    }
+
     private JpsSdk<SdkProperties> addElixirSdk(@NotNull JpsSdk<?> erlangSdk) {
+        @SuppressWarnings("UnstableApiUsage")
         JpsTypedLibrary<JpsSdk<SdkProperties>> elixirTypedLibrary = myModel
                 .getGlobal()
                 .addSdk("Elixir " + elixirVersion(), elixirSdkHome(), elixirVersion(), Elixir.INSTANCE);
 
+        //noinspection UnstableApiUsage
         eachEbinPath(elixirSdkHome(), ebinPath ->
                 elixirTypedLibrary.addRoot(
                         JpsPathUtil.pathToUrl(ebinPath.toAbsolutePath().toString()),
@@ -229,6 +379,7 @@ public class BuilderTest extends JpsBuildTestCase {
         elixirTypedLibrary.getProperties().getSdkProperties().setErlangSdkName(erlangSdkLibrary.getName());
 
         for (JpsLibraryRoot erlangLibraryRoot : erlangSdkLibrary.getRoots(JpsOrderRootType.COMPILED)) {
+            //noinspection UnstableApiUsage
             elixirTypedLibrary.addRoot(erlangLibraryRoot.getUrl(), JpsOrderRootType.COMPILED);
         }
 
@@ -237,9 +388,11 @@ public class BuilderTest extends JpsBuildTestCase {
 
     private JpsSdk<JpsDummyElement> addErlangSdk() {
         String homePath = erlangSdkHome();
+        @SuppressWarnings("UnstableApiUsage")
         JpsTypedLibrary<JpsSdk<JpsDummyElement>> erlangTypedLibrary = myModel
                 .getGlobal()
                 .addSdk("Erlang for Elixir " + otpRelease(), homePath, otpRelease(), Erlang.INSTANCE);
+        //noinspection UnstableApiUsage
         eachEbinPath(homePath,
                 ebinPath ->
                 erlangTypedLibrary.addRoot(
@@ -249,20 +402,6 @@ public class BuilderTest extends JpsBuildTestCase {
         );
 
         return erlangTypedLibrary.getProperties();
-    }
-
-    @Override
-    protected JpsSdk<? extends JpsElement> addJdk(String name, String path) {
-        throw new IllegalArgumentException("Adding JDK by name alone not supported");
-    }
-
-    @Override
-    protected <T extends JpsElement> JpsModule addModule(String moduleName,
-                                                         String[] srcPaths,
-                                                         @Nullable String outputPath,
-                                                         @Nullable String testOutputPath,
-                                                         JpsSdk<T> sdk) {
-        return super.addModule(moduleName, srcPaths, outputPath, testOutputPath, sdk, ModuleType.INSTANCE);
     }
 
     private static void eachEbinPath(@NotNull String homePath, @NotNull Consumer<Path> ebinPathConsumer) {
