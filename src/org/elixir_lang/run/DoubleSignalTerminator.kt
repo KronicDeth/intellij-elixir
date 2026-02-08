@@ -1,6 +1,8 @@
 package org.elixir_lang.run
 
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.trace
+import com.intellij.openapi.diagnostic.traceThrowable
 import kotlinx.coroutines.runBlocking
 
 /**
@@ -44,16 +46,18 @@ interface DoubleSignalTerminator {
     fun performDoubleSignalTermination(process: Process, fallback: () -> Unit)
 }
 
-class ElixirDoubleSignalTerminator : DoubleSignalTerminator {
-    private val log = Logger.getInstance(ElixirDoubleSignalTerminator::class.java)
+class ElixirDoubleSignalTerminator(
+    private val pidProvider: (() -> Long?)? = null
+) : DoubleSignalTerminator {
+    private val logger = Logger.getInstance(ElixirDoubleSignalTerminator::class.java)
     private var doubleSigintInProgress = false
 
     override fun performDoubleSignalTermination(process: Process, fallback: () -> Unit) {
-        log.info("performDoubleSignalTermination called, doubleSigintInProgress=$doubleSigintInProgress")
+        logger.trace { "performDoubleSignalTermination called, doubleSigintInProgress=$doubleSigintInProgress" }
 
         // Prevent infinite recursion
         if (doubleSigintInProgress) {
-            log.warn("Already in double-SIGINT mode, calling fallback")
+            logger.warn("Already in double-SIGINT mode, calling fallback")
             fallback()
             return
         }
@@ -62,47 +66,34 @@ class ElixirDoubleSignalTerminator : DoubleSignalTerminator {
             doubleSigintInProgress = true
 
             if (!process.isAlive) {
-                log.info("Process already terminated")
+                logger.trace { "Process already terminated" }
                 return
             }
 
-            log.info("Process is alive: ${process.isAlive}, attempting first SIGINT")
+            logger.trace { "Process is alive: ${process.isAlive}, attempting first SIGINT" }
 
             // Send first SIGINT
             val firstResult = sendSignal(process, fallback)
-            log.info("First SIGINT result: $firstResult")
-
-            if (!firstResult) {
-                log.warn("First SIGINT failed, calling fallback")
-                fallback()
-                return
-            }
+            logger.trace { "First SIGINT result: $firstResult" }
 
             // Wait briefly for the BREAK menu to appear and give process a chance to exit.
             // Using waitFor() instead of Thread.sleep() allows early return if process exits quickly.
-            log.info("Waiting up to 200ms for process to respond to first SIGINT...")
+            logger.info("Waiting up to 200ms for process to respond to first SIGINT...")
             val terminatedEarly = process.waitFor(200, java.util.concurrent.TimeUnit.MILLISECONDS)
 
             // Check if process is still alive
             if (terminatedEarly || !process.isAlive) {
-                log.info("Process terminated after first SIGINT")
+                logger.trace { "Process terminated after first SIGINT" }
                 return
             }
 
-            log.info("Process still alive after first SIGINT, sending second SIGINT")
-
             // Send second SIGINT
+            logger.trace { "Process still alive after first SIGINT, sending second SIGINT" }
             val secondResult = sendSignal(process, fallback)
-            log.info("Second SIGINT result: $secondResult")
+            logger.trace { "Second SIGINT result: $secondResult" }
 
-            if (!secondResult) {
-                log.warn("Second SIGINT failed, calling fallback")
-                fallback()
-            } else {
-                log.info("Double SIGINT completed successfully")
-            }
         } catch (e: Exception) {
-            log.error("Exception during double-SIGINT termination: ${e.message}", e)
+            logger.error("Exception during double-SIGINT termination: ${e.message}", e)
             fallback()
         } finally {
             doubleSigintInProgress = false
@@ -138,15 +129,17 @@ class ElixirDoubleSignalTerminator : DoubleSignalTerminator {
 
         // Use caller's fallback (typically super.destroyProcessImpl() or process.destroy())
         return try {
-            log.info("Using provided fallback termination strategy")
+            logger.trace { "Using provided fallback termination strategy" }
             fallback()
             true
         } catch (e: Exception) {
-            log.error("Fallback termination failed: ${e.message}", e)
+            logger.error("Fallback termination failed: ${e.message}", e)
             false
         }
     }
 
+    // EelProcess interrupt is experimental; required for IJent/WSL interrupt with no stable alternative.
+    @Suppress("UnstableApiUsage")
     private fun tryIjentInterrupt(process: Process): Boolean {
         try {
             // Check if this is an IJent wrapper process
@@ -154,7 +147,7 @@ class ElixirDoubleSignalTerminator : DoubleSignalTerminator {
                 return false
             }
 
-            log.info("Detected IjentChildProcessAdapter, using EelProcess.interrupt()")
+            logger.trace { ("Detected IjentChildProcessAdapter, using EelProcess.interrupt()") }
 
             // Access the internal ijentChildProcess field (EelProcess)
             val ijentChildProcessField = process.javaClass.getDeclaredField("ijentChildProcess")
@@ -162,7 +155,7 @@ class ElixirDoubleSignalTerminator : DoubleSignalTerminator {
             val ijentChildProcess = ijentChildProcessField.get(process)
 
             if (ijentChildProcess != null) {
-                log.info("Got ijentChildProcess, calling interrupt()")
+                logger.trace { ("Got ijentChildProcess, calling interrupt()") }
 
                 // Cast to EelProcess and call interrupt()
                 val eelProcess = ijentChildProcess as? com.intellij.platform.eel.EelProcess
@@ -170,55 +163,65 @@ class ElixirDoubleSignalTerminator : DoubleSignalTerminator {
                     runBlocking {
                         try {
                             eelProcess.interrupt()
-                            log.info("interrupt() completed successfully")
+                            logger.trace { ("interrupt() completed successfully") }
                         } catch (e: Exception) {
-                            log.error("interrupt() failed: ${e.message}", e)
+                            logger.error("interrupt() failed: ${e.message}", e)
                             throw e
                         }
                     }
                     return true
                 } else {
-                    log.warn("Could not cast to EelProcess")
+                    logger.trace { "Could not cast to EelProcess" }
                 }
             }
         } catch (e: Exception) {
-            log.error("Failed to call EelProcess.interrupt(): ${e.message}", e)
+            logger.error("Failed to call EelProcess.interrupt(): ${e.message}", e)
         }
         return false
     }
 
     private fun tryPidKill(process: Process): Boolean {
         try {
+            val providedPid = pidProvider?.invoke()
+            if (providedPid != null) {
+                logger.trace { "Using provided PID $providedPid" }
+                return sendSigint(providedPid)
+            }
+
             // Try to get the PID using reflection
-            log.info("Getting PID via reflection from ${process.javaClass.name}")
+            logger.trace { "Getting PID via reflection from ${process.javaClass.name}" }
             val pidField = process.javaClass.getDeclaredField("pid")
             pidField.isAccessible = true
             val pid = pidField.get(process)
-            log.info("PID value: $pid (type: ${pid?.javaClass?.name})")
+            logger.trace { ("PID value: $pid (type: ${pid?.javaClass?.name})") }
 
             val pidLong = when (pid) {
                 is Long -> pid
                 is Int -> pid.toLong()
                 else -> {
-                    log.warn("Unexpected PID type: ${pid?.javaClass?.name}")
+                    logger.warn("Unexpected PID type: ${pid?.javaClass?.name}")
                     return false
                 }
             }
 
-            log.info("Sending SIGINT (signal 2) to PID $pidLong")
-
-            // Send signal using kill command
-            val killProcess = Runtime.getRuntime().exec(arrayOf("kill", "-2", pidLong.toString()))
-            val exitCode = killProcess.waitFor()
-
-            log.info("kill command exit code: $exitCode")
-            return exitCode == 0
+            return sendSigint(pidLong)
         } catch (e: NoSuchFieldException) {
-            log.debug("Could not find 'pid' field in ${process.javaClass.name}", e)
+            logger.traceThrowable { Throwable("Could not find 'pid' field in ${process.javaClass.name}", e) }
             return false
         } catch (e: Exception) {
-            log.error("Exception in tryPidKill: ${e.message}", e)
+            logger.error("Exception in tryPidKill: ${e.message}", e)
             return false
         }
+    }
+
+    private fun sendSigint(pidLong: Long): Boolean {
+        logger.trace { ("Sending SIGINT (signal 2) to PID $pidLong") }
+
+        // Send signal using kill command
+        val killProcess = Runtime.getRuntime().exec(arrayOf("kill", "-2", pidLong.toString()))
+        val exitCode = killProcess.waitFor()
+
+        logger.trace { "kill command exit code: $exitCode" }
+        return exitCode == 0
     }
 }

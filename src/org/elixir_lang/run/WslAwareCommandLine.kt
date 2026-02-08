@@ -2,10 +2,11 @@ package org.elixir_lang.run
 
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.trace
 import org.elixir_lang.sdk.wsl.wslCompat
 import java.io.IOException
 
-private val LOG = Logger.getInstance(WslAwareCommandLine::class.java)
+private val logger = Logger.getInstance(WslAwareCommandLine::class.java)
 
 /**
  * A GeneralCommandLine subclass that automatically applies WSL path conversion
@@ -23,7 +24,7 @@ private val LOG = Logger.getInstance(WslAwareCommandLine::class.java)
  * to bypass WSL conversion:
  *
  * ```kotlin
- * val commandLine = Mix.commandLine(...)  // WSL converted
+ * val commandLine = Mix.commandLine(project, ...)  // WSL converted
  * commandLine.addParameters(newParams)     // NOT converted!
  * commandLine.createProcess()
  * ```
@@ -52,7 +53,7 @@ open class WslAwareCommandLine : GeneralCommandLine {
     @Throws(IOException::class)
     override fun createProcess(processBuilder: ProcessBuilder): Process {
         wslCompat.convertProcessBuilderArgumentsForWsl(processBuilder, this)
-        LOG.trace(formatCommandLineForLogging(processBuilder, "Command line"))
+        logger.trace { formatCommandLineForLogging(processBuilder, "Command line") }
         return super.createProcess(processBuilder)
     }
 }

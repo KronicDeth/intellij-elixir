@@ -1,14 +1,14 @@
 package org.elixir_lang.settings
 
-import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.ui.dsl.builder.panel
 import javax.swing.JComponent
 
-private val LOG = logger<ElixirExperimentalSettingsConfigurable>()
+private val logger = Logger.getInstance(ElixirExperimentalSettingsConfigurable::class.java)
 
 /**
  * Configurable for Elixir experimental features.
@@ -20,7 +20,7 @@ internal class ElixirExperimentalSettingsConfigurable : Configurable, Configurab
 
     override fun createComponent(): JComponent {
         settingsPanel = panel {
-            group("HTML Injection in ~H Sigils code blocks") {
+            group("HTML Injection in ~H Sigils Code Blocks") {
                 row {
                     checkBox("Enable ~H Sigil HTML language injection")
                         .comment("Provides HTML syntax highlighting and code completion within <a href='https://hexdocs.pm/phoenix_live_view/1.0.3/Phoenix.Component.html#sigil_H/2'>~H Sigils code blocks</a>, when working with Phoenix Live View HEEx templates, otherwise you'll see this as a string.<br/><br/><a href='https://github.com/joshuataylor/intellij-elixir/tree/sigil-injected-languages-poke?tab=readme-ov-file#h-sigil-html-injection-support'>Documentation for ~H Sigil HTML Injection Support.</a>")
@@ -51,6 +51,16 @@ internal class ElixirExperimentalSettingsConfigurable : Configurable, Configurab
                         )
                 }
             }
+            group("Mix Tooling Bootstrap") {
+                row {
+                    checkBox("Enable mix tooling boostrap for local.hex and local.rebar")
+                        .comment("Runs mix local.hex and mix local.rebar before mix commands to install missing tooling.")
+                        .bindSelected(
+                            getter = { settings.state.enableMixMixToolingBootstrap },
+                            setter = { settings.state.enableMixMixToolingBootstrap = it }
+                        )
+                }
+            }
 //            group("Custom IDE Settings") {
 //                row {
 //                    // @todo check enableDeleteSdkSmallIDE
@@ -74,23 +84,26 @@ internal class ElixirExperimentalSettingsConfigurable : Configurable, Configurab
     override fun apply() {
         // Check if settings have been modified BEFORE we apply changes
         if (!isModified()) {
-            LOG.debug("No modifications detected, skipping apply")
+            logger.debug { "No modifications detected, skipping apply" }
             return
         }
 
         // Store the old state before applying changes
         val oldState = settings.state.copy()
-        LOG.debug("ElixirExperimentalSettingsConfigurable.apply() - oldState: $oldState")
+        logger.debug { "ElixirExperimentalSettingsConfigurable.apply() - oldState: $oldState" }
 
         // Apply the changes from the panel (this modifies settings.state directly)
         settingsPanel?.apply()
 
         // Get the new state after applying
         val newState = settings.state.copy()
-        LOG.debug("ElixirExperimentalSettingsConfigurable.apply() - newState: $newState")
+        logger.debug { "ElixirExperimentalSettingsConfigurable.apply() - newState: $newState" }
 
         // Force the change notification by calling updateState with oldState and newState
-        LOG.debug("Settings were modified, calling updateState(). StatusBarWidget: ${oldState.enableStatusBarWidget} -> ${newState.enableStatusBarWidget}")
+        logger.debug {
+            "Settings were modified, calling updateState(). StatusBarWidget: " +
+                "${oldState.enableStatusBarWidget} -> ${newState.enableStatusBarWidget}"
+        }
 
         // We need to manually trigger the change notification since the state was modified in-place
         val messageBus = com.intellij.openapi.application.ApplicationManager.getApplication().messageBus

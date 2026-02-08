@@ -1,14 +1,68 @@
 package org.elixir_lang
 
 import com.intellij.execution.configurations.GeneralCommandLine
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.util.Version
+import org.elixir_lang.jps.shared.ElixirCliArgumentMerger
 
 internal object ElixirCliBase {
     /**
-     * Keep in-sync with [org.elixir_lang.jps.Builder.addElixir]
+     * Keep in-sync with the JPS builder ElixirCliBase dry-run arguments.
      */
-    fun addElixirBaseArguments(
+    fun dryRunArguments(
+        project: Project?,
+        tool: ElixirCliDryRun.Tool,
+        environment: Map<String, String>,
+        workingDirectory: String?,
+        elixirSdk: Sdk,
+        erlArgumentList: kotlin.collections.List<String>,
+    ): kotlin.collections.List<String>? {
+        val baseArguments = if (project != null) {
+            ElixirCliDryRunCache.getInstance(project).getOrComputeBaseArguments(
+                tool = tool,
+                environment = environment,
+                workingDirectory = workingDirectory,
+                elixirSdk = elixirSdk,
+            )
+        } else {
+            ElixirCliDryRun.baseArguments(tool, environment, workingDirectory, elixirSdk)
+        }
+        return baseArguments?.let { ElixirCliArgumentMerger.mergeArguments(it, erlArgumentList) }
+    }
+
+    /**
+     * Keep in-sync with the JPS builder ElixirCliBase fallback arguments.
+     */
+    fun addFallbackArguments(
+        tool: ElixirCliDryRun.Tool,
+        commandLine: GeneralCommandLine,
+        elixirSdk: Sdk,
+        erlangSdk: Sdk,
+        erlArgumentList: kotlin.collections.List<String>,
+        elixirArgumentList: kotlin.collections.List<String> = emptyList(),
+    ) {
+        when (tool) {
+            ElixirCliDryRun.Tool.ELIXIR -> addElixirFallbackArguments(
+                commandLine,
+                elixirSdk,
+                erlangSdk,
+                erlArgumentList
+            )
+            ElixirCliDryRun.Tool.MIX -> {
+                addElixirFallbackArguments(commandLine, elixirSdk, erlangSdk, erlArgumentList)
+                addMix(commandLine, elixirSdk, elixirArgumentList)
+            }
+            ElixirCliDryRun.Tool.IEX -> addIExFallbackArguments(
+                commandLine,
+                elixirSdk,
+                erlangSdk,
+                erlArgumentList
+            )
+        }
+    }
+
+    private fun addElixirFallbackArguments(
         commandLine: GeneralCommandLine,
         elixirSdk: Sdk,
         erlangSdk: Sdk,
@@ -22,7 +76,19 @@ internal object ElixirCliBase {
         commandLine.addParameter("-extra")
     }
 
-    fun addIExBaseArguments(
+    private fun addMix(
+        commandLine: GeneralCommandLine,
+        sdk: Sdk,
+        elixirArgumentList: kotlin.collections.List<String>,
+    ) {
+        if (elixirArgumentList.isNotEmpty()) {
+            commandLine.addParameters(elixirArgumentList)
+        }
+        val mixPath = ElixirCliToolPaths.mixPath(sdk.homePath)
+        commandLine.addParameter(mixPath)
+    }
+
+    private fun addIExFallbackArguments(
         commandLine: GeneralCommandLine,
         elixirSdk: Sdk,
         erlangSdk: Sdk,
@@ -69,4 +135,5 @@ internal object ElixirCliBase {
         }
         commandLine.addParameter("+iex")
     }
+
 }

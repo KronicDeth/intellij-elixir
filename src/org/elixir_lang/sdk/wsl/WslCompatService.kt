@@ -4,6 +4,7 @@ import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.wsl.WSLDistribution
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.debug
 
 /**
  * Service wrapper for WSL (Windows Subsystem for Linux Integration).
@@ -31,7 +32,7 @@ import com.intellij.openapi.diagnostic.Logger
  *
  * ```kotlin
  * // Factory methods return WslAwareCommandLine instances:
- * val commandLine = Mix.commandLine(env, workDir, sdk)
+ * val commandLine = Mix.commandLine(project, env, workDir, sdk)
  * commandLine.addParameters("--extra", "params")  // These will be converted too
  * commandLine.createProcess()  // Conversion happens here
  * ```
@@ -45,7 +46,7 @@ interface WslCompatService {
      * Logger for this service implementation.
      * Each implementation should override this to use its own class name for better log tracing.
      */
-    val log: Logger
+    val logger: Logger
         get() = Logger.getInstance(WslCompatService::class.java)
 
     /**
@@ -157,7 +158,7 @@ interface WslCompatService {
         val workDirectoryDistribution = getDistributionByWindowsUncPath(workDirectory)
 
         if (workDirectoryDistribution == null) {
-            log.debug("Cannot determine WSL distribution from workDirectory: $workDirectory")
+            logger.debug { "Cannot determine WSL distribution from workDirectory: $workDirectory" }
             return null
         }
 
@@ -165,12 +166,12 @@ interface WslCompatService {
         val exePathDistribution = getDistributionByWindowsUncPath(exePath)
 
         if (exePathDistribution == null) {
-            log.debug("Skipping conversion: exePath is not WSL UNC: $exePath")
+            logger.debug { "Skipping conversion: exePath is not WSL UNC: $exePath" }
             return null
         }
 
         if (exePathDistribution.msId != workDirectoryDistribution.msId) {
-            log.warn("Work directory distribution ($workDirectory = $workDirectoryDistribution) does not match exePath distribution ($exePath = $exePathDistribution)")
+            logger.warn("Work directory distribution ($workDirectory = $workDirectoryDistribution) does not match exePath distribution ($exePath = $exePathDistribution)")
             return null
         }
         return workDirectoryDistribution
@@ -203,10 +204,10 @@ interface WslCompatService {
                 if (wslPath != null) {
                     result = result.substring(0, match.range.first) + wslPath + result.substring(match.range.last + 1)
                 } else {
-                    log.debug("convertSingleWslPath returned null for drive path: $windowsPath")
+                    logger.debug { "convertSingleWslPath returned null for drive path: $windowsPath" }
                 }
             } catch (e: Exception) {
-                log.debug("Failed to convert Windows drive path: $windowsPath", e)
+                    logger.debug(e) { "Failed to convert Windows drive path: $windowsPath" }
             }
         }
 
@@ -231,10 +232,10 @@ interface WslCompatService {
                 if (posixPath != null) {
                     result = result.substring(0, match.range.first) + posixPath + result.substring(match.range.last + 1)
                 } else {
-                    log.warn("convertSingleWslPath returned null for WSL UNC path: $uncPath")
+                    logger.warn("convertSingleWslPath returned null for WSL UNC path: $uncPath")
                 }
             } catch (e: Exception) {
-                log.warn("Failed to convert WSL UNC path: $uncPath", e)
+                logger.warn("Failed to convert WSL UNC path: $uncPath", e)
             }
         }
 

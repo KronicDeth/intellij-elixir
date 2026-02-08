@@ -5,7 +5,7 @@ import java.io.FileNotFoundException
 
 object Distillery {
     /**
-     * Keep in-sync with [org.elixir_lang.jps.Builder.erlCommandLine]
+     * Keep in-sync with the JPS builder erl command line.
      */
     fun commandLine(pty: Boolean, environment: Map<String, String>, workingDirectory: String?, exePath: String?):
             GeneralCommandLine {

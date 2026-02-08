@@ -9,10 +9,12 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.Storage
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.module.Module
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.util.Key
 import org.elixir_lang.Elixir.elixirSdkHasErlangSdk
 import org.elixir_lang.Mix
+import org.elixir_lang.mix.MixToolingBootstrap
 import org.elixir_lang.notification.setup_sdk.Notifier
 import org.elixir_lang.run.ensureWorkingDirectory
 import org.elixir_lang.sdk.elixir.Type.Companion.mostSpecificSdk
@@ -33,7 +35,7 @@ class DialyzerServiceImpl : DialyzerService {
     override var elixirArguments = ""
     override var erlArguments = ""
 
-    private val log = Logger.getInstance(DialyzerServiceImpl::class.java)
+    private val logger = Logger.getInstance(DialyzerServiceImpl::class.java)
 
     override fun dialyzerWarnings(module: Module): List<DialyzerWarn> {
         val workingDirectory = ensureWorkingDirectory(module)
@@ -42,7 +44,7 @@ class DialyzerServiceImpl : DialyzerService {
 
         return if (sdk != null) {
             if (elixirSdkHasErlangSdk(sdk)) {
-                dialyzerWarnings(workingDirectory, sdk)
+                dialyzerWarnings(workingDirectory, sdk, module.project)
             } else {
                 val project = module.project
                 Notifier.error(
@@ -66,19 +68,20 @@ class DialyzerServiceImpl : DialyzerService {
         }
     }
 
-    private fun dialyzerWarnings(workingDirectory: String, elixirSdk: Sdk): List<DialyzerWarn> = try {
-        parseDialyzerOutput(run(workingDirectory, elixirSdk))
+    private fun dialyzerWarnings(workingDirectory: String, elixirSdk: Sdk, project: Project): List<DialyzerWarn> = try {
+        parseDialyzerOutput(run(workingDirectory, elixirSdk, project))
     } catch (ex: Exception) {
         throw DialyzerException("Error while running Dialyzer: ${ex.message}", ex)
     }
 
-    private fun run(workingDirectory: String, elixirSdk: Sdk): Pair<String, String> {
-        log.info("Dialyzer starting...")
+    private fun run(workingDirectory: String, elixirSdk: Sdk, project: Project): Pair<String, String> {
+        logger.info("Dialyzer starting...")
         val erlArgumentList = ParametersList.parse(erlArguments).toList()
         val elixirArgumentList = ParametersList.parse(elixirArguments).toList()
         val mixArgumentList = ParametersList.parse(mixArguments).toList()
-        val commandLine = Mix.commandLine(emptyMap(), workingDirectory, elixirSdk, erlArgumentList, elixirArgumentList)
+        val commandLine = Mix.commandLine(project, emptyMap(), workingDirectory, elixirSdk, erlArgumentList, elixirArgumentList)
         commandLine.addParameters(mixArgumentList)
+        MixToolingBootstrap.ensure(commandLine, project, elixirSdk)
 
         val processHandler = ProcessHandlerFactory.getInstance().createColoredProcessHandler(commandLine)
         val stderrBuilder = StringBuilder()
@@ -113,7 +116,7 @@ class DialyzerServiceImpl : DialyzerService {
 
         val stdout = stdoutBuilder.toString()
         val stderr = stderrBuilder.toString()
-        log.info("Dialyzer stderr:\n$stderr\nDialyzer stdout:\n$stdout")
+        logger.info("Dialyzer stderr:\n$stderr\nDialyzer stdout:\n$stdout")
 
         return Pair(stdout, stderr)
     }
@@ -126,4 +129,3 @@ class DialyzerServiceImpl : DialyzerService {
         erlArguments = state.erlArguments
     }
 }
-

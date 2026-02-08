@@ -6,6 +6,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.application.edtWriteAction
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.fileChooser.FileChooserDescriptor
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleUtilCore
@@ -25,11 +26,10 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.openapi.vfs.toNioPathOrNull
 import com.intellij.psi.PsiElement
-import gnu.trove.THashSet
 import org.apache.commons.io.FilenameUtils
 import org.elixir_lang.Facet
 import org.elixir_lang.Icons
-import org.elixir_lang.jps.model.SerializerExtension
+import org.elixir_lang.jps.shared.ElixirSdkTypeId
 import org.elixir_lang.sdk.HomePath
 import org.elixir_lang.sdk.ProcessOutput
 import org.elixir_lang.sdk.SdkHomeScan
@@ -45,7 +45,7 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import javax.swing.Icon
 
-class Type : org.elixir_lang.sdk.erlang_dependent.Type(SerializerExtension.ELIXIR_SDK_TYPE_ID) {
+class Type : org.elixir_lang.sdk.erlang_dependent.Type(ElixirSdkTypeId.ELIXIR_SDK_TYPE_ID) {
     /**
      * If a path selected in the file chooser is not a valid SDK home path, and the base name is one of the commonly
      * incorrectly selected subdirectories - bin, lib, or src - then return the parent path, so it can be checked for
@@ -171,10 +171,9 @@ ELIXIR_SDK_HOME
     }
 
     @Deprecated("Deprecated in Java")
-    override fun suggestHomePath(): String? {
-        @Suppress("DEPRECATION")
-        return suggestHomePaths().firstOrNull()
-    }
+    // IntelliJ SDKType still requires this deprecated override.
+    @Suppress("DEPRECATION")
+    override fun suggestHomePath(): String? = suggestHomePaths().firstOrNull()
 
     override fun suggestHomePath(path: Path): String? {
         return homePathByVersion(path).values.firstOrNull()
@@ -233,12 +232,11 @@ ELIXIR_SDK_HOME
             try {
                 additionalData.writeExternal(additional)
             } catch (e: WriteExternalException) {
-                LOG.error(e)
+                logger.error(e)
             }
         }
     }
 
-    @Suppress("SameParameterValue")
     override fun loadAdditionalData(
         elixirSdk: Sdk,
         additional: Element,
@@ -247,7 +245,7 @@ ELIXIR_SDK_HOME
         try {
             sdkAdditionalData.readExternal(additional)
         } catch (e: InvalidDataException) {
-            LOG.error(e)
+            logger.error(e)
         }
         return sdkAdditionalData
     }
@@ -255,9 +253,9 @@ ELIXIR_SDK_HOME
     companion object {
         private const val LINUX_DEFAULT_HOME_PATH = HomePath.LINUX_DEFAULT_HOME_PATH + "/elixir"
         private const val LINUX_MINT_HOME_PATH = HomePath.LINUX_MINT_HOME_PATH + "/elixir"
-        private val LOG = Logger.getInstance(Type::class.java)
+        private val logger = Logger.getInstance(Type::class.java)
         private val NIX_PATTERN = HomePath.nixPattern("elixir")
-        private val SDK_HOME_CHILD_BASE_NAME_SET: Set<String> = THashSet(listOf("lib", "src"))
+        private val SDK_HOME_CHILD_BASE_NAME_SET: Set<String> = setOf("lib", "src")
         private const val WINDOWS_32BIT_DEFAULT_HOME_PATH = "C:\\Program Files\\Elixir"
         private const val WINDOWS_64BIT_DEFAULT_HOME_PATH = "C:\\Program Files (x86)\\Elixir"
 
@@ -294,14 +292,14 @@ ELIXIR_SDK_HOME
         }
 
         private fun cleanupProjectReferences(deletedSdk: Sdk) {
-            LOG.info("Elixir SDK removed: ${deletedSdk.name}, cleaning up project references")
+            logger.info("Elixir SDK removed: ${deletedSdk.name}, cleaning up project references")
             com.intellij.openapi.project.ProjectManager.getInstance().openProjects.forEach { project ->
                 val projectRootManager = ProjectRootManager.getInstance(project)
                 if (projectRootManager.projectSdk == deletedSdk) {
                     ApplicationManager.getApplication().invokeLater {
                         ApplicationManager.getApplication().runWriteAction {
                             projectRootManager.projectSdk = null
-                            LOG.info("Cleared removed Elixir SDK '${deletedSdk.name}' from project '${project.name}'")
+                            logger.info("Cleared removed Elixir SDK '${deletedSdk.name}' from project '${project.name}'")
                         }
                     }
                 }
@@ -309,7 +307,7 @@ ELIXIR_SDK_HOME
         }
 
         private fun autoSetProjectSdkIfNeeded(newElixirSdk: Sdk) {
-            LOG.debug("Auto-set check for newly added Elixir SDK: ${newElixirSdk.name}")
+            logger.debug { "Auto-set check for newly added Elixir SDK: ${newElixirSdk.name}" }
 
             // Get all non-disposed projects
             val openProjects = com.intellij.openapi.project.ProjectManager.getInstance().openProjects.filter {
@@ -320,13 +318,13 @@ ELIXIR_SDK_HOME
             // This ensures we don't accidentally set the wrong project's SDK
             val project = when (openProjects.size) {
                 0 -> {
-                    LOG.debug("No open projects, skipping auto-set")
+                    logger.debug { "No open projects, skipping auto-set" }
                     return
                 }
 
                 1 -> openProjects.first()
                 else -> {
-                    LOG.debug("Multiple projects open (${openProjects.size}), skipping auto-set to avoid ambiguity")
+                    logger.debug { "Multiple projects open (${openProjects.size}), skipping auto-set to avoid ambiguity" }
                     return
                 }
             }
@@ -336,11 +334,13 @@ ELIXIR_SDK_HOME
 
             // Only auto-set if current SDK is null or (is Elixir and invalid)
             val shouldAutoSet = if (currentProjectSdk == null) {
-                LOG.debug("Project '${project.name}' has no SDK, will auto-set to '${newElixirSdk.name}'")
+                logger.debug { "Project '${project.name}' has no SDK, will auto-set to '${newElixirSdk.name}'" }
                 true
             } else if (currentProjectSdk.sdkType !is Type) {
                 // Don't replace non-Elixir SDKs (Java, Python, etc.)
-                LOG.debug("Project '${project.name}' has non-Elixir SDK '${currentProjectSdk.name}', skipping auto-set")
+                logger.debug {
+                    "Project '${project.name}' has non-Elixir SDK '${currentProjectSdk.name}', skipping auto-set"
+                }
                 false
             } else {
                 // Current SDK is Elixir - check if it's valid
@@ -349,12 +349,15 @@ ELIXIR_SDK_HOME
                     val erlangSdk = additionalData?.getErlangSdk()
                     erlangSdk != null
                 } catch (e: Exception) {
-                    LOG.debug("Error checking validity of current SDK: ${e.message}")
+                    logger.debug { "Error checking validity of current SDK: ${e.message}" }
                     false
                 }
 
                 if (!isValid) {
-                    LOG.debug("Project '${project.name}' SDK '${currentProjectSdk.name}' is invalid, will auto-set to '${newElixirSdk.name}'")
+                    logger.debug {
+                        "Project '${project.name}' SDK '${currentProjectSdk.name}' is invalid, " +
+                            "will auto-set to '${newElixirSdk.name}'"
+                    }
                 }
                 !isValid
             }
@@ -363,7 +366,7 @@ ELIXIR_SDK_HOME
                 ApplicationManager.getApplication().invokeLater {
                     ApplicationManager.getApplication().runWriteAction {
                         projectRootManager.projectSdk = newElixirSdk
-                        LOG.info("Auto-set project '${project.name}' SDK to '${newElixirSdk.name}'")
+                        logger.info("Auto-set project '${project.name}' SDK to '${newElixirSdk.name}'")
                     }
                 }
             }
@@ -371,7 +374,7 @@ ELIXIR_SDK_HOME
 
         private fun cleanupOrphanedElixirSdkReferences(deletedErlangSdk: Sdk) {
             val deletedName = deletedErlangSdk.name
-            LOG.info("Erlang SDK '$deletedName' removed, checking for orphaned Elixir SDK references")
+            logger.info("Erlang SDK '$deletedName' removed, checking for orphaned Elixir SDK references")
 
             val projectJdkTable = ProjectJdkTable.getInstance()
             val elixirSdks = projectJdkTable.allJdks.filter { it.sdkType is Type }
@@ -386,9 +389,9 @@ ELIXIR_SDK_HOME
                 return
             }
 
-            LOG.warn("Erlang SDK '$deletedName' was deleted and is referenced by ${orphanedElixirSdks.size} Elixir SDK(s)")
+            logger.warn("Erlang SDK '$deletedName' was deleted and is referenced by ${orphanedElixirSdks.size} Elixir SDK(s)")
             orphanedElixirSdks.forEach {
-                LOG.warn("Elixir SDK '${it.name}' references deleted Erlang SDK '$deletedName'")
+                logger.warn("Elixir SDK '${it.name}' references deleted Erlang SDK '$deletedName'")
             }
 
             // Show warning notification instructing user to reconfigure
@@ -422,7 +425,7 @@ ELIXIR_SDK_HOME
 
         private fun updateElixirSdkReferencesAfterRename(renamedErlangSdk: Sdk, previousName: String) {
             val newName = renamedErlangSdk.name
-            LOG.info("Erlang SDK renamed from '$previousName' to '$newName'")
+            logger.info("Erlang SDK renamed from '$previousName' to '$newName'")
 
             val projectJdkTable = ProjectJdkTable.getInstance()
             val elixirSdks = projectJdkTable.allJdks.filter { it.sdkType is Type }
@@ -433,7 +436,7 @@ ELIXIR_SDK_HOME
                 // Use getErlangSdkName() to check stored reference
                 if (additionalData.getErlangSdkName() != previousName) continue
 
-                LOG.info("Updating Elixir SDK '${elixirSdk.name}' reference from '$previousName' to '$newName'")
+                logger.info("Updating Elixir SDK '${elixirSdk.name}' reference from '$previousName' to '$newName'")
 
                 val modificator = elixirSdk.sdkModificator
                 val newAdditionalData = SdkAdditionalData(renamedErlangSdk, elixirSdk)
@@ -513,7 +516,7 @@ ELIXIR_SDK_HOME
         }
 
         private fun configureSdkPaths(sdk: Sdk) {
-            LOG.info("Configuring SDK paths for ${sdk.name}")
+            logger.info("Configuring SDK paths for ${sdk.name}")
             val sdkModificator = sdk.sdkModificator
 
             // Configure base paths
@@ -526,18 +529,18 @@ ELIXIR_SDK_HOME
 
             // Commit changes - check if we're already in a write action to avoid deadlock
             if (ApplicationManager.getApplication().isWriteAccessAllowed) {
-                LOG.debug("Committing SDK changes for ${sdk.name} (already in write action)")
+                logger.debug { "Committing SDK changes for ${sdk.name} (already in write action)" }
                 sdkModificator.commitChanges()
             } else {
                 runBlockingCancellable {
                     edtWriteAction {
-                        LOG.debug("Committing SDK changes for ${sdk.name}")
+                        logger.debug { "Committing SDK changes for ${sdk.name}" }
                         sdkModificator.commitChanges()
-                        LOG.debug("Committed SDK changes for ${sdk.name}")
+                        logger.debug { "Committed SDK changes for ${sdk.name}" }
                     }
                 }
             }
-            LOG.info("SDK paths configured for ${sdk.name} (Erlang SDK: ${erlangSdk?.name ?: "none"})")
+            logger.info("SDK paths configured for ${sdk.name} (Erlang SDK: ${erlangSdk?.name ?: "none"})")
         }
 
         private fun configureInternalErlangSdk(
@@ -567,7 +570,7 @@ ELIXIR_SDK_HOME
                 // Clear the UserData after use
                 elixirSdk.putUserData(ERLANG_SDK_KEY, null)
             } else {
-                LOG.warn("No Erlang SDK found, Elixir SDK will be incomplete")
+                logger.warn("No Erlang SDK found, Elixir SDK will be incomplete")
             }
             return erlangSdk
         }
@@ -666,7 +669,7 @@ ELIXIR_SDK_HOME
 
         private fun defaultErlangSdkHomePath(): String? =
             // Will suggest newest version, unlike `intellij-erlang`
-            findInstance(org.elixir_lang.sdk.erlang.Type::class.java).suggestHomePath()
+            findInstance(org.elixir_lang.sdk.erlang.Type::class.java).suggestHomePaths(null).firstOrNull()
 
         private fun createDefaultErlangSdk(
             projectJdkTable: ProjectJdkTable,
@@ -676,7 +679,7 @@ ELIXIR_SDK_HOME
             // Check version string using homePath directly, not via SDK (which doesn't have path set yet)
             val versionString = erlangSdkType.getVersionString(homePath)
             if (versionString == null) {
-                LOG.warn("Cannot create Erlang SDK: getVersionString returned null for $homePath")
+                logger.warn("Cannot create Erlang SDK: getVersionString returned null for $homePath")
                 return null
             }
 

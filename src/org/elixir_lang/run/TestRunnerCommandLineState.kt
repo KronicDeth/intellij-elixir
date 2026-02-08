@@ -24,15 +24,15 @@ abstract class TestRunnerCommandLineState<T>(environment: ExecutionEnvironment, 
         get() = "Starting $TEST_FRAMEWORK_NAME tests"
 
     override fun createProcessHandler(process: Process, commandLine: GeneralCommandLine): ProcessHandler =
-        ElixirProcessHandler(process, commandLine.commandLineString)
+        ElixirProcessHandler(process, commandLine.commandLineString, commandLine.exePath)
 
     @Throws(ExecutionException::class)
     override fun execute(executor: Executor, runner: ProgramRunner<*>): ExecutionResult {
-        val processHandler = startProcess()
-
         val properties = createTestConsoleProperties(executor)
-        val console = SMTestRunnerConnectionUtil.createAndAttachConsole(TEST_FRAMEWORK_NAME, processHandler, properties)
+        val console = SMTestRunnerConnectionUtil.createConsole(TEST_FRAMEWORK_NAME, properties)
         ElixirConsoleUtil.attachFilters(configuration.project, console)
+        val processHandler = startProcess(console)
+        console.attachToProcess(processHandler)
 
         val executionResult = DefaultExecutionResult(console, processHandler, *createActions(console, processHandler))
         executionResult.setRestartActions(ToggleAutoTestAction())

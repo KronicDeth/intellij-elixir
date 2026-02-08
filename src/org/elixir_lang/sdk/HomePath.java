@@ -6,13 +6,13 @@ import com.intellij.notification.NotificationType;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.util.Version;
+import org.elixir_lang.jps.shared.sdk.SdkPaths;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -27,16 +27,7 @@ public class HomePath {
     public static final Version UNKNOWN_VERSION = new Version(0, 0, 0);
     private static final File HOMEBREW_ROOT = new File("/usr/local/Cellar");
     private static final File NIX_STORE = new File(NIX_STORE_PATH);
-    private static final Logger LOGGER = Logger.getInstance(HomePath.class);
-
-    public static final String SOURCE_NAME_ASDF = "asdf";
-    public static final String SOURCE_NAME_MISE = "mise";
-    public static final String SOURCE_NAME_ELIXIR_INSTALL = "elixir-install";
-    public static final String SOURCE_NAME_HOMEBREW = "Homebrew";
-    public static final String SOURCE_NAME_NIX = "Nix";
-    public static final String SOURCE_NAME_KERL = "kerl";
-
-    public static final List<String> VERSION_MANAGERS = List.of(SOURCE_NAME_ASDF, SOURCE_NAME_MISE, SOURCE_NAME_ELIXIR_INSTALL);
+    private static final Logger logger = Logger.getInstance(HomePath.class);
 
     private HomePath() {
     }
@@ -59,7 +50,7 @@ public class HomePath {
                         ebinPathConsumer.accept(uncEbinPath);
                     }
                 } catch (IOException ioException) {
-                    LOGGER.error("IOException processing app " + uncApp, ioException);
+                    logger.error("IOException processing app " + uncApp, ioException);
                 }
             }
         } catch (NoSuchFileException noSuchFileException) {
@@ -69,7 +60,7 @@ public class HomePath {
                     .createNotification(noSuchFileException.getFile() + " does not exist, so its ebin paths cannot be enumerated.", NotificationType.ERROR)
                     .notify();
         } catch (IOException ioException) {
-            LOGGER.error("IOException opening DirectoryStream for lib", ioException);
+            logger.error("IOException opening DirectoryStream for lib", ioException);
         }
     }
 
@@ -102,11 +93,11 @@ public class HomePath {
                         break;
                     }
                 } catch (IOException ioException) {
-                    LOGGER.error(ioException);
+                    logger.error(ioException);
                 }
             }
         } catch (IOException ioException) {
-            LOGGER.error(ioException);
+            logger.error(ioException);
         }
 
         return hasEbinPath;
@@ -130,7 +121,15 @@ public class HomePath {
     }
 
     public static void mergeMise(@NotNull Map<Version, String> homePathByVersion, @NotNull String name, @NotNull String userHome) {
-        mergeNameSubdirectories(homePathByVersion, Paths.get(userHome, ".local", "share", "mise", "installs").toFile(), name, Function.identity());
+        File posixPaths = Paths.get(userHome, ".local", "share", "mise", "installs").toFile();
+        File windowsPaths = Paths.get(userHome, "AppData", "Local", "mise", "installs").toFile();
+        if (logger.isDebugEnabled()) {
+            logger.debug("Posix paths: " + posixPaths);
+            logger.debug("Windows paths: " + windowsPaths);
+        }
+
+        mergeNameSubdirectories(homePathByVersion, posixPaths, name, Function.identity());
+        mergeNameSubdirectories(homePathByVersion, windowsPaths, name, Function.identity());
     }
 
     // Installed by https://elixir-lang.org/install.html#install-scripts
@@ -247,89 +246,11 @@ public class HomePath {
      */
     @Nullable
     public static String detectSource(@NotNull String homePath) {
-        String posixPath = com.intellij.openapi.util.io.FileUtil.toSystemIndependentName(homePath);
-
-        if (posixPath.contains("/.local/share/mise/installs/")) {
-            return SOURCE_NAME_MISE;
-        }
-        if (posixPath.contains("/.asdf/installs/")) {
-            return SOURCE_NAME_ASDF;
-        }
-        if (posixPath.contains("/.elixir-install/")) {
-            return SOURCE_NAME_ELIXIR_INSTALL;
-        }
-        if (posixPath.contains("/usr/local/Cellar/") || posixPath.contains("/opt/homebrew/Cellar/")) {
-            return SOURCE_NAME_HOMEBREW;
-        }
-        if (posixPath.contains("/nix/store/")) {
-            return SOURCE_NAME_NIX;
-        }
-        if (posixPath.contains("/otp/") || new File(homePath, ".kerl_config").exists()) {
-            return SOURCE_NAME_KERL;
-        }
-
-        return null;
-    }
-
-    @Nullable
-    public static String mixHome(@Nullable String homePath) {
-        if (homePath == null) {
-            return null;
-        }
-
-        String source = detectSource(homePath);
-        if (source == null || !VERSION_MANAGERS.contains(source)) {
-            return null;
-        }
-
-        File binDir = new File(homePath, "bin");
-        File parentDir = binDir.getParentFile();
-        if (parentDir == null) {
-            return null;
-        }
-
-        return new File(parentDir, ".mix").getAbsolutePath();
-    }
-
-    @Nullable
-    public static String mixHomeReplacePrefix(@Nullable String source) {
-        if (SOURCE_NAME_MISE.equals(source)) {
-            return "/.local/share/mise/installs/";
-        }
-        if (SOURCE_NAME_ASDF.equals(source)) {
-            return "/.asdf/installs/";
-        }
-        if (SOURCE_NAME_ELIXIR_INSTALL.equals(source)) {
-            return "/.elixir-install/installs/";
-        }
-        return null;
-    }
-
-    public static boolean shouldReplaceMixHome(@Nullable String existingMixHome, @Nullable String replacePrefix) {
-        if (existingMixHome == null) {
-            return true;
-        }
-        if (replacePrefix == null) {
-            return false;
-        }
-
-        String posixPath = com.intellij.openapi.util.io.FileUtil.toSystemIndependentName(existingMixHome);
-        return posixPath.contains(replacePrefix);
+        return SdkPaths.detectSource(homePath);
     }
 
     public static void maybeUpdateMixHome(@NotNull Map<String, String> environment, @Nullable String homePath) {
-        String mixHome = mixHome(homePath);
-        if (mixHome == null) {
-            return;
-        }
-
-        String source = detectSource(homePath);
-        String replacePrefix = mixHomeReplacePrefix(source);
-        String existingMixHome = environment.get("MIX_HOME");
-        if (shouldReplaceMixHome(existingMixHome, replacePrefix)) {
-            environment.put("MIX_HOME", mixHome);
-            environment.put("MIX_ARCHIVES", mixHome + File.separator + "archives");
-        }
+        SdkPaths.maybeUpdateMixHome(environment, homePath);
     }
 
     /**
@@ -339,7 +260,7 @@ public class HomePath {
     public static void mergeKerl(@NotNull Map<Version, String> homePathByVersion,
                                  @NotNull Function<File, File> versionPathToHomePath) {
         // Check if kerl is available
-        if (!isCommandAvailable("kerl")) {
+        if (!isKerlAvailable()) {
             return;
         }
 
@@ -369,13 +290,15 @@ public class HomePath {
             process.waitFor(5, java.util.concurrent.TimeUnit.SECONDS);
         } catch (IOException | InterruptedException e) {
             // kerl failed - silently ignore
-            LOGGER.debug("kerl list installations failed: " + e.getMessage());
+            if (logger.isDebugEnabled()) {
+                logger.debug("kerl list installations failed: " + e.getMessage());
+            }
         }
     }
 
-    private static boolean isCommandAvailable(@NotNull String command) {
+    private static boolean isKerlAvailable() {
         try {
-            ProcessBuilder pb = new ProcessBuilder("which", command);
+            ProcessBuilder pb = new ProcessBuilder("which", "kerl");
             Process process = pb.start();
             int exitCode = process.waitFor();
             return exitCode == 0;
@@ -386,10 +309,10 @@ public class HomePath {
 
     @NotNull
     public static String getExecutableFileName(@Nullable String sdkHome, @NotNull String executableName, @NotNull String windowsExt) {
-        // WSL paths should not have .bat extension even on Windows
+        boolean isWindows = SystemInfo.isWindows;
         if (sdkHome != null && WslPath.isWslUncPath(sdkHome)) {
-            return executableName;
+            isWindows = false;
         }
-        return SystemInfo.isWindows ? executableName + windowsExt : executableName;
+        return SdkPaths.getExecutableFileName(isWindows, executableName, windowsExt);
     }
 }

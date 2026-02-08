@@ -1,6 +1,7 @@
 package org.elixir_lang
 
 import com.intellij.execution.configurations.GeneralCommandLine
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.Sdk
 import org.elixir_lang.Erl.prependCodePaths
 import org.elixir_lang.sdk.erlang_dependent.MissingErlangSdk
@@ -8,25 +9,24 @@ import org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData
 
 object Elixir {
     /**
-     * Keep in-sync with [org.elixir_lang.jps.Builder.elixirCommandLine]
+     * Keep in-sync with the JPS builder elixir command line.
      */
     fun commandLine(
+        project: Project?,
         environment: Map<String, String>,
         workingDirectory: String?,
         elixirSdk: Sdk,
         erlArgumentList: kotlin.collections.List<String> = emptyList(),
     ): GeneralCommandLine {
-        val erlangSdk = elixirSdkToEnsuredErlangSdk(elixirSdk)
-        val commandLine =
-            Erl.commandLine(
-                pty = false,
-                environment = environment,
-                workingDirectory = workingDirectory,
-                erlangSdk = erlangSdk,
-            )
-        ElixirCliBase.addElixirBaseArguments(commandLine, elixirSdk, erlangSdk, erlArgumentList)
-
-        return commandLine
+        return ElixirCliCommandLine.commandLine(
+            project = project,
+            tool = ElixirCliDryRun.Tool.ELIXIR,
+            pty = false,
+            environment = environment,
+            workingDirectory = workingDirectory,
+            elixirSdk = elixirSdk,
+            erlArgumentList = erlArgumentList,
+        )
     }
 
     fun elixirSdkToEnsuredErlangSdk(elixirSdk: Sdk): Sdk =

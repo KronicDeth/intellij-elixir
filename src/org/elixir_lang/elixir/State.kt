@@ -31,7 +31,7 @@ class State(environment: ExecutionEnvironment, configuration: Configuration) :
     }
 
     override fun createProcessHandler(process: Process, commandLine: GeneralCommandLine): ProcessHandler =
-        ElixirProcessHandler(process, commandLine.commandLineString)
+        ElixirProcessHandler(process, commandLine.commandLineString, commandLine.exePath)
 
     override fun handleExecutionException(e: ExecutionException) {
         Notifier.mixSettings(configuration.ensureModule(), e)

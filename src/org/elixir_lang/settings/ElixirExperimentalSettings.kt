@@ -4,14 +4,15 @@ import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
-import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.debug
 import com.intellij.util.messages.Topic
 
 interface ElixirExperimentalSettingsListener {
     fun settingsChanged(oldState: ElixirExperimentalSettings.State, newState: ElixirExperimentalSettings.State)
 }
 
-private val LOG = logger<ElixirExperimentalSettings>()
+private val logger = Logger.getInstance(ElixirExperimentalSettings::class.java)
 
 @State(
     name = "org.elixir_lang.settings.ElixirExperimentalSettings",
@@ -23,7 +24,8 @@ class ElixirExperimentalSettings : PersistentStateComponent<ElixirExperimentalSe
         var enableHtmlInjection: Boolean = false,
 //        var enableDeleteSdkSmallIDE: Boolean = false,
         var enableStatusBarWidget : Boolean = false,
-        var enableLiteralSigilInjection: Boolean = false
+        var enableLiteralSigilInjection: Boolean = false,
+        var enableMixMixToolingBootstrap: Boolean = false
     )
 
     private var elixirSettingsState = State()
@@ -31,7 +33,7 @@ class ElixirExperimentalSettings : PersistentStateComponent<ElixirExperimentalSe
     override fun getState(): State = elixirSettingsState
 
     override fun loadState(state: State) {
-        LOG.debug("Loading ElixirExperimentalSettings state: $state")
+        logger.debug { "Loading ElixirExperimentalSettings state: $state" }
         elixirSettingsState = state
     }
 
@@ -48,5 +50,3 @@ class ElixirExperimentalSettings : PersistentStateComponent<ElixirExperimentalSe
                 .getService(ElixirExperimentalSettings::class.java)
     }
 }
-
-

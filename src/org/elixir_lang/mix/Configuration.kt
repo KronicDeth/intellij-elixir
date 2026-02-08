@@ -32,7 +32,7 @@ open class Configuration(name: String, project: Project, configurationFactory: C
     override fun debuggedConfiguration(name: String, cookie: String): Configuration {
         val debugged = Configuration(this.name, project, factory!!)
 
-        debugged.erlArgumentList.addAll(erlArgumentList)
+        debugged.erlArgumentList.addAll(Modules.stripDebugErlArguments(erlArgumentList))
         debugged.erlArgumentList.addAll(arrayOf("-name", name))
         debugged.erlArgumentList.addAll(arrayOf("-setcookie", cookie))
         debugged.erlArgumentList.addAll(Modules.erlArgumentList(mix = true))
@@ -83,7 +83,7 @@ open class Configuration(name: String, project: Project, configurationFactory: C
         val workingDirectory = ensureWorkingDirectory()
         val module = ensureModule()
         val sdk = ensureMostSpecificSdk(module)
-        val commandLine = Mix.commandLine(envs, workingDirectory, sdk, erlArgumentList, elixirArgumentList)
+        val commandLine = Mix.commandLine(project, envs, workingDirectory, sdk, erlArgumentList, elixirArgumentList)
         commandLine.addParameters(mixArgumentList)
 
         return commandLine
@@ -112,6 +112,10 @@ open class Configuration(name: String, project: Project, configurationFactory: C
     override fun readExternal(element: Element) {
         super.readExternal(element)
         element.readExternalArgumentList(ERL, erlArgumentList)
+        Modules.stripDebugErlArguments(erlArgumentList).also {
+            erlArgumentList.clear()
+            erlArgumentList.addAll(it)
+        }
         element.readExternalArgumentList(ELIXIR, elixirArgumentList)
         element.readExternalArgumentList(MIX, mixArgumentList)
         workingDirectoryURL = element.readExternalWorkingDirectory()
@@ -124,7 +128,7 @@ open class Configuration(name: String, project: Project, configurationFactory: C
 
     override fun writeExternal(element: Element) {
         super.writeExternal(element)
-        element.writeExternalArgumentList(ERL, erlArgumentList)
+        element.writeExternalArgumentList(ERL, Modules.stripDebugErlArguments(erlArgumentList))
         element.writeExternalArgumentList(ELIXIR, elixirArgumentList)
         element.writeExternalArgumentList(MIX, mixArgumentList)
         element.writeExternalWorkingDirectory(workingDirectoryURL)

@@ -31,6 +31,11 @@ object Modules {
 
     fun erlArgumentList(mix: Boolean = false): List<String> =
             listOf("-eval", "application:ensure_all_started(elixir)") +
+                    if (mix) {
+                        listOf("-eval", "application:ensure_all_started(mix)")
+                    } else {
+                        emptyList()
+                    } +
                     copy(mix).flatMap { file ->
                         listOf("-eval", "'Elixir.Code':require_file(<<\"${file.path.replace("\\", "\\\\")}\">>)")
                     } + if (mix) {
@@ -38,4 +43,39 @@ object Modules {
             } else {
                 listOf("-eval", "'Elixir.IntelliJElixir.Debugged':start()'")
             }
+
+    fun stripDebugErlArguments(erlArgumentList: List<String>): List<String> {
+        if (erlArgumentList.isEmpty()) {
+            return emptyList()
+        }
+
+        val cleaned = ArrayList<String>(erlArgumentList.size)
+        var index = 0
+        while (index < erlArgumentList.size) {
+            val token = erlArgumentList[index]
+            if (token == "-name" || token == "-sname" || token == "-setcookie") {
+                index += 2
+                continue
+            }
+            if (token == "-eval" && index + 1 < erlArgumentList.size &&
+                isDebuggerEval(erlArgumentList[index + 1])) {
+                index += 2
+                continue
+            }
+            cleaned.add(token)
+            index += 1
+        }
+
+        return cleaned
+    }
+
+    private fun isDebuggerEval(argument: String): Boolean {
+        val normalized = argument.lowercase().replace(" ", "")
+        if (normalized == "application:ensure_all_started(elixir)" ||
+            normalized == "application:ensure_all_started(mix)") {
+            return true
+        }
+
+        return normalized.contains("intellij_elixir") || normalized.contains("intellijelixir")
+    }
 }
