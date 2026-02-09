@@ -1,7 +1,6 @@
 package org.elixir_lang.sdk
 
 import org.elixir_lang.PlatformTestCase
-import org.elixir_lang.jps.HomePath
 import java.io.File
 import java.nio.file.Paths
 

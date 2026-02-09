@@ -8,7 +8,6 @@ import com.intellij.openapi.roots.JavadocOrderRootType
 import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VirtualFile
-import org.elixir_lang.jps.HomePath
 import org.elixir_lang.sdk.wsl.wslCompat
 import java.nio.file.Path
 import java.util.function.Consumer
