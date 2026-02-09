@@ -1,6 +1,80 @@
 <html>
 <body>
 
+<h1>v23.0.0</h1>
+<ul>
+    <li>
+        <p>Enhancements</p>
+        <ul>
+            <li>
+                WSL Support - <a href="https://github.com/sh41">@sh41</a> - See <a href="https://github.com/KronicDeth/intellij-elixir/releases/tag/v23.0.0">release announcement</a> for full details!
+
+                <ul>
+                    <li>
+                        Windows Subsystem for Linux support enabling Elixir development in WSL from Windows JetBrains IDEs.
+                        Originally submitted as <a href="https://github.com/KronicDeth/intellij-elixir/pull/3749">#3749</a>, broken into 7 stacked PRs for review.
+                        Resolves
+                        <a href="https://github.com/KronicDeth/intellij-elixir/issues/1384">#1384</a>,
+                        <a href="https://github.com/KronicDeth/intellij-elixir/issues/1911">#1911</a>,
+                        <a href="https://github.com/KronicDeth/intellij-elixir/issues/2499">#2499</a>,
+                        <a href="https://github.com/KronicDeth/intellij-elixir/issues/3470">#3470</a>,
+                        <a href="https://github.com/KronicDeth/intellij-elixir/issues/3674">#3674</a>,
+                        <a href="https://github.com/KronicDeth/intellij-elixir/issues/3746">#3746</a>.
+                        May also help with
+                        <a href="https://github.com/KronicDeth/intellij-elixir/issues/3659">#3659</a>,
+                        <a href="https://github.com/KronicDeth/intellij-elixir/issues/3716">#3716</a>,
+                        <a href="https://github.com/KronicDeth/intellij-elixir/issues/3715">#3715</a>.
+                        See the <a href="https://github.com/KronicDeth/intellij-elixir?tab=readme-ov-file#windows-subsystem-for-linux-wsl-support">README WSL section</a> for setup instructions.
+                    </li>
+                    <li>SDK discovery for Elixir and Erlang inside WSL distributions (asdf, mise, kerl, kiex, Homebrew, Nix).</li>
+                    <li>WSL path conversion supporting both <code>\\wsl$\</code> and <code>\\wsl.localhost\</code> UNC path formats.</li>
+                    <li>All run configurations work with WSL: Mix tasks, IEx, ExUnit, ESpec, Distillery, external tools.</li>
+                    <li>WSL-safe process handling with graceful BEAM termination across the WSL boundary.</li>
+                    <li>WSL-aware SDK naming in UI and status bar widget.</li>
+                    <li>SDK settings improvements for small-IDE compatibility (RubyMine, WebStorm, etc.).</li>
+                </ul>
+            </li>
+            <li>
+                <a href="https://github.com/KronicDeth/intellij-elixir/pull/3753">#3753</a> - <a href="https://github.com/sh41">@sh41</a>
+                <ul>
+                    <li>Windows development infrastructure: platform-aware build services, Gradle tasks, CI caching (~4.5 GB fork-safe cache), and updated CONTRIBUTING.md.</li>
+                </ul>
+            </li>
+            <li>
+                <a href="https://github.com/KronicDeth/intellij-elixir/pull/3757">#3757</a> - <a href="https://github.com/sh41">@sh41</a>
+                <ul>
+                    <li>Mix dependency health checks on project open with install action and notifications via shared MixTaskRunner.</li>
+                    <li>Faster and more robust Mix project import with pre-scan of OTP apps off EDT.</li>
+                </ul>
+            </li>
+            <li>
+                <a href="https://github.com/KronicDeth/intellij-elixir/pull/3759">#3759</a> - <a href="https://github.com/sh41">@sh41</a>
+                <ul>
+                    <li>IntelliJ IDE Starter-based UI test infrastructure for automated IDE testing.</li>
+                </ul>
+            </li>
+        </ul>
+    </li>
+    <li>
+        <p>Bug Fixes</p>
+        <ul>
+            <li>
+                <a href="https://github.com/KronicDeth/intellij-elixir/pull/3761">#3761</a> - <a href="https://github.com/sh41">@sh41</a>
+                <ul>
+                    <li>Fix deadlock when <code>/deps</code> directory is deleted while the deps watcher is active.</li>
+                    <li>Fix JPS Builder module name handling (broken since September 2024).</li>
+                </ul>
+            </li>
+            <li>
+                <a href="https://github.com/KronicDeth/intellij-elixir/pull/3765">#3765</a> - <a href="https://github.com/sh41">@sh41</a>
+                <ul>
+                    <li>Fix false inspection warnings in <code>~r</code> regex sigils containing interpolated variables.</li>
+                </ul>
+            </li>
+        </ul>
+    </li>
+</ul>
+
 <h1>v22.0.0</h1>
 <ul>
     <li>
