@@ -5,8 +5,6 @@ import com.intellij.ide.util.newProjectWizard.AddModuleWizard
 import com.intellij.ide.util.projectWizard.ModuleWizardStep
 import com.intellij.ide.util.projectWizard.WizardContext
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.client.ClientKind
-import com.intellij.openapi.extensions.PluginId
 import com.intellij.openapi.options.ConfigurationException
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
@@ -23,7 +21,6 @@ import org.elixir_lang.Elixir
 import org.elixir_lang.sdk.elixir.Type
 import org.jetbrains.annotations.NonNls
 import org.jetbrains.annotations.SystemDependent
-import org.jetbrains.annotations.Unmodifiable
 import java.awt.Font
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
@@ -42,13 +39,15 @@ class ElixirSdkForModuleStep(private val wizardContext: WizardContext) : ModuleW
      * Without this wrapper, the default project returns null for projectFilePath, which causes
      * getEelDescriptor() to return LocalEelDescriptor, filtering out WSL/remote SDKs.
      *
-     * Note: Implementing Project interface directly is generally discouraged by the platform,
-     * but necessary here for delegation pattern to work with the specific methods we need to override.
+     * WARNING: Project is @ApiStatus.NonExtendable, but implementing it is necessary here because
+     * the only alternative (syncSdks(EelDescriptor)) is @ApiStatus.Internal. The wrapper is only
+     * used as a parameter to ProjectSdksModel.reset(), which calls isDefault(), projectFilePath,
+     * and getService() on it.
      *
-     * Also note, default methods are not delegated, which is why there are all the straight pass-through
-     * overrides.
+     * Java default methods are not delegated by Kotlin's `by` keyword, so getPresentableUrl() and
+     * scheduleSave() are overridden to delegate explicitly.
      */
-    @Suppress("UnstableApiUsage", "NonExtendableApiUsage")
+    @Suppress("NonExtendableApiUsage")
     private class NonDefaultProjectWrapper(
         private val delegate: Project,
         private val actualProjectPath: String?
@@ -58,43 +57,14 @@ class ElixirSdkForModuleStep(private val wizardContext: WizardContext) : ModuleW
         // and we need to have an actual project path
         override fun getProjectFilePath(): String? = actualProjectPath
 
-        // Delegate to default method
+        // Java default methods must be delegated explicitly
         override fun getPresentableUrl(): @SystemDependent @NonNls String? {
             return delegate.presentableUrl
         }
 
-        // Delegate to default method
+        // Java default methods must be delegated explicitly
         override fun scheduleSave() {
             delegate.scheduleSave()
-        }
-
-        // Delegate to default method
-        @Deprecated("Deprecated in Java")
-        override fun getComponent(name: String): com.intellij.openapi.components.BaseComponent? {
-            return delegate.getComponent(name)
-        }
-
-        // Delegate to default method
-        override fun <T> getServiceForClient(serviceClass: Class<T?>): T? {
-            return delegate.getServiceForClient(serviceClass)
-        }
-
-        // Delegate to default method
-        override fun <T> getServices(
-            serviceClass: Class<T?>,
-            client: ClientKind?
-        ): @Unmodifiable List<T?> {
-            return delegate.getServices(serviceClass, client)
-        }
-
-        // Delegate to default method
-        override fun <T> getServiceIfCreated(serviceClass: Class<T?>): T? {
-            return delegate.getServiceIfCreated(serviceClass)
-        }
-
-        // Delegate to default method
-        override fun logError(error: Throwable, pluginId: PluginId) {
-            delegate.logError(error, pluginId)
         }
     }
 
