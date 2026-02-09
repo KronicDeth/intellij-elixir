@@ -35,95 +35,14 @@ defaults:
     shell: bash
 
 jobs:
-  matrix-setup:
-    runs-on: ubuntu-latest
-    outputs:
-      idea-versions: '["2025.3.2"]'
-    steps:
-      - run: echo "Defining idea-versions matrix"
-
-  seed-gradle-cache:
-    needs: matrix-setup
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        # Stay with windows-2022 until https://github.com/erlef/setup-beam/commit/b94e7d372a9ef22d376b75a9374a7adeb0e2ea94 is released.
-        os: [ubuntu-22.04, windows-2022]
-        idea-version: ${{ fromJson(needs.matrix-setup.outputs.idea-versions) }}
-
-    env:
-      GRADLE_USER_HOME: ${{ github.workspace }}/.gradle
-      GRADLE_CACHE_SCOPE: ${{ github.event.pull_request.head.repo.id || github.repository_id }}
-      GRADLE_CACHE_IDE_VERSION: ${{ matrix.idea-version }}
-
-    steps:
-
-      - name: Checkout
-        id: checkout
-        uses: actions/checkout@v6
-        with:
-          ref: ${{ inputs.ref || github.ref }}
-
-      - name: Restore Gradle cache
-        id: gradle-cache-restore
-        uses: actions/cache/restore@v5
-        with:
-          path: |
-            ${{ env.GRADLE_USER_HOME }}/caches
-            ${{ env.GRADLE_USER_HOME }}/wrapper
-            ${{ env.GRADLE_USER_HOME }}/notifications
-          # Fork-scoped cache key:
-          # - Avoids cross-PR cache poisoning between forks.
-          # - Includes IDE version and build inputs to keep cache correctness.
-          key: gradle-${{ runner.os }}-${{ runner.arch }}-${{ env.GRADLE_CACHE_SCOPE }}-${{ env.GRADLE_CACHE_IDE_VERSION }}-${{ hashFiles('build.gradle.kts', 'settings.gradle.kts', 'gradle.properties', 'gradle/libs.versions.toml', 'gradle/wrapper/gradle-wrapper.properties', 'buildSrc/build.gradle.kts', 'buildSrc/settings.gradle.kts') }}
-          # Graceful fallback:
-          # - First try exact IDE version match.
-          # - Then fall back to the same fork scope on this OS/arch.
-          restore-keys: |
-            gradle-${{ runner.os }}-${{ runner.arch }}-${{ env.GRADLE_CACHE_SCOPE }}-${{ env.GRADLE_CACHE_IDE_VERSION }}-
-            gradle-${{ runner.os }}-${{ runner.arch }}-${{ env.GRADLE_CACHE_SCOPE }}-
-
-      - name: Setup Build Environment
-        id: setup-env
-        uses: ./.github/actions/setup-env
-        with:
-          elixir-version: ${{ inputs.elixir-version || '1.13.4' }}
-          otp-version: ${{ inputs.otp-version || '24.3.4.6' }}
-          idea-version: ${{ matrix.idea-version }}
-          setup-elixir: false
-          gradle-cache-read-only: true
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Resolve External Dependencies
-        id: resolve-external-deps
-        run: ./gradlew :jps-builder:resolveExternalDependencies
-
-      - name: Save Gradle cache
-        id: gradle-cache-save
-        if: always() && steps.gradle-cache-restore.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v5
-        with:
-          path: |
-            ${{ env.GRADLE_USER_HOME }}/caches
-            ${{ env.GRADLE_USER_HOME }}/wrapper
-            ${{ env.GRADLE_USER_HOME }}/notifications
-          key: ${{ steps.gradle-cache-restore.outputs.cache-primary-key }}
-
   test:
-    needs: [matrix-setup, seed-gradle-cache]
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         # Stay with windows-2022 until https://github.com/erlef/setup-beam/commit/b94e7d372a9ef22d376b75a9374a7adeb0e2ea94 is released.
         os: [ubuntu-22.04, windows-2022]
-        idea-version: ${{ fromJson(needs.matrix-setup.outputs.idea-versions) }}
-
-    env:
-      GRADLE_USER_HOME: ${{ github.workspace }}/.gradle
-      GRADLE_CACHE_SCOPE: ${{ github.event.pull_request.head.repo.id || github.repository_id }}
-      GRADLE_CACHE_IDE_VERSION: ${{ matrix.idea-version }}
+        idea-version: ['2025.3.2', 'LATEST-EAP-SNAPSHOT']
 
     steps:
       - name: Checkout
@@ -132,25 +51,6 @@ jobs:
         with:
           ref: ${{ inputs.ref || github.ref }}
 
-      - name: Restore Gradle cache
-        id: gradle-cache-restore
-        uses: actions/cache/restore@v5
-        with:
-          path: |
-            ${{ env.GRADLE_USER_HOME }}/caches
-            ${{ env.GRADLE_USER_HOME }}/wrapper
-            ${{ env.GRADLE_USER_HOME }}/notifications
-          # Fork-scoped cache key:
-          # - Avoids cross-PR cache poisoning between forks.
-          # - Includes IDE version and build inputs to keep cache correctness.
-          key: gradle-${{ runner.os }}-${{ runner.arch }}-${{ env.GRADLE_CACHE_SCOPE }}-${{ env.GRADLE_CACHE_IDE_VERSION }}-${{ hashFiles('build.gradle.kts', 'settings.gradle.kts', 'gradle.properties', 'gradle/libs.versions.toml', 'gradle/wrapper/gradle-wrapper.properties', 'buildSrc/build.gradle.kts', 'buildSrc/settings.gradle.kts') }}
-          # Graceful fallback:
-          # - First try exact IDE version match.
-          # - Then fall back to the same fork scope on this OS/arch.
-          restore-keys: |
-            gradle-${{ runner.os }}-${{ runner.arch }}-${{ env.GRADLE_CACHE_SCOPE }}-${{ env.GRADLE_CACHE_IDE_VERSION }}-
-            gradle-${{ runner.os }}-${{ runner.arch }}-${{ env.GRADLE_CACHE_SCOPE }}-
-
       - name: Setup Build Environment
         id: setup-env
         uses: ./.github/actions/setup-env
@@ -158,29 +58,8 @@ jobs:
           elixir-version: ${{ inputs.elixir-version || '1.13.4' }}
           otp-version: ${{ inputs.otp-version || '24.3.4.6' }}
           idea-version: ${{ matrix.idea-version }}
-          gradle-cache-read-only: true
+          gradle-cache-read-only: ${{ github.event_name == 'pull_request' }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Debug Maven Central access
-        run: |
-          echo "=== DNS / Network / TLS info ==="
-          ip -4 addr || true
-          uname -a
-          echo "Java version:"
-          java -version || true
-          
-          echo
-          echo "=== HTTP HEAD to POM (show headers) ==="
-          curl -vI 'https://repo.maven.apache.org/maven2/commons-io/commons-io/2.21.0/commons-io-2.21.0.pom' || true
-          
-          echo
-          echo "=== HTTP GET to POM (show first 200 bytes) ==="
-          curl -v 'https://repo.maven.apache.org/maven2/commons-io/commons-io/2.21.0/commons-io-2.21.0.pom' -m 20 -sS -o /tmp/commons.pom || true
-          head -c 200 /tmp/commons.pom || true
-          
-          echo
-          echo "=== Try resolving dependency via Gradle (info) ==="
-          ./gradlew --no-daemon --refresh-dependencies dependencies --configuration compileClasspath --info || true
 
       - name: Run Tests
         id: test
@@ -220,13 +99,7 @@ jobs:
 
   build-plugin-for-verifier:
     name: "Build Plugin for verifyPlugin"
-    needs: seed-gradle-cache
     runs-on: ubuntu-22.04
-
-    env:
-      GRADLE_USER_HOME: ${{ github.workspace }}/.gradle
-      GRADLE_CACHE_SCOPE: ${{ github.event.pull_request.head.repo.id || github.repository_id }}
-      GRADLE_CACHE_IDE_VERSION: '2025.3.2'
 
     steps:
       - name: Checkout
@@ -235,30 +108,12 @@ jobs:
         with:
           ref: ${{ inputs.ref || github.ref }}
 
-      - name: Restore Gradle cache
-        id: gradle-cache-restore
-        uses: actions/cache/restore@v5
-        with:
-          path: |
-            ${{ env.GRADLE_USER_HOME }}/caches
-            ${{ env.GRADLE_USER_HOME }}/wrapper
-            ${{ env.GRADLE_USER_HOME }}/notifications
-          # Fork-scoped cache key:
-          # - Avoids cross-PR cache poisoning between forks.
-          # - Includes IDE version and build inputs to keep cache correctness.
-          key: gradle-${{ runner.os }}-${{ runner.arch }}-${{ env.GRADLE_CACHE_SCOPE }}-${{ env.GRADLE_CACHE_IDE_VERSION }}-${{ hashFiles('build.gradle.kts', 'settings.gradle.kts', 'gradle.properties', 'gradle/libs.versions.toml', 'gradle/wrapper/gradle-wrapper.properties', 'buildSrc/build.gradle.kts', 'buildSrc/settings.gradle.kts') }}
-          # Graceful fallback:
-          # - First try exact IDE version match.
-          # - Then fall back to the same fork scope on this OS/arch.
-          restore-keys: |
-            gradle-${{ runner.os }}-${{ runner.arch }}-${{ env.GRADLE_CACHE_SCOPE }}-${{ env.GRADLE_CACHE_IDE_VERSION }}-
-            gradle-${{ runner.os }}-${{ runner.arch }}-${{ env.GRADLE_CACHE_SCOPE }}-
-
       - name: Setup Build Environment
         id: setup-env
         uses: ./.github/actions/setup-env
         with:
           setup-elixir: false
+          gradle-cache-read-only: ${{ github.event_name == 'pull_request' }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
           idea-version: '2025.3.2'
 

@@ -12,11 +12,11 @@ inputs:
     required: false
     default: '24.3.4.6'
   idea-version:
-    description: 'IntelliJ IDEA version to test against. Keep in sync with matrix-setup in shared-test.yml'
+    description: 'IntelliJ IDEA version to test against. Keep in sync with the matrix in shared-test.yml'
     required: false
     default: '253.30387.90'  # 2025.3.2 - should match first version in shared-test.yml
   gradle-cache-read-only:
-    description: 'Controls whether CI should save caches (used to gate Elixir cache saving). Gradle caching is handled in workflows.'
+    description: 'If true, Gradle and Elixir caches are read-only (no writes). Set to false on main branch to seed caches for PRs.'
     required: false
     default: 'true'
   github-token:
@@ -93,7 +93,7 @@ runs:
       id: setup-gradle
       uses: gradle/actions/setup-gradle@v5
       with:
-        cache-disabled: true
+        cache-read-only: ${{ inputs.gradle-cache-read-only }}
         add-job-summary-as-pr-comment: 'on-failure'
         build-scan-publish: ${{ inputs.build-scan-publish }}
         build-scan-terms-of-use-url: 'https://gradle.com/terms-of-service'
@@ -134,8 +134,7 @@ runs:
       uses: actions/cache/save@v5
       with:
         path: |
-          cache/elixir-${{ inputs.elixir-version }}-intellij_elixir-2.1.0/_build
-          cache/elixir-${{ inputs.elixir-version }}-intellij_elixir-2.1.0/deps
+          cache/elixir-${{ inputs.elixir-version }}-intellij_elixir-2.1.0
           !cache/**/tmp/pipe/**
           !cache/**/distillery/priv
         key: ${{ steps.cache-elixir-restore.outputs.cache-primary-key }}

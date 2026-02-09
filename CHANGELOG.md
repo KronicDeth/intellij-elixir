@@ -1,5 +1,31 @@
 # Changelog
 
+## v23.0.0
+
+### Enhancements
+* WSL Support - [@sh41](https://github.com/sh41) - see [release announcement](https://github.com/KronicDeth/intellij-elixir/releases/tag/v23.0.0) for full details!
+  * Windows Subsystem for Linux support enabling Elixir development in WSL from Windows JetBrains IDEs. Originally submitted as [#3749](https://github.com/KronicDeth/intellij-elixir/pull/3749), broken into 7 stacked PRs for review. Resolves [#1384](https://github.com/KronicDeth/intellij-elixir/issues/1384), [#1911](https://github.com/KronicDeth/intellij-elixir/issues/1911), [#2499](https://github.com/KronicDeth/intellij-elixir/issues/2499), [#3470](https://github.com/KronicDeth/intellij-elixir/issues/3470), [#3674](https://github.com/KronicDeth/intellij-elixir/issues/3674), [#3746](https://github.com/KronicDeth/intellij-elixir/issues/3746). May also help with [#3659](https://github.com/KronicDeth/intellij-elixir/issues/3659), [#3716](https://github.com/KronicDeth/intellij-elixir/issues/3716), [#3715](https://github.com/KronicDeth/intellij-elixir/issues/3715). See the [README WSL section](https://github.com/KronicDeth/intellij-elixir?tab=readme-ov-file#windows-subsystem-for-linux-wsl-support) for setup instructions.
+  * SDK discovery for Elixir and Erlang inside WSL distributions (asdf, mise, kerl, kiex, Homebrew, Nix).
+  * WSL path conversion supporting both `\\wsl$\` and `\\wsl.localhost\` UNC path formats.
+  * All run configurations work with WSL: Mix tasks, IEx, ExUnit, ESpec, Distillery, external tools.
+  * WSL-safe process handling with graceful BEAM termination across the WSL boundary.
+  * WSL-aware SDK naming in UI and status bar widget.
+  * SDK settings improvements for small-IDE compatibility (RubyMine, WebStorm, etc.).
+* [#3753](https://github.com/KronicDeth/intellij-elixir/pull/3753) - [@sh41](https://github.com/sh41)
+  * Windows development infrastructure: platform-aware build services, Gradle tasks, CI caching (~4.5 GB fork-safe cache), and updated CONTRIBUTING.md.
+* [#3757](https://github.com/KronicDeth/intellij-elixir/pull/3757) - [@sh41](https://github.com/sh41)
+  * Mix dependency health checks on project open with install action and notifications via shared MixTaskRunner.
+  * Faster and more robust Mix project import with pre-scan of OTP apps off EDT.
+* [#3759](https://github.com/KronicDeth/intellij-elixir/pull/3759) - [@sh41](https://github.com/sh41)
+  * IntelliJ IDE Starter-based UI test infrastructure for automated IDE testing.
+
+### Bug Fixes
+* [#3761](https://github.com/KronicDeth/intellij-elixir/pull/3761) - [@sh41](https://github.com/sh41)
+  * Fix deadlock when `/deps` directory is deleted while the deps watcher is active.
+  * Fix JPS Builder module name handling (broken since September 2024).
+* [#3765](https://github.com/KronicDeth/intellij-elixir/pull/3765) - [@sh41](https://github.com/sh41)
+  * Fix false inspection warnings in `~r` regex sigils containing interpolated variables.
+
 ## v22.0.0
 
 ### Breaking changes
