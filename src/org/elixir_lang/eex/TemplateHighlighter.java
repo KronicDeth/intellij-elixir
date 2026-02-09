@@ -52,6 +52,16 @@ public class TemplateHighlighter extends LayeredLexerEditorHighlighter {
             }
 
             if (type == null) {
+                FileType fileType = virtualFile.getFileType();
+                if (fileType instanceof org.elixir_lang.eex.file.Type eexType) {
+                    com.intellij.lang.Language defaultLang = eexType.defaultTemplateDataLanguage();
+                    if (defaultLang != null) {
+                        type = defaultLang.getAssociatedFileType();
+                    }
+                }
+            }
+
+            if (type == null) {
                 type = Language.defaultTemplateLanguageFileType();
             }
         }
