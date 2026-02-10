@@ -6,10 +6,12 @@ import com.intellij.execution.process.ProcessOutputTypes
 import com.intellij.openapi.util.Key
 import org.elixir_lang.run.DoubleSignalTerminator
 import org.elixir_lang.run.ElixirDoubleSignalTerminator
+import org.elixir_lang.run.ProcessTargetPid
 
 class ProcessHandler : KillableProcessHandler {
     private val generalCommandLine: GeneralCommandLine
-    private val terminator: DoubleSignalTerminator = ElixirDoubleSignalTerminator()
+    private val targetPid: Long? by lazy { ProcessTargetPid.select(process, generalCommandLine.exePath) }
+    private val terminator: DoubleSignalTerminator = ElixirDoubleSignalTerminator { targetPid }
 
     // Original constructor - creates process from GeneralCommandLine
     constructor(generalCommandLine: GeneralCommandLine) : super(generalCommandLine) {

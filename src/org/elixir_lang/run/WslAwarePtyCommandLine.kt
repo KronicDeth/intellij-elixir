@@ -24,7 +24,7 @@ open class WslAwarePtyCommandLine : PtyCommandLine {
     @Throws(IOException::class)
     override fun createProcess(processBuilder: ProcessBuilder): Process {
         wslCompat.convertProcessBuilderArgumentsForWsl(processBuilder, this)
-        LOG.debug(formatCommandLineForLogging(processBuilder, "Command line"))
+        LOG.trace(formatCommandLineForLogging(processBuilder, "Pty Command line"))
         return super.createProcess(processBuilder)
     }
 }

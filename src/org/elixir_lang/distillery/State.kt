@@ -50,7 +50,7 @@ class State(environment: ExecutionEnvironment, configuration: Configuration) :
             org.elixir_lang.iex.ProcessHandler(process, commandLine.commandLineString, commandLine)
         } else {
             // Non-PTY mode uses standard Elixir handler with double-SIGINT logic
-            ElixirProcessHandler(process, commandLine.commandLineString)
+            ElixirProcessHandler(process, commandLine.commandLineString, commandLine.exePath)
         }
     }
 

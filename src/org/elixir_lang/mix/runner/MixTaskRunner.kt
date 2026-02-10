@@ -5,7 +5,7 @@ import com.intellij.execution.process.ProcessEvent
 import com.intellij.execution.process.ProcessHandlerFactory
 import com.intellij.execution.process.ProcessListener
 import com.intellij.execution.process.ProcessTerminatedListener
-import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
@@ -14,8 +14,9 @@ import com.intellij.openapi.util.Key
 import com.intellij.platform.ide.progress.ModalTaskOwner
 import com.intellij.platform.ide.progress.runWithModalProgressBlocking
 import org.elixir_lang.Mix
+import org.elixir_lang.mix.MixToolingBootstrap
 
-private val LOG = logger<MixTaskRunner>()
+private val logger = Logger.getInstance(MixTaskRunner::class.java)
 
 /**
  * Shared utility for running Mix tasks with progress indication.
@@ -47,7 +48,7 @@ object MixTaskRunner {
             if (project != null) {
                 // Modern Kotlin API for actions with project context
                 runWithModalProgressBlocking(ModalTaskOwner.project(project), title) {
-                    executeMixTask(workingDirectory, sdk, task, *taskParameters)
+                    executeMixTask(project, workingDirectory, sdk, task, *taskParameters)
                 }
             } else {
                 // Legacy Java API for import wizard (no project context yet)
@@ -56,7 +57,7 @@ object MixTaskRunner {
                     object : Task.Modal(null, title, true) {
                         override fun run(indicator: com.intellij.openapi.progress.ProgressIndicator) {
                             try {
-                                executeMixTask(workingDirectory, sdk, task, *taskParameters)
+                                executeMixTask(project, workingDirectory, sdk, task, *taskParameters)
                             } catch (e: ExecutionException) {
                                 exception = e
                             }
@@ -67,7 +68,7 @@ object MixTaskRunner {
             }
             Result.success(Unit)
         } catch (e: ExecutionException) {
-            LOG.warn("Mix task '$task' failed", e)
+            logger.warn("Mix task '$task' failed", e)
             Result.failure(e)
         }
     }
@@ -76,6 +77,7 @@ object MixTaskRunner {
      * Core execution logic shared by both modern and legacy APIs.
      */
     private fun executeMixTask(
+        project: Project?,
         workingDirectory: String,
         sdk: Sdk,
         task: String,
@@ -85,6 +87,7 @@ object MixTaskRunner {
         indicator?.isIndeterminate = true
 
         val commandLine = Mix.commandLine(
+            project,
             emptyMap(),
             workingDirectory,
             sdk,
@@ -93,6 +96,7 @@ object MixTaskRunner {
         )
         commandLine.addParameter(task)
         commandLine.addParameters(*taskParameters)
+        MixToolingBootstrap.ensure(commandLine, project, sdk)
 
         // Use ColoredProcessHandler to automatically strip ANSI escape codes
         val handler = ProcessHandlerFactory.getInstance()
@@ -149,8 +153,8 @@ object MixTaskRunner {
      * Returns Result for Kotlin callers who want to handle errors.
      */
     fun installDependencies(project: Project, workingDirectory: String, sdk: Sdk): Result<Unit> {
-        val hexResult = runMixTask(project, workingDirectory, sdk, "Updating hex", "local.hex", "--force")
-        val rebarResult = runMixTask(project, workingDirectory, sdk, "Updating rebar", "local.rebar", "--force")
+        val hexResult = runMixTask(project, workingDirectory, sdk, "Updating hex", "local.hex", "--force", "--if-needed")
+        val rebarResult = runMixTask(project, workingDirectory, sdk, "Updating rebar", "local.rebar", "--force", "--if-needed")
         val depsResult = runMixTask(project, workingDirectory, sdk, "Fetching dependencies", "deps.get")
 
         return hexResult

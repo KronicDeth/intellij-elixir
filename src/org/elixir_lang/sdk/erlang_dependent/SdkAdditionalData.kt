@@ -1,11 +1,13 @@
 package org.elixir_lang.sdk.erlang_dependent
 
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.options.ConfigurationException
 import com.intellij.openapi.projectRoots.ProjectJdkTable
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.projectRoots.SdkModel
 import com.intellij.openapi.projectRoots.ValidatableSdkAdditionalData
+import com.intellij.openapi.projectRoots.impl.SdkAdditionalDataBase
 import com.intellij.openapi.util.InvalidDataException
 import com.intellij.openapi.util.WriteExternalException
 import org.jdom.Element
@@ -15,7 +17,7 @@ import org.jdom.Element
  *
  * ## Persistence Model
  *
- * Only the Erlang SDK **name** is persisted to disk (in the `erlang-sdk-name` XML attribute).
+ * The Erlang SDK name is persisted in the `erlang-sdk-name` XML attribute.
  * The actual SDK reference is resolved lazily when [getErlangSdk] is called.
  *
  * ## Cache Behavior
@@ -33,11 +35,10 @@ import org.jdom.Element
  *
  * @see org.elixir_lang.sdk.elixir.Type.setupSdkTableListener
  */
-class SdkAdditionalData :
+class SdkAdditionalData(private val elixirSdk: Sdk) :
+    SdkAdditionalDataBase(),
     ValidatableSdkAdditionalData,
     Cloneable {
-    private val elixirSdk: Sdk
-
     // Persistence layer - the ONLY thing saved to disk
     private var erlangSdkName: String? = null
 
@@ -48,18 +49,17 @@ class SdkAdditionalData :
 
     companion object {
         private const val ERLANG_SDK_NAME = "erlang-sdk-name"
-        private val LOG = Logger.getInstance(SdkAdditionalData::class.java)
-    }
-
-    // Primary constructor for readExternal
-    constructor(elixirSdk: Sdk) {
-        this.elixirSdk = elixirSdk
+        private val logger = Logger.getInstance(SdkAdditionalData::class.java)
     }
 
     // Secondary constructor for creating new SDKs with a known Erlang SDK
     constructor(erlangSdk: Sdk?, elixirSdk: Sdk) : this(elixirSdk) {
         this.erlangSdkName = erlangSdk?.name
         this.cachedErlangSdk = erlangSdk
+    }
+
+    override fun markInternalsAsCommited(commitStackTrace: Throwable) {
+        // No internal mutable structures to freeze.
     }
 
     /**
@@ -72,7 +72,9 @@ class SdkAdditionalData :
      */
     @Throws(ConfigurationException::class)
     override fun checkValid(sdkModel: SdkModel) {
-        LOG.debug("checkValid called for Elixir SDK: ${elixirSdk.name} (homePath: ${elixirSdk.homePath})")
+        logger.debug {
+            "checkValid called for Elixir SDK: ${elixirSdk.name} (homePath: ${elixirSdk.homePath})"
+        }
 
         // Allow auto-discovery during validation - if the configured SDK is missing,
         // we'll find another one automatically
@@ -89,11 +91,11 @@ class SdkAdditionalData :
                 "No valid Erlang SDK configured. Available: $available"
             }
 
-            LOG.debug("Validation failed for ${elixirSdk.name}: $message")
+            logger.debug { "Validation failed for ${elixirSdk.name}: $message" }
             throw ConfigurationException(message)
         }
 
-        LOG.debug("checkValid completed successfully for ${elixirSdk.name}")
+        logger.debug { "checkValid completed successfully for ${elixirSdk.name}" }
     }
 
     @Throws(InvalidDataException::class)
@@ -124,6 +126,7 @@ class SdkAdditionalData :
     fun getErlangSdkName(): String? = erlangSdkName
 
     fun setErlangSdk(sdk: Sdk?) {
+        assertWritable()
         erlangSdkName = sdk?.name
         cachedErlangSdk = sdk
     }
@@ -146,20 +149,20 @@ class SdkAdditionalData :
             if (isValidAndExists(cached, sdkModel)) {
                 return cached
             }
-            LOG.debug("[$elixirName] Cached Erlang SDK '${cached.name}' no longer valid")
+            logger.debug { "[$elixirName] Cached Erlang SDK '${cached.name}' no longer valid" }
             cachedErlangSdk = null
         }
 
         // 2. Lookup by configured name
         erlangSdkName?.let { name ->
-            LOG.debug("[$elixirName] Looking up Erlang SDK by name: $name")
+            logger.debug { "[$elixirName] Looking up Erlang SDK by name: $name" }
             val found = findErlangSdkByName(name, sdkModel)
             if (found != null) {
-                LOG.debug("[$elixirName] Found Erlang SDK '$name'")
+                logger.debug { "[$elixirName] Found Erlang SDK '$name'" }
                 cachedErlangSdk = found
                 return found
             }
-            LOG.debug("[$elixirName] Erlang SDK '$name' not found")
+            logger.debug { "[$elixirName] Erlang SDK '$name' not found" }
         }
         return null
     }

@@ -22,6 +22,7 @@ tasks.withType<JavaCompile>().configureEach {
 // Ensuring the necessary tasks are executed before tests
 tasks.test {
     dependsOn(":getElixir")
+    inputs.dir(layout.projectDirectory.dir("testData"))
 
     val elixirPath: String by project
     val elixirVersion: String by project

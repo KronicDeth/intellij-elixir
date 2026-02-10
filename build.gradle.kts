@@ -266,6 +266,9 @@ intellijPlatform {
                 sinceBuild = providers.gradleProperty("pluginVerifierVersion").get()
             }
         }
+        // This allows us to verify small IDEs without errors about the JPS plugin.
+        // It's not ideal, but there doesn't seem to be any other way to deal with it right now.
+        externalPrefixes.add("org.jetbrains.jps")
     }
     sourceSets {
         val testUI: SourceSet by project.sourceSets
@@ -313,8 +316,8 @@ dependencies {
         testFramework(TestFrameworkType.JUnit5, configurationName = "testUIImplementation")
     }
 
-    implementation(project(":jps-builder"))
     implementation(project(":jps-shared"))
+    runtimeOnly(project(":jps-builder"))
     implementation(files("lib/OtpErlang.jar"))
     implementation(libCommonsIo)
 

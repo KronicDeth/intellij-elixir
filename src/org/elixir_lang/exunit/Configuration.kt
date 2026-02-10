@@ -33,7 +33,7 @@ class Configuration(name: String, project: Project) :
     override fun debuggedConfiguration(name: String, cookie: String): Configuration {
         val debugged = Configuration(this.name, project)
 
-        debugged.erlArgumentList.addAll(erlArgumentList)
+        debugged.erlArgumentList.addAll(Modules.stripDebugErlArguments(erlArgumentList))
         debugged.erlArgumentList.addAll(arrayOf("-name", name))
         debugged.erlArgumentList.addAll(arrayOf("-setcookie", cookie))
         debugged.erlArgumentList.addAll(Modules.erlArgumentList(mix = true))
@@ -94,6 +94,7 @@ class Configuration(name: String, project: Project) :
         val module = ensureModule()
         val sdk = ensureMostSpecificSdk(module)
         val commandLine = ExUnit.commandLine(
+                project,
                 envs,
                 workingDirectory,
                 sdk,
@@ -118,6 +119,10 @@ class Configuration(name: String, project: Project) :
     override fun readExternal(element: Element) {
         super.readExternal(element)
         element.readExternalArgumentList(ERL, erlArgumentList)
+        Modules.stripDebugErlArguments(erlArgumentList).also {
+            erlArgumentList.clear()
+            erlArgumentList.addAll(it)
+        }
         element.readExternalArgumentList(ELIXIR, elixirArgumentList)
         element.readExternalArgumentList(MIX_TEST, mixTestArgumentList)
         workingDirectoryURL = element.readExternalWorkingDirectory()
@@ -130,7 +135,7 @@ class Configuration(name: String, project: Project) :
 
     override fun writeExternal(element: Element) {
         super.writeExternal(element)
-        element.writeExternalArgumentList(ERL, erlArgumentList)
+        element.writeExternalArgumentList(ERL, Modules.stripDebugErlArguments(erlArgumentList))
         element.writeExternalArgumentList(ELIXIR, elixirArgumentList)
         element.writeExternalArgumentList(MIX_TEST, mixTestArgumentList)
         element.writeExternalWorkingDirectory(workingDirectoryURL)

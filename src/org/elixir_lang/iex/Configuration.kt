@@ -32,7 +32,7 @@ class Configuration(name: String, project: Project, configurationFactory: Config
     override fun debuggedConfiguration(name: String, cookie: String): Configuration {
         val debugged = Configuration(this.name, project, factory!!)
 
-        debugged.erlArgumentList.addAll(erlArgumentList)
+        debugged.erlArgumentList.addAll(Modules.stripDebugErlArguments(erlArgumentList))
         debugged.erlArgumentList.addAll(arrayOf("-name", name))
         debugged.erlArgumentList.addAll(arrayOf("-setcookie", cookie))
         debugged.erlArgumentList.addAll(Modules.erlArgumentList())
@@ -72,6 +72,7 @@ class Configuration(name: String, project: Project, configurationFactory: Config
         val module = ensureModule()
         val sdk = ensureMostSpecificSdk(module)
         val commandLine = IEx.commandLine(
+                project = project,
                 environment = envs,
                 workingDirectory = workingDirectory,
                 elixirSdk = sdk,
@@ -94,6 +95,10 @@ class Configuration(name: String, project: Project, configurationFactory: Config
     override fun readExternal(element: Element) {
         super.readExternal(element)
         element.readExternalArgumentList(ERL, erlArgumentList)
+        Modules.stripDebugErlArguments(erlArgumentList).also {
+            erlArgumentList.clear()
+            erlArgumentList.addAll(it)
+        }
         element.readExternalArgumentList(IEX, iexArgumentList)
         workingDirectoryURL = element.readExternalWorkingDirectory()
         EnvironmentVariablesComponent.readExternal(element, envs)
@@ -105,7 +110,7 @@ class Configuration(name: String, project: Project, configurationFactory: Config
 
     override fun writeExternal(element: Element) {
         super.writeExternal(element)
-        element.writeExternalArgumentList(ERL, erlArgumentList)
+        element.writeExternalArgumentList(ERL, Modules.stripDebugErlArguments(erlArgumentList))
         element.writeExternalArgumentList(IEX, iexArgumentList)
         element.writeExternalWorkingDirectory(workingDirectoryURL)
         EnvironmentVariablesComponent.writeExternal(element, envs)

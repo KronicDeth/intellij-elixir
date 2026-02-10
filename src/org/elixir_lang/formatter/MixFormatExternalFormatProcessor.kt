@@ -3,6 +3,8 @@ package org.elixir_lang.formatter
 import com.intellij.application.options.CodeStyle
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.process.CapturingProcessHandler
+import com.intellij.notification.NotificationGroupManager
+import com.intellij.notification.NotificationType
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.edtWriteAction
 import com.intellij.openapi.application.runReadAction
@@ -18,14 +20,15 @@ import com.intellij.psi.codeStyle.ExternalFormatProcessor
 import org.elixir_lang.Elixir.elixirSdkHasErlangSdk
 import org.elixir_lang.Mix
 import org.elixir_lang.code_style.CodeStyleSettings
+import org.elixir_lang.mix.MixToolingBootstrap
 import org.elixir_lang.mix.Project
 import org.elixir_lang.psi.ElixirFile
 import org.elixir_lang.sdk.elixir.Type.Companion.mostSpecificSdk
 import java.io.FileNotFoundException
 import java.util.concurrent.TimeUnit
 
+// Uses unstable process APIs for progress integration; no stable alternative yet.
 @Suppress("UnstableApiUsage")
-@SuppressWarnings("UnstableApiUsage")
 class MixFormatExternalFormatProcessor : ExternalFormatProcessor {
     override fun activeForFile(source: PsiFile): Boolean =
         source is ElixirFile && CodeStyle.getCustomSettings(source, CodeStyleSettings::class.java).MIX_FORMAT
@@ -48,7 +51,7 @@ class MixFormatExternalFormatProcessor : ExternalFormatProcessor {
                 application.executeOnPooledThread {
                     workingDirectory(source)?.let { workingDirectory ->
                         mostSpecificSdk(source)?.takeIf(::elixirSdkHasErlangSdk)?.let { sdk ->
-                            format(workingDirectory, sdk, document.text)?.let { formattedText ->
+                            format(source.project, workingDirectory, sdk, document.text)?.let { formattedText ->
                                 runBlockingCancellable {
                                     if (source.isValid) {
                                         edtWriteAction {
@@ -72,7 +75,7 @@ class MixFormatExternalFormatProcessor : ExternalFormatProcessor {
     override fun indent(source: PsiFile, lineStartOffset: Int): String? = null
 
     companion object {
-        private val LOGGER = Logger.getInstance(MixFormatExternalFormatProcessor::class.java)
+        private val logger = Logger.getInstance(MixFormatExternalFormatProcessor::class.java)
 
         private fun workingDirectory(psiFile: PsiFile): String? =
             psiFile
@@ -89,21 +92,33 @@ class MixFormatExternalFormatProcessor : ExternalFormatProcessor {
                 }
                 ?.path
 
-        private fun format(workingDirectory: String, sdk: Sdk, unformattedText: String): String? =
-            commandLine(workingDirectory, sdk)
+        private fun format(project: com.intellij.openapi.project.Project, workingDirectory: String, sdk: Sdk, unformattedText: String): String? =
+            commandLine(project, workingDirectory, sdk)
                 ?.let { format(it, unformattedText) }
 
-        private fun commandLine(workingDirectory: String, sdk: Sdk): GeneralCommandLine? =
+        private fun commandLine(project: com.intellij.openapi.project.Project, workingDirectory: String, sdk: Sdk): GeneralCommandLine? =
             try {
-                val commandLine = Mix.commandLine(emptyMap(), workingDirectory, sdk)
+                val commandLine = Mix.commandLine(project, emptyMap(), workingDirectory, sdk)
                 commandLine.addParameter("format")
                 // `-` turns on stdin/stdout for text to format
                 commandLine.addParameter("-")
+                MixToolingBootstrap.ensure(commandLine, project, sdk)
 
                 commandLine
             } catch (fileNotFoundException: FileNotFoundException) {
-                LOGGER.info(fileNotFoundException)
-
+                logger.info(fileNotFoundException)
+                null
+            } catch (executionException: com.intellij.execution.ExecutionException) {
+                logger.warn("mix format bootstrap failed", executionException)
+                NotificationGroupManager
+                    .getInstance()
+                    .getNotificationGroup("Elixir")
+                    .createNotification(
+                        "Mix format bootstrap failed",
+                        executionException.message ?: "Unknown error",
+                        NotificationType.ERROR
+                    )
+                    .notify(project)
                 null
             }
 
@@ -126,7 +141,7 @@ class MixFormatExternalFormatProcessor : ExternalFormatProcessor {
                 processHandler.runProcess(timeout, true)
             }
 
-            return if (output.checkSuccess(LOGGER)) {
+            return if (output.checkSuccess(logger)) {
                 output.stdout
             } else {
                 null

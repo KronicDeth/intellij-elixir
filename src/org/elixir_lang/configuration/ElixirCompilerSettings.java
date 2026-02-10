@@ -4,8 +4,8 @@ import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.project.Project;
-import org.elixir_lang.jps.CompilerOptions;
-import org.elixir_lang.jps.compiler_options.Serializer;
+import org.elixir_lang.jps.shared.CompilerOptions;
+import org.elixir_lang.settings.ElixirExperimentalSettings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -13,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
  * Created by zyuyou on 15/7/6.
  */
 @State(
-        name = Serializer.COMPILER_OPTIONS_COMPONENT_NAME,
+        name = CompilerOptions.COMPONENT_NAME,
         storages = {
                 @Storage(value = "compiler.xml")
         }
@@ -24,11 +24,16 @@ public class ElixirCompilerSettings implements PersistentStateComponent<Compiler
     @Nullable
     @Override
     public CompilerOptions getState() {
+        // this is a shortcut to avoid needing to duplicate the experimental feature flag in compiler settings.
+        myCompilerOptions.useMixToolingBootstrap = ElixirExperimentalSettings.Companion
+                .getInstance()
+                .getState()
+                .getEnableMixMixToolingBootstrap();
         return myCompilerOptions;
     }
 
     @Override
-    public void loadState(CompilerOptions state) {
+    public void loadState(@NotNull CompilerOptions state) {
         myCompilerOptions = state;
     }
 

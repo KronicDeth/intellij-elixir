@@ -17,8 +17,7 @@ import com.intellij.openapi.util.Version
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.toNioPathOrNull
 import com.intellij.util.containers.ContainerUtil
-import org.elixir_lang.jps.HomePath
-import org.elixir_lang.jps.sdk_type.Erlang
+import org.elixir_lang.sdk.HomePath
 import org.elixir_lang.sdk.SdkHomeScan
 import org.elixir_lang.sdk.erlang_dependent.AdditionalDataConfigurable
 import org.jdom.Element
@@ -210,7 +209,7 @@ class Type : SdkType("Erlang SDK for Elixir SDK") {
     }
 
     override fun isValidSdkHome(path: String): Boolean {
-        val erlExe = Erlang.getByteCodeInterpreterExecutable(path)
+        val erlExe = erlExecutable(path)
         return erlExe.canExecute()
     }
 
@@ -256,7 +255,7 @@ class Type : SdkType("Erlang SDK for Elixir SDK") {
             return cachedRelease
         }
 
-        val erl = Erlang.getByteCodeInterpreterExecutable(sdkHome)
+        val erl = erlExecutable(sdkHome)
         LOGGER.debug("=== ERLANG SDK: Erl executable path: ${erl.absolutePath}")
         if (!erl.canExecute()) {
             val message =
@@ -306,5 +305,10 @@ class Type : SdkType("Erlang SDK for Elixir SDK") {
 
         LOGGER.debug("=== ERLANG SDK: Final release result: ${release?.otpRelease ?: "null"}")
         return release
+    }
+
+    private fun erlExecutable(sdkHome: String): File {
+        val fileName = HomePath.getExecutableFileName(sdkHome, "erl", ".exe")
+        return File(File(sdkHome, "bin"), fileName)
     }
 }

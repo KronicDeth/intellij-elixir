@@ -2257,6 +2257,8 @@ See [JetBrains Documentation](https://www.jetbrains.com/help/idea/template-data-
 
 ### Building/Compiling
 
+The JPS builder runs under the Java SDKs configured in the IDE (project and module SDKs). If none are configured, the build process falls back to the IDE's bundled runtime. The Elixir Compiler module requires that the available runtime is at least Java 21. 
+
 #### Settings
 
 ![Build, Execution, Deployment > Compiler > Elixir Compiler](/screenshots/features/building/Settings.png?raw=true "Elixir Compiler Settings")
@@ -6164,7 +6166,7 @@ I'd like to thank those who have donated to help support this project as GitHub 
 * Richard Giraud ([@RGENT](https://github.com/RGENT))  
 * Samir Bouaked ([@sbouaked](https://github.com/sbouaked))
 * Nitin Gupta ([@nitingupta910](https://github.com/nitingupta910))
-* Steve Wagner ([@ciroque](https://github.com/ciroque))
+* user Wagner ([@ciroque](https://github.com/ciroque))
 * Adrian Philipp ([@adri](https://github.com/adri))
 * William De Melo Gueiros ([@williamgueiros](https://github.com/williamgueiros))
 * César Salazar Hernández ([@cesarslzr](https://github.com/cesarslzr))

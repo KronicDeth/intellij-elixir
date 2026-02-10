@@ -1,6 +1,7 @@
 package org.elixir_lang
 
 import com.intellij.execution.configurations.GeneralCommandLine
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.Sdk
 import org.elixir_lang.Erl.prependCodePaths
 import org.elixir_lang.sdk.erlang_dependent.MissingErlangSdk
@@ -8,27 +9,24 @@ import org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData
 
 object Elixir {
     /**
-     * Keep in-sync with [org.elixir_lang.jps.Builder.elixirCommandLine]
+     * Keep in-sync with the JPS builder elixir command line.
      */
     fun commandLine(
+        project: Project?,
         environment: Map<String, String>,
         workingDirectory: String?,
         elixirSdk: Sdk,
         erlArgumentList: kotlin.collections.List<String> = emptyList(),
     ): GeneralCommandLine {
-        val erlangSdk = elixirSdkToEnsuredErlangSdk(elixirSdk)
-        val commandLine =
-            Erl.commandLine(
-                pty = false,
-                environment = environment,
-                workingDirectory = workingDirectory,
-                erlangSdk = erlangSdk,
-            )
-        // MUST be before `addElixir` because it ends with `-extra` which turns off argument parsing for `erl`
-        commandLine.addParameters(erlArgumentList)
-        addElixir(commandLine, elixirSdk, erlangSdk)
-
-        return commandLine
+        return ElixirCliCommandLine.commandLine(
+            project = project,
+            tool = ElixirCliDryRun.Tool.ELIXIR,
+            pty = false,
+            environment = environment,
+            workingDirectory = workingDirectory,
+            elixirSdk = elixirSdk,
+            erlArgumentList = erlArgumentList,
+        )
     }
 
     fun elixirSdkToEnsuredErlangSdk(elixirSdk: Sdk): Sdk =
@@ -50,20 +48,6 @@ object Elixir {
         val elixirEbinDirectories = elixirSdk.ebinDirectories()
         val erlangEbinDirectories = erlangSdk.ebinDirectories()
         prependNewCodePaths(commandLine, elixirEbinDirectories, erlangEbinDirectories)
-    }
-
-    /**
-     * Keep in-suync with [org.elixir_lang.jps.Builder.addElixir]
-     */
-    private fun addElixir(
-        commandLine: GeneralCommandLine,
-        elixirSdk: Sdk,
-        erlangSdk: Sdk,
-    ) {
-        prependNewCodePaths(commandLine, elixirSdk, erlangSdk)
-        commandLine.addParameters("-noshell", "-s", "elixir", "start_cli")
-        commandLine.addParameters("-elixir", "ansi_enabled", "true")
-        commandLine.addParameter("-extra")
     }
 
     private fun prependNewCodePaths(

@@ -2,10 +2,10 @@ package org.elixir_lang.sdk
 
 import com.intellij.execution.wsl.WSLDistribution
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.util.Version
 import com.intellij.util.system.CpuArch
 import com.intellij.util.system.OS
-import org.elixir_lang.jps.HomePath
 import org.elixir_lang.sdk.wsl.wslCompat
 import java.io.File
 import java.nio.file.Path
@@ -19,7 +19,7 @@ import java.util.function.Function
  * (ASDF, mise, Homebrew, kerl, Nix) to discover SDK installations.
  */
 object SdkHomeScan {
-    private val LOG = Logger.getInstance(SdkHomeScan::class.java)
+    private val logger = Logger.getInstance(SdkHomeScan::class.java)
 
     /**
      * Configuration for SDK-specific scanning behavior.
@@ -59,7 +59,7 @@ object SdkHomeScan {
      * @return Map of versions to SDK home paths, sorted by version (descending)
      */
     fun homePathByVersion(path: Path?, config: Config): Map<Version, String> {
-        LOG.debug("Scanning for ${config.toolName} SDKs (path: $path, platform: ${OS.CURRENT})")
+        logger.debug { "Scanning for ${config.toolName} SDKs (path: $path, platform: ${OS.CURRENT})" }
         val homePathByVersion: MutableMap<Version, String> = TreeMap(Comparator.reverseOrder())
 
         val result = when (OS.CURRENT) {
@@ -73,12 +73,15 @@ object SdkHomeScan {
                 homePathByVersionLinux(homePathByVersion, config)
 
             else -> {
-                LOG.debug("Unsupported platform: ${OS.CURRENT}")
+                logger.debug { "Unsupported platform: ${OS.CURRENT}" }
                 homePathByVersion
             }
         }
 
-        LOG.debug("Found ${result.size} ${config.toolName} SDK(s): ${result.values.take(3).joinToString(", ")}${if (result.size > 3) "..." else ""}")
+        logger.debug {
+            "Found ${result.size} ${config.toolName} SDK(s): " +
+                "${result.values.take(3).joinToString(", ")}${if (result.size > 3) "..." else ""}"
+        }
         return result
     }
 
@@ -128,10 +131,11 @@ object SdkHomeScan {
         }
 
         windowsPath?.let {
-            putIfDirectory(homePathByVersion, HomePath.UNKNOWN_VERSION, it)
+            putIfDirectory(homePathByVersion, it)
         }
 
         HomePath.mergeElixirInstallScript(homePathByVersion, config.elixirInstallScriptDirName)
+        HomePath.mergeMise(homePathByVersion, config.toolName)
 
         return homePathByVersion
     }
@@ -144,8 +148,8 @@ object SdkHomeScan {
         homePathByVersion: MutableMap<Version, String>,
         config: Config
     ): Map<Version, String> {
-        putIfDirectory(homePathByVersion, HomePath.UNKNOWN_VERSION, config.linuxDefaultPath)
-        putIfDirectory(homePathByVersion, HomePath.UNKNOWN_VERSION, config.linuxMintPath)
+        putIfDirectory(homePathByVersion, config.linuxDefaultPath)
+        putIfDirectory(homePathByVersion, config.linuxMintPath)
 
         HomePath.mergeASDF(homePathByVersion, config.toolName)
         HomePath.mergeMise(homePathByVersion, config.toolName)
@@ -177,23 +181,23 @@ object SdkHomeScan {
     ) {
         val distributionsToScan = when {
             path == null -> {
-                LOG.debug("No project path, scanning all WSL distributions")
+                logger.debug { "No project path, scanning all WSL distributions" }
                 wslCompat.getInstalledDistributions()
             }
 
             wslCompat.isWslUncPath(path.toString()) -> {
                 val distribution = wslCompat.getDistributionByWindowsUncPath(path.toString())
                 if (distribution != null) {
-                    LOG.debug("Project in WSL (${distribution.msId}), scanning only that distribution")
+                    logger.debug { "Project in WSL (${distribution.msId}), scanning only that distribution" }
                     listOf(distribution)
                 } else {
-                    LOG.debug("Couldn't determine WSL distribution, scanning all")
+                    logger.debug { "Couldn't determine WSL distribution, scanning all" }
                     wslCompat.getInstalledDistributions()
                 }
             }
 
             else -> {
-                LOG.debug("Windows project path, scanning all WSL distributions")
+                logger.debug { "Windows project path, scanning all WSL distributions" }
                 wslCompat.getInstalledDistributions()
             }
         }
@@ -225,10 +229,10 @@ object SdkHomeScan {
         }
 
         wslCompat.convertLinuxPathToWindowsUnc(distribution, config.linuxDefaultPath)?.let {
-            putIfDirectory(homePathByVersion, HomePath.UNKNOWN_VERSION, it)
+            putIfDirectory(homePathByVersion, it)
         }
         wslCompat.convertLinuxPathToWindowsUnc(distribution, config.linuxMintPath)?.let {
-            putIfDirectory(homePathByVersion, HomePath.UNKNOWN_VERSION, it)
+            putIfDirectory(homePathByVersion, it)
         }
 
         wslCompat.convertLinuxPathToWindowsUnc(distribution, HomePath.NIX_STORE_PATH)?.let { wslNixStore ->
@@ -242,12 +246,11 @@ object SdkHomeScan {
      */
     private fun putIfDirectory(
         homePathByVersion: MutableMap<Version, String>,
-        version: Version,
         homePath: String
     ) {
         val homeFile = File(homePath)
         if (homeFile.isDirectory) {
-            homePathByVersion[version] = homePath
+            homePathByVersion[HomePath.UNKNOWN_VERSION] = homePath
         }
     }
 

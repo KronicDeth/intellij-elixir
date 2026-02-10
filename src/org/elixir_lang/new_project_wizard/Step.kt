@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION") // Uses deprecated NewProjectWizardLanguageStep until replacement API is available.
+
 package org.elixir_lang.new_project_wizard
 
 import com.intellij.execution.ExecutionException
@@ -21,7 +23,9 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.projectRoots.SdkTypeId
 import com.intellij.openapi.roots.ProjectRootManager
-import com.intellij.openapi.roots.ui.configuration.*
+import com.intellij.openapi.roots.ui.configuration.JdkComboBox
+import com.intellij.openapi.roots.ui.configuration.SdkListItem
+import com.intellij.openapi.roots.ui.configuration.createSdkComboBox
 import com.intellij.openapi.roots.ui.configuration.projectRoot.ProjectSdksModel
 import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.openapi.util.Disposer
@@ -31,6 +35,7 @@ import com.intellij.ui.layout.ValidationInfoBuilder
 import kotlinx.coroutines.CancellationException
 import org.elixir_lang.Elixir
 import org.elixir_lang.Mix
+import org.elixir_lang.mix.MixToolingBootstrap
 import org.elixir_lang.module.ElixirModuleBuilder
 import org.elixir_lang.module.ElixirModuleType
 import org.elixir_lang.sdk.elixir.Type
@@ -40,6 +45,7 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 
 // Based on [NewPythonProjectStep](https://github.com/JetBrains/intellij-community/blob/dcb0ce2edd2c3b1dffb7e60103898acd5b913cfb/python/src/com/jetbrains/python/newProject/PythonNewProjectWizard.kt#L82-L145)
+@Suppress("DEPRECATION")
 class Step(parent: NewProjectWizardLanguageStep) : AbstractNewProjectWizardStep(parent),
                                                    NewProjectWizardBaseData by parent,
                                                    Data {
@@ -62,13 +68,13 @@ class Step(parent: NewProjectWizardLanguageStep) : AbstractNewProjectWizardStep(
                 elixirSdkComboBox(context, sdkProperty)
                     .columns(COLUMNS_MEDIUM)
             }
-            collapsibleGroup("mix new Options") {
+            collapsibleGroup("Mix New Options") {
                 row("--app") {
                     textField()
                         .bindText(mixNewAppProperty)
                         .align(AlignX.FILL)
                         .validationOnApply {
-                            if (mixNewApp.isNullOrBlank()) {
+                            if (mixNewApp.isBlank()) {
                                 val name = this@Step.name
 
                                 if (!name.matches(APPLICATION_NAME_REGEX)) {
@@ -116,24 +122,25 @@ class Step(parent: NewProjectWizardLanguageStep) : AbstractNewProjectWizardStep(
             val workingDirectory = Paths.get(".").toAbsolutePath().normalize().toString()
             val projectDirectory = context.projectDirectory.toString()
 
-            val commandLine = Mix.commandLine(emptyMap(), workingDirectory, sdk)
-            commandLine.addParameters("new", projectDirectory)
+            val mixArguments = mutableListOf("new", projectDirectory)
 
             if (mixNewApp.isNotBlank()) {
-                commandLine.addParameters("--app", mixNewApp)
+                mixArguments.addAll(listOf("--app", mixNewApp))
             }
 
             if (mixNewModule.isNotBlank()) {
-                commandLine.addParameters("--module", mixNewModule)
+                mixArguments.addAll(listOf("--module", mixNewModule))
             }
 
             if (mixNewSup) {
-                commandLine.addParameter("--sup")
+                mixArguments.add("--sup")
             }
 
             if (mixNewUmbrella) {
-                commandLine.addParameter("--umbrella")
+                mixArguments.add("--umbrella")
             }
+
+            val mixArgumentsSnapshot = mixArguments.toList()
 
             // delete the caller's created empty directory so that `mix new` can create it.
             if (!context.projectDirectory.toFile().deleteRecursively()) {
@@ -151,6 +158,10 @@ class Step(parent: NewProjectWizardLanguageStep) : AbstractNewProjectWizardStep(
                     override fun compute(indicator: ProgressIndicator): ProcessOutput {
                         indicator.isIndeterminate = true
 
+                        val commandLine = Mix.commandLine(project, emptyMap(), workingDirectory, sdk)
+                        commandLine.addParameters(mixArgumentsSnapshot)
+                        MixToolingBootstrap.ensure(commandLine, project, sdk)
+
                         return ExecUtil.execAndGetOutput(commandLine, TimeUnit.SECONDS.toMillis(30).toInt())
                     }
                 })
@@ -165,11 +176,11 @@ class Step(parent: NewProjectWizardLanguageStep) : AbstractNewProjectWizardStep(
                 NotificationGroupManager
                     .getInstance()
                     .getNotificationGroup("Elixir")
-                    .createNotification("mix new failed", stderrWithoutColorCodes, NotificationType.ERROR)
+                    .createNotification("Mix new failed", stderrWithoutColorCodes, NotificationType.ERROR)
                     // project will fail to initialize and not have a window, so don't use `project`
                     .notify(null)
 
-                throw IOException("mix new failed: $stderrWithoutColorCodes")
+                throw IOException("Mix new failed: $stderrWithoutColorCodes")
             }
 
             super.setupProject(project)
@@ -206,6 +217,19 @@ class Step(parent: NewProjectWizardLanguageStep) : AbstractNewProjectWizardStep(
             Logger.getInstance(javaClass).error(ioException)
 
             throw ioException
+        } catch (executionException: ExecutionException) {
+            Logger.getInstance(javaClass).error(executionException)
+            NotificationGroupManager
+                .getInstance()
+                .getNotificationGroup("Elixir")
+                .createNotification(
+                    "Mix new bootstrap failed",
+                    executionException.localizedMessage ?: "Unknown error",
+                    NotificationType.ERROR
+                )
+                .notify(null)
+
+            throw IOException(executionException.localizedMessage, executionException)
         }
     }
 }
@@ -264,7 +288,7 @@ private fun validateAndGetSdkValidationMessage(
 
                     null
                 } catch (e: ConfigurationException) {
-                    e.message ?: e.title
+                    e.localizedMessage ?: e.title
                 }
             } else {
                 "Internal Erlang SDK (${internalErlangSdk.name} home directory (${internalErlangSdk.homePath}) " +
