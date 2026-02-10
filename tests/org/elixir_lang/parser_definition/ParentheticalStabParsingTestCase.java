@@ -81,6 +81,18 @@ public class ParentheticalStabParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
+    public void testShouldBeInBlock() {
+        assertParsedAndQuotedCorrectly(false);
+    }
+
+    public void testShouldNotBeInBlock() {
+        assertParsedAndQuotedCorrectly(false);
+    }
+
+    public void testParensNot() {
+        assertParsedAndQuotedCorrectly(false);
+    }
+
     public void testSpliceOnStab() {
         assertParsedAndQuotedCorrectly();
     }

@@ -6,6 +6,7 @@ import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.name.Module
 import org.elixir_lang.psi.impl.QuotableImpl.metadata
 import org.elixir_lang.psi.impl.QuotableImpl.quotedFunctionCall
+import org.elixir_lang.psi.impl.QuotableImpl.quotedFunctionCallFromInterpolation
 import org.jetbrains.annotations.Contract
 import java.nio.charset.Charset
 
@@ -208,7 +209,7 @@ object ParentImpl {
             val quotedChildren = QuotableImpl.quote(interpolation.children)
             val interpolationMetadata = metadata(interpolation)
 
-            quotedFunctionCall(
+            quotedFunctionCallFromInterpolation(
                 Module.prependElixirPrefix(Module.KERNEL),
                 "to_string",
                 interpolationMetadata,
@@ -218,7 +219,7 @@ object ParentImpl {
             val quotedChildren = QuotableImpl.quote(interpolation.children)
             val interpolationMetadata = metadata(interpolation)
 
-            val quotedKernelToStringCall = quotedFunctionCall(
+            val quotedKernelToStringCall = quotedFunctionCallFromInterpolation(
                 Module.prependElixirPrefix(Module.KERNEL),
                 "to_string",
                 interpolationMetadata,
@@ -246,7 +247,7 @@ object ParentImpl {
         val quotedChildren = QuotableImpl.quote(interpolation.children)
         val interpolationMetadata = metadata(interpolation)
 
-        val quotedKernelToStringCall = quotedFunctionCall(
+        val quotedKernelToStringCall = quotedFunctionCallFromInterpolation(
             Module.prependElixirPrefix(Module.KERNEL),
             "to_string",
             interpolationMetadata,
