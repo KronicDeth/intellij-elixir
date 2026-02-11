@@ -144,11 +144,17 @@ allprojects {
         showStandardStreams = false
         showFailedStandardStreams = true
     }
+
+    tasks.withType<Test>().configureEach {
+        inputs.dir(rootProject.layout.projectDirectory.dir("testData"))
+            .withPropertyName("testData")
+            .withPathSensitivity(PathSensitivity.RELATIVE)
+    }
 }
 
 // --- Subprojects (JPS) ---
 subprojects {
-    apply(plugin = "org.jetbrains.intellij.platform.module")
+    apply(plugin = "org.jetbrains.intellij.platform.base")
 
     repositories {
         intellijPlatform { defaultRepositories() }
@@ -157,20 +163,13 @@ subprojects {
     dependencies {
         intellijPlatform {
             create(providers.gradleProperty("platformType"), providers.provider { actualPlatformVersion })
-            bundledPlugins("com.intellij.java")
-            testFramework(TestFrameworkType.Platform)
         }
-        // JPS Builder tests extend UsefulTestCase (JUnit 3/4 style) and need explicit JUnit 4 on classpath
-        testImplementation(libJunit)
     }
 
     sourceSets {
         main {
             java.srcDirs("src")
             resources.srcDirs("resources")
-        }
-        test {
-            java.srcDir("tests")
         }
     }
 }

@@ -1,5 +1,5 @@
-tasks.jar {
-    archiveFileName.set("jps-shared.jar")
+base {
+    archivesName.set("${rootProject.name}.${project.name}")
 }
 
 tasks.testClasses {
