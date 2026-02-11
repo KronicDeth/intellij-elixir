@@ -9,7 +9,6 @@ import org.elixir_lang.sdk.wsl.wslCompat
 import java.io.File
 import java.nio.file.Path
 import java.util.*
-import java.util.function.Function
 
 /**
  * Consolidated SDK home path scanning for Elixir and Erlang SDKs.
@@ -89,18 +88,18 @@ object SdkHomeScan {
         homePathByVersion: MutableMap<Version, String>,
         config: Config
     ): Map<Version, String> {
-        HomePath.mergeASDF(homePathByVersion, config.toolName)
-        HomePath.mergeMise(homePathByVersion, config.toolName)
+        SdkHomePaths.mergeASDF(homePathByVersion, config.toolName)
+        SdkHomePaths.mergeMise(homePathByVersion, config.toolName)
 
         if (config.kerlTransform != null) {
-            HomePath.mergeKerl(homePathByVersion, config.kerlTransform.toJavaFunction())
+            SdkHomePaths.mergeKerl(homePathByVersion, config.kerlTransform)
         }
 
-        val homebrewTransform = config.homebrewTransform?.toJavaFunction() ?: Function.identity()
-        HomePath.mergeHomebrew(homePathByVersion, config.toolName, homebrewTransform)
+        val homebrewTransform = config.homebrewTransform ?: { it }
+        SdkHomePaths.mergeHomebrew(homePathByVersion, config.toolName, homebrewTransform)
 
-        val nixTransform = config.nixTransform?.toJavaFunction() ?: Function.identity()
-        HomePath.mergeNixStore(homePathByVersion, config.nixPattern, nixTransform)
+        val nixTransform = config.nixTransform ?: { it }
+        SdkHomePaths.mergeNixStore(homePathByVersion, config.nixPattern, nixTransform)
 
         return homePathByVersion
     }
@@ -127,10 +126,10 @@ object SdkHomeScan {
         }
 
         windowsPath?.let {
-            putIfDirectory(homePathByVersion, HomePath.UNKNOWN_VERSION, it)
+            putIfDirectory(homePathByVersion, SdkHomePaths.UNKNOWN_VERSION, it)
         }
 
-        HomePath.mergeElixirInstallScript(homePathByVersion, config.elixirInstallScriptDirName)
+        SdkHomePaths.mergeElixirInstallScript(homePathByVersion, config.elixirInstallScriptDirName)
 
         return homePathByVersion
     }
@@ -143,23 +142,23 @@ object SdkHomeScan {
         homePathByVersion: MutableMap<Version, String>,
         config: Config
     ): Map<Version, String> {
-        putIfDirectory(homePathByVersion, HomePath.UNKNOWN_VERSION, config.linuxDefaultPath)
-        putIfDirectory(homePathByVersion, HomePath.UNKNOWN_VERSION, config.linuxMintPath)
+        putIfDirectory(homePathByVersion, SdkHomePaths.UNKNOWN_VERSION, config.linuxDefaultPath)
+        putIfDirectory(homePathByVersion, SdkHomePaths.UNKNOWN_VERSION, config.linuxMintPath)
 
-        HomePath.mergeASDF(homePathByVersion, config.toolName)
-        HomePath.mergeMise(homePathByVersion, config.toolName)
-        HomePath.mergeElixirInstallScript(homePathByVersion, config.elixirInstallScriptDirName)
+        SdkHomePaths.mergeASDF(homePathByVersion, config.toolName)
+        SdkHomePaths.mergeMise(homePathByVersion, config.toolName)
+        SdkHomePaths.mergeElixirInstallScript(homePathByVersion, config.elixirInstallScriptDirName)
 
         if (config.kerlTransform != null) {
-            HomePath.mergeKerl(homePathByVersion, config.kerlTransform.toJavaFunction())
+            SdkHomePaths.mergeKerl(homePathByVersion, config.kerlTransform)
         }
 
         if (config.travisCIKerlTransform != null) {
-            HomePath.mergeTravisCIKerl(homePathByVersion, config.travisCIKerlTransform.toJavaFunction())
+            SdkHomePaths.mergeTravisCIKerl(homePathByVersion, config.travisCIKerlTransform)
         }
 
-        val nixTransform = config.nixTransform?.toJavaFunction() ?: Function.identity()
-        HomePath.mergeNixStore(homePathByVersion, config.nixPattern, nixTransform)
+        val nixTransform = config.nixTransform ?: { it }
+        SdkHomePaths.mergeNixStore(homePathByVersion, config.nixPattern, nixTransform)
 
         return homePathByVersion
     }
@@ -214,25 +213,25 @@ object SdkHomeScan {
         val wslUserHome = wslCompat.getWslUserHomeUncPath(distribution)
 
         if (wslUserHome != null) {
-            HomePath.mergeASDF(homePathByVersion, config.toolName, wslUserHome)
-            HomePath.mergeMise(homePathByVersion, config.toolName, wslUserHome)
-            HomePath.mergeElixirInstallScript(homePathByVersion, config.elixirInstallScriptDirName, wslUserHome)
+            SdkHomePaths.mergeASDF(homePathByVersion, config.toolName, wslUserHome)
+            SdkHomePaths.mergeMise(homePathByVersion, config.toolName, wslUserHome)
+            SdkHomePaths.mergeElixirInstallScript(homePathByVersion, config.elixirInstallScriptDirName, wslUserHome)
 
             if (config.travisCIKerlTransform != null) {
-                HomePath.mergeTravisCIKerl(homePathByVersion, config.travisCIKerlTransform.toJavaFunction(), wslUserHome)
+                SdkHomePaths.mergeTravisCIKerl(homePathByVersion, config.travisCIKerlTransform, wslUserHome)
             }
         }
 
         wslCompat.convertLinuxPathToWindowsUnc(distribution, config.linuxDefaultPath)?.let {
-            putIfDirectory(homePathByVersion, HomePath.UNKNOWN_VERSION, it)
+            putIfDirectory(homePathByVersion, SdkHomePaths.UNKNOWN_VERSION, it)
         }
         wslCompat.convertLinuxPathToWindowsUnc(distribution, config.linuxMintPath)?.let {
-            putIfDirectory(homePathByVersion, HomePath.UNKNOWN_VERSION, it)
+            putIfDirectory(homePathByVersion, SdkHomePaths.UNKNOWN_VERSION, it)
         }
 
-        wslCompat.convertLinuxPathToWindowsUnc(distribution, HomePath.NIX_STORE_PATH)?.let { wslNixStore ->
-            val nixTransform = config.nixTransform?.toJavaFunction() ?: Function.identity()
-            HomePath.mergeNixStore(homePathByVersion, config.nixPattern, nixTransform, wslNixStore)
+        wslCompat.convertLinuxPathToWindowsUnc(distribution, SdkHomePaths.NIX_STORE_PATH)?.let { wslNixStore ->
+            val nixTransform = config.nixTransform ?: { it }
+            SdkHomePaths.mergeNixStore(homePathByVersion, config.nixPattern, nixTransform, wslNixStore)
         }
     }
 
@@ -250,8 +249,4 @@ object SdkHomeScan {
         }
     }
 
-    /**
-     * Converts a Kotlin lambda to a Java Function for interop with HomePath methods.
-     */
-    private fun ((File) -> File).toJavaFunction(): Function<File, File> = Function { file -> this(file) }
 }

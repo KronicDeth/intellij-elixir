@@ -3,7 +3,7 @@ package org.elixir_lang.jps.shared.sdk
 import org.elixir_lang.PlatformTestCase
 
 /**
- * Tests for HomePath utility methods.
+ * Tests for SdkPaths utility methods.
  */
 class SdkPathsTest : PlatformTestCase() {
 

@@ -200,13 +200,13 @@ public class ElixirWslSdkTest extends PlatformTestCase {
 
     /**
      * ebinPathChainVirtualFile receives paths that look like WSL paths (not regular Linux paths).
-     * This verifies that HomePath.maybeTranslateToUnc correctly converts Linux paths back to UNC format.
+     * This verifies that SdkEbinPaths.maybeTranslateToUnc correctly converts Linux paths back to UNC format.
      * <p/>
      * Note: Java's Paths.get("//wsl.localhost/...") normalizes to "/wsl.localhost/..." (single slash),
      * which is still distinguishable from regular Linux paths like "/usr/..." or "/home/...".
      */
     public void testEbinPathChainVirtualFile_ReceivesWslPathNotRegularLinuxPath() {
-        // Given: A WSL UNC path (as returned by HomePath.maybeTranslateToUnc after DirectoryStream translation)
+        // Given: A WSL UNC path (as returned by SdkEbinPaths.maybeTranslateToUnc after DirectoryStream translation)
         String wslUncPath = "//wsl.localhost/Ubuntu-24.04/usr/lib/erlang/lib/kernel-9.2/ebin";
         java.nio.file.Path ebinPath = java.nio.file.Paths.get(wslUncPath);
 

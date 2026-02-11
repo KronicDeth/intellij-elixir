@@ -152,7 +152,7 @@ class SdkHomeScanTest : PlatformTestCase() {
             for (i in 0 until versions.size - 1) {
                 assertTrue(
                     "Versions should be in descending order",
-                    versions[i] >= versions[i + 1]
+                    versions[i].version >= versions[i + 1].version
                 )
             }
         }
@@ -163,7 +163,7 @@ class SdkHomeScanTest : PlatformTestCase() {
     fun `test config with all null transforms`() {
         val config = SdkHomeScan.Config(
             toolName = "test",
-            nixPattern = HomePath.nixPattern("test"),
+            nixPattern = SdkHomePaths.nixPattern("test"),
             linuxDefaultPath = "/test",
             linuxMintPath = "/test",
             windowsDefaultPath = null,
@@ -187,7 +187,7 @@ class SdkHomeScanTest : PlatformTestCase() {
 
         val config = SdkHomeScan.Config(
             toolName = "test",
-            nixPattern = HomePath.nixPattern("test"),
+            nixPattern = SdkHomePaths.nixPattern("test"),
             linuxDefaultPath = "/test",
             linuxMintPath = "/test",
             windowsDefaultPath = "C:\\test",
@@ -209,7 +209,7 @@ class SdkHomeScanTest : PlatformTestCase() {
 
     private fun createElixirConfig() = SdkHomeScan.Config(
         toolName = "elixir",
-        nixPattern = HomePath.nixPattern("elixir"),
+        nixPattern = SdkHomePaths.nixPattern("elixir"),
         linuxDefaultPath = "/usr/local/lib/elixir",
         linuxMintPath = "/usr/lib/elixir",
         windowsDefaultPath = "C:\\Program Files (x86)\\Elixir",
@@ -223,7 +223,7 @@ class SdkHomeScanTest : PlatformTestCase() {
 
     private fun createErlangConfig() = SdkHomeScan.Config(
         toolName = "erlang",
-        nixPattern = HomePath.nixPattern("erlang"),
+        nixPattern = SdkHomePaths.nixPattern("erlang"),
         linuxDefaultPath = "/usr/local/lib/erlang",
         linuxMintPath = "/usr/lib/erlang",
         windowsDefaultPath = "C:\\Program Files\\erl9.0",

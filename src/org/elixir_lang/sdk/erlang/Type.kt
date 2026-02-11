@@ -17,8 +17,9 @@ import com.intellij.openapi.util.Version
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.toNioPathOrNull
 import com.intellij.util.containers.ContainerUtil
-import org.elixir_lang.jps.HomePath
-import org.elixir_lang.jps.sdk_type.Erlang
+import org.elixir_lang.jps.shared.sdk.SdkPaths
+import org.elixir_lang.sdk.SdkHomePaths
+import org.elixir_lang.sdk.SdkPathsWsl
 import org.elixir_lang.sdk.SdkHomeScan
 import org.elixir_lang.sdk.erlang_dependent.AdditionalDataConfigurable
 import org.jdom.Element
@@ -39,9 +40,9 @@ class Type : SdkType("Erlang SDK for Elixir SDK") {
                     "erlang:system_info(version)" +
                     "]),erlang:halt()."
         private const val WINDOWS_DEFAULT_HOME_PATH = "C:\\Program Files\\erl9.0"
-        private val NIX_PATTERN = HomePath.nixPattern("erlang")
-        private const val LINUX_MINT_HOME_PATH = "${HomePath.LINUX_MINT_HOME_PATH}/erlang"
-        private const val LINUX_DEFAULT_HOME_PATH = "${HomePath.LINUX_DEFAULT_HOME_PATH}/erlang"
+        private val NIX_PATTERN = SdkHomePaths.nixPattern("erlang")
+        private const val LINUX_MINT_HOME_PATH = "${SdkHomePaths.LINUX_MINT_HOME_PATH}/erlang"
+        private const val LINUX_DEFAULT_HOME_PATH = "${SdkHomePaths.LINUX_DEFAULT_HOME_PATH}/erlang"
         private val LOGGER = Logger.getInstance(Type::class.java)
 
         @JvmStatic
@@ -94,7 +95,7 @@ class Type : SdkType("Erlang SDK for Elixir SDK") {
             version: Release?,
         ): String =
             buildString {
-                val source = HomePath.detectSource(sdkHome)
+                val source = SdkPaths.detectSource(sdkHome)
                 if (source != null) {
                     append(source).append(" ")
                 }
@@ -210,7 +211,7 @@ class Type : SdkType("Erlang SDK for Elixir SDK") {
     }
 
     override fun isValidSdkHome(path: String): Boolean {
-        val erlExe = Erlang.getByteCodeInterpreterExecutable(path)
+        val erlExe = erlExecutable(path)
         return erlExe.canExecute()
     }
 
@@ -224,7 +225,7 @@ class Type : SdkType("Erlang SDK for Elixir SDK") {
 
     override fun getVersionString(sdkHome: String): String? {
         val detectedVersion = detectSdkVersion(sdkHome)?.otpRelease ?: return null
-        val source = HomePath.detectSource(sdkHome)
+        val source = SdkPaths.detectSource(sdkHome)
         // Use directory name for version if it's more specific (e.g., "28.3" vs "28")
         val dirVersion = File(sdkHome).name
         val displayVersion = if (dirVersion.startsWith(detectedVersion)) dirVersion else detectedVersion
@@ -256,7 +257,7 @@ class Type : SdkType("Erlang SDK for Elixir SDK") {
             return cachedRelease
         }
 
-        val erl = Erlang.getByteCodeInterpreterExecutable(sdkHome)
+        val erl = erlExecutable(sdkHome)
         LOGGER.debug("=== ERLANG SDK: Erl executable path: ${erl.absolutePath}")
         if (!erl.canExecute()) {
             val message =
@@ -306,5 +307,9 @@ class Type : SdkType("Erlang SDK for Elixir SDK") {
 
         LOGGER.debug("=== ERLANG SDK: Final release result: ${release?.otpRelease ?: "null"}")
         return release
+    }
+
+    private fun erlExecutable(sdkHome: String): File {
+        return SdkPathsWsl.binExecutablePath(sdkHome, "erl", ".exe").toFile()
     }
 }

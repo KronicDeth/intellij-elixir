@@ -20,12 +20,10 @@ import org.elixir_lang.jps.builder.sdk_type.MissingHomePath;
 import org.elixir_lang.jps.builder.target.BuilderUtil;
 import org.elixir_lang.jps.builder.target.Type;
 import org.elixir_lang.jps.shared.CompilerOptions;
-import org.elixir_lang.jps.shared.mix.MixToolingBootstrapSpec;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jps.builders.BuildOutputConsumer;
 import org.jetbrains.jps.builders.DirtyFilesHolder;
-import org.jetbrains.jps.builders.logging.ProjectBuilderLogger;
 import org.jetbrains.jps.incremental.CompileContext;
 import org.jetbrains.jps.incremental.ProjectBuildException;
 import org.jetbrains.jps.incremental.TargetBuilder;
@@ -48,9 +46,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.AccessDeniedException;
-import java.nio.file.Path;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 import static com.intellij.util.io.URLUtil.extractPath;
 
@@ -380,7 +376,7 @@ public class Builder extends TargetBuilder<SourceRootDescriptor, Target> {
     }
 
     private static void addMix(@NotNull GeneralCommandLine commandLine, @NotNull JpsSdk<SdkProperties> sdk) throws MissingHomePath {
-        String mixPath = Elixir.mixPath(sdk);
+        String mixPath = ""; // Elixir.mixPath(sdk);
         Elixir.maybeUpdateMixHome(commandLine.getEnvironment(), sdk.getHomePath());
         commandLine.addParameter(mixPath);
     }
