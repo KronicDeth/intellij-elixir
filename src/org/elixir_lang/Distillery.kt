@@ -9,7 +9,7 @@ object Distillery {
      */
     fun commandLine(pty: Boolean, environment: Map<String, String>, workingDirectory: String?, exePath: String?):
             GeneralCommandLine {
-        val commandLine = commandLine(pty, environment, workingDirectory)
+        val commandLine = org.elixir_lang.run.baseCommandLine(pty, environment, workingDirectory)
         commandLine.exePath = exePath ?: throw FileNotFoundException("Distillery release CLI path is not set")
 
         return commandLine

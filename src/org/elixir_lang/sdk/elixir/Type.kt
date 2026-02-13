@@ -21,7 +21,10 @@ import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.util.InvalidDataException
 import com.intellij.openapi.util.Version
 import com.intellij.openapi.util.WriteExternalException
+import com.intellij.openapi.util.io.FileUtil
+import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtil
+import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.openapi.vfs.toNioPathOrNull
@@ -29,7 +32,9 @@ import com.intellij.psi.PsiElement
 import org.apache.commons.io.FilenameUtils
 import org.elixir_lang.Facet
 import org.elixir_lang.Icons
+import org.elixir_lang.cli.getExecutableFilepathWslSafe
 import org.elixir_lang.jps.shared.ElixirSdkTypeId
+import org.elixir_lang.jps.shared.cli.CliTool
 import org.elixir_lang.jps.shared.sdk.SdkPaths
 import org.elixir_lang.sdk.ProcessOutput
 import org.elixir_lang.sdk.SdkEbinPaths
@@ -152,19 +157,15 @@ ELIXIR_SDK_HOME
         }
 
     override fun isValidSdkHome(path: String): Boolean {
-        val elixir = elixirExecutable(path, "elixir")
-        val elixirc = elixirExecutable(path, "elixirc")
-        val iex = elixirExecutable(path, "iex")
-        val mix = File(File(path, "bin"), "mix")
+        val elixir = File(CliTool.ELIXIR.getExecutableFilepathWslSafe(path))
+        val elixirc = File(CliTool.ELIXIRC.getExecutableFilepathWslSafe(path))
+        val iex = File(CliTool.IEX.getExecutableFilepathWslSafe(path))
+        val mix = File(CliTool.MIX.getExecutableFilepathWslSafe(path))
         return elixir.canExecute() &&
                 elixirc.canExecute() &&
                 iex.canExecute() &&
                 mix.canRead() &&
                 SdkEbinPaths.hasEbinPath(path)
-    }
-
-    private fun elixirExecutable(sdkHome: String, executableName: String): File {
-        return SdkPaths.binExecutablePath(sdkHome, executableName, ".bat").toFile()
     }
 
     override fun setupSdkPaths(sdk: Sdk) {
@@ -774,7 +775,10 @@ ELIXIR_SDK_HOME
         @JvmStatic
         fun hasErlangClasspathInRoots(classRoots: Array<VirtualFile>, erlangSdk: Sdk): Boolean {
             val erlangHomePath = erlangSdk.homePath ?: return false
-            return classRoots.any { root -> root.path.startsWith(erlangHomePath) }
+            val erlangHomePathVf = LocalFileSystem.getInstance()
+                .refreshAndFindFileByPath(FileUtil.toSystemIndependentName(erlangHomePath))
+                ?: return false
+            return classRoots.any { root -> VfsUtilCore.isAncestor(erlangHomePathVf, root, true) }
         }
 
         @JvmStatic

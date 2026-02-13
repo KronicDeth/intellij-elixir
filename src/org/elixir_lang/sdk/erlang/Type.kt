@@ -17,9 +17,10 @@ import com.intellij.openapi.util.Version
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.toNioPathOrNull
 import com.intellij.util.containers.ContainerUtil
+import org.elixir_lang.cli.getExecutableFilepathWslSafe
+import org.elixir_lang.jps.shared.cli.CliTool
 import org.elixir_lang.jps.shared.sdk.SdkPaths
 import org.elixir_lang.sdk.SdkHomePaths
-import org.elixir_lang.sdk.SdkPathsWsl
 import org.elixir_lang.sdk.SdkHomeScan
 import org.elixir_lang.sdk.erlang_dependent.AdditionalDataConfigurable
 import org.jdom.Element
@@ -309,7 +310,5 @@ class Type : SdkType("Erlang SDK for Elixir SDK") {
         return release
     }
 
-    private fun erlExecutable(sdkHome: String): File {
-        return SdkPathsWsl.binExecutablePath(sdkHome, "erl", ".exe").toFile()
-    }
+    private fun erlExecutable(sdkHome: String): File = File(CliTool.ERL.getExecutableFilepathWslSafe(sdkHome))
 }

@@ -1,17 +1,15 @@
-package org.elixir_lang
+package org.elixir_lang.run
 
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.openapi.util.SystemInfo
-import org.elixir_lang.run.WslAwareCommandLine
-import org.elixir_lang.run.WslAwarePtyCommandLine
 
-fun commandLine(pty: Boolean, environment: Map<String, String>, workingDirectory: String?): GeneralCommandLine =
-        commandLine(pty)
+fun baseCommandLine(pty: Boolean, environment: Map<String, String>, workingDirectory: String?): GeneralCommandLine =
+        baseCommandLine(pty)
                 .withCharset(Charsets.UTF_8)
                 .withEnvironment(environment)
                 .withWorkDirectory(workingDirectory)
 
-private fun commandLine(pty: Boolean): GeneralCommandLine =
+private fun baseCommandLine(pty: Boolean): GeneralCommandLine =
         if (pty) {
             WslAwarePtyCommandLine().apply {
                 if (!SystemInfo.isWindows) {

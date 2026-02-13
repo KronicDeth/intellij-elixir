@@ -92,7 +92,8 @@ class Global : GlobalInspectionTool() {
                                             workingDirectory,
                                             elixirSdk,
                                             erlParameters,
-                                            elixirParameters
+                                            elixirParameters,
+                                            false
                                         )
                                         .withCharset(StandardCharsets.UTF_8)
                                         .withWorkDirectory(workingDirectory)
