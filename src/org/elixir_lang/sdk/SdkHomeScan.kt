@@ -2,13 +2,13 @@ package org.elixir_lang.sdk
 
 import com.intellij.execution.wsl.WSLDistribution
 import com.intellij.openapi.diagnostic.Logger
-import com.intellij.openapi.util.Version
 import com.intellij.util.system.CpuArch
 import com.intellij.util.system.OS
 import org.elixir_lang.sdk.wsl.wslCompat
 import java.io.File
 import java.nio.file.Path
 import java.util.*
+
 
 /**
  * Consolidated SDK home path scanning for Elixir and Erlang SDKs.
@@ -56,9 +56,9 @@ object SdkHomeScan {
      * @param config SDK-specific configuration
      * @return Map of versions to SDK home paths, sorted by version (descending)
      */
-    fun homePathByVersion(path: Path?, config: Config): Map<Version, String> {
+    fun homePathByVersion(path: Path?, config: Config): Map<SdkHomeKey, String> {
         LOG.debug("Scanning for ${config.toolName} SDKs (path: $path, platform: ${OS.CURRENT})")
-        val homePathByVersion: MutableMap<Version, String> = TreeMap(Comparator.reverseOrder())
+        val homePathByVersion: MutableMap<SdkHomeKey, String> = TreeMap()
 
         val result = when (OS.CURRENT) {
             OS.macOS ->
@@ -85,9 +85,9 @@ object SdkHomeScan {
      * Note: path parameter not used on macOS (no distribution filtering needed).
      */
     private fun homePathByVersionMac(
-        homePathByVersion: MutableMap<Version, String>,
+        homePathByVersion: MutableMap<SdkHomeKey, String>,
         config: Config
-    ): Map<Version, String> {
+    ): Map<SdkHomeKey, String> {
         SdkHomePaths.mergeASDF(homePathByVersion, config.toolName)
         SdkHomePaths.mergeMise(homePathByVersion, config.toolName)
 
@@ -109,9 +109,9 @@ object SdkHomeScan {
      */
     private fun homePathByVersionWindows(
         path: Path?,
-        homePathByVersion: MutableMap<Version, String>,
+        homePathByVersion: MutableMap<SdkHomeKey, String>,
         config: Config
-    ): Map<Version, String> {
+    ): Map<SdkHomeKey, String> {
         if (wslCompat.isWslUncPath(path.toString())) {
             // WSL distributions
             homePathByVersionWSLs(path, homePathByVersion, config)
@@ -126,10 +126,11 @@ object SdkHomeScan {
         }
 
         windowsPath?.let {
-            putIfDirectory(homePathByVersion, SdkHomePaths.UNKNOWN_VERSION, it)
+            putIfDirectory(homePathByVersion, SdkHomePaths.unknownVersionKey(it), it)
         }
 
         SdkHomePaths.mergeElixirInstallScript(homePathByVersion, config.elixirInstallScriptDirName)
+        SdkHomePaths.mergeMise(homePathByVersion, config.toolName)
 
         return homePathByVersion
     }
@@ -139,11 +140,11 @@ object SdkHomeScan {
      * Note: path parameter not used on Linux (no distribution filtering needed).
      */
     private fun homePathByVersionLinux(
-        homePathByVersion: MutableMap<Version, String>,
+        homePathByVersion: MutableMap<SdkHomeKey, String>,
         config: Config
-    ): Map<Version, String> {
-        putIfDirectory(homePathByVersion, SdkHomePaths.UNKNOWN_VERSION, config.linuxDefaultPath)
-        putIfDirectory(homePathByVersion, SdkHomePaths.UNKNOWN_VERSION, config.linuxMintPath)
+    ): Map<SdkHomeKey, String> {
+        putIfDirectory(homePathByVersion, SdkHomePaths.unknownVersionKey(config.linuxDefaultPath), config.linuxDefaultPath)
+        putIfDirectory(homePathByVersion, SdkHomePaths.unknownVersionKey(config.linuxMintPath), config.linuxMintPath)
 
         SdkHomePaths.mergeASDF(homePathByVersion, config.toolName)
         SdkHomePaths.mergeMise(homePathByVersion, config.toolName)
@@ -170,7 +171,7 @@ object SdkHomeScan {
      */
     private fun homePathByVersionWSLs(
         path: Path?,
-        homePathByVersion: MutableMap<Version, String>,
+        homePathByVersion: MutableMap<SdkHomeKey, String>,
         config: Config
     ) {
         val distributionsToScan = when {
@@ -207,7 +208,7 @@ object SdkHomeScan {
      */
     private fun homePathByVersionWSL(
         distribution: WSLDistribution,
-        homePathByVersion: MutableMap<Version, String>,
+        homePathByVersion: MutableMap<SdkHomeKey, String>,
         config: Config
     ) {
         val wslUserHome = wslCompat.getWslUserHomeUncPath(distribution)
@@ -223,10 +224,10 @@ object SdkHomeScan {
         }
 
         wslCompat.convertLinuxPathToWindowsUnc(distribution, config.linuxDefaultPath)?.let {
-            putIfDirectory(homePathByVersion, SdkHomePaths.UNKNOWN_VERSION, it)
+            putIfDirectory(homePathByVersion, SdkHomePaths.unknownVersionKey(it), it)
         }
         wslCompat.convertLinuxPathToWindowsUnc(distribution, config.linuxMintPath)?.let {
-            putIfDirectory(homePathByVersion, SdkHomePaths.UNKNOWN_VERSION, it)
+            putIfDirectory(homePathByVersion, SdkHomePaths.unknownVersionKey(it), it)
         }
 
         wslCompat.convertLinuxPathToWindowsUnc(distribution, SdkHomePaths.NIX_STORE_PATH)?.let { wslNixStore ->
@@ -239,13 +240,13 @@ object SdkHomeScan {
      * Adds a home path to the map only if it exists as a directory.
      */
     private fun putIfDirectory(
-        homePathByVersion: MutableMap<Version, String>,
-        version: Version,
+        homePathByVersion: MutableMap<SdkHomeKey, String>,
+        key: SdkHomeKey,
         homePath: String
     ) {
         val homeFile = File(homePath)
         if (homeFile.isDirectory) {
-            homePathByVersion[version] = homePath
+            homePathByVersion[key] = homePath
         }
     }
 

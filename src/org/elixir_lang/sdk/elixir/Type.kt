@@ -19,7 +19,6 @@ import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.util.InvalidDataException
-import com.intellij.openapi.util.Version
 import com.intellij.openapi.util.WriteExternalException
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vfs.LocalFileSystem
@@ -36,10 +35,7 @@ import org.elixir_lang.cli.getExecutableFilepathWslSafe
 import org.elixir_lang.jps.shared.ElixirSdkTypeId
 import org.elixir_lang.jps.shared.cli.CliTool
 import org.elixir_lang.jps.shared.sdk.SdkPaths
-import org.elixir_lang.sdk.ProcessOutput
-import org.elixir_lang.sdk.SdkEbinPaths
-import org.elixir_lang.sdk.SdkHomePaths
-import org.elixir_lang.sdk.SdkHomeScan
+import org.elixir_lang.sdk.*
 import org.elixir_lang.sdk.Type.ebinPathChainVirtualFile
 import org.elixir_lang.sdk.erlang_dependent.AdditionalDataConfigurable
 import org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData
@@ -113,7 +109,7 @@ class Type : org.elixir_lang.sdk.erlang_dependent.Type(ElixirSdkTypeId.ELIXIR_SD
      *
      * @return Map
      */
-    private fun homePathByVersion(path: Path?): Map<Version, String> {
+    private fun homePathByVersion(path: Path?): Map<SdkHomeKey, String> {
         return SdkHomeScan.homePathByVersion(
             path, SdkHomeScan.Config(
                 toolName = "elixir",

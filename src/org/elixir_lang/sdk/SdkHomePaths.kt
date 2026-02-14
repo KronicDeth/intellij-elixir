@@ -1,10 +1,12 @@
 package org.elixir_lang.sdk
 
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.trace
 import com.intellij.openapi.util.Version
+import org.elixir_lang.jps.shared.sdk.SdkPaths
 import java.io.File
 import java.io.IOException
-import java.nio.file.Paths
+import java.nio.file.Path
 import java.util.concurrent.TimeUnit
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -28,59 +30,67 @@ object SdkHomePaths {
     }
 
     @JvmStatic
-    fun mergeASDF(homePathByVersion: MutableMap<Version, String>, name: String) {
+    fun mergeASDF(homePathByVersion: MutableMap<SdkHomeKey, String>, name: String) {
         mergeASDF(homePathByVersion, name, System.getProperty("user.home"))
     }
 
     @JvmStatic
-    fun mergeASDF(homePathByVersion: MutableMap<Version, String>, name: String, userHome: String) {
+    fun mergeASDF(homePathByVersion: MutableMap<SdkHomeKey, String>, name: String, userHome: String) {
         mergeNameSubdirectories(
             homePathByVersion,
-            Paths.get(userHome, ".asdf", "installs").toFile(),
-            name,
-        ) { it }
+            Path.of(userHome, ".asdf", "installs").toFile(),
+            name, SdkPaths.SOURCE_NAME_ASDF
+        )
     }
 
     @JvmStatic
-    fun mergeMise(homePathByVersion: MutableMap<Version, String>, name: String) {
+    fun mergeMise(homePathByVersion: MutableMap<SdkHomeKey, String>, name: String) {
         mergeMise(homePathByVersion, name, System.getProperty("user.home"))
     }
 
     @JvmStatic
-    fun mergeMise(homePathByVersion: MutableMap<Version, String>, name: String, userHome: String) {
-        mergeNameSubdirectories(
-            homePathByVersion,
-            Paths.get(userHome, ".local", "share", "mise", "installs").toFile(),
-            name,
-        ) { it }
+    fun mergeMise(homePathByVersion: MutableMap<SdkHomeKey, String>, name: String, userHome: String) {
+        listOf(SdkPaths.MISE_POSIX_PATH_FROM_HOME, SdkPaths.MISE_WINDOWS_PATH_FROM_HOME).forEach { misePath ->
+            mergeNameSubdirectories(
+                homePathByVersion,
+                Path.of(userHome, misePath).toFile(),
+                name, SdkPaths.SOURCE_NAME_MISE
+            )
+        }
     }
 
     @JvmStatic
-    fun mergeElixirInstallScript(homePathByVersion: MutableMap<Version, String>, name: String) {
+    fun mergeElixirInstallScript(homePathByVersion: MutableMap<SdkHomeKey, String>, name: String) {
         mergeElixirInstallScript(homePathByVersion, name, System.getProperty("user.home"))
     }
 
     @JvmStatic
-    fun mergeElixirInstallScript(homePathByVersion: MutableMap<Version, String>, name: String, userHome: String) {
+    fun mergeElixirInstallScript(homePathByVersion: MutableMap<SdkHomeKey, String>, name: String, userHome: String) {
         mergeNameSubdirectories(
             homePathByVersion,
-            Paths.get(userHome, ".elixir-install", "installs").toFile(),
-            name,
-        ) { it }
+            Path.of(userHome, ".elixir-install", "installs").toFile(),
+            name, SdkPaths.SOURCE_NAME_ELIXIR_INSTALL
+        )
     }
 
     @JvmStatic
     fun mergeHomebrew(
-        homePathByVersion: MutableMap<Version, String>,
+        homePathByVersion: MutableMap<SdkHomeKey, String>,
         name: String,
         versionPathToHomePath: (File) -> File,
     ) {
-        mergeNameSubdirectories(homePathByVersion, HOMEBREW_ROOT, name, versionPathToHomePath)
+        mergeNameSubdirectories(
+            homePathByVersion,
+            HOMEBREW_ROOT,
+            name,
+            SdkPaths.SOURCE_NAME_HOMEBREW,
+            versionPathToHomePath
+        )
     }
 
     @JvmStatic
     fun mergeNixStore(
-        homePathByVersion: MutableMap<Version, String>,
+        homePathByVersion: MutableMap<SdkHomeKey, String>,
         nixPattern: Pattern,
         versionPathToHomePath: (File) -> File,
     ) {
@@ -89,7 +99,7 @@ object SdkHomePaths {
 
     @JvmStatic
     fun mergeNixStore(
-        homePathByVersion: MutableMap<Version, String>,
+        homePathByVersion: MutableMap<SdkHomeKey, String>,
         nixPattern: Pattern,
         versionPathToHomePath: (File) -> File,
         nixStorePath: String,
@@ -104,8 +114,9 @@ object SdkHomePaths {
                     val minor = matcher.group(2).toInt()
                     val bugfix = matcher.group(3).toInt()
                     val version = Version(major, minor, bugfix)
-                    val homePath = versionPathToHomePath(File(dir, name))
-                    homePathByVersion[version] = homePath.absolutePath
+                    val homePath = versionPathToHomePath(File(dir, name)).absolutePath
+                    val key = SdkHomeKey(version, name, SdkPaths.SOURCE_NAME_NIX, homePath)
+                    homePathByVersion[key] = homePath
                     accept = true
                 }
                 accept
@@ -115,7 +126,7 @@ object SdkHomePaths {
 
     @JvmStatic
     fun mergeTravisCIKerl(
-        homePathByVersion: MutableMap<Version, String>,
+        homePathByVersion: MutableMap<SdkHomeKey, String>,
         versionPathToHomePath: (File) -> File,
     ) {
         val userHome = System.getProperty("user.home")
@@ -126,16 +137,22 @@ object SdkHomePaths {
 
     @JvmStatic
     fun mergeTravisCIKerl(
-        homePathByVersion: MutableMap<Version, String>,
+        homePathByVersion: MutableMap<SdkHomeKey, String>,
         versionPathToHomePath: (File) -> File,
         userHome: String,
     ) {
-        mergeNameSubdirectories(homePathByVersion, File(userHome), "otp", versionPathToHomePath)
+        mergeNameSubdirectories(
+            homePathByVersion,
+            File(userHome),
+            "otp",
+            SdkPaths.SOURCE_NAME_KERL,
+            versionPathToHomePath
+        )
     }
 
     @JvmStatic
     fun mergeKerl(
-        homePathByVersion: MutableMap<Version, String>,
+        homePathByVersion: MutableMap<SdkHomeKey, String>,
         versionPathToHomePath: (File) -> File,
     ) {
         if (!isCommandAvailable("kerl")) {
@@ -156,7 +173,9 @@ object SdkHomePaths {
                         val homePath = versionPathToHomePath(File(path))
                         if (homePath.isDirectory) {
                             val version = parseVersion(versionString)
-                            homePathByVersion[version] = homePath.absolutePath
+                            val key =
+                                SdkHomeKey(version, versionString, SdkPaths.SOURCE_NAME_KERL, homePath.absolutePath)
+                            homePathByVersion[key] = homePath.absolutePath
                         }
                     }
                 }
@@ -175,27 +194,35 @@ object SdkHomePaths {
     }
 
     private fun mergeNameSubdirectories(
-        homePathByVersion: MutableMap<Version, String>,
+        homePathByVersion: MutableMap<SdkHomeKey, String>,
         parent: File,
         name: String,
-        versionPathToHomePath: (File) -> File,
+        source: String,
+        versionPathToHomePath: (File) -> File = { it },
     ) {
+        LOGGER.trace { "$parent: Scanning for SDK Home Paths" }
         if (!parent.isDirectory) {
+            LOGGER.trace { "$parent: Not a directory" }
             return
         }
 
         val nameDirectory = File(parent, name)
+        LOGGER.trace { "$nameDirectory: Scanning" }
         if (!nameDirectory.isDirectory) {
+            LOGGER.trace { "$nameDirectory: Not a directory" }
             return
         }
 
         val children = nameDirectory.listFiles() ?: return
         for (child in children) {
+                LOGGER.trace { "$child: Scanning" }
             if (child.isDirectory) {
                 val versionString = child.name
                 val version = parseVersion(versionString)
-                val homePath = versionPathToHomePath(child)
-                homePathByVersion[version] = homePath.absolutePath
+                val homePath = versionPathToHomePath(child).absolutePath
+                val key = SdkHomeKey(version, versionString, source, homePath)
+                LOGGER.trace { "$child: Adding $key" }
+                homePathByVersion[key] = homePath
             }
         }
     }
@@ -223,4 +250,6 @@ object SdkHomePaths {
             false
         }
     }
+
+    fun unknownVersionKey(path: String) = SdkHomeKey(UNKNOWN_VERSION, null, null, path)
 }

@@ -13,13 +13,13 @@ import com.intellij.openapi.projectRoots.SdkModel
 import com.intellij.openapi.projectRoots.SdkModificator
 import com.intellij.openapi.projectRoots.SdkType
 import com.intellij.openapi.roots.OrderRootType
-import com.intellij.openapi.util.Version
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.toNioPathOrNull
 import com.intellij.util.containers.ContainerUtil
 import org.elixir_lang.cli.getExecutableFilepathWslSafe
 import org.elixir_lang.jps.shared.cli.CliTool
 import org.elixir_lang.jps.shared.sdk.SdkPaths
+import org.elixir_lang.sdk.SdkHomeKey
 import org.elixir_lang.sdk.SdkHomePaths
 import org.elixir_lang.sdk.SdkHomeScan
 import org.elixir_lang.sdk.erlang_dependent.AdditionalDataConfigurable
@@ -129,12 +129,12 @@ class Type : SdkType("Erlang SDK for Elixir SDK") {
         }
 
         @JvmStatic
-        fun homePathByVersion(): Map<Version, String> {
+        fun homePathByVersion(): Map<SdkHomeKey, String> {
             return SdkHomeScan.homePathByVersion(null, createConfig())
         }
 
         @JvmStatic
-        fun homePathByVersion(path: Path?): Map<Version, String> {
+        fun homePathByVersion(path: Path?): Map<SdkHomeKey, String> {
             return SdkHomeScan.homePathByVersion(path, createConfig())
         }
     }
