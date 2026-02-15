@@ -1,5 +1,6 @@
 package org.elixir_lang.reference.resolver
 
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveResult
 import com.intellij.psi.impl.source.resolve.ResolveCache
@@ -20,6 +21,7 @@ import org.elixir_lang.reference.ModuleAttribute
 
 object ModuleAttribute : ResolveCache.PolyVariantResolver<ModuleAttribute> {
     override fun resolve(moduleAttribute: ModuleAttribute, incompleteCode: Boolean): Array<ResolveResult> {
+        ApplicationManager.getApplication().assertReadAccessAllowed()
         val resolveResultOrderedSet = ResolveResultOrderedSet()
         val element = moduleAttribute.element
 

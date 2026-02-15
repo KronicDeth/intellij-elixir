@@ -1,5 +1,6 @@
 package org.elixir_lang.reference.resolver
 
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.DumbService
 import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveResult
@@ -14,8 +15,9 @@ import org.elixir_lang.psi.scope.type.MultiResolve
 import org.elixir_lang.psi.stub.index.ModularName
 import org.elixir_lang.reference.Type
 
-object Type : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Type> {
+object Type : ResolveCache.PolyVariantResolver<Type> {
     override fun resolve(type: Type, incompleteCode: Boolean): Array<ResolveResult> {
+        ApplicationManager.getApplication().assertReadAccessAllowed()
         val element = type.element
 
         return if (element is Qualified) {

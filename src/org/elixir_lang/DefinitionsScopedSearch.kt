@@ -1,5 +1,6 @@
 package org.elixir_lang
 
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.QueryExecutorBase
 import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveState
@@ -17,11 +18,12 @@ import org.elixir_lang.psi.impl.maybeModularNameToModulars
 import org.elixir_lang.psi.outerMostQualifiableAlias
 
 class DefinitionsScopedSearch :
-    QueryExecutorBase<PsiElement, DefinitionsScopedSearch.SearchParameters>(/* readAction = */ true) {
+    QueryExecutorBase<PsiElement, DefinitionsScopedSearch.SearchParameters>(/* requireReadAction = */ true) {
     override fun processQuery(
         queryParameters: DefinitionsScopedSearch.SearchParameters,
         consumer: Processor<in PsiElement>
     ) {
+        ApplicationManager.getApplication().assertReadAccessAllowed()
         when (val element = queryParameters.element) {
             is Call -> processQuery(element, consumer)
             is QualifiableAlias -> processQuery(element, consumer)
@@ -29,6 +31,7 @@ class DefinitionsScopedSearch :
     }
 
     private fun processQuery(qualifiableAlias: QualifiableAlias, consumer: Processor<in PsiElement>) {
+        ApplicationManager.getApplication().assertReadAccessAllowed()
         qualifiableAlias.outerMostQualifiableAlias().maybeModularNameToModulars(qualifiableAlias.containingFile)
             .map { modular ->
                 processQuery(modular, consumer)
@@ -36,6 +39,7 @@ class DefinitionsScopedSearch :
     }
 
     private fun processQuery(psiElement: PsiElement, consumer: Processor<in PsiElement>) {
+        ApplicationManager.getApplication().assertReadAccessAllowed()
         when (psiElement) {
             is Call -> processQuery(psiElement, consumer)
             is ModuleImpl<*> -> processQuery(psiElement, consumer)
@@ -44,6 +48,7 @@ class DefinitionsScopedSearch :
     }
 
     private fun processQuery(call: Call, consumer: Processor<in PsiElement>) {
+        ApplicationManager.getApplication().assertReadAccessAllowed()
         if (Protocol.`is`(call)) {
             Protocol.processImplementations(call, consumer)
         } else if (CallDefinitionClause.`is`(call)) {
@@ -73,12 +78,14 @@ class DefinitionsScopedSearch :
     }
 
     private fun processQuery(moduleImpl: ModuleImpl<*>, consumer: Processor<in PsiElement>) {
+        ApplicationManager.getApplication().assertReadAccessAllowed()
         if (Protocol.`is`(moduleImpl)) {
             Protocol.processImplementations(moduleImpl, consumer)
         }
     }
 
     private fun processQuery(callDefinitionImpl: CallDefinitionImpl<*>, consumer: Processor<in PsiElement>) {
+        ApplicationManager.getApplication().assertReadAccessAllowed()
         val moduleImpl = callDefinitionImpl.parent
 
         if (Protocol.`is`(moduleImpl)) {
