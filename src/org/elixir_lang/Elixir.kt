@@ -1,6 +1,7 @@
 package org.elixir_lang
 
 import com.intellij.execution.configurations.GeneralCommandLine
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.Sdk
 import org.elixir_lang.cli.CliArguments
 import org.elixir_lang.jps.shared.cli.CliArgs
@@ -17,8 +18,15 @@ object Elixir {
         workingDirectory: String?,
         elixirSdk: Sdk,
         erlArgumentList: kotlin.collections.List<String> = emptyList(),
+        project: Project? = null,
     ): GeneralCommandLine {
-        val args: CliArgs = CliArguments.args(elixirSdk, CliTool.ELIXIR, extraErlangArguments = erlArgumentList) ?: throw RuntimeException("Unable to compute CLI arguments for SDK $elixirSdk")
+        val args: CliArgs =
+            CliArguments.argsOrThrow(
+                elixirSdk,
+                CliTool.ELIXIR,
+                extraErlangArguments = erlArgumentList,
+                project = project,
+            )
         val commandLine = baseCommandLine(false, environment, workingDirectory)
         commandLine.exePath = args.exePath
         commandLine.addParameters(args.arguments)
