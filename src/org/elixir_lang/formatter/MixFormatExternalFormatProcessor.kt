@@ -2,14 +2,13 @@ package org.elixir_lang.formatter
 
 import com.intellij.application.options.CodeStyle
 import com.intellij.execution.configurations.GeneralCommandLine
+import com.intellij.execution.ExecutionException
 import com.intellij.execution.process.CapturingProcessHandler
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.application.edtWriteAction
 import com.intellij.openapi.application.runReadAction
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.progress.ProgressManager
-import com.intellij.openapi.progress.runBlockingCancellable
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.util.TextRange
@@ -21,6 +20,7 @@ import org.elixir_lang.code_style.CodeStyleSettings
 import org.elixir_lang.mix.Project
 import org.elixir_lang.psi.ElixirFile
 import org.elixir_lang.sdk.elixir.Type.Companion.mostSpecificSdk
+import org.elixir_lang.util.WriteActions
 import java.io.FileNotFoundException
 import java.util.concurrent.TimeUnit
 
@@ -48,10 +48,10 @@ class MixFormatExternalFormatProcessor : ExternalFormatProcessor {
                 application.executeOnPooledThread {
                     workingDirectory(source)?.let { workingDirectory ->
                         mostSpecificSdk(source)?.takeIf(::elixirSdkHasErlangSdk)?.let { sdk ->
-                            format(workingDirectory, sdk, document.text)?.let { formattedText ->
-                                runBlockingCancellable {
-                                    if (source.isValid) {
-                                        edtWriteAction {
+                            format(workingDirectory, sdk, source.project, document.text)?.let { formattedText ->
+                                if (source.isValid) {
+                                    WriteActions.runWriteActionLater {
+                                        if (source.isValid) {
                                             CommandProcessor.getInstance().runUndoTransparentAction {
                                                 document.setText(formattedText)
                                             }
@@ -89,20 +89,23 @@ class MixFormatExternalFormatProcessor : ExternalFormatProcessor {
                 }
                 ?.path
 
-        private fun format(workingDirectory: String, sdk: Sdk, unformattedText: String): String? =
-            commandLine(workingDirectory, sdk)
+        private fun format(workingDirectory: String, sdk: Sdk, project: com.intellij.openapi.project.Project, unformattedText: String): String? =
+            commandLine(workingDirectory, sdk, project)
                 ?.let { format(it, unformattedText) }
 
-        private fun commandLine(workingDirectory: String, sdk: Sdk): GeneralCommandLine? =
+        private fun commandLine(workingDirectory: String, sdk: Sdk, project: com.intellij.openapi.project.Project): GeneralCommandLine? =
             try {
-                val commandLine = Mix.commandLine(emptyMap(), workingDirectory, sdk)
+                val commandLine = Mix.commandLine(emptyMap(), workingDirectory, sdk, project = project)
                 commandLine.addParameter("format")
                 // `-` turns on stdin/stdout for text to format
                 commandLine.addParameter("-")
 
                 commandLine
-            } catch (fileNotFoundException: FileNotFoundException) {
-                LOGGER.info(fileNotFoundException)
+            } catch (e: FileNotFoundException) {
+                LOGGER.info(e)
+                null
+            } catch (e: ExecutionException) {
+                LOGGER.info(e)
 
                 null
             }
