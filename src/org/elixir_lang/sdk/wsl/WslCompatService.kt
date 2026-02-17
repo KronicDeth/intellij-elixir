@@ -4,6 +4,13 @@ import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.wsl.WSLDistribution
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.util.io.FileUtil
+import com.intellij.util.system.OS
+import java.nio.file.Paths
+import kotlin.io.path.absolutePathString
+
+const val MODERN_WSL_PREFIX = "\\\\wsl.localhost\\"
+const val LEGACY_WSL_PREFIX = "\\\\wsl$\\"
 
 /**
  * Service wrapper for WSL (Windows Subsystem for Linux Integration).
@@ -55,6 +62,57 @@ interface WslCompatService {
      * @return true if the path points to a WSL location, false otherwise
      */
     fun isWslUncPath(path: String?): Boolean
+
+    /**
+     * Canonicalizes path:
+     *  - Standardizes any WSL UNC prefix if needed so that it always uses the correct prefix for the current windows version
+     *  - Resolves any symlinks to the realpath
+     *  - Returns anything else unchanged.
+     *
+     *  This is needed for path comparison to identify duplicate SDK instances where package, managers like mise will
+     *  use a symlink of `latest` -> `1.19.1` or `1.19` -> `1.19.1`. It also helps to keep a standard WSL prefix for
+     *  things like class paths in SDK data avoiding having a mix of //wsl$/distro and //wsl.localhost/distro paths.
+     *
+     * @param path the path to canonicalize
+     * @return the canonicalized path,
+     */
+    fun canonicalizePath(path: String, currentOs: OS = OS.CURRENT): String {
+        val maybeConvertedPath = when {
+            currentOs != OS.Windows -> path
+
+            currentOs.isAtLeast(11, 0) ->
+                path.replacePrefix(LEGACY_WSL_PREFIX, MODERN_WSL_PREFIX)
+
+            else -> path.replacePrefix(MODERN_WSL_PREFIX, LEGACY_WSL_PREFIX)
+        }
+        // Resolve symlinks
+        return Paths.get(maybeConvertedPath).toRealPath().absolutePathString()
+    }
+
+    /**
+     * Nullable version of [canonicalizePath]
+     */
+    fun canonicalizePathNullable(path: String?, currentOs: OS = OS.CURRENT): String? {
+        if (path == null) {
+            return path
+        }
+        return canonicalizePath(path, currentOs)
+    }
+
+    fun String.replacePrefix(prefix: String, replacement: String) = if (startsWith(prefix, true))
+        replacement + substring(prefix.length)
+    else
+        this
+
+    /**
+     * Compares two SDK home paths, normalizing WSL UNC paths before comparison.
+     */
+    fun pathsEqualWslAware(first: String?, second: String?): Boolean =
+        if (first.isNullOrBlank() || second.isNullOrBlank()) {
+            false
+        } else {
+            FileUtil.pathsEqual(canonicalizePath(first), canonicalizePath(second))
+        }
 
     /**
      * Converts a single Windows path to WSL Linux format.

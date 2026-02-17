@@ -4,6 +4,7 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.diagnostic.trace
 import com.intellij.openapi.util.Version
 import org.elixir_lang.jps.shared.sdk.SdkPaths
+import org.elixir_lang.sdk.wsl.wslCompat
 import java.io.File
 import java.io.IOException
 import java.nio.file.Path
@@ -217,9 +218,9 @@ object SdkHomePaths {
         for (child in children) {
                 LOGGER.trace { "$child: Scanning" }
             if (child.isDirectory) {
-                val versionString = child.name
+                val homePath = wslCompat.canonicalizePath(versionPathToHomePath(child).absolutePath)
+                val versionString = File(homePath).name
                 val version = parseVersion(versionString)
-                val homePath = versionPathToHomePath(child).absolutePath
                 val key = SdkHomeKey(version, versionString, source, homePath)
                 LOGGER.trace { "$child: Adding $key" }
                 homePathByVersion[key] = homePath
