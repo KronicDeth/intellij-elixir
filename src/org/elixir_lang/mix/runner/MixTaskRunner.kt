@@ -47,7 +47,7 @@ object MixTaskRunner {
             if (project != null) {
                 // Modern Kotlin API for actions with project context
                 runWithModalProgressBlocking(ModalTaskOwner.project(project), title) {
-                    executeMixTask(workingDirectory, sdk, task, *taskParameters)
+                    executeMixTask(workingDirectory, sdk, task, project, *taskParameters)
                 }
             } else {
                 // Legacy Java API for import wizard (no project context yet)
@@ -56,7 +56,7 @@ object MixTaskRunner {
                     object : Task.Modal(null, title, true) {
                         override fun run(indicator: com.intellij.openapi.progress.ProgressIndicator) {
                             try {
-                                executeMixTask(workingDirectory, sdk, task, *taskParameters)
+                                executeMixTask(workingDirectory, sdk, task, project, *taskParameters)
                             } catch (e: ExecutionException) {
                                 exception = e
                             }
@@ -79,6 +79,7 @@ object MixTaskRunner {
         workingDirectory: String,
         sdk: Sdk,
         task: String,
+        project: Project?,
         vararg taskParameters: String
     ) {
         val indicator = ProgressManager.getInstance().progressIndicator
@@ -89,7 +90,8 @@ object MixTaskRunner {
             workingDirectory,
             sdk,
             emptyList(),
-            emptyList()
+            emptyList(),
+            project = project,
         )
         commandLine.addParameter(task)
         commandLine.addParameters(*taskParameters)

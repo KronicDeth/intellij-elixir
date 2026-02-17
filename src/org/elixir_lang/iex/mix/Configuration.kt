@@ -92,7 +92,8 @@ class Configuration(name: String, project: Project, configurationFactory: Config
                 workingDirectory = workingDirectory,
                 elixirSdk = sdk,
                 erlArgumentList = erlArgumentList,
-                iexArgumentList = iexArgumentList
+                iexArgumentList = iexArgumentList,
+                project = project,
         )
         commandLine.addParameters(mixArgumentList)
 

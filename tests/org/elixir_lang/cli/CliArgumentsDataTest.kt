@@ -2,6 +2,7 @@ package org.elixir_lang.cli
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.projectRoots.Sdk
+import com.intellij.openapi.projectRoots.SdkModel
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.testFramework.registerOrReplaceServiceInstance
 import com.intellij.util.execution.ParametersListUtil
@@ -9,6 +10,8 @@ import com.intellij.util.system.OS
 import org.elixir_lang.PlatformTestCase
 import org.elixir_lang.jps.shared.cli.CliTool
 import org.elixir_lang.sdk.erlang_dependent.ErlangSdkResolver
+import org.elixir_lang.sdk.erlang_dependent.ErlangSdkResult
+import org.elixir_lang.sdk.erlang_dependent.MissingErlangSdkReason
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
@@ -82,7 +85,7 @@ class CliArgumentsDataTest(private val case: Case) : PlatformTestCase() {
 
         ApplicationManager.getApplication().registerOrReplaceServiceInstance(
             ErlangSdkResolver::class.java,
-            TestErlangSdkResolver(erlangSdkByElixirSdk),
+            ErlangSdkResolverMockImpl(erlangSdkByElixirSdk),
             testRootDisposable,
         )
 
@@ -216,11 +219,19 @@ class CliArgumentsDataTest(private val case: Case) : PlatformTestCase() {
         return path
     }
 
-    private class TestErlangSdkResolver(
+    private class ErlangSdkResolverMockImpl(
         private val erlangSdkByElixirSdk: Map<Sdk, Sdk>
     ) : ErlangSdkResolver {
-        override fun resolveErlangSdk(elixirSdk: Sdk, sdkModel: com.intellij.openapi.projectRoots.SdkModel?): Sdk? {
-            return erlangSdkByElixirSdk[elixirSdk]
+        override fun resolveErlangSdkResult(
+            elixirSdk: Sdk,
+            sdkModel: SdkModel?
+        ): ErlangSdkResult {
+            val erlangSdk = erlangSdkByElixirSdk[elixirSdk]
+                ?: return ErlangSdkResult.Missing(
+                    elixirSdk,
+                    MissingErlangSdkReason.NOT_FOUND,
+                )
+            return ErlangSdkResult.Success(erlangSdk)
         }
     }
 
