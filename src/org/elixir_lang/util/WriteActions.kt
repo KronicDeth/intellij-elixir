@@ -23,4 +23,22 @@ object WriteActions {
             }
         }
     }
+
+    fun runWriteActionLater(action: () -> Unit) {
+        val application = ApplicationManager.getApplication()
+
+        if (application.isWriteAccessAllowed) {
+            action()
+        } else {
+            val runnable = Runnable {
+                WriteAction.run<RuntimeException> { action() }
+            }
+
+            if (application.isDispatchThread) {
+                runnable.run()
+            } else {
+                application.invokeLater(runnable)
+            }
+        }
+    }
 }
