@@ -94,7 +94,7 @@ object Project {
                     moduleModel.commit()
                 }
                 ProgressManager.getInstance()
-                    .run(object : Task.Backgroundable(project, "Scanning dependencies for Libraries", true) {
+                    .run(object : Task.Backgroundable(project, "Scanning deps for Libraries", true) {
                         override fun run(indicator: ProgressIndicator) {
                             DepsWatcher(project).syncLibraries(indicator)
                         }

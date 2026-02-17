@@ -61,6 +61,10 @@ open class Configuration(name: String, project: Project, configurationFactory: C
         mixArguments = value
     }
 
+    fun setProgramParameters(value: MutableList<String>) {
+        mixArgumentList = value
+    }
+
     private var erlArgumentList: MutableList<String> = mutableListOf()
 
     var erlArguments: String?

@@ -142,7 +142,7 @@ object MixTaskRunner {
      */
     @JvmStatic
     fun fetchDependencies(project: Project?, workingDirectory: String, sdk: Sdk) {
-        runMixTask(project, workingDirectory, sdk, "Fetching dependencies", "deps.get")
+        runMixTask(project, workingDirectory, sdk, "Fetching deps", "deps.get")
         // Result is ignored - errors are logged internally
     }
 
@@ -153,7 +153,7 @@ object MixTaskRunner {
     fun installDependencies(project: Project, workingDirectory: String, sdk: Sdk): Result<Unit> {
         val hexResult = runMixTask(project, workingDirectory, sdk, "Updating hex", "local.hex", "--force")
         val rebarResult = runMixTask(project, workingDirectory, sdk, "Updating rebar", "local.rebar", "--force")
-        val depsResult = runMixTask(project, workingDirectory, sdk, "Fetching dependencies", "deps.get")
+        val depsResult = runMixTask(project, workingDirectory, sdk, "Fetching deps", "deps.get")
 
         return hexResult
             .mapCatching { rebarResult.getOrThrow() }
