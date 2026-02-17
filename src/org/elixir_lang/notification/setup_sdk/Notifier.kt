@@ -14,8 +14,13 @@ import java.util.Collections
 import java.util.WeakHashMap
 
 object Notifier {
+    const val MIX_DEPS_OUTDATED_TITLE: String = "Mix deps outdated"
+    private const val MIX_DEPS_GROUP_ID: String = "Elixir Mix Deps"
+    private val mixDepsNotifications: MutableMap<Project, Notification> =
+        Collections.synchronizedMap(WeakHashMap())
     private val missingErlangSdkNotifications: MutableMap<Project, Notification> =
         Collections.synchronizedMap(WeakHashMap())
+
     fun mixSettings(module: Module, executionException: ExecutionException) {
         val message = executionException.message
         val isEmpty = "Executable is not specified" == message
@@ -120,16 +125,39 @@ object Notifier {
 
     // Mix Dependencies notification methods
     fun mixDepsOutdated(project: Project) {
+        if (mixDepsNotifications.containsKey(project)) {
+            return
+        }
+
+        val notification = NotificationGroupManager
+            .getInstance()
+            .getNotificationGroup(MIX_DEPS_GROUP_ID)
+            .createNotification(
+                MIX_DEPS_OUTDATED_TITLE,
+                "Mix deps reported missing, outdated, or uncompiled deps",
+                NotificationType.WARNING
+            )
+            .addAction(org.elixir_lang.notification.mix_deps.InstallAction())
+            .addAction(org.elixir_lang.notification.mix_deps.ShowStatusAction())
+            .whenExpired { mixDepsNotifications.remove(project) }
+        mixDepsNotifications[project] = notification
+        notification.notify(project)
+    }
+
+    fun mixDepsCheckFailed(project: Project, message: String) {
         NotificationGroupManager
             .getInstance()
             .getNotificationGroup("Elixir")
             .createNotification(
-                "Mix dependencies outdated",
-                "The deps/ is folder missing or mix.lock is newer than the deps/ folder",
-                NotificationType.WARNING
+                "Mix deps check failed",
+                message,
+                NotificationType.INFORMATION
             )
-            .addAction(org.elixir_lang.notification.mix_deps.InstallAction())
             .notify(project)
+    }
+
+    fun clearMixDepsOutdated(project: Project) {
+        mixDepsNotifications.remove(project)?.expire()
     }
 
     fun mixDepsInstallSuccess(project: Project) {
@@ -137,8 +165,8 @@ object Notifier {
             .getInstance()
             .getNotificationGroup("Elixir")
             .createNotification(
-                "Mix dependencies installed",
-                "Successfully installed hex, rebar, and fetched dependencies",
+                "Mix deps installed",
+                "Successfully installed hex, rebar, fetched deps, and compiled",
                 NotificationType.INFORMATION
             )
             .notify(project)
@@ -149,8 +177,8 @@ object Notifier {
             .getInstance()
             .getNotificationGroup("Elixir")
             .createNotification(
-                "Mix Dependencies installation failed",
-                "Failed to install dependencies: $errorMessage",
+                "Mix deps installation failed",
+                "Failed during local.hex, local.rebar, deps.get, or compilation. See Run Window for details: $errorMessage",
                 NotificationType.ERROR
             )
             .notify(project)
@@ -162,7 +190,7 @@ object Notifier {
             .getNotificationGroup("Elixir")
             .createNotification(
                 "No Elixir SDK found",
-                "Please configure an Elixir SDK for this project before installing dependencies",
+                "Please configure an Elixir SDK for this project before installing deps",
                 NotificationType.ERROR
             )
             .notify(project)
@@ -173,7 +201,7 @@ object Notifier {
             .getInstance()
             .getNotificationGroup("Elixir")
             .createNotification(
-                "Mix dependencies error",
+                "Mix deps error",
                 errorMessage,
                 NotificationType.ERROR
             )
