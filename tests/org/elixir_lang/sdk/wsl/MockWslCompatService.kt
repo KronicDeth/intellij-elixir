@@ -2,6 +2,7 @@ package org.elixir_lang.sdk.wsl
 
 import com.intellij.execution.wsl.WSLDistribution
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.util.system.OS
 
 /**
  * Mock implementation of WslCompatService for testing purposes.
@@ -123,5 +124,14 @@ class MockWslCompatService : WslCompatService {
         }
 
         return null
+    }
+
+    override fun canonicalizePath(path: String, currentOs: OS): String = when {
+        currentOs != OS.Windows -> path
+
+        currentOs.isAtLeast(11, 0) ->
+            path.replacePrefix(LEGACY_WSL_PREFIX, MODERN_WSL_PREFIX)
+
+        else -> path.replacePrefix(MODERN_WSL_PREFIX, LEGACY_WSL_PREFIX)
     }
 }
