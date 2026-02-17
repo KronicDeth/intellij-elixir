@@ -1,9 +1,6 @@
 package org.elixir_lang.beam.assembly
 
-import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.application.edtWriteAction
 import com.intellij.openapi.editor.Document
-import com.intellij.openapi.progress.runBlockingCancellable
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiFileFactory
@@ -11,6 +8,7 @@ import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.components.JBScrollPane
 import org.elixir_lang.beam.Cache
 import org.elixir_lang.beam.chunk.Code
+import org.elixir_lang.util.WriteActions
 import java.awt.event.ItemEvent.DESELECTED
 import java.awt.event.ItemEvent.SELECTED
 import javax.swing.BoxLayout
@@ -180,10 +178,10 @@ class Controls(val cache: Cache, val project: Project): JBScrollPane() {
     private fun computeDocumentText() = cache.code?.assembly(cache, assemblyOptions) ?: DEFAULT_TEXT
 
     private fun setDocumentText() {
-        runBlockingCancellable {
-            edtWriteAction {
-                document.setText(computeDocumentText())
-            }
+        val text = computeDocumentText()
+
+        WriteActions.runWriteActionLater {
+            document.setText(text)
         }
     }
 }
