@@ -9,6 +9,7 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.Storage
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.module.Module
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.util.Key
 import org.elixir_lang.Elixir.elixirSdkHasErlangSdk
@@ -42,7 +43,7 @@ class DialyzerServiceImpl : DialyzerService {
 
         return if (sdk != null) {
             if (elixirSdkHasErlangSdk(sdk)) {
-                dialyzerWarnings(workingDirectory, sdk)
+                dialyzerWarnings(workingDirectory, sdk, module.project)
             } else {
                 val project = module.project
                 Notifier.error(
@@ -66,18 +67,26 @@ class DialyzerServiceImpl : DialyzerService {
         }
     }
 
-    private fun dialyzerWarnings(workingDirectory: String, elixirSdk: Sdk): List<DialyzerWarn> = try {
-        parseDialyzerOutput(run(workingDirectory, elixirSdk))
+    private fun dialyzerWarnings(workingDirectory: String, elixirSdk: Sdk, project: Project): List<DialyzerWarn> = try {
+        parseDialyzerOutput(run(workingDirectory, elixirSdk, project))
     } catch (ex: Exception) {
         throw DialyzerException("Error while running Dialyzer: ${ex.message}", ex)
     }
 
-    private fun run(workingDirectory: String, elixirSdk: Sdk): Pair<String, String> {
+    private fun run(workingDirectory: String, elixirSdk: Sdk, project: Project): Pair<String, String> {
         log.info("Dialyzer starting...")
         val erlArgumentList = ParametersList.parse(erlArguments).toList()
         val elixirArgumentList = ParametersList.parse(elixirArguments).toList()
         val mixArgumentList = ParametersList.parse(mixArguments).toList()
-        val commandLine = Mix.commandLine(emptyMap(), workingDirectory, elixirSdk, erlArgumentList, elixirArgumentList)
+        val commandLine =
+            Mix.commandLine(
+                emptyMap(),
+                workingDirectory,
+                elixirSdk,
+                erlArgumentList,
+                elixirArgumentList,
+                project = project,
+            )
         commandLine.addParameters(mixArgumentList)
 
         val processHandler = ProcessHandlerFactory.getInstance().createColoredProcessHandler(commandLine)
@@ -126,4 +135,3 @@ class DialyzerServiceImpl : DialyzerService {
         erlArguments = state.erlArguments
     }
 }
-

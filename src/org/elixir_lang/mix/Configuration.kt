@@ -83,7 +83,14 @@ open class Configuration(name: String, project: Project, configurationFactory: C
         val workingDirectory = ensureWorkingDirectory()
         val module = ensureModule()
         val sdk = ensureMostSpecificSdk(module)
-        val commandLine = Mix.commandLine(envs, workingDirectory, sdk, erlArgumentList, elixirArgumentList)
+        val commandLine = Mix.commandLine(
+            envs,
+            workingDirectory,
+            sdk,
+            erlArgumentList,
+            elixirArgumentList,
+            project = project,
+        )
         commandLine.addParameters(mixArgumentList)
 
         return commandLine

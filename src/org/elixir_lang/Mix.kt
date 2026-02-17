@@ -1,6 +1,7 @@
 package org.elixir_lang
 
 import com.intellij.execution.configurations.GeneralCommandLine
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.Sdk
 import org.elixir_lang.cli.CliArguments
 import org.elixir_lang.jps.shared.cli.CliArgs
@@ -16,12 +17,20 @@ object Mix {
             elixirSdk: Sdk,
             erlParameters: kotlin.collections.List<String> = emptyList(),
             elixirParameters: kotlin.collections.List<String> = emptyList(),
-            pty: Boolean = false
+            pty: Boolean = false,
+            project: Project? = null
     ): GeneralCommandLine {
         val updatedEnvironment = environment.toMutableMap()
         SdkPaths.maybeUpdateMixHome(updatedEnvironment, elixirSdk.homePath)
 
-        val args: CliArgs = CliArguments.args(elixirSdk, CliTool.MIX, extraElixirArguments =  elixirParameters, extraErlangArguments = erlParameters) ?: throw RuntimeException("Unable to compute CLI arguments for SDK $elixirSdk")
+        val args: CliArgs =
+            CliArguments.argsOrThrow(
+                elixirSdk,
+                CliTool.MIX,
+                extraElixirArguments = elixirParameters,
+                extraErlangArguments = erlParameters,
+                project = project,
+            )
         val commandLine = baseCommandLine(pty, updatedEnvironment, workingDirectory)
         commandLine.exePath = args.exePath
         commandLine.addParameters(args.arguments)
