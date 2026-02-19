@@ -2,6 +2,7 @@ package org.elixir_lang.run
 
 import com.intellij.execution.configurations.PtyCommandLine
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.trace
 import org.elixir_lang.sdk.wsl.wslCompat
 import java.io.IOException
 
@@ -24,7 +25,7 @@ open class WslAwarePtyCommandLine : PtyCommandLine {
     @Throws(IOException::class)
     override fun createProcess(processBuilder: ProcessBuilder): Process {
         wslCompat.convertProcessBuilderArgumentsForWsl(processBuilder, this)
-        LOG.debug(formatCommandLineForLogging(processBuilder, "Command line"))
+        LOG.trace { formatCommandLineForLogging(processBuilder, "PTY Command line") }
         return super.createProcess(processBuilder)
     }
 }

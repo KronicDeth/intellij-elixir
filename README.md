@@ -483,6 +483,7 @@ The plugin supports running Elixir, Mix, and IEx commands within WSL. This inclu
 
 * **New Project Wizard**: SDK selection is based on the location of the currently open project, not the new project. To select a WSL based SDK during the New Project Wizard, open any WSL project or directory in the IDE first. 
 * **SDKs and Project must all be on the same WSL Distribution**: You cannot use a WSL based SDK with a non-WSL project, and vice versa. You can use the `/mnt/c` drive to access Windows files from WSL, but the performance is terrible. 
+* **Build system (Ctrl+F9)**: The IDE build system only works when the **Project SDK** is set to a **JDK 21+** in the same WSL distribution, and all **Module SDKs** are set to the correct **Elixir SDK**.
 * **Performance**: Running the IDE in Windows with a WSL project is slower than running the IDE directly in the WSL instance. This is a limitation of the IDE, not specific to the Elixir plugin.  
 
 ### Module Settings

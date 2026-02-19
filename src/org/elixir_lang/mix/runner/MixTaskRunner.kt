@@ -47,7 +47,7 @@ object MixTaskRunner {
             if (project != null) {
                 // Modern Kotlin API for actions with project context
                 runWithModalProgressBlocking(ModalTaskOwner.project(project), title) {
-                    executeMixTask(workingDirectory, sdk, task, *taskParameters)
+                    executeMixTask(workingDirectory, sdk, task, project, *taskParameters)
                 }
             } else {
                 // Legacy Java API for import wizard (no project context yet)
@@ -56,7 +56,7 @@ object MixTaskRunner {
                     object : Task.Modal(null, title, true) {
                         override fun run(indicator: com.intellij.openapi.progress.ProgressIndicator) {
                             try {
-                                executeMixTask(workingDirectory, sdk, task, *taskParameters)
+                                executeMixTask(workingDirectory, sdk, task, project, *taskParameters)
                             } catch (e: ExecutionException) {
                                 exception = e
                             }
@@ -79,6 +79,7 @@ object MixTaskRunner {
         workingDirectory: String,
         sdk: Sdk,
         task: String,
+        project: Project?,
         vararg taskParameters: String
     ) {
         val indicator = ProgressManager.getInstance().progressIndicator
@@ -89,7 +90,8 @@ object MixTaskRunner {
             workingDirectory,
             sdk,
             emptyList(),
-            emptyList()
+            emptyList(),
+            project = project,
         )
         commandLine.addParameter(task)
         commandLine.addParameters(*taskParameters)
@@ -140,7 +142,7 @@ object MixTaskRunner {
      */
     @JvmStatic
     fun fetchDependencies(project: Project?, workingDirectory: String, sdk: Sdk) {
-        runMixTask(project, workingDirectory, sdk, "Fetching dependencies", "deps.get")
+        runMixTask(project, workingDirectory, sdk, "Fetching deps", "deps.get")
         // Result is ignored - errors are logged internally
     }
 
@@ -151,7 +153,7 @@ object MixTaskRunner {
     fun installDependencies(project: Project, workingDirectory: String, sdk: Sdk): Result<Unit> {
         val hexResult = runMixTask(project, workingDirectory, sdk, "Updating hex", "local.hex", "--force")
         val rebarResult = runMixTask(project, workingDirectory, sdk, "Updating rebar", "local.rebar", "--force")
-        val depsResult = runMixTask(project, workingDirectory, sdk, "Fetching dependencies", "deps.get")
+        val depsResult = runMixTask(project, workingDirectory, sdk, "Fetching deps", "deps.get")
 
         return hexResult
             .mapCatching { rebarResult.getOrThrow() }

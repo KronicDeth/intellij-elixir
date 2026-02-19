@@ -273,6 +273,56 @@ abstract class Type protected constructor(name: String) : DependentSdkType(name)
         @JvmStatic
         val ERLANG_SDK_KEY = com.intellij.openapi.util.Key.create<Sdk>("ERLANG_SDK_FOR_ELIXIR")
 
+        /**
+         * UserData key to mark an Elixir SDK as missing its Erlang SDK dependency.
+         * This is an in-memory flag only (not persisted).
+         */
+        @JvmStatic
+        val MISSING_ERLANG_SDK_KEY = com.intellij.openapi.util.Key.create<Boolean>("ELIXIR_SDK_MISSING_ERLANG")
+
+        /**
+         * Attaches or updates the Erlang dependency for an Elixir SDK and commits the SDK changes.
+         * Keeps ERLANG_SDK_KEY in sync so configureSdkPaths can resolve the dependency reliably.
+         */
+        @JvmStatic
+        fun attachErlangDependency(elixirSdk: Sdk, erlangSdk: Sdk?) {
+            val app = ApplicationManager.getApplication()
+            val action = {
+                elixirSdk.putUserData(ERLANG_SDK_KEY, erlangSdk)
+                setMissingErlangSdkFlag(elixirSdk, erlangSdk == null)
+                val modificator = elixirSdk.sdkModificator
+                val existing =
+                    (modificator.sdkAdditionalData as? org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData)
+                        ?: (elixirSdk.sdkAdditionalData as? org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData)
+                if (existing != null) {
+                    existing.setErlangSdk(erlangSdk)
+                    modificator.sdkAdditionalData = existing
+                } else {
+                    modificator.sdkAdditionalData =
+                        org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData(erlangSdk, elixirSdk)
+                }
+                modificator.commitChanges()
+            }
+            if (app.isWriteAccessAllowed) {
+                action()
+            } else {
+                val runnable = Runnable { app.runWriteAction { action() } }
+                if (app.isDispatchThread) {
+                    runnable.run()
+                } else {
+                    app.invokeAndWait(runnable)
+                }
+            }
+        }
+
+        @JvmStatic
+        fun isMissingErlangSdk(elixirSdk: Sdk): Boolean =
+            elixirSdk.getUserData(MISSING_ERLANG_SDK_KEY) == true
+
+        private fun setMissingErlangSdkFlag(elixirSdk: Sdk, missing: Boolean) {
+            elixirSdk.putUserData(MISSING_ERLANG_SDK_KEY, if (missing) true else null)
+        }
+
         fun staticIsValidDependency(sdk: Sdk): Boolean {
             val sdkTypeCanonicalName = sdk.sdkType.javaClass.canonicalName
 

@@ -1,6 +1,10 @@
 package org.elixir_lang.sdk.erlang
 
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.testFramework.registerOrReplaceServiceInstance
 import org.elixir_lang.PlatformTestCase
+import org.elixir_lang.sdk.wsl.MockWslCompatService
+import org.elixir_lang.sdk.wsl.WslCompatService
 
 /**
  * Tests for Erlang SDK Type naming methods.
@@ -8,6 +12,17 @@ import org.elixir_lang.PlatformTestCase
 class TypeNamingTest : PlatformTestCase() {
 
     private val erlangType = Type()
+
+    override fun setUp() {
+        super.setUp()
+
+        // Replace the real WslCompatService with MockWslCompatService for testing
+        ApplicationManager.getApplication().registerOrReplaceServiceInstance(
+            WslCompatService::class.java,
+            MockWslCompatService(),
+            testRootDisposable,
+        )
+    }
 
     fun testGetVersionString_miseErlang() {
         // Note: getVersionString returns null if it can't detect the version from the path
