@@ -27,24 +27,6 @@ verbose_echo() {
   fi
 }
 
-function realpath_it() {
-  read -ra ARGS
-  RESULT=()
-  for ARG in "${ARGS[@]}"; do
-    if [[ $ARG = */* ]]; then
-      REAL_PATH=$(realpath -e -- "$ARG" 2>/dev/null)
-      if [[ -n $REAL_PATH ]]; then
-        RESULT+=("$REAL_PATH")
-      else
-        RESULT+=("$ARG")
-      fi
-    else
-      RESULT+=("$ARG")
-    fi
-  done
-  echo "${RESULT[@]}"
-}
-
 # Credit to https://stackoverflow.com/a/60279429
 faketty() {
   # Create a temporary file for storing the status code
@@ -121,7 +103,7 @@ for EXEC_TO_TEST in "${EXECS_TO_TEST[@]}"; do
         set -x
       fi
       # shellcheck disable=SC2086
-      OUTPUT=$(ELIXIR_CLI_DRY_RUN=1 faketty mise exec "elixir@$VERSION" -- $EXEC_TO_TEST -- 2>/dev/null | sed -e 's/[\r\n]//g' | realpath_it)
+      OUTPUT=$(ELIXIR_CLI_DRY_RUN=1 faketty mise exec "elixir@$VERSION" -- $EXEC_TO_TEST -- 2>/dev/null | sed -e 's/[\r\n]//g')
       if [[ "$VERBOSE" -eq 1 ]]; then
         set +x
       fi

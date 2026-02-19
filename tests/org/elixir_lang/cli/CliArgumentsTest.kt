@@ -76,7 +76,7 @@ class CliArgumentsTest(private val targetOS: OS) : PlatformTestCase() {
         assertContainsSequence(tokens, listOf("-s", "elixir", "start_cli"))
 
         val expectedEbins = listOf("eex", "elixir", "mix").map { lib ->
-            normalize(elixirHome.resolve("lib").resolve(lib).resolve("ebin").toString())
+            normalize(elixirHome.resolve("bin/../lib").resolve(lib).resolve("ebin").toString())
         }
         expectedEbins.forEach { ebin -> assertTrue("Missing legacy ebin path $ebin", tokens.contains(ebin)) }
 
@@ -98,8 +98,8 @@ class CliArgumentsTest(private val targetOS: OS) : PlatformTestCase() {
         val tokens = normalize(args!!.arguments)
         assertEquals(args.exePath, erlangExec)
 
-        val libPath = normalize(elixirHome.resolve("lib").toString())
-        val elixirEbinPath = normalize(elixirHome.resolve("lib").resolve("elixir").resolve("ebin").toString())
+        val libPath = normalize(elixirHome.resolve("bin/../lib").toString())
+        val elixirEbinPath = normalize(elixirHome.resolve("bin/../lib").resolve("elixir").resolve("ebin").toString())
         assertContainsSequence(tokens, listOf("-elixir_root", libPath))
         assertContainsSequence(tokens, listOf("-pa", elixirEbinPath))
         assertContainsSequence(tokens, listOf("-s", "elixir", "start_cli"))
@@ -182,7 +182,7 @@ class CliArgumentsTest(private val targetOS: OS) : PlatformTestCase() {
     private fun createElixirHome(vararg libs: String): Path {
         val home = trackPath(Files.createTempDirectory("elixir-home"))
         Files.createDirectories(home.resolve("bin"))
-        val libDir = home.resolve("lib")
+        val libDir = home.resolve("bin/../lib")
         libs.forEach { lib -> Files.createDirectories(libDir.resolve(lib).resolve("ebin")) }
         return home
     }
@@ -191,7 +191,7 @@ class CliArgumentsTest(private val targetOS: OS) : PlatformTestCase() {
         val home = trackPath(Files.createTempDirectory("erlang-home"))
         val bin = Files.createDirectories(home.resolve("bin"), )
         Files.createFile(bin.resolve("erl"))
-        val lib = Files.createDirectories(home.resolve("lib"), )
+        val lib = Files.createDirectories(home.resolve("bin/../lib"), )
         listOf("asn1-5.0.18.1",
             "common_test-1.22.1",
             "compiler-8.1.1.1",
