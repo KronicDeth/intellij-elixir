@@ -42,6 +42,8 @@ private class ResolveWithCachingComputable(
         val reference: Reference,
         val incompleteCode: Boolean
 ) : Computable<Array<ResolveResult>> {
-    override fun compute(): Array<ResolveResult> =
-        ResolveCache.getInstance(project).resolveWithCaching(reference, Resolver, false, incompleteCode)
+    override fun compute(): Array<ResolveResult> {
+        ApplicationManager.getApplication().assertReadAccessAllowed()
+        return ResolveCache.getInstance(project).resolveWithCaching(reference, Resolver, false, incompleteCode)
+    }
 }

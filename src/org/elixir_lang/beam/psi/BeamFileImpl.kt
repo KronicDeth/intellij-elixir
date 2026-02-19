@@ -20,7 +20,6 @@ import com.intellij.psi.impl.source.tree.TreeElement
 import com.intellij.psi.scope.PsiScopeProcessor
 import com.intellij.psi.search.PsiElementProcessor
 import com.intellij.psi.stubs.*
-import com.intellij.reference.SoftReference
 import com.intellij.util.ArrayUtil
 import com.intellij.util.IncorrectOperationException
 import org.elixir_lang.ElixirLanguage
@@ -41,7 +40,8 @@ import org.elixir_lang.psi.stub.impl.ElixirFileStubImpl
 import org.elixir_lang.type.Visibility
 import org.jetbrains.annotations.NonNls
 import java.io.IOException
-import java.util.*
+import java.lang.ref.SoftReference as JavaSoftReference
+import com.intellij.reference.SoftReference
 
 // See com.intellij.psi.impl.compiled.ClsFileImpl
 class BeamFileImpl private constructor(
@@ -56,7 +56,7 @@ class BeamFileImpl private constructor(
 
     @Volatile
     private var mirrorFileElement: TreeElement? = null
-    private var stub: SoftReference<StubTree>? = null
+    private var stub: JavaSoftReference<StubTree>? = null
 
     constructor(fileViewProvider: FileViewProvider) : this(fileViewProvider, false) {}
 
@@ -109,8 +109,14 @@ class BeamFileImpl private constructor(
      */
     override fun getChildren(): Array<PsiElement> = arrayOf(module())
 
-    private fun module(): Module = moduleStub().psi
-    private fun moduleStub(): ModuleStub<Module> = getStub().childrenStubs.single() as ModuleStub<Module>
+    private fun module(): Module {
+        val stub = getStub().childrenStubs.singleOrNull()
+            ?: throw IllegalStateException("Expected single module stub for ${virtualFile.presentableUrl}")
+        val moduleStub = stub as? ModuleStub<*>
+            ?: throw IllegalStateException("Expected ModuleStub, got ${stub.javaClass.name}")
+        val psi = moduleStub.psi
+        return psi ?: throw IllegalStateException("Expected Module PSI, got ${psi?.javaClass?.name}")
+    }
 
     private fun getStub(): PsiFileStub<*> = stubTree.root
 
@@ -131,7 +137,16 @@ class BeamFileImpl private constructor(
                     LOGGER.debug("No stub for BEAM file in index: " + virtualFile.presentableUrl)
                 }
 
-                StubTree(ElixirFileStubImpl())
+                val rootStub = ElixirFileStubImpl()
+                val moduleName =
+                    from(virtualFile)
+                        ?.atoms()
+                        ?.moduleName()
+                        ?: virtualFile.nameWithoutExtension
+                val name = Decompiler.defmoduleArgument(moduleName)
+                LOGGER.warn("Building minimal stub tree for ${virtualFile.presentableUrl} (module $name)")
+                ModuleStubImpl<ModuleImpl<*>>(rootStub, name)
+                StubTree(rootStub)
             } else {
                 indexStubTree
             }
@@ -145,10 +160,13 @@ class BeamFileImpl private constructor(
                 } else {
                     newStubTree
                         .root
-                        .let { it as PsiFileStubImpl<PsiFile> }
+                        .let {
+                            @Suppress("UNCHECKED_CAST")
+                            it as PsiFileStubImpl<PsiFile>
+                        }
                         .setPsi(this)
 
-                    stub = SoftReference(newStubTree)
+                    stub = JavaSoftReference(newStubTree)
 
                     newStubTree
                 }
@@ -254,7 +272,7 @@ class BeamFileImpl private constructor(
      *
      *
      * @return true if the element is valid, false otherwise.
-     * @see PsiUtilCore.ensureValid
+     * @see com.intellij.psi.PsiElement.isValid
      */
     override fun isValid(): Boolean = isForDecompiling || virtualFile.isValid
 
@@ -287,8 +305,7 @@ class BeamFileImpl private constructor(
      * Returns the element which should be used as the parent of this element in a tree up
      * walk during a resolve operation. For most elements, this returns `getParent()`,
      * but the context can be overridden for some elements like code fragments (see
-     * [PsiElementFactory.createCodeBlockCodeFragment]).
-     *
+     * [com.intellij.psi.JavaCodeFragmentFactory.createCodeBlockCodeFragment] [com.intellij.psi.PsiElement.getContext]).
      * @return the resolve context element.
      */
     override fun getContext(): PsiElement? = FileContextUtil.getFileContext(this)
@@ -334,6 +351,7 @@ class BeamFileImpl private constructor(
      *
      * @return a single-element array containing `this`
      */
+    @Deprecated("Use FileViewProvider#getAllFiles instead.")
     override fun getPsiRoots(): Array<PsiFile> = arrayOf(this)
 
     override fun getViewProvider(): FileViewProvider = fileViewProvider
@@ -383,12 +401,12 @@ class BeamFileImpl private constructor(
                     )
                     mirrorTreeElement = SourceTreeToPsiMap.psiToTreeNotNull(mirror)
                     try {
-                        val finalMirrorTreeElement = mirrorTreeElement!!
+                        val finalMirrorTreeElement = mirrorTreeElement
                         LOGGER.info("Setting mirror for $fileName")
-                        ProgressManager.getInstance().executeNonCancelableSection(Runnable {
+                        ProgressManager.getInstance().executeNonCancelableSection {
                             setMirror(finalMirrorTreeElement)
                             putUserData(MODULE_DOCUMENT_LINK_KEY, document)
-                        })
+                        }
                         LOGGER.info("Mirror for $fileName")
                     } catch (e: InvalidMirrorException) {
                         LOGGER.error(file.url, e)

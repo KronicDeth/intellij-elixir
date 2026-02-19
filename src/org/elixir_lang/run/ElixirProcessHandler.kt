@@ -8,10 +8,15 @@ import com.intellij.execution.process.KillableColoredProcessHandler
  * The Erlang VM (BEAM) treats the first SIGINT as entering BREAK mode, and requires a second
  * SIGINT to actually exit. This handler implements that behavior using a DoubleSignalTerminator.
  */
-class ElixirProcessHandler(process: Process, commandLineString: String) :
+class ElixirProcessHandler(
+    process: Process,
+    commandLineString: String,
+    exePath: String? = null
+) :
     KillableColoredProcessHandler(process, commandLineString) {
 
-    private val terminator: DoubleSignalTerminator = ElixirDoubleSignalTerminator()
+    private val targetPid: Long? = ProcessTargetPid.select(process, exePath)
+    private val terminator: DoubleSignalTerminator = ElixirDoubleSignalTerminator { targetPid }
 
     override fun destroyProcessImpl() {
         terminator.performDoubleSignalTermination(process) {

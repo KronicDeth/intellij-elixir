@@ -17,7 +17,7 @@ import com.intellij.ui.awt.RelativePoint
 import com.intellij.util.messages.MessageBusConnection
 import com.intellij.util.ui.JBUI
 import org.elixir_lang.Icons
-import org.elixir_lang.jps.HomePath
+import org.elixir_lang.sdk.SdkEbinPaths
 import org.elixir_lang.sdk.elixir.SdkSettingsOpener
 import org.elixir_lang.sdk.elixir.Type
 import org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData
@@ -302,7 +302,7 @@ class ElixirSdkStatusWidget(@param:NotNull private val project: Project) : Custo
         val homePath = elixirSdk.homePath ?: return true
 
         // Check if Elixir SDK has proper ebin paths in lib directory
-        if (!HomePath.hasEbinPath(homePath)) {
+        if (!SdkEbinPaths.hasEbinPath(homePath)) {
             return true
         }
 
@@ -315,7 +315,7 @@ class ElixirSdkStatusWidget(@param:NotNull private val project: Project) : Custo
         val homePath = erlangSdk.homePath ?: return true
 
         // Check if Erlang SDK has proper ebin paths
-        if (!HomePath.hasEbinPath(homePath)) {
+        if (!SdkEbinPaths.hasEbinPath(homePath)) {
             return true
         }
 

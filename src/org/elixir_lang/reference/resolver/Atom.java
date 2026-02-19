@@ -1,5 +1,6 @@
 package org.elixir_lang.reference.resolver;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.psi.ResolveResult;
 import com.intellij.psi.impl.source.resolve.ResolveCache;
 import org.elixir_lang.psi.ElixirAtom;
@@ -13,7 +14,8 @@ public class Atom implements ResolveCache.PolyVariantResolver<org.elixir_lang.re
 
     @NotNull
     @Override
-    public ResolveResult[] resolve(@NotNull org.elixir_lang.reference.Atom atom, boolean incompleteCode) {
+    public ResolveResult @NotNull [] resolve(@NotNull org.elixir_lang.reference.Atom atom, boolean incompleteCode) {
+        ApplicationManager.getApplication().assertReadAccessAllowed();
         ElixirAtom element = atom.getElement();
         Resolvable resolvable = resolvable(element);
 

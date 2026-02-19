@@ -2,15 +2,13 @@ package org.elixir_lang.sdk
 
 import com.intellij.execution.wsl.WSLDistribution
 import com.intellij.openapi.diagnostic.Logger
-import com.intellij.openapi.util.Version
 import com.intellij.util.system.CpuArch
 import com.intellij.util.system.OS
-import org.elixir_lang.jps.HomePath
 import org.elixir_lang.sdk.wsl.wslCompat
 import java.io.File
 import java.nio.file.Path
 import java.util.*
-import java.util.function.Function
+
 
 /**
  * Consolidated SDK home path scanning for Elixir and Erlang SDKs.
@@ -58,9 +56,9 @@ object SdkHomeScan {
      * @param config SDK-specific configuration
      * @return Map of versions to SDK home paths, sorted by version (descending)
      */
-    fun homePathByVersion(path: Path?, config: Config): Map<Version, String> {
+    fun homePathByVersion(path: Path?, config: Config): Map<SdkHomeKey, String> {
         LOG.debug("Scanning for ${config.toolName} SDKs (path: $path, platform: ${OS.CURRENT})")
-        val homePathByVersion: MutableMap<Version, String> = TreeMap(Comparator.reverseOrder())
+        val homePathByVersion: MutableMap<SdkHomeKey, String> = TreeMap()
 
         val result = when (OS.CURRENT) {
             OS.macOS ->
@@ -87,21 +85,21 @@ object SdkHomeScan {
      * Note: path parameter not used on macOS (no distribution filtering needed).
      */
     private fun homePathByVersionMac(
-        homePathByVersion: MutableMap<Version, String>,
+        homePathByVersion: MutableMap<SdkHomeKey, String>,
         config: Config
-    ): Map<Version, String> {
-        HomePath.mergeASDF(homePathByVersion, config.toolName)
-        HomePath.mergeMise(homePathByVersion, config.toolName)
+    ): Map<SdkHomeKey, String> {
+        SdkHomePaths.mergeASDF(homePathByVersion, config.toolName)
+        SdkHomePaths.mergeMise(homePathByVersion, config.toolName)
 
         if (config.kerlTransform != null) {
-            HomePath.mergeKerl(homePathByVersion, config.kerlTransform.toJavaFunction())
+            SdkHomePaths.mergeKerl(homePathByVersion, config.kerlTransform)
         }
 
-        val homebrewTransform = config.homebrewTransform?.toJavaFunction() ?: Function.identity()
-        HomePath.mergeHomebrew(homePathByVersion, config.toolName, homebrewTransform)
+        val homebrewTransform = config.homebrewTransform ?: { it }
+        SdkHomePaths.mergeHomebrew(homePathByVersion, config.toolName, homebrewTransform)
 
-        val nixTransform = config.nixTransform?.toJavaFunction() ?: Function.identity()
-        HomePath.mergeNixStore(homePathByVersion, config.nixPattern, nixTransform)
+        val nixTransform = config.nixTransform ?: { it }
+        SdkHomePaths.mergeNixStore(homePathByVersion, config.nixPattern, nixTransform)
 
         return homePathByVersion
     }
@@ -111,9 +109,9 @@ object SdkHomeScan {
      */
     private fun homePathByVersionWindows(
         path: Path?,
-        homePathByVersion: MutableMap<Version, String>,
+        homePathByVersion: MutableMap<SdkHomeKey, String>,
         config: Config
-    ): Map<Version, String> {
+    ): Map<SdkHomeKey, String> {
         if (wslCompat.isWslUncPath(path.toString())) {
             // WSL distributions
             homePathByVersionWSLs(path, homePathByVersion, config)
@@ -128,10 +126,11 @@ object SdkHomeScan {
         }
 
         windowsPath?.let {
-            putIfDirectory(homePathByVersion, HomePath.UNKNOWN_VERSION, it)
+            putIfDirectory(homePathByVersion, SdkHomePaths.unknownVersionKey(it), it)
         }
 
-        HomePath.mergeElixirInstallScript(homePathByVersion, config.elixirInstallScriptDirName)
+        SdkHomePaths.mergeElixirInstallScript(homePathByVersion, config.elixirInstallScriptDirName)
+        SdkHomePaths.mergeMise(homePathByVersion, config.toolName)
 
         return homePathByVersion
     }
@@ -141,26 +140,26 @@ object SdkHomeScan {
      * Note: path parameter not used on Linux (no distribution filtering needed).
      */
     private fun homePathByVersionLinux(
-        homePathByVersion: MutableMap<Version, String>,
+        homePathByVersion: MutableMap<SdkHomeKey, String>,
         config: Config
-    ): Map<Version, String> {
-        putIfDirectory(homePathByVersion, HomePath.UNKNOWN_VERSION, config.linuxDefaultPath)
-        putIfDirectory(homePathByVersion, HomePath.UNKNOWN_VERSION, config.linuxMintPath)
+    ): Map<SdkHomeKey, String> {
+        putIfDirectory(homePathByVersion, SdkHomePaths.unknownVersionKey(config.linuxDefaultPath), config.linuxDefaultPath)
+        putIfDirectory(homePathByVersion, SdkHomePaths.unknownVersionKey(config.linuxMintPath), config.linuxMintPath)
 
-        HomePath.mergeASDF(homePathByVersion, config.toolName)
-        HomePath.mergeMise(homePathByVersion, config.toolName)
-        HomePath.mergeElixirInstallScript(homePathByVersion, config.elixirInstallScriptDirName)
+        SdkHomePaths.mergeASDF(homePathByVersion, config.toolName)
+        SdkHomePaths.mergeMise(homePathByVersion, config.toolName)
+        SdkHomePaths.mergeElixirInstallScript(homePathByVersion, config.elixirInstallScriptDirName)
 
         if (config.kerlTransform != null) {
-            HomePath.mergeKerl(homePathByVersion, config.kerlTransform.toJavaFunction())
+            SdkHomePaths.mergeKerl(homePathByVersion, config.kerlTransform)
         }
 
         if (config.travisCIKerlTransform != null) {
-            HomePath.mergeTravisCIKerl(homePathByVersion, config.travisCIKerlTransform.toJavaFunction())
+            SdkHomePaths.mergeTravisCIKerl(homePathByVersion, config.travisCIKerlTransform)
         }
 
-        val nixTransform = config.nixTransform?.toJavaFunction() ?: Function.identity()
-        HomePath.mergeNixStore(homePathByVersion, config.nixPattern, nixTransform)
+        val nixTransform = config.nixTransform ?: { it }
+        SdkHomePaths.mergeNixStore(homePathByVersion, config.nixPattern, nixTransform)
 
         return homePathByVersion
     }
@@ -172,7 +171,7 @@ object SdkHomeScan {
      */
     private fun homePathByVersionWSLs(
         path: Path?,
-        homePathByVersion: MutableMap<Version, String>,
+        homePathByVersion: MutableMap<SdkHomeKey, String>,
         config: Config
     ) {
         val distributionsToScan = when {
@@ -209,31 +208,31 @@ object SdkHomeScan {
      */
     private fun homePathByVersionWSL(
         distribution: WSLDistribution,
-        homePathByVersion: MutableMap<Version, String>,
+        homePathByVersion: MutableMap<SdkHomeKey, String>,
         config: Config
     ) {
         val wslUserHome = wslCompat.getWslUserHomeUncPath(distribution)
 
         if (wslUserHome != null) {
-            HomePath.mergeASDF(homePathByVersion, config.toolName, wslUserHome)
-            HomePath.mergeMise(homePathByVersion, config.toolName, wslUserHome)
-            HomePath.mergeElixirInstallScript(homePathByVersion, config.elixirInstallScriptDirName, wslUserHome)
+            SdkHomePaths.mergeASDF(homePathByVersion, config.toolName, wslUserHome)
+            SdkHomePaths.mergeMise(homePathByVersion, config.toolName, wslUserHome)
+            SdkHomePaths.mergeElixirInstallScript(homePathByVersion, config.elixirInstallScriptDirName, wslUserHome)
 
             if (config.travisCIKerlTransform != null) {
-                HomePath.mergeTravisCIKerl(homePathByVersion, config.travisCIKerlTransform.toJavaFunction(), wslUserHome)
+                SdkHomePaths.mergeTravisCIKerl(homePathByVersion, config.travisCIKerlTransform, wslUserHome)
             }
         }
 
         wslCompat.convertLinuxPathToWindowsUnc(distribution, config.linuxDefaultPath)?.let {
-            putIfDirectory(homePathByVersion, HomePath.UNKNOWN_VERSION, it)
+            putIfDirectory(homePathByVersion, SdkHomePaths.unknownVersionKey(it), it)
         }
         wslCompat.convertLinuxPathToWindowsUnc(distribution, config.linuxMintPath)?.let {
-            putIfDirectory(homePathByVersion, HomePath.UNKNOWN_VERSION, it)
+            putIfDirectory(homePathByVersion, SdkHomePaths.unknownVersionKey(it), it)
         }
 
-        wslCompat.convertLinuxPathToWindowsUnc(distribution, HomePath.NIX_STORE_PATH)?.let { wslNixStore ->
-            val nixTransform = config.nixTransform?.toJavaFunction() ?: Function.identity()
-            HomePath.mergeNixStore(homePathByVersion, config.nixPattern, nixTransform, wslNixStore)
+        wslCompat.convertLinuxPathToWindowsUnc(distribution, SdkHomePaths.NIX_STORE_PATH)?.let { wslNixStore ->
+            val nixTransform = config.nixTransform ?: { it }
+            SdkHomePaths.mergeNixStore(homePathByVersion, config.nixPattern, nixTransform, wslNixStore)
         }
     }
 
@@ -241,18 +240,14 @@ object SdkHomeScan {
      * Adds a home path to the map only if it exists as a directory.
      */
     private fun putIfDirectory(
-        homePathByVersion: MutableMap<Version, String>,
-        version: Version,
+        homePathByVersion: MutableMap<SdkHomeKey, String>,
+        key: SdkHomeKey,
         homePath: String
     ) {
         val homeFile = File(homePath)
         if (homeFile.isDirectory) {
-            homePathByVersion[version] = homePath
+            homePathByVersion[key] = homePath
         }
     }
 
-    /**
-     * Converts a Kotlin lambda to a Java Function for interop with HomePath methods.
-     */
-    private fun ((File) -> File).toJavaFunction(): Function<File, File> = Function { file -> this(file) }
 }
