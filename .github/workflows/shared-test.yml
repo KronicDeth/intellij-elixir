@@ -151,8 +151,7 @@ jobs:
 
       - name: Verify Plugin
         id: verify-plugin
-        # Revert to upstream action when/if https://github.com/ChrisCarini/intellij-platform-plugin-verifier-action/pull/94 is merged.
-        uses: sh41/intellij-platform-plugin-verifier-action@add-external-prefixes-parameter
+        uses: ChrisCarini/intellij-platform-plugin-verifier-action@latest
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
