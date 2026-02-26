@@ -7,7 +7,8 @@ import com.intellij.ide.JavaUiBundle
 import com.intellij.ide.util.projectWizard.WizardContext
 import com.intellij.ide.wizard.AbstractNewProjectWizardStep
 import com.intellij.ide.wizard.NewProjectWizardBaseData
-import com.intellij.ide.wizard.NewProjectWizardLanguageStep
+import com.intellij.ide.wizard.NewProjectWizardBaseData.Companion.baseData
+import com.intellij.ide.wizard.NewProjectWizardStep
 import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.diagnostic.Logger
@@ -40,9 +41,9 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 
 // Based on [NewPythonProjectStep](https://github.com/JetBrains/intellij-community/blob/dcb0ce2edd2c3b1dffb7e60103898acd5b913cfb/python/src/com/jetbrains/python/newProject/PythonNewProjectWizard.kt#L82-L145)
-class Step(parent: NewProjectWizardLanguageStep) : AbstractNewProjectWizardStep(parent),
-                                                   NewProjectWizardBaseData by parent,
-                                                   Data {
+class Step(parent: NewProjectWizardStep) : AbstractNewProjectWizardStep(parent),
+                                           NewProjectWizardBaseData by parent.baseData!!,
+                                           Data {
     override val sdkProperty = propertyGraph.property<Sdk?>(null)
     override val mixNewAppProperty = propertyGraph.property<String>("")
     override val mixNewModuleProperty = propertyGraph.property<String>("")
