@@ -73,6 +73,41 @@
         <lang.parserDefinition language="EEx" implementationClass="org.elixir_lang.eex.ParserDefinition"/>
         <!--<lang.psiStructureViewFactory language="EEx" implementationClass="org.elixir_lang.eex.PsiStructureViewFactory"/>-->
 
+        <!-- HEEx -->
+        <fileType.fileViewProviderFactory
+            filetype="HEEx"
+            implementationClass="org.elixir_lang.heex.file.view_provider.Factory"
+        />
+        <fileType name="HTML Embedded Elixir"
+            implementationClass="org.elixir_lang.heex.file.Type"
+            fieldName="INSTANCE"
+            language="HEEx"
+            extensions="heex"
+        />
+        <lang.fileViewProviderFactory
+            language="HEEx"
+            implementationClass="org.elixir_lang.heex.file.view_provider.Factory"
+        />
+        <lang.fileViewProviderFactory
+            language="HEEx"
+            implementationClass="org.elixir_lang.heex.file.view_provider.Factory"/>
+        <lang.parserDefinition
+            language="HEEx"
+            implementationClass="org.elixir_lang.heex.ParserDefinition"
+        />
+
+        <!-- Replaces  injected outer element types with a dummy string, ensuring the injections don't break the HTML lexer -->
+        <outerLanguageRangePatcher
+            language="HTML"
+            implementationClass="org.elixir_lang.heex.html.HeexHTMLOuterLanguageRangePatcher"
+        />
+
+        <!-- Disable some unhelpful HTML inspections that are false positives for HEEx components -->
+        <lang.inspectionSuppressor
+            language="HTML"
+            implementationClass="org.elixir_lang.heex.inspections.HTMLInspectionSuppressor"
+        />
+
         <!-- Mix related extensions -->
         <configurationType implementation="org.elixir_lang.mix.configuration.Type"/>
 
