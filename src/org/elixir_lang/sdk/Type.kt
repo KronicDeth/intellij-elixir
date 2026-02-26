@@ -8,7 +8,6 @@ import com.intellij.openapi.roots.JavadocOrderRootType
 import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VirtualFile
-import org.elixir_lang.jps.HomePath
 import org.elixir_lang.sdk.wsl.wslCompat
 import java.nio.file.Path
 import java.util.function.Consumer
@@ -28,7 +27,7 @@ object Type {
         // Clear existing CLASSES roots to prevent duplicates when refreshing SDK
         sdkModificator.removeRoots(OrderRootType.CLASSES)
 
-        HomePath.eachEbinPath(
+        SdkEbinPaths.eachEbinPath(
             homePath
         ) { ebin: Path ->
             ebinPathChainVirtualFile(ebin) { virtualFile: VirtualFile? ->
@@ -42,7 +41,7 @@ object Type {
     @JvmStatic
     fun ebinPathChainVirtualFile(ebinPath: Path, virtualFileConsumer: Consumer<VirtualFile?>) {
         // LocalFileSystem.refreshAndFindFileByNioFile handles both regular paths and WSL UNC paths correctly
-        // For WSL paths, ebinPath is already a Windows UNC path thanks to maybeTranslateToUnc in HomePath.eachEbinPath
+        // For WSL paths, ebinPath is already a Windows UNC path thanks to maybeTranslateToUnc in SdkEbinPaths.eachEbinPath
         val virtualFile = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(ebinPath)
 
         if (virtualFile != null) {

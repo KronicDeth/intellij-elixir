@@ -52,6 +52,8 @@ class Injector : MultiHostInjector {
                 //            |> String.split("<!-- MDOC !-->")
                 //            |> Enum.fetch!(1)
             is ElixirMatchedArrowOperation,
+                // @moduledoc @doc_header <> @doc_footer
+            is ElixirMatchedAtOperation,
                 // With missing quotes like in #2991 `@module implements logic`
             is ElixirIdentifier,
             is ElixirAtomKeyword -> Unit
@@ -164,7 +166,7 @@ class Injector : MultiHostInjector {
 
                 try {
                     registrar.addPlace(null, null, documentation, textRangeInQuote)
-                } catch (exception: RuntimeExceptionWithAttachments) {
+                } catch (_: RuntimeExceptionWithAttachments) {
                     Logger.error(javaClass, "Cannot inject markdown in Heredoc", documentation)
                 }
             }

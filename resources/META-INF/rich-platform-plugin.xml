@@ -21,7 +21,7 @@
         <projectOpenProcessor implementation="org.elixir_lang.mix.project.OpenProcessor"/>
 
         <!-- Specifies semicolon-separated list of paths which should be added to the classpath of the compile server -->
-        <compileServer.plugin classpath="jps-builder.jar;jps-shared.jar"/>
+        <compileServer.plugin classpath="intellij-elixir.jps-builder.jar;intellij-elixir.jps-shared.jar"/>
 
         <!-- project compiler configurable -->
         <projectConfigurable instance="org.elixir_lang.configuration.ElixirCompilerOptionsConfigurable"

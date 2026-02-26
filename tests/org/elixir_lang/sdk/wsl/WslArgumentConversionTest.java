@@ -235,8 +235,8 @@ public class WslArgumentConversionTest extends PlatformTestCase {
      * Test conversion of Windows drive path with forward slashes.
      */
     public void testConvertWindowsDrivePathWithForwardSlashes() {
-        String input = "--path=C:/Users/steve/project";
-        String expected = "--path=/mnt/c/Users/steve/project";
+        String input = "--path=C:/Users/user/project";
+        String expected = "--path=/mnt/c/Users/user/project";
 
         assertSingleArgumentConverted(input, expected);
     }
@@ -245,8 +245,8 @@ public class WslArgumentConversionTest extends PlatformTestCase {
      * Test conversion of Windows drive path with backslashes.
      */
     public void testConvertWindowsDrivePathWithBackslashes() {
-        String input = "--path=C:\\Users\\steve\\project";
-        String expected = "--path=/mnt/c/Users/steve/project";
+        String input = "--path=C:\\Users\\user\\project";
+        String expected = "--path=/mnt/c/Users/user/project";
 
         assertSingleArgumentConverted(input, expected);
     }
@@ -275,8 +275,8 @@ public class WslArgumentConversionTest extends PlatformTestCase {
      * Test conversion of mixed WSL UNC and Windows drive paths.
      */
     public void testConvertMixedWslUncAndDrivePaths() {
-        String input = "--wsl=\\\\wsl$\\Ubuntu\\home\\user --win=C:/Users/steve";
-        String expected = "--wsl=/home/user --win=/mnt/c/Users/steve";
+        String input = "--wsl=\\\\wsl$\\Ubuntu\\home\\user --win=C:/Users/user";
+        String expected = "--wsl=/home/user --win=/mnt/c/Users/user";
 
         assertSingleArgumentConverted(input, expected);
     }
@@ -285,8 +285,8 @@ public class WslArgumentConversionTest extends PlatformTestCase {
      * Test conversion of Windows drive path with mixed separators.
      */
     public void testConvertWindowsDrivePathMixedSeparators() {
-        String input = "C:\\Users/steve\\Documents/file.txt";
-        String expected = "/mnt/c/Users/steve/Documents/file.txt";
+        String input = "C:\\Users/user\\Documents/file.txt";
+        String expected = "/mnt/c/Users/user/Documents/file.txt";
 
         assertSingleArgumentConverted(input, expected);
     }
@@ -295,8 +295,8 @@ public class WslArgumentConversionTest extends PlatformTestCase {
      * Test that Windows drive paths stop at invalid characters.
      */
     public void testConvertWindowsDrivePathStopsAtInvalidChars() {
-        String input = "--path=C:/Users/steve|other";
-        String expected = "--path=/mnt/c/Users/steve|other";
+        String input = "--path=C:/Users/user|other";
+        String expected = "--path=/mnt/c/Users/user|other";
 
         assertSingleArgumentConverted(input, expected);
     }
@@ -310,13 +310,13 @@ public class WslArgumentConversionTest extends PlatformTestCase {
 
         commandLine.setExePath("\\\\wsl$\\Ubuntu\\usr\\bin\\elixir");
         commandLine.setWorkDirectory(WSL_WORK_DIR);
-        commandLine.getEnvironment().put("MYPATH", "C:/Users/steve/bin");
+        commandLine.getEnvironment().put("MYPATH", "C:/Users/user/bin");
         commandLine.getEnvironment().put("DATADIR", "D:\\data\\files");
 
         ProcessBuilder processBuilder = toProcessBuilder(commandLine);
         service.convertProcessBuilderArgumentsForWsl(processBuilder, commandLine);
 
-        assertEquals("/mnt/c/Users/steve/bin", processBuilder.environment().get("MYPATH"));
+        assertEquals("/mnt/c/Users/user/bin", processBuilder.environment().get("MYPATH"));
         assertEquals("/mnt/d/data/files", processBuilder.environment().get("DATADIR"));
     }
 

@@ -144,11 +144,17 @@ allprojects {
         showStandardStreams = false
         showFailedStandardStreams = true
     }
+
+    tasks.withType<Test>().configureEach {
+        inputs.dir(rootProject.layout.projectDirectory.dir("testData"))
+            .withPropertyName("testData")
+            .withPathSensitivity(PathSensitivity.RELATIVE)
+    }
 }
 
 // --- Subprojects (JPS) ---
 subprojects {
-    apply(plugin = "org.jetbrains.intellij.platform.module")
+    apply(plugin = "org.jetbrains.intellij.platform.base")
 
     repositories {
         intellijPlatform { defaultRepositories() }
@@ -157,20 +163,13 @@ subprojects {
     dependencies {
         intellijPlatform {
             create(providers.gradleProperty("platformType"), providers.provider { actualPlatformVersion })
-            bundledPlugins("com.intellij.java")
-            testFramework(TestFrameworkType.Platform)
         }
-        // JPS Builder tests extend UsefulTestCase (JUnit 3/4 style) and need explicit JUnit 4 on classpath
-        testImplementation(libJunit)
     }
 
     sourceSets {
         main {
             java.srcDirs("src")
             resources.srcDirs("resources")
-        }
-        test {
-            java.srcDir("tests")
         }
     }
 }
@@ -266,6 +265,9 @@ intellijPlatform {
                 sinceBuild = providers.gradleProperty("pluginVerifierVersion").get()
             }
         }
+        // This allows us to verify small IDEs without errors about the JPS plugin.
+        // It's not ideal, but there doesn't seem to be any other way to deal with it right now.
+        externalPrefixes.add("org.jetbrains.jps")
     }
     sourceSets {
         val testUI: SourceSet by project.sourceSets
@@ -313,8 +315,8 @@ dependencies {
         testFramework(TestFrameworkType.JUnit5, configurationName = "testUIImplementation")
     }
 
-    implementation(project(":jps-builder"))
     implementation(project(":jps-shared"))
+    runtimeOnly(project(":jps-builder"))
     implementation(files("lib/OtpErlang.jar"))
     implementation(libCommonsIo)
 

@@ -77,7 +77,7 @@ interface WslCompatService {
      * - `--path=\\wsl$\Ubuntu\home\user` → `--path=/home/user`
      * - `--map=\\wsl$\Ubuntu\home\user\dir1:\\wsl$\Ubuntu\home\user\dir2` → `--map=/home/user/dir1:/home/user/dir2`
      * - `\\wsl.localhost\Ubuntu\home\user\file.txt` → `/home/user/file.txt`
-     * - `C:/Users/steve/file.txt` → `/mnt/c/Users/steve/file.txt`
+     * - `C:/Users/user/file.txt` → `/mnt/c/Users/user/file.txt`
      * - `D:\data\file.txt` → `/mnt/d/data/file.txt`
      *
      * @param processBuilder The process builder to convert (modified in place)

@@ -1,7 +1,5 @@
 package org.elixir_lang.parser_definition;
 
-import org.elixir_lang.sdk.elixir.Release;
-
 /**
  * atom is invalid to the right of `.`, so unlike in {@link MatchedDotOperationParsingTestCase}, this tests only when
  * atom is left of `.` and the right operand varies based on the test name.
@@ -202,29 +200,5 @@ public class MatchedQualifiedMultipleAliasesParsingTestCase extends ParsingTestC
 
     private void assertParsedAndQuotedCorrectlyInOneThree(boolean checkResult) {
         assertParsedAndQuotedCorrectly(checkResult);
-    }
-
-    /*
-     * Private Instance Methods
-     */
-
-    private Release elixirSdkRelease() {
-        String elixirVersion = elixirVersion();
-        Release elixirSdkRelease = Release.fromString((elixirVersion));
-
-        assertNotNull(
-                "ELIXIR_VERSION (" + elixirVersion  + ") could not be parsed into an ElixirSdkRelease",
-                elixirSdkRelease
-        );
-
-        return elixirSdkRelease;
-    }
-
-    private String elixirVersion() {
-        String elixirVersion = System.getenv("ELIXIR_VERSION");
-
-        assertNotNull("ELIXIR_VERSION is not set", elixirVersion);
-
-        return elixirVersion;
     }
 }

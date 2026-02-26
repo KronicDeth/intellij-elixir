@@ -1,5 +1,6 @@
 package org.elixir_lang.reference.resolver
 
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.module.ModuleUtil
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.roots.ProjectRootManager
@@ -25,6 +26,7 @@ object Module : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Modul
         module: org.elixir_lang.reference.Module,
         incompleteCode: Boolean
     ): Array<ResolveResult> {
+        ApplicationManager.getApplication().assertReadAccessAllowed()
         val element = module.element
         val name = element.fullyQualifiedName()
 

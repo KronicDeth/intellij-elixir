@@ -1,6 +1,7 @@
 package org.elixir_lang.reference;
 
 import com.intellij.codeInsight.lookup.LookupElement;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiPolyVariantReference;
@@ -21,10 +22,10 @@ public class Atom extends PsiReferenceBase<ElixirAtom> implements PsiPolyVariant
 
     @NotNull
     @Override
-    public Object[] getVariants() {
+    public Object @NotNull [] getVariants() {
         List<LookupElement> lookupElementList = Variants.lookupElementList(myElement);
 
-        return lookupElementList.toArray(new Object[lookupElementList.size()]);
+        return lookupElementList.toArray(new Object[0]);
     }
 
     /**
@@ -37,7 +38,8 @@ public class Atom extends PsiReferenceBase<ElixirAtom> implements PsiPolyVariant
      */
     @NotNull
     @Override
-    public ResolveResult[] multiResolve(boolean incompleteCode) {
+    public ResolveResult @NotNull [] multiResolve(boolean incompleteCode) {
+        ApplicationManager.getApplication().assertReadAccessAllowed();
         return ResolveCache
                 .getInstance(this.myElement.getProject())
                 .resolveWithCaching(this, org.elixir_lang.reference.resolver.Atom.INSTANCE, false, incompleteCode);
