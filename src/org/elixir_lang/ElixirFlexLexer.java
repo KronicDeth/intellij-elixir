@@ -1850,9 +1850,16 @@ public class ElixirFlexLexer implements FlexLexer {
             }
             // fall through
           case 271: break;
-          case 82:
-            { pushAndBegin(ESCAPE_SEQUENCE);
-                     return ElixirTypes.ESCAPE;
+            case 82: {
+                // Hotfix: non-interpolating sigil heredocs (e.g. ~S""") should not enter ESCAPE_SEQUENCE
+                // This breaks in [regex.ex](https://github.com/elixir-lang/elixir/blob/v1.16/lib/elixir/lib/regex.ex#L50) in Elixir 1.16+,
+                // causing completion, highlighting, etc, to not work, throwing error.
+                if (isInterpolating()) {
+                    pushAndBegin(ESCAPE_SEQUENCE);
+                    return ElixirTypes.ESCAPE;
+                } else {
+                    return ElixirTypes.FRAGMENT;
+                }
             }
             // fall through
           case 272: break;
@@ -2375,8 +2382,14 @@ public class ElixirFlexLexer implements FlexLexer {
             // lookahead expression with fixed base length
             zzMarkedPos = Character.offsetByCodePoints
                 (zzBufferL/*, zzStartRead, zzEndRead - zzStartRead*/, zzStartRead, 1);
-            { yybegin(GROUP_HEREDOC_LINE_ESCAPED_EOL);
-                     return ElixirTypes.ESCAPE;
+          {
+              // Hotfix: non-interpolating sigil heredocs (e.g. ~S""") should not enter ESCAPE_SEQUENCE
+              if (isInterpolating()) {
+                  yybegin(GROUP_HEREDOC_LINE_ESCAPED_EOL);
+                  return ElixirTypes.ESCAPE;
+              } else {
+                  return ElixirTypes.FRAGMENT;
+              }
             }
             // fall through
           case 338: break;
