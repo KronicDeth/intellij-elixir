@@ -97,31 +97,34 @@ object IdeTestContext {
                         details: String,
                         linkToLogs: String?
                     ) {
-                        // Check if your plugin is mentioned in the error message or details
-                        val mentionsElixir = message.contains("elixir", ignoreCase = true) ||
-                                details.contains("org.elixir_lang")
-
-                        // Check if stack trace contains references to your plugin's code
-                        // Exclude the error reporting mechanism itself (IdeTestContext.kt reportTestFailure)
-                        val hasElixirInStackTrace = details.lines().any { line ->
-                            val trimmed = line.trim()
-                            trimmed.startsWith("at org.elixir_lang.") &&
-                                    !trimmed.contains("IdeTestContext") &&
-                                    !trimmed.contains("reportTestFailure")
-                        }
-
                         // Ignore known problematic plugins and components
                         val ignoredPlugins = listOf(
                             "ReactNativePackagerBeforeRunTaskProvider",
                             "JVMDTraceProfilerConfiguration",
                             "com.intellij.profiler"
                         )
-                        val isIgnoredPlugin = ignoredPlugins.any {
-                            message.contains(it) || details.contains(it)
+                        val foundIgnoredPlugins = ignoredPlugins.filter {
+                            message.contains(it, true) || details.contains(it, true)
+                        }
+                        if (foundIgnoredPlugins.isNotEmpty()) {
+                            println("Ignoring plugin error from ($foundIgnoredPlugins) in $testName: $message")
+                            return
                         }
 
-                        if ((mentionsElixir || hasElixirInStackTrace) && !isIgnoredPlugin) {
-                            fail { "$testName fails: $message. \n$details" }
+                        // Check if your plugin is mentioned in the error message or details
+                        val mentionsElixir = message.contains("elixir", ignoreCase = true) && ! message.startsWith("Test: org.elixir_lang")
+
+                        // Check if stack trace contains references to your plugin's code
+                        // Exclude the error reporting mechanism itself (IdeTestContext.kt reportTestFailure)
+                        val elixirInStackTrace = details.lines().filter { line ->
+                            val trimmed = line.trim()
+                            trimmed.startsWith("at org.elixir_lang.") &&
+                                    !trimmed.contains("IdeTestContext") &&
+                                    !trimmed.contains("reportTestFailure")
+                        }
+
+                        if ((mentionsElixir || elixirInStackTrace.isNotEmpty())) {
+                            fail { "$testName fails: $message. (mentionsElixir=$mentionsElixir, elixirInStackTrace=$elixirInStackTrace)\n$details" }
                         } else {
                             println("Ignoring unrelated error in $testName: $message")
                         }

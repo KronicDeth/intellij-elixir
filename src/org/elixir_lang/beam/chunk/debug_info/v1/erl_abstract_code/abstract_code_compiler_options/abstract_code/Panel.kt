@@ -2,10 +2,7 @@
 
 package org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code
 
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.EditorFactory
-import com.intellij.openapi.progress.runBlockingCancellable
-import com.intellij.openapi.application.edtWriteAction
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiFileFactory
@@ -17,6 +14,7 @@ import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.AbstractCodeCo
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.attribute.MacroString
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.function.Clause
 import org.elixir_lang.beam.decompiler.Options
+import org.elixir_lang.util.WriteActions
 import java.awt.GridLayout
 import java.lang.ref.WeakReference
 import javax.swing.JPanel
@@ -206,10 +204,8 @@ class Panel(private val formsTree: Tree, project: Project): JPanel(GridLayout(1,
             else -> DEFAULT_TEXT
         }
 
-        runBlockingCancellable {
-            edtWriteAction {
-                document.setText(text)
-            }
+        WriteActions.runWriteActionLater {
+            document.setText(text)
         }
     }
 

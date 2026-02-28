@@ -2,15 +2,9 @@ package org.elixir_lang.action
 
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.application.edtWriteAction
-import com.intellij.openapi.progress.runBlockingCancellable
-import com.intellij.openapi.projectRoots.ProjectJdkTable
-import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl
 import org.elixir_lang.notification.setup_sdk.Notifier
-import org.elixir_lang.sdk.elixir.Type as ElixirSdkType
+import org.elixir_lang.sdk.SdkRegistrar
 import org.elixir_lang.sdk.erlang.Type as ErlangSdkType
-import org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData
 import java.io.File
 
 /**
@@ -56,7 +50,7 @@ class AddDevelopmentSdksAction : AnAction() {
 
             // Create Elixir SDK
             if (!elixirPath.isNullOrBlank()) {
-                val createdElixirSdk = createElixirSdk(elixirPath, erlangSdk)
+                val createdElixirSdk = createElixirSdk(elixirPath, erlangSdk, project)
                 elixirSdkCreated = createdElixirSdk != null
                 if (elixirSdkCreated) {
                     Notifier.sdkRefreshSuccess(project, 1, 1, 0, 0)
@@ -76,91 +70,30 @@ class AddDevelopmentSdksAction : AnAction() {
             return null
         }
 
-        val projectJdkTable = ProjectJdkTable.getInstance()
-        val erlangSdkType = ErlangSdkType()
-
-        // Check if SDK with this home path already exists
-        val existingSdk = projectJdkTable.allJdks.find {
-            it.sdkType is ErlangSdkType && it.homePath == homePath
-        }
-        if (existingSdk != null) {
-            return existingSdk
-        }
-
-        val sdkName = erlangSdkType.suggestSdkName("Erlang (Dev)", homePath)
-        val sdk = ProjectJdkImpl(sdkName, erlangSdkType)
-
-        val modificator = sdk.sdkModificator
-        modificator.homePath = homePath
-
-        if (sdk.versionString == null) {
-            return null
-        }
-
-        modificator.commitChanges()
-
-        runBlockingCancellable {
-            edtWriteAction {
-                projectJdkTable.addJdk(sdk)
-                erlangSdkType.setupSdkPaths(sdk)
-            }
-        }
-
-        return sdk
+        return SdkRegistrar.registerOrUpdateErlangSdk(homePath)
     }
 
     private fun createElixirSdk(
         homePath: String,
-        erlangSdk: com.intellij.openapi.projectRoots.Sdk?
+        erlangSdk: com.intellij.openapi.projectRoots.Sdk?,
+        project: com.intellij.openapi.project.Project
     ): com.intellij.openapi.projectRoots.Sdk? {
         if (!File(homePath).exists()) {
             return null
         }
 
-        val projectJdkTable = ProjectJdkTable.getInstance()
-        val elixirSdkType = ElixirSdkType.instance
-
-        // Check if SDK with this home path already exists
-        val existingSdk = projectJdkTable.allJdks.find {
-            it.sdkType is ElixirSdkType && it.homePath == homePath
-        }
-        if (existingSdk != null) {
-            return existingSdk
-        }
-
-        val sdkName = elixirSdkType.suggestSdkName("Elixir (Dev)", homePath)
-        val sdk = ProjectJdkImpl(sdkName, elixirSdkType)
-
-        val modificator = sdk.sdkModificator
-        modificator.homePath = homePath
-
-        if (sdk.versionString == null) {
-            return null
-        }
-
-        // Set the Erlang SDK as internal dependency if available
         val actualErlangSdk = erlangSdk ?: findExistingErlangSdk()
-        if (actualErlangSdk != null) {
-            modificator.sdkAdditionalData = SdkAdditionalData(actualErlangSdk, sdk)
-        }
-
-        modificator.commitChanges()
-
-        runBlockingCancellable {
-            edtWriteAction {
-                projectJdkTable.addJdk(sdk)
-                elixirSdkType.setupSdkPaths(sdk)
-            }
-        }
-
-        return sdk
+        return SdkRegistrar.registerOrUpdateElixirSdk(
+            homePath = homePath,
+            erlangSdk = actualErlangSdk,
+            project = project,
+        )
     }
 
-    private fun findExistingErlangSdk(): com.intellij.openapi.projectRoots.Sdk? {
-        return ProjectJdkTable.getInstance().allJdks.find {
-            it.sdkType is ErlangSdkType
-        }
-    }
+    private fun findExistingErlangSdk(): com.intellij.openapi.projectRoots.Sdk? =
+        com.intellij.openapi.projectRoots.ProjectJdkTable.getInstance()
+            .getSdksOfType(ErlangSdkType.instance)
+            .firstOrNull()
 
     override fun update(e: AnActionEvent) {
         // Only enable if we have SDK paths configured

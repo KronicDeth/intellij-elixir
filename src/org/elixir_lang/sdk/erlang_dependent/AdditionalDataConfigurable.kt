@@ -3,6 +3,7 @@ package org.elixir_lang.sdk.erlang_dependent
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.trace
 import com.intellij.openapi.options.ConfigurationException
 import com.intellij.openapi.projectRoots.AdditionalDataConfigurable
 import com.intellij.openapi.projectRoots.Sdk
@@ -13,6 +14,7 @@ import com.intellij.openapi.ui.ComboBox
 import com.intellij.openapi.util.Comparing
 import com.intellij.ui.SimpleListCellRenderer
 import com.intellij.util.ui.JBUI
+import org.elixir_lang.debug
 import org.elixir_lang.sdk.elixir.Type.Companion.addNewCodePathsFromInternErlangSdk
 import org.elixir_lang.sdk.elixir.Type.Companion.hasErlangClasspathInRoots
 import org.elixir_lang.sdk.elixir.Type.Companion.removeCodePathsFromInternalErlangSdk
@@ -232,16 +234,39 @@ class AdditionalDataConfigurable(
         }
     }
 
-    override fun isModified(): Boolean = modified
+    override fun isModified(): Boolean {
+        if (modified) {
+            return true
+        }
+
+        val sdk = elixirSdk ?: return false
+        val selectedErlangSdk = internalErlangSdksComboBox.selectedItem as? Sdk ?: return false
+        val additionalData = sdk.sdkAdditionalData as? SdkAdditionalData ?: return true
+
+        return additionalData.getErlangSdkName() != selectedErlangSdk.name
+    }
 
     @Throws(ConfigurationException::class)
     override fun apply() {
-        writeInternalErlangSdk(internalErlangSdksComboBox.selectedItem as? Sdk)
+        val myElixirSdk = elixirSdk ?: return
+        val selectedErlangSdk = internalErlangSdksComboBox.selectedItem as? Sdk
+        val existingAdditionalData = myElixirSdk.sdkAdditionalData as? SdkAdditionalData
+        val needsUpdate = existingAdditionalData?.getErlangSdkName() != selectedErlangSdk?.name
+
+        if (needsUpdate) {
+            writeInternalErlangSdk(selectedErlangSdk)
+            myElixirSdk.putUserData(Type.ERLANG_SDK_KEY, selectedErlangSdk)
+            if (LOG.isTraceEnabled) {
+                LOG.trace("[${myElixirSdk.name}] Reconfiguring SDK paths after Erlang SDK update")
+            }
+            (myElixirSdk.sdkType as? org.elixir_lang.sdk.elixir.Type)?.setupSdkPaths(myElixirSdk)
+        }
         modified = false
     }
 
     private fun writeInternalErlangSdk(erlangSdk: Sdk?) {
         val myElixirSdk = elixirSdk ?: return
+        LOG.trace { "[${myElixirSdk.name}] Persisting Erlang SDK dependency: ${erlangSdk?.name ?: "null"}" }
         val sdkAdditionData =
             SdkAdditionalData(
                 erlangSdk,
@@ -306,7 +331,12 @@ class AdditionalDataConfigurable(
                 }
             }
             if (!found) {
-                LOG.debug("[$sdkName] Erlang SDK '${erlangSdk.name}' not found in combo box (size=${internalErlangSdksComboBoxModel.size})")
+                LOG.debug { ("[$sdkName] Erlang SDK '${erlangSdk.name}' not found in combo box (size=${internalErlangSdksComboBoxModel.size})") }
+            }
+
+            if (!hasErlangClasspathInRoots(sdkModificator.getRoots(OrderRootType.CLASSES), erlangSdk)) {
+                addNewCodePathsFromInternErlangSdk(sdk, erlangSdk, sdkModificator)
+                updateWarningLabel()
             }
         } else {
             LOG.debug("[$sdkName] No Erlang SDK found to select")

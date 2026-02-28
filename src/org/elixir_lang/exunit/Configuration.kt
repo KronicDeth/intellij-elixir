@@ -99,7 +99,8 @@ class Configuration(name: String, project: Project) :
                 sdk,
                 erlArgumentList,
                 elixirArgumentList,
-                mixArgumentList
+                mixArgumentList,
+                project = project,
         )
         commandLine.addParameters(mixTestArgumentList)
 

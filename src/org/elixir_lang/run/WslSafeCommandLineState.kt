@@ -16,7 +16,13 @@ abstract class WslSafeCommandLineState<T>(
 
     @Throws(ExecutionException::class)
     override fun startProcess(): ProcessHandler {
-        val commandLine = configuration.commandLine()
+        val commandLine =
+            try {
+                configuration.commandLine()
+            } catch (e: ExecutionException) {
+                handleExecutionException(e)
+                throw e
+            }
 
         try {
             // Create process in background thread to avoid EDT violations with WSL command line patching
