@@ -1,26 +1,28 @@
 package org.elixir_lang.reference
 
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiPolyVariantReferenceBase
 import com.intellij.psi.ResolveResult
 import com.intellij.psi.impl.source.resolve.ResolveCache
-import com.intellij.psi.util.PsiTreeUtil
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.reference.resolver.Type
 
 class Type(typeSpec: AtUnqualifiedNoParenthesesCall<*>, type: Call) : PsiPolyVariantReferenceBase<Call>(type, textRange(typeSpec, type)) {
-    override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> =
-            ResolveCache
-                    .getInstance(this.myElement.project)
-                    .resolveWithCaching(
-                            this,
-                            Type,
-                            false,
-                            incompleteCode
-                    )
+    override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> {
+        ApplicationManager.getApplication().assertReadAccessAllowed()
+        return ResolveCache
+            .getInstance(this.myElement.project)
+            .resolveWithCaching(
+                this,
+                Type,
+                false,
+                incompleteCode
+            )
+    }
 
     companion object {
         tailrec fun typeHead(typeSpec: PsiElement): Call? =

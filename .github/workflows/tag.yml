@@ -1,0 +1,77 @@
+name: Tag Release
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag name for the release (e.g. v23.0.1)'
+        required: true
+        type: string
+      prerelease:
+        description: 'Mark as pre-release'
+        required: false
+        type: boolean
+        default: true
+      make_latest:
+        description: 'Mark as latest release'
+        required: false
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+          - 'legacy'
+        default: 'true'
+jobs:
+  test-and-verify:
+    uses: ./.github/workflows/shared-test.yml
+    with:
+      elixir-version: '1.13.4'
+      otp-version: '24.3.4.6'
+
+  release:
+    needs: [ test-and-verify ]
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Build Environment
+        id: setup-env
+        uses: ./.github/actions/setup-env
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          gradle-cache-read-only: 'false'
+          skip-searchable-options: 'false'
+
+      - name: Build with Gradle
+        id: build-plugin
+        run: ./gradlew buildPlugin --no-scan -PpublishChannels=default -PisRelease=true
+
+      - name: Export ASSET_PATH
+        run: echo "ASSET_PATH=$(ls -1 build/distributions/intellij-elixir-*.zip)" >> $GITHUB_ENV
+
+      - name: Tag Commit
+        id: tag-commit
+        uses: mathieudutour/github-tag-action@v6.2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          custom_tag: ${{ inputs.tag }}
+          tag_prefix: ''
+
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v2.5.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ inputs.tag }}
+          name: ${{ inputs.tag }}
+          prerelease: ${{ inputs.prerelease }}
+          make_latest: ${{ inputs.make_latest }}
+          files: ${{ env.ASSET_PATH }}
+          fail_on_unmatched_files: true
+
+#     - name: Publish
+#       env:
+#         JET_BRAINS_MARKETPLACE_TOKEN: ${{ secrets.JetBrainsMarketplaceToken }}
+#       run: ./gradlew --stacktrace publishPlugin

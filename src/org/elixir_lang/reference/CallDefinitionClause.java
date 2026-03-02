@@ -1,6 +1,7 @@
 package org.elixir_lang.reference;
 
 import com.intellij.codeInsight.lookup.LookupElement;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiPolyVariantReference;
@@ -59,7 +60,7 @@ public class CallDefinitionClause extends PsiReferenceBase<Call> implements PsiP
      */
     @NotNull
     @Override
-    public Object[] getVariants() {
+    public Object @NotNull [] getVariants() {
         return new Object[0];
     }
 
@@ -73,7 +74,8 @@ public class CallDefinitionClause extends PsiReferenceBase<Call> implements PsiP
      */
     @NotNull
     @Override
-    public ResolveResult[] multiResolve(boolean incompleteCode) {
+    public ResolveResult @NotNull [] multiResolve(boolean incompleteCode) {
+        ApplicationManager.getApplication().assertReadAccessAllowed();
         return ResolveCache
                 .getInstance(this.myElement.getProject())
                 .resolveWithCaching(

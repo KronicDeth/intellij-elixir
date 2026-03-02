@@ -1,5 +1,6 @@
 package org.elixir_lang.reference.resolver
 
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.DumbService
 import com.intellij.psi.PsiElementResolveResult
 import com.intellij.psi.ResolveResult
@@ -28,6 +29,7 @@ import org.elixir_lang.structure_view.element.Delegation
 
 object Callable : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Callable> {
     override fun resolve(callable: org.elixir_lang.reference.Callable, incompleteCode: Boolean): Array<ResolveResult> {
+        ApplicationManager.getApplication().assertReadAccessAllowed()
         val element = callable.element
         val resolvedPrimaryArity = element.resolvedPrimaryArity() ?: 0
 
@@ -102,7 +104,7 @@ object Callable : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Cal
             } else {
                 resolveUnqualified(element, name, resolvedPrimaryArity, incompleteCode)
             }
-        } catch (stackOverflowError: StackOverflowError) {
+        } catch (_: StackOverflowError) {
             Logger.error(Callable::class.java, "StackOverflowError when annotating Call", element)
 
             emptyList()

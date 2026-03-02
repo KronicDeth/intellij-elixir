@@ -2,6 +2,7 @@ package org.elixir_lang.reference
 
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiPolyVariantReferenceBase
@@ -56,8 +57,9 @@ class ModuleAttribute(psiElement: PsiElement) : PsiPolyVariantReferenceBase<PsiE
      * invalid results.
      * @return the array of results for resolving the reference.
      */
-    override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> =
-        ResolveCache
+    override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> {
+        ApplicationManager.getApplication().assertReadAccessAllowed()
+        return ResolveCache
             .getInstance(this.myElement.project)
             .resolveWithCaching(
                 this,
@@ -65,6 +67,7 @@ class ModuleAttribute(psiElement: PsiElement) : PsiPolyVariantReferenceBase<PsiE
                 false,
                 incompleteCode
             )
+    }
 
     override fun calculateDefaultRangeInElement(): TextRange {
         val elementTextRange = element.textRange

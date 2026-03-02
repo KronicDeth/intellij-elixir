@@ -1,6 +1,5 @@
 package org.elixir_lang.credo.inspection_tool
 
-import com.google.common.base.Charsets
 import com.intellij.analysis.AnalysisScope
 import com.intellij.codeInspection.*
 import com.intellij.execution.ExecutionException
@@ -24,10 +23,11 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
 import org.elixir_lang.Mix
 import org.elixir_lang.credo.Action
-import org.elixir_lang.jps.builder.ParametersList
+import org.elixir_lang.jps.shared.ParametersList
 import org.elixir_lang.mix.Project
 import org.elixir_lang.notification.setup_sdk.Notifier
 import org.elixir_lang.sdk.elixir.Type.Companion.mostSpecificSdk
+import java.nio.charset.StandardCharsets
 import java.nio.file.Paths
 
 class Global : GlobalInspectionTool() {
@@ -92,9 +92,10 @@ class Global : GlobalInspectionTool() {
                                             workingDirectory,
                                             elixirSdk,
                                             erlParameters,
-                                            elixirParameters
+                                            elixirParameters,
+                                            false
                                         )
-                                        .withCharset(Charsets.UTF_8)
+                                        .withCharset(StandardCharsets.UTF_8)
                                         .withWorkDirectory(workingDirectory)
                                         .apply { addParameters("credo", "--format", "flycheck") }
 
@@ -225,6 +226,8 @@ class Global : GlobalInspectionTool() {
     override fun worksInBatchModeOnly(): Boolean = true
 
     companion object {
+        // Referenced by inspection registration via reflection.
+        @Suppress("unused")
         val SHORT_NAME = "Credo"
     }
 }

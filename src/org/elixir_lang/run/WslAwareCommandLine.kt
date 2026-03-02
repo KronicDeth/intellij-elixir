@@ -2,6 +2,7 @@ package org.elixir_lang.run
 
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.trace
 import org.elixir_lang.sdk.wsl.wslCompat
 import java.io.IOException
 
@@ -52,7 +53,7 @@ open class WslAwareCommandLine : GeneralCommandLine {
     @Throws(IOException::class)
     override fun createProcess(processBuilder: ProcessBuilder): Process {
         wslCompat.convertProcessBuilderArgumentsForWsl(processBuilder, this)
-        LOG.debug(formatCommandLineForLogging(processBuilder, "Command line"))
+        LOG.trace  { formatCommandLineForLogging(processBuilder, "Command line") }
         return super.createProcess(processBuilder)
     }
 }

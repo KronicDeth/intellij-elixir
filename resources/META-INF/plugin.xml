@@ -123,6 +123,8 @@
         <!-- WSL Support Service -->
         <applicationService serviceInterface="org.elixir_lang.sdk.wsl.WslCompatService"
                             serviceImplementation="org.elixir_lang.sdk.wsl.WslCompatServiceImpl"/>
+        <applicationService serviceInterface="org.elixir_lang.sdk.erlang_dependent.ErlangSdkResolver"
+                            serviceImplementation="org.elixir_lang.sdk.erlang_dependent.DefaultErlangSdkResolver"/>
         <applicationService serviceInterface="org.elixir_lang.sdk.elixir.SdkSettingsOpener"
                             serviceImplementation="org.elixir_lang.sdk.elixir.SettingsSdkSettingsOpener"/>
 

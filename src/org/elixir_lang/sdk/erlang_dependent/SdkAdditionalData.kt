@@ -25,6 +25,8 @@ import org.jdom.Element
  * - Invalidated when the referenced SDK no longer exists in ProjectJdkTable
  * - Cleared on [readExternal] to force re-resolution after loading from disk
  *
+ * Cache resolution is performed by [ErlangSdkResolver].
+ *
  * ## SDK Removal Handling
  *
  * When an Erlang SDK is removed from ProjectJdkTable, the [org.elixir_lang.sdk.elixir.Type]
@@ -128,6 +130,12 @@ class SdkAdditionalData :
         cachedErlangSdk = sdk
     }
 
+    internal fun getCachedErlangSdk(): Sdk? = cachedErlangSdk
+
+    internal fun setCachedErlangSdk(sdk: Sdk?) {
+        cachedErlangSdk = sdk
+    }
+
     fun getErlangSdk(): Sdk? = getErlangSdk(sdkModel = null)
 
     /**
@@ -139,43 +147,6 @@ class SdkAdditionalData :
      * @return the Erlang SDK, or null if none found
      */
     fun getErlangSdk(sdkModel: SdkModel?): Sdk? {
-        val elixirName = elixirSdk.name
-
-        // 1. Check cached SDK - verify it still exists AND is valid type
-        cachedErlangSdk?.let { cached ->
-            if (isValidAndExists(cached, sdkModel)) {
-                return cached
-            }
-            LOG.debug("[$elixirName] Cached Erlang SDK '${cached.name}' no longer valid")
-            cachedErlangSdk = null
-        }
-
-        // 2. Lookup by configured name
-        erlangSdkName?.let { name ->
-            LOG.debug("[$elixirName] Looking up Erlang SDK by name: $name")
-            val found = findErlangSdkByName(name, sdkModel)
-            if (found != null) {
-                LOG.debug("[$elixirName] Found Erlang SDK '$name'")
-                cachedErlangSdk = found
-                return found
-            }
-            LOG.debug("[$elixirName] Erlang SDK '$name' not found")
-        }
-        return null
-    }
-
-    private fun isValidAndExists(sdk: Sdk, sdkModel: SdkModel?): Boolean {
-        if (!Type.staticIsValidDependency(sdk)) return false
-        val name = sdk.name
-        val jdkTable = ProjectJdkTable.getInstance()
-        return (sdkModel?.sdks?.any { it.name == name } == true)
-            || (jdkTable.findJdk(name) != null)
-    }
-
-    private fun findErlangSdkByName(name: String, sdkModel: SdkModel?): Sdk? {
-        val jdkTable = ProjectJdkTable.getInstance()
-        // Check SdkModel first (for unsaved SDKs in dialogs)
-        return sdkModel?.sdks?.find { it.name == name && Type.staticIsValidDependency(it) }
-            ?: jdkTable.findJdk(name)?.takeIf { Type.staticIsValidDependency(it) }
+        return ErlangSdkResolver.getInstance().resolveErlangSdk(elixirSdk, sdkModel)
     }
 }
