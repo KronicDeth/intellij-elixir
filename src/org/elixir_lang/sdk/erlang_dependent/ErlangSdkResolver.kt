@@ -12,7 +12,17 @@ import com.intellij.openapi.projectRoots.SdkModel
  * Interface allows mocking in tests
  */
 interface ErlangSdkResolver {
-    fun resolveErlangSdk(elixirSdk: Sdk, sdkModel: SdkModel? = null): Sdk?
+    fun resolveErlangSdkResult(elixirSdk: Sdk, sdkModel: SdkModel? = null): ErlangSdkResult
+
+    /**
+     * Lightweight resolver that returns only the SDK or null, discarding failure details.
+     * Use [resolveErlangSdkResult] when you need the reason for a missing dependency.
+     */
+    fun resolveErlangSdk(elixirSdk: Sdk, sdkModel: SdkModel? = null): Sdk? =
+        when (val result = resolveErlangSdkResult(elixirSdk, sdkModel)) {
+            is ErlangSdkResult.Success -> result.sdk
+            is ErlangSdkResult.Missing -> null
+        }
 
     companion object {
         fun getInstance(): ErlangSdkResolver =
@@ -24,38 +34,60 @@ interface ErlangSdkResolver {
  * Default implementation extracted from SdkAdditionalData
  */
 class DefaultErlangSdkResolver : ErlangSdkResolver {
-    override fun resolveErlangSdk(elixirSdk: Sdk, sdkModel: SdkModel?): Sdk? {
-        val additionalData = elixirSdk.elixirAdditionalData ?: return null
-        return resolveFromAdditionalData(elixirSdk, additionalData, sdkModel)
-    }
-
-    private fun resolveFromAdditionalData(
-        elixirSdk: Sdk,
-        additionalData: SdkAdditionalData,
-        sdkModel: SdkModel?
-    ): Sdk? {
+    override fun resolveErlangSdkResult(elixirSdk: Sdk, sdkModel: SdkModel?): ErlangSdkResult {
         val elixirName = elixirSdk.name
+        val additionalData = elixirSdk.elixirAdditionalData
+        val configuredName = additionalData?.getErlangSdkName()?.takeIf { it.isNotBlank() }
+            ?: return ErlangSdkResult.Missing(
+                elixirSdk,
+                MissingErlangSdkReason.NOT_CONFIGURED,
+            )
 
         additionalData.getCachedErlangSdk()?.let { cached ->
             if (isValidAndExists(cached, sdkModel)) {
-                return cached
+                if (cached.homePath.isNullOrBlank()) {
+                    return ErlangSdkResult.Missing(
+                        elixirSdk,
+                        MissingErlangSdkReason.MISSING_HOME_PATH,
+                        cached.name,
+                    )
+                }
+                return ErlangSdkResult.Success(cached)
             }
             logger.debug { "[$elixirName] Cached Erlang SDK '${cached.name}' no longer valid" }
             additionalData.setCachedErlangSdk(null)
         }
 
-        additionalData.getErlangSdkName()?.let { name ->
-            logger.debug { "[$elixirName] Looking up Erlang SDK by name: $name" }
-            val found = findErlangSdkByName(name, sdkModel)
-            if (found != null) {
-                logger.debug { "[$elixirName] Found Erlang SDK '$name'" }
-                additionalData.setCachedErlangSdk(found)
-                return found
+        logger.debug { "[$elixirName] Looking up Erlang SDK by name: $configuredName" }
+        val found = findErlangSdkByName(configuredName, sdkModel)
+        if (found != null) {
+            logger.debug { "[$elixirName] Found Erlang SDK '$configuredName'" }
+            additionalData.setCachedErlangSdk(found)
+            if (found.homePath.isNullOrBlank()) {
+                return ErlangSdkResult.Missing(
+                    elixirSdk,
+                    MissingErlangSdkReason.MISSING_HOME_PATH,
+                    found.name,
+                )
             }
-            logger.debug { "[$elixirName] Erlang SDK '$name' not found" }
+            return ErlangSdkResult.Success(found)
         }
 
-        return null
+        logger.debug { "[$elixirName] Erlang SDK '$configuredName' not found" }
+        val candidate =
+            sdkModel?.sdks?.find { it.name == configuredName }
+                ?: ProjectJdkTable.getInstance().findJdk(configuredName)
+        val reason = when {
+            candidate == null -> MissingErlangSdkReason.NOT_FOUND
+            !Type.staticIsValidDependency(candidate) -> MissingErlangSdkReason.INVALID_TYPE
+            else -> MissingErlangSdkReason.NOT_FOUND
+        }
+
+        return ErlangSdkResult.Missing(
+            elixirSdk,
+            reason,
+            configuredName,
+        )
     }
 
     private fun isValidAndExists(sdk: Sdk, sdkModel: SdkModel?): Boolean {
@@ -74,5 +106,27 @@ class DefaultErlangSdkResolver : ErlangSdkResolver {
 
     companion object {
         private val logger = Logger.getInstance(DefaultErlangSdkResolver::class.java)
+    }
+}
+
+enum class MissingErlangSdkReason {
+    NOT_CONFIGURED,
+    NOT_FOUND,
+    INVALID_TYPE,
+    MISSING_HOME_PATH
+}
+
+sealed class ErlangSdkResult {
+    data class Success(val sdk: Sdk) : ErlangSdkResult()
+    data class Missing(
+        val elixirSdkName: String,
+        val reason: MissingErlangSdkReason,
+        val erlangSdkName: String? = null,
+    ) : ErlangSdkResult() {
+        constructor(
+            elixirSdk: Sdk,
+            reason: MissingErlangSdkReason,
+            erlangSdkName: String? = null,
+        ) : this(elixirSdk.name, reason, erlangSdkName)
     }
 }
