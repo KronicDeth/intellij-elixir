@@ -14,7 +14,7 @@ test-logger = "4.0.0"
 # Dependency Versions
 commons-io = "2.21.0"
 junit = "4.13.2"
-junit-jupiter = "5.11.4"
+junit-jupiter = "6.0.2"
 opentest4j = "1.3.0"
 mockito-core = "5.21.0"
 kodein = "7.22.0"
