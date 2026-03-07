@@ -489,7 +489,7 @@ val getElixir by tasks.registering {
 
 
 val getQuoter by tasks.registering(Download::class) {
-    src("https://github.com/KronicDeth/intellij_elixir/archive/v${quoterVersion}.zip")
+    src("https://github.com/joshuataylor/intellij_elixir/archive/${quoterVersion}.zip")
     dest(cachePath.file("intellij_elixir-${quoterVersion}.zip"))
     overwrite(false)
 }
