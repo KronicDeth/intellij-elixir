@@ -1,9 +1,6 @@
 package org.elixir_lang.beam.chunk.elixir_documentation
 
-import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.application.edtWriteAction
 import com.intellij.openapi.editor.EditorFactory
-import com.intellij.openapi.progress.runBlockingCancellable
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiFileFactory
@@ -11,6 +8,7 @@ import com.intellij.util.containers.ContainerUtil.createWeakValueMap
 import org.elixir_lang.ElixirFileType
 import org.elixir_lang.ElixirLanguage
 import org.elixir_lang.beam.chunk.ElixirDocumentation
+import org.elixir_lang.util.WriteActions
 import java.awt.GridLayout
 import java.lang.ref.WeakReference
 import javax.swing.JPanel
@@ -53,10 +51,8 @@ class Panel(private val elixirDocumentationTree: Tree, project: Project, private
             else -> DEFAULT_TEXT
         }
 
-        runBlockingCancellable {
-            edtWriteAction {
-                document.setText(text)
-            }
+        WriteActions.runWriteActionLater {
+            document.setText(text)
         }
     }
 

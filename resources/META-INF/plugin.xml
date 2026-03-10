@@ -32,6 +32,7 @@
         <backgroundPostStartupActivity implementation="org.elixir_lang.status_bar_widget.ElixirSdkStatusWidgetStartupActivity"/>
 
         <postStartupActivity implementation="org.elixir_lang.sdk.SdkTableListenerStartupActivity"/>
+        <postStartupActivity implementation="org.elixir_lang.mix.DepsCheckerStartupActivity"/>
 
         <!--        <errorHandler implementation="org.elixir_lang.errorreport.Submitter"/>-->
         <errorHandler implementation="com.intellij.diagnostic.JetBrainsMarketplaceErrorReportSubmitter"/>
@@ -46,6 +47,7 @@
 
         <editorNotificationProvider implementation="org.elixir_lang.notification.setup_sdk.Provider"/>
         <notificationGroup displayType="BALLOON" id="Elixir"/>
+        <notificationGroup displayType="STICKY_BALLOON" id="Elixir Mix Deps"/>
 
         <!-- Distillery -->
         <configurationType implementation="org.elixir_lang.distillery.configuration.Type"/>
@@ -347,9 +349,9 @@
             <separator/>
             <!--suppress PluginXmlCapitalization -->
             <action id="Elixir.InstallMixDependencies" class="org.elixir_lang.action.InstallMixDependenciesAction"
-                    text="Install Mix Dependencies (hex, rebar, deps.get)"
+                    text="Install Mix Deps (hex, rebar, deps.get, deps.compile)"
                     icon="org.elixir_lang.mix.configuration.Icons.TYPE"
-                    description="Installs hex, rebar, and fetches Mix dependencies"/>
+                    description="Installs hex, rebar, fetches Mix deps, and compiles them"/>
             <separator/>
             <add-to-group group-id="ToolsMenu" anchor="last"/>
         </group>

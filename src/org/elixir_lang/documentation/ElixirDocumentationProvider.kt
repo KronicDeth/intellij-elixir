@@ -11,6 +11,7 @@ import com.intellij.openapi.util.TextRange
 import com.intellij.psi.*
 import com.intellij.psi.impl.source.tree.LeafPsiElement
 import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.psi.DummyBlockType.DummyBlock as ExperimentalPsiDummyBlock
 import org.elixir_lang.beam.chunk.beam_documentation.docs.documented.Hidden
 import org.elixir_lang.beam.chunk.beam_documentation.docs.documented.MarkdownByLanguage
 import org.elixir_lang.beam.chunk.beam_documentation.docs.documented.None
@@ -97,7 +98,9 @@ class ElixirDocumentationProvider : DocumentationProvider {
             is Parent,
                 // Aliases
             is QualifiableAlias,
-            is PsiErrorElement
+            is PsiErrorElement,
+            // Errors seen in 2026.1 with this type, so ignoring.
+            is ExperimentalPsiDummyBlock
             -> Unit
 
             else -> {

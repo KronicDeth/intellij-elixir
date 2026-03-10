@@ -1,12 +1,26 @@
 package org.elixir_lang.notification.setup_sdk
 
 import com.intellij.execution.ExecutionException
+import com.intellij.notification.Notification
+import com.intellij.notification.NotificationAction
 import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
+import org.elixir_lang.sdk.erlang_dependent.ErlangSdkResult
+import org.elixir_lang.sdk.erlang_dependent.MissingErlangSdkReason
+import org.elixir_lang.sdk.elixir.SdkSettingsOpener
+import java.util.Collections
+import java.util.WeakHashMap
 
 object Notifier {
+    const val MIX_DEPS_OUTDATED_TITLE: String = "Mix deps outdated"
+    private const val MIX_DEPS_GROUP_ID: String = "Elixir Mix Deps"
+    private val mixDepsNotifications: MutableMap<Project, Notification> =
+        Collections.synchronizedMap(WeakHashMap())
+    private val missingErlangSdkNotifications: MutableMap<Project, Notification> =
+        Collections.synchronizedMap(WeakHashMap())
+
     fun mixSettings(module: Module, executionException: ExecutionException) {
         val message = executionException.message
         val isEmpty = "Executable is not specified" == message
@@ -111,16 +125,39 @@ object Notifier {
 
     // Mix Dependencies notification methods
     fun mixDepsOutdated(project: Project) {
+        if (mixDepsNotifications.containsKey(project)) {
+            return
+        }
+
+        val notification = NotificationGroupManager
+            .getInstance()
+            .getNotificationGroup(MIX_DEPS_GROUP_ID)
+            .createNotification(
+                MIX_DEPS_OUTDATED_TITLE,
+                "Mix deps reported missing, outdated, or uncompiled deps",
+                NotificationType.WARNING
+            )
+            .addAction(org.elixir_lang.notification.mix_deps.InstallAction())
+            .addAction(org.elixir_lang.notification.mix_deps.ShowStatusAction())
+            .whenExpired { mixDepsNotifications.remove(project) }
+        mixDepsNotifications[project] = notification
+        notification.notify(project)
+    }
+
+    fun mixDepsCheckFailed(project: Project, message: String) {
         NotificationGroupManager
             .getInstance()
             .getNotificationGroup("Elixir")
             .createNotification(
-                "Mix dependencies outdated",
-                "The deps/ is folder missing or mix.lock is newer than the deps/ folder",
-                NotificationType.WARNING
+                "Mix deps check failed",
+                message,
+                NotificationType.INFORMATION
             )
-            .addAction(org.elixir_lang.notification.mix_deps.InstallAction())
             .notify(project)
+    }
+
+    fun clearMixDepsOutdated(project: Project) {
+        mixDepsNotifications.remove(project)?.expire()
     }
 
     fun mixDepsInstallSuccess(project: Project) {
@@ -128,8 +165,8 @@ object Notifier {
             .getInstance()
             .getNotificationGroup("Elixir")
             .createNotification(
-                "Mix dependencies installed",
-                "Successfully installed hex, rebar, and fetched dependencies",
+                "Mix deps installed",
+                "Successfully installed hex, rebar, fetched deps, and compiled",
                 NotificationType.INFORMATION
             )
             .notify(project)
@@ -140,8 +177,8 @@ object Notifier {
             .getInstance()
             .getNotificationGroup("Elixir")
             .createNotification(
-                "Mix Dependencies installation failed",
-                "Failed to install dependencies: $errorMessage",
+                "Mix deps installation failed",
+                "Failed during local.hex, local.rebar, deps.get, or compilation. See Run Window for details: $errorMessage",
                 NotificationType.ERROR
             )
             .notify(project)
@@ -153,7 +190,7 @@ object Notifier {
             .getNotificationGroup("Elixir")
             .createNotification(
                 "No Elixir SDK found",
-                "Please configure an Elixir SDK for this project before installing dependencies",
+                "Please configure an Elixir SDK for this project before installing deps",
                 NotificationType.ERROR
             )
             .notify(project)
@@ -164,10 +201,65 @@ object Notifier {
             .getInstance()
             .getNotificationGroup("Elixir")
             .createNotification(
-                "Mix dependencies error",
+                "Mix deps error",
                 errorMessage,
                 NotificationType.ERROR
             )
             .notify(project)
+    }
+
+    fun elixirSdkMissingErlangDependency(project: Project?, missing: ErlangSdkResult.Missing) {
+        if (project != null && missingErlangSdkNotifications.containsKey(project)) {
+            return
+        }
+
+        val settingsTarget = SdkSettingsOpener.getInstance().targetName()
+        val details = when (missing.reason) {
+            MissingErlangSdkReason.NOT_CONFIGURED ->
+                "Elixir SDK '<b>${missing.elixirSdkName}</b>' does not have an Erlang SDK configured."
+
+            MissingErlangSdkReason.NOT_FOUND ->
+                if (missing.erlangSdkName.isNullOrBlank()) {
+                    "Elixir SDK '<b>${missing.elixirSdkName}</b>' references an Erlang SDK that cannot be found."
+                } else {
+                    "Elixir SDK '<b>${missing.elixirSdkName}</b>' references Erlang SDK '<b>${missing.erlangSdkName}</b>' which cannot be found."
+                }
+
+            MissingErlangSdkReason.INVALID_TYPE ->
+                if (missing.erlangSdkName.isNullOrBlank()) {
+                    "Elixir SDK '<b>${missing.elixirSdkName}</b>' references an SDK that is not an Erlang SDK."
+                } else {
+                    "Elixir SDK '<b>${missing.elixirSdkName}</b>' references SDK '<b>${missing.erlangSdkName}</b>' which is not an Erlang SDK."
+                }
+
+            MissingErlangSdkReason.MISSING_HOME_PATH ->
+                if (missing.erlangSdkName.isNullOrBlank()) {
+                    "Elixir SDK '<b>${missing.elixirSdkName}</b>' references an Erlang SDK with no home path."
+                } else {
+                    "Elixir SDK '<b>${missing.elixirSdkName}</b>' references Erlang SDK '<b>${missing.erlangSdkName}</b>' with no home path."
+                }
+        }
+        val notification =
+            NotificationGroupManager
+                .getInstance()
+                .getNotificationGroup("Elixir")
+                .createNotification(
+                    "Elixir SDK missing Erlang SDK",
+                    "$details Configure it in $settingsTarget.",
+                    NotificationType.WARNING
+                )
+                .addAction(NotificationAction.create("Configure SDKs") { event, _ ->
+                    SdkSettingsOpener.getInstance().open(event)
+                })
+                .whenExpired {
+                    if (project != null) {
+                        missingErlangSdkNotifications.remove(project)
+                    }
+                }
+
+        if (project != null) {
+            missingErlangSdkNotifications[project] = notification
+        }
+        notification.notify(project)
     }
 }
