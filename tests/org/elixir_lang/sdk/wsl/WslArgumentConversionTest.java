@@ -310,14 +310,16 @@ public class WslArgumentConversionTest extends PlatformTestCase {
 
         commandLine.setExePath("\\\\wsl$\\Ubuntu\\usr\\bin\\elixir");
         commandLine.setWorkDirectory(WSL_WORK_DIR);
-        commandLine.getEnvironment().put("MYPATH", "C:/Users/user/bin");
-        commandLine.getEnvironment().put("DATADIR", "D:\\data\\files");
+        commandLine.getEnvironment().put("ANOTHER_ENV_VAR", "/home/user/.local/share/mise/installs/elixir/1.17.3/bin:/home/user/.local/share/mise/installs/elixir/1.17.3/.mix/escripts");
+        commandLine.getEnvironment().put("MIX_HOME", "C:/Users/user/.mix");
+        commandLine.getEnvironment().put("MIX_ARCHIVES", "D:\\data\\mix_archives");
 
         ProcessBuilder processBuilder = toProcessBuilder(commandLine);
         service.convertProcessBuilderArgumentsForWsl(processBuilder, commandLine);
 
-        assertEquals("/mnt/c/Users/user/bin", processBuilder.environment().get("MYPATH"));
-        assertEquals("/mnt/d/data/files", processBuilder.environment().get("DATADIR"));
+        assertEquals("/mnt/c/Users/user/.mix", processBuilder.environment().get("MIX_HOME"));
+        assertEquals("/mnt/d/data/mix_archives", processBuilder.environment().get("MIX_ARCHIVES"));
+        assertEquals("/home/user/.local/share/mise/installs/elixir/1.17.3/bin:/home/user/.local/share/mise/installs/elixir/1.17.3/.mix/escripts", processBuilder.environment().get("ANOTHER_ENV_VAR"));
     }
 
     /**

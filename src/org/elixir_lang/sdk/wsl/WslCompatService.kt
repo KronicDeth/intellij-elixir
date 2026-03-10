@@ -11,7 +11,7 @@ import kotlin.io.path.absolutePathString
 
 const val MODERN_WSL_PREFIX = "\\\\wsl.localhost\\"
 const val LEGACY_WSL_PREFIX = "\\\\wsl$\\"
-
+private val envVarsToConvert = setOf("MIX_HOME", "MIX_ARCHIVES")
 /**
  * Service wrapper for WSL (Windows Subsystem for Linux Integration).
  *
@@ -149,7 +149,11 @@ interface WslCompatService {
 
         // Modify ProcessBuilder environment in place
         val env = processBuilder.environment()
-        env.replaceAll { _, value -> convertWslPathsInString(value, distribution) }
+        for (key in envVarsToConvert) {
+            env[key]?.let { value ->
+                env[key] = convertWslPathsInString(value, distribution)
+            }
+        }
     }
 
     /**
