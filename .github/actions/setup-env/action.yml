@@ -15,10 +15,6 @@ inputs:
     description: 'IntelliJ IDEA version to test against. Keep in sync with the matrix in shared-test.yml'
     required: false
     default: '253.30387.90'  # 2025.3.2 - should match first version in shared-test.yml
-  gradle-cache-read-only:
-    description: 'If true, Gradle and Elixir caches are read-only (no writes). Set to false on main branch to seed caches for PRs.'
-    required: false
-    default: 'true'
   github-token:
     description: 'GitHub token for API access (required for setup-java to download JBR)'
     required: true
@@ -93,7 +89,7 @@ runs:
       id: setup-gradle
       uses: gradle/actions/setup-gradle@v5
       with:
-        cache-read-only: ${{ inputs.gradle-cache-read-only }}
+        cache-disabled: true
         add-job-summary-as-pr-comment: 'on-failure'
         build-scan-publish: ${{ inputs.build-scan-publish }}
         build-scan-terms-of-use-url: 'https://gradle.com/terms-of-service'
@@ -130,7 +126,7 @@ runs:
 
     - name: Save Elixir cache
       id: cache-elixir-save
-      if: always() && inputs.gradle-cache-read-only != 'true' && steps.cache-elixir-restore.outputs.cache-hit != 'true' && inputs.setup-elixir == 'true'
+      if: always() && steps.cache-elixir-restore.outputs.cache-hit != 'true' && inputs.setup-elixir == 'true'
       uses: actions/cache/save@v5
       with:
         path: |
