@@ -16,7 +16,6 @@ jobs:
         uses: ./.github/actions/setup-env
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          gradle-cache-read-only: 'false'
           setup-elixir: false
 
       - name: Download Release Asset

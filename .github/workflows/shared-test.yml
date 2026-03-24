@@ -58,7 +58,6 @@ jobs:
           elixir-version: ${{ inputs.elixir-version || '1.13.4' }}
           otp-version: ${{ inputs.otp-version || '24.3.4.6' }}
           idea-version: ${{ matrix.idea-version }}
-          gradle-cache-read-only: ${{ github.event_name == 'pull_request' }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run Tests
@@ -113,7 +112,6 @@ jobs:
         uses: ./.github/actions/setup-env
         with:
           setup-elixir: false
-          gradle-cache-read-only: ${{ github.event_name == 'pull_request' }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
           idea-version: '2025.3.2'
 
