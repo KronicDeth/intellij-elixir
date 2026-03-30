@@ -117,7 +117,7 @@ class Step(parent: NewProjectWizardStep) : AbstractNewProjectWizardStep(parent),
             val workingDirectory = Paths.get(".").toAbsolutePath().normalize().toString()
             val projectDirectory = context.projectDirectory.toString()
 
-            val commandLine = Mix.commandLine(emptyMap(), workingDirectory, sdk)
+            val commandLine = Mix.commandLine(emptyMap(), workingDirectory, sdk, project = project)
             commandLine.addParameters("new", projectDirectory)
 
             if (mixNewApp.isNotBlank()) {
@@ -203,6 +203,9 @@ class Step(parent: NewProjectWizardStep) : AbstractNewProjectWizardStep(parent),
             )
 
             builder.commit(project)
+        } catch (e: ExecutionException) {
+            Logger.getInstance(javaClass).warn("mix new failed", e)
+            throw e
         } catch (ioException: IOException) {
             Logger.getInstance(javaClass).error(ioException)
 

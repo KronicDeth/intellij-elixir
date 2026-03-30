@@ -1,13 +1,29 @@
 package org.elixir_lang.sdk.elixir
 
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.testFramework.registerOrReplaceServiceInstance
 import org.elixir_lang.PlatformTestCase
+import org.elixir_lang.sdk.wsl.MockWslCompatService
+import org.elixir_lang.sdk.wsl.WslCompatService
 
 /**
  * Tests for Elixir SDK Type naming methods.
  */
-class TypeNamingTest: PlatformTestCase() {
+class TypeNamingTest : PlatformTestCase() {
 
-    private val elixirType = Type.instance
+    private lateinit var elixirType: Type
+
+    override fun setUp() {
+        super.setUp()
+
+        // Replace the real WslCompatService with MockWslCompatService for testing
+        ApplicationManager.getApplication().registerOrReplaceServiceInstance(
+            WslCompatService::class.java,
+            MockWslCompatService(),
+            testRootDisposable,
+        )
+        elixirType = Type.instance
+    }
 
     fun testSuggestSdkName_miseElixir() {
         val name = elixirType.suggestSdkName(null, "/Users/josh/.local/share/mise/installs/elixir/1.15.7")

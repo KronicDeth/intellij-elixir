@@ -31,6 +31,7 @@ libs/
 .intellijPlatform
 /.kotlin
 CLAUDE.md
+AGENTS.md
 /.claude
 /.ai
 /allure-results

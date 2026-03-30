@@ -1,13 +1,17 @@
 package org.elixir_lang.cli
 
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.execution.CantRunException
 import com.intellij.openapi.projectRoots.Sdk
+import com.intellij.openapi.projectRoots.SdkModel
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.testFramework.registerOrReplaceServiceInstance
 import com.intellij.util.system.OS
 import org.elixir_lang.PlatformTestCase
 import org.elixir_lang.jps.shared.cli.CliTool
 import org.elixir_lang.sdk.erlang_dependent.ErlangSdkResolver
+import org.elixir_lang.sdk.erlang_dependent.ErlangSdkResult
+import org.elixir_lang.sdk.erlang_dependent.MissingErlangSdkReason
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
@@ -41,7 +45,7 @@ class CliArgumentsTest(private val targetOS: OS) : PlatformTestCase() {
 
         ApplicationManager.getApplication().registerOrReplaceServiceInstance(
             ErlangSdkResolver::class.java,
-            TestErlangSdkResolver(erlangSdkByElixirSdk),
+            ErlangSdkResolverMockImpl(erlangSdkByElixirSdk),
             testRootDisposable,
         )
 
@@ -163,6 +167,38 @@ class CliArgumentsTest(private val targetOS: OS) : PlatformTestCase() {
         assertFalse(tokens.contains("-elixir_root"))
     }
 
+    @Test
+    fun testArgsOrThrowMissingErlangSdkThrows() {
+        val elixirHome = createElixirHome("elixir")
+        val elixirSdk = mockSdk("1.18.4", elixirHome)
+
+        ApplicationManager.getApplication().registerOrReplaceServiceInstance(
+            ErlangSdkResolver::class.java,
+            object : ErlangSdkResolver {
+                override fun resolveErlangSdkResult(
+                    elixirSdk: Sdk,
+                    sdkModel: SdkModel?
+                ): ErlangSdkResult {
+                    return ErlangSdkResult.Missing(
+                        elixirSdk,
+                        MissingErlangSdkReason.NOT_FOUND,
+                        "Erlang SDK"
+                    )
+                }
+            },
+            testRootDisposable,
+        )
+
+        assertThrows(CantRunException.CustomProcessedCantRunException::class.java) {
+            CliArguments.argsOrThrow(
+                elixirSdk = elixirSdk,
+                tool = CliTool.MIX,
+                os = targetOS,
+                project = null,
+            )
+        }
+    }
+
     private fun mockSdk(version: String?, homePath: Path, erlangSdk: Sdk? = null): Sdk {
         val sdk = mock(Sdk::class.java)
         `when`(sdk.versionString).thenReturn(version)
@@ -264,11 +300,19 @@ class CliArgumentsTest(private val targetOS: OS) : PlatformTestCase() {
         return path
     }
 
-    private class TestErlangSdkResolver(
+    private class ErlangSdkResolverMockImpl(
         private val erlangSdkByElixirSdk: Map<Sdk, Sdk>
     ) : ErlangSdkResolver {
-        override fun resolveErlangSdk(elixirSdk: Sdk, sdkModel: com.intellij.openapi.projectRoots.SdkModel?): Sdk? {
-            return erlangSdkByElixirSdk[elixirSdk]
+        override fun resolveErlangSdkResult(
+            elixirSdk: Sdk,
+            sdkModel: SdkModel?
+        ): ErlangSdkResult {
+            val erlangSdk = erlangSdkByElixirSdk[elixirSdk]
+                ?: return ErlangSdkResult.Missing(
+                    elixirSdk,
+                    MissingErlangSdkReason.NOT_FOUND,
+                )
+            return ErlangSdkResult.Success(erlangSdk)
         }
     }
 }

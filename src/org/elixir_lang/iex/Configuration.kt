@@ -75,7 +75,8 @@ class Configuration(name: String, project: Project, configurationFactory: Config
                 environment = envs,
                 workingDirectory = workingDirectory,
                 elixirSdk = sdk,
-                erlArgumentList = erlArgumentList
+                erlArgumentList = erlArgumentList,
+                project = project,
         )
         commandLine.addParameters(iexArgumentList)
 

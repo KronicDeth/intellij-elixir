@@ -1,11 +1,15 @@
 package org.elixir_lang.jps.shared.sdk
 
 import org.elixir_lang.PlatformTestCase
+import java.io.File
 
 /**
  * Tests for SdkPaths utility methods.
  */
 class SdkPathsTest : PlatformTestCase() {
+    private val asdfElixir117 = "/home/user/.asdf/installs/elixir/1.17.0"
+    private val asdfElixir116 = "/home/user/.asdf/installs/elixir/1.16.0"
+    private val customMixHome = "/custom/mix/home"
 
     fun testDetectSource_mise() {
         assertEquals("mise", SdkPaths.detectSource("/Users/josh/.local/share/mise/installs/elixir/1.15.0"))
@@ -46,4 +50,39 @@ class SdkPathsTest : PlatformTestCase() {
         assertNull(SdkPaths.detectSource(""))
         assertNull(SdkPaths.detectSource("/"))
     }
+
+    fun testMaybeUpdateMixHome_setsWhenMissing() {
+        val environment = mutableMapOf<String, String>()
+
+        SdkPaths.maybeUpdateMixHome(environment, asdfElixir117)
+
+        val expectedMixHome = mixHomePath(asdfElixir117)
+        assertEquals(expectedMixHome, environment["MIX_HOME"])
+        assertEquals(File(expectedMixHome, "archives").absolutePath, environment["MIX_ARCHIVES"])
+    }
+
+    fun testMaybeUpdateMixHome_replacesWhenUnderManagerPrefix() {
+        val environment = mutableMapOf<String, String>()
+        environment["MIX_HOME"] = mixHomePath(asdfElixir116)
+        environment["MIX_ARCHIVES"] = File(environment["MIX_HOME"]!!, "archives").absolutePath
+
+        SdkPaths.maybeUpdateMixHome(environment, asdfElixir117)
+
+        val expectedMixHome = mixHomePath(asdfElixir117)
+        assertEquals(expectedMixHome, environment["MIX_HOME"])
+        assertEquals(File(expectedMixHome, "archives").absolutePath, environment["MIX_ARCHIVES"])
+    }
+
+    fun testMaybeUpdateMixHome_preservesCustomMixHome() {
+        val environment = mutableMapOf<String, String>()
+        environment["MIX_HOME"] = customMixHome
+        environment["MIX_ARCHIVES"] = "$customMixHome/archives"
+
+        SdkPaths.maybeUpdateMixHome(environment, asdfElixir117)
+
+        assertEquals(customMixHome, environment["MIX_HOME"])
+        assertEquals("$customMixHome/archives", environment["MIX_ARCHIVES"])
+    }
+
+    private fun mixHomePath(homePath: String): String = File(homePath, ".mix").absolutePath
 }
