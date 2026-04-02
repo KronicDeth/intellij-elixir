@@ -5,5 +5,9 @@ class Issue2200 : ParsingTestCase() {
         assertParsedAndQuotedCorrectly()
     }
 
+    fun testOperatorDefinition() {
+        assertParsedAndQuotedCorrectly(false)
+    }
+
     override fun getTestDataPath(): String = "${super.getTestDataPath()}/issue_2200"
 }
