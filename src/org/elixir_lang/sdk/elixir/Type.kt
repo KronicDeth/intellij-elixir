@@ -9,6 +9,8 @@ import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.fileChooser.FileChooserDescriptor
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleUtilCore
+import com.intellij.platform.ide.progress.ModalTaskOwner
+import com.intellij.platform.ide.progress.runWithModalProgressBlocking
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.projectRoots.*
@@ -287,6 +289,20 @@ ELIXIR_SDK_HOME
                 return cached
             }
 
+            val app = ApplicationManager.getApplication()
+            if (app.isDispatchThread) {
+                return runWithModalProgressBlocking(
+                    ModalTaskOwner.guess(),
+                    "Detecting Elixir SDK version..."
+                ) {
+                    elixirVersionBackground(canonicalHome, exePath, cacheKey)
+                }
+            }
+
+            return elixirVersionBackground(canonicalHome, exePath, cacheKey)
+        }
+
+        private fun elixirVersionBackground(canonicalHome: String, exePath: String, cacheKey: String): String? {
             return try {
                 val output =
                     ProcessOutput.getProcessOutput(
