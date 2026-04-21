@@ -794,28 +794,13 @@ ELIXIR_SDK_HOME
 
         fun mostSpecificSdk(psiElement: PsiElement): Sdk? {
             val project = psiElement.project
+            if (project.isDisposed) return null
 
-            return if (!project.isDisposed) {
-                run {
-                    // Use a background thread to perform the ReadAction
-                    val module =
-                        ApplicationManager
-                            .getApplication()
-                            .executeOnPooledThread<Module?> {
-                                ReadAction.compute<Module, Throwable> {
-                                    ModuleUtilCore.findModuleForPsiElement(psiElement)
-                                }
-                            }.get() // Wait for the result
-
-                    if (module != null) {
-                        mostSpecificSdk(module)
-                    } else {
-                        mostSpecificSdk(project)
-                    }
-                }
-            } else {
-                null
+            val module = ReadAction.compute<Module?, Throwable> {
+                ModuleUtilCore.findModuleForPsiElement(psiElement)
             }
+
+            return if (module != null) mostSpecificSdk(module) else mostSpecificSdk(project)
         }
 
         @JvmStatic
