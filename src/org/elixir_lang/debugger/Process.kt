@@ -40,6 +40,7 @@ import com.intellij.util.containers.ContainerUtil
 import com.intellij.util.indexing.FileBasedIndex
 import com.intellij.xdebugger.XDebugProcess
 import com.intellij.xdebugger.XDebugSession
+import com.intellij.xdebugger.XExpression
 import com.intellij.xdebugger.XSourcePosition
 import com.intellij.xdebugger.breakpoints.XBreakpointHandler
 import com.intellij.xdebugger.breakpoints.XLineBreakpoint
@@ -285,11 +286,11 @@ class Process(session: XDebugSession, private val executionEnvironment: Executio
         return object : XDebuggerEditorsProvider() {
             override fun createDocument(
                 project: Project,
-                text: String,
+                expression: XExpression,
                 sourcePosition: XSourcePosition?,
                 mode: EvaluationMode
             ): Document {
-                val file = LightVirtualFile("plain-text-elixir-debugger.txt", text)
+                val file = LightVirtualFile("plain-text-elixir-debugger.txt", expression.expression)
 
                 return FileDocumentManager.getInstance().getDocument(file)!!
             }
@@ -325,7 +326,7 @@ class Process(session: XDebugSession, private val executionEnvironment: Executio
                             java.io.File(path).relativeTo(
                                 java.io.File(rootDirectory)
                             )
-                        } catch (illegalArgumentException: IllegalArgumentException) {
+                        } catch (_: IllegalArgumentException) {
                             null
                         }?.let { relativeFile ->
                             val filename = relativeFile.path
