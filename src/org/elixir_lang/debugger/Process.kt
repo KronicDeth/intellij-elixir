@@ -26,7 +26,7 @@ import com.intellij.execution.process.ProcessHandler
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.execution.ui.ExecutionConsole
 import com.intellij.icons.AllIcons
-import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.components.service
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileTypes.FileType
@@ -54,7 +54,7 @@ import org.elixir_lang.debugger.configuration.Debuggable
 import org.elixir_lang.debugger.configuration.doNotInterpretPatterns
 import org.elixir_lang.debugger.line_breakpoint.Handler
 import org.elixir_lang.debugger.line_breakpoint.Properties
-import org.elixir_lang.debugger.node.Exception
+import org.elixir_lang.debugger.node.Exception as NodeException
 import org.elixir_lang.debugger.node.ProcessSnapshot
 import org.elixir_lang.debugger.node.event.Listener
 import org.elixir_lang.debugger.node.ok_error_reason.ErrorReason
@@ -63,7 +63,14 @@ import org.elixir_lang.psi.ElixirFile
 import org.elixir_lang.psi.impl.getModuleName
 import org.elixir_lang.run.Configuration
 import org.elixir_lang.run.ensureWorkingDirectory
+import org.elixir_lang.util.ElixirCoroutineService
+import org.elixir_lang.util.supervisedChildScope
 import org.elixir_lang.utils.ElixirModulesUtil.elixirModuleNameToErlang
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
@@ -73,6 +80,11 @@ import kotlin.system.measureNanoTime
 
 class Process(session: XDebugSession, private val executionEnvironment: ExecutionEnvironment) :
     XDebugProcess(session), Listener {
+    private val projectCoroutineService = session.project.service<ElixirCoroutineService>()
+
+    private val scope: CoroutineScope =
+        projectCoroutineService.supervisedChildScope("DebuggerProcess")
+
     init {
         session.setPauseActionSupported(false)
     }
@@ -103,16 +115,24 @@ class Process(session: XDebugSession, private val executionEnvironment: Executio
     private val debuggedName by lazy { debuggableConfiguration.nodeName ?: "debugged$nodesUUID@127.0.0.1" }
     private val debuggerName by lazy { "debugger$nodesUUID@127.0.0.1" }
 
-    private val node by lazy {
+    private val nodeDelegate = lazy {
         try {
             //TODO add the debugger node to disposable hierarchy (we may fail to initialize session so the session will not be stopped!)
-            Node(debuggerName, debuggedName, cookie, { debuggedExecutionResult }, this)
-        } catch (e: Exception) {
+            Node(
+                debuggerName,
+                debuggedName,
+                cookie,
+                { debuggedExecutionResult },
+                this,
+                scope.supervisedChildScope("DebuggerNode")
+            )
+        } catch (e: NodeException) {
             session.reportError(e.message ?: "Exception creating JInterface node")
             session.stop()
             throw ExecutionException(e)
         }
     }
+    private val node by nodeDelegate
 
     private val debuggableConfiguration: Debuggable<*>
         get() = session.runProfile as Debuggable<*>
@@ -370,7 +390,7 @@ class Process(session: XDebugSession, private val executionEnvironment: Executio
     }
 
     private fun asyncRunInitializers() {
-        ApplicationManager.getApplication().executeOnPooledThread {
+        scope.launch(Dispatchers.IO) {
             try {
                 runInitializers()
 
@@ -379,6 +399,8 @@ class Process(session: XDebugSession, private val executionEnvironment: Executio
                 // run anything inserted between first runInitializers and above line
                 runInitializers()
             } catch (exception: Exception) {
+                if (exception is CancellationException) throw exception
+
                 session.reportError(exception.message ?: exception.toString())
                 session.stop()
             }
@@ -408,9 +430,14 @@ class Process(session: XDebugSession, private val executionEnvironment: Executio
     }
 
     override fun stop() {
-        node.stop()
-        debuggedExecutionResult.processHandler.destroyProcess()
+        if (nodeIsInitialized()) {
+            node.stop()
+        }
+
+        scope.cancel()
     }
+
+    private fun nodeIsInitialized(): Boolean = nodeDelegate.isInitialized()
 
     override fun unknownMessage(messageText: String) {
         session.reportMessage("Unknown message received: $messageText", MessageType.WARNING)
