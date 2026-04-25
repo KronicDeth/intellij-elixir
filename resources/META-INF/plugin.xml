@@ -230,7 +230,7 @@
                         implementationClass="com.intellij.psi.templateLanguages.SimpleTemplateLanguageFormattingModelBuilder"/>
         <langCodeStyleSettingsProvider
                 implementation="org.elixir_lang.formatter.settings.LanguageCodeStyleSettingsProvider"/>
-        <externalFormatProcessor implementation="org.elixir_lang.formatter.MixFormatExternalFormatProcessor"/>
+        <formattingService implementation="org.elixir_lang.formatter.MixFormatFormattingService"/>
 
         <!-- test -->
         <runLineMarkerContributor language="Elixir"
