@@ -88,6 +88,12 @@ class Process(session: XDebugSession, private val executionEnvironment: Executio
         projectCoroutineService.supervisedChildScope("DebuggerProcess")
 
     /**
+     * Serial dispatcher for all operations that touch [Node] (breakpoint set/remove, interpret, attach).
+     * `limitedParallelism(1)` ensures ordering and prevents concurrent network calls to the BEAM node.
+     */
+    private val nodeDispatcher = Dispatchers.IO.limitedParallelism(1)
+
+    /**
      * Cached WSL distribution for the project, used for converting Linux file paths
      * reported by the Erlang VM back to Windows UNC paths for source navigation.
      * `null` for non-WSL projects (fast path — no overhead).
@@ -176,7 +182,15 @@ class Process(session: XDebugSession, private val executionEnvironment: Executio
 
     private fun afterInitialized(task: () -> Unit) {
         if (initialized.get()) {
-            task()
+            scope.launch(nodeDispatcher) {
+                try {
+                    task()
+                } catch (exception: Exception) {
+                    if (exception is CancellationException) throw exception
+
+                    session.reportError(exception.message ?: exception.toString())
+                }
+            }
         } else {
             initializers.add(task)
         }
@@ -363,17 +377,28 @@ class Process(session: XDebugSession, private val executionEnvironment: Executio
         sourcePosition(breakpoint)?.let { breakpointPosition ->
             sourcePositionToBreakpoint.remove(breakpointPosition)
 
-            moduleNameSet(breakpointPosition).forEach { moduleName ->
-                moduleName
-                    .let(::elixirModuleNameToErlang)
-                    .let(::OtpErlangAtom)
-                    .let { node.removeBreakpoint(it, breakpointPosition.line) }
+            val moduleNames = moduleNameSet(breakpointPosition)
+            val line = breakpointPosition.line
+
+            scope.launch(nodeDispatcher) {
+                try {
+                    moduleNames.forEach { moduleName ->
+                        moduleName
+                            .let(::elixirModuleNameToErlang)
+                            .let(::OtpErlangAtom)
+                            .let { node.removeBreakpoint(it, line) }
+                    }
+                } catch (exception: Exception) {
+                    if (exception is CancellationException) throw exception
+
+                    session.reportError(exception.message ?: exception.toString())
+                }
             }
         }
     }
 
     override fun resume(context: XSuspendContext?) {
-        node.resume()
+        scope.launch(nodeDispatcher) { node.resume() }
     }
 
     private val initialized = AtomicBoolean(false)
@@ -401,7 +426,7 @@ class Process(session: XDebugSession, private val executionEnvironment: Executio
     }
 
     private fun asyncRunInitializers() {
-        scope.launch(Dispatchers.IO) {
+        scope.launch(nodeDispatcher) {
             try {
                 runInitializers()
 
@@ -429,15 +454,15 @@ class Process(session: XDebugSession, private val executionEnvironment: Executio
     }
 
     override fun startStepInto(context: XSuspendContext?) {
-        node.stepInto()
+        scope.launch(nodeDispatcher) { node.stepInto() }
     }
 
     override fun startStepOut(context: XSuspendContext?) {
-        node.stepOut()
+        scope.launch(nodeDispatcher) { node.stepOut() }
     }
 
     override fun startStepOver(context: XSuspendContext?) {
-        node.stepOver()
+        scope.launch(nodeDispatcher) { node.stepOver() }
     }
 
     override fun stop() {
@@ -466,6 +491,8 @@ class Process(session: XDebugSession, private val executionEnvironment: Executio
         expression: String,
         callback: XDebuggerEvaluator.XEvaluationCallback
     ) {
-        node.evaluate(pid, stackPointer, module, function, arity, file, line, expression, callback)
+        scope.launch(nodeDispatcher) {
+            node.evaluate(pid, stackPointer, module, function, arity, file, line, expression, callback)
+        }
     }
 }

@@ -2,6 +2,7 @@ package org.elixir_lang.debugger
 
 import com.ericsson.otp.erlang.*
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.util.concurrency.ThreadingAssertions
 import com.intellij.xdebugger.evaluation.XDebuggerEvaluator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -249,7 +250,7 @@ class Node(
     private fun debugger() {
         try {
             loop()
-        } catch (otpErlangExit: OtpErlangExit) {
+        } catch (_: OtpErlangExit) {
             eventListener.debuggerStopped()
         } catch (_: CancellationException) {
             eventListener.debuggerStopped()
@@ -258,8 +259,11 @@ class Node(
         }
     }
 
-    private fun callDebugged(request: OtpErlangObject): OtpErlangObject =
-            mailBox.genericServerCall(remote, request, TIMEOUT_IN_MILLISECONDS)
+    private fun callDebugged(request: OtpErlangObject): OtpErlangObject {
+        ThreadingAssertions.assertBackgroundThread()
+
+        return mailBox.genericServerCall(remote, request, TIMEOUT_IN_MILLISECONDS)
+    }
 
     private tailrec fun loop() {
         mailBox.receive { receivedMessage ->
