@@ -111,9 +111,7 @@ tailrec fun PsiElement.selfOrEnclosingMacroCall(): Call? =
     }
 
 /**
- *
- * @param call
- * @return `null` if call is at top-level
+ * @return `null` if this element is at top-level
  */
 @Contract(pure = true)
 fun PsiElement.enclosingMacroCall(): Call? = parent.selfOrEnclosingMacroCall()
@@ -263,11 +261,11 @@ fun PsiElement.isExpression(): Boolean =
     }
 
 @Contract(pure = true)
-fun PsiElement.siblingExpression(function: (PsiElement) -> PsiElement): PsiElement? {
-    var expression = this
+fun PsiElement.siblingExpression(function: (PsiElement) -> PsiElement?): PsiElement? {
+    var expression: PsiElement? = this
 
     do {
-        expression = function(expression)
+        expression = function(expression ?: return null)
     } while (expression is ElixirEndOfExpression ||
         expression is LeafPsiElement ||
         expression is PsiComment ||
