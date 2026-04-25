@@ -17,7 +17,8 @@ object CliArguments {
         tool: CliTool,
         extraElixirArguments: List<String> = emptyList(),
         extraErlangArguments: List<String> = emptyList(),
-        os: OS = effectiveOS(elixirSdk)
+        os: OS = effectiveOS(elixirSdk),
+        ansiEnabled: Boolean = true
     ): CliArgs? {
         return SharedCliArguments.args(
             elixirSdk.homePath,
@@ -26,7 +27,8 @@ object CliArguments {
             tool,
             extraElixirArguments,
             extraErlangArguments,
-            os
+            os,
+            ansiEnabled
         )
     }
 
@@ -37,6 +39,7 @@ object CliArguments {
         extraErlangArguments: List<String> = emptyList(),
         os: OS = effectiveOS(elixirSdk),
         project: Project? = null,
+        ansiEnabled: Boolean = true,
     ): CliArgs {
         val elixirHomePath =
             elixirSdk.homePath
@@ -53,7 +56,8 @@ object CliArguments {
             tool,
             extraElixirArguments,
             extraErlangArguments,
-            os
+            os,
+            ansiEnabled
         ) ?: throw ExecutionException("Unable to compute CLI arguments for SDK ${elixirSdk.name}")
     }
 

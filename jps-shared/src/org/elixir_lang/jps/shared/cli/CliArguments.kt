@@ -51,18 +51,19 @@ object CliArguments {
         tool: CliTool,
         extraElixirArguments: List<String> = emptyList(),
         extraErlangArguments: List<String> = emptyList(),
-        os: OS = OS.CURRENT
+        os: OS = OS.CURRENT,
+        ansiEnabled: Boolean = true
     ): CliArgs? {
         val elixirHomePath = elixirSdkHomePath ?: return null
         val erlangHomePath = erlangSdkHomePath ?: return null
         val elixirVersion = parseElixirVersion(elixirVersion)
         logger.trace { "Calculating CliArguments (elixirHomePath=$elixirHomePath, elixirVersion=$elixirVersion, erlangHomePath=$erlangHomePath" }
-        val erlCommonArgs = erlCommonArguments(elixirVersion, elixirHomePath)
+        val erlCommonArgs = erlCommonArguments(elixirVersion, elixirHomePath, ansiEnabled)
         val toolArgs = when (tool) {
             CliTool.IEX -> iexArguments(elixirVersion) + "+iex" + extraElixirArguments
-            CliTool.ELIXIR -> elixirCommonArguments(elixirVersion) + extraElixirArguments
-            CliTool.ELIXIRC -> elixirCommonArguments(elixirVersion) + "+elixirc" + extraElixirArguments
-            CliTool.MIX -> elixirCommonArguments(elixirVersion) + extraElixirArguments + Path(
+            CliTool.ELIXIR -> elixirCommonArguments(elixirVersion, ansiEnabled) + extraElixirArguments
+            CliTool.ELIXIRC -> elixirCommonArguments(elixirVersion, ansiEnabled) + "+elixirc" + extraElixirArguments
+            CliTool.MIX -> elixirCommonArguments(elixirVersion, ansiEnabled) + extraElixirArguments + Path(
                 elixirHomePath,
                 "bin",
                 "mix"
@@ -76,22 +77,39 @@ object CliArguments {
         return CliArgs(erlExePath, args)
     }
 
-    private fun erlCommonArguments(version: Version, homePath: String): List<String> =
-        if (version.lessThan(1, 15, 0)) legacyPaArgs(homePath) + ansiEnableArg(version) + "-noshell"
-        else if (version.isOrGreaterThan(1, 17, 0)) listOf("-noshell") + elixirRootArgs(homePath) + ansiEnableArg(
-            version
-        )
+    private fun erlCommonArguments(version: Version, homePath: String, ansiEnabled: Boolean): List<String> =
+        if (version.lessThan(1, 15, 0))
+            legacyPaArgs(homePath) + ansiArg(version, ansiEnabled) + "-noshell"
+        else if (version.isOrGreaterThan(1, 17, 0))
+            listOf("-noshell") + elixirRootArgs(homePath) + ansiArg(version, ansiEnabled)
         else listOf("-noshell") + elixirRootArgs(homePath)
 
-    private fun elixirCommonArguments(version: Version): List<String> =
+    private fun elixirCommonArguments(version: Version, ansiEnabled: Boolean): List<String> =
         if (version.lessThan(1, 15, 0) || version.isOrGreaterThan(1, 17, 0))
             listOf("-s", "elixir", "start_cli", "-extra")
         else
-            listOf("-s", "elixir", "start_cli") + ansiEnableArg(version) + "-extra"
+            listOf("-s", "elixir", "start_cli") + ansiArg(version, ansiEnabled) + "-extra"
 
-    private fun ansiEnableArg(version: Version) =
+    /**
+     * Returns the erl arguments to set the `:ansi_enabled` application env.
+     *
+     * For Elixir < 1.19, the shell scripts passed `-elixir ansi_enabled true`
+     * when stdout/stderr were a TTY. We replicate (or override) that here so
+     * callers can disable ANSI when capturing process output (e.g. the
+     * formatter reads stderr for error messages).
+     *
+     * For Elixir ≥ 1.19, the `-elixir ansi_enabled` erl flag was removed
+     * (commit f5579913 in elixir-lang/elixir). Instead, `elixir.erl` startup
+     * auto-detects via `prim_tty:isatty(stdout)`. A piped process (as the
+     * plugin always creates) is never a TTY, so ANSI defaults to `false`
+     * automatically — no erl argument is needed.
+     *
+     * See also: `--color` / `--no-color` CLI flags (Elixir ≥ 1.18) which
+     * set `Application.put_env(:elixir, :ansi_enabled, ...)` at parse time.
+     */
+    private fun ansiArg(version: Version, ansiEnabled: Boolean) =
         if (version.lessThan(1, 19, 0)) {
-            listOf("-elixir", "ansi_enabled", "true")
+            listOf("-elixir", "ansi_enabled", if (ansiEnabled) "true" else "false")
         } else {
             emptyList()
         }
