@@ -25,13 +25,13 @@ internal class ExecutionStack(private val process: Process, private val processS
         XExecutionStack(processSnapshot.pidString) {
     private val stackFrames: List<StackFrame> by lazy {
         processSnapshot.stack.map { traceElement ->
-           StackFrame(process, processSnapshot.pid, traceElement)
+           StackFrame(process, processSnapshot.pid, traceElement, process.wslDistribution)
        }
     }
 
     override fun getTopFrame(): XStackFrame? = stackFrames.firstOrNull()
 
-    override fun computeStackFrames(firstFrameIndex: Int, container: XExecutionStack.XStackFrameContainer) {
+    override fun computeStackFrames(firstFrameIndex: Int, container: XStackFrameContainer) {
         container.addStackFrames(stackFrames, true)
     }
 }

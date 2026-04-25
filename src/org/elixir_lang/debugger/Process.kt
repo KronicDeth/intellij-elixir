@@ -26,6 +26,7 @@ import com.intellij.execution.process.ProcessHandler
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.execution.ui.ExecutionConsole
 import com.intellij.icons.AllIcons
+import com.intellij.execution.wsl.WSLDistribution
 import com.intellij.openapi.components.service
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.fileEditor.FileDocumentManager
@@ -85,6 +86,15 @@ class Process(session: XDebugSession, private val executionEnvironment: Executio
 
     private val scope: CoroutineScope =
         projectCoroutineService.supervisedChildScope("DebuggerProcess")
+
+    /**
+     * Cached WSL distribution for the project, used for converting Linux file paths
+     * reported by the Erlang VM back to Windows UNC paths for source navigation.
+     * `null` for non-WSL projects (fast path — no overhead).
+     */
+    internal val wslDistribution: WSLDistribution? by lazy {
+        org.elixir_lang.sdk.wsl.wslCompat.getDistributionByWindowsUncPath(session.project.basePath)
+    }
 
     init {
         session.setPauseActionSupported(false)
@@ -203,7 +213,7 @@ class Process(session: XDebugSession, private val executionEnvironment: Executio
     override fun breakpointReached(pid: OtpErlangPid, snapshots: List<ProcessSnapshot>) {
         val processInBreakpoint =
             ContainerUtil.find(snapshots) { elixirProcessSnapshot -> elixirProcessSnapshot.pid == pid }!!
-        val breakPosition = SourcePosition.create(processInBreakpoint)
+        val breakPosition = SourcePosition.create(processInBreakpoint, wslDistribution)
         val breakpoint = getLineBreakpoint(breakPosition)
         val suspendContext = SuspendContext(this, pid, snapshots)
         if (breakpoint == null) {
@@ -259,7 +269,7 @@ class Process(session: XDebugSession, private val executionEnvironment: Executio
         line: Int,
         errorMessage: OtpErlangObject
     ) {
-        val sourcePosition = SourcePosition.create(file, line)
+        val sourcePosition = SourcePosition.create(file, line, wslDistribution)
         val breakpoint = getLineBreakpoint(sourcePosition)
 
         if (breakpoint != null) {
