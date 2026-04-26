@@ -35,10 +35,10 @@ class CaptureNameArity(element: NonNumeric, val nameElement: Call, val arity: Ar
             incompleteCode: Boolean
     ): Array<ResolveResult> {
         ApplicationManager.getApplication().assertReadAccessAllowed()
-        return ReadAction.compute<Array<ResolveResult>, Throwable> {
+        return ReadAction.nonBlocking<Array<ResolveResult>> {
             ResolveCache
                 .getInstance(project)
                 .resolveWithCaching(captureNameArity, Resolver, false, incompleteCode)
-        }
+        }.executeSynchronously()
     }
 }

@@ -45,6 +45,7 @@ class ModuleImpl<T : ModuleStub<*>?>(private val stub: T) : ModuleElementImpl(),
      */
     override fun getParent(): PsiElement = stub!!.getParentStub().psi
 
+    @Suppress("OVERRIDE_DEPRECATION")
     override fun getElementType(): IStubElementType<*, *> = stub!!.getStubType()
 
     override fun getStub(): T = stub

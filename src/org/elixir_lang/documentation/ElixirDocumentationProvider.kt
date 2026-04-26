@@ -302,7 +302,7 @@ class ElixirDocumentationProvider : DocumentationProvider {
         return contextElement?.let(::getCustomDocumentationElement)
     }
 
-    private tailrec fun getCustomDocumentationElement(contextElement: PsiElement): PsiElement? = when (contextElement) {
+    private fun getCustomDocumentationElement(contextElement: PsiElement): PsiElement? = when (contextElement) {
         is LeafPsiElement, is ElixirIdentifier -> getCustomDocumentationElement(contextElement.parent)
         is Call -> {
             contextElement

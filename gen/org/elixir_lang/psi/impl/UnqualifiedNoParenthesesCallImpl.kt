@@ -16,6 +16,7 @@ fun UnqualifiedNoParenthesesCall<*>.exportedArity(state: ResolveState): Int =
     } ?: MaybeExported.UNEXPORTED_ARITY
 
 @Contract(pure = true)
+@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
 fun UnqualifiedNoParenthesesCall<*>.exportedName(): String? =
     if (isExported(this)) {
         CallDefinitionClause.nameArityInterval(this, ResolveState.initial())?.name

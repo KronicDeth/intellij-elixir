@@ -51,6 +51,7 @@ fun QualifiableAlias.computeReference(): PsiPolyVariantReference? =
             }
     }
 
+@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
 fun QualifiableAlias.getReference(): PsiPolyVariantReference? =
     CachedValuesManager.getCachedValue(this) {
         CachedValueProvider.Result.create(computeReference(), this)

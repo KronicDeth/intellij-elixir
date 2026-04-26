@@ -26,8 +26,7 @@ class ModuleDocs(private val docsMap: OtpErlangMap) {
         fun from(term: OtpErlangMap?): ModuleDocs? =
                 when (term) {
                     null -> null
-                    is OtpErlangList -> ModuleDocs(term)
-                    else -> TODO("Module Docs term is not OtpErlangList")
+                    else -> ModuleDocs(term)
                 }
         }
 

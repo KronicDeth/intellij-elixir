@@ -5,12 +5,13 @@ import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.ExecutionException
 import com.intellij.execution.process.CapturingProcessHandler
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.application.runReadAction
+import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.roots.ProjectRootManager
+import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiFile
 import com.intellij.psi.codeStyle.ExternalFormatProcessor
@@ -80,9 +81,9 @@ class MixFormatExternalFormatProcessor : ExternalFormatProcessor {
                 ?.let { virtualFile ->
                     val fileIndex = ProjectRootManager.getInstance(psiFile.project).fileIndex
 
-                    runReadAction {
+                    ReadAction.nonBlocking<VirtualFile?> {
                         fileIndex.getContentRootForFile(virtualFile)
-                    }
+                    }.executeSynchronously()
                 }
                 ?.takeIf { contentRoot ->
                     contentRoot.findChild(Project.MIX_EXS) != null

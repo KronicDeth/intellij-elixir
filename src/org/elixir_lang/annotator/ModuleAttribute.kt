@@ -210,7 +210,7 @@ class ModuleAttribute : Annotator, DumbAware {
             when (grandChild) {
                 /* Match is invalid.  It will be marked by MatchOperatorInsteadOfTypeOperator inspection as an error */
                 is Match, is Type -> {
-                    val infix = grandChild as Infix
+                    val infix = grandChild
                     val leftOperand: PsiElement? = infix.leftOperand()?.stripAccessExpression()
                     var typeParameterNameSet: Set<String?> = emptySet<String>()
 
@@ -353,6 +353,7 @@ class ModuleAttribute : Annotator, DumbAware {
         call: ElixirMatchedUnqualifiedParenthesesCall,
         annotationHolder: AnnotationHolder,
     ): Set<String?> {
+        @Suppress("UNCHECKED_CAST")
         val arguments: Array<PsiElement>? = if (Unquote.`is`(call)) {
             call.secondaryArguments() as Array<PsiElement>?
         } else {
@@ -865,11 +866,7 @@ class ModuleAttribute : Annotator, DumbAware {
             cannotHighlightTypes(decimalFloat)
         }
 
-        if (message == null) {
-            message = "Float literals are not allowed in types: use float() instead"
-        }
-
-        highlightTypeError(decimalFloat, message!!, annotationHolder)
+        highlightTypeError(decimalFloat, message ?: "Float literals are not allowed in types: use float() instead", annotationHolder)
     }
 
     private fun highlightTypesAndTypeParameterUsages(

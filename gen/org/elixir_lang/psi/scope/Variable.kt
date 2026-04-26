@@ -38,7 +38,7 @@ abstract class Variable : PsiScopeProcessor {
      */
     override fun execute(element: PsiElement, state: ResolveState): Boolean =
             when (element) {
-                is Addition, is And -> executeNonDeclaringScopeInfix(element as Infix, state)
+                is Addition, is And -> executeNonDeclaringScopeInfix(element, state)
                 is ElixirAccessExpression, is ElixirAssociations, is ElixirAssociationsBase, is ElixirBitString,
                 is ElixirEexTag, is ElixirList, is ElixirMapConstructionArguments, is ElixirMultipleAliases,
                 is ElixirNoParenthesesArguments, is ElixirNoParenthesesOneArgument, is ElixirParenthesesArguments,
@@ -58,7 +58,7 @@ abstract class Variable : PsiScopeProcessor {
                 // MUST be before Call as InMatch is a Call
                 is InMatch -> execute(element, state)
                 is Match -> execute(element, state)
-                is Pipe, is Ternary, is Two -> execute(element as Infix, state)
+                is Pipe, is Ternary, is Two -> execute(element, state)
                 is Type -> execute(element, state)
                 is UnaryOperation -> execute(element, state)
                 is UnqualifiedNoArgumentsCall<*> -> executeOnMaybeVariable(element, state)

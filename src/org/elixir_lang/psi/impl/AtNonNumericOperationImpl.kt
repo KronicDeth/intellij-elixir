@@ -17,6 +17,7 @@ private fun AtOperation.computeReference(): PsiReference? =
             null
         }
 
+@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
 fun AtOperation.getReference(): PsiReference? =
         getCachedValue(this) { CachedValueProvider.Result.create(computeReference(), this) }
 

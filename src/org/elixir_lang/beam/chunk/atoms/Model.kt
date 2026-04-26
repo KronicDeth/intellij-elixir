@@ -6,7 +6,7 @@ import javax.swing.table.AbstractTableModel
 class Model(private val atoms: Atoms?) : AbstractTableModel() {
     override fun getColumnClass(columnIndex: Int): Class<*> =
             when (columnIndex) {
-                0, 1 -> Integer::class.java
+                0, 1 -> Int::class.javaObjectType
                 2 -> String::class.java
                 else -> throw IllegalArgumentException("Column $columnIndex out of bounds")
             }

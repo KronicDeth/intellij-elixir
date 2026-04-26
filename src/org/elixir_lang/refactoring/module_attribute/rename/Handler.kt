@@ -62,7 +62,7 @@ class Handler : RenameHandler {
      *                    (it is recommended to pass DataManager.getDataContext() instead of null)
      */
     override fun invoke(project: Project, elements: Array<out PsiElement>, dataContext: DataContext?) {
-        val nonNullDataContext = dataContext ?: DataManager.getInstance().dataContext
+        val nonNullDataContext = dataContext ?: DataManager.getInstance().getDataContext()
 
         invoke(nonNullDataContext.let(CommonDataKeys.EDITOR::getData)!!, elements, nonNullDataContext)
     }
@@ -72,7 +72,7 @@ class Handler : RenameHandler {
 
     // See `com.intellij.refactoring.rename.inplace.VariableInplaceRenameHandler.doRename`
     private fun invoke(editor: Editor, element: PsiElement, dataContext: DataContext) {
-        val renamer = createRenamer(element, editor!!)
+        val renamer = createRenamer(element, editor)
         val startedRename = renamer.performInplaceRename()
 
         if (!startedRename) {

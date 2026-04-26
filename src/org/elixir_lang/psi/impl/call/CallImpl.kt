@@ -149,6 +149,7 @@ fun Call.finalArguments(): Array<PsiElement>? = try {
     null
 }
 
+@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
 fun Call.getReference(): PsiReference? =
     CachedValuesManager.getCachedValue(this) {
         CachedValueProvider.Result.create(computeReference(), this)

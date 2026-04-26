@@ -6,6 +6,7 @@ import com.intellij.psi.util.CachedValuesManager
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
 import org.elixir_lang.reference.ModuleAttribute.Companion.isNonReferencing
 
+@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
 fun AtUnqualifiedNoParenthesesCall<*>.getReference(): PsiReference? =
         CachedValuesManager.getCachedValue(this) {
            CachedValueProvider.Result.create(computeReference(), this)

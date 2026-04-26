@@ -1,6 +1,6 @@
 package org.elixir_lang.mix
 
-import com.intellij.openapi.application.runReadAction
+import com.intellij.openapi.application.ReadAction
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.ResolveState
@@ -19,9 +19,9 @@ import org.elixir_lang.psi.impl.stripAccessExpression
 class DepGatherer : DepGatherer() {
     override fun visitFile(file: PsiFile) {
         if (file is ElixirFile) {
-            runReadAction {
+            ReadAction.nonBlocking<Unit> {
                 file.acceptChildren(this)
-            }
+            }.executeSynchronously()
         }
     }
 

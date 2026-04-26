@@ -64,7 +64,7 @@ class Handler : RenameHandler {
      *                    (it is recommended to pass DataManager.getDataContext() instead of null)
      */
     override fun invoke(project: Project, elements: Array<out PsiElement>, dataContext: DataContext?) {
-        val nonNullDataContext = dataContext ?: DataManager.getInstance().dataContext
+        val nonNullDataContext = dataContext ?: DataManager.getInstance().getDataContext()
 
         invoke(nonNullDataContext.let(CommonDataKeys.EDITOR::getData), elements, nonNullDataContext)
     }

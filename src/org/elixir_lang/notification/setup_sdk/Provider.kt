@@ -40,14 +40,14 @@ class Provider : EditorNotificationProvider {
         virtualFile: VirtualFile,
         project: Project,
     ): EditorNotificationPanel? =
-        ReadAction.compute<EditorNotificationPanel?, Throwable> {
+        ReadAction.nonBlocking<EditorNotificationPanel?> {
             val psiFile = PsiManager.getInstance(project).findFile(virtualFile)
 
             if (psiFile == null ||
                 psiFile.language !== ElixirLanguage ||
                 Type.mostSpecificSdk(psiFile) != null
             ) {
-                return@compute null
+                return@nonBlocking null
             }
 
             // Avoid slow ModuleUtilCore.findModuleForPsiElement call
@@ -60,7 +60,7 @@ class Provider : EditorNotificationProvider {
                 ProcessOutput.isSmallIde -> createSmallIDEFacetPanel(project)
                 else -> createProjectPanel(project)
             }
-        }
+        }.executeSynchronously()
 
 }
 

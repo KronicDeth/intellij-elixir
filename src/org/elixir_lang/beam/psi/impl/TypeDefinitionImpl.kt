@@ -32,6 +32,7 @@ class TypeDefinitionImpl<T : TypeDefinitionStub<*>>(private val stub: T) : Modul
      */
     override fun getParent(): ModuleImpl<*> = stub.parentStub.psi as ModuleImpl<*>
 
+    @Suppress("OVERRIDE_DEPRECATION")
     override fun getElementType(): IStubElementType<*, *> = stub.stubType
 
     override fun getStub(): T = stub

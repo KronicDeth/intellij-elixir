@@ -268,7 +268,7 @@ private fun validateAndGetSdkValidationMessage(
 
                     null
                 } catch (e: ConfigurationException) {
-                    e.message ?: e.title
+                    e.messageHtml.toString().ifEmpty { e.title }
                 }
             } else {
                 "Internal Erlang SDK (${internalErlangSdk.name} home directory (${internalErlangSdk.homePath}) " +

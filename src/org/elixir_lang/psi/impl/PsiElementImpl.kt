@@ -1,6 +1,6 @@
 package org.elixir_lang.psi.impl
 
-import com.intellij.openapi.application.runReadAction
+import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.psi.PsiComment
@@ -25,9 +25,9 @@ import java.util.*
 
 fun PsiElement.ancestorSequence() = generateSequence(this) { it.parent }
 fun PsiElement.document(): Document? = containingFile.viewProvider.let { viewProvider ->
-    runReadAction {
+    ReadAction.nonBlocking<Document?> {
         viewProvider.document
-    }
+    }.executeSynchronously()
 }
 
 tailrec fun PsiElement.selfOrEnclosingMacroCall(): Call? =

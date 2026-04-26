@@ -1195,12 +1195,9 @@ public class FormattingTest extends PlatformTestCase {
     }
 
     private void reformatFixture() {
-        new WriteCommandAction.Simple(getProject()) {
-            @Override
-            protected void run() throws Throwable {
-                CodeStyleManager.getInstance(getProject()).reformatText(myFixture.getFile(),
-                        ContainerUtil.newArrayList(myFixture.getFile().getTextRange()));
-            }
-        }.execute();
+        WriteCommandAction.runWriteCommandAction(getProject(), () ->
+            CodeStyleManager.getInstance(getProject()).reformatText(myFixture.getFile(),
+                    ContainerUtil.newArrayList(myFixture.getFile().getTextRange()))
+        );
     }
 }

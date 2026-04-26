@@ -13,7 +13,6 @@ import com.intellij.openapi.projectRoots.SdkType
 import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.toNioPathOrNull
-import com.intellij.util.containers.ContainerUtil
 import org.elixir_lang.cli.getExecutableFilepathWslSafe
 import org.elixir_lang.jps.shared.ErlangSdkTypeId
 import org.elixir_lang.jps.shared.cli.CliTool
@@ -29,7 +28,7 @@ import java.io.File
 import java.nio.file.Path
 
 class Type : SdkType(ErlangSdkTypeId.ERLANG_SDK_TYPE_ID) {
-    private val releaseBySdkHome: MutableMap<String, Release> = ContainerUtil.createWeakMap()
+    private val releaseBySdkHome: MutableMap<String, Release> = java.util.WeakHashMap()
 
     companion object {
         private const val OTP_RELEASE_PREFIX_LINE = "org.elixir_lang.sdk.erlang.Type OTP_RELEASE:"

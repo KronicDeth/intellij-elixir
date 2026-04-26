@@ -802,9 +802,9 @@ ELIXIR_SDK_HOME
                         ApplicationManager
                             .getApplication()
                             .executeOnPooledThread<Module?> {
-                                ReadAction.compute<Module, Throwable> {
+                                ReadAction.nonBlocking<Module?> {
                                     ModuleUtilCore.findModuleForPsiElement(psiElement)
-                                }
+                                }.executeSynchronously()
                             }.get() // Wait for the result
 
                     if (module != null) {

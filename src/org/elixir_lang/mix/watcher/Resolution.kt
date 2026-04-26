@@ -1,6 +1,6 @@
 package org.elixir_lang.mix.watcher
 
-import com.intellij.openapi.application.runReadAction
+import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
@@ -91,13 +91,13 @@ class Resolution(
             packageManager: PackageManager,
             packageVirtualFile: VirtualFile
         ): Set<Dep> {
-            val packagePsiFile = runReadAction {
+            val packagePsiFile = ReadAction.nonBlocking<PsiFile?> {
                 try {
                     psiManager.findFile(packageVirtualFile)
                 } catch (error: IncorrectOperationException) {
                     null
                 }
-            }
+            }.executeSynchronously()
 
             return if (packagePsiFile != null && !progressIndicator.isCanceled) {
                 progressIndicator.text2 = "Finding deps in ${packagePsiFile.virtualFile.path}"
@@ -112,7 +112,7 @@ class Resolution(
             packageManager: PackageManager,
             packagePsiFile: PsiFile
         ): Set<Dep> =
-            runReadAction {
+            ReadAction.nonBlocking<Set<Dep>> {
                 getCachedValue(packagePsiFile, DEP_SET) {
                     packageManager
                         .depGatherer()
@@ -120,7 +120,7 @@ class Resolution(
                         .depSet.toSet()
                         .let { CachedValueProvider.Result.create(it, packagePsiFile) }
                 }
-            }
+            }.executeSynchronously()
     }
 }
 

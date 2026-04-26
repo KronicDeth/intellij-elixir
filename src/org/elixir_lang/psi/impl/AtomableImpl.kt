@@ -14,6 +14,7 @@ import org.jetbrains.annotations.Contract
 private val UTF_8 = OtpErlangAtom("utf8")
 
 @Contract(pure = true)
+@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
 fun ElixirLine.quoteAsAtom(): OtpErlangObject {
     val quotedChildNodes = quotedChildNodes(AtomableParent(this), *childNodes(lineBody!!));
 

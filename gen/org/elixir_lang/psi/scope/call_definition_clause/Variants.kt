@@ -42,15 +42,7 @@ class Variants : CallDefinitionClause() {
         return true
     }
 
-    override fun execute(element: CallDefinitionImpl<*>, state: ResolveState): Boolean {
-        val entranceCallDefinitionClause = state.get(ENTRANCE_CALL_DEFINITION_CLAUSE)
-
-        if ((entranceCallDefinitionClause == null || !element.isEquivalentTo(entranceCallDefinitionClause)) && element is Named) {
-            addCallDefinitionClauseToLookupElementByPsiElement(element)
-        }
-
-        return true
-    }
+    override fun execute(element: CallDefinitionImpl<*>, state: ResolveState): Boolean = true
 
     private fun addCallDefinitionClauseToLookupElementByPsiElement(named: Named) {
         named.name?.let { name ->

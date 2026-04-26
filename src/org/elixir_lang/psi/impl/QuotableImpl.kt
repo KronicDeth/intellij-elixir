@@ -4,7 +4,7 @@ package org.elixir_lang.psi.impl
 
 import com.ericsson.otp.erlang.*
 import com.intellij.lang.ASTNode
-import com.intellij.openapi.application.runReadAction
+import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.util.Computable
 import com.intellij.psi.*
 import com.intellij.psi.impl.source.tree.Factory
@@ -955,9 +955,9 @@ object QuotableImpl {
         val quoted: OtpErlangObject
         val identifier = unqualifiedNoArgumentsCall.identifier
 
-        val identifierText = runReadAction {
+        val identifierText = ReadAction.nonBlocking<String> {
             identifier.text
-        }
+        }.executeSynchronously()
         val callMetadata = metadata(identifier)
 
         // if a variable has a `do` block is no longer a variable because the do block acts as keyword arguments.

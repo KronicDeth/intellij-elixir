@@ -263,6 +263,7 @@ class Process(session: XDebugSession, private val executionEnvironment: Executio
 
     override fun getEditorsProvider(): XDebuggerEditorsProvider {
         return object : XDebuggerEditorsProvider() {
+            @Suppress("OVERRIDE_DEPRECATION")
             override fun createDocument(
                 project: Project,
                 text: String,

@@ -2,7 +2,7 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.application.ex.ApplicationManagerEx
 import com.intellij.openapi.application.runInEdt
-import com.intellij.openapi.application.runReadAction
+import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
@@ -85,13 +85,13 @@ class BulkDecompilation : AnAction() {
                         true
                     } else {
                         if (file.fileType is org.elixir_lang.beam.FileType) {
-                           runReadAction {
+                            ReadAction.nonBlocking<Unit> {
                                 psiManager.findFile(file)?.let { it as? PsiCompiledFile }?.decompiledPsiFile?.let { decompiledPsiFile ->
                                     if (SyntaxTraverser.psiTraverser(decompiledPsiFile).traverse().filter(PsiErrorElement::class.java).isNotEmpty) {
                                         Logger.error(BulkDecompilation::class.java, "Parsing error in decompiled ${file.path}", decompiledPsiFile)
                                     }
                                 }
-                            }
+                            }.executeSynchronously()
                         }
 
                         false
