@@ -4,6 +4,11 @@ import com.google.common.io.Files;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.newvfs.impl.VfsRootAccess;
+import com.intellij.psi.PsiCompiledFile;
+import com.intellij.psi.PsiErrorElement;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiManager;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.PlatformTestCase;
 
 import java.io.File;
@@ -529,9 +534,47 @@ public class DecompilerTest extends PlatformTestCase {
         Decompiler decompiler = new Decompiler();
         String actual = decompiler.decompile(virtualFile).toString();
 
+        assertParseable(name, virtualFile, actual);
+
         if (!expected.equals(actual)) {
             fail(buildCompactDiffMessage(name, expected, actual));
         }
+    }
+
+    private void assertParseable(String name, VirtualFile virtualFile, String decompiledText) {
+        PsiFile compiledPsiFile = PsiManager.getInstance(getProject()).findFile(virtualFile);
+        assertNotNull("Compiled PSI file is null for " + name, compiledPsiFile);
+        assertTrue("PSI file is not compiled for " + name, compiledPsiFile instanceof PsiCompiledFile);
+
+        PsiFile decompiledPsiFile = ((PsiCompiledFile) compiledPsiFile).getDecompiledPsiFile();
+        assertNotNull("Decompiled PSI file is null for " + name, decompiledPsiFile);
+
+        PsiErrorElement firstParseError = PsiTreeUtil.findChildOfType(decompiledPsiFile, PsiErrorElement.class);
+
+        if (firstParseError != null) {
+            String failingLine = parseErrorLine(decompiledText, firstParseError.getTextRange().getStartOffset());
+            String description = firstParseError.getErrorDescription();
+
+            fail(
+                    "DECOMPILATION PARSE ERROR: " + name +
+                    (description == null || description.isBlank() ? "" : "\nDescription: " + description) +
+                    (failingLine == null || failingLine.isBlank() ? "" : "\nLine: " + failingLine)
+            );
+        }
+    }
+
+    private String parseErrorLine(String text, int offset) {
+        if (text.isEmpty() || offset < 0 || offset > text.length()) {
+            return null;
+        }
+
+        int lineStart = text.lastIndexOf('\n', Math.max(offset - 1, 0));
+        lineStart = lineStart < 0 ? 0 : lineStart + 1;
+
+        int lineEnd = text.indexOf('\n', offset);
+        lineEnd = lineEnd < 0 ? text.length() : lineEnd;
+
+        return text.substring(lineStart, lineEnd);
     }
 
     private String buildCompactDiffMessage(String name, String expected, String actual) {

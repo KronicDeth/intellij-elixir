@@ -25,15 +25,26 @@ object BulkDecompilationRunLogger {
             return
         }
 
+        val totalDecompiled = runState.totalDecompiledCount.get()
         val parseFirst = runState.parseFirstCount.get()
         val parseSuppressed = runState.parseSuppressedCount.get()
+        val uniqueParseLines = runState.parseErrorLineCountByText.size
         val missingFirst = runState.missingFunctionFirstCount.get()
         val missingSuppressed = runState.missingFunctionSuppressedCount.get()
 
         LOG.info(
-            "Bulk decompilation log summary: parse errors first=$parseFirst, parse errors suppressed=$parseSuppressed, " +
-                    "missing-function errors first=$missingFirst, missing-function errors suppressed=$missingSuppressed"
+            "Bulk decompilation log summary: total files decompiled=$totalDecompiled, " +
+                    "parse errors first=$parseFirst, parse errors suppressed=$parseSuppressed, " +
+                    "unique parse error lines=$uniqueParseLines, missing-function errors first=$missingFirst, " +
+                    "missing-function errors suppressed=$missingSuppressed"
         )
+
+        if (uniqueParseLines > 0) {
+            LOG.info(
+                "Unique parse error lines (top $MAX_SAMPLE_SIZE):\n" +
+                        sampleMultiline(runState.parseErrorLineCountByText)
+            )
+        }
 
         if (parseSuppressed > 0) {
             LOG.info("Suppressed repeated parse errors (sample): ${sample(runState.suppressedParseByFilePath)}")
@@ -64,6 +75,22 @@ object BulkDecompilationRunLogger {
         }
     }
 
+    fun recordParseErrorLine(project: Project, parseErrorLine: String?) {
+        val runState = ACTIVE.get()
+
+        if (runState == null || runState.project != project) {
+            return
+        }
+
+        parseErrorLine
+            ?.trim()
+            ?.takeIf { it.isNotEmpty() }
+            ?.let { normalizedLine ->
+                val boundedLine = normalizedLine.take(MAX_PARSE_LINE_LENGTH)
+                runState.parseErrorLineCountByText.computeIfAbsent(boundedLine) { AtomicInteger(0) }.incrementAndGet()
+            }
+    }
+
     /**
      * @return true when the caller should emit the detailed missing-function error log.
      */
@@ -84,6 +111,13 @@ object BulkDecompilationRunLogger {
         }
     }
 
+    fun recordDecompilation(project: Project) {
+        val runState = ACTIVE.get()
+        if (runState != null && runState.project == project) {
+            runState.totalDecompiledCount.incrementAndGet()
+        }
+    }
+
     private fun sample(counterByKey: ConcurrentHashMap<String, AtomicInteger>): String {
         return counterByKey.entries
             .sortedByDescending { it.value.get() }
@@ -91,11 +125,21 @@ object BulkDecompilationRunLogger {
             .joinToString(" | ") { (key, count) -> "${count.get()}x $key" }
     }
 
+    private fun sampleMultiline(counterByKey: ConcurrentHashMap<String, AtomicInteger>): String {
+        return counterByKey.entries
+            .sortedWith(compareByDescending<Map.Entry<String, AtomicInteger>> { it.value.get() }.thenBy { it.key })
+            .take(MAX_SAMPLE_SIZE)
+            .mapIndexed { index, (key, count) -> "  ${index + 1}. ${count.get()}x $key" }
+            .joinToString("\n")
+    }
+
     private class RunState(val project: Project) {
+        val totalDecompiledCount = AtomicInteger(0)
         val parseFirstByFilePath = ConcurrentHashMap.newKeySet<String>()
         val parseFirstCount = AtomicInteger(0)
         val parseSuppressedCount = AtomicInteger(0)
         val suppressedParseByFilePath = ConcurrentHashMap<String, AtomicInteger>()
+        val parseErrorLineCountByText = ConcurrentHashMap<String, AtomicInteger>()
 
         val missingFunctionFirstByMessage = ConcurrentHashMap.newKeySet<String>()
         val missingFunctionFirstCount = AtomicInteger(0)
@@ -104,4 +148,5 @@ object BulkDecompilationRunLogger {
     }
 
     private const val MAX_SAMPLE_SIZE = 10
+    private const val MAX_PARSE_LINE_LENGTH = 160
 }

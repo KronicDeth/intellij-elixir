@@ -113,21 +113,66 @@ class BulkDecompilation : AnAction() {
         !file.isDirectory && file.extension.equals("beam", ignoreCase = true)
 
     private suspend fun decompileFile(psiManager: PsiManager, file: VirtualFile) {
+        BulkDecompilationRunLogger.recordDecompilation(psiManager.project)
         readAction {
             psiManager.findFile(file)
                 ?.let { it as? PsiCompiledFile }
                 ?.decompiledPsiFile
                 ?.let { decompiledPsiFile ->
-                    if (SyntaxTraverser.psiTraverser(decompiledPsiFile)
-                            .traverse()
-                            .filter(PsiErrorElement::class.java)
-                            .isNotEmpty
-                    ) {
+                    val firstParseError = SyntaxTraverser.psiTraverser(decompiledPsiFile)
+                        .traverse()
+                        .filter(PsiErrorElement::class.java)
+                        .firstOrNull()
+
+                    if (firstParseError != null) {
+                        val failingLine = parseErrorLine(decompiledPsiFile.text, firstParseError.textRange.startOffset)
+                        BulkDecompilationRunLogger.recordParseErrorLine(
+                            psiManager.project,
+                            failingLine
+                        )
+
                         if (BulkDecompilationRunLogger.shouldLogParseError(psiManager.project, file.path)) {
-                            Logger.error(BulkDecompilation::class.java, "Parsing error in decompiled ${file.path}", decompiledPsiFile)
+                            Logger.error(
+                                BulkDecompilation::class.java,
+                                parseErrorTitle(file.path, firstParseError.errorDescription, failingLine),
+                                decompiledPsiFile
+                            )
                         }
                     }
                 }
         }
+    }
+
+    private fun parseErrorTitle(filePath: String, errorDescription: String?, failingLine: String?): String {
+        val descriptionPart = errorDescription?.takeIf { it.isNotBlank() }?.let {
+            " description=${compactForTitle(it)}"
+        } ?: ""
+        val linePart = failingLine?.takeIf { it.isNotBlank() }?.let {
+            " line=${compactForTitle(it)}"
+        } ?: ""
+
+        return "Parsing error in decompiled $filePath$descriptionPart$linePart"
+    }
+
+    private fun parseErrorLine(text: String, offset: Int): String? {
+        if (text.isEmpty() || offset < 0 || offset > text.length) {
+            return null
+        }
+
+        val lineStart = text.lastIndexOf('\n', startIndex = (offset - 1).coerceAtLeast(0)).let {
+            if (it < 0) 0 else it + 1
+        }
+        val lineEnd = text.indexOf('\n', startIndex = offset).let {
+            if (it < 0) text.length else it
+        }
+
+        return text.substring(lineStart, lineEnd)
+    }
+
+    private fun compactForTitle(text: String): String =
+        text.trim().replace(Regex("\\s+"), " ").take(MAX_PARSE_TITLE_TEXT_LENGTH)
+
+    companion object {
+        private const val MAX_PARSE_TITLE_TEXT_LENGTH = 180
     }
 }
