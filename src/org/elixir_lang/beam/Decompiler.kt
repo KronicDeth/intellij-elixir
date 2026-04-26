@@ -32,10 +32,10 @@ class Decompiler : BinaryFileDecompiler {
     companion object {
         private val logger = Logger.getInstance(Decompiler::class.java)
         private val HEADER_NAME_BY_MACRO: Map<String, String> = mapOf(
-            Function.DEFMACRO to "Macros",
-            Function.DEFMACROP to "Private Macros",
-            Function.DEF to "Functions",
-            Function.DEFP to "Private Functions"
+            DEFMACRO to "Macros",
+            DEFMACROP to "Private Macros",
+            DEF to "Functions",
+            DEFP to "Private Functions"
         )
         private val MACRO_NAME_ARITY_DECOMPILER_LIST: List<org.elixir_lang.beam.decompiler.MacroNameArity> = listOf(
             InfixOperator,
@@ -150,7 +150,7 @@ class Decompiler : BinaryFileDecompiler {
                     documented.doc?.let { doc ->
                         when (doc) {
                             is None -> Unit
-                            is Hidden -> appendDocumentation(decompiled, "typedoc", false)
+                            is Hidden -> appendDocumentation(decompiled, "typedoc")
                             is MarkdownByLanguage -> {
                                 for (formatted in doc.formattedByLanguage.values) {
                                     appendDocumentation(decompiled, "typedoc", formatted)
@@ -162,7 +162,9 @@ class Decompiler : BinaryFileDecompiler {
                     val signatures = documented.signatures
 
                     if (signatures.isNotEmpty()) {
-                        TODO()
+                        for (signature in signatures) {
+                            decompiled.append("  @type ").append(signature.replace("\r", "")).append('\n')
+                        }
                     } else {
                         decompiled.append("  @type ").append(name).append('(')
 
@@ -281,7 +283,7 @@ class Decompiler : BinaryFileDecompiler {
                                 docs.doc(macroNameArity)?.let { doc ->
                                     when (doc) {
                                         is None -> Unit
-                                        is Hidden -> appendDocumentation(decompiled, "doc", false)
+                                        is Hidden -> appendDocumentation(decompiled, "doc")
                                         is MarkdownByLanguage -> {
                                             for (formatted in doc.formattedByLanguage.values) {
                                                 appendDocumentation(decompiled, "doc", formatted)
@@ -328,12 +330,13 @@ class Decompiler : BinaryFileDecompiler {
                 .append("\n")
         }
 
-        private fun appendDocumentation(decompiled: StringBuilder, moduleAttribute: String, shown: Boolean) {
-            decompiled.append("  @").append(moduleAttribute).append(' ').append(shown).append('\n')
+        private fun appendDocumentation(decompiled: StringBuilder, moduleAttribute: String) {
+            decompiled.append("  @").append(moduleAttribute).append(' ').append("false").append('\n')
         }
 
         private fun appendDocumentation(decompiled: StringBuilder, moduleAttribute: String, text: String) {
-            val safePromoterTerminator = safePromoterTerminator(text)
+            val sanitizedText = text.replace("\r", "")
+            val safePromoterTerminator = safePromoterTerminator(sanitizedText)
             val promoterTerminator: String = safePromoterTerminator ?: "\"\"\""
             decompiled
                 .append("  @")
@@ -343,7 +346,7 @@ class Decompiler : BinaryFileDecompiler {
                 .append(" ~S")
                 .append(promoterTerminator)
                 .append('\n')
-            appendDocumentationText(decompiled, safePromoterTerminator, text)
+            appendDocumentationText(decompiled, safePromoterTerminator, sanitizedText)
             decompiled
                 .append("\n  ")
                 .append(promoterTerminator)
@@ -497,7 +500,7 @@ class Decompiler : BinaryFileDecompiler {
                     if (signatures != null && signatures.isNotEmpty()) {
                         for (signature in signatures) {
                             decompiled.append("  ").append(macroNameArity.macro).append(' ')
-                            decompiled.append(signature)
+                            decompiled.append(signature.replace("\r", ""))
                             appendNotDecompiledBody(decompiled)
                         }
                     } else {
