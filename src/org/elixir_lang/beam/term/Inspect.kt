@@ -22,7 +22,39 @@ fun String.elixirEscape(): String {
         elixirEscapedBuilder.appendCodePoint(elixirEscapedCodePoint)
     }
 
-    return elixirEscapedBuilder.toString()
+    return escapeInterpolation(elixirEscapedBuilder.toString())
+}
+
+private fun escapeInterpolation(text: String): String {
+    val escaped = StringBuilder(text.length)
+    var index = 0
+
+    while (index < text.length) {
+        val current = text[index]
+
+        if (current == '#' && index + 1 < text.length && text[index + 1] == '{') {
+            var precedingBackslashes = 0
+            var previousIndex = escaped.length - 1
+
+            while (previousIndex >= 0 && escaped[previousIndex] == '\\') {
+                precedingBackslashes++
+                previousIndex--
+            }
+
+            // In Elixir interpolation starts at unescaped `#{`, so keep the backslash count odd.
+            if (precedingBackslashes % 2 == 0) {
+                escaped.append('\\')
+            }
+
+            escaped.append("#{")
+            index += 2
+        } else {
+            escaped.append(current)
+            index++
+        }
+    }
+
+    return escaped.toString()
 }
 
 private fun Int.elixirEscape(): IntStream =
