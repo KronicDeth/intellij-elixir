@@ -21,7 +21,6 @@ import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.attribute.Type
 import org.elixir_lang.beam.decompiler.*
 import org.elixir_lang.beam.term.inspect
-import org.elixir_lang.psi.call.name.Function
 import org.elixir_lang.psi.call.name.Function.*
 import org.elixir_lang.psi.call.name.Module
 import org.elixir_lang.reference.resolver.Type.BUILTIN_ARITY_BY_NAME
@@ -499,7 +498,7 @@ class Decompiler : BinaryFileDecompiler {
                         for (signature in signatures) {
                             decompiled.append("  ").append(macroNameArity.macro).append(' ')
                             decompiled.append(signature)
-                            decompiled.append(" do\n    # body not decompiled\n  end\n")
+                            appendNotDecompiledBody(decompiled)
                         }
                     } else {
                         decompiler.append(decompiled, macroNameArity)

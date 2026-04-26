@@ -7,60 +7,13 @@ import org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.v1.definitions.compon
 import org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.v1.definitions.component3
 import org.elixir_lang.beam.term.inspect
 import org.elixir_lang.code.Identifier
+import org.elixir_lang.code.sanitizeErlangVariableName
 import kotlin.collections.List
-
-val binaryOps = arrayOf(
-    "===",
-    "!==",
-    "==",
-    "!=",
-    "<=",
-    ">=",
-    "&&",
-    "||",
-    "<>",
-    "++",
-    "--",
-    "\\",
-    "::",
-    "<-",
-    "..",
-    "|>",
-    "=~",
-    "<",
-    ">",
-    "->",
-    "+",
-    "-",
-    "*",
-    "/",
-    "=",
-    "|",
-    ".",
-    "and",
-    "or",
-    "when",
-    "in",
-    "~>>",
-    "<<~",
-    "~>",
-    "<~",
-    "<~>",
-    "<|>",
-    "<<<",
-    ">>>",
-    "|||",
-    "&&&",
-    "^^^",
-    "~~~"
-)
 
 fun otpErlangList(vararg elements: OtpErlangObject): OtpErlangList = OtpErlangList(elements)
 fun otpErlangList(elements: List<OtpErlangObject>): OtpErlangList = OtpErlangList(elements.toTypedArray())
 
 object Macro {
-    private const val MACRO_CALL_PREFIX = "MACRO-"
-
     val logger = Logger.getInstance(Macro.javaClass)
 
     fun block(expressions: List<OtpErlangObject>): OtpErlangTuple =
@@ -119,7 +72,7 @@ object Macro {
     }
 
     /**
-     * Return whether the macro is an Expr node: `expr :: {expr | atom, Keyword.t, atom | [t]}`.
+     * Return whether the macro is an Expr node: `expr :: {expr | atom, Keyword.t, atom | \[t\]}`.
      *
      * @param macro a quoted form from a `quote` method.
      * @return `true` if a tuple with 3 elements; `false` otherwise.
@@ -846,13 +799,7 @@ object Macro {
         tag: String,
         crossinline taggedTupleTo: (OtpErlangTuple) -> T?
     ): T? =
-        ifTupleTo(macro, 3) { tuple: OtpErlangTuple ->
-            if (tuple.elementAt(0) == OtpErlangAtom(tag)) {
-                taggedTupleTo(tuple)
-            } else {
-                null
-            }
-        }
+        ifTaggedTuple(macro, arity = 3, predicate = { it == tag }, ifTrue = taggedTupleTo)
 
     // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex#L578-L582
     private fun ifTupleContainerToString(macro: OtpErlangObject): String? =
@@ -916,7 +863,7 @@ object Macro {
                     "[]"
                 IOLib.printableList(list) ->
                     "'${IOLib.printableListToString(list)}'"
-                org.elixir_lang.Inspect.List.isKeyword(list) ->
+                Inspect.List.isKeyword(list) ->
                     "[${keywordListToString(list)}]"
                 else ->
                     "[${list.joinToString(", ") { toString(it) }}]"
@@ -1156,7 +1103,7 @@ object Macro {
             }
         } ?:
         // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex?utf8=%E2%9C%93#L760-L761
-        part is OtpErlangBinary
+        (part is OtpErlangBinary)
 
     fun adjustNewLines(textWithNewLines: String, newLineReplacement: String): String =
         Regex(Regex.escape("\n")).replace(textWithNewLines, Regex.escapeReplacement(newLineReplacement))
@@ -1166,16 +1113,12 @@ object Macro {
             orelseArguments.arity() == 2 &&
                     isCallingWithArguments(
                         orelseArguments.elementAt(0),
-                        "erlang",
-                        "=:=",
                         variable,
                         OtpErlangAtom("false")
                     )
                     &&
                     isCallingWithArguments(
                         orelseArguments.elementAt(1),
-                        "erlang",
-                        "=:=",
                         variable,
                         OtpErlangAtom("nil")
                     )
@@ -1183,11 +1126,9 @@ object Macro {
 
     private fun isCallingWithArguments(
         term: OtpErlangObject,
-        module: String,
-        name: String,
         vararg expected: OtpErlangObject
     ): Boolean =
-        ifCallConvertArgumentsTo(term, module, name) { actual ->
+        ifCallConvertArgumentsTo(term, "erlang", "=:=") { actual ->
             actual.elements()!!.contentEquals(expected)
         } ?: false
 
@@ -1691,8 +1632,7 @@ object Macro {
                     ) {
                         ifCaseClauseTo(clauses.elementAt(1)) { trueInput, trueOutput ->
                             if (trueInput.let { it as? OtpErlangList }?.singleOrNull() == OtpErlangAtom("true")) {
-                                if (clauseCount == 2 ||
-                                    (clauseCount == 3 && isBadBoolClause(clauses.elementAt(2)))
+                                if (clauseCount == 2 || isBadBoolClause(clauses.elementAt(2))
                                 ) {
                                     transformer(
                                         otpErlangTuple(
@@ -1960,7 +1900,7 @@ object Macro {
 
     // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/exception.ex#L302-L316
     fun rewriteGuard(guard: OtpErlangObject): OtpErlangObject =
-        Macro.prewalk(guard) { macro ->
+        prewalk(guard) { macro ->
             ifErlangElementRewriteTo(macro) { it } ?: ifErlangRewriteTo(macro) { it } ?: macro
         }
 
@@ -2174,12 +2114,6 @@ object Macro {
     private fun kernelToString(@Suppress("UNUSED_PARAMETER") term: OtpErlangObject): String {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
-
-    private fun ifAtomToString(term: OtpErlangObject): String? =
-        when (term) {
-            is OtpErlangAtom -> term.atomValue().removePrefix(MACRO_CALL_PREFIX)
-            else -> null
-        }
 
     val NIL = OtpErlangAtom("nil")
 
