@@ -9,7 +9,6 @@ import org.elixir_lang.ElixirLanguage
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.impl.stripAccessExpression
-import org.elixir_lang.reference.ModuleAttribute.Companion.DOCUMENTATION_NAME_SET
 import org.intellij.plugins.markdown.lang.MarkdownLanguage
 import java.util.regex.Pattern
 
@@ -17,7 +16,7 @@ class Injector : MultiHostInjector {
     override fun getLanguagesToInject(registrar: MultiHostRegistrar, context: PsiElement) {
         context
             .let { it as? AtUnqualifiedNoParenthesesCall<*> }
-            ?.takeIf(Companion::isValidHost)
+            ?.takeIf(org.elixir_lang.injection.PsiLanguageInjectionHost::isDocumentationHost)
             ?.lastChild
             ?.firstChild
             ?.firstChild
@@ -62,11 +61,11 @@ class Injector : MultiHostInjector {
             is QuotableKeywordPair -> {
                 when (val key = documentation.keywordKey.text) {
                     "deprecated" -> getLanguagesToInjectInQuote(registrar, documentation.keywordValue)
-                    "authors", "group", "guard", "request_body", "responses", "since", "type" -> Unit
+                    "authors", "delegate_to", "group", "guard", "request_body", "responses", "since", "type" -> Unit
                     else -> {
                         Logger.error(
                             javaClass,
-                            "Do not known whether to inject Markdown in documentation key $key",
+                            "Do not know whether to inject Markdown in documentation key $key",
                             documentation
                         )
                     }
@@ -303,10 +302,8 @@ class Injector : MultiHostInjector {
         private const val IEX_CONTINUATION_LENGTH = IEX_CONTINUATION.length
         private const val EXCEPTION_PREFIX = "** ("
         private const val DEBUG_PREFIX = "*DBG* "
-        private val LIST_START_PATTERN = Pattern.compile("(?<indent>\\s*)([-*+]|\\d+\\.) \\S+.*\n")
-        private val INDENTED_PATTERN = Pattern.compile("(?<indent>\\s*).*\n")
-
-        fun isValidHost(atUnqualifiedNoParenthesesCall: AtUnqualifiedNoParenthesesCall<*>): Boolean =
-            atUnqualifiedNoParenthesesCall.atIdentifier.lastChild?.text in DOCUMENTATION_NAME_SET
     }
 }
+
+private val LIST_START_PATTERN: Pattern = Pattern.compile("(?<indent>\\s*)([-*+]|\\d+\\.) \\S+.*\n")
+private val INDENTED_PATTERN: Pattern = Pattern.compile("(?<indent>\\s*).*\n")
