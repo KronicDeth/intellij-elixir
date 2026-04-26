@@ -16,6 +16,7 @@ fun elixirErl(v1: V1): DebugInfo {
 
     return when (metadata) {
         is OtpErlangTuple -> elixirErlFromMetadata(metadata, elixirErl)
+        is OtpErlangAtom -> elixirErlFromMetadataAtom(metadata, elixirErl)
         else -> {
             logger.error("""
                          Dbgi :debug_info_v1 version :elixir_erl backend metadata is not a tuple
@@ -29,6 +30,21 @@ fun elixirErl(v1: V1): DebugInfo {
 
             elixirErl
         }
+    }
+}
+
+private fun elixirErlFromMetadataAtom(metadata: OtpErlangAtom, elixirErl: ElixirErl): DebugInfo {
+    val atomValue = metadata.atomValue()
+
+    return if (atomValue == "none") {
+        // `:none` is expected for modules compiled with `debug_info: false`.
+        elixirErl
+    } else {
+        logger.error("""
+                     Dbgi :debug_info_v1 version :elixir_erl backend metadata atom (${inspect(metadata)}) is not :none
+                     """.trimIndent())
+
+        elixirErl
     }
 }
 
