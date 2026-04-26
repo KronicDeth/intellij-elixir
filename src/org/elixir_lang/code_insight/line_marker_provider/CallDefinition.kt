@@ -22,35 +22,57 @@ import org.elixir_lang.structure_view.element.CallDefinitionSpecification.Compan
 import org.elixir_lang.structure_view.element.CallDefinitionSpecification.Companion.specificationType
 
 class CallDefinition : LineMarkerProvider {
-    override fun getLineMarkerInfo(element: PsiElement): LineMarkerInfo<*>? =
-        if (daemonCodeAnalyzerSettings.SHOW_METHOD_SEPARATORS) {
-            when (element) {
-                is AtUnqualifiedNoParenthesesCall<*> -> getLineMarkerInfo(element)
-                is Call -> getLineMarkerInfo(element)
-                else -> null
+    override fun getLineMarkerInfo(element: PsiElement): LineMarkerInfo<*>? {
+        // LineMarkerProvider contract: only return info for leaf elements
+        if (element.firstChild != null) return null
+        if (!daemonCodeAnalyzerSettings.SHOW_METHOD_SEPARATORS) return null
+
+        val parent = element.parent
+
+        // Leaf is IDENTIFIER_TOKEN inside an @-attribute's atIdentifier
+        if (parent != null && element.node.elementType == ElixirTypes.IDENTIFIER_TOKEN) {
+            val grandparent = parent.parent
+            if (grandparent is AtUnqualifiedNoParenthesesCall<*>) {
+                // Verify this is the expected leaf anchor for the attribute
+                val expectedLeaf = grandparent.atIdentifier.node
+                    .findChildByType(ElixirTypes.IDENTIFIER_TOKEN) as? LeafPsiElement
+                if (element == expectedLeaf) {
+                    return getLineMarkerInfo(grandparent)
+                }
             }
-        } else {
-            null
         }
+
+        // Leaf is the marker anchor of a Call (function name identifier).
+        // markerAnchor(call) places the leaf at most 2 levels below the Call
+        // (Call → functionNameElement → IDENTIFIER_TOKEN), so we bound the search.
+        val call = generateSequence(parent) { it.parent }
+            .take(2)
+            .filterIsInstance<Call>()
+            .firstOrNull()
+
+        if (call != null && CallDefinitionClause.`is`(call) && element == markerAnchor(call)) {
+            return getLineMarkerInfo(call)
+        }
+
+        return null
+    }
 
     private val daemonCodeAnalyzerSettings: DaemonCodeAnalyzerSettings = DaemonCodeAnalyzerSettings.getInstance()
     private val editorColorsManager: EditorColorsManager = EditorColorsManager.getInstance()
 
     private fun callDefinitionSeparator(
         atUnqualifiedNoParenthesesCall: AtUnqualifiedNoParenthesesCall<*>
-    ): LineMarkerInfo<*> {
+    ): LineMarkerInfo<*>? {
         val leafPsiElement = atUnqualifiedNoParenthesesCall
             .atIdentifier
             .node
-            .findChildByType(ElixirTypes.IDENTIFIER_TOKEN) as LeafPsiElement?
-            ?: error(
-                "AtUnqualifiedNoParenthesesCall (" +
-                        atUnqualifiedNoParenthesesCall.text +
-                        ") does not have an Tokenizer token"
-            )
+            .findChildByType(ElixirTypes.IDENTIFIER_TOKEN) as? LeafPsiElement
 
-        return callDefinitionSeparator(leafPsiElement)
+        return leafPsiElement?.let(::callDefinitionSeparator)
     }
+
+    private fun callDefinitionSeparator(call: Call): LineMarkerInfo<*>? =
+        markerAnchor(call)?.let(::callDefinitionSeparator)
 
     private fun callDefinitionSeparator(psiElement: PsiElement): LineMarkerInfo<*> =
         LineMarkerInfo(

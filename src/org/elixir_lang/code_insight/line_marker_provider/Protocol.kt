@@ -1,7 +1,6 @@
 package org.elixir_lang.code_insight.line_marker_provider
 
 import com.intellij.codeInsight.CodeInsightBundle
-import com.intellij.codeInsight.ContainerProvider
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler
 import com.intellij.codeInsight.daemon.LineMarkerInfo
 import com.intellij.codeInsight.daemon.LineMarkerProvider
@@ -9,11 +8,12 @@ import com.intellij.codeInsight.daemon.impl.PsiElementListNavigator
 import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder
 import com.intellij.codeInsight.navigation.NavigationGutterIconRenderer
 import com.intellij.ide.util.PsiElementListCellRenderer
-import com.intellij.navigation.NavigationItem
 import com.intellij.openapi.util.Computable
 import com.intellij.openapi.util.NotNullLazyValue
-import com.intellij.openapi.util.text.StringUtil
-import com.intellij.psi.*
+import com.intellij.psi.NavigatablePsiElement
+import com.intellij.psi.PsiElement
+import com.intellij.psi.ResolveState
+import com.intellij.psi.SmartPsiElementPointer
 import org.elixir_lang.Icons
 import org.elixir_lang.beam.psi.impl.ModuleImpl
 import org.elixir_lang.psi.CallDefinitionClause
@@ -26,14 +26,28 @@ import java.util.*
 import javax.swing.Icon
 
 class Protocol : LineMarkerProvider {
-    override fun getLineMarkerInfo(element: PsiElement): LineMarkerInfo<*>? =
-        when (element) {
-            is Call -> getLineMarkerInfo(element)
-            else -> null
-        }
+    override fun getLineMarkerInfo(element: PsiElement): LineMarkerInfo<*>? {
+        // LineMarkerProvider contract: only return info for leaf elements
+        if (element.firstChild != null) return null
+
+        // Walk up from leaf to find the nearest enclosing Call.
+        // markerAnchor(call) places the leaf at most 2 levels below the Call
+        // (Call → functionNameElement → IDENTIFIER_TOKEN), so we bound the search.
+        val call = generateSequence(element.parent) { it.parent }
+            .take(2)
+            .filterIsInstance<Call>()
+            .firstOrNull()
+            ?: return null
+
+        // Verify this leaf is the marker anchor for the call
+        if (element != markerAnchor(call)) return null
+
+        return getLineMarkerInfo(call)
+    }
 
     private fun getLineMarkerInfo(call: Call): LineMarkerInfo<*>? =
         if (Protocol.`is`(call)) {
+            val anchor = markerAnchor(call) ?: return null
             val targets: NotNullLazyValue<Collection<PsiElement>> = NotNullLazyValue.createValue {
                 val implementations = mutableListOf<PsiElement>()
 
@@ -46,11 +60,12 @@ class Protocol : LineMarkerProvider {
 
             ImplsGutterIconBuilder()
                 .setTargets(targets)
-                .createLineMarkerInfo(call)
+                .createLineMarkerInfo(anchor)
         } else if (CallDefinitionClause.`is`(call)) {
             enclosingModularMacroCall(call)?.let { modularCall ->
                 CallDefinitionClause.nameArityInterval(call, ResolveState.initial())?.let { protocolNameArityInterval ->
                     if (Protocol.`is`(modularCall)) {
+                        val anchor = markerAnchor(call) ?: return null
                         val targets: NotNullLazyValue<Collection<PsiElement>> = NotNullLazyValue.createValue {
                             val implementations = mutableListOf<PsiElement>()
 
@@ -95,7 +110,7 @@ class Protocol : LineMarkerProvider {
 
                         ImplsGutterIconBuilder()
                             .setTargets(targets)
-                            .createLineMarkerInfo(call)
+                            .createLineMarkerInfo(anchor)
                     } else {
                         null
                     }
@@ -152,45 +167,15 @@ class Protocol : LineMarkerProvider {
             val renderer = myCellRenderer.compute()
 
             Arrays.sort(targets, Comparator.comparing(renderer::getComparingObject))
-            val escapedName = escapedName(elt)
+            val name = escapedName(elt)
 
-            @Suppress("DialogTitleCapitalization")
             PsiElementListNavigator.openTargets(
                 event,
                 targets,
-                CodeInsightBundle.message("goto.implementation.chooserTitle", escapedName, targets.size, ""),
-                CodeInsightBundle.message("goto.implementation.findUsages.title", escapedName, targets.size),
+                CodeInsightBundle.message("goto.implementation.chooserTitle", name, targets.size, ""),
+                CodeInsightBundle.message("goto.implementation.findUsages.title", name, targets.size),
                 renderer
             )
         }
-
-        private fun escapedName(element: PsiElement): String {
-            val presentation = (element as NavigationItem).presentation!!
-            val containerText = containerText(element)
-            val prefix = if (containerText == null) {
-                ""
-            } else {
-                "$containerText."
-            }
-            val fullName = prefix + presentation.presentableText
-
-            return StringUtil.escapeXmlEntities(fullName)
-        }
-
-        private fun containerText(element: PsiElement): String? {
-            val container = container(element)
-            val containerPresentation =
-                if (container == null || container is PsiFile) null else (container as NavigationItem).presentation
-            return containerPresentation?.presentableText
-        }
-
-        private fun container(refElement: PsiElement): PsiElement? {
-            for (provider in ContainerProvider.EP_NAME.extensions) {
-                val container = provider.getContainer(refElement)
-                if (container != null) return container
-            }
-            return refElement.parent
-        }
-
     }
 }
