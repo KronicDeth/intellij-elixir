@@ -1,7 +1,7 @@
 package org.elixir_lang
 
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.QueryExecutorBase
+import com.intellij.openapi.progress.ProgressManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveState
 import com.intellij.psi.search.searches.DefinitionsScopedSearch
@@ -23,7 +23,6 @@ class DefinitionsScopedSearch :
         queryParameters: DefinitionsScopedSearch.SearchParameters,
         consumer: Processor<in PsiElement>
     ) {
-        ApplicationManager.getApplication().assertReadAccessAllowed()
         when (val element = queryParameters.element) {
             is Call -> processQuery(element, consumer)
             is QualifiableAlias -> processQuery(element, consumer)
@@ -31,7 +30,7 @@ class DefinitionsScopedSearch :
     }
 
     private fun processQuery(qualifiableAlias: QualifiableAlias, consumer: Processor<in PsiElement>) {
-        ApplicationManager.getApplication().assertReadAccessAllowed()
+        ProgressManager.checkCanceled()
         qualifiableAlias.outerMostQualifiableAlias().maybeModularNameToModulars(qualifiableAlias.containingFile)
             .map { modular ->
                 processQuery(modular, consumer)
@@ -39,7 +38,6 @@ class DefinitionsScopedSearch :
     }
 
     private fun processQuery(psiElement: PsiElement, consumer: Processor<in PsiElement>) {
-        ApplicationManager.getApplication().assertReadAccessAllowed()
         when (psiElement) {
             is Call -> processQuery(psiElement, consumer)
             is ModuleImpl<*> -> processQuery(psiElement, consumer)
@@ -48,7 +46,6 @@ class DefinitionsScopedSearch :
     }
 
     private fun processQuery(call: Call, consumer: Processor<in PsiElement>) {
-        ApplicationManager.getApplication().assertReadAccessAllowed()
         if (Protocol.`is`(call)) {
             Protocol.processImplementations(call, consumer)
         } else if (CallDefinitionClause.`is`(call)) {
@@ -56,20 +53,56 @@ class DefinitionsScopedSearch :
                 CallDefinitionClause.nameArityInterval(call, ResolveState.initial())?.let { protocolNameArityInterval ->
                     if (Protocol.`is`(modularCall)) {
                         Protocol.processImplementations(modularCall) { defimpl ->
-                            for (defimplChild in (defimpl as Call).macroChildCallList()) {
-                                if (CallDefinitionClause.`is`(defimplChild)) {
-                                    CallDefinitionClause.nameArityInterval(defimplChild, ResolveState.initial())
-                                        ?.let { implNameArityInterval ->
-                                            if (implNameArityInterval.name == protocolNameArityInterval.name &&
-                                                implNameArityInterval.arityInterval.overlaps(protocolNameArityInterval.arityInterval)
-                                            ) {
-                                                consumer.process(defimplChild)
+                            ProgressManager.checkCanceled()
+
+                            var continueProcessing = true
+
+                            when (defimpl) {
+                                is Call -> {
+                                    for (defimplChild in defimpl.macroChildCallList()) {
+                                        ProgressManager.checkCanceled()
+
+                                        if (CallDefinitionClause.`is`(defimplChild)) {
+                                            CallDefinitionClause.nameArityInterval(defimplChild, ResolveState.initial())
+                                                ?.let { implNameArityInterval ->
+                                                    if (implNameArityInterval.name == protocolNameArityInterval.name &&
+                                                        implNameArityInterval.arityInterval.overlaps(protocolNameArityInterval.arityInterval)
+                                                    ) {
+                                                        if (!consumer.process(defimplChild)) {
+                                                            continueProcessing = false
+                                                        }
+                                                    }
+                                                }
+                                        }
+
+                                        if (!continueProcessing) {
+                                            break
+                                        }
+                                    }
+                                }
+
+                                is ModuleImpl<*> -> {
+                                    for (callDefinition in defimpl.callDefinitions()) {
+                                        ProgressManager.checkCanceled()
+
+                                        val implNameArityInterval = callDefinition.nameArityInterval
+
+                                        if (implNameArityInterval.name == protocolNameArityInterval.name &&
+                                            implNameArityInterval.arityInterval.overlaps(protocolNameArityInterval.arityInterval)
+                                        ) {
+                                            if (!consumer.process(callDefinition)) {
+                                                continueProcessing = false
                                             }
                                         }
+
+                                        if (!continueProcessing) {
+                                            break
+                                        }
+                                    }
                                 }
                             }
 
-                            true
+                            continueProcessing
                         }
                     }
                 }
@@ -78,14 +111,12 @@ class DefinitionsScopedSearch :
     }
 
     private fun processQuery(moduleImpl: ModuleImpl<*>, consumer: Processor<in PsiElement>) {
-        ApplicationManager.getApplication().assertReadAccessAllowed()
         if (Protocol.`is`(moduleImpl)) {
             Protocol.processImplementations(moduleImpl, consumer)
         }
     }
 
     private fun processQuery(callDefinitionImpl: CallDefinitionImpl<*>, consumer: Processor<in PsiElement>) {
-        ApplicationManager.getApplication().assertReadAccessAllowed()
         val moduleImpl = callDefinitionImpl.parent
 
         if (Protocol.`is`(moduleImpl)) {
@@ -93,34 +124,54 @@ class DefinitionsScopedSearch :
             val arity = callDefinitionImpl.exportedArity(ResolveState.initial())
 
             Protocol.processImplementations(moduleImpl) { defimpl ->
+                ProgressManager.checkCanceled()
+
+                var continueProcessing = true
+
                 when (defimpl) {
                     is Call -> {
                         for (defimplChild in defimpl.macroChildCallList()) {
+                            ProgressManager.checkCanceled()
+
                             if (CallDefinitionClause.`is`(defimplChild)) {
                                 CallDefinitionClause.nameArityInterval(defimplChild, ResolveState.initial())
                                     ?.let { implNameArityInterval ->
                                         if (implNameArityInterval.name == name &&
                                             implNameArityInterval.arityInterval.contains(arity)
                                         ) {
-                                            consumer.process(defimplChild)
+                                            if (!consumer.process(defimplChild)) {
+                                                continueProcessing = false
+                                            }
                                         }
                                     }
+                            }
+
+                            if (!continueProcessing) {
+                                break
                             }
                         }
                     }
                     is ModuleImpl<*> ->
                         for (callDefinition in defimpl.callDefinitions()) {
+                            ProgressManager.checkCanceled()
+
                             val implNameArityInterval = callDefinition.nameArityInterval
 
                             if (implNameArityInterval.name == name &&
                                 implNameArityInterval.arityInterval.contains(arity)
                             ) {
-                                consumer.process(callDefinition)
+                                if (!consumer.process(callDefinition)) {
+                                    continueProcessing = false
+                                }
+                            }
+
+                            if (!continueProcessing) {
+                                break
                             }
                         }
                 }
 
-                true
+                continueProcessing
             }
         }
     }
