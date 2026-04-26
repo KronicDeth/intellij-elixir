@@ -2,12 +2,14 @@ package org.elixir_lang.reference.resolver
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.DumbService
+import com.intellij.openapi.util.RecursionManager
 import com.intellij.psi.PsiElementResolveResult
 import com.intellij.psi.ResolveResult
 import com.intellij.psi.ResolveState
 import com.intellij.psi.impl.source.resolve.ResolveCache
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
+import com.intellij.psi.util.PsiUtilCore
 import org.elixir_lang.Arity
 import org.elixir_lang.NameArityInterval
 import org.elixir_lang.errorreport.Logger
@@ -66,8 +68,40 @@ object Callable : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Cal
                 listOf(terminalResolveResult) + pathResolveResultList
             }
             // deduplicate shared `defdelegate`, `import`, or `use`
-            .groupBy { it.element }
-            .map { (_, resolveResults) -> resolveResults.first() }
+            .groupBy { resolveResultKey(it) }
+            .map { (_, resolveResults) ->
+                resolveResults.maxByOrNull { if (it.isValidResult) 1 else 0 } ?: resolveResults.first()
+            }
+            .let(::deduplicateEquivalentResults)
+
+    private fun deduplicateEquivalentResults(resolveResults: List<PsiElementResolveResult>): List<PsiElementResolveResult> {
+        val deduplicated = mutableListOf<PsiElementResolveResult>()
+
+        for (candidate in resolveResults) {
+            val existingIndex = deduplicated.indexOfFirst { existing ->
+                existing.element.manager.areElementsEquivalent(existing.element, candidate.element)
+            }
+
+            if (existingIndex == -1) {
+                deduplicated.add(candidate)
+            } else if (candidate.isValidResult && !deduplicated[existingIndex].isValidResult) {
+                deduplicated[existingIndex] = candidate
+            }
+        }
+
+        return deduplicated
+    }
+
+    private fun resolveResultKey(resolveResult: PsiElementResolveResult): String {
+        val element = resolveResult.element.navigationElement
+        val filePath = element.containingFile?.virtualFile?.path ?: ""
+        val range = element.textRange
+        val startOffset = range?.startOffset ?: -1
+        val endOffset = range?.endOffset ?: -1
+        val elementType = PsiUtilCore.getElementType(element)?.toString() ?: ""
+
+        return "$filePath#$startOffset:$endOffset:$elementType"
+    }
 
     private fun resolvePreferred(
         element: Call,
@@ -97,18 +131,21 @@ object Callable : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Cal
         name: String,
         resolvedPrimaryArity: Arity,
         incompleteCode: Boolean
-    ): List<VisitedElementSetResolveResult> =
-        try {
-            if (element is Qualified) {
-                resolveQualified(element, name, resolvedPrimaryArity, incompleteCode)
-            } else {
-                resolveUnqualified(element, name, resolvedPrimaryArity, incompleteCode)
-            }
-        } catch (_: StackOverflowError) {
-            Logger.error(Callable::class.java, "StackOverflowError when annotating Call", element)
+    ): List<VisitedElementSetResolveResult> {
+        return RecursionManager.doPreventingRecursion(element, true) {
+            try {
+                if (element is Qualified) {
+                    resolveQualified(element, name, resolvedPrimaryArity, incompleteCode)
+                } else {
+                    resolveUnqualified(element, name, resolvedPrimaryArity, incompleteCode)
+                }
+            } catch (_: StackOverflowError) {
+                Logger.error(Callable::class.java, "StackOverflowError when annotating Call", element)
 
-            emptyList()
-        }
+                emptyList()
+            }
+        } ?: emptyList()
+    }
 
     private fun resolveUnqualified(
         element: Call,
