@@ -799,7 +799,7 @@ object Macro {
                     val scope = tuple.elementAt(2)
 
                     if (scope is OtpErlangAtom || (scope is OtpErlangList && scope.arity() == 1 && scope.elementAt(0) == NIL)) {
-                        variable.atomValue()
+                        sanitizeErlangVariableName(variable)
                     } else {
                         null
                     }

@@ -97,13 +97,14 @@ object Identifier {
     fun inspectAsFunction(string: String, local: Boolean = false): String {
         val classification = classify(string)
 
-        return if (classification in arrayOf(Classification.CALLABLE_LOCAL, Classification.CALLABLE_OPERATOR)) {
+        return if (classification in arrayOf(Classification.CALLABLE_LOCAL, Classification.CALLABLE_OPERATOR)
+            && !(local && string in RESERVED_VARIABLE_KEYWORDS)) {
             string
         } else {
            val escaped = if (classification in arrayOf(Classification.ALIAS, Classification.NOT_CALLABLE)) {
                string
            } else {
-               string.replace("\"", "\\\"")
+               escapeForElixirQuotedString(string)
            }
 
            val quoted = "\"$escaped\""
@@ -122,7 +123,7 @@ object Identifier {
         return if (classify(atomValue) in arrayOf(Classification.CALLABLE_LOCAL, Classification.CALLABLE_OPERATOR, Classification.NOT_CALLABLE)) {
             "$atomValue:"
         } else {
-            val escaped = atomValue.replace("\"", "\\\"")
+            val escaped = escapeForElixirQuotedString(atomValue)
 
             "\"$escaped\":"
         }
