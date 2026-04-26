@@ -370,9 +370,9 @@ defmodule :gb_sets do
 
   def intersection_list(s, []), do: s
 
-  def is_disjoint_1({k1, smaller1, bigger}, {k2, smaller2, _} = tree) when k1 < k2, do: notis_member_1(k1, smaller2) and is_disjoint_1(smaller1, smaller2) and is_disjoint_1(bigger, tree)
+  def is_disjoint_1({k1, smaller1, bigger}, {k2, smaller2, _} = tree) when k1 < k2, do: not is_member_1(k1, smaller2) and is_disjoint_1(smaller1, smaller2) and is_disjoint_1(bigger, tree)
 
-  def is_disjoint_1({k1, smaller, bigger1}, {k2, _, bigger2} = tree) when k1 > k2, do: notis_member_1(k1, bigger2) and is_disjoint_1(bigger1, bigger2) and is_disjoint_1(smaller, tree)
+  def is_disjoint_1({k1, smaller, bigger1}, {k2, _, bigger2} = tree) when k1 > k2, do: not is_member_1(k1, bigger2) and is_disjoint_1(bigger1, bigger2) and is_disjoint_1(smaller, tree)
 
   def is_disjoint_1({_K1, _, _}, {_K2, _, _}), do: false
 

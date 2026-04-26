@@ -775,13 +775,13 @@ defmodule :ssh_options do
   def check_function4(f), do: is_function(f, 4)
 
   def check_input_ok(algs) do
-    for kVs <- algs, notis_tuple(kVs) or size(kVs) !== 2 do
+    for kVs <- algs, not is_tuple(kVs) or size(kVs) !== 2 do
       error_in_check(kVs, 'Bad preferred_algorithms')
     end
   end
 
   def check_modify_algorithms(m) when is_list(m) do
-    for op_KVs <- m, notis_tuple(op_KVs) or size(op_KVs) !== 2 or not:lists.member(element(1, op_KVs), [:append, :prepend, :rm]) do
+    for op_KVs <- m, not is_tuple(op_KVs) or size(op_KVs) !== 2 or not :lists.member(element(1, op_KVs), [:append, :prepend, :rm]) do
       error_in_check(op_KVs, 'Bad modify_algorithms')
     end
     {true, for {op, kVs} <- m do
@@ -942,7 +942,7 @@ defmodule :ssh_options do
   def handle_options(role, optsList0, opts0) when is_map(opts0) and is_list(optsList0), do: ...
 
   def nml(k, l) do
-    for v <- l, notis_atom(v) do
+    for v <- l, not is_atom(v) do
       error_in_check(k, 'Bad value for this key')
     end
     case l -- :lists.usort(l) do

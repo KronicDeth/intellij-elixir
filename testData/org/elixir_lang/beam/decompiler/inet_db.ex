@@ -684,7 +684,7 @@ defmodule :inet_db do
         end, %{}, nms)
         del_ip_bynms(byname, type, iP, (for nm <- (for name <- names_0 do
           tolower(name)
-        end), not:maps.is_key(nm, nmsSet) do
+        end), not :maps.is_key(nm, nmsSet) do
           nm
         end))
     end

@@ -297,7 +297,7 @@ defmodule :dialyzer_callgraph do
   @spec strip_module_deps(mod_deps(), :sets.set(module())) :: mod_deps()
   def strip_module_deps(modDeps, stripSet) do
     filterFun1 = fn val ->
-        not:sets.is_element(val, stripSet)
+        not :sets.is_element(val, stripSet)
     end
     mapFun = fn _Key, valSet ->
         :ordsets.filter(filterFun1, valSet)

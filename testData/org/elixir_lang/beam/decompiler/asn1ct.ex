@@ -234,7 +234,7 @@ defmodule :asn1ct do
           :error ->
             parse_and_save1(s, suffixedASN1source, options)
         end
-      err when notmaps ->
+      err when not maps ->
         case :asn1_db.dbload(module) do
           :ok ->
             warning('could not do a consistency check of the ~p file: no asn1 source file was found.~n', [:lists.concat([module, '.asn1db'])], options)
@@ -1766,7 +1766,7 @@ defmodule :asn1ct do
   end
 
   def remove_asn_flags(options) do
-    for x <- options, notis_asn1_flag(x) do
+    for x <- options, not is_asn1_flag(x) do
       x
     end
   end
