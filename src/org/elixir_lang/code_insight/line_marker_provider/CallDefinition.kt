@@ -142,7 +142,7 @@ class CallDefinition : LineMarkerProvider {
                     if (moduleAttributeNameArity != null) {
                         moduleAttributeNameArity(previousModuleAttribute)?.let { previousModuleAttributeNameArity ->
                             // name match, now check if the arities match.
-                            if (moduleAttributeNameArity.arity == previousModuleAttributeNameArity.arity) {
+                            if (moduleAttributeNameArity.name == previousModuleAttributeNameArity.name) {
                                 val moduleAttributeArity = moduleAttributeNameArity.arity
                                 val previousModuleAttributeArity = previousModuleAttributeNameArity.arity
 
