@@ -29,47 +29,53 @@ class BulkDecompilation : AnAction() {
         val project = event.project ?: return
 
         currentThreadCoroutineScope().launch {
-            withBackgroundProgress(project, "Bulk Decompiling BEAM (.beam) files") {
-                withContext(Dispatchers.Default) {
-                    val sdkSet = mutableSetOf<Sdk>()
-                    val psiManager = PsiManager.getInstance(project)
-                    val modules = ModuleManager.getInstance(project).modules
+            BulkDecompilationRunLogger.begin(project)
 
-                    if (modules.isNotEmpty()) {
-                        reportSequentialProgress(modules.size) { reporter ->
-                            for (module in modules) {
-                                reporter.itemStep("Module ${module.name}") {
-                                    ProgressManager.checkCanceled()
+            try {
+                withBackgroundProgress(project, "Bulk Decompiling BEAM (.beam) files") {
+                    withContext(Dispatchers.Default) {
+                        val sdkSet = mutableSetOf<Sdk>()
+                        val psiManager = PsiManager.getInstance(project)
+                        val modules = ModuleManager.getInstance(project).modules
 
-                                    val moduleRootManager = ModuleRootManager.getInstance(module)
-                                    moduleRootManager.sdk?.let { sdkSet.add(it) }
-
-                                    for (contentRoot in moduleRootManager.contentRoots) {
+                        if (modules.isNotEmpty()) {
+                            reportSequentialProgress(modules.size) { reporter ->
+                                for (module in modules) {
+                                    reporter.itemStep("Module ${module.name}") {
                                         ProgressManager.checkCanceled()
-                                        decompile(psiManager, contentRoot)
+
+                                        val moduleRootManager = ModuleRootManager.getInstance(module)
+                                        moduleRootManager.sdk?.let { sdkSet.add(it) }
+
+                                        for (contentRoot in moduleRootManager.contentRoots) {
+                                            ProgressManager.checkCanceled()
+                                            decompile(psiManager, contentRoot)
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
 
-                    ProjectRootManager.getInstance(project).projectSdk?.let { sdkSet.add(it) }
+                        ProjectRootManager.getInstance(project).projectSdk?.let { sdkSet.add(it) }
 
-                    if (sdkSet.isNotEmpty()) {
-                        reportSequentialProgress(sdkSet.size) { reporter ->
-                            for (sdk in sdkSet) {
-                                reporter.itemStep("SDK ${sdk.name}") {
-                                    ProgressManager.checkCanceled()
-
-                                    for (virtualFile in sdk.rootProvider.getFiles(OrderRootType.CLASSES)) {
+                        if (sdkSet.isNotEmpty()) {
+                            reportSequentialProgress(sdkSet.size) { reporter ->
+                                for (sdk in sdkSet) {
+                                    reporter.itemStep("SDK ${sdk.name}") {
                                         ProgressManager.checkCanceled()
-                                        decompile(psiManager, virtualFile)
+
+                                        for (virtualFile in sdk.rootProvider.getFiles(OrderRootType.CLASSES)) {
+                                            ProgressManager.checkCanceled()
+                                            decompile(psiManager, virtualFile)
+                                        }
                                     }
                                 }
                             }
                         }
                     }
                 }
+            } finally {
+                BulkDecompilationRunLogger.end(project)
             }
         }
     }
@@ -117,7 +123,9 @@ class BulkDecompilation : AnAction() {
                             .filter(PsiErrorElement::class.java)
                             .isNotEmpty
                     ) {
-                        Logger.error(BulkDecompilation::class.java, "Parsing error in decompiled ${file.path}", decompiledPsiFile)
+                        if (BulkDecompilationRunLogger.shouldLogParseError(psiManager.project, file.path)) {
+                            Logger.error(BulkDecompilation::class.java, "Parsing error in decompiled ${file.path}", decompiledPsiFile)
+                        }
                     }
                 }
         }
