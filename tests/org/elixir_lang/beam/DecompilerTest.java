@@ -552,13 +552,18 @@ public class DecompilerTest extends PlatformTestCase {
         PsiErrorElement firstParseError = PsiTreeUtil.findChildOfType(decompiledPsiFile, PsiErrorElement.class);
 
         if (firstParseError != null) {
-            String failingLine = parseErrorLine(decompiledText, firstParseError.getTextRange().getStartOffset());
+            int errorOffset = firstParseError.getTextRange().getStartOffset();
+            String failingLine = parseErrorLine(decompiledText, errorOffset);
             String description = firstParseError.getErrorDescription();
+            String context = parseErrorContext(decompiledText, errorOffset);
 
             fail(
                     "DECOMPILATION PARSE ERROR: " + name +
-                    (description == null || description.isBlank() ? "" : "\nDescription: " + description) +
-                    (failingLine == null || failingLine.isBlank() ? "" : "\nLine: " + failingLine)
+                            (description.isBlank() ? "" : "\nDescription: " + description) +
+                    (failingLine == null || failingLine.isBlank() ? "" : "\nLine: " + failingLine) +
+                    "\nError offset: " + errorOffset +
+                    "\n\n--- Context (20 lines before/after error) ---\n" + context +
+                    "\n--- End context ---"
             );
         }
     }
@@ -575,6 +580,36 @@ public class DecompilerTest extends PlatformTestCase {
         lineEnd = lineEnd < 0 ? text.length() : lineEnd;
 
         return text.substring(lineStart, lineEnd);
+    }
+
+    private String parseErrorContext(String text, int offset) {
+        int surroundingLines = 20;
+        if (text.isEmpty() || offset < 0 || offset > text.length()) {
+            return "(no context available)";
+        }
+
+        String[] lines = text.split("\n", -1);
+        // Find which line the offset is on
+        int charCount = 0;
+        int errorLine = 0;
+        for (int i = 0; i < lines.length; i++) {
+            int lineLen = lines[i].length() + 1; // +1 for the \n
+            if (charCount + lineLen > offset) {
+                errorLine = i;
+                break;
+            }
+            charCount += lineLen;
+        }
+
+        int startLine = Math.max(0, errorLine - surroundingLines);
+        int endLine = Math.min(lines.length - 1, errorLine + surroundingLines);
+
+        StringBuilder sb = new StringBuilder();
+        for (int i = startLine; i <= endLine; i++) {
+            String marker = (i == errorLine) ? ">>> " : "    ";
+            sb.append(String.format("%s%4d | %s%n", marker, i + 1, lines[i]));
+        }
+        return sb.toString();
     }
 
     private String buildCompactDiffMessage(String name, String expected, String actual) {
