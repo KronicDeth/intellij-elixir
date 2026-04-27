@@ -32,6 +32,10 @@ class InspectTest : TestCase() {
         assertEquals("'\\''", inspect(OtpErlangString("'")))
     }
 
+    fun testEscapesBackslashInAtomName() {
+        assertEquals(":\"\\\\\"", inspect(OtpErlangAtom("\\")))
+    }
+
     // Atoms starting with "Elixir." but containing invalid alias characters
     // (e.g. :"Benchfella:tests" which is atom 'Elixir.Benchfella:tests' in Erlang)
     // must be rendered as quoted atoms, not bare aliases.

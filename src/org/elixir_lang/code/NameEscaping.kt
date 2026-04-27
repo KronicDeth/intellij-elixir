@@ -6,7 +6,9 @@ internal val RESERVED_VARIABLE_KEYWORDS: Set<String> =
     Macro.KEYWORD_BLOCK_KEYWORDS.toSet() + setOf("end", "fn", "in", "when", "and", "not")
 
 internal fun escapeForElixirQuotedString(text: String): String =
-    text.replace("\"", "\\\"")
+    text
+        .replace("\\", "\\\\")
+        .replace("\"", "\\\"")
 
 internal fun escapeElixirVariableKeyword(text: String): String =
     if (text in RESERVED_VARIABLE_KEYWORDS) {
