@@ -99,7 +99,7 @@
 
         <projectConfigurable
                 parentId="language.elixir"
-                displayName="Elixir Experimental Settings"
+                displayName="Experimental Settings"
                 id="org.elixir_lang.settings.ElixirExperimentalSettingsConfigurable"
                 instance="org.elixir_lang.settings.ElixirExperimentalSettingsConfigurable"/>
 
@@ -169,8 +169,10 @@
                           implementationClass="org.elixir_lang.credo.inspection_tool.Global" language="Elixir"
                           level="WARNING"
                           shortName="Credo"/>
-        // groupId/parentId "Errors" is Editor > Inspections
-        <projectConfigurable instance="org.elixir_lang.credo.Configurable" groupId="Errors" parentId="Errors"
+        <!-- Credo settings -->
+        <projectConfigurable id="language.elixir.credo"
+                             parentId="language.elixir"
+                             instance="org.elixir_lang.credo.Configurable"
                              displayName="Credo"/>
 
         <!-- <code>.beam</code> -->
@@ -312,8 +314,12 @@
                           language="Elixir" level="ERROR"/>
         <projectService serviceInterface="org.elixir_lang.dialyzer.service.DialyzerService"
                         serviceImplementation="org.elixir_lang.dialyzer.service.DialyzerServiceImpl"/>
-        <projectConfigurable instance="org.elixir_lang.dialyzer.service.Configurable" groupId="Errors"
-                             parentId="Errors" displayName="Dialyzer"/>
+        <projectConfigurable id="language.elixir.dialyzer"
+                             parentId="language.elixir"
+                             instance="org.elixir_lang.dialyzer.service.Configurable"
+                             displayName="Dialyzer"/>
+
+        <search.optionContributor implementation="org.elixir_lang.settings.ElixirSearchableOptionContributor"/>
     </extensions>
 
     <projectListeners>

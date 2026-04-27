@@ -5898,9 +5898,9 @@ The Visibility icons indicated whether the element is usable outside its definin
 
 ## Experimental Features
 
-As we develop new functionality that requires additional testing and feedback, we offer an opt-in system for Experimental Features via the `Elixir Experimental Settings` page.
+As we develop new functionality that requires additional testing and feedback, we offer an opt-in system for Experimental Features via the `Elixir > Experimental Settings` page.
 
-You can view the currently available Experimental Features by navigating to `Languages & Frameworks` and selecting `Elixir Experimental Settings`, which is marked with the [BETA icon](https://plugins.jetbrains.com/docs/intellij/settings-guide.html#l6vycg_378). Alternatively, you can access it directly via [Settings | Languages & Frameworks | Elixir Experimental Settings](jetbrains://Idea/settings?name=Languages+%26+Frameworks--Elixir+Experimental+Settings).
+You can view the currently available Experimental Features by navigating to `Languages & Frameworks > Elixir` and selecting `Experimental Settings`, which is marked with the [BETA icon](https://plugins.jetbrains.com/docs/intellij/settings-guide.html#l6vycg_378). Alternatively, you can access it directly via [Settings | Languages & Frameworks | Elixir | Experimental Settings](jetbrains://Idea/settings?name=Languages+%26+Frameworks--Elixir--Experimental+Settings).
 
 ![Elixir Experimental Settings UI](/screenshots/experimental/elixir-experimental-settings-ui.png)
 
@@ -5940,10 +5940,10 @@ More information about [Language Injections](https://www.jetbrains.com/help/idea
 To enable support for HTML syntax highlighting and autocomplete:
 
 1. Open [Settings](https://www.jetbrains.com/help/idea/configure-project-settings.html).
-2. Navigate to [Settings | Languages & Frameworks | Elixir Experimental Settings](jetbrains://Idea/settings?name=Languages+%26+Frameworks--Elixir+Experimental+Settings).
+2. Navigate to [Settings | Languages & Frameworks | Elixir | Experimental Settings](jetbrains://Idea/settings?name=Languages+%26+Frameworks--Elixir--Experimental+Settings).
 3. Enable the **~H Sigil HTML Injection** feature.
 
-![Settings | Languages & Frameworks | Elixir Experimental Settings](/screenshots/experimental/elixir-experimental-settings-ui.png?raw=true "Elixir Experimental Settings UI")
+![Settings | Languages & Frameworks | Elixir | Experimental Settings](/screenshots/experimental/elixir-experimental-settings-ui.png?raw=true "Elixir Experimental Settings UI")
 
 > [!NOTE]
 > This Experimental Feature is currently enabled on a **per-project** basis. We are considering adding application-level support or enabling it by default in future versions based on feedback

@@ -9,7 +9,8 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 
 public class Configurable implements SearchableConfigurable {
-    private static final String ID = "Credo";
+    private static final String ID = "language.elixir.credo";
+    private static final String DISPLAY_NAME = "Credo";
     private JPanel panel;
     private JTextField elixirArguments;
     private JTextField erlArguments;
@@ -23,7 +24,7 @@ public class Configurable implements SearchableConfigurable {
     @NotNull
     @Override
     public String getDisplayName() {
-        return ID;
+        return DISPLAY_NAME;
     }
 
     @Nullable

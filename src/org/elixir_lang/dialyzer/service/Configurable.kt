@@ -8,15 +8,20 @@ import javax.swing.JPanel
 import javax.swing.JTextField
 
 class Configurable(project: Project) : SearchableConfigurable {
+    companion object {
+        private const val ID = "language.elixir.dialyzer"
+        private const val DISPLAY_NAME = "Dialyzer"
+    }
+
     private val service: DialyzerService = project.getService(DialyzerService::class.java)
     private var mixArguments: JTextField? = null
     private var elixirArguments: JTextField? = null
     private var erlArguments: JTextField? = null
     private var panel: JPanel? = null
-    override fun getId() = "Dialyzer"
+    override fun getId() = ID
 
     @Nls(capitalization = Nls.Capitalization.Title)
-    override fun getDisplayName(): String = id
+    override fun getDisplayName(): String = DISPLAY_NAME
 
     override fun createComponent(): JComponent? = panel
 

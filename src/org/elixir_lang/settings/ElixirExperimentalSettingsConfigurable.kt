@@ -93,11 +93,11 @@ internal class ElixirExperimentalSettingsConfigurable : Configurable, Configurab
         LOG.debug("Settings were modified, calling updateState(). StatusBarWidget: ${oldState.enableStatusBarWidget} -> ${newState.enableStatusBarWidget}")
 
         // We need to manually trigger the change notification since the state was modified in-place
-        val messageBus = com.intellij.openapi.application.ApplicationManager.getApplication().messageBus
+        val messageBus = ApplicationManager.getApplication().messageBus
         messageBus.syncPublisher(ElixirExperimentalSettings.SETTINGS_CHANGED_TOPIC).settingsChanged(oldState, newState)
     }
 
-    override fun getDisplayName(): String = "Elixir Experimental Settings"
+    override fun getDisplayName(): String = "Experimental Settings"
 
     override fun reset() {
         settingsPanel?.reset()
