@@ -939,7 +939,31 @@ object Macro {
             ?: if (parentOperator == "->" && side == Identifier.Associativity.LEFT && expression is OtpErlangList && expression.arity() == 0) {
                 "()"
             } else {
-                toString(expression)
+                val rendered = toString(expression)
+
+                // Wrap do...end block expressions in parentheses when they appear as the
+                // LEFT operand of a binary operation AND the rendered output actually ends
+                // with `end`.  Example: `(case ... end) + title_padding` instead of
+                // `case ... end + title_padding` which causes the parser to treat `end`
+                // as closing the outer block.
+                //
+                // We check the rendered string rather than the raw AST structure because
+                // deinlining rewrites (e.g. `case` → `||` via ifSymbolicOrRewriteTo) may
+                // eliminate the do...end block entirely.  Right-side operands are safe
+                // because `end` comes last with no trailing operator token.
+                //
+                // Excluded: `::` (type annotation in binary segments) — inside `<<>>`,
+                // `case...end::binary()` is parsed correctly by Elixir.
+                //
+                // Analogous to `MacroString.group()` in the Erlang abstract code
+                // decompiler (see commit a5cbbaa2).
+                if (side == Identifier.Associativity.LEFT
+                    && parentOperator != "::"
+                    && rendered.trimEnd().endsWith("end")) {
+                    "($rendered)"
+                } else {
+                    rendered
+                }
             }
 
     // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex?utf8=%E2%9C%93#L960-L962
