@@ -12,6 +12,14 @@ class VariableNameTest : TestCase() {
         assertEquals("erlangVariableFn", sanitizeErlangVariableName("Fn"))
     }
 
+    fun testEscapesNotKeywordVariable() {
+        assertEquals("erlangVariableNot", sanitizeErlangVariableName("Not"))
+    }
+
+    fun testEscapesEndKeywordVariable() {
+        assertEquals("erlangVariableEnd", sanitizeErlangVariableName("End"))
+    }
+
     fun testPreservesTrailingPunctuation() {
         assertEquals("foo!", sanitizeErlangVariableName("Foo!"))
     }

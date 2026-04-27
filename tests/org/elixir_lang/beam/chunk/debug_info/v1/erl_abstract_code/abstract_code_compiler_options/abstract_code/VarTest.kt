@@ -16,6 +16,14 @@ class VarTest : TestCase() {
         assertEquals("erlangVariableFn", Var.nameToString(OtpErlangAtom("Fn")))
     }
 
+    fun testEscapesNotKeywordAfterNormalization() {
+        assertEquals("erlangVariableNot", Var.nameToString(OtpErlangAtom("Not")))
+    }
+
+    fun testEscapesEndKeywordAfterNormalization() {
+        assertEquals("erlangVariableEnd", Var.nameToString(OtpErlangAtom("End")))
+    }
+
     fun testPreservesValidTrailingPunctuation() {
         assertEquals("foo!", Var.nameToString(OtpErlangAtom("Foo!")))
     }
