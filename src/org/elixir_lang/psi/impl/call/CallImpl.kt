@@ -1,14 +1,11 @@
 package org.elixir_lang.psi.impl.call
 
-import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.util.Computable
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReference
 import com.intellij.psi.tree.TokenSet
 import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager
 import org.elixir_lang.errorreport.Logger
-import org.elixir_lang.mix.project.computeReadAction
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.StubBased
@@ -20,7 +17,8 @@ import org.elixir_lang.psi.call.name.Function.__MODULE__
 import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.call.name.Module.stripElixirPrefix
 import org.elixir_lang.psi.impl.*
-import org.elixir_lang.psi.impl.ElixirPsiImplUtil.*
+import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ARROW_OPERATOR_TOKEN_SET
+import org.elixir_lang.psi.impl.ElixirPsiImplUtil.moduleAttributeName
 import org.elixir_lang.psi.operation.*
 import org.elixir_lang.psi.qualification.Qualified
 import org.elixir_lang.psi.qualification.Unqualified
@@ -144,8 +142,8 @@ private fun Call.computeCallableReference(): PsiReference? =
  */
 fun Call.finalArguments(): Array<PsiElement>? = try {
     (secondaryArguments() ?: primaryArguments())?.map { it!! }?.toTypedArray()
-} catch (e: NullPointerException) {
-    Logger.error(this.javaClass, "NullPointerException getting Call.finalArguments()", this);
+} catch (_: NullPointerException) {
+    Logger.error(this.javaClass, "NullPointerException getting Call.finalArguments()", this)
     null
 }
 
@@ -353,9 +351,7 @@ object CallImpl {
     @Contract(pure = true)
     @JvmStatic
     fun functionName(call: Call): String? =
-        call.functionNameElement()?.let { element ->
-            computeReadAction(Computable<String> { element.text })
-        }
+        call.functionNameElement()?.text
 
     /**
      * @return `null` because the `IDENTIFIER`, `foo` in `@foo 1` is not the local name of a function, but the name of a
@@ -537,7 +533,7 @@ object CallImpl {
     // TODO handle more complex qualifiers besides Aliases
     @Contract(pure = true)
     @JvmStatic
-    fun moduleName(qualified: Qualified): String = computeReadAction(Computable<String> { qualified.firstChild.text })
+    fun moduleName(qualified: Qualified): String = qualified.firstChild.text
 
     @Contract(pure = true)
     @JvmStatic
@@ -720,11 +716,7 @@ object CallImpl {
     @Suppress("UNCHECKED_CAST")
     @JvmStatic
     fun resolvedModuleName(unqualified: Unqualified): String =
-        (unqualified as? StubBased<Stub<*>>)?.let { stubBased ->
-            ApplicationManager.getApplication().runReadAction(Computable {
-                stubBased.stub
-            })?.resolvedModuleName()
-        } ?: KERNEL
+        (unqualified as? StubBased<Stub<*>>)?.stub?.resolvedModuleName() ?: KERNEL
 
     // TODO handle `import`s and determine whether actually a local variable
     @Contract(pure = true)
@@ -746,7 +738,7 @@ object CallImpl {
                 resolvedPrimaryArity = (resolvedPrimaryArity ?: 0) + 1
             }
 
-            val parent = computeReadAction(Computable<PsiElement> { call.parent })
+            val parent = call.parent
 
             if (parent.isPipe()) {
                 val parentPipeOperation = parent as Arrow
@@ -809,4 +801,3 @@ object CallImpl {
      */
     private fun PsiElement.isPipe(): Boolean = (this as? Arrow)?.isPipe() ?: false
 }
-
