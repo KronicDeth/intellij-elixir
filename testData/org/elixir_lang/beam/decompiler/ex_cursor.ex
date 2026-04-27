@@ -267,7 +267,7 @@ defmodule :ex_cursor do
   end
 
   def init(config) do
-    :wx.batch(fn  ->
+    :wx.batch(fn () ->
         do_init(config)
     end)
   end

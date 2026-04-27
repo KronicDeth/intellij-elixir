@@ -500,7 +500,7 @@ defmodule :code do
 
   @spec do_par_fun(prep_fun_type(), []) :: (() -> no_return())
   def do_par_fun(fun, l) do
-    fn  ->
+    fn () ->
         _ = for item <- l do
           spawn_monitor(do_par_fun_2(fun, item))
         end
@@ -510,7 +510,7 @@ defmodule :code do
 
   @spec do_par_fun_2(prep_fun_type(), {module(), :file.filename(), binary()}) :: (() -> no_return())
   def do_par_fun_2(fun, item) do
-    fn  ->
+    fn () ->
         {mod, filename, bin} = item
         try do
           fun.(mod, filename, bin)
@@ -839,7 +839,7 @@ defmodule :code do
     else
       chunkTag ->
         loaded = all_loaded()
-        _ = spawn(fn  ->
+        _ = spawn(fn () ->
             load_all_native(loaded, chunkTag)
         end)
         :ok

@@ -253,7 +253,7 @@ defmodule :dbg_wx_trace_win do
   end
 
   def configure(wi0 = winInfo(window: win, m_szr: {panel, sizer}), windows) do
-    :wx.batch(fn  ->
+    :wx.batch(fn () ->
         wi = enable_windows(wi0, windows)
         _ = show_windows(wi)
         :wxSizer.layout(sizer)
@@ -767,7 +767,7 @@ defmodule :dbg_wx_trace_win do
   end
 
   def configure(wi = winInfo(window: win, m_szr: {panel, sizer})) do
-    :wx.batch(fn  ->
+    :wx.batch(fn () ->
         _ = show_windows(wi)
         :wxSizer.layout(sizer)
         :wxWindow.setSizer(panel, sizer)

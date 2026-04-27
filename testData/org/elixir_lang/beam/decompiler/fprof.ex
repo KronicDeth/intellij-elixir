@@ -205,7 +205,7 @@ defmodule :fprof do
   def setopts(options) when is_list(options), do: :lists.append(options)
 
   def start() do
-    spawn_3step(fn  ->
+    spawn_3step(fn () ->
         try do
           register(:fprof_server, self())
         catch
@@ -448,7 +448,7 @@ defmodule :fprof do
   def apply_continue(function, args, procs, options) do
     ref = make_ref()
     parent = self()
-    child = spawn(fn  ->
+    child = spawn(fn () ->
         mRef = :erlang.monitor(:process, parent)
         receive do
         {parent, ref, :start_trace} ->
@@ -827,7 +827,7 @@ defmodule :fprof do
             state
           {destState, destPid} ->
             profileTable = get(:profile_table)
-            reply(tag, spawn_3step(fn  ->
+            reply(tag, spawn_3step(fn () ->
                 do_analyse(profileTable, analyse(request, dest: destPid))
             end, fn result ->
                 {result, :finish}
@@ -1135,7 +1135,7 @@ defmodule :fprof do
 
   def spawn_link_trace_client(table, groupLeader, dump) do
     parent = self()
-    spawn_link_3step(fn  ->
+    spawn_link_3step(fn () ->
         process_flag(:trap_exit, true)
         {self(), :go}
     end, fn ack ->

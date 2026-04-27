@@ -53,7 +53,7 @@ defmodule :asn1ct do
       options1 ->
         options2 = includes(file, options1)
         includes = strip_includes(options2)
-        in_process(fn  ->
+        in_process(fn () ->
             compile_proc(file, includes, options2)
         end)
     end
@@ -345,7 +345,7 @@ defmodule :asn1ct do
   def value(module, type), do: value(module, type, [])
 
   def value(module, type, includes) do
-    in_process(fn  ->
+    in_process(fn () ->
         start(strip_includes(includes))
         case check(module, includes) do
           {:ok, _NewTypes} ->
@@ -1382,7 +1382,7 @@ defmodule :asn1ct do
 
   def in_process(fun) do
     parent = self()
-    pid = spawn_link(fn  ->
+    pid = spawn_link(fn () ->
         process(parent, fun)
     end)
     receive do
@@ -2132,7 +2132,7 @@ defmodule :asn1ct do
   def test_each(_, []), do: :ok
 
   def test_module(module, includes) do
-    in_process(fn  ->
+    in_process(fn () ->
         start(strip_includes(includes))
         case check(module, includes) do
           {:ok, newTypes} ->
@@ -2153,7 +2153,7 @@ defmodule :asn1ct do
   end
 
   def test_type(module, type, includes) do
-    in_process(fn  ->
+    in_process(fn () ->
         start(strip_includes(includes))
         case check(module, includes) do
           {:ok, _NewTypes} ->
@@ -2165,7 +2165,7 @@ defmodule :asn1ct do
   end
 
   def test_value(module, type, value) do
-    in_process(fn  ->
+    in_process(fn () ->
         try do
           module.encode(type, value)
         catch
