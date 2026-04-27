@@ -7,6 +7,7 @@ import com.ericsson.otp.erlang.OtpErlangTuple
 import org.elixir_lang.beam.chunk.component1
 import org.elixir_lang.beam.chunk.component2
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode
+import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Scope
 
 object TypeSpecifier {
     fun toMacroString(term: OtpErlangAtom): String = term.atomValue()
@@ -15,8 +16,14 @@ object TypeSpecifier {
             if (term.arity() == 2) {
                 val (name, value) = term
 
-                if (name is OtpErlangAtom && value is OtpErlangLong) {
-                    "${name.atomValue()}(${value.longValue()})"
+                if (name is OtpErlangAtom) {
+                    val renderedValue = if (value is OtpErlangLong) {
+                        value.longValue().toString()
+                    } else {
+                        AbstractCode.toString(value, Scope.EMPTY)
+                    }
+
+                    "${name.atomValue()}(${renderedValue})"
                 } else {
                     AbstractCode.unknown("type_specifier_name_value_pair", "Bin element type specifier pair", term)
                 }
