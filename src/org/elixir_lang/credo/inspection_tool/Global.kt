@@ -8,18 +8,14 @@ import com.intellij.execution.util.ExecUtil
 import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.editor.Document
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.roots.ModuleRootManager
-import com.intellij.openapi.util.Computable
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
 import org.elixir_lang.Mix
 import org.elixir_lang.credo.Action
@@ -123,87 +119,59 @@ class Global : GlobalInspectionTool() {
                         Regex("(?<path>.+?):(?<line>\\d+):(?:(?<column>\\d+):)? (?<tag>[CFRSW]): (?<message>.+)")
 
                     for (colorizedLine in processOutput.stdoutLines) {
+                        ProgressManager.checkCanceled()
+
                         val line = colorizedLine.stripColor()
-                        val match = flycheckRegex.matchEntire(line)
+                        val match = flycheckRegex.matchEntire(line) ?: continue
+                        val groups = match.groups as MatchNamedGroupCollection
+                        val path = groups["path"]!!.value
+                        val absolutePath = Paths.get(workingDirectory, path).toString()
+                        val virtualFile = LocalFileSystem.getInstance().findFileByPath(absolutePath) ?: continue
 
-                        if (match != null) {
-                            val groups = match.groups as MatchNamedGroupCollection
-                            val path = groups["path"]!!.value
-                            val absolutePath = Paths.get(workingDirectory, path).toString()
-                            val virtualFile = LocalFileSystem.getInstance().findFileByPath(absolutePath)
+                        ApplicationManager.getApplication().runReadAction {
+                            val psiFile = PsiManager.getInstance(project).findFile(virtualFile) ?: return@runReadAction
+                            val document = psiFile.viewProvider.document ?: return@runReadAction
+                            val lineNumber = groups["line"]!!.value.toInt() - 1
 
-                            if (virtualFile != null) {
-                                val psiFile =
-                                    ApplicationManager
-                                        .getApplication()
-                                        .runReadAction(Computable<PsiFile?> {
-                                            PsiManager.getInstance(project).findFile(virtualFile)
-                                        })
+                            if (lineNumber !in 0 until document.lineCount) return@runReadAction
 
-                                if (psiFile != null) {
-                                    val viewProvider = psiFile.viewProvider
-                                    val document =
-                                        ApplicationManager
-                                            .getApplication()
-                                            .runReadAction(Computable<Document?> {
-                                                viewProvider.document
-                                            })
+                            val lineStartOffset = document.getLineStartOffset(lineNumber)
+                            val lineEndOffset = document.getLineEndOffset(lineNumber)
+                            val start: Int
+                            val end: Int
 
-                                    if (document != null) {
-                                        val lineNumber = groups["line"]!!.value.toInt() - 1
-                                        val lineStartOffset = document.getLineStartOffset(lineNumber)
-                                        val start: Int
-                                        val end: Int
+                            val columnNumber = groups["column"]?.value?.toInt()
 
-                                        val columnNumber = groups["column"]?.value?.toInt()
+                            if (columnNumber != null) {
+                                val offset = lineStartOffset + columnNumber
 
-                                        if (columnNumber != null) {
-                                            start = lineStartOffset + columnNumber
-                                            end = start + 1
-                                        } else {
-                                            start = lineStartOffset
-                                            end = document.getLineEndOffset(lineNumber)
-                                        }
+                                if (offset !in lineStartOffset until lineEndOffset) return@runReadAction
 
-                                        val refElement = globalContext.refManager.getReference(psiFile)
-
-                                        val startElement =
-                                            ApplicationManager
-                                                .getApplication()
-                                                .runReadAction(Computable<PsiElement?> {
-                                                    psiFile.findElementAt(start)
-                                                })
-                                        val endElement =
-                                            ApplicationManager
-                                                .getApplication()
-                                                .runReadAction(Computable<PsiElement?> {
-                                                    psiFile.findElementAt(end - 1)
-                                                })
-
-                                        if (startElement != null && endElement != null) {
-                                            val message = groups["message"]!!.value
-
-                                            val problemDescriptor =
-                                                ApplicationManager
-                                                    .getApplication()
-                                                    .runReadAction(Computable<ProblemDescriptor> {
-                                                        manager.createProblemDescriptor(
-                                                            startElement,
-                                                            endElement,
-                                                            message,
-                                                            ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
-                                                            false
-                                                        )
-                                                    })
-
-                                            problemDescriptionsProcessor.addProblemElement(
-                                                refElement,
-                                                problemDescriptor
-                                            )
-                                        }
-                                    }
-                                }
+                                start = offset
+                                end = start + 1
+                            } else {
+                                start = lineStartOffset
+                                end = lineEndOffset
                             }
+
+                            if (end <= start) return@runReadAction
+
+                            val startElement = psiFile.findElementAt(start) ?: return@runReadAction
+                            val endElement = psiFile.findElementAt(end - 1) ?: return@runReadAction
+                            val message = groups["message"]!!.value
+                            val problemDescriptor = manager.createProblemDescriptor(
+                                startElement,
+                                endElement,
+                                message,
+                                ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
+                                false
+                            )
+                            val refElement = globalContext.refManager.getReference(psiFile)
+
+                            problemDescriptionsProcessor.addProblemElement(
+                                refElement,
+                                problemDescriptor
+                            )
                         }
                     }
                 }
