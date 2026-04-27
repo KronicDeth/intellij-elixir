@@ -335,7 +335,7 @@ class Decompiler : BinaryFileDecompiler {
         }
 
         private fun appendDocumentation(decompiled: StringBuilder, moduleAttribute: String, text: String) {
-            val sanitizedText = text.replace("\r", "")
+            val sanitizedText = escapeUnicodeCodePointSequence(text.replace("\r", ""))
             val safePromoterTerminator = safePromoterTerminator(sanitizedText)
             val promoterTerminator: String = safePromoterTerminator ?: "\"\"\""
             decompiled
@@ -548,6 +548,17 @@ class Decompiler : BinaryFileDecompiler {
         } else {
             moduleName
         }
+    }
+}
+
+// Prevent Elixir parser from treating documentation text as Unicode code point escapes.
+private val UNICODE_CODE_POINT_START = Regex("""(\\+)u\{""")
+
+internal fun escapeUnicodeCodePointSequence(text: String): String {
+    return UNICODE_CODE_POINT_START.replace(text) { match ->
+        val slashes = match.groupValues[1]
+        val escapedSlashes = if (slashes.length % 2 == 1) "$slashes\\" else slashes
+        "${escapedSlashes}u{"
     }
 }
 
