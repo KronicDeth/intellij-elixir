@@ -16,7 +16,18 @@ object BitstringGenerate {
         val (expressionMacroString, expressionDeclaredScope) = expressionMacroStringDeclaredScope(term, scope)
         val patternScope = scope.union(expressionDeclaredScope)
         val (patternMacroString, patternDeclaredScope) = patternMacroStringDeclaredScope(term, patternScope)
-        val string = "<<${patternMacroString.string} <- ${expressionMacroString.group().string}>>"
+
+        val expressionString = expressionMacroString.group().string
+        // When the expression is itself a bitstring (`<<...>>`), the closing `>>>>` is
+        // ambiguous because `>>>` is parsed as Elixir's unsigned-right-shift operator.
+        // Wrap in parentheses to disambiguate: `<<c :: 6 <- (<<bin :: binary>>)>>`
+        val safeExpressionString = if (expressionString.startsWith("<<")) {
+            "($expressionString)"
+        } else {
+            expressionString
+        }
+
+        val string = "<<${patternMacroString.string} <- $safeExpressionString>>"
         val declaredScope = patternScope.union(patternDeclaredScope)
 
         return MacroStringDeclaredScope(string, doBlock = false, declaredScope)
