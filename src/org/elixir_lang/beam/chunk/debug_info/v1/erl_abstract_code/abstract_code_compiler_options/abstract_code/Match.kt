@@ -11,10 +11,13 @@ object Match {
 
     fun toMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope): MacroStringDeclaredScope {
         // right executes before left
-        val rightString = rightString(term, scope)
+        val rightMacroString = rightMacroString(term, scope)
         val (leftMacroString, leftDeclaredScope) = leftMacroStringDeclaredScope(term, scope)
 
-        return MacroStringDeclaredScope("${leftMacroString.string} = $rightString", doBlock = false, leftDeclaredScope)
+        // Propagate doBlock from the right-hand side so that callers know to wrap in
+        // parentheses when needed — e.g. `cs = for ... end` used as a comprehension
+        // qualifier must become `(cs = for ... end)` to prevent `end do` syntax errors.
+        return MacroStringDeclaredScope("${leftMacroString.string} = ${rightMacroString.string}", doBlock = rightMacroString.doBlock, leftDeclaredScope)
     }
 
     private const val TAG = "match"
@@ -24,10 +27,10 @@ object Match {
                     ?.let { AbstractCode.toMacroStringDeclaredScope(it, scope.copy(pinning = true)) }
                     ?: MacroStringDeclaredScope.missing("left", "match left", term)
 
-    private fun rightString(term: OtpErlangTuple, scope: Scope): String =
+    private fun rightMacroString(term: OtpErlangTuple, scope: Scope): MacroString =
             toRight(term)
-                    ?.let { AbstractCode.toString(it, scope) }
-                    ?: AbstractCode.missing("right", "match right", term)
+                    ?.let { AbstractCode.toMacroStringDeclaredScope(it, scope).macroString }
+                    ?: MacroString.error("missing_right", "match right", term)
 
     private fun toLeft(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(2)
     private fun toRight(term: OtpErlangTuple): OtpErlangObject? = term.elementAt(3)
