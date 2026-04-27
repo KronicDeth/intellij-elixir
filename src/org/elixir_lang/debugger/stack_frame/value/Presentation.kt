@@ -174,7 +174,9 @@ class Presentation(private val myValue: Any) : XValuePresentation() {
                 renderer.renderValue(
                         str
                                 .stringValue()
-                                .replace("\\x", "\\\\x")
+                                // Escape backslash first so that subsequent replacements don't
+                                // double-escape already-escaped sequences.
+                                .replace("\\", "\\\\")
                                 .replace("'", "\\'")
                 )
                 renderer.renderSpecialSymbol("'")
@@ -186,7 +188,7 @@ class Presentation(private val myValue: Any) : XValuePresentation() {
         @JvmStatic
         fun toUtf8String(bitstr: OtpErlangBitstr): String? = if (bitstr.pad_bits() > 0) null else try {
             Charset.availableCharsets()["UTF-8"]!!.newDecoder().decode(ByteBuffer.wrap(bitstr.binaryValue())).toString()
-        } catch (e: CharacterCodingException) {
+        } catch (_: CharacterCodingException) {
             null
         }
 

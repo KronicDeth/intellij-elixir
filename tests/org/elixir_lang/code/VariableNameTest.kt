@@ -19,4 +19,15 @@ class VariableNameTest : TestCase() {
     fun testAtomOverload() {
         assertEquals("left_1", sanitizeErlangVariableName(OtpErlangAtom("left@1")))
     }
+
+    // `_Token`, `_Line` patterns in Erlang code — `_Token` is already valid Elixir
+    // (underscore-prefixed unused variable), so it passes through unchanged.
+    fun testPreservesUnderscorePrefixedCapitalizedVariable() {
+        assertEquals("_Token", sanitizeErlangVariableName("_Token"))
+    }
+
+    // Elixir special env vars with double-underscore prefix must not be mutated.
+    fun testPreservesElixirSpecialVariable() {
+        assertEquals("__CALLER__", sanitizeErlangVariableName("__CALLER__"))
+    }
 }

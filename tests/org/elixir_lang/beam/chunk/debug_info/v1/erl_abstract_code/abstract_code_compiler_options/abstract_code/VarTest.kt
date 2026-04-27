@@ -19,4 +19,14 @@ class VarTest : TestCase() {
     fun testPreservesValidTrailingPunctuation() {
         assertEquals("foo!", Var.nameToString(OtpErlangAtom("Foo!")))
     }
+
+    // `_Token`, `_Line` are valid Elixir unused-variable syntax — pass through unchanged.
+    fun testPreservesUnderscorePrefixedCapitalizedVariable() {
+        assertEquals("_Token", Var.nameToString(OtpErlangAtom("_Token")))
+    }
+
+    // Elixir special env variables like __CALLER__ must not be modified.
+    fun testPreservesElixirDoubleUnderscoreVariable() {
+        assertEquals("__CALLER__", Var.nameToString(OtpErlangAtom("__CALLER__")))
+    }
 }
