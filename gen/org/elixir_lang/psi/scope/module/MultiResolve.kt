@@ -8,6 +8,7 @@ import com.intellij.psi.util.PsiTreeUtil
 import org.elixir_lang.Module.concat
 import org.elixir_lang.Module.split
 import org.elixir_lang.psi.NamedElement
+import org.elixir_lang.psi.QualifiableAlias
 import org.elixir_lang.psi.call.Named
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
 import org.elixir_lang.psi.impl.call.finalArguments
@@ -67,7 +68,7 @@ class MultiResolve internal constructor(private val name: String, private val in
                                 )
                             }
                         }
-            } else if (requireCall != null) {
+            } else {
                 resolveResultOrderedSet.add(match, requireCall.text, true, state.visitedElementSet())
             }
         } else {
@@ -106,6 +107,8 @@ class MultiResolve internal constructor(private val name: String, private val in
         val project = match.project
 
         if (!DumbService.isDumb(project)) {
+            var found = false
+
             StubIndex
                     .getInstance()
                     .processElements(
@@ -115,8 +118,28 @@ class MultiResolve internal constructor(private val name: String, private val in
                             GlobalSearchScope.allScope(project),
                             NamedElement::class.java) {
                 resolveResultOrderedSet.add(it, unaliasedName, true, visitedElementSet)
+                found = true
 
                 true
+            }
+
+            // Transitive alias fallback: if stub lookup found nothing and match is a QualifiableAlias,
+            // resolve it through the module scope to follow alias chains
+            // (e.g., `alias MyNamespace.Referenced; alias Referenced, as: Refd` — resolving `Refd` needs
+            // to follow Referenced → MyNamespace.Referenced transitively)
+            if (!found && match is QualifiableAlias) {
+                val transitiveResults = resolveResults(match.fullyQualifiedName(), incompleteCode, match)
+                for (result in transitiveResults) {
+                    val resolvedElement = result.element
+                    if (resolvedElement is NamedElement) {
+                        resolveResultOrderedSet.add(
+                            resolvedElement,
+                            resolvedElement.name ?: unaliasedName,
+                            result.isValidResult,
+                            visitedElementSet + result.visitedElementSet
+                        )
+                    }
+                }
             }
         }
     }

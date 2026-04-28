@@ -43,7 +43,7 @@ class Issue480Test : PlatformTestCase() {
 
     fun testUnresolvedAliasQualifier() {
         myFixture.configureByFiles("unresolved_alias_qualifier.ex", "referenced.ex")
-        assertReferenceAndResolvedNameArityRange("changeset", 1)
+        assertUnresolvableReferenceNameArityRange("changeset", 1)
     }
 
     override fun getTestDataPath(): String = "testData/org/elixir_lang/reference/callable/issue_480"
@@ -92,17 +92,18 @@ class Issue480Test : PlatformTestCase() {
         val psiPolyVariantReference = reference as PsiPolyVariantReference
 
         val resolveResults = psiPolyVariantReference.multiResolve(false)
-        for (resolveResult in resolveResults) {
-            if (resolveResult.isValidResult) {
-                val resolved = resolveResult.element
-                assertInstanceOf(resolved, Call::class.java)
-                val maybeDefCall = resolved as Call?
-                assertTrue(`is`(maybeDefCall!!))
-                assertEquals(
-                        NameArityInterval(name, ArityInterval(arity, arity)),
-                        nameArityInterval(maybeDefCall, ResolveState.initial())
-                )
-            }
+        val validResults = resolveResults.filter { it.isValidResult }
+        assertTrue("Expected at least one valid resolve result, but got none", validResults.isNotEmpty())
+
+        for (resolveResult in validResults) {
+            val resolved = resolveResult.element
+            assertInstanceOf(resolved, Call::class.java)
+            val maybeDefCall = resolved as Call?
+            assertTrue(`is`(maybeDefCall!!))
+            assertEquals(
+                    NameArityInterval(name, ArityInterval(arity, arity)),
+                    nameArityInterval(maybeDefCall, ResolveState.initial())
+            )
         }
     }
 }

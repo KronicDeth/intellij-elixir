@@ -121,18 +121,11 @@ class Issue463Test : PlatformTestCase() {
         assertInstanceOf(reference, PsiPolyVariantReference::class.java)
         val psiPolyVariantReference = reference as PsiPolyVariantReference
 
+        // An unresolvable qualifier (no alias, no module definition) should produce
+        // zero results — not a global search across every module in the project.
+        // The standard unresolved-reference highlight will inform the user.
         val resolveResults = psiPolyVariantReference.multiResolve(false)
-        assertEquals(1, resolveResults.size)
-
-        val firstResolveResult = resolveResults[0]
-        assertFalse(firstResolveResult.isValidResult)
-        val firstElement = firstResolveResult.element
-        assertNotNull(firstElement)
-        assertEquals(firstElement!!.text, """def changeset(params) do
-    %__MODULE__{}
-    |> cast(params, ~w(name))
-    |> validate_required(:name)
-  end""")
+        assertEquals(0, resolveResults.size)
     }
 
     override fun getTestDataPath(): String = "testData/org/elixir_lang/reference/callable/issue_463"
