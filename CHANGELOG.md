@@ -1,5 +1,10 @@
 # Changelog
 
+## v23.0.5
+
+### Bug Fixes
+* Fixed Umbrella project import crash when root folder and child app share the same name (e.g., `emqx/` root with `apps/emqx/` child). The quick import path (`File` -> `Open` on `mix.exs`) bypassed the wizard's duplicate detection, causing `ModuleWithNameAlreadyExists`. Module names are now disambiguated using the relative path (e.g., `emqx` for the root, `emqx-apps-emqx` for the child). - [@joshuataylor](https://github.com/joshuataylor), (Thanks to [@JiaRG](https://github.com/JiaRG) for the thorough and reproducible bug report and excellent example umbrella project!)
+
 ## v23.0.4
 
 ### Enhancements

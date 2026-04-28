@@ -75,7 +75,7 @@ class Builder : ProjectImportBuilder<OtpApp>() {
      *
      */
     override fun validate(currentProject: Project?, project: Project): Boolean {
-        if (!findIdeaModuleFiles(mySelectedOtpApps)) {
+        if (!findIdeaModuleFiles(mySelectedOtpApps, myProjectRoot)) {
             return true
         }
 
@@ -149,7 +149,8 @@ class Builder : ProjectImportBuilder<OtpApp>() {
                 )
                 // output paths need to be included, so that they are indexed for Phoenix EEx Template Elixir Line Breakpoints
                 compilerModuleExt.isExcludeOutput = false
-            }
+            },
+            projectRoot = myProjectRoot
         )
 
         if (myIsImportingProject) {
@@ -247,11 +248,12 @@ class Builder : ProjectImportBuilder<OtpApp>() {
             }
         }
 
-        private fun findIdeaModuleFiles(otpApps: List<OtpApp>): Boolean {
+        private fun findIdeaModuleFiles(otpApps: List<OtpApp>, projectRoot: VirtualFile?): Boolean {
+            val moduleNames = org.elixir_lang.mix.Project.moduleNameForOtpApps(otpApps, projectRoot)
             var ideaModuleFileExists = false
             for (importedOtpApp in otpApps) {
                 val applicationRoot = importedOtpApp.root
-                val ideaModuleName = importedOtpApp.name
+                val ideaModuleName = moduleNames[importedOtpApp] ?: importedOtpApp.name
                 val imlFile = applicationRoot.findChild("$ideaModuleName.iml")
                 if (imlFile != null) {
                     ideaModuleFileExists = true

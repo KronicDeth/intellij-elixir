@@ -66,22 +66,59 @@ object Project {
             val nameCompareResult = String.CASE_INSENSITIVE_ORDER.compare(o1.name, o2.name)
 
             if (nameCompareResult == 0) {
-                String.CASE_INSENSITIVE_ORDER.compare(o1.root.path, o1.root.path)
+                String.CASE_INSENSITIVE_ORDER.compare(o1.root.path, o2.root.path)
             } else {
                 nameCompareResult
             }
         })
     }
 
+    /**
+     * Computes unique IntelliJ module names for a list of OTP apps, disambiguating when
+     * multiple apps share the same name (e.g., umbrella root and child app both named "emqx").
+     *
+     * Apps with unique names keep their original name. For collisions, the app at [projectRoot]
+     * keeps its name and others get a suffix derived from their relative path.
+     */
+    fun moduleNameForOtpApps(otpApps: List<OtpApp>, projectRoot: VirtualFile? = null): Map<OtpApp, String> {
+        val result = mutableMapOf<OtpApp, String>()
+        val byName = otpApps.groupBy { it.name.lowercase() }
+
+        for ((_, apps) in byName) {
+            if (apps.size == 1) {
+                result[apps.first()] = apps.first().name
+            } else {
+                for (app in apps) {
+                    val isRoot = projectRoot != null && app.root.path == projectRoot.path
+                    if (isRoot) {
+                        result[app] = app.name
+                    } else if (projectRoot != null) {
+                        val relativePath = app.root.path
+                            .removePrefix(projectRoot.path)
+                            .trimStart('/')
+                            .replace('/', '-')
+                        result[app] = "${app.name}-${relativePath}"
+                    } else {
+                        result[app] = "${app.name}-${app.root.name}"
+                    }
+                }
+            }
+        }
+
+        return result
+    }
+
     fun createModulesForOtpApps(
         project: Project,
         otpApps: List<OtpApp>,
         modifiableModuleModelFactory: () -> ModifiableModuleModel,
-        rootModelModifier: (OtpApp, ModifiableRootModel) -> Unit = { _, _ -> }
+        rootModelModifier: (OtpApp, ModifiableRootModel) -> Unit = { _, _ -> },
+        projectRoot: VirtualFile? = null
     ): List<Module> =
         if (otpApps.isNotEmpty()) {
             val moduleModel = modifiableModuleModelFactory()
-            val createdRootModels = otpApps.mapNotNull { createModuleForOtpApp(it, moduleModel, rootModelModifier) }
+            val moduleNames = moduleNameForOtpApps(otpApps, projectRoot)
+            val createdRootModels = otpApps.mapNotNull { createModuleForOtpApp(it, moduleModel, rootModelModifier, moduleNames[it] ?: it.name) }
 
             if (createdRootModels.isNotEmpty()) {
                 // Use WriteAction.run since this is called from EDT via importToProject
@@ -109,10 +146,11 @@ object Project {
     private fun createModuleForOtpApp(
         otpApp: OtpApp,
         moduleModel: ModifiableModuleModel,
-        rootModelModifier: (OtpApp, ModifiableRootModel) -> Unit
+        rootModelModifier: (OtpApp, ModifiableRootModel) -> Unit,
+        moduleName: String
     ): ModifiableRootModel? {
         val ideaModuleDir = otpApp.root
-        val ideaModuleFile = "${ideaModuleDir.canonicalPath}${File.separator}/${otpApp.name}.iml"
+        val ideaModuleFile = "${ideaModuleDir.canonicalPath}${File.separator}/${moduleName}.iml"
         val module = moduleModel.newModule(ideaModuleFile, ElixirModuleType.MODULE_TYPE_ID)
         otpApp.module = module
 
