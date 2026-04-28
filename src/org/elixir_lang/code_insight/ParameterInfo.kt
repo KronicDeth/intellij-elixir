@@ -20,7 +20,7 @@ class ParameterInfo : ParameterInfoHandler<Arguments, Any> {
 
     override fun showParameterInfo(element: Arguments, context: CreateParameterInfoContext) {
         PsiTreeUtil.getParentOfType(element, Call::class.java)?.let { call ->
-            val itemToShowList = call.references.flatMap { reference ->
+            val allClauses = call.references.flatMap { reference ->
                 if (reference is PsiPolyVariantReference) {
                     reference.multiResolve(true).flatMap { resolveResult ->
                         resolveResult.element?.let {
@@ -38,9 +38,14 @@ class ParameterInfo : ParameterInfoHandler<Arguments, Any> {
                         } else {
                             null
                         }
-                    } ?: emptyList<Any>()
+                    } ?: emptyList()
                 }
             }
+
+            // Deduplicate by (name, arity), preferring bare function heads (no do block)
+            // over implementation clauses.  Uses arity-aware grouping so that
+            // genuinely different arities (e.g. foo/1 vs foo/2) each get their own hint.
+            val itemToShowList = preferFunctionHeadsByArity(allClauses)
 
             if (itemToShowList.isNotEmpty()) {
                 context.itemsToShow = itemToShowList.toTypedArray()
@@ -115,9 +120,6 @@ class ParameterInfo : ParameterInfoHandler<Arguments, Any> {
         }
     }
 
-    private fun findArguments(context: ParameterInfoContext): Arguments? {
-        val elementAtOffset = context.file.findElementAt(context.offset)
-
-        return PsiTreeUtil.getParentOfType<Arguments>(elementAtOffset, Arguments::class.java)
-    }
+    private fun findArguments(context: ParameterInfoContext): Arguments? =
+        ParameterInfoUtils.findParentOfType(context.file, context.offset, Arguments::class.java)
 }
