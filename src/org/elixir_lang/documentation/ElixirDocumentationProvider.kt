@@ -31,8 +31,6 @@ import org.elixir_lang.reference.Resolver
 import org.elixir_lang.structure_view.element.Callback
 import org.intellij.markdown.html.HtmlGenerator
 import org.intellij.markdown.parser.MarkdownParser
-import java.lang.Integer.max
-import java.lang.Integer.min
 import java.util.function.Consumer
 import java.util.regex.Pattern
 
@@ -51,27 +49,7 @@ class ElixirDocumentationProvider : DocumentationProvider {
 
     private fun markdown(comment: PsiDocCommentBase): String? =
         when (comment) {
-            is Comment -> {
-                comment.moduleAttribute.moduleAttributeValue()?.let { quote ->
-                    when (quote) {
-                        is Heredoc -> {
-                            val prefixLength = quote.heredocPrefix.textLength
-
-                            quote.heredocLineList.joinToString("") { heredocLine ->
-                                val text = heredocLine.text
-                                val textLengthWithoutNewline = text.length - 1
-                                val startIndex = min(max(textLengthWithoutNewline, 0), prefixLength)
-
-                                heredocLine.text.substring(startIndex)
-                            }
-                        }
-
-                        is ElixirLine -> quote.body?.text
-                        else -> null
-                    }
-                }
-            }
-
+            is Comment -> comment.moduleAttribute.moduleAttributeValue()?.documentationMarkdownText()
             else -> null
         }
 
