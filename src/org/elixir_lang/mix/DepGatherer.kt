@@ -15,6 +15,7 @@ import org.elixir_lang.psi.impl.call.foldChildrenWhile
 import org.elixir_lang.psi.impl.call.macroChildCalls
 import org.elixir_lang.psi.impl.keywordValue
 import org.elixir_lang.psi.impl.stripAccessExpression
+import org.elixir_lang.util.AccumulatorContinue
 
 class DepGatherer : DepGatherer() {
     override fun visitFile(file: PsiFile) {

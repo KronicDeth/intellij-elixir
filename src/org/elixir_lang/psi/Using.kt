@@ -15,6 +15,7 @@ import org.elixir_lang.psi.impl.call.stabBodyChildExpressions
 import org.elixir_lang.psi.impl.maybeModularNameToModulars
 import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.structure_view.element.Timed
+import org.elixir_lang.util.AccumulatorContinue
 
 object Using {
     fun treeWalkUp(

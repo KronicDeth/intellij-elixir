@@ -20,8 +20,9 @@ import org.elixir_lang.psi.impl.call.maybeModularNameToModulars
 import org.elixir_lang.psi.operation.Match
 import org.elixir_lang.psi.operation.Pipe
 import org.elixir_lang.psi.scope.WhileIn.whileIn
+import org.elixir_lang.util.AccumulatorContinue
+import org.elixir_lang.util.foldWhile
 import org.jetbrains.annotations.Contract
-import java.util.*
 
 fun PsiElement.ancestorSequence() = generateSequence(this) { it.parent }
 fun PsiElement.document(): Document? = containingFile.viewProvider.let { viewProvider ->
@@ -239,7 +240,7 @@ fun <R> PsiElement.childExpressionsFoldWhile(
         element: PsiElement, accumulator: R
     ) -> AccumulatorContinue<R>
 ): AccumulatorContinue<R> =
-    AccumulatorContinue.childExpressionsFoldWhile(this, forward, initial, folder)
+    childExpressions(forward).foldWhile(initial, folder)
 
 fun PsiElement.childExpressions(forward: Boolean = true): Sequence<PsiElement> {
     val seed = if (forward) {
