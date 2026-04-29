@@ -186,8 +186,6 @@ class Injector : MultiHostInjector {
 
 
     private fun injectElixirInCodeBlocksInQuote(registrar: MultiHostRegistrar, documentation: Heredoc) {
-        registrar.startInjecting(MarkdownLanguage.INSTANCE)
-
         val prefixLength = documentation.heredocPrefix.textLength
         val quoteOffset = documentation.textOffset
         var inCodeBlock = false

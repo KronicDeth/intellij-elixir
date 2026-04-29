@@ -3,8 +3,11 @@ package org.elixir_lang.injection.markdown
 import com.intellij.lang.injection.InjectedLanguageManager
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.testFramework.LoggedErrorProcessor
+import org.elixir_lang.ElixirLanguage
 import org.elixir_lang.PlatformTestCase
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
+import org.elixir_lang.psi.ElixirTypes
+import org.elixir_lang.psi.Heredoc
 import org.intellij.plugins.markdown.lang.MarkdownLanguage
 
 /**
@@ -205,6 +208,39 @@ class DelegateToInjectorTest : PlatformTestCase() {
             "Markdown was NOT injected into @doc deprecated: value. " +
                 "The 'deprecated' key value should still receive markdown injection.",
             markdownFound
+        )
+    }
+
+    fun testCodeBlockTrailingEndIsInjectedWithElixir() {
+        myFixture.configureByFile("trailing_end_code_block.ex")
+
+        val heredoc = PsiTreeUtil.findChildOfType(myFixture.file, Heredoc::class.java)
+        assertNotNull("Could not find documentation heredoc in fixture", heredoc)
+
+        val injectedLanguageManager = InjectedLanguageManager.getInstance(myFixture.project)
+        val injectedFiles = injectedLanguageManager.getInjectedPsiFiles(heredoc!!).orEmpty()
+
+        val elixirInjectedFile = injectedFiles
+            .map { pair -> pair.first }
+            .firstOrNull { injectedFile -> injectedFile.language.isKindOf(ElixirLanguage) }
+
+        assertNotNull("Expected Elixir injection for markdown code block", elixirInjectedFile)
+
+        val injectedText = elixirInjectedFile!!.text
+        val trailingEndOffset = injectedText.lastIndexOf("end")
+
+        assertTrue(
+            "Expected trailing 'end' in injected Elixir text, but got: '$injectedText'",
+            trailingEndOffset >= 0
+        )
+
+        val trailingEndElement = elixirInjectedFile.findElementAt(trailingEndOffset)
+        assertNotNull("Could not resolve PSI element for trailing 'end'", trailingEndElement)
+        assertEquals("end", trailingEndElement!!.text)
+        assertEquals(
+            "Trailing 'end' should be tokenized as Elixir keyword END",
+            ElixirTypes.END,
+            trailingEndElement.node.elementType
         )
     }
 }
