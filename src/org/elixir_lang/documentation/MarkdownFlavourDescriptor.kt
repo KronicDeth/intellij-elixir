@@ -18,6 +18,13 @@ import org.intellij.markdown.html.URI
 import org.intellij.markdown.parser.LinkMap
 import java.util.regex.Pattern
 
+/**
+ * GFM-based markdown flavour for Elixir documentation rendering.
+ *
+ * Overrides the default code block providers to add syntax highlighting
+ * ([CodeBlockHtmlProvider], [CodeFenceHtmlProvider]) and augments `CODE_SPAN`
+ * with hyperlink resolution for module and function references.
+ */
 class MarkdownFlavourDescriptor(private val project: Project) : GFMFlavourDescriptor() {
     fun renderGenericCode(
         gfmHtmlGeneratingProvider: GeneratingProvider?,
@@ -38,6 +45,14 @@ class MarkdownFlavourDescriptor(private val project: Project) : GFMFlavourDescri
             .createHtmlGeneratingProviders(linkMap, baseURI)
             .toMutableMap()
             .apply {
+                compute(MarkdownElementTypes.CODE_BLOCK) { _, _ ->
+                    CodeBlockHtmlProvider(project)
+                }
+
+                compute(MarkdownElementTypes.CODE_FENCE) { _, _ ->
+                    CodeFenceHtmlProvider(project)
+                }
+
                 compute(MarkdownElementTypes.CODE_SPAN) { _, gfmHtmlGeneratingProvider ->
                     object : GeneratingProvider {
                         override fun processNode(
