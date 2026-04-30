@@ -40,8 +40,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Stay with windows-2022 until https://github.com/erlef/setup-beam/commit/b94e7d372a9ef22d376b75a9374a7adeb0e2ea94 is released.
-        os: [ ubuntu-22.04, windows-2022 ]
+        os: [ ubuntu-22.04, windows-2025 ]
         idea-version: [ '2026.1.1', '2025.3.2', 'LATEST-EAP-SNAPSHOT' ]
 
     steps:
