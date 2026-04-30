@@ -6,6 +6,8 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.fileChooser.FileChooserDescriptor
 import com.intellij.platform.ide.progress.ModalTaskOwner
 import com.intellij.platform.ide.progress.runWithModalProgressBlocking
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.projectRoots.Sdk
@@ -226,14 +228,11 @@ class Type : SdkType(ErlangSdkTypeId.ERLANG_SDK_TYPE_ID) {
         // Following Java SDK pattern: if on EDT, run VirtualFile access in background thread
         // This avoids EEL environment check issues with WSL paths
         if (app.isDispatchThread && !app.isWriteAccessAllowed) {
-            com.intellij.openapi.progress.ProgressManager.getInstance().runProcessWithProgressSynchronously(
-                {
+            runWithModalProgressBlocking(ModalTaskOwner.guess(), "Setting Up Erlang SDK Paths...") {
+                withContext(Dispatchers.IO) {
                     setupSdkPathsImpl(sdk)
-                },
-                "Setting Up Erlang SDK Paths...",
-                false,
-                null
-            )
+                }
+            }
         } else {
             setupSdkPathsImpl(sdk)
         }
