@@ -34,12 +34,12 @@ data class CanonicalFolder(
 )
 
 /**
- * The single authoritative list of folder marks for an Elixir Mix project, mirroring
- * [org.elixir_lang.mix.Project.addFolders].
+ * The single authoritative list of folder marks for an Elixir Mix project.
  *
  * Shared by:
+ * - [org.elixir_lang.mix.Project.addFolders] - to apply canonical marks when configuring modules.
  * - [ProjectModuleSetupValidator] - to detect missing/incorrect marks.
- * - `ReconfigureModuleSetupAction` (future) - to additively apply missing marks.
+ * - `ReconfigureModuleSetupAction` - to additively apply missing marks.
  *
  * If `addFolders()` changes, update this list and both consumers pick up the change automatically.
  */
