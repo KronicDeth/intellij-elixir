@@ -516,8 +516,12 @@ Module paths list the output directories when compiling code in the module.  The
 
 ![Module Settings > Dependencies](/screenshots/project_settings/module/Dependencies.png?raw=true "Module Dependencies")
 
-Module dependencies are currently just the SDK and the sources for the module.  Dependencies in `deps` are not
-automatically detected at this time.
+Module dependencies include the SDK and the module's own sources.  Mix dependencies from `deps/` are automatically detected and registered as IDE Libraries by the background `DepsWatcher`:
+
+* **Trigger**: File system events in `deps/` and `_build/` (after `mix deps.get`, `mix compile` or folder deletions).
+* **What it creates**: For each dependency, an IDE Library with source roots from `deps/APP/lib` and class roots from `_build/ENV/lib/APP/ebin`.
+* **Result**: Dependencies appear under "External Libraries" in the Project tool window, providing Go-to-Declaration, completion, and Find Usages into dependency source code.
+* **Troubleshooting**: If libraries don't appear after `mix deps.get`, try running `mix compile` to generate `_build/` output, then wait a few seconds for the file watcher to pick up changes. You can also use **Tools → Elixir → Install Mix Dependencies**.
 
 ### New Elixir File
 
