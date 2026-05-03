@@ -2381,39 +2381,39 @@ defmodule :erl_syntax do
     # body not decompiled
   end
 
-  def abstract_list([t | ts]), do: [abstract(t) | abstract_list(ts)]
+  defp abstract_list([t | ts]), do: [abstract(t) | abstract_list(ts)]
 
-  def abstract_list([]), do: []
+  defp abstract_list([]), do: []
 
-  def abstract_tail(h1, [h2 | t]), do: cons(abstract(h1), abstract_tail(h2, t))
+  defp abstract_tail(h1, [h2 | t]), do: cons(abstract(h1), abstract_tail(h2, t))
 
-  def abstract_tail(h, t), do: cons(abstract(h), abstract(t))
+  defp abstract_tail(h, t), do: cons(abstract(h), abstract(t))
 
-  def add_postcomments_1(cs, attr(com: :none) = attr), do: attr(attr, com: com(post: cs))
+  defp add_postcomments_1(cs, attr(com: :none) = attr), do: attr(attr, com: com(post: cs))
 
-  def add_postcomments_1(cs, attr(com: com) = attr), do: attr(attr, com: com(com, post: com(com, :post) ++ cs))
+  defp add_postcomments_1(cs, attr(com: com) = attr), do: attr(attr, com: com(com, post: com(com, :post) ++ cs))
 
-  def add_precomments_1(cs, attr(com: :none) = attr), do: attr(attr, com: com(pre: cs))
+  defp add_precomments_1(cs, attr(com: :none) = attr), do: attr(attr, com: com(pre: cs))
 
-  def add_precomments_1(cs, attr(com: com) = attr), do: attr(attr, com: com(com, pre: com(com, :pre) ++ cs))
+  defp add_precomments_1(cs, attr(com: com) = attr), do: attr(attr, com: com(com, pre: com(com, :pre) ++ cs))
 
-  def concrete_list([e | es]), do: [concrete(e) | concrete_list(es)]
+  defp concrete_list([e | es]), do: [concrete(e) | concrete_list(es)]
 
-  def concrete_list([]), do: []
+  defp concrete_list([]), do: []
 
-  def conjunction_list([l | ls]), do: [conjunction(l) | conjunction_list(ls)]
+  defp conjunction_list([l | ls]), do: [conjunction(l) | conjunction_list(ls)]
 
-  def conjunction_list([]), do: []
+  defp conjunction_list([]), do: []
 
-  def cons_prefix({:cons, _, head, tail}), do: [head | cons_prefix(tail)]
+  defp cons_prefix({:cons, _, head, tail}), do: [head | cons_prefix(tail)]
 
-  def cons_prefix(_), do: []
+  defp cons_prefix(_), do: []
 
-  def cons_suffix({:cons, _, _, tail}), do: cons_suffix(tail)
+  defp cons_suffix({:cons, _, _, tail}), do: cons_suffix(tail)
 
-  def cons_suffix(tail), do: tail
+  defp cons_suffix(tail), do: tail
 
-  def flatten_form_list_1([f | fs], as) do
+  defp flatten_form_list_1([f | fs], as) do
     case type(f) do
       :form_list ->
         as1 = flatten_form_list_1(form_list_elements(f), as)
@@ -2423,9 +2423,9 @@ defmodule :erl_syntax do
     end
   end
 
-  def flatten_form_list_1([], as), do: as
+  defp flatten_form_list_1([], as), do: as
 
-  def fold_binary_field_type(node) do
+  defp fold_binary_field_type(node) do
     case type(node) do
       :size_qualifier ->
         {concrete(size_qualifier_body(node)), concrete(size_qualifier_argument(node))}
@@ -2434,26 +2434,26 @@ defmodule :erl_syntax do
     end
   end
 
-  def fold_binary_field_types(ts) do
+  defp fold_binary_field_types(ts) do
     for t <- ts do
       fold_binary_field_type(t)
     end
   end
 
-  def fold_function_name(n) do
+  defp fold_function_name(n) do
     name = arity_qualifier_body(n)
     arity = arity_qualifier_argument(n)
     true = type(name) === :atom and type(arity) === :integer
     {concrete(name), concrete(arity)}
   end
 
-  def fold_function_names(ns) do
+  defp fold_function_names(ns) do
     for n <- ns do
       fold_function_name(n)
     end
   end
 
-  def fold_record_field(f) do
+  defp fold_record_field(f) do
     case type(f) do
       :typed_record_field ->
         field = fold_record_field_1(typed_record_field_body(f))
@@ -2464,7 +2464,7 @@ defmodule :erl_syntax do
     end
   end
 
-  def fold_record_field_1(f) do
+  defp fold_record_field_1(f) do
     pos = get_pos(f)
     name = record_field_name(f)
     case record_field_value(f) do
@@ -2475,13 +2475,13 @@ defmodule :erl_syntax do
     end
   end
 
-  def fold_record_fields(fs) do
+  defp fold_record_fields(fs) do
     for f <- fs do
       fold_record_field(f)
     end
   end
 
-  def fold_try_clause({:clause, pos, [p], guard, body}) do
+  defp fold_try_clause({:clause, pos, [p], guard, body}) do
     p1 = case type(p) do
       :class_qualifier ->
         {:tuple, pos, [class_qualifier_argument(p), class_qualifier_body(p), {:var, pos, :_}]}
@@ -2491,27 +2491,27 @@ defmodule :erl_syntax do
     {:clause, pos, [p1], guard, body}
   end
 
-  def fold_variable_names(vs) do
+  defp fold_variable_names(vs) do
     for v <- vs do
       variable_name(v)
     end
   end
 
-  def get_com(tree(attr: attr)), do: attr(attr, :com)
+  defp get_com(tree(attr: attr)), do: attr(attr, :com)
 
-  def get_com(wrapper(attr: attr)), do: attr(attr, :com)
+  defp get_com(wrapper(attr: attr)), do: attr(attr, :com)
 
-  def get_com(_), do: :none
+  defp get_com(_), do: :none
 
-  def get_postcomments_1(attr(com: :none)), do: []
+  defp get_postcomments_1(attr(com: :none)), do: []
 
-  def get_postcomments_1(attr(com: com(post: cs))), do: cs
+  defp get_postcomments_1(attr(com: com(post: cs))), do: cs
 
-  def get_precomments_1(attr(com: :none)), do: []
+  defp get_precomments_1(attr(com: :none)), do: []
 
-  def get_precomments_1(attr(com: com(pre: cs))), do: cs
+  defp get_precomments_1(attr(com: com(pre: cs))), do: cs
 
-  def is_literal_binary_field(f) do
+  defp is_literal_binary_field(f) do
     case binary_field_types(f) do
       [] ->
         is_literal(binary_field_body(f))
@@ -2520,7 +2520,7 @@ defmodule :erl_syntax do
     end
   end
 
-  def is_literal_map_field(f) do
+  defp is_literal_map_field(f) do
     case type(f) do
       :map_field_assoc ->
         is_literal(map_field_assoc_name(f)) and is_literal(map_field_assoc_value(f))
@@ -2529,9 +2529,9 @@ defmodule :erl_syntax do
     end
   end
 
-  def is_printable(s), do: :io_lib.printable_list(s)
+  defp is_printable(s), do: :io_lib.printable_list(s)
 
-  def list_elements(node, as) do
+  defp list_elements(node, as) do
     case type(node) do
       :list ->
         as1 = :lists.reverse(list_prefix(node)) ++ as
@@ -2546,7 +2546,7 @@ defmodule :erl_syntax do
     end
   end
 
-  def list_length(node, a) do
+  defp list_length(node, a) do
     case type(node) do
       :list ->
         a1 = length(list_prefix(node)) + a
@@ -2561,19 +2561,19 @@ defmodule :erl_syntax do
     end
   end
 
-  def make_float(value), do: tree(:float, value)
+  defp make_float(value), do: tree(:float, value)
 
-  def meta_0(t), do: meta_1(remove_comments(t))
+  defp meta_0(t), do: meta_1(remove_comments(t))
 
-  def meta_1(t), do: ...
+  defp meta_1(t), do: ...
 
-  def meta_call(f, as), do: application(atom(:erl_syntax), atom(f), as)
+  defp meta_call(f, as), do: application(atom(:erl_syntax), atom(f), as)
 
-  def meta_list([t | ts]), do: [meta(t) | meta_list(ts)]
+  defp meta_list([t | ts]), do: [meta(t) | meta_list(ts)]
 
-  def meta_list([]), do: []
+  defp meta_list([]), do: []
 
-  def meta_postcomment(t) do
+  defp meta_postcomment(t) do
     case get_postcomments(t) do
       [] ->
         meta_0(t)
@@ -2582,7 +2582,7 @@ defmodule :erl_syntax do
     end
   end
 
-  def meta_precomment(t) do
+  defp meta_precomment(t) do
     case get_precomments(t) do
       [] ->
         meta_postcomment(t)
@@ -2591,7 +2591,7 @@ defmodule :erl_syntax do
     end
   end
 
-  def meta_subtrees(gs) do
+  defp meta_subtrees(gs) do
     list((for g <- gs do
       list((for t <- g do
       meta(t)
@@ -2599,32 +2599,32 @@ defmodule :erl_syntax do
     end))
   end
 
-  def normalize_list_1(es, tail) do
+  defp normalize_list_1(es, tail) do
     :lists.foldr(fn x, a ->
         list([x], a)
     end, tail, es)
   end
 
-  def revert_annotated_type(node) do
+  defp revert_annotated_type(node) do
     pos = get_pos(node)
     name = annotated_type_name(node)
     type = annotated_type_body(node)
     {:ann_type, pos, [name, type]}
   end
 
-  def revert_application(node) do
+  defp revert_application(node) do
     pos = get_pos(node)
     operator = application_operator(node)
     arguments = application_arguments(node)
     {:call, pos, operator, arguments}
   end
 
-  def revert_atom(node) do
+  defp revert_atom(node) do
     pos = get_pos(node)
     {:atom, pos, atom_value(node)}
   end
 
-  def revert_attribute(node) do
+  defp revert_attribute(node) do
     name = attribute_name(node)
     args = attribute_arguments(node)
     pos = get_pos(node)
@@ -2636,7 +2636,7 @@ defmodule :erl_syntax do
     end
   end
 
-  def revert_attribute_1(:module, [m], pos, node) do
+  defp revert_attribute_1(:module, [m], pos, node) do
     case revert_module_name(m) do
       {:ok, a} ->
         {:attribute, pos, :module, a}
@@ -2645,7 +2645,7 @@ defmodule :erl_syntax do
     end
   end
 
-  def revert_attribute_1(:module, [m, list], pos, node) do
+  defp revert_attribute_1(:module, [m, list], pos, node) do
     vs = case is_list_skeleton(list) do
       true ->
         case is_proper_list(list) do
@@ -2665,7 +2665,7 @@ defmodule :erl_syntax do
     end
   end
 
-  def revert_attribute_1(:export, [list], pos, node) do
+  defp revert_attribute_1(:export, [list], pos, node) do
     case is_list_skeleton(list) do
       true ->
         case is_proper_list(list) do
@@ -2680,7 +2680,7 @@ defmodule :erl_syntax do
     end
   end
 
-  def revert_attribute_1(:import, [m], pos, node) do
+  defp revert_attribute_1(:import, [m], pos, node) do
     case revert_module_name(m) do
       {:ok, a} ->
         {:attribute, pos, :import, a}
@@ -2689,7 +2689,7 @@ defmodule :erl_syntax do
     end
   end
 
-  def revert_attribute_1(:import, [m, list], pos, node) do
+  defp revert_attribute_1(:import, [m, list], pos, node) do
     case revert_module_name(m) do
       {:ok, a} ->
         case is_list_skeleton(list) do
@@ -2709,7 +2709,7 @@ defmodule :erl_syntax do
     end
   end
 
-  def revert_attribute_1(:file, [a, line], pos, node) do
+  defp revert_attribute_1(:file, [a, line], pos, node) do
     case type(a) do
       :string ->
         case type(line) do
@@ -2723,7 +2723,7 @@ defmodule :erl_syntax do
     end
   end
 
-  def revert_attribute_1(:record, [a, tuple], pos, node) do
+  defp revert_attribute_1(:record, [a, tuple], pos, node) do
     case type(a) do
       :atom ->
         case type(tuple) do
@@ -2738,23 +2738,23 @@ defmodule :erl_syntax do
     end
   end
 
-  def revert_attribute_1(n, [t], pos, _), do: {:attribute, pos, n, concrete(t)}
+  defp revert_attribute_1(n, [t], pos, _), do: {:attribute, pos, n, concrete(t)}
 
-  def revert_attribute_1(_, _, _, node), do: node
+  defp revert_attribute_1(_, _, _, node), do: node
 
-  def revert_binary(node) do
+  defp revert_binary(node) do
     pos = get_pos(node)
     {:bin, pos, binary_fields(node)}
   end
 
-  def revert_binary_comp(node) do
+  defp revert_binary_comp(node) do
     pos = get_pos(node)
     template = binary_comp_template(node)
     body = binary_comp_body(node)
     {:bc, pos, template, body}
   end
 
-  def revert_binary_field(node) do
+  defp revert_binary_field(node) do
     pos = get_pos(node)
     body = binary_field_body(node)
     {expr, size} = case type(body) do
@@ -2772,27 +2772,27 @@ defmodule :erl_syntax do
     {:bin_element, pos, expr, size, types}
   end
 
-  def revert_binary_generator(node) do
+  defp revert_binary_generator(node) do
     pos = get_pos(node)
     pattern = binary_generator_pattern(node)
     body = binary_generator_body(node)
     {:b_generate, pos, pattern, body}
   end
 
-  def revert_bitstring_type(node) do
+  defp revert_bitstring_type(node) do
     pos = get_pos(node)
     m = bitstring_type_m(node)
     n = bitstring_type_n(node)
     {:type, pos, :binary, [m, n]}
   end
 
-  def revert_block_expr(node) do
+  defp revert_block_expr(node) do
     pos = get_pos(node)
     body = block_expr_body(node)
     {:block, pos, body}
   end
 
-  def revert_case_expr(node) do
+  defp revert_case_expr(node) do
     pos = get_pos(node)
     argument = case_expr_argument(node)
     clauses = for c <- case_expr_clauses(node) do
@@ -2801,18 +2801,18 @@ defmodule :erl_syntax do
     {:case, pos, argument, clauses}
   end
 
-  def revert_catch_expr(node) do
+  defp revert_catch_expr(node) do
     pos = get_pos(node)
     expr = catch_expr_body(node)
     {:catch, pos, expr}
   end
 
-  def revert_char(node) do
+  defp revert_char(node) do
     pos = get_pos(node)
     {:char, pos, char_value(node)}
   end
 
-  def revert_clause(node) do
+  defp revert_clause(node) do
     pos = get_pos(node)
     guard = case clause_guard(node) do
       :none ->
@@ -2830,7 +2830,7 @@ defmodule :erl_syntax do
     {:clause, pos, clause_patterns(node), guard, clause_body(node)}
   end
 
-  def revert_clause_disjunction(d) do
+  defp revert_clause_disjunction(d) do
     for e <- disjunction_body(d) do
       case type(e) do
       :conjunction ->
@@ -2841,7 +2841,7 @@ defmodule :erl_syntax do
     end
   end
 
-  def revert_cond_expr(node) do
+  defp revert_cond_expr(node) do
     pos = get_pos(node)
     clauses = for c <- cond_expr_clauses(node) do
       revert_clause(c)
@@ -2849,33 +2849,33 @@ defmodule :erl_syntax do
     {:cond, pos, clauses}
   end
 
-  def revert_constrained_function_type(node) do
+  defp revert_constrained_function_type(node) do
     pos = get_pos(node)
     functionType = constrained_function_type_body(node)
     functionConstraint = conjunction_body(constrained_function_type_argument(node))
     {:type, pos, :bounded_fun, [functionType, functionConstraint]}
   end
 
-  def revert_constraint(node) do
+  defp revert_constraint(node) do
     pos = get_pos(node)
     name = constraint_argument(node)
     types = constraint_body(node)
     {:type, pos, :constraint, [name, types]}
   end
 
-  def revert_eof_marker(node) do
+  defp revert_eof_marker(node) do
     pos = get_pos(node)
     {:eof, pos}
   end
 
-  def revert_error_marker(node), do: {:error, error_marker_info(node)}
+  defp revert_error_marker(node), do: {:error, error_marker_info(node)}
 
-  def revert_float(node) do
+  defp revert_float(node) do
     pos = get_pos(node)
     {:float, pos, float_value(node)}
   end
 
-  def revert_forms_1([t | ts]) do
+  defp revert_forms_1([t | ts]) do
     case type(t) do
       :comment ->
         revert_forms_1(ts)
@@ -2890,9 +2890,9 @@ defmodule :erl_syntax do
     end
   end
 
-  def revert_forms_1([]), do: []
+  defp revert_forms_1([]), do: []
 
-  def revert_fun_expr(node) do
+  defp revert_fun_expr(node) do
     clauses = for c <- fun_expr_clauses(node) do
       revert_clause(c)
     end
@@ -2900,12 +2900,12 @@ defmodule :erl_syntax do
     {:fun, pos, {:clauses, clauses}}
   end
 
-  def revert_fun_type(node) do
+  defp revert_fun_type(node) do
     pos = get_pos(node)
     {:type, pos, :fun, []}
   end
 
-  def revert_function(node) do
+  defp revert_function(node) do
     name = function_name(node)
     clauses = for c <- function_clauses(node) do
       revert_clause(c)
@@ -2920,7 +2920,7 @@ defmodule :erl_syntax do
     end
   end
 
-  def revert_function_type(node) do
+  defp revert_function_type(node) do
     pos = get_pos(node)
     type = function_type_return(node)
     case function_type_arguments(node) do
@@ -2931,14 +2931,14 @@ defmodule :erl_syntax do
     end
   end
 
-  def revert_generator(node) do
+  defp revert_generator(node) do
     pos = get_pos(node)
     pattern = generator_pattern(node)
     body = generator_body(node)
     {:generate, pos, pattern, body}
   end
 
-  def revert_if_expr(node) do
+  defp revert_if_expr(node) do
     pos = get_pos(node)
     clauses = for c <- if_expr_clauses(node) do
       revert_clause(c)
@@ -2946,7 +2946,7 @@ defmodule :erl_syntax do
     {:if, pos, clauses}
   end
 
-  def revert_implicit_fun(node) do
+  defp revert_implicit_fun(node) do
     pos = get_pos(node)
     name = implicit_fun_name(node)
     case type(name) do
@@ -2975,7 +2975,7 @@ defmodule :erl_syntax do
     end
   end
 
-  def revert_infix_expr(node) do
+  defp revert_infix_expr(node) do
     pos = get_pos(node)
     operator = infix_expr_operator(node)
     left = infix_expr_left(node)
@@ -2988,19 +2988,19 @@ defmodule :erl_syntax do
     end
   end
 
-  def revert_integer(node) do
+  defp revert_integer(node) do
     pos = get_pos(node)
     {:integer, pos, integer_value(node)}
   end
 
-  def revert_integer_range_type(node) do
+  defp revert_integer_range_type(node) do
     pos = get_pos(node)
     low = integer_range_type_low(node)
     high = integer_range_type_high(node)
     {:type, pos, :range, [low, high]}
   end
 
-  def revert_list(node) do
+  defp revert_list(node) do
     pos = get_pos(node)
     p = list_prefix(node)
     s = case list_suffix(node) do
@@ -3014,14 +3014,14 @@ defmodule :erl_syntax do
     end, s, p)
   end
 
-  def revert_list_comp(node) do
+  defp revert_list_comp(node) do
     pos = get_pos(node)
     template = list_comp_template(node)
     body = list_comp_body(node)
     {:lc, pos, template, body}
   end
 
-  def revert_map_expr(node) do
+  defp revert_map_expr(node) do
     pos = get_pos(node)
     argument = map_expr_argument(node)
     fields = map_expr_fields(node)
@@ -3033,47 +3033,47 @@ defmodule :erl_syntax do
     end
   end
 
-  def revert_map_field_assoc(node) do
+  defp revert_map_field_assoc(node) do
     pos = get_pos(node)
     name = map_field_assoc_name(node)
     value = map_field_assoc_value(node)
     {:map_field_assoc, pos, name, value}
   end
 
-  def revert_map_field_exact(node) do
+  defp revert_map_field_exact(node) do
     pos = get_pos(node)
     name = map_field_exact_name(node)
     value = map_field_exact_value(node)
     {:map_field_exact, pos, name, value}
   end
 
-  def revert_map_type(node) do
+  defp revert_map_type(node) do
     pos = get_pos(node)
     {:type, pos, :map, map_type_fields(node)}
   end
 
-  def revert_map_type_assoc(node) do
+  defp revert_map_type_assoc(node) do
     pos = get_pos(node)
     name = map_type_assoc_name(node)
     value = map_type_assoc_value(node)
     {:type, pos, :map_type_assoc, [name, value]}
   end
 
-  def revert_map_type_exact(node) do
+  defp revert_map_type_exact(node) do
     pos = get_pos(node)
     name = map_type_exact_name(node)
     value = map_type_exact_value(node)
     {:type, pos, :map_type_exact, [name, value]}
   end
 
-  def revert_match_expr(node) do
+  defp revert_match_expr(node) do
     pos = get_pos(node)
     pattern = match_expr_pattern(node)
     body = match_expr_body(node)
     {:match, pos, pattern, body}
   end
 
-  def revert_module_name(a) do
+  defp revert_module_name(a) do
     case type(a) do
       :atom ->
         {:ok, concrete(a)}
@@ -3082,14 +3082,14 @@ defmodule :erl_syntax do
     end
   end
 
-  def revert_module_qualifier(node) do
+  defp revert_module_qualifier(node) do
     pos = get_pos(node)
     module = module_qualifier_argument(node)
     body = module_qualifier_body(node)
     {:remote, pos, module, body}
   end
 
-  def revert_named_fun_expr(node) do
+  defp revert_named_fun_expr(node) do
     pos = get_pos(node)
     name = named_fun_expr_name(node)
     clauses = for c <- named_fun_expr_clauses(node) do
@@ -3103,14 +3103,14 @@ defmodule :erl_syntax do
     end
   end
 
-  def revert_nil(node) do
+  defp revert_nil(node) do
     pos = get_pos(node)
     {nil, pos}
   end
 
-  def revert_parentheses(node), do: parentheses_body(node)
+  defp revert_parentheses(node), do: parentheses_body(node)
 
-  def revert_prefix_expr(node) do
+  defp revert_prefix_expr(node) do
     pos = get_pos(node)
     operator = prefix_expr_operator(node)
     argument = prefix_expr_argument(node)
@@ -3122,7 +3122,7 @@ defmodule :erl_syntax do
     end
   end
 
-  def revert_receive_expr(node) do
+  defp revert_receive_expr(node) do
     pos = get_pos(node)
     clauses = for c <- receive_expr_clauses(node) do
       revert_clause(c)
@@ -3137,7 +3137,7 @@ defmodule :erl_syntax do
     end
   end
 
-  def revert_record_access(node) do
+  defp revert_record_access(node) do
     pos = get_pos(node)
     argument = record_access_argument(node)
     type = record_access_type(node)
@@ -3150,7 +3150,7 @@ defmodule :erl_syntax do
     end
   end
 
-  def revert_record_expr(node) do
+  defp revert_record_expr(node) do
     pos = get_pos(node)
     argument = record_expr_argument(node)
     type = record_expr_type(node)
@@ -3170,7 +3170,7 @@ defmodule :erl_syntax do
     end
   end
 
-  def revert_record_index_expr(node) do
+  defp revert_record_index_expr(node) do
     pos = get_pos(node)
     type = record_index_expr_type(node)
     field = record_index_expr_field(node)
@@ -3182,30 +3182,30 @@ defmodule :erl_syntax do
     end
   end
 
-  def revert_record_type(node) do
+  defp revert_record_type(node) do
     pos = get_pos(node)
     name = record_type_name(node)
     fields = record_type_fields(node)
     {:type, pos, :record, [name | fields]}
   end
 
-  def revert_record_type_field(node) do
+  defp revert_record_type_field(node) do
     pos = get_pos(node)
     name = record_type_field_name(node)
     type = record_type_field_type(node)
     {:type, pos, :field_type, [name, type]}
   end
 
-  def revert_root(node), do: ...
+  defp revert_root(node), do: ...
 
-  def revert_string(node) do
+  defp revert_string(node) do
     pos = get_pos(node)
     {:string, pos, string_value(node)}
   end
 
-  def revert_try_clause(node), do: fold_try_clause(revert_clause(node))
+  defp revert_try_clause(node), do: fold_try_clause(revert_clause(node))
 
-  def revert_try_expr(node) do
+  defp revert_try_expr(node) do
     pos = get_pos(node)
     body = try_expr_body(node)
     clauses = for c <- try_expr_clauses(node) do
@@ -3218,17 +3218,17 @@ defmodule :erl_syntax do
     {:try, pos, body, clauses, handlers, erlangVariableAfter}
   end
 
-  def revert_tuple(node) do
+  defp revert_tuple(node) do
     pos = get_pos(node)
     {:tuple, pos, tuple_elements(node)}
   end
 
-  def revert_tuple_type(node) do
+  defp revert_tuple_type(node) do
     pos = get_pos(node)
     {:type, pos, :tuple, tuple_type_elements(node)}
   end
 
-  def revert_type_application(node) do
+  defp revert_type_application(node) do
     pos = get_pos(node)
     typeName = type_application_name(node)
     arguments = type_application_arguments(node)
@@ -3242,32 +3242,32 @@ defmodule :erl_syntax do
     end
   end
 
-  def revert_type_union(node) do
+  defp revert_type_union(node) do
     pos = get_pos(node)
     {:type, pos, :union, type_union_types(node)}
   end
 
-  def revert_underscore(node) do
+  defp revert_underscore(node) do
     pos = get_pos(node)
     {:var, pos, :_}
   end
 
-  def revert_user_type_application(node) do
+  defp revert_user_type_application(node) do
     pos = get_pos(node)
     typeName = user_type_application_name(node)
     arguments = user_type_application_arguments(node)
     {:user_type, pos, atom_value(typeName), arguments}
   end
 
-  def revert_variable(node) do
+  defp revert_variable(node) do
     pos = get_pos(node)
     name = variable_name(node)
     {:var, pos, name}
   end
 
-  def revert_warning_marker(node), do: {:warning, warning_marker_info(node)}
+  defp revert_warning_marker(node), do: {:warning, warning_marker_info(node)}
 
-  def set_com(node, com) do
+  defp set_com(node, com) do
     case node do
       tree(attr: attr) ->
         tree(node, attr: attr(attr, com: com))
@@ -3278,25 +3278,25 @@ defmodule :erl_syntax do
     end
   end
 
-  def set_postcomments_1(attr(com: :none) = attr, cs), do: attr(attr, com: com(post: cs))
+  defp set_postcomments_1(attr(com: :none) = attr, cs), do: attr(attr, com: com(post: cs))
 
-  def set_postcomments_1(attr(com: com) = attr, cs), do: attr(attr, com: com(com, post: cs))
+  defp set_postcomments_1(attr(com: com) = attr, cs), do: attr(attr, com: com(com, post: cs))
 
-  def set_precomments_1(attr(com: :none) = attr, cs), do: attr(attr, com: com(pre: cs))
+  defp set_precomments_1(attr(com: :none) = attr, cs), do: attr(attr, com: com(pre: cs))
 
-  def set_precomments_1(attr(com: com) = attr, cs), do: attr(attr, com: com(com, pre: cs))
+  defp set_precomments_1(attr(com: com) = attr, cs), do: attr(attr, com: com(com, pre: cs))
 
-  def unfold_binary_field_type({type, size}, pos), do: set_pos(size_qualifier(atom(type), integer(size)), pos)
+  defp unfold_binary_field_type({type, size}, pos), do: set_pos(size_qualifier(atom(type), integer(size)), pos)
 
-  def unfold_binary_field_type(type, pos), do: set_pos(atom(type), pos)
+  defp unfold_binary_field_type(type, pos), do: set_pos(atom(type), pos)
 
-  def unfold_binary_field_types(ts, pos) do
+  defp unfold_binary_field_types(ts, pos) do
     for t <- ts do
       unfold_binary_field_type(t, pos)
     end
   end
 
-  def unfold_function_names(ns, pos) do
+  defp unfold_function_names(ns, pos) do
     f = fn {atom, arity} ->
         n = arity_qualifier(atom(atom), integer(arity))
         set_pos(n, pos)
@@ -3306,44 +3306,44 @@ defmodule :erl_syntax do
     end
   end
 
-  def unfold_record_field({:typed_record_field, field, type}) do
+  defp unfold_record_field({:typed_record_field, field, type}) do
     f = unfold_record_field_1(field)
     set_pos(typed_record_field(f, type), get_pos(f))
   end
 
-  def unfold_record_field(field), do: unfold_record_field_1(field)
+  defp unfold_record_field(field), do: unfold_record_field_1(field)
 
-  def unfold_record_field_1({:record_field, pos, name}), do: set_pos(record_field(name), pos)
+  defp unfold_record_field_1({:record_field, pos, name}), do: set_pos(record_field(name), pos)
 
-  def unfold_record_field_1({:record_field, pos, name, value}), do: set_pos(record_field(name, value), pos)
+  defp unfold_record_field_1({:record_field, pos, name, value}), do: set_pos(record_field(name, value), pos)
 
-  def unfold_record_fields(fs) do
+  defp unfold_record_fields(fs) do
     for f <- fs do
       unfold_record_field(f)
     end
   end
 
-  def unfold_try_clause({:clause, pos, [{:tuple, _, [{:atom, _, :throw}, v, _]}], guard, body}), do: {:clause, pos, [v], guard, body}
+  defp unfold_try_clause({:clause, pos, [{:tuple, _, [{:atom, _, :throw}, v, _]}], guard, body}), do: {:clause, pos, [v], guard, body}
 
-  def unfold_try_clause({:clause, pos, [{:tuple, _, [c, v, _]}], guard, body}), do: {:clause, pos, [class_qualifier(c, v)], guard, body}
+  defp unfold_try_clause({:clause, pos, [{:tuple, _, [c, v, _]}], guard, body}), do: {:clause, pos, [class_qualifier(c, v)], guard, body}
 
-  def unfold_try_clauses(cs) do
+  defp unfold_try_clauses(cs) do
     for c <- cs do
       unfold_try_clause(c)
     end
   end
 
-  def unfold_variable_names(vs, pos) do
+  defp unfold_variable_names(vs, pos) do
     for v <- vs do
       set_pos(variable(v), pos)
     end
   end
 
   @spec unwrap(syntaxTree()) :: (tree() | erl_parse())
-  def unwrap(wrapper(tree: node)), do: node
+  defp unwrap(wrapper(tree: node)), do: node
 
-  def unwrap(node), do: node
+  defp unwrap(node), do: node
 
   @spec wrap(erl_parse()) :: wrapper()
-  def wrap(node), do: wrapper(type: type(node), attr: attr(pos: get_pos(node)), tree: node)
+  defp wrap(node), do: wrapper(type: type(node), attr: attr(pos: get_pos(node)), tree: node)
 end

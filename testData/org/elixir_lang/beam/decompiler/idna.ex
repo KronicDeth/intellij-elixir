@@ -176,17 +176,17 @@ defmodule :idna do
     # body not decompiled
   end
 
-  def append(char, <<>>) when is_integer(char), do: [char]
+  defp append(char, <<>>) when is_integer(char), do: [char]
 
-  def append(char, <<>>) when is_list(char), do: char
+  defp append(char, <<>>) when is_list(char), do: char
 
-  def append(char, bin) when is_binary(bin), do: [char, bin]
+  defp append(char, bin) when is_binary(bin), do: [char, bin]
 
-  def append(char, str) when is_integer(char), do: [char | str]
+  defp append(char, str) when is_integer(char), do: [char | str]
 
-  def append(gC, str) when is_list(gC), do: gC ++ str
+  defp append(gC, str) when is_list(gC), do: gC ++ str
 
-  def characters_to_nfc_list(cD) do
+  defp characters_to_nfc_list(cD) do
     case :unicode_util_compat.nfc(cD) do
       [cPs | str] when is_list(cPs) ->
         cPs ++ characters_to_nfc_list(str)
@@ -197,13 +197,13 @@ defmodule :idna do
     end
   end
 
-  def check_bidi(label, true), do: :idna_bidi.check_bidi(label)
+  defp check_bidi(label, true), do: :idna_bidi.check_bidi(label)
 
-  def check_bidi(_, false), do: :ok
+  defp check_bidi(_, false), do: :ok
 
-  def check_context(label, checkJoiners), do: check_context(label, label, checkJoiners, 0)
+  defp check_context(label, checkJoiners), do: check_context(label, label, checkJoiners, 0)
 
-  def check_context([cP | rest], label, checkJoiners, pos) do
+  defp check_context([cP | rest], label, checkJoiners, pos) do
     case :idna_table.lookup(cP) do
       :"PVALID" ->
         check_context(rest, label, checkJoiners, pos + 1)
@@ -219,9 +219,9 @@ defmodule :idna do
     end
   end
 
-  def check_context([], _, _, _), do: :ok
+  defp check_context([], _, _, _), do: :ok
 
-  def check_hyphen(label, true) when length(label) >= 3 do
+  defp check_hyphen(label, true) when length(label) >= 3 do
     case :lists.nthtail(2, label) do
       [?-, ?- | _] ->
         errorMsg = error_msg('Label ~p has disallowed hyphens in 3rd and 4th position', [label])
@@ -237,7 +237,7 @@ defmodule :idna do
     end
   end
 
-  def check_hyphen(label, true) do
+  defp check_hyphen(label, true) do
     case :lists.nth(1, label) == ?- or :lists.last(label) == ?- do
       true ->
         errorMsg = error_msg('Label ~p must not start or end with a hyphen', [label])
@@ -247,24 +247,24 @@ defmodule :idna do
     end
   end
 
-  def check_hyphen(_Label, false), do: :ok
+  defp check_hyphen(_Label, false), do: :ok
 
-  def decode_1([], acc), do: :lists.reverse(acc)
+  defp decode_1([], acc), do: :lists.reverse(acc)
 
-  def decode_1([label | labels], []), do: decode_1(labels, :lists.reverse(ulabel(label)))
+  defp decode_1([label | labels], []), do: decode_1(labels, :lists.reverse(ulabel(label)))
 
-  def decode_1([label | labels], acc), do: decode_1(labels, :lists.reverse(ulabel(label), [?. | acc]))
+  defp decode_1([label | labels], acc), do: decode_1(labels, :lists.reverse(ulabel(label), [?. | acc]))
 
-  def encode_1([], acc), do: :lists.reverse(acc)
+  defp encode_1([], acc), do: :lists.reverse(acc)
 
-  def encode_1([label | labels], []), do: encode_1(labels, :lists.reverse(alabel(label)))
+  defp encode_1([label | labels], []), do: encode_1(labels, :lists.reverse(alabel(label)))
 
-  def encode_1([label | labels], acc), do: encode_1(labels, :lists.reverse(alabel(label), [?. | acc]))
+  defp encode_1([label | labels], acc), do: encode_1(labels, :lists.reverse(alabel(label), [?. | acc]))
 
-  def error_msg(msg, fmt), do: :lists.flatten(:io_lib.format(msg, fmt))
+  defp error_msg(msg, fmt), do: :lists.flatten(:io_lib.format(msg, fmt))
 
   @spec lowercase(string :: :unicode.chardata()) :: :unicode.chardata()
-  def lowercase(cD) when is_list(cD) do
+  defp lowercase(cD) when is_list(cD) do
     try do
       lowercase_list(cD, false)
     catch
@@ -273,7 +273,7 @@ defmodule :idna do
     end
   end
 
-  def lowercase(<<cP1 :: utf8, rest :: binary>> = orig) do
+  defp lowercase(<<cP1 :: utf8, rest :: binary>> = orig) do
     try do
       lowercase_bin(cP1, rest, false)
     catch
@@ -285,13 +285,13 @@ defmodule :idna do
     end
   end
 
-  def lowercase(<<>>), do: <<>>
+  defp lowercase(<<>>), do: <<>>
 
-  def lowercase_bin(cP1, <<cP2 :: utf8, bin :: binary>>, _Changed) when ?A <= cP1 and cP1 <= ?Z and cP2 < 256, do: [cP1 + 32 | lowercase_bin(cP2, bin, true)]
+  defp lowercase_bin(cP1, <<cP2 :: utf8, bin :: binary>>, _Changed) when ?A <= cP1 and cP1 <= ?Z and cP2 < 256, do: [cP1 + 32 | lowercase_bin(cP2, bin, true)]
 
-  def lowercase_bin(cP1, <<cP2 :: utf8, bin :: binary>>, changed) when cP1 < 128 and cP2 < 256, do: [cP1 | lowercase_bin(cP2, bin, changed)]
+  defp lowercase_bin(cP1, <<cP2 :: utf8, bin :: binary>>, changed) when cP1 < 128 and cP2 < 256, do: [cP1 | lowercase_bin(cP2, bin, changed)]
 
-  def lowercase_bin(cP1, bin, changed) do
+  defp lowercase_bin(cP1, bin, changed) do
     case :unicode_util_compat.lowercase([cP1 | bin]) do
       [cP1 | cPs] ->
         case :unicode_util_compat.cp(cPs) do
@@ -312,15 +312,15 @@ defmodule :idna do
     end
   end
 
-  def lowercase_list([cP1 | [cP2 | _] = cont], _Changed) when ?A <= cP1 and cP1 <= ?Z and cP2 < 256, do: [cP1 + 32 | lowercase_list(cont, true)]
+  defp lowercase_list([cP1 | [cP2 | _] = cont], _Changed) when ?A <= cP1 and cP1 <= ?Z and cP2 < 256, do: [cP1 + 32 | lowercase_list(cont, true)]
 
-  def lowercase_list([cP1 | [cP2 | _] = cont], changed) when cP1 < 128 and cP2 < 256, do: [cP1 | lowercase_list(cont, changed)]
+  defp lowercase_list([cP1 | [cP2 | _] = cont], changed) when cP1 < 128 and cP2 < 256, do: [cP1 | lowercase_list(cont, changed)]
 
-  def lowercase_list([], true), do: []
+  defp lowercase_list([], true), do: []
 
-  def lowercase_list([], false), do: throw(:unchanged)
+  defp lowercase_list([], false), do: throw(:unchanged)
 
-  def lowercase_list(cPs0, changed) do
+  defp lowercase_list(cPs0, changed) do
     case :unicode_util_compat.lowercase(cPs0) do
       [char | cPs] when char === hd(cPs0) ->
         [char | lowercase_list(cPs, changed)]
@@ -331,13 +331,13 @@ defmodule :idna do
     end
   end
 
-  def uts46_remap(str, std3Rules, transitional), do: characters_to_nfc_list(uts46_remap_1(str, std3Rules, transitional))
+  defp uts46_remap(str, std3Rules, transitional), do: characters_to_nfc_list(uts46_remap_1(str, std3Rules, transitional))
 
-  def uts46_remap_1([cp | rs], std3Rules, transitional), do: ...
+  defp uts46_remap_1([cp | rs], std3Rules, transitional), do: ...
 
-  def uts46_remap_1([], _, _), do: []
+  defp uts46_remap_1([], _, _), do: []
 
-  def valid_contextj(cP, label, pos, true) do
+  defp valid_contextj(cP, label, pos, true) do
     case :idna_context.valid_contextj(cP, label, pos) do
       true ->
         :ok
@@ -347,9 +347,9 @@ defmodule :idna do
     end
   end
 
-  def valid_contextj(_CP, _Label, _Pos, false), do: :ok
+  defp valid_contextj(_CP, _Label, _Pos, false), do: :ok
 
-  def valid_contexto(cP, label, pos, true) do
+  defp valid_contexto(cP, label, pos, true) do
     case :idna_context.valid_contexto(cP, label, pos) do
       true ->
         :ok
@@ -359,25 +359,25 @@ defmodule :idna do
     end
   end
 
-  def valid_contexto(_CP, _Label, _Pos, false), do: :ok
+  defp valid_contexto(_CP, _Label, _Pos, false), do: :ok
 
-  def validate_options([]), do: :ok
+  defp validate_options([]), do: :ok
 
-  def validate_options([:uts46 | rs]), do: validate_options(rs)
+  defp validate_options([:uts46 | rs]), do: validate_options(rs)
 
-  def validate_options([{:uts46, b} | rs]) when is_boolean(b), do: validate_options(rs)
+  defp validate_options([{:uts46, b} | rs]) when is_boolean(b), do: validate_options(rs)
 
-  def validate_options([:strict | rs]), do: validate_options(rs)
+  defp validate_options([:strict | rs]), do: validate_options(rs)
 
-  def validate_options([{:strict, b} | rs]) when is_boolean(b), do: validate_options(rs)
+  defp validate_options([{:strict, b} | rs]) when is_boolean(b), do: validate_options(rs)
 
-  def validate_options([:std3_rules | rs]), do: validate_options(rs)
+  defp validate_options([:std3_rules | rs]), do: validate_options(rs)
 
-  def validate_options([{:std3_rules, b} | rs]) when is_boolean(b), do: validate_options(rs)
+  defp validate_options([{:std3_rules, b} | rs]) when is_boolean(b), do: validate_options(rs)
 
-  def validate_options([:transitional | rs]), do: validate_options(rs)
+  defp validate_options([:transitional | rs]), do: validate_options(rs)
 
-  def validate_options([{:transitional, b} | rs]) when is_boolean(b), do: validate_options(rs)
+  defp validate_options([{:transitional, b} | rs]) when is_boolean(b), do: validate_options(rs)
 
-  def validate_options([_]), do: :erlang.error(:badarg)
+  defp validate_options([_]), do: :erlang.error(:badarg)
 end

@@ -460,7 +460,16 @@ class Decompiler : BinaryFileDecompiler {
                     val function = debugInfo.functions.byNameArity[macroNameArity.toNameArity()]
 
                     if (function != null) {
-                        decompiled.append(function.toMacroString(options).prependIndentToNonBlank()).append('\n')
+                        var macroString = function.toMacroString(options)
+
+                        // The Erlang abstract code Function always hardcodes macro as DEF because
+                        // the AST doesn't distinguish exported/unexported. The Decompiler knows the
+                        // correct macro from the export table, so fix it up here.
+                        if (macroNameArity.macro == DEFP) {
+                            macroString = macroString.replaceDefWithDefp()
+                        }
+
+                        decompiled.append(macroString.prependIndentToNonBlank()).append('\n')
 
                         true
                     } else {
@@ -568,6 +577,25 @@ fun String.prependIndentToNonBlank(indent: String = "  "): String =
             when {
                 it.isBlank() -> it
                 else -> indent + it
+            }
+        }
+        .joinToString("\n")
+
+/**
+ * Replaces `def ` with `defp ` at the start of each clause in a multi-clause function string
+ * produced by [org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Function.toMacroString].
+ *
+ * The Erlang abstract code [Function] always produces `def` because the AST doesn't encode
+ * export information. This extension is used by the [Decompiler] when the export table indicates
+ * the function is private.
+ */
+private fun String.replaceDefWithDefp(): String =
+    lineSequence()
+        .map { line ->
+            if (line.startsWith("def ")) {
+                "defp " + line.removePrefix("def ")
+            } else {
+                line
             }
         }
         .joinToString("\n")

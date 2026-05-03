@@ -692,11 +692,11 @@ defmodule Kernel do
     # body not decompiled
   end
 
-  def alias_meta({:__aliases__, meta_1, _}), do: meta_1
+  defp alias_meta({:__aliases__, meta_1, _}), do: meta_1
 
-  def alias_meta(_), do: []
+  defp alias_meta(_), do: []
 
-  def assert_module_scope(env_1, fun_1, arity_1) do
+  defp assert_module_scope(env_1, fun_1, arity_1) do
     case env_1 do
       %{:module => __1} ->
         __1
@@ -723,7 +723,7 @@ defmodule Kernel do
     end
   end
 
-  def assert_no_function_scope(env_1, fun_1, arity_1) do
+  defp assert_no_function_scope(env_1, fun_1, arity_1) do
     case env_1 do
       %{:function => __1} ->
         __1
@@ -750,27 +750,27 @@ defmodule Kernel do
     end
   end
 
-  def bootstrapped?(_), do: true
+  defp bootstrapped?(_), do: true
 
-  def build_if(condition_1, [{:do, do_clause_1}]), do: build_if(condition_1, [{:do, do_clause_1}, {:else, nil}])
+  defp build_if(condition_1, [{:do, do_clause_1}]), do: build_if(condition_1, [{:do, do_clause_1}, {:else, nil}])
 
-  def build_if(condition_1, [{:do, do_clause_1}, {:else, else_clause_1}]), do: optimize_boolean({:case, [], [condition_1, [{:do, [{:"->", [], [[{:when, [], [{:x, [], Kernel}, {:in, [{:context, Kernel}, {:import, Kernel}], [{:x, [], Kernel}, [false, nil]]}]}], else_clause_1]}, {:"->", [], [[{:_, [], Kernel}], do_clause_1]}]}]]})
+  defp build_if(condition_1, [{:do, do_clause_1}, {:else, else_clause_1}]), do: optimize_boolean({:case, [], [condition_1, [{:do, [{:"->", [], [[{:when, [], [{:x, [], Kernel}, {:in, [{:context, Kernel}, {:import, Kernel}], [{:x, [], Kernel}, [false, nil]]}]}], else_clause_1]}, {:"->", [], [[{:_, [], Kernel}], do_clause_1]}]}]]})
 
-  def build_if(_condition_1, _arguments_1), do: :erlang.error(ArgumentError.exception(<<"invalid or duplicate keys for if, only \"do\" ", "and an optional \"else\" are permitted">>))
+  defp build_if(_condition_1, _arguments_1), do: :erlang.error(ArgumentError.exception(<<"invalid or duplicate keys for if, only \"do\" ", "and an optional \"else\" are permitted">>))
 
-  def build_unless(condition_1, [{:do, do_clause_1}]), do: build_unless(condition_1, [{:do, do_clause_1}, {:else, nil}])
+  defp build_unless(condition_1, [{:do, do_clause_1}]), do: build_unless(condition_1, [{:do, do_clause_1}, {:else, nil}])
 
-  def build_unless(condition_1, [{:do, do_clause_1}, {:else, else_clause_1}]), do: {:if, [{:context, Kernel}, {:import, Kernel}], [condition_1, [{:do, else_clause_1}, {:else, do_clause_1}]]}
+  defp build_unless(condition_1, [{:do, do_clause_1}, {:else, else_clause_1}]), do: {:if, [{:context, Kernel}, {:import, Kernel}], [condition_1, [{:do, else_clause_1}, {:else, do_clause_1}]]}
 
-  def build_unless(_condition_1, _arguments_1), do: :erlang.error(ArgumentError.exception(<<"invalid or duplicate keys for unless, only \"do\" ", "and an optional \"else\" are permitted">>))
+  defp build_unless(_condition_1, _arguments_1), do: :erlang.error(ArgumentError.exception(<<"invalid or duplicate keys for unless, only \"do\" ", "and an optional \"else\" are permitted">>))
 
-  def comp(left_1, {:|, _, [h_1, t_1]}), do: {{:".", [], [:erlang, :or]}, [], [{{:".", [], [:erlang, :"=:="]}, [], [left_1, h_1]}, {:in, [{:context, Kernel}, {:import, Kernel}], [left_1, t_1]}]}
+  defp comp(left_1, {:|, _, [h_1, t_1]}), do: {{:".", [], [:erlang, :or]}, [], [{{:".", [], [:erlang, :"=:="]}, [], [left_1, h_1]}, {:in, [{:context, Kernel}, {:import, Kernel}], [left_1, t_1]}]}
 
-  def comp(left_1, right_1), do: {{:".", [], [:erlang, :"=:="]}, [], [left_1, right_1]}
+  defp comp(left_1, right_1), do: {{:".", [], [:erlang, :"=:="]}, [], [left_1, right_1]}
 
-  def decreasing_compare(var_1, first_1, last_1), do: {:and, [{:context, Kernel}, {:import, Kernel}], [{{:".", [], [:erlang, :"=<"]}, [], [var_1, first_1]}, {{:".", [], [:erlang, :>=]}, [], [var_1, last_1]}]}
+  defp decreasing_compare(var_1, first_1, last_1), do: {:and, [{:context, Kernel}, {:import, Kernel}], [{{:".", [], [:erlang, :"=<"]}, [], [var_1, first_1]}, {{:".", [], [:erlang, :>=]}, [], [var_1, last_1]}]}
 
-  def define(kind_1, call_1, expr_1, env_1) do
+  defp define(kind_1, call_1, expr_1, env_1) do
     assert_module_scope(env_1, kind_1, 2)
     assert_no_function_scope(env_1, kind_1, 2)
     line_1 = case env_1 do
@@ -795,11 +795,11 @@ defmodule Kernel do
     {{:".", [], [:elixir_def, :store_definition]}, [], [line_1, kind_1, check_clauses_1, call_2, expr_2, pos_1]}
   end
 
-  def do_at([arg_1], meta_1, name_1, function__1, env_1), do: ...
+  defp do_at([arg_1], meta_1, name_1, function__1, env_1), do: ...
 
-  def do_at(args_1, _meta_1, name_1, function__1, env_1) when :erlang.is_atom(args_1) or args_1 == [], do: ...
+  defp do_at(args_1, _meta_1, name_1, function__1, env_1) when :erlang.is_atom(args_1) or args_1 == [], do: ...
 
-  def do_at(args_1, _meta_1, name_1, _function__1, _env_1) do
+  defp do_at(args_1, _meta_1, name_1, _function__1, _env_1) do
     :erlang.error(ArgumentError.exception(<<"expected 0 or 1 argument for @", (case name_1 do
       __1 when :erlang.is_binary(__1) ->
         __1
@@ -813,29 +813,29 @@ defmodule Kernel do
     end) :: binary>>))
   end
 
-  def do_pop_in(nil, [_ | _]), do: :pop
+  defp do_pop_in(nil, [_ | _]), do: :pop
 
-  def do_pop_in(data_1, [h_1]) when :erlang.is_function(h_1) do
+  defp do_pop_in(data_1, [h_1]) when :erlang.is_function(h_1) do
     h_1.(:get_and_update, data_1, fn _ ->
         :pop
     end)
   end
 
-  def do_pop_in(data_1, [h_1 | t_1]) when :erlang.is_function(h_1) do
+  defp do_pop_in(data_1, [h_1 | t_1]) when :erlang.is_function(h_1) do
     h_1.(:get_and_update, data_1, fn __1 ->
         do_pop_in(__1, t_1)
     end)
   end
 
-  def do_pop_in(data_1, [h_1]), do: Access.pop(data_1, h_1)
+  defp do_pop_in(data_1, [h_1]), do: Access.pop(data_1, h_1)
 
-  def do_pop_in(data_1, [h_1 | t_1]) do
+  defp do_pop_in(data_1, [h_1 | t_1]) do
     Access.get_and_update(data_1, h_1, fn __1 ->
         do_pop_in(__1, t_1)
     end)
   end
 
-  def env_stacktrace(env_1) do
+  defp env_stacktrace(env_1) do
     case bootstrapped?(Path) do
       true ->
         Macro.Env.stacktrace(env_1)
@@ -844,7 +844,7 @@ defmodule Kernel do
     end
   end
 
-  def expand_aliases({{:".", _, [base_1, :"{}"]}, _, refs_1}, env_1) do
+  defp expand_aliases({{:".", _, [base_1, :"{}"]}, _, refs_1}, env_1) do
     base_2 = Macro.expand(base_1, env_1)
     Enum.map(refs_1, fn {:__aliases__, _, ref_1} ->
         Module.concat([base_2 | ref_1])
@@ -855,15 +855,15 @@ defmodule Kernel do
     end)
   end
 
-  def expand_aliases(module_1, env_1), do: [Macro.expand(module_1, env_1)]
+  defp expand_aliases(module_1, env_1), do: [Macro.expand(module_1, env_1)]
 
-  def expand_module(raw_1, _module_1, _env_1) when :erlang.is_atom(raw_1), do: raw_1
+  defp expand_module(raw_1, _module_1, _env_1) when :erlang.is_atom(raw_1), do: raw_1
 
-  def expand_module({:__aliases__, _, [:"Elixir" | t_1]}, module_1, _env_1) when t_1 != [], do: module_1
+  defp expand_module({:__aliases__, _, [:"Elixir" | t_1]}, module_1, _env_1) when t_1 != [], do: module_1
 
-  def expand_module({:__aliases__, _, _}, module_1, %{:module => nil}), do: module_1
+  defp expand_module({:__aliases__, _, _}, module_1, %{:module => nil}), do: module_1
 
-  def expand_module({:__aliases__, _, t_1}, _module_1, env_1) do
+  defp expand_module({:__aliases__, _, t_1}, _module_1, env_1) do
     :elixir_aliases.concat([case env_1 do
       %{:module => __1} ->
         __1
@@ -874,7 +874,7 @@ defmodule Kernel do
     end | t_1])
   end
 
-  def expand_module(_raw_1, module_1, env_1) do
+  defp expand_module(_raw_1, module_1, env_1) do
     :elixir_aliases.concat([(case env_1 do
       %{:module => __1} ->
         __1
@@ -885,17 +885,17 @@ defmodule Kernel do
     end), module_1])
   end
 
-  def extract_concatenations({:<>, _, [left_1, right_1]}), do: [wrap_concatenation(left_1) | extract_concatenations(right_1)]
+  defp extract_concatenations({:<>, _, [left_1, right_1]}), do: [wrap_concatenation(left_1) | extract_concatenations(right_1)]
 
-  def extract_concatenations(other_1), do: [wrap_concatenation(other_1)]
+  defp extract_concatenations(other_1), do: [wrap_concatenation(other_1)]
 
-  def in_list(left_1, h_1, t_1) do
+  defp in_list(left_1, h_1, t_1) do
     :lists.foldr(fn x_1, acc_1 ->
         {{:".", [], [:erlang, :or]}, [], [comp(left_1, x_1), acc_1]}
     end, comp(left_1, h_1), t_1)
   end
 
-  def in_range(left_1, first_1, last_1) do
+  defp in_range(left_1, first_1, last_1) do
     case :erlang.is_integer(first_1) do
       true ->
         :erlang.is_integer(last_1)
@@ -910,23 +910,23 @@ defmodule Kernel do
     end
   end
 
-  def in_range_literal(left_1, first_1, ^first_1), do: {{:".", [], [:erlang, :"=:="]}, [], [left_1, first_1]}
+  defp in_range_literal(left_1, first_1, ^first_1), do: {{:".", [], [:erlang, :"=:="]}, [], [left_1, first_1]}
 
-  def in_range_literal(left_1, first_1, last_1) when first_1 < last_1, do: {:and, [{:context, Kernel}, {:import, Kernel}], [{{:".", [], [:erlang, :is_integer]}, [], [left_1]}, increasing_compare(left_1, first_1, last_1)]}
+  defp in_range_literal(left_1, first_1, last_1) when first_1 < last_1, do: {:and, [{:context, Kernel}, {:import, Kernel}], [{{:".", [], [:erlang, :is_integer]}, [], [left_1]}, increasing_compare(left_1, first_1, last_1)]}
 
-  def in_range_literal(left_1, first_1, last_1), do: {:and, [{:context, Kernel}, {:import, Kernel}], [{{:".", [], [:erlang, :is_integer]}, [], [left_1]}, decreasing_compare(left_1, first_1, last_1)]}
+  defp in_range_literal(left_1, first_1, last_1), do: {:and, [{:context, Kernel}, {:import, Kernel}], [{{:".", [], [:erlang, :is_integer]}, [], [left_1]}, decreasing_compare(left_1, first_1, last_1)]}
 
-  def in_var(false, ast_1, fun_1), do: fun_1.(ast_1)
+  defp in_var(false, ast_1, fun_1), do: fun_1.(ast_1)
 
-  def in_var(true, {atom_1, _, context_1} = var_1, fun_1) when :erlang.is_atom(atom_1) and :erlang.is_atom(context_1), do: fun_1.(var_1)
+  defp in_var(true, {atom_1, _, context_1} = var_1, fun_1) when :erlang.is_atom(atom_1) and :erlang.is_atom(context_1), do: fun_1.(var_1)
 
-  def in_var(true, ast_1, fun_1), do: {:__block__, [], [{:=, [], [{:var, [], Kernel}, ast_1]}, fun_1.({:var, [], Kernel})]}
+  defp in_var(true, ast_1, fun_1), do: {:__block__, [], [{:=, [], [{:var, [], Kernel}, ast_1]}, fun_1.({:var, [], Kernel})]}
 
-  def increasing_compare(var_1, first_1, last_1), do: {:and, [{:context, Kernel}, {:import, Kernel}], [{{:".", [], [:erlang, :>=]}, [], [var_1, first_1]}, {{:".", [], [:erlang, :"=<"]}, [], [var_1, last_1]}]}
+  defp increasing_compare(var_1, first_1, last_1), do: {:and, [{:context, Kernel}, {:import, Kernel}], [{{:".", [], [:erlang, :>=]}, [], [var_1, first_1]}, {{:".", [], [:erlang, :"=<"]}, [], [var_1, last_1]}]}
 
-  def module_nesting(nil, full_1), do: {nil, full_1}
+  defp module_nesting(nil, full_1), do: {nil, full_1}
 
-  def module_nesting(prefix_1, full_1) do
+  defp module_nesting(prefix_1, full_1) do
     case split_module(prefix_1) do
       [] ->
         {nil, full_1}
@@ -935,13 +935,13 @@ defmodule Kernel do
     end
   end
 
-  def module_nesting([x_1 | t1_1], [^x_1 | t2_1], acc_1, full_1), do: module_nesting(t1_1, t2_1, [x_1 | acc_1], full_1)
+  defp module_nesting([x_1 | t1_1], [^x_1 | t2_1], acc_1, full_1), do: module_nesting(t1_1, t2_1, [x_1 | acc_1], full_1)
 
-  def module_nesting([], [h_1 | _], acc_1, _full_1), do: {:erlang.binary_to_atom(<<"Elixir.", h_1 :: binary>>, :utf8), :elixir_aliases.concat(:lists.reverse([h_1 | acc_1]))}
+  defp module_nesting([], [h_1 | _], acc_1, _full_1), do: {:erlang.binary_to_atom(<<"Elixir.", h_1 :: binary>>, :utf8), :elixir_aliases.concat(:lists.reverse([h_1 | acc_1]))}
 
-  def module_nesting(_, _, _acc_1, full_1), do: {nil, full_1}
+  defp module_nesting(_, _, _acc_1, full_1), do: {nil, full_1}
 
-  def module_vars([{key_1, kind_1} | vars_1], counter_1) do
+  defp module_vars([{key_1, kind_1} | vars_1], counter_1) do
     var_1 = case :erlang.is_atom(kind_1) do
       true ->
         {key_1, [{:generated, true}], kind_1}
@@ -953,43 +953,43 @@ defmodule Kernel do
     [{:"{}", [], args_1} | module_vars(vars_1, counter_1 + 1)]
   end
 
-  def module_vars([], _counter_1), do: []
+  defp module_vars([], _counter_1), do: []
 
-  def nest_get_and_update_in([], fun_1), do: fun_1
+  defp nest_get_and_update_in([], fun_1), do: fun_1
 
-  def nest_get_and_update_in(list_1, fun_1), do: {:fn, [], [{:"->", [], [[{:x, [], Kernel}], nest_get_and_update_in({:x, [], Kernel}, list_1, fun_1)]}]}
+  defp nest_get_and_update_in(list_1, fun_1), do: {:fn, [], [{:"->", [], [[{:x, [], Kernel}], nest_get_and_update_in({:x, [], Kernel}, list_1, fun_1)]}]}
 
-  def nest_get_and_update_in(h_1, [{:access, key_1} | t_1], fun_1), do: {{:".", [], [{:__aliases__, [{:alias, false}], [:"Access"]}, :get_and_update]}, [], [h_1, key_1, nest_get_and_update_in(t_1, fun_1)]}
+  defp nest_get_and_update_in(h_1, [{:access, key_1} | t_1], fun_1), do: {{:".", [], [{:__aliases__, [{:alias, false}], [:"Access"]}, :get_and_update]}, [], [h_1, key_1, nest_get_and_update_in(t_1, fun_1)]}
 
-  def nest_get_and_update_in(h_1, [{:map, key_1} | t_1], fun_1), do: {{:".", [], [{:__aliases__, [{:alias, false}], [:"Map"]}, :get_and_update!]}, [], [h_1, key_1, nest_get_and_update_in(t_1, fun_1)]}
+  defp nest_get_and_update_in(h_1, [{:map, key_1} | t_1], fun_1), do: {{:".", [], [{:__aliases__, [{:alias, false}], [:"Map"]}, :get_and_update!]}, [], [h_1, key_1, nest_get_and_update_in(t_1, fun_1)]}
 
-  def nest_pop_in(kind_1, list_1), do: {:fn, [], [{:"->", [], [[{:x, [], Kernel}], nest_pop_in(kind_1, {:x, [], Kernel}, list_1)]}]}
+  defp nest_pop_in(kind_1, list_1), do: {:fn, [], [{:"->", [], [[{:x, [], Kernel}], nest_pop_in(kind_1, {:x, [], Kernel}, list_1)]}]}
 
-  def nest_pop_in(:map, h_1, [{:access, key_1}]), do: {:case, [], [h_1, [{:do, [{:"->", [], [[nil], {nil, nil}]}, {:"->", [], [[{:h, [], Kernel}], {{:".", [], [{:__aliases__, [{:alias, false}], [:"Access"]}, :pop]}, [], [{:h, [], Kernel}, key_1]}]}]}]]}
+  defp nest_pop_in(:map, h_1, [{:access, key_1}]), do: {:case, [], [h_1, [{:do, [{:"->", [], [[nil], {nil, nil}]}, {:"->", [], [[{:h, [], Kernel}], {{:".", [], [{:__aliases__, [{:alias, false}], [:"Access"]}, :pop]}, [], [{:h, [], Kernel}, key_1]}]}]}]]}
 
-  def nest_pop_in(_, _, [{:map, key_1}]), do: :erlang.error(ArgumentError.exception(<<"cannot use pop_in when the last segment is a map/struct field. ", (<<"This would effectively remove the field ", Kernel.inspect(key_1) :: binary, " from the map/struct">>) :: binary>>))
+  defp nest_pop_in(_, _, [{:map, key_1}]), do: :erlang.error(ArgumentError.exception(<<"cannot use pop_in when the last segment is a map/struct field. ", (<<"This would effectively remove the field ", Kernel.inspect(key_1) :: binary, " from the map/struct">>) :: binary>>))
 
-  def nest_pop_in(_, h_1, [{:map, key_1} | t_1]), do: {{:".", [], [{:__aliases__, [{:alias, false}], [:"Map"]}, :get_and_update!]}, [], [h_1, key_1, nest_pop_in(:map, t_1)]}
+  defp nest_pop_in(_, h_1, [{:map, key_1} | t_1]), do: {{:".", [], [{:__aliases__, [{:alias, false}], [:"Map"]}, :get_and_update!]}, [], [h_1, key_1, nest_pop_in(:map, t_1)]}
 
-  def nest_pop_in(_, h_1, [{:access, key_1}]), do: {:case, [], [h_1, [{:do, [{:"->", [], [[nil], :pop]}, {:"->", [], [[{:h, [], Kernel}], {{:".", [], [{:__aliases__, [{:alias, false}], [:"Access"]}, :pop]}, [], [{:h, [], Kernel}, key_1]}]}]}]]}
+  defp nest_pop_in(_, h_1, [{:access, key_1}]), do: {:case, [], [h_1, [{:do, [{:"->", [], [[nil], :pop]}, {:"->", [], [[{:h, [], Kernel}], {{:".", [], [{:__aliases__, [{:alias, false}], [:"Access"]}, :pop]}, [], [{:h, [], Kernel}, key_1]}]}]}]]}
 
-  def nest_pop_in(_, h_1, [{:access, key_1} | t_1]), do: {{:".", [], [{:__aliases__, [{:alias, false}], [:"Access"]}, :get_and_update]}, [], [h_1, key_1, nest_pop_in(:access, t_1)]}
+  defp nest_pop_in(_, h_1, [{:access, key_1} | t_1]), do: {{:".", [], [{:__aliases__, [{:alias, false}], [:"Access"]}, :get_and_update]}, [], [h_1, key_1, nest_pop_in(:access, t_1)]}
 
-  def nest_update_in([], fun_1), do: fun_1
+  defp nest_update_in([], fun_1), do: fun_1
 
-  def nest_update_in(list_1, fun_1), do: {:fn, [], [{:"->", [], [[{:x, [], Kernel}], nest_update_in({:x, [], Kernel}, list_1, fun_1)]}]}
+  defp nest_update_in(list_1, fun_1), do: {:fn, [], [{:"->", [], [[{:x, [], Kernel}], nest_update_in({:x, [], Kernel}, list_1, fun_1)]}]}
 
-  def nest_update_in(h_1, [{:map, key_1} | t_1], fun_1), do: {{:".", [], [{:__aliases__, [{:alias, false}], [:"Map"]}, :update!]}, [], [h_1, key_1, nest_update_in(t_1, fun_1)]}
+  defp nest_update_in(h_1, [{:map, key_1} | t_1], fun_1), do: {{:".", [], [{:__aliases__, [{:alias, false}], [:"Map"]}, :update!]}, [], [h_1, key_1, nest_update_in(t_1, fun_1)]}
 
-  def optimize_boolean({:case, meta_1, args_1}), do: {:case, [{:optimize_boolean, true} | meta_1], args_1}
+  defp optimize_boolean({:case, meta_1, args_1}), do: {:case, [{:optimize_boolean, true} | meta_1], args_1}
 
-  def proper_start?({{:".", _, [expr_1, _]}, _, _args_1}) when :erlang.is_atom(expr_1) or :erlang.element(1, expr_1) == :__aliases__ or :erlang.element(1, expr_1) == :__MODULE__, do: true
+  defp proper_start?({{:".", _, [expr_1, _]}, _, _args_1}) when :erlang.is_atom(expr_1) or :erlang.element(1, expr_1) == :__aliases__ or :erlang.element(1, expr_1) == :__MODULE__, do: true
 
-  def proper_start?({atom_1, _, _args_1}) when :erlang.is_atom(atom_1), do: true
+  defp proper_start?({atom_1, _, _args_1}) when :erlang.is_atom(atom_1), do: true
 
-  def proper_start?(other_1), do: not :erlang.is_tuple(other_1)
+  defp proper_start?(other_1), do: not :erlang.is_tuple(other_1)
 
-  def split_module(atom_1) do
+  defp split_module(atom_1) do
     case :binary.split(:erlang.atom_to_binary(atom_1, :utf8), ".", [:global]) do
       ["Elixir" | t_1] ->
         t_1
@@ -998,9 +998,9 @@ defmodule Kernel do
     end
   end
 
-  def split_words(string_1, []), do: split_words(string_1, [115])
+  defp split_words(string_1, []), do: split_words(string_1, [115])
 
-  def split_words(string_1, [mod_1]) when mod_1 == 115 or mod_1 == 97 or mod_1 == 99 do
+  defp split_words(string_1, [mod_1]) when mod_1 == 115 or mod_1 == 97 or mod_1 == 99 do
     case :erlang.is_binary(string_1) do
       true ->
         parts_1 = String.split(string_1)
@@ -1027,9 +1027,9 @@ defmodule Kernel do
     end
   end
 
-  def split_words(_string_1, _mods_1), do: :erlang.error(ArgumentError.exception("modifier must be one of: s, a, c"))
+  defp split_words(_string_1, _mods_1), do: :erlang.error(ArgumentError.exception("modifier must be one of: s, a, c"))
 
-  def struct(struct_1, [], _fun_1) when :erlang.is_atom(struct_1) do
+  defp struct(struct_1, [], _fun_1) when :erlang.is_atom(struct_1) do
     case struct_1 do
       %{:__struct__ => __1} ->
         __1
@@ -1040,7 +1040,7 @@ defmodule Kernel do
     end
   end
 
-  def struct(struct_1, kv_1, fun_1) when :erlang.is_atom(struct_1) do
+  defp struct(struct_1, kv_1, fun_1) when :erlang.is_atom(struct_1) do
     struct((case struct_1 do
       %{:__struct__ => __1} ->
         __1
@@ -1051,31 +1051,31 @@ defmodule Kernel do
     end), kv_1, fun_1)
   end
 
-  def struct(%{:__struct__ => _} = struct_1, [], _fun_1), do: struct_1
+  defp struct(%{:__struct__ => _} = struct_1, [], _fun_1), do: struct_1
 
-  def struct(%{:__struct__ => _} = struct_1, kv_1, fun_1), do: Enum.reduce(kv_1, struct_1, fun_1)
+  defp struct(%{:__struct__ => _} = struct_1, kv_1, fun_1), do: Enum.reduce(kv_1, struct_1, fun_1)
 
-  def typespec(:type), do: :deftype
+  defp typespec(:type), do: :deftype
 
-  def typespec(:typep), do: :deftypep
+  defp typespec(:typep), do: :deftypep
 
-  def typespec(:opaque), do: :defopaque
+  defp typespec(:opaque), do: :defopaque
 
-  def typespec(:spec), do: :defspec
+  defp typespec(:spec), do: :defspec
 
-  def typespec(:callback), do: :defcallback
+  defp typespec(:callback), do: :defcallback
 
-  def typespec(:macrocallback), do: :defmacrocallback
+  defp typespec(:macrocallback), do: :defmacrocallback
 
-  def typespec(:optional_callbacks), do: :defoptional_callbacks
+  defp typespec(:optional_callbacks), do: :defoptional_callbacks
 
-  def typespec(_), do: false
+  defp typespec(_), do: false
 
-  def unnest({{:".", _, [Access, :get]}, _, [expr_1, key_1]}, acc_1, _all_map__1, kind_1), do: unnest(expr_1, [{:access, key_1} | acc_1], false, kind_1)
+  defp unnest({{:".", _, [Access, :get]}, _, [expr_1, key_1]}, acc_1, _all_map__1, kind_1), do: unnest(expr_1, [{:access, key_1} | acc_1], false, kind_1)
 
-  def unnest({{:".", _, [expr_1, key_1]}, _, []}, acc_1, all_map__1, kind_1) when :erlang.is_tuple(expr_1) and :erlang.element(1, expr_1) != :__aliases__ and :erlang.element(1, expr_1) != :__MODULE__, do: unnest(expr_1, [{:map, key_1} | acc_1], all_map__1, kind_1)
+  defp unnest({{:".", _, [expr_1, key_1]}, _, []}, acc_1, all_map__1, kind_1) when :erlang.is_tuple(expr_1) and :erlang.element(1, expr_1) != :__aliases__ and :erlang.element(1, expr_1) != :__MODULE__, do: unnest(expr_1, [{:map, key_1} | acc_1], all_map__1, kind_1)
 
-  def unnest(other_1, [], _all_map__1, kind_1) do
+  defp unnest(other_1, [], _all_map__1, kind_1) do
     :erlang.error(ArgumentError.exception(<<"expected expression given to ", (case kind_1 do
       __1 when :erlang.is_binary(__1) ->
         __1
@@ -1089,7 +1089,7 @@ defmodule Kernel do
     end) :: binary>>))
   end
 
-  def unnest(other_1, acc_1, all_map__1, kind_1) do
+  defp unnest(other_1, acc_1, all_map__1, kind_1) do
     case proper_start?(other_1) do
       true ->
         {[other_1 | acc_1], all_map__1}
@@ -1108,11 +1108,11 @@ defmodule Kernel do
     end
   end
 
-  def wrap_binding(true, var_1), do: {:^, [], [var_1]}
+  defp wrap_binding(true, var_1), do: {:^, [], [var_1]}
 
-  def wrap_binding(_, var_1), do: var_1
+  defp wrap_binding(_, var_1), do: var_1
 
-  def wrap_concatenation(binary_1) when :erlang.is_binary(binary_1), do: binary_1
+  defp wrap_concatenation(binary_1) when :erlang.is_binary(binary_1), do: binary_1
 
-  def wrap_concatenation(other_1), do: {:::, [], [other_1, {:binary, [], nil}]}
+  defp wrap_concatenation(other_1), do: {:::, [], [other_1, {:binary, [], nil}]}
 end

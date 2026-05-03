@@ -483,15 +483,15 @@ defmodule :dialyzer_callgraph do
     # body not decompiled
   end
 
-  def active_digraph_delete({:d, dG}), do: :digraph.delete(dG)
+  defp active_digraph_delete({:d, dG}), do: :digraph.delete(dG)
 
-  def active_digraph_delete({:e, out, erlangVariableIn, maps}) do
+  defp active_digraph_delete({:e, out, erlangVariableIn, maps}) do
     :ets.delete(out)
     :ets.delete(erlangVariableIn)
     :ets.delete(maps)
   end
 
-  def build_maps(tree, eTSRecVarMap, eTSNameMap, eTSRevNameMap, eTSLetrecMap) do
+  defp build_maps(tree, eTSRecVarMap, eTSNameMap, eTSRevNameMap, eTSLetrecMap) do
     defs = :cerl.module_defs(tree)
     mod = :cerl.atom_val(:cerl.module_name(tree))
     fun = fn {var, function} ->
@@ -508,7 +508,7 @@ defmodule :dialyzer_callgraph do
     :lists.foreach(fun, defs)
   end
 
-  def check_add_edge(g, v1, v2) do
+  defp check_add_edge(g, v1, v2) do
     case :digraph.add_edge(g, v1, v2) do
       {:error, error} ->
         exit({:add_edge, v1, v2, error})
@@ -517,7 +517,7 @@ defmodule :dialyzer_callgraph do
     end
   end
 
-  def check_add_edge(g, e, v1, v2, l) do
+  defp check_add_edge(g, e, v1, v2, l) do
     case :digraph.add_edge(g, e, v1, v2, l) do
       {:error, error} ->
         exit({:add_edge, e, v1, v2, l, error})
@@ -526,7 +526,7 @@ defmodule :dialyzer_callgraph do
     end
   end
 
-  def condensation(g) do
+  defp condensation(g) do
     {pid, ref} = :erlang.spawn_monitor(do_condensation(g, self()))
     receive do
     {:"DOWN", ^ref, :process, ^pid, result} ->
@@ -538,7 +538,7 @@ defmodule :dialyzer_callgraph do
     end
   end
 
-  def digraph_add_edge(from, to, dG) do
+  defp digraph_add_edge(from, to, dG) do
     case :digraph.vertex(dG, from) do
       false ->
         :digraph.add_vertex(dG, from)
@@ -555,25 +555,25 @@ defmodule :dialyzer_callgraph do
     :ok
   end
 
-  def digraph_add_edges([{from, to} | left], dG) do
+  defp digraph_add_edges([{from, to} | left], dG) do
     digraph_add_edge(from, to, dG)
     digraph_add_edges(left, dG)
   end
 
-  def digraph_add_edges([], _DG), do: :ok
+  defp digraph_add_edges([], _DG), do: :ok
 
-  def digraph_confirm_vertices([mFA | left], dG) do
+  defp digraph_confirm_vertices([mFA | left], dG) do
     :digraph.add_vertex(dG, mFA, :confirmed)
     digraph_confirm_vertices(left, dG)
   end
 
-  def digraph_confirm_vertices([], _DG), do: :ok
+  defp digraph_confirm_vertices([], _DG), do: :ok
 
-  def digraph_delete(dG), do: :digraph.delete(dG)
+  defp digraph_delete(dG), do: :digraph.delete(dG)
 
-  def digraph_edges(dG), do: :digraph.edges(dG)
+  defp digraph_edges(dG), do: :digraph.edges(dG)
 
-  def digraph_in_neighbours(v, dG) do
+  defp digraph_in_neighbours(v, dG) do
     case :digraph.in_neighbours(dG, v) do
       [] ->
         :none
@@ -582,23 +582,23 @@ defmodule :dialyzer_callgraph do
     end
   end
 
-  def digraph_reaching_subgraph(funs, dG) do
+  defp digraph_reaching_subgraph(funs, dG) do
     vertices = :digraph_utils.reaching(funs, dG)
     :digraph_utils.subgraph(dG, vertices)
   end
 
-  def digraph_remove_external(dG) do
+  defp digraph_remove_external(dG) do
     vertices = :digraph.vertices(dG)
     unconfirmed = remove_unconfirmed(vertices, dG)
     {dG, unconfirmed}
   end
 
-  def digraph_vertices(dG), do: :digraph.vertices(dG)
+  defp digraph_vertices(dG), do: :digraph.vertices(dG)
 
   @spec do_condensation(:digraph.graph(), pid()) :: (() -> no_return())
-  def do_condensation(g, parent), do: ...
+  defp do_condensation(g, parent), do: ...
 
-  def edge_fold({{m1, _, _}, {m2, _, _}}, set) do
+  defp edge_fold({{m1, _, _}, {m2, _, _}}, set) do
     case m1 !== m2 do
       true ->
         :sets.add_element({m1, m2}, set)
@@ -607,9 +607,9 @@ defmodule :dialyzer_callgraph do
     end
   end
 
-  def edge_fold(_, set), do: set
+  defp edge_fold(_, set), do: set
 
-  def ets_lookup_dict(key, table) do
+  defp ets_lookup_dict(key, table) do
     try do
       :ets.lookup_element(table, key, 2)
     catch
@@ -621,22 +621,22 @@ defmodule :dialyzer_callgraph do
     end
   end
 
-  def ets_lookup_set(key, table), do: :ets.lookup(table, key) !== []
+  defp ets_lookup_set(key, table), do: :ets.lookup(table, key) !== []
 
   @spec find_non_local_calls([{mfa_or_funlbl(), mfa_or_funlbl()}], call_tab()) :: mfa_calls()
-  def find_non_local_calls([{{m, _, _}, {m, _, _}} | left], set), do: find_non_local_calls(left, set)
+  defp find_non_local_calls([{{m, _, _}, {m, _, _}} | left], set), do: find_non_local_calls(left, set)
 
-  def find_non_local_calls([{{m1, _, _}, {m2, _, _}} = edge | left], set) when m1 !== m2, do: find_non_local_calls(left, :sets.add_element(edge, set))
+  defp find_non_local_calls([{{m1, _, _}, {m2, _, _}} = edge | left], set) when m1 !== m2, do: find_non_local_calls(left, :sets.add_element(edge, set))
 
-  def find_non_local_calls([{{_, _, _}, label} | left], set) when is_integer(label), do: find_non_local_calls(left, set)
+  defp find_non_local_calls([{{_, _, _}, label} | left], set) when is_integer(label), do: find_non_local_calls(left, set)
 
-  def find_non_local_calls([{label, {_, _, _}} | left], set) when is_integer(label), do: find_non_local_calls(left, set)
+  defp find_non_local_calls([{label, {_, _, _}} | left], set) when is_integer(label), do: find_non_local_calls(left, set)
 
-  def find_non_local_calls([{label1, label2} | left], set) when is_integer(label1) and is_integer(label2), do: find_non_local_calls(left, set)
+  defp find_non_local_calls([{label1, label2} | left], set) when is_integer(label1) and is_integer(label2), do: find_non_local_calls(left, set)
 
-  def find_non_local_calls([], set), do: :sets.to_list(set)
+  defp find_non_local_calls([], set), do: :sets.to_list(set)
 
-  def get_edges_from_deps(deps) do
+  defp get_edges_from_deps(deps) do
     edges = :dict.fold(fn :external, _Set, acc ->
         acc
       caller, set, acc ->
@@ -647,7 +647,7 @@ defmodule :dialyzer_callgraph do
     :lists.flatten(edges)
   end
 
-  def get_label(t) do
+  defp get_label(t) do
     case :cerl.get_ann(t) do
       [{:label, l} | _] when is_integer(l) ->
         l
@@ -656,7 +656,7 @@ defmodule :dialyzer_callgraph do
     end
   end
 
-  def lookup_scc(sCC, table, maps) do
+  defp lookup_scc(sCC, table, maps) do
     case ets_lookup_dict({:scc, sCC}, maps) do
       {:ok, sCCInt} ->
         case ets_lookup_dict(sCCInt, table) do
@@ -673,7 +673,7 @@ defmodule :dialyzer_callgraph do
   end
 
   @spec module_postorder(callgraph()) :: {[module()], {:d, :digraph.graph()}}
-  def module_postorder(callgraph(digraph: dG)) do
+  defp module_postorder(callgraph(digraph: dG)) do
     edges = :lists.foldl(&edge_fold/2, :sets.new(), digraph_edges(dG))
     nodes = :sets.from_list((for {m, _F, _A} <- digraph_vertices(dG) do
       m
@@ -687,7 +687,7 @@ defmodule :dialyzer_callgraph do
     {:lists.reverse(:digraph_utils.topsort(mDG)), {:d, mDG}}
   end
 
-  def name_edges(edges, eTSNameMap) do
+  defp name_edges(edges, eTSNameMap) do
     mapFun = fn x ->
         case ets_lookup_dict(x, eTSNameMap) do
           :error ->
@@ -699,17 +699,17 @@ defmodule :dialyzer_callgraph do
     name_edges(edges, mapFun, [])
   end
 
-  def name_edges([{from, to} | left], mapFun, acc) do
+  defp name_edges([{from, to} | left], mapFun, acc) do
     newFrom = mapFun.(from)
     newTo = mapFun.(to)
     name_edges(left, mapFun, [{newFrom, newTo} | acc])
   end
 
-  def name_edges([], _MapFun, acc), do: acc
+  defp name_edges([], _MapFun, acc), do: acc
 
-  def remove_unconfirmed(vertexes, dG), do: remove_unconfirmed(vertexes, dG, [])
+  defp remove_unconfirmed(vertexes, dG), do: remove_unconfirmed(vertexes, dG, [])
 
-  def remove_unconfirmed([v | left], dG, unconfirmed) do
+  defp remove_unconfirmed([v | left], dG, unconfirmed) do
     case :digraph.vertex(dG, v) do
       {v, :confirmed} ->
         remove_unconfirmed(left, dG, unconfirmed)
@@ -718,7 +718,7 @@ defmodule :dialyzer_callgraph do
     end
   end
 
-  def remove_unconfirmed([], dG, unconfirmed) do
+  defp remove_unconfirmed([], dG, unconfirmed) do
     badCalls = :lists.append((for v <- unconfirmed do
       :digraph.in_edges(dG, v)
     end))
@@ -727,7 +727,7 @@ defmodule :dialyzer_callgraph do
     badCallsSorted
   end
 
-  def scan_core_funs(tree) do
+  defp scan_core_funs(tree) do
     defs = :cerl.module_defs(tree)
     mod = :cerl.atom_val(:cerl.module_name(tree))
     deepEdges = :lists.foldl(fn {var, function}, edges ->
@@ -739,5 +739,5 @@ defmodule :dialyzer_callgraph do
     :lists.flatten(deepEdges)
   end
 
-  def scan_one_core_fun(topTree, funName), do: ...
+  defp scan_one_core_fun(topTree, funName), do: ...
 end
