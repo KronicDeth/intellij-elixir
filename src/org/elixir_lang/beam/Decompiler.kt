@@ -163,7 +163,9 @@ class Decompiler : BinaryFileDecompiler {
 
                     if (signatures.isNotEmpty()) {
                         for (signature in signatures) {
-                            decompiled.append("  @type ").append(signature.replace("\r", "")).append('\n')
+                            val cleaned = signature.replace("\r", "")
+                            val (attr, body) = erlangTypeSignatureToElixir(cleaned)
+                            decompiled.append("  @").append(attr).append(' ').append(body).append('\n')
                         }
                     } else {
                         decompiled.append("  @type ").append(name).append('(')
@@ -556,6 +558,35 @@ class Decompiler : BinaryFileDecompiler {
             "\"" + moduleName + "\""
         } else {
             moduleName
+        }
+
+        /**
+         * Converts an Erlang type signature like `-type ascii_binary() :: binary().` or
+         * `-opaque queue(Item) :: {list(Item), list(Item)}.` into an Elixir attribute
+         * name and body: `("type", "ascii_binary() :: binary()")` or
+         * `("opaque", "queue(Item) :: {list(Item), list(Item)}")`.
+         *
+         * Strips the leading `-type `/`-opaque ` prefix and trailing `.` that are
+         * part of Erlang's syntax but invalid in Elixir `@type`/`@opaque` attributes.
+         */
+        private fun erlangTypeSignatureToElixir(signature: String): Pair<String, String> {
+            var body = signature
+            val attr = when {
+                body.startsWith("-opaque ") -> {
+                    body = body.removePrefix("-opaque ")
+                    "opaque"
+                }
+                body.startsWith("-type ") -> {
+                    body = body.removePrefix("-type ")
+                    "type"
+                }
+                else -> "type"
+            }
+            // Strip trailing Erlang period
+            if (body.endsWith(".")) {
+                body = body.dropLast(1)
+            }
+            return Pair(attr, body)
         }
     }
 }
