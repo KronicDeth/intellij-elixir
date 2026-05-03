@@ -1,7 +1,6 @@
 package org.elixir_lang;
 
 import com.ericsson.otp.erlang.*;
-import org.apache.commons.lang3.NotImplementedException;
 import org.jetbrains.annotations.Nullable;
 
 import static org.elixir_lang.psi.impl.QuotableImpl.NIL;
@@ -28,7 +27,7 @@ public class Process {
             if (response.equals(NIL)) {
                 pid = null;
             } else {
-                throw new NotImplementedException("Expected atoms to be nil, but got" + response);
+                throw new UnsupportedOperationException("Expected atoms to be nil, but got" + response);
             }
         } else {
             pid = (OtpErlangPid) response;

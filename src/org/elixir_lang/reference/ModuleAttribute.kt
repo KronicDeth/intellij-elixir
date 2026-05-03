@@ -8,7 +8,6 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiPolyVariantReferenceBase
 import com.intellij.psi.ResolveResult
 import com.intellij.psi.impl.source.resolve.ResolveCache
-import org.apache.commons.lang.NotImplementedException
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil
@@ -41,7 +40,7 @@ class ModuleAttribute(psiElement: PsiElement) : PsiPolyVariantReferenceBase<PsiE
                 // do nothing; handled by setName on ElixirAtUnqualifiedNoParenthesesCall
                 myElement
             }
-            else -> throw NotImplementedException(
+            else -> throw UnsupportedOperationException(
                 "Renaming module attribute reference on " + myElement.javaClass.canonicalName +
                         " PsiElements is not implemented yet.  Please open an issue " +
                         "(https://github.com/KronicDeth/intellij-elixir/issues/new) with the class name and the " +
@@ -84,10 +83,7 @@ class ModuleAttribute(psiElement: PsiElement) : PsiPolyVariantReferenceBase<PsiE
                     atIdentifierTextRange.endOffset - startOffset
                 )
             }
-            else -> TextRange.create(
-                startOffset - startOffset,
-                elementTextRange.endOffset - startOffset
-            )
+            else -> TextRange.create(0, elementTextRange.length)
         }
     }
 
