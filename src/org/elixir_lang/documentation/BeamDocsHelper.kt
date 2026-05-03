@@ -1,5 +1,8 @@
 package org.elixir_lang.documentation
 
+import com.ericsson.otp.erlang.OtpErlangList
+import com.ericsson.otp.erlang.OtpErlangObject
+import com.ericsson.otp.erlang.OtpErlangTuple
 import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveState
 import org.elixir_lang.beam.Beam
@@ -9,6 +12,9 @@ import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
 import org.elixir_lang.psi.Definition
 import org.elixir_lang.psi.call.MaybeExported
+import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Attribute
+import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.attribute.Spec
+import org.elixir_lang.beam.decompiler.Options
 import org.elixir_lang.utils.ElixirModulesUtil.erlangModuleNameToElixir
 
 object BeamDocsHelper {
@@ -16,8 +22,10 @@ object BeamDocsHelper {
         .from(element.containingFile.originalFile.virtualFile)
         ?.let { beam ->
             beam.atoms()?.moduleName()?.let { erlangModuleNameToElixir(it) }?.let { module ->
+                val documentation = beam.documentation()
+
                 when (element) {
-                    is Module -> beam.documentation()?.moduleDocs?.englishDocs?.let { moduleDoc ->
+                    is Module -> documentation?.moduleDocs?.englishDocs?.let { moduleDoc ->
                         FetchedDocs.ModuleDocumentation(module, moduleDoc)
                     }
                     is MaybeExported -> {
@@ -25,7 +33,7 @@ object BeamDocsHelper {
                             val arity = element.exportedArity(ResolveState.initial())
                             val kind = kindForElement(element)
 
-                            beam.documentation()?.docs?.let { docs ->
+                            documentation?.docs?.let { docs ->
                                 // Try exact arity first, then fall back to other arities for the same name.
                                 // In Elixir, default-argument stubs (e.g. info/1) delegate to the full-arity
                                 // definition (e.g. info/2) which is where the @doc lives.
@@ -36,15 +44,22 @@ object BeamDocsHelper {
                                     val signatures = it.signatures
                                     val deprecated = it.deprecated()
                                     val doc = it.doc
+                                    val specs = specsFromMetadata(it.metadatumByName)
 
-                                    if (deprecated != null || doc != null) {
+                                    // Use specs as heads when available -- they contain the full
+                                    // typed signature (e.g. "@spec any(pred, list) :: boolean() when ...")
+                                    // which is more informative than the EEP-48 signatures field
+                                    // (which is often just "any/2" for Erlang modules).
+                                    val heads = specs.ifEmpty { signatures }
+
+                                    if (deprecated != null || doc != null || heads.isNotEmpty()) {
                                         FetchedDocs.FunctionOrMacroDocumentation(
                                             module,
                                             deprecated,
                                             doc,
                                             impls = emptyList(),
                                             specs = emptyList(),
-                                            heads = signatures
+                                            heads = heads
                                         )
                                     } else {
                                         null
@@ -63,6 +78,24 @@ object BeamDocsHelper {
                 }
             }
         }
+
+    /**
+     * Extracts `@spec` strings from the EEP-48 metadata `signature` key.
+     *
+     * The `signature` metadata contains a list of Erlang abstract form attribute tuples like
+     * `{attribute, Line, spec, {{Name, Arity}, [Definition, ...]}}`. These are parsed using
+     * the existing [Attribute] → [Spec] pipeline and rendered via [Spec.toMacroString].
+     */
+    private fun specsFromMetadata(metadata: Map<String, OtpErlangObject>): List<String> {
+        val signatureTerms = metadata["signature"] as? OtpErlangList ?: return emptyList()
+        return signatureTerms.elements().mapNotNull { term ->
+            (term as? OtpErlangTuple)?.let { tuple ->
+                Attribute.from(tuple)?.let { attribute ->
+                    Spec.from(attribute)?.toMacroString(Options())
+                }
+            }
+        }
+    }
 
     /**
      * Returns the list of BEAM documentation "kind" strings to try when looking up docs for [element].

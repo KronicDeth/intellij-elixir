@@ -284,6 +284,17 @@ class ElixirDocumentationProvider : DocumentationProvider {
         contextElement is LeafPsiElement || contextElement is ElixirIdentifier || contextElement is ElixirRelativeIdentifier ->
             getCustomDocumentationElement(contextElement.parent)
 
+        contextElement is ElixirAtom -> {
+            contextElement.reference
+                ?.let { it as? PsiPolyVariantReference }
+                ?.multiResolve(false)
+                ?.filter(ResolveResult::isValidResult)
+                ?.mapNotNull(ResolveResult::getElement)
+                ?.filterIsInstance<PsiNamedElement>()
+                ?.let { Resolver.preferSource(it) }
+                ?.firstOrNull()
+        }
+
         contextElement is Call -> {
             contextElement
                 .getReference()
@@ -493,9 +504,13 @@ class ElixirDocumentationProvider : DocumentationProvider {
     }
 
     private fun fetchDocs(element: PsiElement): FetchedDocs? =
-        // If resolves to .beam file then fetch docs from the decompiled docs
+        // For compiled Beam elements, prefer docs from the decompiled source mirror so hover uses
+        // the cached inline docs from decompilation.
         if (element.containingFile?.originalFile is BeamFileImpl) {
-            BeamDocsHelper.fetchDocs(element)
+            val sourceElement = (element as? PsiCompiledElement)?.mirror ?: element.navigationElement
+
+            SourceFileDocsHelper.fetchDocs(sourceElement)
+                ?: BeamDocsHelper.fetchDocs(element)
         } else {
             SourceFileDocsHelper.fetchDocs(element)
         }
