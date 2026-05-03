@@ -27,7 +27,7 @@ import org.elixir_lang.reference.resolver.Type.BUILTIN_ARITY_BY_NAME
 import java.util.*
 
 class Decompiler : BinaryFileDecompiler {
-    override fun decompile(virtualFile: VirtualFile): CharSequence = decompiled(from(virtualFile))
+    override fun decompile(virtualFile: VirtualFile): CharSequence = decompiled(from(virtualFile), virtualFile)
 
     companion object {
         private val logger = Logger.getInstance(Decompiler::class.java)
@@ -47,7 +47,7 @@ class Decompiler : BinaryFileDecompiler {
 
         private const val DECOMPILATION_ERROR = "# Decompilation Error: "
 
-        private fun decompiled(beam: Beam?): CharSequence {
+        private fun decompiled(beam: Beam?, virtualFile: VirtualFile): CharSequence {
             val decompiled = StringBuilder()
 
             return if (beam != null) {
@@ -62,6 +62,7 @@ class Decompiler : BinaryFileDecompiler {
                             .append(defmoduleArgument)
                             .append(" do\n")
                         val documentation = beam.documentation()
+                            ?: Documentation.fromExternalChunk(virtualFile)
 
                         if (documentation != null) {
                             documentation.moduleDocs?.englishDocs?.let { moduleDocs ->
