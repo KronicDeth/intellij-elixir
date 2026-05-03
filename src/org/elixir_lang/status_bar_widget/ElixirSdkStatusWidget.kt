@@ -25,6 +25,7 @@ import com.intellij.ui.awt.RelativePoint
 import com.intellij.util.messages.MessageBusConnection
 import com.intellij.util.ui.JBUI
 import org.elixir_lang.Icons
+import org.elixir_lang.isElixirModule
 import org.elixir_lang.sdk.SdkEbinPaths
 import org.elixir_lang.sdk.elixir.SdkSettingsOpener
 import org.elixir_lang.sdk.elixir.Type
@@ -457,6 +458,8 @@ class ElixirSdkStatusWidget(@param:NotNull private val project: Project) : Custo
         } != null
 
         for (module in ModuleManager.getInstance(project).modules) {
+            if (!module.isElixirModule()) continue
+
             val rootManager = ModuleRootManager.getInstance(module)
 
             for (entry in rootManager.orderEntries) {
