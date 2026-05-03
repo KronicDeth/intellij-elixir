@@ -111,6 +111,7 @@ Table of Contents[![Backers on Open Collective](https://opencollective.com/intel
                * [For a function](#for-a-function-1)
                * [For a module](#for-a-module)
                * [For a type](#for-a-type)
+               * [For an Erlang module or function](#for-an-erlang-module-or-function)
          * [Run/Debug Configurations](#rundebug-configurations)
             * [Distillery Release CLI <a target="_blank" rel="noopener noreferrer" href="resources/icons/run/distillery/release-cli.svg"><img src="resources/icons/run/distillery/release-cli.svg" alt="Elixir Mix Icon with tapered neck to make a retort as used in distilleries" title="Distillery Release CLI Icon" style="max-width: 100%;"></a>](resources/icons/run/distillery/release-cli.svg)
                * [Running](#running)
@@ -2736,6 +2737,41 @@ You can get documentation for functions and macros that have a `@doc`, aliases o
    * From the menu: View > Quick Documentation
 
    ![](screenshots/features/documentation/quick/typedoc.png)
+
+##### For an Erlang module or function
+
+Quick Documentation also works for Erlang modules and functions referenced via atom syntax
+(e.g. `:math`, `:lists.any/2`). The plugin reads documentation from the EEP-48 `Docs` chunk
+embedded in `.beam` files, or from external `.chunk` files at `<app>/doc/chunks/<module>.chunk`.
+
+For this to work, your Erlang/OTP installation must have been built **with documentation**.
+
+**Checking if docs are available:**
+
+If hovering over `:lists` or `:math` shows "No Documentation found", your OTP was built without
+docs. Many `mise`/`asdf`/`kerl` installations omit docs by default.
+
+**Installing Erlang with documentation via `mise`:**
+
+```bash
+KERL_BUILD_DOCS=yes MISE_ERLANG_COMPILE=true mise install erlang@X.Y.Z
+```
+
+Replace `X.Y.Z` with your desired OTP version (e.g. `27.3.3`). The key variables are:
+- `KERL_BUILD_DOCS=yes` -- tells kerl to build documentation (including `.chunk` files)
+- `MISE_ERLANG_COMPILE=true` -- forces a source build (pre-built binaries may not include docs)
+
+**Installing Erlang with documentation via `asdf`:**
+
+```bash
+KERL_BUILD_DOCS=yes asdf install erlang X.Y.Z
+```
+
+After reinstalling Erlang with docs, restart the IDE so it re-indexes the `.beam` files.
+
+> **OTP 23 and earlier:** You may need to add
+> `CFLAGS="-O2 -g -Wno-error=implicit-function-declaration"` to the install command to avoid
+> compilation errors on newer toolchains.
 
 ### Run/Debug Configurations
 
