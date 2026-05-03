@@ -4,7 +4,6 @@ import com.intellij.icons.AllIcons;
 import com.intellij.ide.util.treeView.smartTree.ActionPresentation;
 import com.intellij.ide.util.treeView.smartTree.ActionPresentationData;
 import com.intellij.ide.util.treeView.smartTree.Sorter;
-import org.apache.commons.lang3.NotImplementedException;
 import org.elixir_lang.structure_view.element.Timed;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -26,7 +25,33 @@ public class Time implements Sorter {
     public static final String TIME_SORTER_ID = "TIME_COMPARATOR";
 
     /*
-     * Constructors
+     * Private
+     */
+
+    /**
+     * Maps an element to a sort rank based on its {@link Timed.Time}:
+     * <ul>
+     *   <li>{@code -1} - compile-time ({@link Timed.Time#COMPILE})</li>
+     *   <li>{@code  0} - not {@link Timed} (no time classification)</li>
+     *   <li>{@code  1} - run-time ({@link Timed.Time#RUN})</li>
+     * </ul>
+     */
+    private static int timeRank(Object o) {
+        if (o instanceof Timed timed) {
+            return switch (timed.time()) {
+                case COMPILE -> -1;
+                case RUN -> 1;
+                // default branch is required: without it, javac emits an implicit reference to
+                // java.lang.MatchException which the IntelliJ Plugin Verifier cannot resolve.
+                //noinspection UnnecessaryDefault
+                default -> 0;
+            };
+        }
+        return 0;
+    }
+
+    /*
+     * Instance Methods
      */
 
     /**
@@ -35,70 +60,10 @@ public class Time implements Sorter {
      * @return the comparator for comparing nodes.
      */
     @Override
+    @SuppressWarnings("rawtypes")
     public Comparator getComparator() {
-        return new Comparator() {
-            @Override
-            public int compare(Object o1, Object o2) {
-                int comparison;
-
-                if (o1 instanceof Timed && o2 instanceof Timed) {
-                    Timed timed1 = (Timed) o1;
-                    Timed timed2 = (Timed) o2;
-
-                    Timed.Time time1 = timed1.time();
-                    Timed.Time time2 = timed2.time();
-
-                    if (time1 == time2) {
-                        comparison = 0;
-                    } else if (time1 == Timed.Time.COMPILE && time2 == Timed.Time.RUN) {
-                        comparison = -1;
-                    } else if (time1 == Timed.Time.RUN && time2 == Timed.Time.COMPILE) {
-                        comparison = 1;
-                    } else {
-                        throw new NotImplementedException("Only COMPILE and RUN time are expected");
-                    }
-                } else if (o1 instanceof Timed && !(o2 instanceof Timed)) {
-                    Timed timed1 = (Timed) o1;
-                    Timed.Time time1 = timed1.time();
-
-                    switch (time1) {
-                        case COMPILE:
-                            comparison = -1;
-                            break;
-                        case RUN:
-                            comparison = 1;
-                            break;
-                        default:
-                            throw new NotImplementedException("Only COMPILE and RUN time are expected");
-                    }
-                } else if (!(o1 instanceof Timed) && o2 instanceof Timed) {
-                    Timed timed2 = (Timed) o2;
-                    Timed.Time time2 = timed2.time();
-
-                    switch (time2) {
-                        case COMPILE:
-                            comparison = 1;
-                            break;
-                        case RUN:
-                            comparison = -1;
-                            break;
-                        default:
-                            throw new NotImplementedException("Only COMPILE and RUN time are expected");
-                    }
-                } else {
-                    assert !(o1 instanceof Timed) && !(o2 instanceof Timed);
-
-                    comparison = 0;
-                }
-
-                return comparison;
-            }
-        };
+        return Comparator.comparingInt(Time::timeRank);
     }
-
-    /*
-     * Instance Methods
-     */
 
     /**
      * Returns a unique identifier for the action.
