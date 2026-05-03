@@ -274,6 +274,9 @@
         <localInspection displayName="Elixir references" shortName="ElixirReferences" enabledByDefault="false"
                          groupName="Elixir" implementationClass="org.elixir_lang.inspection.References"
                          language="Elixir" level="ERROR"/>
+        <localInspection displayName="Unresolvable module qualifier" enabledByDefault="true" groupName="Elixir"
+                         implementationClass="org.elixir_lang.inspection.UnresolvableModuleQualifier"
+                         language="Elixir" level="ERROR" shortName="UnresolvableModuleQualifier"/>
         <spellchecker.support implementationClass="org.elixir_lang.spell_checking.Strategy" language="Elixir"/>
         <spellchecker.bundledDictionaryProvider
                 implementation="org.elixir_lang.spell_checking.BundledDictionaryProvider"/>
