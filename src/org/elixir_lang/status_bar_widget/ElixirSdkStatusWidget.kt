@@ -133,6 +133,8 @@ class ElixirSdkStatusWidget(@param:NotNull private val project: Project) : Custo
             val actionManager = ActionManager.getInstance()
             actionManager.getAction("Elixir.RefreshAllElixirSdks")?.let { add(it) }
             actionManager.getAction("Elixir.InstallMixDependencies")?.let { add(it) }
+            add(Separator.getInstance())
+            actionManager.getAction("Elixir.ReconfigureModuleSetup")?.let { add(it) }
         }
 
         val dataContext = DataManager.getInstance().getDataContext(component)
@@ -291,7 +293,7 @@ class ElixirSdkStatusWidget(@param:NotNull private val project: Project) : Custo
         val sdkStatus = detectSdkStatus()
         val issueKey = computeIssueKey(sdkStatus)
 
-        // No issue, or same issue already notified — skip
+        // No issue, or same issue already notified - skip
         if (issueKey == null) {
             lastNotifiedIssueKey = null
             return
@@ -304,6 +306,19 @@ class ElixirSdkStatusWidget(@param:NotNull private val project: Project) : Custo
         val notification = NotificationGroupManager.getInstance()
             .getNotificationGroup("Elixir")
             .createNotification(title, message, type)
+
+        // For module SDK errors, offer one-click fix via ReconfigureModuleSetupAction
+        if (sdkStatus is SdkStatus.ModuleSdkError) {
+            val reconfigureAction = ActionManager.getInstance().getAction("Elixir.ReconfigureModuleSetup")
+            if (reconfigureAction != null) {
+                notification.addAction(object : AnAction("Reconfigure Now") {
+                    override fun actionPerformed(e: AnActionEvent) {
+                        reconfigureAction.actionPerformed(e)
+                        notification.expire()
+                    }
+                })
+            }
+        }
 
         notification.addAction(object : AnAction("Open Project Structure") {
             override fun actionPerformed(e: AnActionEvent) {
@@ -340,7 +355,7 @@ class ElixirSdkStatusWidget(@param:NotNull private val project: Project) : Custo
 
             is SdkStatus.Partial -> NotificationContent(
                 "Elixir SDK Issue",
-                "Elixir SDK: ${status.elixirVersion ?: "Unknown"} — ${status.issue}.",
+                "Elixir SDK: ${status.elixirVersion ?: "Unknown"} - ${status.issue}.",
                 NotificationType.WARNING
             )
 
