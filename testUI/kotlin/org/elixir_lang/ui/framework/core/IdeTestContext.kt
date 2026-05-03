@@ -15,7 +15,7 @@ import com.intellij.ide.starter.plugins.PluginConfigurator
 import com.intellij.ide.starter.project.NoProject
 import com.intellij.ide.starter.runner.Starter
 import com.intellij.ide.starter.utils.Git
-import com.intellij.openapi.util.SystemInfo
+import com.intellij.util.system.OS
 import org.junit.jupiter.api.fail
 import org.kodein.di.DI
 import org.kodein.di.bindSingleton
@@ -198,8 +198,8 @@ object IdeTestContext {
 
                 // === OS-specific system properties ===
 
-                when {
-                    SystemInfo.isMac -> {
+                when (OS.CURRENT) {
+                    OS.macOS -> {
                         // macOS specific settings
                         addSystemProperty("ide.mac.file.chooser.native", false) // Use Java file chooser
                         addSystemProperty("ide.mac.message.dialogs.as.sheets", false) // Use regular dialogs
@@ -207,12 +207,12 @@ object IdeTestContext {
                         addSystemProperty("ide.native.launcher", true) // Use native launcher
                     }
 
-                    SystemInfo.isWindows -> {
+                    OS.Windows -> {
                         // Windows specific settings
                         addSystemProperty("ide.win.file.chooser.native", false)
                     }
 
-                    SystemInfo.isLinux -> {
+                    OS.Linux -> {
                         // Linux specific settings
                         addSystemProperty("ide.browser.jcef.enabled", true)
                         addSystemProperty("ide.native.launcher", false) // Avoid launcher issues on Linux
@@ -221,6 +221,8 @@ object IdeTestContext {
                         addSystemProperty("sun.java2d.uiScale.enabled", false)
                         addSystemProperty("sun.java2d.xrender", false)
                     }
+
+                    else -> {} // FreeBSD / Other fall through to statisy linter but unsupported
                 }
 
             }.addProjectToTrustedLocations()

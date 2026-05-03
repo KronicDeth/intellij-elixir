@@ -18,7 +18,7 @@ package org.elixir_lang.jps.builder.execution;
 
 import com.intellij.execution.CommandLineUtil;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.util.SystemInfo;
+import com.intellij.util.system.OS;
 import com.intellij.openapi.util.UserDataHolderBase;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.EnvironmentUtil;
@@ -121,6 +121,7 @@ public class GeneralCommandLine extends UserDataHolderBase {
         myProgramParams.add(parameter);
     }
 
+    @SuppressWarnings("unused")
     public ParametersList getParametersList() {
         return myProgramParams;
     }
@@ -208,7 +209,7 @@ public class GeneralCommandLine extends UserDataHolderBase {
         environment.putAll(getParentEnvironment());
 
         if (!myEnvParams.isEmpty()) {
-            if (SystemInfo.isWindows) {
+            if (OS.CURRENT == OS.Windows) {
                 Map<String, String> envVars = com.intellij.util.containers.CollectionFactory.createCaseInsensitiveStringMap();
                 envVars.putAll(environment);
                 envVars.putAll(myEnvParams);
