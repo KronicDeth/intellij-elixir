@@ -6,7 +6,7 @@ import org.elixir_lang.psi.impl.stripAccessExpression
 /**
  * <expression> dotInfixOperator alias
  */
-interface QualifiedAlias : QualifiableAlias, Quotable {
+interface QualifiedAlias : NamedElement, QualifiableAlias, Quotable {
     fun getAlias(): ElixirAlias
 }
 

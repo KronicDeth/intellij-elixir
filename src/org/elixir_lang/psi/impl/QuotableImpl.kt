@@ -5,7 +5,6 @@ package org.elixir_lang.psi.impl
 import com.ericsson.otp.erlang.*
 import com.intellij.lang.ASTNode
 import com.intellij.openapi.application.runReadAction
-import com.intellij.openapi.util.Computable
 import com.intellij.psi.*
 import com.intellij.psi.impl.source.tree.Factory
 import com.intellij.psi.tree.IElementType
@@ -212,7 +211,7 @@ object QuotableImpl {
         return try {
             val value = Long.parseLong(text, base)
             OtpErlangLong(value)
-        } catch (exception: NumberFormatException) {
+        } catch (_: NumberFormatException) {
             val value = BigInteger(text, base)
             OtpErlangLong(value)
         }
@@ -224,7 +223,7 @@ object QuotableImpl {
         val children = accessExpression.children
 
         if (children.size != 1) {
-            throw TODO("Expecting 1 child in accessExpression")
+            TODO("Expecting 1 child in accessExpression")
         }
 
         return (children[0] as Quotable).quote()
@@ -286,7 +285,7 @@ object QuotableImpl {
         val children = charToken.node.getChildren(null)
 
         if (children.size != 2) {
-            throw TODO("CharToken expected to be ?(<character>|<escape sequence>)")
+            TODO("CharToken expected to be ?(<character>|<escape sequence>)")
         }
 
         val tokenized = children[1]
@@ -294,7 +293,7 @@ object QuotableImpl {
 
         val codePoint = if (tokenizedElementType === ElixirTypes.FRAGMENT) {
             if (tokenized.textLength != 1) {
-                throw TODO("Tokenized character expected to only be one character long")
+                TODO("Tokenized character expected to only be one character long")
             }
 
             tokenized.text.codePointAt(0)
@@ -633,7 +632,7 @@ object QuotableImpl {
         val children = `in`.children
 
         if (children.size != 3) {
-            throw TODO("BinaryOperation expected to have 3 children (left operand, operator, right operand")
+            TODO("BinaryOperation expected to have 3 children (left operand, operator, right operand")
         }
 
         val quotedLeftOperand = (children[0] as Quotable).quote()
@@ -661,7 +660,7 @@ object QuotableImpl {
                             OtpErlangLong(unaryOperatorArguments.stringValue().codePointAt(0).toLong())
                         }
                         is OtpErlangList -> unaryOperatorArguments.elementAt(0)
-                        else -> throw TODO("Expected REARRANGED_UNARY_OPERATORS operand to be quoted as an OtpErlangString or OtpErlangList")
+                        else -> TODO("Expected REARRANGED_UNARY_OPERATORS operand to be quoted as an OtpErlangString or OtpErlangList")
                     }
 
                     val operatorMetadata = metadata(operator)
@@ -1029,7 +1028,7 @@ object QuotableImpl {
         val children = prefix.children
 
         if (children.size != 2) {
-            throw TODO("Prefix expected to have 2 children (operator and operand")
+            TODO("Prefix expected to have 2 children (operator and operand")
         }
 
         val quotedOperator = (children[0] as Quotable).quote()
@@ -1046,7 +1045,7 @@ object QuotableImpl {
     @JvmStatic
     fun quote(children: Array<PsiElement>): OtpErlangObject =
         children.asSequence().filter { it !is Unquoted }.map {
-            it as? Quotable ?: throw TODO("Child, $it, must be Quotable or Unquoted")
+            it as? Quotable ?: TODO("Child, $it, must be Quotable or Unquoted")
         }.toList().toTypedArray().let { quote(it) }
 
     @Contract(pure = true)
@@ -1067,10 +1066,10 @@ object QuotableImpl {
 
     @Contract(pure = true)
     @JvmStatic
-    fun quote(sigilHeredoc: SigilHeredoc): OtpErlangObject {
-        val quotedHeredoc = quote(sigilHeredoc as Heredoc)
+    fun quote(sigilHeredoc: SigilHeredocLiteral): OtpErlangObject {
+        val quotedHeredocLiteral = quote(sigilHeredoc as HeredocLiteral)
 
-        return quote(sigilHeredoc, quotedHeredoc)
+        return quote(sigilHeredoc, quotedHeredocLiteral)
     }
 
     @Contract(pure = true)
@@ -1089,9 +1088,9 @@ object QuotableImpl {
 
     @Contract(pure = true)
     @JvmStatic
-    fun quote(heredocLine: HeredocLine, heredoc: Heredoc, prefixLength: Int): OtpErlangObject {
-        val excessWhitespace = heredocLine.heredocLinePrefix.excessWhitespace(ElixirTypes.FRAGMENT, prefixLength)
-        val directChildNodes = childNodes(heredocLine.body)
+    fun quote(heredocLineable: HeredocLineable, heredocLiteral: HeredocLiteral, prefixLength: Int): OtpErlangObject {
+        val excessWhitespace = heredocLineable.heredocLinePrefix.excessWhitespace(ElixirTypes.FRAGMENT, prefixLength)
+        val directChildNodes = childNodes(heredocLineable.body)
 
         val accumulatedChildNodes = if (excessWhitespace != null) {
             arrayOf(excessWhitespace) + directChildNodes
@@ -1100,18 +1099,18 @@ object QuotableImpl {
         }
 
         return quotedChildNodes(
-                heredoc,
-                metadata(heredocLine),
+                heredocLiteral,
+                metadata(heredocLineable),
                 *accumulatedChildNodes
         )
     }
 
     @Contract(pure = true)
     @JvmStatic
-    fun quote(heredoc: Heredoc): OtpErlangObject {
-        val prefixLength = heredoc.heredocPrefix.textLength
+    fun quote(heredocLiteral: HeredocLiteral): OtpErlangObject {
+        val prefixLength = heredocLiteral.heredocPrefix.textLength
         val alignedNodeQueue = LinkedList<ASTNode>()
-        val heredocLineList = heredoc.heredocLineList
+        val heredocLineList = heredocLiteral.heredocLineList
 
         for (line in heredocLineList) {
             queueChildNodes(line, ElixirTypes.FRAGMENT, prefixLength, alignedNodeQueue)
@@ -1120,10 +1119,10 @@ object QuotableImpl {
         val mergedNodeQueue = mergeFragments(
                 alignedNodeQueue,
                 ElixirTypes.FRAGMENT,
-                heredoc.manager
+                heredocLiteral.manager
         )
 
-        return quotedChildNodes(heredoc, *mergedNodeQueue.toTypedArray())
+        return quotedChildNodes(heredocLiteral, *mergedNodeQueue.toTypedArray())
     }
 
     @Contract(pure = true)
@@ -1330,7 +1329,7 @@ object QuotableImpl {
             )
 
             if (integralDigitsList.inBase() && fractionalDigitsList.inBase()) {
-                java.lang.Double.parseDouble(floatString).let(::OtpErlangDouble)
+                Double.parseDouble(floatString).let(::OtpErlangDouble)
             } else {
                 // Convert parser error to runtime ArgumentError
                 quotedFunctionCall(
@@ -1357,7 +1356,7 @@ object QuotableImpl {
                         if (element is Quotable) {
                             visitQuotable((element as Quotable?)!!)
                         } else if (!element.isUnquoted()) {
-                            throw TODO("Don't know how to visit $element")
+                            TODO("Don't know how to visit $element")
                         }
 
                         super.visitElement(element)
@@ -1478,9 +1477,6 @@ object QuotableImpl {
     /* Returns the 0-indexed line number for the element */
     private fun lineNumber(node: ASTNode): Int = node.psi.document()!!.getLineNumber(node.startOffset)
 
-    private fun lineNumberKeywordTuple(operator: Operator): OtpErlangTuple =
-            lineNumberKeywordTuple(operator.operatorTokenNode())
-
     private fun lineNumberKeywordTuple(node: ASTNode): OtpErlangTuple =
             keywordTuple(
                     "line",
@@ -1593,7 +1589,7 @@ object QuotableImpl {
                         codePointList = null
                     }
 
-                    if (parent is Heredoc  &&  quotedParentList.isEmpty()) {
+                    if (parent is HeredocLiteral &&  quotedParentList.isEmpty()) {
                         quotedParentList.add(elixirString(""))
                     }
 
@@ -1602,7 +1598,7 @@ object QuotableImpl {
                 } else if (elementType === ElixirTypes.QUOTE_HEXADECIMAL_ESCAPE_SEQUENCE || elementType === ElixirTypes.SIGIL_HEXADECIMAL_ESCAPE_SEQUENCE) {
                     codePointList = parent.addHexadecimalEscapeSequenceCodePoints(codePointList, child)
                 } else {
-                    throw TODO("Can't quote " + child)
+                    TODO("Can't quote " + child)
                 }
             }
 
@@ -1645,10 +1641,10 @@ object QuotableImpl {
             )
 
     private fun queueChildNodes(
-            line: HeredocLine,
-            fragmentType: IElementType,
-            prefixLength: Int,
-            heredocDescendantNodes: Queue<ASTNode>
+        line: HeredocLineable,
+        fragmentType: IElementType,
+        prefixLength: Int,
+        heredocDescendantNodes: Queue<ASTNode>
     ) {
         val excessWhitespace = line.heredocLinePrefix.excessWhitespace(fragmentType, prefixLength)
 
@@ -1712,9 +1708,9 @@ object QuotableImpl {
     /**
      * Unwraps `when` from left end of noParenthesesArguments in stabNoParenthesesSignature so that the when acts as a guard for the signature instead of a guard on the last positional argument.
      *
-     * @see [`unwrap_when` in `stab_expr`](https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl.L276-L277)
-     *
-     * @see [`unwrap_when`](https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl.L716-L722)
+     * Based on Elixir's `unwrap_when`:
+     * - [`unwrap_when` in `stab_expr`](https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L276-L277)
+     * - [`unwrap_when`](https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L716-L722)
      */
     private fun unwrapWhen(quotedArguments: Array<OtpErlangObject>): Array<OtpErlangObject> {
         // https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L717
@@ -1813,7 +1809,7 @@ object QuotableImpl {
                         // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L547
                         when ((quotedChild as OtpErlangTuple).elementAt(0)) {
                             EXCLAMATION_POINT, NOT, UNQUOTE_SPLICING ->
-                                QuotableImpl.blockFunctionCall(quotedChildren, metadata)
+                                blockFunctionCall(quotedChildren, metadata)
                             else ->
                                 quotedChild
                         }
@@ -1821,6 +1817,6 @@ object QuotableImpl {
                         quotedChild
                     }
                 }
-                else -> QuotableImpl.blockFunctionCall(quotedChildren, metadata)
+                else -> blockFunctionCall(quotedChildren, metadata)
             }
 }

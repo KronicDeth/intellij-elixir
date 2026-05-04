@@ -2,8 +2,6 @@
 package org.elixir_lang.psi.impl;
 
 import java.util.List;
-
-import org.elixir_lang.psi.operation.And;
 import org.jetbrains.annotations.*;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
@@ -121,7 +119,7 @@ public class ElixirMatchedAndOperationImpl extends ElixirMatchedExpressionImpl i
 
   @Override
   public boolean processDeclarations(@NotNull PsiScopeProcessor processor, @NotNull ResolveState state, PsiElement lastParent, @NotNull PsiElement place) {
-    return ElixirPsiImplUtil.processDeclarations((And) this, processor, state, lastParent, place);
+    return ElixirPsiImplUtil.processDeclarations(this, processor, state, lastParent, place);
   }
 
   @Override

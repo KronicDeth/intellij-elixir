@@ -226,19 +226,12 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitHeredoc(@NotNull ElixirHeredoc o) {
-    visitQuote(o);
-  }
-
-  public void visitQuote(@NotNull Quote quote) {
-    visitElement(quote);
+    visitHeredocLiteral(o);
+    // visitQuote(o);
   }
 
   public void visitHeredocLine(@NotNull ElixirHeredocLine o) {
-    visitHeredocLine((HeredocLine) o);
-  }
-
-  public void visitHeredocLine(@NotNull HeredocLine o) {
-    visitElement(o);
+    visitHeredocLineable(o);
   }
 
   public void visitHeredocLineBody(@NotNull ElixirHeredocLineBody o) {
@@ -278,7 +271,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitInterpolatedHeredocLine(@NotNull ElixirInterpolatedHeredocLine o) {
-    visitHeredocLine(o);
+    visitHeredocLineable(o);
   }
 
   public void visitInterpolatedHeredocLineBody(@NotNull ElixirInterpolatedHeredocLineBody o) {
@@ -286,15 +279,12 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitInterpolatedSigilHeredoc(@NotNull ElixirInterpolatedSigilHeredoc o) {
-    visitSigil(o);
+    visitSigilHeredocLiteral(o);
   }
 
   public void visitInterpolatedSigilLine(@NotNull ElixirInterpolatedSigilLine o) {
-    visitSigil(o);
-  }
-
-  public void visitSigil(@NotNull Sigil sigil) {
-    visitElement(sigil);
+    visitInterpolated(o);
+    // visitSigilLine(o);
   }
 
   public void visitInterpolatedSigilLineBody(@NotNull ElixirInterpolatedSigilLineBody o) {
@@ -319,7 +309,11 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitLine(@NotNull ElixirLine o) {
-    visitQuote(o);
+    visitAtomable(o);
+    // visitInterpolated(o);
+    // visitLine(o);
+    // visitQuotable(o);
+    // visitQuote(o);
   }
 
   public void visitLineBody(@NotNull ElixirLineBody o) {
@@ -331,7 +325,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitLiteralHeredocLine(@NotNull ElixirLiteralHeredocLine o) {
-    visitHeredocLine(o);
+    visitHeredocLineable(o);
   }
 
   public void visitLiteralHeredocLineBody(@NotNull ElixirLiteralHeredocLineBody o) {
@@ -339,11 +333,13 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitLiteralSigilHeredoc(@NotNull ElixirLiteralSigilHeredoc o) {
-    visitSigil(o);
+    visitLiteral(o);
+    // visitSigilHeredocLiteral(o);
   }
 
   public void visitLiteralSigilLine(@NotNull ElixirLiteralSigilLine o) {
-    visitSigil(o);
+    visitLiteral(o);
+    // visitSigilLine(o);
   }
 
   public void visitLiteralSigilLineBody(@NotNull ElixirLiteralSigilLineBody o) {
@@ -398,11 +394,8 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitMatchedAtOperation(@NotNull ElixirMatchedAtOperation o) {
-    visitAtOperation(o);
-  }
-
-  public void visitAtOperation(@NotNull AtOperation o) {
-    visitElement(o);
+    visitMatchedExpression(o);
+    // visitAtOperation(o);
   }
 
   public void visitMatchedAtUnqualifiedBracketOperation(@NotNull ElixirMatchedAtUnqualifiedBracketOperation o) {
@@ -770,7 +763,8 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitUnmatchedAtOperation(@NotNull ElixirUnmatchedAtOperation o) {
-    visitAtOperation(o);
+    visitUnmatchedExpression(o);
+    // visitAtOperation(o);
   }
 
   public void visitUnmatchedAtUnqualifiedBracketOperation(@NotNull ElixirUnmatchedAtUnqualifiedBracketOperation o) {
@@ -997,6 +991,14 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitElement(o);
   }
 
+  public void visitHeredocLineable(@NotNull HeredocLineable o) {
+    visitElement(o);
+  }
+
+  public void visitHeredocLiteral(@NotNull HeredocLiteral o) {
+    visitElement(o);
+  }
+
   public void visitInterpolated(@NotNull Interpolated o) {
     visitElement(o);
   }
@@ -1033,7 +1035,7 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitElement(o);
   }
 
-  public void visitSigilHeredoc(@NotNull SigilHeredoc o) {
+  public void visitSigilHeredocLiteral(@NotNull SigilHeredocLiteral o) {
     visitElement(o);
   }
 

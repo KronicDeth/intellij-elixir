@@ -9,8 +9,8 @@ import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
 import org.elixir_lang.psi.ElixirInterpolation
-import org.elixir_lang.psi.HeredocLine
-import org.elixir_lang.psi.SigilHeredoc
+import org.elixir_lang.psi.HeredocLineable
+import org.elixir_lang.psi.SigilHeredocLiteral
 import org.elixir_lang.psi.SigilLine
 import org.intellij.lang.regexp.RegExpLanguage
 import org.elixir_lang.eex.Language as EexLanguage
@@ -28,7 +28,7 @@ internal class ElixirSigilInjector : MultiHostInjector {
     override fun getLanguagesToInject(registrar: MultiHostRegistrar, context: PsiElement) {
         when (context) {
             is SigilLine -> handleSigilLine(registrar, context)
-            is SigilHeredoc -> handleSigilHeredoc(registrar, context)
+            is SigilHeredocLiteral -> handleSigilHeredoc(registrar, context)
             else -> return
         }
     }
@@ -46,7 +46,7 @@ internal class ElixirSigilInjector : MultiHostInjector {
         registrar.doneInjecting()
     }
 
-    private fun handleSigilHeredoc(registrar: MultiHostRegistrar, sigilHeredoc: SigilHeredoc) {
+    private fun handleSigilHeredoc(registrar: MultiHostRegistrar, sigilHeredoc: SigilHeredocLiteral) {
         if (!sigilHeredoc.isValidHost || sigilHeredoc.heredocLineList.isEmpty() || !sigilHeredoc.isValid) {
             if (LOG.isDebugEnabled) {
                 LOG.debug(
@@ -85,14 +85,14 @@ internal class ElixirSigilInjector : MultiHostInjector {
     }
 
     private fun sigilHeredocInjectionRanges(
-        heredocLineList: List<HeredocLine>,
+        heredocLineableList: List<HeredocLineable>,
         lang: Language
     ): List<TextRange> {
-        val lines = heredocInjectionLines(heredocLineList)
+        val lines = heredocInjectionLines(heredocLineableList)
         return injectionRangesForLines(lines, lang)
     }
 
-    override fun elementsToInjectIn() = listOf(SigilHeredoc::class.java, SigilLine::class.java)
+    override fun elementsToInjectIn() = listOf(SigilHeredocLiteral::class.java, SigilLine::class.java)
 
     private fun languageForSigil(sigilName: Char): Language? {
         LOG.debug("languageForSigil: sigilName='$sigilName'")
@@ -137,9 +137,9 @@ internal class ElixirSigilInjector : MultiHostInjector {
         return injectionRangesForLines(lines, lang)
     }
 
-    private fun heredocInjectionLines(heredocLineList: List<HeredocLine>): List<InjectionLine> {
+    private fun heredocInjectionLines(heredocLineableList: List<HeredocLineable>): List<InjectionLine> {
         val lines = mutableListOf<InjectionLine>()
-        for (item in heredocLineList) {
+        for (item in heredocLineableList) {
             if (!item.isValid) {
                 if (LOG.isDebugEnabled) {
                     LOG.debug("handleSigilHeredoc: skipping invalid heredocLine")

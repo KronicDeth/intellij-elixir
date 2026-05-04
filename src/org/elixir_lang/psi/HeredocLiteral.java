@@ -7,8 +7,8 @@ import java.util.List;
 /**
  * Created by luke.imhoff on 1/19/15.
  */
-public interface Heredoc extends Parent, PsiElement, Quotable {
+public interface HeredocLiteral extends Parent, PsiElement, Quotable {
     ElixirHeredocPrefix getHeredocPrefix();
 
-    List<? extends HeredocLine> getHeredocLineList();
+    List<? extends HeredocLineable> getHeredocLineList();
 }

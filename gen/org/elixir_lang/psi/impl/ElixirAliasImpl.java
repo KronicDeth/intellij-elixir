@@ -48,7 +48,7 @@ public class ElixirAliasImpl extends ASTWrapperPsiElement implements ElixirAlias
   }
 
   @Override
-  public @Nullable ItemPresentation getPresentation() {
+  public @NotNull ItemPresentation getPresentation() {
     return ElixirPsiImplUtil.getPresentation(this);
   }
 

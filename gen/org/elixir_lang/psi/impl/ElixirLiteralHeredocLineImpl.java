@@ -52,8 +52,8 @@ public class ElixirLiteralHeredocLineImpl extends ASTWrapperPsiElement implement
   }
 
   @Override
-  public @NotNull OtpErlangObject quote(@NotNull Heredoc heredoc, int prefixLength) {
-    return ElixirPsiImplUtil.quote(this, heredoc, prefixLength);
+  public @NotNull OtpErlangObject quote(@NotNull HeredocLiteral heredocLiteral, int prefixLength) {
+    return ElixirPsiImplUtil.quote(this, heredocLiteral, prefixLength);
   }
 
 }

@@ -2,7 +2,7 @@ package org.elixir_lang.documentation
 
 import com.intellij.psi.PsiElement
 import org.elixir_lang.psi.ElixirLine
-import org.elixir_lang.psi.Heredoc
+import org.elixir_lang.psi.HeredocLiteral
 import kotlin.math.max
 import kotlin.math.min
 
@@ -10,7 +10,7 @@ import kotlin.math.min
  * Extracts the documentation markdown text from a module attribute value element
  * (the quoted content of `@doc`, `@moduledoc`, or `@typedoc`).
  *
- * For [Heredoc] values, strips the heredoc indentation prefix from each line.
+ * For [HeredocLiteral] values, strips the heredoc indentation prefix from each line.
  * For [ElixirLine] values (single-line `@doc "..."`), returns the body text directly.
  *
  * @return the raw markdown text suitable for parsing by a markdown engine, or `null`
@@ -18,7 +18,7 @@ import kotlin.math.min
  */
 fun PsiElement.documentationMarkdownText(): String? =
     when (this) {
-        is Heredoc -> dedentedDocumentationMarkdownText()
+        is HeredocLiteral -> dedentedDocumentationMarkdownText()
         is ElixirLine -> body?.text
         else -> null
     }
@@ -43,7 +43,7 @@ fun PsiElement.documentationMarkdownText(): String? =
  *     code_example()
  * ```
  */
-fun Heredoc.dedentedDocumentationMarkdownText(): String =
+fun HeredocLiteral.dedentedDocumentationMarkdownText(): String =
     dedentDocumentationHeredocLines(heredocPrefix.textLength, heredocLineList.map { it.text })
 
 internal fun dedentDocumentationHeredocLines(prefixLength: Int, lines: List<String>): String =

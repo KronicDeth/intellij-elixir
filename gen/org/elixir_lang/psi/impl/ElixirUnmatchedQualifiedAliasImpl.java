@@ -51,7 +51,7 @@ public class ElixirUnmatchedQualifiedAliasImpl extends ElixirUnmatchedExpression
   }
 
   @Override
-  public @Nullable String fullyQualifiedName() {
+  public @NotNull String fullyQualifiedName() {
     return ElixirPsiImplUtil.fullyQualifiedName(this);
   }
 
@@ -66,7 +66,7 @@ public class ElixirUnmatchedQualifiedAliasImpl extends ElixirUnmatchedExpression
   }
 
   @Override
-  public @Nullable ItemPresentation getPresentation() {
+  public @NotNull ItemPresentation getPresentation() {
     return ElixirPsiImplUtil.getPresentation(this);
   }
 

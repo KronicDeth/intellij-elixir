@@ -11,7 +11,6 @@ import org.elixir_lang.ElixirSyntaxHighlighter.Companion.SIGIL
 import org.elixir_lang.ElixirSyntaxHighlighter.Companion.SIGIL_BY_NAME
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.impl.identifierName
-import org.elixir_lang.psi.operation.*
 import org.elixir_lang.reference.ModuleAttribute.Companion.isDocumentationName
 
 /**
@@ -30,7 +29,11 @@ class Textual : Annotator, DumbAware {
     override fun annotate(element: PsiElement, holder: AnnotationHolder) {
             element.accept(
                     object : ElixirVisitor() {
-                        override fun visitQuote(quote: Quote) {
+                        // Quote visitors - heredoc and line both implement Quote
+                        override fun visitHeredoc(o: ElixirHeredoc) = visitQuote(o)
+                        override fun visitLine(o: ElixirLine) = visitQuote(o)
+
+                        private fun visitQuote(quote: Quote) {
                             if (!isDocumentationText(quote)) {
                                 val textAttributesKey = if (quote.isCharList) {
                                     ElixirSyntaxHighlighter.CHAR_LIST
@@ -42,7 +45,13 @@ class Textual : Annotator, DumbAware {
                             }
                         }
 
-                        override fun visitSigil(sigil: Sigil) {
+                        // Sigil visitors - all four sigil types implement Sigil
+                        override fun visitInterpolatedSigilHeredoc(o: ElixirInterpolatedSigilHeredoc) = visitSigil(o)
+                        override fun visitInterpolatedSigilLine(o: ElixirInterpolatedSigilLine) = visitSigil(o)
+                        override fun visitLiteralSigilHeredoc(o: ElixirLiteralSigilHeredoc) = visitSigil(o)
+                        override fun visitLiteralSigilLine(o: ElixirLiteralSigilLine) = visitSigil(o)
+
+                        private fun visitSigil(sigil: Sigil) {
                             if (!isDocumentationText(sigil)) {
                                 val textAttributesKey = textAttributesKey(sigil.sigilName())
 
@@ -99,13 +108,13 @@ class Textual : Annotator, DumbAware {
 
         private fun highlightChildren(holder: AnnotationHolder, parent: PsiElement, textAttributesKey: TextAttributesKey) =
                 when (parent) {
-                    is Heredoc -> highlightHeredoc(holder, parent, textAttributesKey)
+                    is HeredocLiteral -> highlightHeredoc(holder, parent, textAttributesKey)
                     is Line -> highlightBodied(holder, parent, textAttributesKey)
                     else -> Unit
                 }
 
-        private fun highlightHeredoc(holder: AnnotationHolder, heredoc: Heredoc, textAttributesKey: TextAttributesKey) {
-            heredoc.heredocLineList.forEach { heredocLine ->
+        private fun highlightHeredoc(holder: AnnotationHolder, heredocLiteral: HeredocLiteral, textAttributesKey: TextAttributesKey) {
+            heredocLiteral.heredocLineList.forEach { heredocLine ->
                 highlightBodied(holder, heredocLine, textAttributesKey)
             }
         }

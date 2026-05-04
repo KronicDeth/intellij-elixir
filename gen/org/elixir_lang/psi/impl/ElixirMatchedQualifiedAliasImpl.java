@@ -51,13 +51,13 @@ public class ElixirMatchedQualifiedAliasImpl extends ElixirMatchedExpressionImpl
   }
 
   @Override
-  public @Nullable String fullyQualifiedName() {
+  public @NotNull String fullyQualifiedName() {
     return ElixirPsiImplUtil.fullyQualifiedName(this);
   }
 
   @Override
   public @NotNull String getName() {
-    return ElixirPsiImplUtil.getName((QualifiedAlias) this);
+    return ElixirPsiImplUtil.getName(this);
   }
 
   @Override
@@ -66,7 +66,7 @@ public class ElixirMatchedQualifiedAliasImpl extends ElixirMatchedExpressionImpl
   }
 
   @Override
-  public @Nullable ItemPresentation getPresentation() {
+  public @NotNull ItemPresentation getPresentation() {
     return ElixirPsiImplUtil.getPresentation(this);
   }
 

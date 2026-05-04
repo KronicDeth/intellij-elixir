@@ -38,7 +38,7 @@ abstract class Variable : PsiScopeProcessor {
      */
     override fun execute(element: PsiElement, state: ResolveState): Boolean =
             when (element) {
-                is Addition, is And -> executeNonDeclaringScopeInfix(element as Infix, state)
+                is Addition, is And -> executeNonDeclaringScopeInfix(element, state)
                 is ElixirAccessExpression, is ElixirAssociations, is ElixirAssociationsBase, is ElixirBitString,
                 is ElixirEexTag, is ElixirList, is ElixirMapConstructionArguments, is ElixirMultipleAliases,
                 is ElixirNoParenthesesArguments, is ElixirNoParenthesesOneArgument, is ElixirParenthesesArguments,
@@ -58,7 +58,7 @@ abstract class Variable : PsiScopeProcessor {
                 // MUST be before Call as InMatch is a Call
                 is InMatch -> execute(element, state)
                 is Match -> execute(element, state)
-                is Pipe, is Ternary, is Two -> execute(element as Infix, state)
+                is Pipe, is Ternary, is Two -> execute(element, state)
                 is Type -> execute(element, state)
                 is UnaryOperation -> execute(element, state)
                 is UnqualifiedNoArgumentsCall<*> -> executeOnMaybeVariable(element, state)
@@ -76,7 +76,7 @@ abstract class Variable : PsiScopeProcessor {
                 else -> {
                     if (!(element is AtOperation ||  // a module attribute reference
                                     element is AtUnqualifiedBracketOperation ||  // a module attribute reference with access
-                                    element is Heredoc ||
+                                    element is HeredocLiteral ||
                                     element is BracketOperation ||  /* an anonymous function is a new scope, so it can't be used to declare a variable.  This won't ever
                            be hit if the element is declared in the {@code fn} signature because that upward resolution
                            from resolveVariable stops before this level */
@@ -96,8 +96,6 @@ abstract class Variable : PsiScopeProcessor {
                                     element is PsiErrorElement ||
                                     element is PsiWhiteSpace ||
                                     element is QualifiableAlias ||
-                                    element is QualifiedBracketOperation ||
-                                    element is UnqualifiedBracketOperation ||
                                     element is WholeNumber ||
                                 element.node?.elementType == GeneratedParserUtilBase.DUMMY_BLOCK)) {
                         Logger.error(Callable::class.java, "Don't know how to resolve variable in match", element)
