@@ -203,6 +203,9 @@ sourceSets {
 
 idea {
     module {
+        // Mark gen/ as generated sources so IntelliJ suppresses inspections (e.g. unused imports)
+        // on Grammar-Kit-generated PSI classes.
+        generatedSourceDirs.add(file("gen"))
         testSources.from(sourceSets["testUI"].kotlin.srcDirs)
         testResources.from(sourceSets["testUI"].resources.srcDirs)
     }
