@@ -26,6 +26,7 @@ import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 import org.jetbrains.intellij.platform.gradle.models.ProductRelease
 import org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask
+import org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
@@ -254,6 +255,13 @@ intellijPlatform {
     }
 
     pluginVerification {
+        verificationReportsFormats.set(
+            listOf(
+                VerifyPluginTask.VerificationReportsFormats.MARKDOWN,
+                VerifyPluginTask.VerificationReportsFormats.HTML,
+                VerifyPluginTask.VerificationReportsFormats.PLAIN
+            )
+        )
         ides {
             select {
                 types = providers.gradleProperty("pluginVerifierIdeTypes")

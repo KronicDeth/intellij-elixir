@@ -120,7 +120,8 @@ jobs:
 
       - name: Verify Plugin
         id: verify-plugin
-        uses: ChrisCarini/intellij-platform-plugin-verifier-action@latest
+        # Fork to be replaced when/if https://github.com/ChrisCarini/intellij-platform-plugin-verifier-action/pull/102 merges
+        uses: sh41/intellij-platform-plugin-verifier-action@add_format_options
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -129,7 +130,18 @@ jobs:
             ideaIU:261.23567.138
             rubymine:2025.3.2
             rubymine:2026.1
+          failure-levels: |
+            COMPATIBILITY_PROBLEMS
+            INVALID_PLUGIN
+          # Should probably have these two as well, but until there is a resolution for https://youtrack.jetbrains.com/issue/IJPL-243914
+          # These will keep failing the build
+          # OVERRIDE_ONLY_API_USAGES
+          # NON_EXTENDABLE_API_USAGES
+          # We can't use this because RubyMine will fail. The verifier doesn't understand "optional"
+          # MISSING_DEPENDENCIES
           external-prefixes: 'org.jetbrains.jps'
+          verification-reports-formats: 'plain,markdown,html'
+          add-to-summary: 'verification-verdict.txt,compatibility-problems.txt,invalid-plugin.txt,dependencies.txt,override-only-usages.txt,non-extendable-api-usages.txt,markdown'
 
       - name: Print Verification Output
         id: print-verification-output
@@ -146,4 +158,5 @@ jobs:
           name: verify-plugin-reports
           path: |
             ${{ steps.verify-plugin.outputs.verification-output-log-filename }}
+            ${{ steps.verify-plugin.outputs.verification-reports-dir }}
           retention-days: 30
