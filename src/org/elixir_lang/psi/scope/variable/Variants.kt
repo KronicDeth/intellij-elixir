@@ -1,17 +1,14 @@
 package org.elixir_lang.psi.scope.variable
 
-import com.intellij.psi.PsiElement
 import com.intellij.codeInsight.lookup.LookupElement
+import com.intellij.codeInsight.lookup.LookupElementBuilder
+import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiNamedElement
 import com.intellij.psi.ResolveState
-import com.intellij.psi.PsiReference
-import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.psi.util.PsiTreeUtil
-import gnu.trove.THashMap
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil
 import org.elixir_lang.psi.putInitialVisitedElement
 import org.elixir_lang.psi.scope.Variable
-import java.util.ArrayList
 
 class Variants : Variable() {
     private var lookupElementByElement = mutableMapOf<PsiElement, LookupElement>()

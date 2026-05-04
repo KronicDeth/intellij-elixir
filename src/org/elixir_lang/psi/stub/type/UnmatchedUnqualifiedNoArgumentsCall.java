@@ -9,7 +9,6 @@ import org.elixir_lang.psi.QuoteMacro;
 import org.elixir_lang.psi.Variable;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.impl.ElixirUnmatchedUnqualifiedNoArgumentsCallImpl;
-import org.elixir_lang.psi.operation.Match;
 import org.elixir_lang.psi.stub.call.Deserialized;
 import org.elixir_lang.psi.stub.type.call.Stub;
 import org.jetbrains.annotations.NotNull;
@@ -18,7 +17,6 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 
 import static org.elixir_lang.psi.CallDefinitionClause.enclosingModularMacroCall;
-import static org.elixir_lang.psi.DefinitionKt.definition;
 
 public class UnmatchedUnqualifiedNoArgumentsCall extends Stub<org.elixir_lang.psi.stub.UnmatchedUnqualifiedNoArgumentsCall, ElixirUnmatchedUnqualifiedNoArgumentsCall> {
     /*

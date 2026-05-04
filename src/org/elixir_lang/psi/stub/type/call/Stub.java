@@ -1,17 +1,11 @@
 package org.elixir_lang.psi.stub.type.call;
 
 import com.intellij.lang.ASTNode;
-import com.intellij.psi.ResolveState;
 import com.intellij.psi.stubs.StubOutputStream;
 import org.elixir_lang.module.PutAttribute;
 import org.elixir_lang.module.RegisterAttribute;
-import org.elixir_lang.psi.CallDefinitionClause;
-import org.elixir_lang.psi.Implementation;
+import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.Module;
-import org.elixir_lang.psi.ModuleAttribute;
-import org.elixir_lang.psi.Protocol;
-import org.elixir_lang.psi.QuoteMacro;
-import org.elixir_lang.psi.Variable;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.call.StubBased;
 import org.elixir_lang.psi.stub.call.Deserialized;

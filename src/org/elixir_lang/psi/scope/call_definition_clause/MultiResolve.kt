@@ -1,11 +1,8 @@
 package org.elixir_lang.psi.scope.call_definition_clause
 
 import com.intellij.psi.PsiElement
-import com.intellij.psi.ResolveResult
 import com.intellij.psi.ResolveState
 import com.intellij.psi.util.PsiTreeUtil
-import org.elixir_lang.EEx.FUNCTION_FROM_FILE_ARITY_RANGE
-import org.elixir_lang.EEx.FUNCTION_FROM_STRING_ARITY_RANGE
 import org.elixir_lang.NameArityInterval
 import org.elixir_lang.beam.psi.impl.CallDefinitionImpl
 import org.elixir_lang.errorreport.Logger
@@ -13,9 +10,7 @@ import org.elixir_lang.psi.*
 import org.elixir_lang.psi.CallDefinitionClause.nameArityInterval
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.Named
-
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
-import org.elixir_lang.psi.impl.ProcessDeclarationsImpl
 import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.call.keywordArgument
 import org.elixir_lang.psi.impl.maybeModularNameToModulars

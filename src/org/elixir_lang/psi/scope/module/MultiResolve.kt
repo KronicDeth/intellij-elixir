@@ -1,28 +1,25 @@
 package org.elixir_lang.psi.scope.module
 
 import com.intellij.openapi.project.DumbService
-import com.intellij.psi.*
+import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiNamedElement
+import com.intellij.psi.ResolveState
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
 import com.intellij.psi.util.PsiTreeUtil
 import org.elixir_lang.Module.concat
 import org.elixir_lang.Module.split
-import org.elixir_lang.psi.NamedElement
-import org.elixir_lang.psi.QualifiableAlias
+import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Named
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
 import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.stripAccessExpression
-import org.elixir_lang.psi.putInitialVisitedElement
-import org.elixir_lang.psi.putVisitedElement
 import org.elixir_lang.psi.scope.Module
 import org.elixir_lang.psi.scope.ResolveResultOrderedSet
 import org.elixir_lang.psi.scope.VisitedElementSetResolveResult
 import org.elixir_lang.psi.scope.maxScope
 import org.elixir_lang.psi.stub.index.ModularName
-import org.elixir_lang.psi.visitedElementSet
 import org.elixir_lang.reference.module.UnaliasedName
-import java.util.*
 
 class MultiResolve internal constructor(private val name: String, private val incompleteCode: Boolean) : Module() {
     /**

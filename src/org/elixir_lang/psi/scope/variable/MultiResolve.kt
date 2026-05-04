@@ -2,7 +2,10 @@ package org.elixir_lang.psi.scope.variable
 
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.util.Key
-import com.intellij.psi.*
+import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiNamedElement
+import com.intellij.psi.ResolveResult
+import com.intellij.psi.ResolveState
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
 import com.intellij.psi.util.PsiTreeUtil
@@ -20,7 +23,6 @@ import org.elixir_lang.psi.scope.VisitedElementSetResolveResult
 import org.elixir_lang.psi.stub.index.QuoteVariableName
 import org.elixir_lang.reference.Callable
 import org.jetbrains.annotations.Contract
-import java.util.*
 
 class MultiResolve(private val name: String, private val incompleteCode: Boolean) : Variable() {
     private val resolveResultList = mutableListOf<VisitedElementSetResolveResult>()

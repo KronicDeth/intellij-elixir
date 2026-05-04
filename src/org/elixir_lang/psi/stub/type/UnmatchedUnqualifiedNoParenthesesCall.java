@@ -11,7 +11,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.util.Collection;
 
 public class UnmatchedUnqualifiedNoParenthesesCall extends Stub<org.elixir_lang.psi.stub.UnmatchedUnqualifiedNoParenthesesCall, ElixirUnmatchedUnqualifiedNoParenthesesCall> {
     /*
