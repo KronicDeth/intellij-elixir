@@ -287,6 +287,46 @@ intellijPlatform {
     }
 }
 
+// Capture values eagerly so the task action doesn't reference Project objects (config cache safe)
+val verifierReportsDir: File = layout.buildDirectory.dir("reports/pluginVerifier").get().asFile
+val projectDirFile: File = projectDir
+
+val openVerificationReports by tasks.registering {
+    description = "Opens plugin verification markdown reports in the IDE"
+    group = "verification"
+
+    // Always run when triggered (no up-to-date checking)
+    outputs.upToDateWhen { false }
+
+    doLast {
+        val mdFiles = verifierReportsDir.listFiles()
+            ?.filter { it.isDirectory }
+            ?.mapNotNull { dir -> dir.resolve("report.md").takeIf { it.exists() } }
+            ?: emptyList()
+
+        val htmlFiles = verifierReportsDir.listFiles()
+            ?.filter { it.isDirectory }
+            ?.mapNotNull { dir -> dir.resolve("report.html").takeIf { it.exists() } }
+            ?: emptyList()
+
+        if (mdFiles.isNotEmpty() || htmlFiles.isNotEmpty()) {
+            logger.lifecycle("")
+            logger.lifecycle("=== Plugin Verification Reports ===")
+            mdFiles.forEach { md ->
+                logger.lifecycle("  ${md.toRelativeString(projectDirFile)}")
+            }
+            htmlFiles.forEach { html ->
+                logger.lifecycle("  file:///${html.absolutePath.replace("\\", "/")}")
+            }
+            logger.lifecycle("")
+        }
+    }
+}
+
+tasks.named("verifyPlugin") {
+    finalizedBy(openVerificationReports)
+}
+
 intellijPlatformTesting.runIde.configureEach {
     plugins {
         // Run-IDE sandbox only: Kubernetes plugin consistently fails on startup.
