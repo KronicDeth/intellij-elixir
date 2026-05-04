@@ -8,12 +8,11 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static org.elixir_lang.psi.ElixirTypes.*;
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.psi.*;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.psi.PsiReference;
 
-public class ElixirAtomImpl extends ASTWrapperPsiElement implements ElixirAtom {
+public class ElixirAtomImpl extends ElixirAtomMixin implements ElixirAtom {
 
   public ElixirAtomImpl(@NotNull ASTNode node) {
     super(node);
