@@ -11,7 +11,6 @@ import com.intellij.openapi.util.TextRange
 import com.intellij.psi.*
 import com.intellij.psi.impl.source.tree.LeafPsiElement
 import com.intellij.psi.util.PsiTreeUtil
-import com.intellij.psi.DummyBlockType.DummyBlock as ExperimentalPsiDummyBlock
 import org.elixir_lang.beam.chunk.beam_documentation.docs.documented.Hidden
 import org.elixir_lang.beam.chunk.beam_documentation.docs.documented.MarkdownByLanguage
 import org.elixir_lang.beam.chunk.beam_documentation.docs.documented.None
@@ -33,6 +32,7 @@ import org.intellij.markdown.html.HtmlGenerator
 import org.intellij.markdown.parser.MarkdownParser
 import java.util.function.Consumer
 import java.util.regex.Pattern
+import com.intellij.psi.DummyBlockType.DummyBlock as ExperimentalPsiDummyBlock
 
 
 class ElixirDocumentationProvider : DocumentationProvider {
@@ -63,6 +63,8 @@ class ElixirDocumentationProvider : DocumentationProvider {
     }
 
     private tailrec fun collectDocComments(element: PsiElement, sink: Consumer<in PsiDocCommentBase>) {
+        // ExperimentalPsiDummyBlock unstable, but used in 2026.1 so we need to handle it.
+        @Suppress("UnstableApiUsage")
         when (element) {
             is Call -> collectDocComments(element, sink)
             is ElixirAccessExpression -> collectDocComments(element.stripAccessExpression(), sink)
@@ -77,9 +79,9 @@ class ElixirDocumentationProvider : DocumentationProvider {
                 // Aliases
             is QualifiableAlias,
             is PsiErrorElement,
-            // Errors seen in 2026.1 with this type, so ignoring.
+                // Errors seen in 2026.1 with this type, so ignoring.
             is ExperimentalPsiDummyBlock
-            -> Unit
+                -> Unit
 
             else -> {
                 Logger.error(javaClass, "Don't know how to collect doc comments", element)
@@ -172,10 +174,7 @@ class ElixirDocumentationProvider : DocumentationProvider {
                     }
 
                     resolveResults
-                        .let { Resolver.preferred(context, false, it) }
-                        .map { it.element }
-                        .let { Resolver.preferSource(it) }
-                        .firstOrNull()
+                        .let { Resolver.preferred(context, false, it) }.firstNotNullOfOrNull { it.element }
                 }
 
                 "c" -> {
@@ -219,10 +218,7 @@ class ElixirDocumentationProvider : DocumentationProvider {
                                 ?.let(Callback.Companion::`is`)
                                 ?: false
                         }
-                        .let { Resolver.preferred(context, false, it) }
-                        .map { it.element }
-                        .let { Resolver.preferSource(it) }
-                        .firstOrNull()
+                        .let { Resolver.preferred(context, false, it) }.firstNotNullOfOrNull { it.element }
                 }
 
                 "t" -> {
@@ -247,7 +243,6 @@ class ElixirDocumentationProvider : DocumentationProvider {
                     resolveResults
                         .let { Resolver.preferred(context, false, it) }
                         .mapNotNull { it.element }
-                        .let { Resolver.preferSource(it) }
                         .firstOrNull()
                 }
 
@@ -265,8 +260,7 @@ class ElixirDocumentationProvider : DocumentationProvider {
 
             modulars
                 .toList()
-                .let { Resolver.preferUnderSameModule(context, it) }
-                .let { Resolver.preferSource(it) }
+                .let { Resolver.preferredElements(context, it) }
                 .firstOrNull()
         }
     }
@@ -324,6 +318,7 @@ class ElixirDocumentationProvider : DocumentationProvider {
                                     is CallDefinitionImpl<*> -> element.exportedName() == callName
                                     is Call -> CallDefinitionClause.nameArityInterval(element, ResolveState.initial())
                                         ?.name == callName
+
                                     else -> false
                                 }
                             }
@@ -504,7 +499,7 @@ class ElixirDocumentationProvider : DocumentationProvider {
     }
 
     private fun fetchDocs(element: PsiElement): FetchedDocs? =
-        // For compiled Beam elements, prefer docs from the decompiled source mirror so hover uses
+    // For compiled Beam elements, prefer docs from the decompiled source mirror so hover uses
         // the cached inline docs from decompilation.
         if (element.containingFile?.originalFile is BeamFileImpl) {
             val sourceElement = (element as? PsiCompiledElement)?.mirror ?: element.navigationElement

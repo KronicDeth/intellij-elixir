@@ -1,6 +1,6 @@
 package org.elixir_lang.reference
 
-import com.intellij.openapi.module.Module
+import com.intellij.openapi.module.Module as IdeModule
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.module.ModuleUtil
 import com.intellij.openapi.roots.ModuleRootManager
@@ -18,9 +18,19 @@ object Resolver {
         resolveResultList: List<T>
     ): List<T> {
         val validResolveResultList = preferIsValidResult(incompleteCode, resolveResultList)
-        val sameModuleResolveResultList = preferElementUnderSameModule(element, validResolveResultList)
+        val sourcePreferredList = preferSourceElement(validResolveResultList)
+        val sameModuleResolveResultList = preferElementUnderSameModule(element, sourcePreferredList)
 
         return sameModuleResolveResultList
+    }
+
+    /**
+     * Applies the same source-over-decompiled and same-module preference logic as [preferred],
+     * but operates on a raw list of [PsiElement]s rather than [ResolveResult]s.
+     */
+    fun <T : PsiElement> preferredElements(elementInModule: PsiElement, elementList: List<T>): List<T> {
+        val sourcePreferredList = preferSource(elementList)
+        return preferUnderSameModule(elementInModule, sourcePreferredList)
     }
 
     private fun <T : ResolveResult> preferIsValidResult(
@@ -50,7 +60,7 @@ object Resolver {
             .takeIf(List<T>::isNotEmpty)
             ?: list
 
-    fun <T : ResolveResult> preferSourceElement(resolveResultList: List<T>): List<T> =
+    private fun <T : ResolveResult> preferSourceElement(resolveResultList: List<T>): List<T> =
         preferSource(resolveResultList, ResolveResult::getElement)
 
     fun <T : PsiElement> preferSource(elementList: List<T>): List<T> =
@@ -78,7 +88,7 @@ object Resolver {
     }
 
     // `ModuleUtil.findModuleForPsiElement` returns `null` for library source, so need to find module a different way if a library
-    private fun moduleForSourceOrLibrary(element: PsiElement): com.intellij.openapi.module.Module? =
+    private fun moduleForSourceOrLibrary(element: PsiElement): IdeModule? =
         ModuleUtil.findModuleForPsiElement(element) ?: element
             .containingFile
             .virtualFile
@@ -90,7 +100,7 @@ object Resolver {
     private fun moduleForSourceOrLibrary(
         element: PsiElement,
         virtualFile: VirtualFile
-    ): com.intellij.openapi.module.Module? =
+    ): IdeModule? =
         ModuleManager
             .getInstance(element.project)
             .modules
@@ -101,7 +111,7 @@ object Resolver {
             .minByOrNull { (_, depth) -> depth }
             ?.first
 
-    private fun moduleDepth(virtualFile: VirtualFile, module: Module): Pair<com.intellij.openapi.module.Module, Int>? {
+    private fun moduleDepth(virtualFile: VirtualFile, module: IdeModule): Pair<IdeModule, Int>? {
         val contentRootSet = ModuleRootManager.getInstance(module).contentRoots.toSet()
 
         return depth(virtualFile, contentRootSet)
@@ -130,7 +140,7 @@ object Resolver {
         }
 
     private fun <T, U : PsiElement> filterUnderModule(
-        module: com.intellij.openapi.module.Module,
+        module: IdeModule,
         list: List<T>,
         listElementToPsiElement: (listElement: T) -> U?
     ): List<T> = if (list.isNotEmpty()) {

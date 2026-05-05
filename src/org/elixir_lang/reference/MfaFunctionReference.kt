@@ -38,7 +38,6 @@ class MfaFunctionReference(
 
     override fun resolve(): PsiElement? =
         ReferenceResolver.preferred(myElement, false, multiResolve(false).toList())
-            .let { ReferenceResolver.preferSourceElement(it) }
             .firstOrNull()
             ?.element
 
