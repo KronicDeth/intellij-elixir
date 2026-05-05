@@ -85,7 +85,7 @@ val skipSearchableOptions: Boolean = project.property("skipSearchableOptions").t
 
 val actualPlatformVersion: String = if (useDynamicEapVersion) {
     // Calling the helper from buildSrc
-    VersionFetcher.getLatestEapBuild(platformType = providers.gradleProperty("platformType").get() ?: "IU")
+    VersionFetcher.getLatestEapBuild(platformType = providers.gradleProperty("platformType").getOrElse("IU"))
 } else {
     project.property("platformVersion").toString()
 }
@@ -333,6 +333,19 @@ intellijPlatformTesting.runIde.configureEach {
         disablePlugin("com.intellij.kubernetes")
         // Run-IDE sandbox only: Sass plugin logs missing color scheme resources.
         disablePlugin("org.jetbrains.plugins.sass")
+    }
+
+    // On Windows, the sandboxed IDEA process holds OS-level file locks on its native binaries
+    // (fsnotifier.exe, DLLs, etc.). If a concurrent Gradle task triggers a transforms-cache
+    // refresh for the same IDEA distribution, Gradle cannot delete the locked files and fails.
+    //
+    // Setting localPath makes the task run IDEA from your locally installed copy rather than
+    // the extracted Gradle transforms cache, so there is no lock conflict.
+    //
+    // Set in ~/.gradle/gradle.properties (not committed):
+    //   runIdeLocalPath=C:\\Program Files\\JetBrains\\IntelliJ IDEA 2026.1.1
+    if (getName() == "runIde") {
+        localPath.set(layout.dir(providers.gradleProperty("runIdeLocalPath").map { project.file(it) }))
     }
 }
 
