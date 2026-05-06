@@ -184,7 +184,7 @@ jobs:
           # MISSING_DEPENDENCIES
           external-prefixes: 'org.jetbrains.jps'
           verification-reports-formats: 'plain,markdown,html'
-          add-to-summary: 'verification-verdict.txt,compatibility-problems.txt,invalid-plugin.txt,dependencies.txt,override-only-usages.txt,non-extendable-api-usages.txt,markdown'
+          add-to-summary: 'verification-verdict.txt,compatibility-problems.txt,invalid-plugin.txt'
 
       - name: Print Verification Output
         id: print-verification-output
