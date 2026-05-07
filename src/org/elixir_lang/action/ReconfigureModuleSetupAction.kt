@@ -103,7 +103,7 @@ class ReconfigureModuleSetupAction : AnAction() {
                     }
                 }
 
-                if (hasRootMixExs && projectSdk != null) {
+                if (hasRootMixExs && projectSdk != null && projectSdk.sdkType is ElixirSdkType) {
                     if (fixModuleSdk(model, projectSdk)) {
                         sdksFixed++
                         moduleChanged = true
