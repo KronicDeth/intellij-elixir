@@ -5,7 +5,8 @@ import com.intellij.ide.DataManager
 import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.*
-import com.intellij.openapi.application.ReadAction
+import com.intellij.openapi.application.UI
+import com.intellij.openapi.application.readAction
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.module.ModuleManager
@@ -26,7 +27,6 @@ import com.intellij.ui.ClickListener
 import com.intellij.ui.awt.RelativePoint
 import com.intellij.util.messages.MessageBusConnection
 import com.intellij.util.ui.JBUI
-import com.intellij.openapi.application.UI
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.cancel
@@ -37,14 +37,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.elixir_lang.Icons
 import org.elixir_lang.isElixirModule
-import org.elixir_lang.sdk.SdkHomeKey
-import org.elixir_lang.sdk.SdkHomePaths
 import org.elixir_lang.mix.project.ProjectModuleSetupValidator
 import org.elixir_lang.mix.project.ProjectModuleSetupValidator.FolderMarkIssue
 import org.elixir_lang.sdk.SdkEbinPaths
 import org.elixir_lang.sdk.elixir.SdkSettingsOpener
 import org.elixir_lang.sdk.elixir.Type
-import org.elixir_lang.sdk.elixir.Type.Companion.SKIP_ERLANG_SETTINGS_HINT_KEY
 import org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData
 import org.elixir_lang.util.ElixirCoroutineService
 import org.jetbrains.annotations.NotNull
@@ -73,9 +70,7 @@ class ElixirSdkStatusWidget(@param:NotNull private val project: Project) : Custo
     private val rootsChangedFlow = MutableSharedFlow<Unit>(
         extraBufferCapacity = 1,
         onBufferOverflow = BufferOverflow.DROP_OLDEST,
-    )
-
-    // Track last notified status to avoid spamming duplicate notifications
+    )    // Track last notified status to avoid spamming duplicate notifications
     @Volatile
     private var lastNotifiedIssueKey: String? = null
 
@@ -100,9 +95,6 @@ class ElixirSdkStatusWidget(@param:NotNull private val project: Project) : Custo
     // Cached widget presentation data - computed once per update
     @Volatile
     private var cachedPresentation: WidgetPresentation? = null
-
-    @Volatile
-    private var cachedSdkConfigured: Boolean = true
 
     private data class WidgetPresentation(
         val text: String,
@@ -148,6 +140,9 @@ class ElixirSdkStatusWidget(@param:NotNull private val project: Project) : Custo
     private data class ModuleSdkIssue(val moduleName: String, val issue: String, val isDangling: Boolean)
 
     init {
+        // Kick off the first presentation computation asynchronously.
+        // updateWidget() only schedules a coroutine and returns immediately, so it is safe
+        // to call from the EDT (the widget constructor runs on the EDT during widget creation).
         updateWidget()
     }
 
@@ -158,6 +153,7 @@ class ElixirSdkStatusWidget(@param:NotNull private val project: Project) : Custo
     override fun install(statusBar: StatusBar) {
         this.statusBar = statusBar
         setupListeners()
+        // Refresh immediately now that statusBar is wired up.  Safe to call from EDT - async.
         updateWidget()
     }
 
@@ -174,16 +170,6 @@ class ElixirSdkStatusWidget(@param:NotNull private val project: Project) : Custo
     private fun showPopup(e: MouseEvent) {
         val actionGroup = DefaultActionGroup().apply {
             add(createAddSdkAction())
-
-            // When no SDK is configured, show detected mise Elixir SDKs for quick setup
-            if (!cachedSdkConfigured) {
-                val detectedActions = createDetectedSdkActions()
-                if (detectedActions.isNotEmpty()) {
-                    add(Separator.create("Detected Elixir SDKs"))
-                    detectedActions.forEach { add(it) }
-                }
-            }
-
             val actionManager = ActionManager.getInstance()
             actionManager.getAction("Elixir.RefreshAllElixirSdks")?.let { add(it) }
             actionManager.getAction("Elixir.InstallMixDependencies")?.let { add(it) }
@@ -235,68 +221,19 @@ class ElixirSdkStatusWidget(@param:NotNull private val project: Project) : Custo
         }
     }
 
-    private fun createDetectedSdkActions(): List<AnAction> {
-        val miseHomes = mutableMapOf<SdkHomeKey, String>()
-        SdkHomePaths.mergeMise(miseHomes, "elixir")
-
-        val elixirSdkType = Type.instance
-        return miseHomes.entries
-            .filter { (_, path) -> elixirSdkType.isValidSdkHome(path) }
-            .map { (_, homePath) ->
-                val sdkName = Type.suggestSdkNameForHome(homePath, null)
-                object : AnAction(sdkName, "Add $sdkName and set as project SDK", Icons.LANGUAGE) {
-                    override fun actionPerformed(e: AnActionEvent) {
-                        addDetectedElixirSdk(homePath)
-                    }
-
-                    override fun getActionUpdateThread(): ActionUpdateThread = ActionUpdateThread.BGT
-                }
-            }
-    }
-
-    private fun addDetectedElixirSdk(homePath: String) {
-        val elixirSdkType = Type.instance
-        val canonicalHome = org.elixir_lang.sdk.wsl.wslCompat.canonicalizePath(homePath)
-        val versionString = Type.versionStringForHome(canonicalHome, null) ?: return
-        val sdkName = Type.suggestSdkNameForHome(canonicalHome, null)
-
-        val newSdk = com.intellij.openapi.projectRoots.impl.ProjectJdkImpl(
-            sdkName, elixirSdkType, canonicalHome, versionString
-        )
-
-        val app = com.intellij.openapi.application.ApplicationManager.getApplication()
-        app.invokeLater {
-            app.runWriteAction {
-                ProjectJdkTable.getInstance().addJdk(newSdk)
-            }
-            // setupSdkPaths triggers the Erlang SDK prompt if needed.
-            // Skip the "reopen settings" hint since we're not in the settings dialog.
-            newSdk.putUserData(SKIP_ERLANG_SETTINGS_HINT_KEY, true)
-            elixirSdkType.setupSdkPaths(newSdk)
-
-            // Set as project SDK
-            app.runWriteAction {
-                ProjectRootManager.getInstance(project).projectSdk = newSdk
-            }
-        }
-    }
-
     private fun updateWidget() {
         widgetScope.launch {
-            cachedPresentation = null
-            val sdkStatus = detectSdkStatus()
-            cachedSdkConfigured = sdkStatus !is SdkStatus.NotConfigured
+            val sdkStatus = readAction { detectSdkStatus() }
             val presentation = createPresentation(sdkStatus)
-            cachedPresentation = presentation
-
             withContext(Dispatchers.UI) {
+                cachedPresentation = presentation
                 component.text = presentation.text
                 component.icon = presentation.icon
                 component.toolTipText = presentation.tooltip
                 statusBar?.updateWidget(ID)
+                // Fire notification whenever a discrepancy is detected
+                notifyIfNeeded(sdkStatus)
             }
-
-            notifyIfNeeded(sdkStatus)
         }
     }
 
@@ -543,7 +480,8 @@ class ElixirSdkStatusWidget(@param:NotNull private val project: Project) : Custo
     private fun setupListeners() {
         messageBusConnection = project.messageBus.connect(this)
 
-        // Listen for project JDK table changes (SDK added/removed/modified)
+        // Listen for project JDK table changes (SDK added/removed/modified).
+        // These events are infrequent; call updateWidget() directly (it just launches a coroutine).
         messageBusConnection?.subscribe(ProjectJdkTable.JDK_TABLE_TOPIC, object : ProjectJdkTable.Listener {
             override fun jdkAdded(jdk: Sdk) {
                 if (jdk.sdkType is Type) {
@@ -564,7 +502,7 @@ class ElixirSdkStatusWidget(@param:NotNull private val project: Project) : Custo
             }
         })
 
-        // Listen for project root changes (project SDK changes)
+        // Listen for project root changes (project SDK changes).
         // Debounced: bulk operations (import wizard, DepsWatcher) fire rootsChanged() rapidly;
         // collapse them into a single update after a 2-second quiet window.
         messageBusConnection?.subscribe(
@@ -590,49 +528,47 @@ class ElixirSdkStatusWidget(@param:NotNull private val project: Project) : Custo
     }
 
     private fun detectSdkStatus(): SdkStatus {
-        return ReadAction.nonBlocking<SdkStatus> {
-            val elixirSdk = Type.mostSpecificSdk(project) ?: return@nonBlocking SdkStatus.NotConfigured
-            val versionString = elixirSdk.versionString ?: "Unknown"
+        val elixirSdk = Type.mostSpecificSdk(project) ?: return SdkStatus.NotConfigured
+        val versionString = elixirSdk.versionString ?: "Unknown"
 
-            // Add WSL distribution suffix if this is a WSL SDK
-            val elixirVersion = org.elixir_lang.sdk.Type.appendWslSuffix(versionString, elixirSdk.homePath)
+        // Add WSL distribution suffix if this is a WSL SDK
+        val elixirVersion = org.elixir_lang.sdk.Type.appendWslSuffix(versionString, elixirSdk.homePath)
 
-            if (!isValidSdk(elixirSdk)) {
-                return@nonBlocking SdkStatus.InvalidSdk(elixirSdk, elixirVersion, "Invalid Elixir SDK")
-            }
+        if (!isValidSdk(elixirSdk)) {
+            return SdkStatus.InvalidSdk(elixirSdk, elixirVersion, "Invalid Elixir SDK")
+        }
 
-            val erlangSdk = getErlangSdk(elixirSdk)
-                ?: return@nonBlocking SdkStatus.InvalidSdk(elixirSdk, elixirVersion, "Missing Erlang SDK")
+        val erlangSdk = getErlangSdk(elixirSdk)
+            ?: return SdkStatus.InvalidSdk(elixirSdk, elixirVersion, "Missing Erlang SDK")
 
-            // Check module-level SDK consistency (dangling references or mismatches)
-            val moduleSdkIssues = detectModuleSdkIssues()
-            if (moduleSdkIssues.isNotEmpty()) {
-                return@nonBlocking SdkStatus.ModuleSdkError(elixirSdk, elixirVersion, moduleSdkIssues)
-            }
+        // Check module-level SDK consistency (dangling references or mismatches)
+        val moduleSdkIssues = detectModuleSdkIssues()
+        if (moduleSdkIssues.isNotEmpty()) {
+            return SdkStatus.ModuleSdkError(elixirSdk, elixirVersion, moduleSdkIssues)
+        }
 
-            // Check classpath/ebin configuration (breaks code resolution globally)
-            val issues = mutableListOf<String>()
-            if (hasEbinPathIssues(elixirSdk)) {
-                issues.add("Missing Elixir ebin paths or classpath entries")
-            }
-            if (hasErlangSdkIssues(erlangSdk)) {
-                issues.add("Erlang SDK configuration issues")
-            }
-            if (!Type.hasErlangClasspathInElixirSdk(elixirSdk, erlangSdk)) {
-                issues.add("Erlang SDK classpath entries missing - reopen SDK settings to fix")
-            }
-            if (issues.isNotEmpty()) {
-                return@nonBlocking SdkStatus.ClasspathIssue(elixirSdk, erlangSdk, elixirVersion, issues)
-            }
+        // Check classpath/ebin configuration (breaks code resolution globally)
+        val issues = mutableListOf<String>()
+        if (hasEbinPathIssues(elixirSdk)) {
+            issues.add("Missing Elixir ebin paths or classpath entries")
+        }
+        if (hasErlangSdkIssues(erlangSdk)) {
+            issues.add("Erlang SDK configuration issues")
+        }
+        if (!Type.hasErlangClasspathInElixirSdk(elixirSdk, erlangSdk)) {
+            issues.add("Erlang SDK classpath entries missing - reopen SDK settings to fix")
+        }
+        if (issues.isNotEmpty()) {
+            return SdkStatus.ClasspathIssue(elixirSdk, erlangSdk, elixirVersion, issues)
+        }
 
-            // Check folder mark configuration (breaks specific per-directory features)
-            val folderMarkIssues = ProjectModuleSetupValidator.detectFolderMarkIssues(project)
-            if (folderMarkIssues.isNotEmpty()) {
-                return@nonBlocking SdkStatus.FolderMarkWarning(elixirSdk, elixirVersion, folderMarkIssues)
-            }
+        // Check folder mark configuration (breaks specific per-directory features)
+        val folderMarkIssues = ProjectModuleSetupValidator.detectFolderMarkIssues(project)
+        if (folderMarkIssues.isNotEmpty()) {
+            return SdkStatus.FolderMarkWarning(elixirSdk, elixirVersion, folderMarkIssues)
+        }
 
-            SdkStatus.Configured(elixirSdk, erlangSdk, elixirVersion)
-        }.executeSynchronously()
+        return SdkStatus.Configured(elixirSdk, erlangSdk, elixirVersion)
     }
 
     private fun detectModuleSdkIssues(): List<ModuleSdkIssue> {
