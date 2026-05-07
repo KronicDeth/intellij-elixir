@@ -339,13 +339,6 @@ ELIXIR_SDK_HOME
         internal fun setupSdkTableListener() {
             val messageBus = ApplicationManager.getApplication().messageBus
             messageBus.connect().subscribe(ProjectJdkTable.JDK_TABLE_TOPIC, object : ProjectJdkTable.Listener {
-                override fun jdkAdded(jdk: Sdk) {
-                    // When an Elixir SDK is added, auto-set it as the project SDK if appropriate
-                    if (jdk.sdkType is Type) {
-                        autoSetProjectSdkIfNeeded(jdk)
-                    }
-                }
-
                 override fun jdkRemoved(jdk: Sdk) {
                     // When an Erlang SDK is removed, clean up any Elixir SDKs that reference it
                     if (staticIsValidDependency(jdk)) {
@@ -376,70 +369,6 @@ ELIXIR_SDK_HOME
                         projectRootManager.projectSdk = null
                         LOG.info("Cleared removed Elixir SDK '${deletedSdk.name}' from project '${project.name}'")
                     }
-                }
-            }
-        }
-
-        private fun autoSetProjectSdkIfNeeded(newElixirSdk: Sdk) {
-            LOG.debug { "Auto-set check for newly added Elixir SDK: ${newElixirSdk.name}" }
-
-            // Get all non-disposed projects
-            val openProjects = com.intellij.openapi.project.ProjectManager.getInstance().openProjects.filter {
-                !it.isDisposed
-            }
-
-            // Only auto-set if exactly one project is open
-            // This ensures we don't accidentally set the wrong project's SDK
-            val project = when (openProjects.size) {
-                0 -> {
-                    LOG.debug { "No open projects, skipping auto-set" }
-                    return
-                }
-
-                1 -> openProjects.first()
-                else -> {
-                    LOG.debug { "Multiple projects open (${openProjects.size}), skipping auto-set to avoid ambiguity" }
-                    return
-                }
-            }
-
-            val projectRootManager = ProjectRootManager.getInstance(project)
-            val currentProjectSdk = projectRootManager.projectSdk
-
-            // Only auto-set if current SDK is null or (is Elixir and invalid)
-            val shouldAutoSet = if (currentProjectSdk == null) {
-                LOG.debug { "Project '${project.name}' has no SDK, will auto-set to '${newElixirSdk.name}'" }
-                true
-            } else if (currentProjectSdk.sdkType !is Type) {
-                // Don't replace non-Elixir SDKs (Java, Python, etc.)
-                LOG.debug {
-                    "Project '${project.name}' has non-Elixir SDK '${currentProjectSdk.name}', skipping auto-set"
-                }
-                false
-            } else {
-                // Current SDK is Elixir - check if it's valid
-                val isValid = try {
-                    val additionalData = currentProjectSdk.sdkAdditionalData as? SdkAdditionalData
-                    val erlangSdk = additionalData?.getErlangSdk()
-                    erlangSdk != null
-                } catch (e: Exception) {
-                    LOG.debug { "Error checking validity of current SDK: ${e.message}" }
-                    false
-                }
-
-                if (!isValid) {
-                    LOG.debug {
-                        "Project '${project.name}' SDK '${currentProjectSdk.name}' is invalid, " +
-                                "will auto-set to '${newElixirSdk.name}'"
-                    }
-                }
-                !isValid
-            }
-
-            if (shouldAutoSet) {
-                WriteActions.runWriteActionLater {
-                    projectRootManager.projectSdk = newElixirSdk
-                    LOG.info("Auto-set project '${project.name}' SDK to '${newElixirSdk.name}'")
                 }
             }
         }

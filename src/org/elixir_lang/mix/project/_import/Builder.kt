@@ -9,11 +9,9 @@ import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.options.ConfigurationException
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.projectRoots.ProjectJdkTable
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.projectRoots.SdkTypeId
 import com.intellij.openapi.roots.CompilerModuleExtension
-import com.intellij.openapi.roots.ex.ProjectRootManagerEx
 import com.intellij.openapi.roots.ui.configuration.ModulesProvider
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.text.StringUtil
@@ -40,6 +38,9 @@ class Builder : ProjectImportBuilder<OtpApp>() {
     private var mySelectedOtpApps = emptyList<OtpApp>()
     private var myIsImportingProject: Boolean = false
     private var myNeedsScan: Boolean = false
+
+    /** Elixir SDK to assign to each created module. Set by ElixirSdkForModuleStep.updateDataModel(). */
+    var elixirSdk: Sdk? = null
 
     override fun getIcon(): Icon = Icons.PROJECT
     override fun getName(): String = "Mix"
@@ -117,12 +118,15 @@ class Builder : ProjectImportBuilder<OtpApp>() {
         modulesProvider: ModulesProvider,
         artifactModel: ModifiableArtifactModel?
     ): List<Module> {
-        fixProjectSdk(project)
+        val sdk = elixirSdk
         val createModules = createModulesForOtpApps(
             project,
             mySelectedOtpApps,
             { moduleModel ?: ModuleManager.getInstance(project).getModifiableModel() },
             { otpApp, rootModel ->
+                if (sdk != null) {
+                    rootModel.sdk = sdk
+                }
                 val compilerModuleExt = rootModel.getModuleExtension(CompilerModuleExtension::class.java)
                 compilerModuleExt.inheritCompilerOutputPath(false)
                 val ideaModuleDir = otpApp.root
@@ -206,21 +210,6 @@ class Builder : ProjectImportBuilder<OtpApp>() {
 
     companion object {
         private val LOG = Logger.getInstance(Builder::class.java)
-
-        private fun fixProjectSdk(project: Project): Sdk? {
-            val projectRootMgr = ProjectRootManagerEx.getInstanceEx(project)
-            val selectedSdk = projectRootMgr.projectSdk
-            val fixedProjectSdk: Sdk?
-
-            if (selectedSdk == null || selectedSdk.sdkType !== Type.instance) {
-                fixedProjectSdk = ProjectJdkTable.getInstance().findMostRecentSdkOfType(Type.instance)
-                ApplicationManager.getApplication().runWriteAction { projectRootMgr.projectSdk = fixedProjectSdk }
-            } else {
-                fixedProjectSdk = selectedSdk
-            }
-
-            return fixedProjectSdk
-        }
 
         @Throws(IOException::class)
         private fun deleteIdeaModuleFiles(otpApps: List<OtpApp>) {

@@ -21,7 +21,6 @@ import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.projectRoots.SdkTypeId
-import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.roots.ui.configuration.*
 import com.intellij.openapi.roots.ui.configuration.projectRoot.ProjectSdksModel
 import com.intellij.openapi.ui.ValidationInfo
@@ -177,12 +176,9 @@ class Step(parent: NewProjectWizardStep) : AbstractNewProjectWizardStep(parent),
 
             val builder = ElixirModuleBuilder()
 
-            // Based on https://github.com/JetBrains/intellij-community/blob/8c0419e906efe686479832543092f4918e6516bd/java/idea-ui/src/com/intellij/ide/projectWizard/generators/IntelliJJavaNewProjectWizard.kt#L40-L48
-            if (context.isCreatingNewProject) {
-                context.projectJdk = sdk
-            } else {
-                builder.moduleJdk = sdk.takeIf { ProjectRootManager.getInstance(project).projectSdk?.name != it.name }
-            }
+            // Always set moduleJdk rather than context.projectJdk so the Elixir plugin never claims the project SDK slot.
+            // The project SDK belongs to the host language (Java, Python, etc.) and is not required for Elixir functionality.
+            builder.moduleJdk = sdk
 
             builder.addSourcePath(
                 com.intellij.openapi.util.Pair(
@@ -242,7 +238,6 @@ fun Row.elixirSdkComboBox(context: WizardContext, sdkProperty: ObservableMutable
 
     return cell(comboBox)
         .validationOnApply { validateElixirSdk(sdkProperty, sdksModel) }
-        .onApply { context.projectJdk = sdkProperty.get() }
 }
 
 fun ValidationInfoBuilder.validateElixirSdk(
