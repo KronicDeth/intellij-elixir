@@ -529,8 +529,28 @@ class ElixirSdkStatusWidget(@param:NotNull private val project: Project) : Custo
         })
     }
 
+    /**
+     * Finds the active Elixir SDK by scanning all Elixir modules.
+     *
+     * Uses [Type.mostSpecificSdk] (module overload) which checks Facet SDK → module SDK → project SDK,
+     * returning the first non-null result. This covers both Rich IDEs (JdkOrderEntry) and Small IDEs
+     * (Facet library entry) without additional branching.
+     *
+     * When both the project SDK and a module SDK are Elixir, this returns the **module** SDK - the one
+     * that actually drives code insight - rather than the project-level one. The mismatch between them
+     * is reported separately by [detectModuleSdkIssues].
+     */
+    private fun findModuleLevelElixirSdk(): Sdk? {
+        for (module in ModuleManager.getInstance(project).modules) {
+            if (!module.isElixirModule()) continue
+            val moduleSdk = Type.mostSpecificSdk(module)
+            if (moduleSdk != null) return moduleSdk
+        }
+        return null
+    }
+
     private fun detectSdkStatus(): SdkStatus {
-        val elixirSdk = Type.mostSpecificSdk(project) ?: return SdkStatus.NotConfigured
+        val elixirSdk = findModuleLevelElixirSdk() ?: return SdkStatus.NotConfigured
         val versionString = elixirSdk.versionString ?: "Unknown"
 
         // Add WSL distribution suffix if this is a WSL SDK
