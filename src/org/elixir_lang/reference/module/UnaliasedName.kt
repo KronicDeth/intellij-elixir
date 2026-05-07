@@ -89,7 +89,8 @@ object UnaliasedName {
                     up(element, entrance)
 
                 is QualifiedMultipleAliases ->
-                    up(element, entrance)
+                    entrance.fullyQualifiedName()
+
                 is ElixirAccessExpression,
                 is ElixirNoParenthesesOneArgument,
                 is QuotableArguments,
