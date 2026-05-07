@@ -1,5 +1,6 @@
 package org.elixir_lang.status_bar_widget
 
+import com.intellij.facet.FacetManager
 import com.intellij.icons.AllIcons
 import com.intellij.ide.DataManager
 import com.intellij.notification.NotificationGroupManager
@@ -35,6 +36,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.elixir_lang.Facet
 import org.elixir_lang.Icons
 import org.elixir_lang.isElixirModule
 import org.elixir_lang.mix.project.ProjectModuleSetupValidator
@@ -583,10 +585,13 @@ class ElixirSdkStatusWidget(@param:NotNull private val project: Project) : Custo
 
             val rootManager = ModuleRootManager.getInstance(module)
 
+            // --- Rich IDE path: detect dangling/mismatch JdkOrderEntry ---
+            var hasJdkEntry = false
             for (entry in rootManager.orderEntries) {
                 if (entry !is JdkOrderEntry) continue
 
                 val jdkName = entry.jdkName ?: continue
+                hasJdkEntry = true
                 // Only check Elixir SDK entries (when SDK is resolvable, check its type)
                 val resolvedSdk = entry.jdk
                 if (resolvedSdk != null && resolvedSdk.sdkType !is Type) continue
@@ -600,13 +605,32 @@ class ElixirSdkStatusWidget(@param:NotNull private val project: Project) : Custo
                             isDangling = true
                         )
                     )
-                } else if (hasRootMixExs && projectSdk != null && resolvedSdk != projectSdk) {
-                    // MISMATCH: Module uses different SDK than project in a single-version project
+                } else if (hasRootMixExs && projectSdk != null && projectSdk.sdkType is Type && resolvedSdk != projectSdk) {
+                    // MISMATCH: Module uses different SDK than project in a single-version project.
+                    // Only meaningful when the project SDK is itself Elixir; skip when it is Java/Python/etc.
                     issues.add(
                         ModuleSdkIssue(
                             module.name,
                             "uses '$jdkName' but project SDK is '${projectSdk.name}'",
                             isDangling = false
+                        )
+                    )
+                }
+            }
+
+            // --- Small IDE path: detect dangling Facet SDK ---
+            // Only check if the Rich IDE path didn't find any JDK entries (Small IDE modules use
+            // a Facet library entry instead of a JdkOrderEntry to hold the Elixir SDK).
+            if (!hasJdkEntry) {
+                val facet = FacetManager.getInstance(module).getFacetByType(Facet.ID)
+                if (facet != null && Facet.sdk(module) == null && Facet.sdks().isNotEmpty()) {
+                    // The module has an Elixir Facet and Elixir SDKs exist in the table, but the
+                    // Facet library entry doesn't match any current SDK name - stale/dangling reference.
+                    issues.add(
+                        ModuleSdkIssue(
+                            module.name,
+                            "Elixir Facet SDK is not configured (stale reference). Reconfigure in Settings → Languages → Elixir.",
+                            isDangling = true
                         )
                     )
                 }
