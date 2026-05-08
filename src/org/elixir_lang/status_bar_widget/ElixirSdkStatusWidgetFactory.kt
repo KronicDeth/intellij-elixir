@@ -1,10 +1,12 @@
 package org.elixir_lang.status_bar_widget
 
 import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.StatusBar
 import com.intellij.openapi.wm.StatusBarWidget
 import com.intellij.openapi.wm.StatusBarWidgetFactory
+import org.elixir_lang.isElixirModule
 import org.elixir_lang.settings.ElixirExperimentalSettings
 
 private val LOG = logger<ElixirSdkStatusWidgetFactory>()
@@ -15,9 +17,12 @@ class ElixirSdkStatusWidgetFactory : StatusBarWidgetFactory {
     override fun getDisplayName(): String = "Elixir SDK Status"
 
     override fun isAvailable(project: Project): Boolean {
-        // Widget is available when the experimental setting is enabled
-        val isAvailable = ElixirExperimentalSettings.instance.state.enableStatusBarWidget
-        LOG.debug("isAvailable called for project ${project.name}, returning $isAvailable")
+        val isSettingEnabled = ElixirExperimentalSettings.instance.state.enableStatusBarWidget
+        if (!isSettingEnabled) return false
+
+        val hasElixirModule = ModuleManager.getInstance(project).modules.any { it.isElixirModule() }
+        val isAvailable = hasElixirModule
+        LOG.debug("isAvailable called for project ${project.name}, setting=$isSettingEnabled, hasElixirModule=$hasElixirModule, returning $isAvailable")
         return isAvailable
     }
 
