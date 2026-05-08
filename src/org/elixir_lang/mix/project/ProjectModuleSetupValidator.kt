@@ -12,7 +12,7 @@ import org.elixir_lang.mixContentRoots
  * Validates each Elixir Mix module's folder marks against the canonical specification defined in
  * [CANONICAL_FOLDER_MARKS] (which mirrors [org.elixir_lang.mix.Project.addFolders]).
  *
- * Threading: follows the same contract as `detectModuleSdkIssues()` in `ElixirSdkStatusWidget` -
+ * Threading: follows the same contract as `detectModuleSdkIssues()` in `ElixirEditorBasedSdkWidget` -
  * accesses [ModuleRootManager] which requires read access.  Callers must either hold a read lock
  * or call this inside a `readAction { }` block.
  */
@@ -41,8 +41,8 @@ object ProjectModuleSetupValidator {
      * **Threading**: must be called off the EDT (background thread).  The method accesses
      * [ModuleRootManager] which requires read access; the caller must either hold a read lock or
      * call this inside a `readAction { }` block.  The current call site in
-     * `ElixirSdkStatusWidget.detectSdkStatus()` follows the same contract as
-     * `detectModuleSdkIssues()` - both run in the widget's update cycle.
+     * `ElixirEditorBasedSdkWidget` follows the same contract as `detectModuleSdkIssues()` -
+     * both run in the background notification job triggered by rootsChanged.
      */
     fun detectFolderMarkIssues(project: Project): List<FolderMarkIssue> {
         ThreadingAssertions.assertBackgroundThread()

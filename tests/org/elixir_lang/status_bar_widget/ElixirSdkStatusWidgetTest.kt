@@ -11,34 +11,45 @@ import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl
 import com.intellij.openapi.roots.ModuleRootModificationUtil
 import com.intellij.openapi.roots.ProjectRootManager
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import org.elixir_lang.Facet
 import org.elixir_lang.PlatformTestCase
 import org.elixir_lang.facet.Type
 import org.elixir_lang.sdk.elixir.Type as ElixirSdkType
 
 /**
- * Tests for [ElixirSdkStatusWidget] detection logic.
+ * Tests for [ElixirEditorBasedSdkWidget] detection logic (notification scan methods).
  *
- * Tests scenarios from the project-sdk-fixes plan (Step 8):
- * 1. Project SDK = Java, module SDK = Elixir → no NotConfigured, no mismatch
- * 2. Project SDK = null, module SDK = Elixir → no NotConfigured
- * 3. Project SDK = Elixir A, module SDK = Elixir B → mismatch reported
- * 5. No Elixir modules → widget factory isAvailable() = false
- * 6. Small IDE: stale Facet SDK reference, Elixir SDKs exist → dangling issue
- * 7. Small IDE: Facet SDK resolves correctly → no issue
- * 8. Small IDE: stale Facet SDK reference, no Elixir SDKs in table → no dangling (NotConfigured)
+ * These tests exercise the project-wide background notification helpers directly:
+ * [ElixirEditorBasedSdkWidget.detectModuleSdkIssues] and
+ * [ElixirEditorBasedSdkWidget.findModuleLevelElixirSdk].
+ *
+ * Tests scenarios from the project-sdk-fixes plan (adapted for the new widget class):
+ * 1a. Project SDK = Java, module SDK = Elixir → no NotConfigured, no mismatch
+ * 1b. Project SDK = Java, module SDK = Elixir → no mismatch issues
+ * 2.  Project SDK = null, module SDK = Elixir → no NotConfigured
+ * 3.  Project SDK = Elixir A, module SDK = Elixir B → mismatch reported
+ * 5.  No Elixir modules → widget factory isAvailable() = false
+ * 6.  Small IDE: stale Facet SDK reference, Elixir SDKs exist → dangling issue
+ * 7.  Small IDE: Facet SDK resolves correctly → no issue
+ * 8.  Small IDE: stale Facet SDK reference, no Elixir SDKs in table → no dangling (NotConfigured)
  */
 class ElixirSdkStatusWidgetTest : PlatformTestCase() {
 
     private val addedSdks = mutableListOf<Sdk>()
+    private lateinit var testScope: CoroutineScope
 
     override fun setUp() {
         super.setUp()
+        testScope = CoroutineScope(SupervisorJob())
         ensureElixirFacet()
     }
 
     override fun tearDown() {
         try {
+            testScope.cancel("test tearDown")
             ModuleRootModificationUtil.setModuleSdk(module, null)
             WriteAction.run<Throwable> {
                 ProjectRootManager.getInstance(project).projectSdk = null
@@ -80,8 +91,6 @@ class ElixirSdkStatusWidgetTest : PlatformTestCase() {
     }
 
     private fun removeElixirFacetLibraries() {
-        // Use the Facet setter with null - this calls removeElixirSDKs() internally,
-        // which removes all Elixir SDK library entries from the module.
         val facetManager = FacetManager.getInstance(module)
         val facet = facetManager.getFacetByType(Facet.ID) ?: return
         ApplicationManager.getApplication().runWriteAction {
@@ -121,7 +130,28 @@ class ElixirSdkStatusWidgetTest : PlatformTestCase() {
         }
     }
 
-    private fun createWidget(): ElixirSdkStatusWidget = ElixirSdkStatusWidget(project)
+    private fun createWidget(): ElixirEditorBasedSdkWidget = ElixirEditorBasedSdkWidget(project, testScope)
+
+    /**
+     * Calls [ElixirEditorBasedSdkWidget.detectModuleSdkIssues] from the EDT-bound test body.
+     *
+     * [detectModuleSdkIssues] asserts it runs off the EDT.  Test methods run on the EDT, so we
+     * dispatch to a pooled background thread via [com.intellij.openapi.application.Application.executeOnPooledThread] and
+     * use the synchronous (blocking, non-suspending) [com.intellij.openapi.application.Application.runReadAction]
+     * to acquire the read lock.  [java.util.concurrent.Future.get] blocks the EDT while waiting;
+     * this is safe because there are no pending write actions at the call site, so the background
+     * thread acquires the read lock immediately without needing the EDT.
+     *
+     * Prefer this over `runBlocking { readAction { } }` on the EDT: the suspend form of
+     * `readAction` internally needs the EDT to pump events for write-action coordination, which
+     * deadlocks when the EDT is already blocked by `runBlocking`.
+     */
+    private fun ElixirEditorBasedSdkWidget.detectModuleSdkIssuesInTest(): List<ModuleSdkIssue> =
+        ApplicationManager.getApplication().executeOnPooledThread<List<ModuleSdkIssue>> {
+            ApplicationManager.getApplication().runReadAction<List<ModuleSdkIssue>> {
+                detectModuleSdkIssues()
+            }
+        }.get()
 
     // -------------------------------------------------------------------------
     // Scenario 1: Project SDK = Java, module SDK = Elixir
@@ -149,7 +179,7 @@ class ElixirSdkStatusWidgetTest : PlatformTestCase() {
         setModuleSdk(elixirSdk)
 
         val widget = createWidget()
-        val issues = widget.detectModuleSdkIssues()
+        val issues = widget.detectModuleSdkIssuesInTest()
 
         assertTrue(
             "No module SDK issues should be reported when project SDK is non-Elixir; got: $issues",
@@ -175,8 +205,7 @@ class ElixirSdkStatusWidgetTest : PlatformTestCase() {
     }
 
     // -------------------------------------------------------------------------
-    // Scenario 3: Project SDK = Elixir A, module SDK = Elixir B
-    // → mismatch reported
+    // Scenario 3: Project SDK = Elixir A, module SDK = Elixir B → mismatch reported
     // -------------------------------------------------------------------------
 
     fun testMismatchReportedWhenModuleSdkDiffersFromElixirProjectSdk() {
@@ -187,7 +216,7 @@ class ElixirSdkStatusWidgetTest : PlatformTestCase() {
         setModuleSdk(elixirSdkB)
 
         val widget = createWidget()
-        val issues = widget.detectModuleSdkIssues()
+        val issues = widget.detectModuleSdkIssuesInTest()
 
         assertTrue(
             "Expected a mismatch issue (project=Elixir 1.17, module=Elixir 1.16); got: $issues",
@@ -214,7 +243,6 @@ class ElixirSdkStatusWidgetTest : PlatformTestCase() {
     // -------------------------------------------------------------------------
 
     fun testDanglingFacetSdkReportedWhenElixirSdkExistsButFacetReferenceIsStale() {
-        // Set up: Facet references "Elixir 1.17", then remove it from the JDK table
         val staleSdk = createAndRegisterElixirSdk("Elixir 1.17")
         setFacetSdk(staleSdk)
 
@@ -229,7 +257,7 @@ class ElixirSdkStatusWidgetTest : PlatformTestCase() {
         // Do NOT call setModuleSdk() - no JdkOrderEntry, simulating Small IDE path
 
         val widget = createWidget()
-        val issues = widget.detectModuleSdkIssues()
+        val issues = widget.detectModuleSdkIssuesInTest()
 
         assertTrue(
             "Expected a dangling issue for stale Facet SDK reference; got: $issues",
@@ -246,7 +274,7 @@ class ElixirSdkStatusWidgetTest : PlatformTestCase() {
         setFacetSdk(registeredSdk)
 
         val widget = createWidget()
-        val issues = widget.detectModuleSdkIssues()
+        val issues = widget.detectModuleSdkIssuesInTest()
 
         assertTrue(
             "Expected no issues when Facet SDK resolves correctly; got: $issues",
@@ -270,7 +298,7 @@ class ElixirSdkStatusWidgetTest : PlatformTestCase() {
         assertTrue("Precondition: no Elixir SDKs in table", Facet.sdks().isEmpty())
 
         val widget = createWidget()
-        val issues = widget.detectModuleSdkIssues()
+        val issues = widget.detectModuleSdkIssuesInTest()
 
         assertTrue(
             "Expected no dangling issue when no Elixir SDKs exist (this is NotConfigured); got: $issues",
@@ -282,24 +310,7 @@ class ElixirSdkStatusWidgetTest : PlatformTestCase() {
     // Smoke tests (regression)
     // -------------------------------------------------------------------------
 
-    fun testWidgetCreation() {
-        val widget = createWidget()
-        assertNotNull(widget)
-        assertEquals(ElixirSdkStatusWidget.ID, widget.ID())
-    }
-
-    fun testWidgetComponent() {
-        val widget = createWidget()
-        val component = widget.getComponent()
-        assertNotNull("Widget should have a component", component)
-    }
-
     fun testWidgetIdConstant() {
-        assertEquals("ElixirSdkStatus", ElixirSdkStatusWidget.ID)
-    }
-
-    fun testWidgetDispose() {
-        val widget = createWidget()
-        widget.dispose()
+        assertEquals("ElixirSdkStatus", ElixirEditorBasedSdkWidget.ID)
     }
 }
