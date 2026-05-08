@@ -6,6 +6,12 @@ import com.intellij.openapi.actionSystem.ActionUiKind
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.WriteAction
+import com.intellij.openapi.projectRoots.ProjectJdkTable
+import com.intellij.openapi.projectRoots.SimpleJavaSdkType
+import com.intellij.openapi.projectRoots.Sdk
+import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl
+import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.util.ThrowableComputable
 import com.intellij.facet.FacetManager
 import com.intellij.facet.FacetType
@@ -16,11 +22,15 @@ import org.elixir_lang.Facet
 import org.elixir_lang.PlatformTestCase
 import org.elixir_lang.facet.Type
 import org.elixir_lang.mix.project.ProjectModuleSetupValidator
+import org.elixir_lang.sdk.elixir.Type as ElixirSdkType
 
 class ReconfigureModuleSetupActionTest : PlatformTestCase() {
 
     /** URLs of content entries added during a test, cleaned up in [tearDown]. */
     private val addedContentRootUrls = mutableListOf<String>()
+
+    /** SDKs registered in the JDK table during a test, cleaned up in [tearDown]. */
+    private val addedSdks = mutableListOf<Sdk>()
 
     override fun setUp() {
         super.setUp()
@@ -42,6 +52,20 @@ class ReconfigureModuleSetupActionTest : PlatformTestCase() {
                     }
                 }
                 addedContentRootUrls.clear()
+            }
+            // Clear module SDK before removing SDKs from the table
+            ModuleRootModificationUtil.setModuleSdk(module, null)
+            // Clear project SDK
+            WriteAction.run<Throwable> {
+                ProjectRootManager.getInstance(project).projectSdk = null
+            }
+            // Remove registered SDKs
+            WriteAction.run<Throwable> {
+                val jdkTable = ProjectJdkTable.getInstance()
+                for (sdk in addedSdks) {
+                    if (jdkTable.allJdks.contains(sdk)) jdkTable.removeJdk(sdk)
+                }
+                addedSdks.clear()
             }
         } finally {
             super.tearDown()
@@ -333,5 +357,45 @@ class ReconfigureModuleSetupActionTest : PlatformTestCase() {
 
         assertNotNull("web/ should be marked as Source even when it does not exist", webFolder)
         assertFalse("web/ should be Sources (not Test Sources)", webFolder!!.isTestSource)
+    }
+
+    // -------------------------------------------------------------------------
+    // Scenario 4: Project SDK = Java, Reconfigure action invoked
+    // → folder marks applied; module SDK left untouched (Step 1 guard)
+    // -------------------------------------------------------------------------
+
+    /**
+     * When the project SDK is non-Elixir (e.g. Java), the Reconfigure action must NOT
+     * touch the module SDK.  Before Step 1, `fixModuleSdk()` would call `model.inheritSdk()`
+     * unconditionally, replacing the Elixir module SDK with the Java project SDK.
+     */
+    fun testReconfigureWithNonElixirProjectSdkDoesNotTouchModuleSdk() {
+        val javaHome = System.getProperty("java.home") ?: "/usr/lib/jvm/java"
+        val javaSdk = SimpleJavaSdkType().createJdk("Java Mock", javaHome)
+
+        val elixirSdk = ProjectJdkImpl("Elixir Mock", ElixirSdkType.instance)
+        WriteAction.run<Throwable> {
+            ProjectJdkTable.getInstance().addJdk(elixirSdk)
+        }
+        addedSdks.add(elixirSdk)
+
+        // Set project SDK to Java and module SDK to Elixir
+        WriteAction.run<Throwable> {
+            ProjectRootManager.getInstance(project).projectSdk = javaSdk
+        }
+        ModuleRootModificationUtil.setModuleSdk(module, elixirSdk)
+
+        // Add a Mix content entry so the action processes the module
+        addMixContentEntry("sdk_guard_app", subdirs = listOf("lib", "test"))
+
+        runAction()
+
+        // The module SDK should still be the Elixir SDK, not the Java project SDK
+        val moduleSdkAfter = ModuleRootManager.getInstance(module).sdk
+        assertEquals(
+            "Module SDK must not be replaced with Java project SDK when project SDK is non-Elixir",
+            elixirSdk,
+            moduleSdkAfter
+        )
     }
 }
