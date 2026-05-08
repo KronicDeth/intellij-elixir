@@ -5,7 +5,6 @@ import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.module.ModuleManager
@@ -16,6 +15,7 @@ import com.intellij.openapi.vfs.VirtualFile
 import org.elixir_lang.mix.project.CANONICAL_FOLDER_MARKS
 import org.elixir_lang.mix.project.FolderMark
 import org.elixir_lang.isElixirMixModule
+import org.elixir_lang.sdk.elixir.findAllActiveElixirSdks
 import org.elixir_lang.sdk.elixir.Type as ElixirSdkType
 
 private val LOG = logger<ReconfigureModuleSetupAction>()
@@ -44,12 +44,9 @@ class ReconfigureModuleSetupAction : AnAction() {
         }
 
         // Enable when at least one module has a mix.exs in its content root,
-        // or a project-level Elixir SDK is configured.
-        val (hasElixirModule, hasElixirSdk) = ReadAction.nonBlocking(java.util.concurrent.Callable {
-            val hasModule = ModuleManager.getInstance(project).modules.any { it.isElixirMixModule() }
-            val hasSdk = ElixirSdkType.mostSpecificSdk(project) != null
-            hasModule to hasSdk
-        }).executeSynchronously()
+        // or any module has an active Elixir SDK configured.
+        val hasElixirModule = ModuleManager.getInstance(project).modules.any { it.isElixirMixModule() }
+        val hasElixirSdk = findAllActiveElixirSdks(project).isNotEmpty()
 
         e.presentation.isEnabledAndVisible = hasElixirModule || hasElixirSdk
     }
