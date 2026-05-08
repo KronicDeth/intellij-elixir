@@ -20,7 +20,6 @@ import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.text.StringUtil
-import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.wm.CustomStatusBarWidget
 import com.intellij.openapi.wm.StatusBar
 import com.intellij.openapi.wm.impl.status.TextPanel
@@ -104,7 +103,7 @@ class ElixirSdkStatusWidget(@param:NotNull private val project: Project) : Custo
         val tooltip: String
     )
 
-    private sealed interface SdkStatus {
+    internal sealed interface SdkStatus {
         data class Configured(
             val elixirSdk: Sdk,
             val erlangSdk: Sdk,
@@ -139,7 +138,7 @@ class ElixirSdkStatusWidget(@param:NotNull private val project: Project) : Custo
         data object NotConfigured : SdkStatus
     }
 
-    private data class ModuleSdkIssue(val moduleName: String, val issue: String, val isDangling: Boolean)
+    internal data class ModuleSdkIssue(val moduleName: String, val issue: String, val isDangling: Boolean)
 
     init {
         // Kick off the first presentation computation asynchronously.
@@ -540,7 +539,7 @@ class ElixirSdkStatusWidget(@param:NotNull private val project: Project) : Custo
      * that actually drives code insight - rather than the project-level one. The mismatch between them
      * is reported separately by [detectModuleSdkIssues].
      */
-    private fun findModuleLevelElixirSdk(): Sdk? {
+    internal fun findModuleLevelElixirSdk(): Sdk? {
         for (module in ModuleManager.getInstance(project).modules) {
             if (!module.isElixirModule()) continue
             val moduleSdk = Type.mostSpecificSdk(module)
@@ -549,7 +548,7 @@ class ElixirSdkStatusWidget(@param:NotNull private val project: Project) : Custo
         return null
     }
 
-    private fun detectSdkStatus(): SdkStatus {
+    internal fun detectSdkStatus(): SdkStatus {
         val elixirSdk = findModuleLevelElixirSdk() ?: return SdkStatus.NotConfigured
         val versionString = elixirSdk.versionString ?: "Unknown"
 
@@ -593,12 +592,9 @@ class ElixirSdkStatusWidget(@param:NotNull private val project: Project) : Custo
         return SdkStatus.Configured(elixirSdk, erlangSdk, elixirVersion)
     }
 
-    private fun detectModuleSdkIssues(): List<ModuleSdkIssue> {
+    internal fun detectModuleSdkIssues(): List<ModuleSdkIssue> {
         val issues = mutableListOf<ModuleSdkIssue>()
         val projectSdk = ProjectRootManager.getInstance(project).projectSdk
-        val hasRootMixExs = project.basePath?.let { basePath ->
-            LocalFileSystem.getInstance().findFileByPath(basePath)?.findChild("mix.exs")
-        } != null
 
         for (module in ModuleManager.getInstance(project).modules) {
             if (!module.isElixirModule()) continue
@@ -625,8 +621,8 @@ class ElixirSdkStatusWidget(@param:NotNull private val project: Project) : Custo
                             isDangling = true
                         )
                     )
-                } else if (hasRootMixExs && projectSdk != null && projectSdk.sdkType is Type && resolvedSdk != projectSdk) {
-                    // MISMATCH: Module uses different SDK than project in a single-version project.
+                } else if (projectSdk != null && projectSdk.sdkType is Type && resolvedSdk != projectSdk) {
+                    // MISMATCH: Module uses different Elixir SDK than project in a single-version project.
                     // Only meaningful when the project SDK is itself Elixir; skip when it is Java/Python/etc.
                     issues.add(
                         ModuleSdkIssue(
