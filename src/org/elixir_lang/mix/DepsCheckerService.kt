@@ -2,13 +2,10 @@ package org.elixir_lang.mix
 
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.logger
-import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.Sdk
-import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vfs.VirtualFile
@@ -20,7 +17,7 @@ import org.elixir_lang.notification.setup_sdk.Notifier
 import org.elixir_lang.package_manager.DepsStatusResult
 import org.elixir_lang.package_manager.virtualFile
 import org.elixir_lang.settings.ElixirExperimentalSettings
-import org.elixir_lang.sdk.elixir.Type as ElixirSdkType
+import org.elixir_lang.sdk.elixir.findElixirSdkForRoot
 import java.util.concurrent.atomic.AtomicBoolean
 
 @Service(Service.Level.PROJECT)
@@ -81,21 +78,13 @@ class DepsCheckerService(private val project: Project) : Disposable {
             }
 
             LOG.debug("DepsCheckerService: Checking Mix deps ($reason)")
-            val (sdk, projectRoots) = ReadAction.nonBlocking(java.util.concurrent.Callable {
-                val sdk = findElixirSdk(project)
-                val roots = selectTopLevelMixRoots(ProjectRootManager.getInstance(project).contentRootsFromAllModules)
-                sdk to roots
-            }).executeSynchronously()
-
-            if (sdk == null) {
-                LOG.debug("DepsCheckerService: Skipping mix deps check, no Elixir SDK configured")
-                return
-            }
+            val projectRoots = selectTopLevelMixRoots(ProjectRootManager.getInstance(project).contentRootsFromAllModules)
 
             var sawSupported = false
             var sawNonOk = false
 
             for (root in projectRoots) {
+                val sdk = findElixirSdkForRoot(project, root)
                 when (val statusResult = depsStatusResult(project, root, sdk)) {
                     is DepsStatusResult.Available -> {
                         sawSupported = true
@@ -134,24 +123,6 @@ class DepsCheckerService(private val project: Project) : Disposable {
             ?: return DepsStatusResult.Unsupported
         val (packageManager, packageVirtualFile) = packageManagerVirtualFile
         return packageManager.depsStatus(project, packageVirtualFile, sdk)
-    }
-
-    private fun findElixirSdk(project: Project): Sdk? {
-        val elixirSdkType = ElixirSdkType.instance
-
-        val projectSdk = ProjectRootManager.getInstance(project).projectSdk
-        if (projectSdk?.sdkType === elixirSdkType) {
-            return projectSdk
-        }
-
-        ModuleManager.getInstance(project).modules.forEach { module ->
-            val moduleSdk = ModuleRootManager.getInstance(module).sdk
-            if (moduleSdk?.sdkType === elixirSdkType) {
-                return moduleSdk
-            }
-        }
-
-        return null
     }
 
     private fun isDepsChange(event: VFileEvent): Boolean {

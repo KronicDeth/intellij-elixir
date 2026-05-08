@@ -10,10 +10,7 @@ import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.components.service
-import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.projectRoots.Sdk
-import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.util.Disposer
@@ -21,21 +18,21 @@ import org.elixir_lang.mix.createInstallMixDependenciesRunConfiguration
 import org.elixir_lang.mix.DepsCheckerService
 import org.elixir_lang.notification.setup_sdk.Notifier
 import org.elixir_lang.util.ElixirProjectDisposable
-import org.elixir_lang.sdk.elixir.Type as ElixirSdkType
+import org.elixir_lang.sdk.elixir.findElixirSdkForRoot
 
 class InstallMixDependenciesAction : AnAction() {
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return
 
-        val sdk = getProjectElixirSdk(project)
-        if (sdk == null) {
-            Notifier.mixDepsNoSdk(project)
-            return
-        }
-
         val projectRoot = getProjectRoot(project)
         if (projectRoot == null) {
             Notifier.mixDepsError(project, "Could not determine project root directory")
+            return
+        }
+
+        val sdk = findElixirSdkForRoot(project, projectRoot)
+        if (sdk == null) {
+            Notifier.mixDepsNoSdk(project)
             return
         }
 
@@ -81,26 +78,6 @@ class InstallMixDependenciesAction : AnAction() {
     }
 
     override fun isDumbAware(): Boolean = true
-
-    private fun getProjectElixirSdk(project: Project): Sdk? {
-        val elixirSdkType = ElixirSdkType.instance
-
-        // Check project-level SDK
-        val projectSdk = ProjectRootManager.getInstance(project).projectSdk
-        if (projectSdk?.sdkType === elixirSdkType) {
-            return projectSdk
-        }
-
-        // Check module-level SDKs
-        ModuleManager.getInstance(project).modules.forEach { module ->
-            val moduleSdk = ModuleRootManager.getInstance(module).sdk
-            if (moduleSdk?.sdkType === elixirSdkType) {
-                return moduleSdk
-            }
-        }
-
-        return null
-    }
 
     private fun getProjectRoot(project: Project): VirtualFile? {
         val contentRoots = ProjectRootManager.getInstance(project).contentRootsFromAllModules
