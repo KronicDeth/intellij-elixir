@@ -14,6 +14,7 @@ import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.util.Key
 import org.elixir_lang.Elixir.elixirSdkHasErlangSdk
 import org.elixir_lang.Mix
+import org.elixir_lang.isElixirMixModule
 import org.elixir_lang.notification.setup_sdk.Notifier
 import org.elixir_lang.run.ensureWorkingDirectory
 import org.elixir_lang.sdk.elixir.Type.Companion.mostSpecificSdk
@@ -37,6 +38,10 @@ class DialyzerServiceImpl : DialyzerService {
     private val log = Logger.getInstance(DialyzerServiceImpl::class.java)
 
     override fun dialyzerWarnings(module: Module): List<DialyzerWarn> {
+        if (!module.isElixirMixModule()) {
+            return emptyList()
+        }
+
         val workingDirectory = ensureWorkingDirectory(module)
 
         val sdk = mostSpecificSdk(module)

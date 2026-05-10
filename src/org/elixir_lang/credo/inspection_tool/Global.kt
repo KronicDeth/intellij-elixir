@@ -20,6 +20,7 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiManager
 import org.elixir_lang.Mix
 import org.elixir_lang.credo.Action
+import org.elixir_lang.isElixirMixModule
 import org.elixir_lang.jps.shared.ParametersList
 import org.elixir_lang.mix.Project
 import org.elixir_lang.notification.setup_sdk.Notifier
@@ -112,7 +113,7 @@ class Global : GlobalInspectionTool() {
     ) {
         val project = scope.project
         val scopedModules = ApplicationManager.getApplication().runReadAction<List<Module>> {
-            ModuleManager.getInstance(project).modules.filter { scope.containsModule(it) }
+            ModuleManager.getInstance(project).modules.filter { scope.containsModule(it) && it.isElixirMixModule() }
         }
         val moduleByWorkingDirectory = linkedMapOf<String, Module>()
         val executionFailures = mutableListOf<CredoExecutionIssue>()
