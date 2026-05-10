@@ -41,7 +41,13 @@ jobs:
       fail-fast: false
       matrix:
         os: [ ubuntu-22.04, windows-2025 ]
-        idea-version: [ '2026.1.1', '2025.3.2', 'LATEST-EAP-SNAPSHOT' ]
+        idea-version:
+            - '2026.1.1'
+            - '2025.3.2'
+            # 2026.2 upgrades to Java 25, won't work in CI until we resolve issues. https://github.com/JetBrains/intellij-community/commit/aa1cfa9632ab
+            # - 'LATEST-EAP-SNAPSHOT'
+            # revert to 261 eap instead
+            - '261.24374.34'
 
     steps:
       - name: Checkout
