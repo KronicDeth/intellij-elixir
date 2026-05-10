@@ -131,6 +131,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
+          # Pin to 1.384 (2025-03-19): versions ≥1.385 introduced https://youtrack.jetbrains.com/issue/MP-7267 which
+          # causes the pipeline to fail on a regular basis.
+          verifier-version: '1.384'
           ide-versions: |
             ideaIU:253.30387.90
             ideaIU:261.23567.138
