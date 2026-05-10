@@ -88,7 +88,7 @@ class IntramoduleTest : PlatformTestCase() {
         Assert.assertNotEquals("Resolved to both clauses instead of selected clause", 2, resolveResults.size.toLong())
         assertEquals("Resolves to self", 1, resolveResults.size)
 
-        val resolved = reference!!.resolve()
+        val resolved = reference.resolve()
         assertNotNull("Reference not resolved", resolved)
         assertEquals("def referenced(true) do\n  end", resolved!!.text)
     }
