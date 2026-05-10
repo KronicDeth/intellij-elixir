@@ -199,8 +199,13 @@ abstract class Type protected constructor(name: String) : DependentSdkType(name)
         erlangSdkToUse: Sdk? = null
     ): Sdk? {
         val result = Ref<Sdk?>(null)
-        val basePath = getBasePath(dependencySdk)
-        SdkConfigurationUtil.selectSdkHome(sdkType, null, basePath, com.intellij.util.Consumer { home: String? ->
+        // The 4-arg selectSdkHome(SdkType, Component?, Path, Consumer) was changed to a 5-arg form
+        // in 262.4852.50 by inserting Project? before Consumer (https://youtrack.jetbrains.com/issue/IJPL-236990/Docker-project.-Project-Settings.-Add-JDK-from-disk-File-Chooser-container-is-absent-in-the-tree#focus=Comments-27-13746689.0-0 /
+        // https://github.com/JetBrains/intellij-community/commit/edf92c9185e1a3e2f28c237c91e6fe493f7f80ac).
+        // The 5-arg form does not exist in 261, so there is no single call that compiles against both.
+        // Fall back to the 2-arg deprecated form until 261 support is dropped.
+        @Suppress("DEPRECATION")
+        SdkConfigurationUtil.selectSdkHome(sdkType, com.intellij.util.Consumer { home: String? ->
             val newSdk =
                 SdkConfigurationUtil.createSdk(sdkModel.sdks.toList(), home!!, sdkType, null, null)
 
