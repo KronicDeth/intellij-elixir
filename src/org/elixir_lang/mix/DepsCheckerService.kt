@@ -1,7 +1,6 @@
 package org.elixir_lang.mix
 
-import com.intellij.openapi.Disposable
-import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.EDT
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.module.ModuleManager
@@ -13,75 +12,70 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.openapi.vfs.newvfs.BulkFileListener
 import com.intellij.openapi.vfs.newvfs.events.VFileEvent
-import com.intellij.util.Alarm
+import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import org.elixir_lang.isElixirMixModule
 import org.elixir_lang.mixContentRoots
 import org.elixir_lang.notification.setup_sdk.Notifier
 import org.elixir_lang.package_manager.DepsStatusResult
 import org.elixir_lang.package_manager.virtualFile
-import org.elixir_lang.settings.ElixirExperimentalSettings
 import org.elixir_lang.sdk.elixir.findElixirSdkForRoot
+import org.elixir_lang.settings.ElixirExperimentalSettings
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.time.Duration.Companion.milliseconds
 
 @Service(Service.Level.PROJECT)
-class DepsCheckerService(private val project: Project) : Disposable {
-    private val alarm = Alarm(Alarm.ThreadToUse.POOLED_THREAD, this)
-    private val checkInProgress = AtomicBoolean(false)
-    @Volatile
-    private var checkPending = false
+class DepsCheckerService(private val project: Project, private val cs: CoroutineScope) {
+    private val checkMutex = Mutex()
 
     /** Roots whose deps files changed during the current debounce window. */
     private val pendingRoots: MutableSet<VirtualFile> = ConcurrentHashMap.newKeySet()
 
+    private val checkFlow = MutableSharedFlow<String>(
+        extraBufferCapacity = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
+
     init {
-        project.messageBus.connect(this).subscribe(
+        project.messageBus.connect(cs).subscribe(
             VirtualFileManager.VFS_CHANGES,
             object : BulkFileListener {
                 override fun after(events: List<VFileEvent>) {
                     val affectedRoots = findAffectedMixRoots(events)
                     if (affectedRoots.isNotEmpty()) {
                         pendingRoots.addAll(affectedRoots)
-                        scheduleCheck("deps change")
+                        checkFlow.tryEmit("deps change")
                     }
                 }
             }
         )
+
+        @OptIn(FlowPreview::class)
+        cs.launch {
+            checkFlow
+                .debounce(DEPS_CHECK_DEBOUNCE_MS.milliseconds)
+                .collect { reason -> runCheck(reason) }
+        }
     }
 
     fun scheduleInitialCheck() {
-        scheduleCheck("startup", 0)
+        cs.launch { runCheck("startup") }
     }
 
     fun scheduleCheckNow(reason: String) {
-        scheduleCheck(reason, 0)
+        cs.launch { runCheck(reason) }
     }
 
-    private fun scheduleCheck(reason: String, delayMs: Int = DEPS_CHECK_DEBOUNCE_MS) {
-        if (project.isDisposed) {
-            return
-        }
-
-        if (checkInProgress.get()) {
-            checkPending = true
-            return
-        }
-
-        alarm.cancelAllRequests()
-        alarm.addRequest({ runCheck(reason) }, delayMs)
-    }
-
-    private fun runCheck(reason: String) {
+    private suspend fun runCheck(reason: String) {
         if (!ElixirExperimentalSettings.instance.state.enableMixDepsCheck) {
             LOG.debug("DepsCheckerService: Mix deps check disabled in settings")
             return
         }
-
-        if (!checkInProgress.compareAndSet(false, true)) {
-            return
-        }
-
-        try {
+        checkMutex.withLock {
             if (project.isDisposed) {
                 return
             }
@@ -98,7 +92,7 @@ class DepsCheckerService(private val project: Project) : Disposable {
 
             for (root in rootsToCheck) {
                 val sdk = findElixirSdkForRoot(project, root)
-                when (val statusResult = depsStatusResult(project, root, sdk)) {
+                when (val statusResult = withContext(Dispatchers.IO) { depsStatusResult(project, root, sdk) }) {
                     is DepsStatusResult.Available -> {
                         sawSupported = true
                         if (statusResult.status.hasNonOk) {
@@ -106,7 +100,9 @@ class DepsCheckerService(private val project: Project) : Disposable {
                         }
                     }
                     is DepsStatusResult.Error -> {
-                        notifyOnEdt { Notifier.mixDepsCheckFailed(project, statusResult.message) }
+                        withContext(Dispatchers.EDT) {
+                            if (!project.isDisposed) Notifier.mixDepsCheckFailed(project, statusResult.message)
+                        }
                         return
                     }
                     DepsStatusResult.Unsupported -> Unit
@@ -117,16 +113,14 @@ class DepsCheckerService(private val project: Project) : Disposable {
                 return
             }
 
-            if (sawNonOk) {
-                notifyOnEdt { Notifier.mixDepsOutdated(project) }
-            } else {
-                notifyOnEdt { Notifier.clearMixDepsOutdated(project) }
-            }
-        } finally {
-            checkInProgress.set(false)
-            if (checkPending) {
-                checkPending = false
-                scheduleCheck("pending")
+            withContext(Dispatchers.EDT) {
+                if (!project.isDisposed) {
+                    if (sawNonOk) {
+                        Notifier.mixDepsOutdated(project)
+                    } else {
+                        Notifier.clearMixDepsOutdated(project)
+                    }
+                }
             }
         }
     }
@@ -195,18 +189,8 @@ class DepsCheckerService(private val project: Project) : Disposable {
     internal fun selectTopLevelMixRoots(roots: Array<out VirtualFile>): List<VirtualFile> =
         selectTopLevelMixRoots(roots.asList())
 
-    private fun notifyOnEdt(action: () -> Unit) {
-        ApplicationManager.getApplication().invokeLater {
-            if (!project.isDisposed) {
-                action()
-            }
-        }
-    }
-
-    override fun dispose() {}
-
     companion object {
-        private const val DEPS_CHECK_DEBOUNCE_MS: Int = 1500
+        private const val DEPS_CHECK_DEBOUNCE_MS: Long = 1500
         private val LOG = logger<DepsCheckerService>()
     }
 }

@@ -1,7 +1,8 @@
 package org.elixir_lang.mix
 
-import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.io.FileUtil
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
 import org.elixir_lang.PlatformTestCase
 
 class DepsCheckerServiceTest : PlatformTestCase() {
@@ -80,8 +81,7 @@ class DepsCheckerServiceTest : PlatformTestCase() {
     // ------------------------------------------------------------------
 
     private fun makeService(): DepsCheckerService {
-        val service = DepsCheckerService(project)
-        Disposer.register(testRootDisposable, service)
-        return service
+        val testScope = CoroutineScope(SupervisorJob())
+        return DepsCheckerService(project, testScope)
     }
 }
