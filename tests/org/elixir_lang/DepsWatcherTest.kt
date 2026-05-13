@@ -1,11 +1,15 @@
 package org.elixir_lang
 
 import com.intellij.openapi.application.WriteAction
-import com.intellij.openapi.progress.EmptyProgressIndicator
+import com.intellij.openapi.components.service
 import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar
 import com.intellij.util.concurrency.annotations.RequiresEdt
 import org.elixir_lang.mix.library.CONSOLIDATED_LIBRARY_SUFFIX
+import com.intellij.psi.util.PsiTreeUtil
+import org.elixir_lang.mix.Dep
+import org.elixir_lang.mix.sync.MixDepsSyncService
+import org.elixir_lang.psi.ElixirTuple
 
 class DepsWatcherTest : PlatformTestCase() {
     private val depName = "my_dep"
@@ -28,12 +32,11 @@ class DepsWatcherTest : PlatformTestCase() {
         myFixture.tempDirFixture.findOrCreateDir("_build/dev/lib/$depName/ebin")
         val staleClassesRoot = myFixture.tempDirFixture.findOrCreateDir("stale_classes/$depName")
 
-        val watcher = DepsWatcher(project)
+        val service = project.service<MixDepsSyncService>()
         val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
-        val indicator = EmptyProgressIndicator()
 
         WriteAction.run<Throwable> {
-            watcher.syncLibraries(arrayOf(depRoot), libraryTable, indicator)
+            service.syncLibraries(arrayOf(depRoot), libraryTable)
         }
 
         val firstSyncClassRootUrls = classRootUrls(depName)
@@ -63,7 +66,7 @@ class DepsWatcherTest : PlatformTestCase() {
         )
 
         WriteAction.run<Throwable> {
-            watcher.syncLibraries(arrayOf(depRoot), libraryTable, indicator)
+            service.syncLibraries(arrayOf(depRoot), libraryTable)
         }
 
         val secondSyncClassRootUrls = classRootUrls(depName)
@@ -94,12 +97,11 @@ class DepsWatcherTest : PlatformTestCase() {
         val firstStaleClassesRoot = myFixture.tempDirFixture.findOrCreateDir("stale_classes/$depName")
         val secondStaleClassesRoot = myFixture.tempDirFixture.findOrCreateDir("stale_classes/$secondDepName")
 
-        val watcher = DepsWatcher(project)
+        val service = project.service<MixDepsSyncService>()
         val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
-        val indicator = EmptyProgressIndicator()
 
         WriteAction.run<Throwable> {
-            watcher.syncLibraries(arrayOf(firstDepRoot, secondDepRoot), libraryTable, indicator)
+            service.syncLibraries(arrayOf(firstDepRoot, secondDepRoot), libraryTable)
         }
 
         assertTrue(
@@ -149,7 +151,7 @@ class DepsWatcherTest : PlatformTestCase() {
         )
 
         WriteAction.run<Throwable> {
-            watcher.syncLibraries(arrayOf(firstDepRoot, secondDepRoot), libraryTable, indicator)
+            service.syncLibraries(arrayOf(firstDepRoot, secondDepRoot), libraryTable)
         }
 
         val firstDepSecondSyncClassRootUrls = classRootUrls(depName)
@@ -192,20 +194,19 @@ class DepsWatcherTest : PlatformTestCase() {
         myFixture.tempDirFixture.findOrCreateDir("_build/dev/lib/$depName/ebin")
         myFixture.tempDirFixture.findOrCreateDir("_build/dev/lib/$secondDepName/ebin")
 
-        val watcher = DepsWatcher(project)
+        val service = project.service<MixDepsSyncService>()
         val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
-        val indicator = EmptyProgressIndicator()
         val libraryNames = listOf(depName, secondDepName)
 
         WriteAction.run<Throwable> {
-            watcher.syncLibraries(arrayOf(firstDepRoot, secondDepRoot), libraryTable, indicator)
+            service.syncLibraries(arrayOf(firstDepRoot, secondDepRoot), libraryTable)
         }
 
         val firstClassRootsByLibrary = libraryNames.associateWith { classRootUrls(it) }
         val firstSourceRootsByLibrary = libraryNames.associateWith { sourceRootUrls(it) }
 
         WriteAction.run<Throwable> {
-            watcher.syncLibraries(arrayOf(firstDepRoot, secondDepRoot), libraryTable, indicator)
+            service.syncLibraries(arrayOf(firstDepRoot, secondDepRoot), libraryTable)
         }
 
         libraryNames.forEach { libraryName ->
@@ -236,6 +237,83 @@ class DepsWatcherTest : PlatformTestCase() {
     }
 
     @RequiresEdt
+    fun testDeleteAllLibrariesRemovesAllDepsLibraries() {
+        val firstDepRoot = myFixture.tempDirFixture.findOrCreateDir("deps/$depName")
+        val secondDepRoot = myFixture.tempDirFixture.findOrCreateDir("deps/$secondDepName")
+        myFixture.tempDirFixture.findOrCreateDir("deps/$depName/lib")
+        myFixture.tempDirFixture.findOrCreateDir("deps/$secondDepName/lib")
+        myFixture.tempDirFixture.findOrCreateDir("_build/dev/consolidated")
+        myFixture.tempDirFixture.findOrCreateDir("_build/dev/lib/$depName/ebin")
+        myFixture.tempDirFixture.findOrCreateDir("_build/dev/lib/$secondDepName/ebin")
+
+        val service = project.service<MixDepsSyncService>()
+        val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
+
+        WriteAction.run<Throwable> {
+            service.syncLibraries(arrayOf(firstDepRoot, secondDepRoot), libraryTable)
+        }
+
+        assertNotNull("Expected first dep library to exist before delete-all", libraryTable.getLibraryByName(depName))
+        assertNotNull("Expected second dep library to exist before delete-all", libraryTable.getLibraryByName(secondDepName))
+
+        WriteAction.run<Throwable> {
+            service.deleteAllLibraries(myFixture.tempDirFixture.findOrCreateDir("deps").url)
+        }
+
+        assertNull("Expected first dep library to be deleted", libraryTable.getLibraryByName(depName))
+        assertNull("Expected second dep library to be deleted", libraryTable.getLibraryByName(secondDepName))
+    }
+
+    @RequiresEdt
+    fun testDeleteLibraryRemovesOnlyMatchingDepLibrary() {
+        val firstDepRoot = myFixture.tempDirFixture.findOrCreateDir("deps/$depName")
+        val secondDepRoot = myFixture.tempDirFixture.findOrCreateDir("deps/$secondDepName")
+        myFixture.tempDirFixture.findOrCreateDir("deps/$depName/lib")
+        myFixture.tempDirFixture.findOrCreateDir("deps/$secondDepName/lib")
+        myFixture.tempDirFixture.findOrCreateDir("_build/dev/consolidated")
+        myFixture.tempDirFixture.findOrCreateDir("_build/dev/lib/$depName/ebin")
+        myFixture.tempDirFixture.findOrCreateDir("_build/dev/lib/$secondDepName/ebin")
+
+        val service = project.service<MixDepsSyncService>()
+        val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
+
+        WriteAction.run<Throwable> {
+            service.syncLibraries(arrayOf(firstDepRoot, secondDepRoot), libraryTable)
+        }
+
+        WriteAction.run<Throwable> {
+            service.deleteLibrary(depName)
+        }
+
+        assertNull("Expected target dep library to be deleted", libraryTable.getLibraryByName(depName))
+        assertNotNull("Expected non-target dep library to remain", libraryTable.getLibraryByName(secondDepName))
+    }
+
+    fun testDepPathCallValueKeepsDefaultDepsPath() {
+        val psiFile = myFixture.configureByText(
+            "mix.exs",
+            """
+            defmodule Sample.MixProject do
+              def project do
+                [
+                  deps: [
+                    {:$depName, path: dep_path()}
+                  ]
+                ]
+              end
+            end
+            """.trimIndent()
+        )
+
+        val depTuple = PsiTreeUtil.findChildOfType(psiFile, ElixirTuple::class.java)
+        assertNotNull("Expected to find dep tuple in mix file", depTuple)
+
+        val dep = Dep.from(depTuple!!)
+        assertNotNull("Expected dep tuple to parse", dep)
+        assertEquals("Expected path call value to keep fallback deps path", "deps/$depName", dep!!.path)
+    }
+
+    @RequiresEdt
     fun testSyncConsolidatedLibraryCreatesSeparateSharedLibrary() {
         myFixture.tempDirFixture.findOrCreateDir("deps/$depName/lib")
         myFixture.tempDirFixture.findOrCreateDir("_build/dev/consolidated")
@@ -243,11 +321,10 @@ class DepsWatcherTest : PlatformTestCase() {
         myFixture.tempDirFixture.findOrCreateDir("_build/dev/lib/$depName/ebin")
         val buildRoot = myFixture.tempDirFixture.findOrCreateDir("_build")
 
-        val watcher = DepsWatcher(project)
-        val indicator = EmptyProgressIndicator()
+        val service = project.service<MixDepsSyncService>()
 
         WriteAction.run<Throwable> {
-            watcher.syncConsolidatedLibrary(buildRoot, indicator)
+            service.syncConsolidatedLibrary(buildRoot)
         }
 
         val consolidatedLibraryName = "${buildRoot.parent!!.name} $CONSOLIDATED_LIBRARY_SUFFIX"
@@ -273,21 +350,20 @@ class DepsWatcherTest : PlatformTestCase() {
         myFixture.tempDirFixture.findOrCreateDir("_build/dev/consolidated")
         val buildRoot = myFixture.tempDirFixture.findOrCreateDir("_build")
 
-        val watcher = DepsWatcher(project)
-        val indicator = EmptyProgressIndicator()
+        val service = project.service<MixDepsSyncService>()
         val consolidatedLibraryName = "${buildRoot.parent!!.name} $CONSOLIDATED_LIBRARY_SUFFIX"
 
         WriteAction.run<Throwable> {
-            watcher.syncConsolidatedLibrary(buildRoot, indicator)
+            service.syncConsolidatedLibrary(buildRoot)
         }
         assertNotNull(
             "Expected consolidated library to exist before deleting all deps libraries",
             LibraryTablesRegistrar.getInstance().getLibraryTable(project).getLibraryByName(consolidatedLibraryName)
         )
 
-        val deleteAllLibraries = DepsWatcher::class.java.getDeclaredMethod("deleteAllLibraries", String::class.java)
-        deleteAllLibraries.isAccessible = true
-        deleteAllLibraries.invoke(watcher, depsRoot.url)
+        WriteAction.run<Throwable> {
+            service.deleteAllLibraries(depsRoot.url)
+        }
 
         assertNull(
             "Consolidated library should be removed even when there are no per-dep libraries",

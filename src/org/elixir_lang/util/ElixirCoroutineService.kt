@@ -66,3 +66,34 @@ class ElixirCoroutineService(
      */
     fun supervisedChildScope(name: String): CoroutineScope = scope.supervisedChildScope(name)
 }
+
+/**
+ * Provides an application-scoped [CoroutineScope] for non-service code that operates
+ * outside any particular project (e.g. global SDK management, application-wide settings).
+ *
+ * The injected service scope is cancelled automatically by the platform when the application
+ * shuts down or when the plugin is unloaded.
+ *
+ * Prefer [ElixirCoroutineService] (project-level) whenever a [com.intellij.openapi.project.Project]
+ * is available - application-level scopes live longer and are only cancelled on IDE shutdown.
+ *
+ * Usage:
+ * ```kotlin
+ * val cs = service<ElixirAppCoroutineService>().supervisedChildScope(javaClass.simpleName)
+ * // ...
+ * override fun dispose() { cs.cancel() }
+ * ```
+ */
+@Suppress("unused")
+@Service(Service.Level.APP)
+class ElixirAppCoroutineService(
+    val scope: CoroutineScope,
+) {
+    /**
+     * Creates a child [CoroutineScope] scoped to the caller's lifecycle.
+     *
+     * @param name used for coroutine debugging and thread-dump identification.
+     * @see ElixirCoroutineService.supervisedChildScope for project-scoped equivalent.
+     */
+    fun supervisedChildScope(name: String): CoroutineScope = scope.supervisedChildScope(name)
+}
