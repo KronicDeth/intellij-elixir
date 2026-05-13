@@ -1,5 +1,6 @@
 package org.elixir_lang
 
+import com.google.common.annotations.VisibleForTesting
 import com.intellij.ide.projectView.impl.ProjectRootsUtil.isModuleContentRoot
 import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.components.service
@@ -111,7 +112,8 @@ class DepsWatcher(val project: Project) : DebouncedBulkFileListener(project.serv
         }
     }
 
-    private fun syncRequestFor(virtualFile: VirtualFile): SyncRequest? {
+    @VisibleForTesting
+    internal fun syncRequestFor(virtualFile: VirtualFile): SyncRequest? {
         val fileName = virtualFile.name
         val parent = virtualFile.parent ?: return null
 
@@ -433,7 +435,8 @@ class DepsWatcher(val project: Project) : DebouncedBulkFileListener(project.serv
         libraryModifiableModel.commit()
     }
 
-    private fun deleteAllLibraries(depsUrl: String) {
+    @VisibleForTesting
+    internal fun deleteAllLibraries(depsUrl: String) {
         val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
 
         val depsLibraries = libraryTable.libraries.filter { library ->
@@ -461,7 +464,8 @@ class DepsWatcher(val project: Project) : DebouncedBulkFileListener(project.serv
         }
     }
 
-    private fun deleteLibrary(depName: String) {
+    @VisibleForTesting
+    internal fun deleteLibrary(depName: String) {
         val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
 
         libraryTable.getLibraryByName(depName)?.let { library ->
@@ -473,7 +477,8 @@ class DepsWatcher(val project: Project) : DebouncedBulkFileListener(project.serv
 
 }
 
-private sealed class SyncRequest {
+@VisibleForTesting
+internal sealed class SyncRequest {
     object All : SyncRequest()
     data class Dep(val depRoot: VirtualFile) : SyncRequest()
 }

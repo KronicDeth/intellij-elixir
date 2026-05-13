@@ -5,14 +5,11 @@ import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiPolyVariantReference
-import com.intellij.psi.ResolveResult
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.psi.impl.stripAccessExpressions
-import org.elixir_lang.psi.operation.Match
 import java.nio.file.Paths
 
 /**
@@ -107,61 +104,11 @@ data class Dep(val application: String, val path: String, val type: Type = Type.
 
         private fun putPath(dep: Dep, stringLine: ElixirLine): Dep = dep.copy(path = stringLine.body!!.text)
 
-        private fun putPath(dep: Dep, call: Call): Dep =
-            call
-                .reference?.let { it as? PsiPolyVariantReference }
-                ?.multiResolve(false)
-                ?.asSequence()?.filter(ResolveResult::isValidResult)?.mapNotNull(ResolveResult::getElement)
-                ?.fold(dep) { acc, resolved ->
-                    putPathFromResolved(acc, resolved)
-                }
-                ?: dep
-
-        private fun putPathFromResolved(dep: Dep, resolved: PsiElement): Dep =
-            when (resolved) {
-                is Call -> putPathFromResolved(dep, resolved)
-                else -> dep
-            }
-
-        private fun putPathFromResolved(dep: Dep, resolved: Call): Dep =
-            if (CallDefinitionClause.`is`(resolved)) {
-                dep
-            } else {
-                putPathFromVariable(dep, resolved)
-            }
-
-        private fun putPathFromVariable(dep: Dep, variable: Call): Dep =
-            when (val parent = variable.parent) {
-                is Match -> {
-                    // variable = ..
-                    if (parent.leftOperand() == variable) {
-                        parent.rightOperand()?.let { value ->
-                            putPathFromValue(dep, value)
-                        } ?: dep
-                    }
-                    // ... = variable
-                    else {
-                        dep
-                    }
-                }
-
-                else -> dep
-            }
-
-        private fun putPathFromValue(dep: Dep, value: PsiElement): Dep =
-            when (value) {
-                is Call -> putPathFromValue(dep, value)
-                else -> dep
-            }
-
-        private fun putPathFromValue(dep: Dep, value: Call): Dep =
-            if (value.isCalling("System", "get_env")) {
-                // Getting environment variable in IDEs is unreliable because whether the local shell or not is
-                // used is based on how the IDE was launched.
-                dep
-            } else {
-                dep
-            }
+        // NOTE: path: <call> patterns (e.g. path: some_helper()) are not resolved because multiResolve is expensive
+        // and the resolution chain always returns the dep unchanged. If full resolution is needed in the future,
+        // re-implement with a non-blocking, suspending approach.
+        @Suppress("UNUSED_PARAMETER")
+        private fun putPath(dep: Dep, call: Call): Dep = dep
     }
 }
 
