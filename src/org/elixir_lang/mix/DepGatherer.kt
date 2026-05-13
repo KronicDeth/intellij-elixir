@@ -1,6 +1,7 @@
 package org.elixir_lang.mix
 
-import com.intellij.openapi.application.runReadAction
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.progress.ProgressManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.ResolveState
@@ -19,10 +20,14 @@ import org.elixir_lang.util.AccumulatorContinue
 
 class DepGatherer : DepGatherer() {
     override fun visitFile(file: PsiFile) {
+        // Caller (Resolution.packagePsiFileToDepSet) already holds a read lock via runReadAction { ... }.
+        // A nested runReadAction here is redundant. Protect from inadvertent calls with
+        // assertion.
+        assert(ApplicationManager.getApplication().isReadAccessAllowed) {
+            "DepGatherer.visitFile must be called under a read lock"
+        }
         if (file is ElixirFile) {
-            runReadAction {
-                file.acceptChildren(this)
-            }
+            file.acceptChildren(this)
         }
     }
 
@@ -59,6 +64,8 @@ private fun <R> Array<Call>.foldDepsDefinersWhile(
 
     depsNameArity()?.let { depsNameArity ->
         for (childCall in this) {
+            ProgressManager.checkCanceled()
+
             if (isDefining(childCall, depsNameArity)) {
                 final = operation(childCall, final.accumulator)
 

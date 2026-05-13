@@ -2,6 +2,7 @@ package org.elixir_lang.mix.watcher
 
 import com.intellij.openapi.application.runReadAction
 import com.intellij.openapi.progress.ProgressIndicator
+import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.vfs.VirtualFile
@@ -33,6 +34,7 @@ class Resolution(
             val depToRootVirtualFile = mutableMapOf<Dep, VirtualFile?>()
 
             while (rootVirtualFileQueue.isNotEmpty() && !progressIndicator.isCanceled) {
+                ProgressManager.checkCanceled()
                 val rootVirtualFile = rootVirtualFileQueue.remove()
 
                 if (!rootVirtualFileToDepSet.containsKey(rootVirtualFile)) {
@@ -42,6 +44,7 @@ class Resolution(
                         if (progressIndicator.isCanceled) {
                             break
                         }
+                        ProgressManager.checkCanceled()
 
                         /* Don't need to check module dep because it will already be in `rootVirtualFiles` AND
                            Module deps handle transitivity while Library deps don't */
