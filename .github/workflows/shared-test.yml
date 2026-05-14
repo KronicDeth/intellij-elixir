@@ -40,9 +40,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Stay with windows-2022 until https://github.com/erlef/setup-beam/commit/b94e7d372a9ef22d376b75a9374a7adeb0e2ea94 is released.
-        os: [ ubuntu-22.04, windows-2022 ]
-        idea-version: [ '2026.1.1', '2025.3.2', 'LATEST-EAP-SNAPSHOT' ]
+        # Note, we use ubuntu-22.04, due to 
+        os: [ ubuntu-22.04, windows-2025 ]
+        idea-version:
+            - '2026.1.1'
+            - '2025.3.2'
+            # 2026.2 upgrades to Java 25, won't work in CI until we resolve issues. https://github.com/JetBrains/intellij-community/commit/aa1cfa9632ab
+            # - 'LATEST-EAP-SNAPSHOT'
+            # revert to 261 eap instead
+            - '261.24374.34'
 
     steps:
       - name: Checkout
@@ -96,7 +102,7 @@ jobs:
           overwrite: true
           if-no-files-found: 'error'
 
-  verify-plugin:
+  build-plugin:
     runs-on: ubuntu-22.04
 
     steps:
@@ -119,32 +125,78 @@ jobs:
         id: build-plugin
         run: ./gradlew buildPlugin
 
+      - name: Upload Plugin Zip
+        id: upload-plugin-zip
+        uses: actions/upload-artifact@v6
+        with:
+          name: plugin-zip
+          path: build/distributions/*.zip
+          retention-days: 1
+          if-no-files-found: 'error'
+
+  # Verify one IDE at a time to avoid OOM -- the verifier runs all IDEs concurrently
+  # and there is no CLI flag to control parallelism.
+  verify-plugin:
+    needs: build-plugin
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        ide-version:
+          - 'ideaIU:253.30387.90'
+          - 'ideaIU:261.23567.138'
+          - 'rubymine:2025.3.2'
+          - 'rubymine:2026.1'
+
+    steps:
+      - name: Download Plugin Zip
+        id: download-plugin-zip
+        uses: actions/download-artifact@v6
+        with:
+          name: plugin-zip
+          path: build/distributions
+
+      # Fork to be replaced when/if https://github.com/ChrisCarini/intellij-platform-plugin-verifier-action/pull/102 merges
       - name: Verify Plugin
         id: verify-plugin
-        uses: ChrisCarini/intellij-platform-plugin-verifier-action@latest
+        uses: sh41/intellij-platform-plugin-verifier-action@add_format_options
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
+          # Pin to 1.384 (2025-03-19): versions >=1.385 introduced https://youtrack.jetbrains.com/issue/MP-7267 which
+          # causes the pipeline to fail on a regular basis.
+          verifier-version: '1.384'
           ide-versions: |
-            ideaIU:253.30387.90
-            ideaIU:261.23567.138
-            rubymine:2025.3.2
-            rubymine:2026.1
+            ${{ matrix.ide-version }}
+          failure-levels: |
+            COMPATIBILITY_PROBLEMS
+            INVALID_PLUGIN
+          # Should probably have these two as well, but until there is a resolution for https://youtrack.jetbrains.com/issue/IJPL-243914
+          # These will keep failing the build
+          # OVERRIDE_ONLY_API_USAGES
+          # NON_EXTENDABLE_API_USAGES
+          # We can't use this because RubyMine will fail. The verifier doesn't understand "optional"
+          # MISSING_DEPENDENCIES
           external-prefixes: 'org.jetbrains.jps'
+          verification-reports-formats: 'plain,markdown,html'
+          add-to-summary: 'verification-verdict.txt,compatibility-problems.txt,invalid-plugin.txt,dependencies.txt,override-only-usages.txt,non-extendable-api-usages.txt,markdown'
 
       - name: Print Verification Output
         id: print-verification-output
         if: always()
         run: |
-          echo "Verification log:"
-          cat "${{ steps.verify-plugin.outputs.verification-output-log-filename }}"
+          log_file="${{ steps.verify-plugin.outputs.verification-output-log-filename }}"
+          if [ -n "$log_file" ] && [ -f "$log_file" ]; then
+            cat "$log_file"
+          fi
 
       - name: Upload Verify Reports
         id: upload-verify-reports
         uses: actions/upload-artifact@v6
         if: ${{ always() && inputs.upload-reports }}
         with:
-          name: verify-plugin-reports
+          name: verify-plugin-reports-${{ matrix.ide-version }}
           path: |
             ${{ steps.verify-plugin.outputs.verification-output-log-filename }}
+            ${{ steps.verify-plugin.outputs.verification-reports-dir }}
           retention-days: 30

@@ -1,6 +1,44 @@
 <html>
 <body>
 
+<h1>v23.0.6</h1>
+<ul>
+    <li>
+        <p>Enhancements</p>
+        <ul>
+            <li>
+                <a href="https://github.com/KronicDeth/intellij-elixir/pull/3814">#3814</a> - <a href="https://github.com/sh41">@sh41</a>
+                <ul>
+                    <li>2026.2 compatibility: use deprecated <code>selectSdkHome</code> 2-arg form in SDK setup to compile against both 261 and 262 API. <b>Note</b>: On WSL, the SDK file chooser now opens at the user home directory instead of the WSL distribution root. This will be restored when 261 support is dropped.</li>
+                </ul>
+            </li>
+        </ul>
+    </li>
+    <li>
+        <p>Bug Fixes</p>
+        <ul>
+            <li>
+                <a href="https://github.com/KronicDeth/intellij-elixir/pull/3814">#3814</a> - <a href="https://github.com/sh41">@sh41</a>
+                <ul>
+                    <li>Fix unreachable <code>?: "IU"</code> fallback for <code>platformType</code> Gradle property -- <code>get()</code> throws on missing properties, so the elvis operator was dead code. Now uses <code>getOrElse("IU")</code>.</li>
+                </ul>
+            </li>
+        </ul>
+    </li>
+    <li>
+        <p>Build</p>
+        <ul>
+            <li>
+                <a href="https://github.com/KronicDeth/intellij-elixir/pull/3814">#3814</a> - <a href="https://github.com/sh41">@sh41</a>
+                <ul>
+                    <li>CI matrix updated to <code>windows-2025</code> runners. IDEA EAP version pinned to <code>261.24374.34</code> (Java 25 incompatibility with <code>LATEST-EAP-SNAPSHOT</code>).</li>
+                    <li>Plugin verifier pinned to 1.384 with markdown/HTML/plain report formats and clickable report output.</li>
+                </ul>
+            </li>
+        </ul>
+    </li>
+</ul>
+
 <h1>v23.0.5</h1>
 <ul>
     <li>

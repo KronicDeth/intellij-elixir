@@ -39,6 +39,8 @@ class ElixirSdkForModuleStep(private val wizardContext: WizardContext) : ModuleW
      * Without this wrapper, the default project returns null for projectFilePath, which causes
      * getEelDescriptor() to return LocalEelDescriptor, filtering out WSL/remote SDKs.
      *
+     * Raised https://youtrack.jetbrains.com/issue/IJPL-243914 to see if there is an alternative.
+     *
      * WARNING: Project is @ApiStatus.NonExtendable, but implementing it is necessary here because
      * the only alternative (syncSdks(EelDescriptor)) is @ApiStatus.Internal. The wrapper is only
      * used as a parameter to ProjectSdksModel.reset(), which calls isDefault(), projectFilePath,

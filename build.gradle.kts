@@ -26,6 +26,7 @@ import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 import org.jetbrains.intellij.platform.gradle.models.ProductRelease
 import org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask
+import org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
@@ -84,7 +85,7 @@ val skipSearchableOptions: Boolean = project.property("skipSearchableOptions").t
 
 val actualPlatformVersion: String = if (useDynamicEapVersion) {
     // Calling the helper from buildSrc
-    VersionFetcher.getLatestEapBuild(platformType = providers.gradleProperty("platformType").get() ?: "IU")
+    VersionFetcher.getLatestEapBuild(platformType = providers.gradleProperty("platformType").getOrElse("IU"))
 } else {
     project.property("platformVersion").toString()
 }
@@ -254,6 +255,23 @@ intellijPlatform {
     }
 
     pluginVerification {
+        // Match CI failure levels: only fail on compatibility problems and invalid plugin.
+        // INTERNAL_API_USAGES is excluded because the verifier flags ComponentManager methods
+        // referenced indirectly via service/extension registration bytecode, not our source code.
+        // See https://platform.jetbrains.com/t/stricter-plugin-verification-in-intellij-platform-gradle-plugin-2-15-0/4169
+        failureLevel.set(
+            listOf(
+                VerifyPluginTask.FailureLevel.COMPATIBILITY_PROBLEMS,
+                VerifyPluginTask.FailureLevel.INVALID_PLUGIN,
+            )
+        )
+        verificationReportsFormats.set(
+            listOf(
+                VerifyPluginTask.VerificationReportsFormats.MARKDOWN,
+                VerifyPluginTask.VerificationReportsFormats.HTML,
+                VerifyPluginTask.VerificationReportsFormats.PLAIN
+            )
+        )
         ides {
             select {
                 types = providers.gradleProperty("pluginVerifierIdeTypes")
@@ -279,12 +297,65 @@ intellijPlatform {
     }
 }
 
+// Capture values eagerly so the task action doesn't reference Project objects (config cache safe)
+val verifierReportsDir: File = layout.buildDirectory.dir("reports/pluginVerifier").get().asFile
+val projectDirFile: File = projectDir
+
+val openVerificationReports by tasks.registering {
+    description = "Opens plugin verification markdown reports in the IDE"
+    group = "verification"
+
+    // Always run when triggered (no up-to-date checking)
+    outputs.upToDateWhen { false }
+
+    doLast {
+        val mdFiles = verifierReportsDir.listFiles()
+            ?.filter { it.isDirectory }
+            ?.mapNotNull { dir -> dir.resolve("report.md").takeIf { it.exists() } }
+            ?: emptyList()
+
+        val htmlFiles = verifierReportsDir.listFiles()
+            ?.filter { it.isDirectory }
+            ?.mapNotNull { dir -> dir.resolve("report.html").takeIf { it.exists() } }
+            ?: emptyList()
+
+        if (mdFiles.isNotEmpty() || htmlFiles.isNotEmpty()) {
+            logger.lifecycle("")
+            logger.lifecycle("=== Plugin Verification Reports ===")
+            mdFiles.forEach { md ->
+                logger.lifecycle("  ${md.toRelativeString(projectDirFile)}")
+            }
+            htmlFiles.forEach { html ->
+                logger.lifecycle("  file:///${html.absolutePath.replace("\\", "/")}")
+            }
+            logger.lifecycle("")
+        }
+    }
+}
+
+tasks.named("verifyPlugin") {
+    finalizedBy(openVerificationReports)
+}
+
 intellijPlatformTesting.runIde.configureEach {
     plugins {
         // Run-IDE sandbox only: Kubernetes plugin consistently fails on startup.
         disablePlugin("com.intellij.kubernetes")
         // Run-IDE sandbox only: Sass plugin logs missing color scheme resources.
         disablePlugin("org.jetbrains.plugins.sass")
+    }
+
+    // On Windows, the sandboxed IDEA process holds OS-level file locks on its native binaries
+    // (fsnotifier.exe, DLLs, etc.). If a concurrent Gradle task triggers a transforms-cache
+    // refresh for the same IDEA distribution, Gradle cannot delete the locked files and fails.
+    //
+    // Setting localPath makes the task run IDEA from your locally installed copy rather than
+    // the extracted Gradle transforms cache, so there is no lock conflict.
+    //
+    // Set in ~/.gradle/gradle.properties (not committed):
+    //   runIdeLocalPath=C:\\Program Files\\JetBrains\\IntelliJ IDEA 2026.1.1
+    if (getName() == "runIde") {
+        localPath.set(layout.dir(providers.gradleProperty("runIdeLocalPath").map { project.file(it) }))
     }
 }
 
