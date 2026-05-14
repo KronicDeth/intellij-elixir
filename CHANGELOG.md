@@ -1,5 +1,20 @@
 # Changelog
 
+## v23.0.6
+
+### Enhancements
+* [#3814](https://github.com/KronicDeth/intellij-elixir/pull/3814) - [@sh41](https://github.com/sh41)
+  * 2026.2 compatibility: use deprecated `selectSdkHome` 2-arg form in SDK setup to compile against both 261 and 262 API. **Note**: On WSL, the SDK file chooser now opens at the user home directory instead of the WSL distribution root. This will be restored when 261 support is dropped.
+
+### Bug Fixes
+* [#3814](https://github.com/KronicDeth/intellij-elixir/pull/3814) - [@sh41](https://github.com/sh41)
+  * Fix unreachable `?: "IU"` fallback for `platformType` Gradle property -- `get()` throws on missing properties, so the elvis operator was dead code. Now uses `getOrElse("IU")`.
+
+### Build
+* [#3814](https://github.com/KronicDeth/intellij-elixir/pull/3814) - [@sh41](https://github.com/sh41)
+  * CI matrix updated to `windows-2025` runners. IDEA EAP version pinned to `261.24374.34` (Java 25 incompatibility with `LATEST-EAP-SNAPSHOT`).
+  * Plugin verifier pinned to 1.384 with markdown/HTML/plain report formats and clickable report output.
+
 ## v23.0.5
 
 ### Bug Fixes
