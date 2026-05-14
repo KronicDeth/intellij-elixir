@@ -255,6 +255,16 @@ intellijPlatform {
     }
 
     pluginVerification {
+        // Match CI failure levels: only fail on compatibility problems and invalid plugin.
+        // INTERNAL_API_USAGES is excluded because the verifier flags ComponentManager methods
+        // referenced indirectly via service/extension registration bytecode, not our source code.
+        // See https://platform.jetbrains.com/t/stricter-plugin-verification-in-intellij-platform-gradle-plugin-2-15-0/4169
+        failureLevel.set(
+            listOf(
+                VerifyPluginTask.FailureLevel.COMPATIBILITY_PROBLEMS,
+                VerifyPluginTask.FailureLevel.INVALID_PLUGIN,
+            )
+        )
         verificationReportsFormats.set(
             listOf(
                 VerifyPluginTask.VerificationReportsFormats.MARKDOWN,
