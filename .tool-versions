@@ -1,5 +1,5 @@
-elixir 1.13.4-otp-24
-erlang 24.3.4.6
+elixir 1.19.5-otp-28
+erlang 28.3
 
 # 21.0.4+7 / Azul Zulu: 21.36.17
 # GitHub actions uses JBR 21

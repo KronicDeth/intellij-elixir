@@ -5,7 +5,6 @@ package org.elixir_lang.psi.impl
 import com.ericsson.otp.erlang.*
 import com.intellij.lang.ASTNode
 import com.intellij.openapi.application.runReadAction
-import com.intellij.openapi.util.Computable
 import com.intellij.psi.*
 import com.intellij.psi.impl.source.tree.Factory
 import com.intellij.psi.tree.IElementType
@@ -59,7 +58,7 @@ fun ElixirStabBody.quote(metadata: OtpErlangList): OtpErlangObject =
                 }
                 .map { it as Quotable }
                 .map { it.quote() }
-                .let { QuotableImpl.buildBlock(it.toList(), metadata) }
+                .let { QuotableImpl.buildBlock(it.toList(), metadata, this.node) }
 
 object QuotableImpl {
     private val AMBIGUOUS_OP = OtpErlangAtom("ambiguous_op")
@@ -103,12 +102,53 @@ object QuotableImpl {
         // this is not valid Elixir quoting, but something needs to be there for quoting to work
         NIL
 
-        return quotedFunctionCall(
+        return if (isAmbiguous(operator, infix.rightOperand())){
+            quotedFunctionCall(
+                OtpErlangAtom(infix.leftOperand()?.text),
+                otpErlangList(
+                    OtpErlangTuple(arrayOf(OtpErlangAtom("ambiguous_op"), NIL)),
+                    lineNumberKeywordTuple(infix.node) ),
+                quotedFunctionCall(
+                    quotedOperator,
+                    metadata(operator),
+                    quotedRightOperand
+                )
+            )
+        } else {
+            quotedFunctionCall(
                 quotedOperator,
                 metadata(operator),
                 quotedLeftOperand,
                 quotedRightOperand
-        )
+            )
+        }
+
+    }
+
+    private val UNAMBIGUOUS_OPERATORS = arrayOf("++", "--")
+    private val AMBIGUOUS_FOR_ALL = arrayOf("(", "[", "<", "{", "%")
+    private val AMBIGUOUS_FOR_PLUS = arrayOf(*AMBIGUOUS_FOR_ALL, "-")
+    private val AMBIGUOUS_FOR_MINUS = arrayOf(*AMBIGUOUS_FOR_ALL, "+")
+
+    @Contract(pure = true)
+    @JvmStatic
+    fun isAmbiguous(operator: Operator, rightOperand: PsiElement?): Boolean {
+        if (UNAMBIGUOUS_OPERATORS.contains(operator.text)) {
+            return false
+        }
+
+        if (operator.nextSibling is PsiWhiteSpace) {
+            return false
+        }
+
+        val nextChar = rightOperand?.text?.first().toString()
+        if (operator.text.equals("+")) {
+            return AMBIGUOUS_FOR_PLUS.contains(nextChar)
+        } else if (operator.text.equals("-")) {
+            return AMBIGUOUS_FOR_MINUS.contains(nextChar)
+        }
+
+        return false
     }
 
     @Contract(pure = true)
@@ -338,7 +378,7 @@ object QuotableImpl {
         return quotedFunctionCall(
                 "Elixir.Access",
                 "get",
-                metadata(bracketArguments),
+                bracketOperationMetadata(bracketArguments),
                 quotedContainer,
                 quotedBracketArguments
         )
@@ -488,7 +528,7 @@ object QuotableImpl {
         return quotedFunctionCall(
                 "Elixir.Access",
                 "get",
-                metadata(bracketArguments),
+                bracketOperationMetadata(bracketArguments),
                 quotedContainer,
                 quotedBracketArguments
         )
@@ -559,7 +599,7 @@ object QuotableImpl {
         return quotedFunctionCall(
                 "Elixir.Access",
                 "get",
-                metadata(bracketArguments),
+                bracketOperationMetadata(bracketArguments),
                 quotedMatchedExpression,
                 quotedBracketArguments
         )
@@ -788,7 +828,7 @@ object QuotableImpl {
         return quotedFunctionCall(
                 "Elixir.Access",
                 "get",
-                metadata(bracketArguments),
+                bracketOperationMetadata(bracketArguments),
                 quotedContainer,
                 quotedBracketArguments
         )
@@ -894,7 +934,7 @@ object QuotableImpl {
         return quotedFunctionCall(
                 "Elixir.Access",
                 "get",
-                metadata(bracketArguments),
+                bracketOperationMetadata(bracketArguments),
                 quotedContainer,
                 quotedBracketArguments
         )
@@ -968,6 +1008,12 @@ object QuotableImpl {
                     identifierText,
                     callMetadata,
                     *quotedBlockArguments
+            )
+        } else if (identifierText == "...") {
+            // For some reason, as of 1.19, ellipsis in @spec are considered a function call.
+            quoted = quotedFunctionCall(
+                identifierText,
+                callMetadata
             )
         } else {
             /* @note quotedFunctionCall cannot be used here because in the 3-tuple for function calls, the elements are
@@ -1509,6 +1555,14 @@ object QuotableImpl {
     fun metadata(element: PsiElement): OtpErlangList = metadata(element.node)
 
     @JvmStatic
+    fun bracketOperationMetadata(element: PsiElement): OtpErlangList = OtpErlangList(
+        arrayOf<OtpErlangObject>(
+            keywordTuple("from_brackets", true),
+            lineNumberKeywordTuple(element.node)
+        )
+    )
+
+    @JvmStatic
     fun quotedFunctionCall(
             identifier: String,
             metadata: OtpErlangList,
@@ -1538,6 +1592,31 @@ object QuotableImpl {
                 quotedQualifiedIdentifier,
                 metadata,
                 *arguments
+        )
+    }
+
+    @JvmStatic
+    fun quotedFunctionCallFromInterpolation(
+        module: String,
+        identifier: String,
+        metadata: OtpErlangList,
+        vararg arguments: OtpErlangObject
+    ): OtpErlangTuple {
+        val quotedQualifiedIdentifier = quotedFunctionCall(
+            ".",
+            metadata,
+            OtpErlangAtom(module),
+            OtpErlangAtom(identifier)
+        )
+
+        val metadataObjectsList = metadata.elements().toMutableList()
+        metadataObjectsList.add(0, keywordTuple("from_interpolation", true))
+
+
+        return quotedFunctionCall(
+            quotedQualifiedIdentifier,
+            OtpErlangList(metadataObjectsList.toTypedArray()),
+            *arguments
         )
     }
 
@@ -1802,7 +1881,7 @@ object QuotableImpl {
      * @param quotedChildren
      */
     @Contract(pure = true)
-    internal fun buildBlock(quotedChildren: List<OtpErlangObject>, metadata: OtpErlangList): OtpErlangObject =
+    internal fun buildBlock(quotedChildren: List<OtpErlangObject>, metadata: OtpErlangList, node: ASTNode? = null): OtpErlangObject =
             when (quotedChildren.size) {
                 0 -> NIL
                 1 -> {
@@ -1812,8 +1891,17 @@ object QuotableImpl {
                     if (Macro.isLocalCall(quotedChild)) {
                         // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L547
                         when ((quotedChild as OtpErlangTuple).elementAt(0)) {
-                            EXCLAMATION_POINT, NOT, UNQUOTE_SPLICING ->
+                            UNQUOTE_SPLICING ->
                                 QuotableImpl.blockFunctionCall(quotedChildren, metadata)
+                            EXCLAMATION_POINT, NOT -> {
+                                if (
+                                    node?.treeParent?.treePrev?.text.equals("(")
+                                ) {
+                                    QuotableImpl.blockFunctionCall(quotedChildren, otpErlangList())
+                                } else {
+                                    quotedChild
+                                }
+                            }
                             else ->
                                 quotedChild
                         }

@@ -37,7 +37,7 @@ abstract class ReleaseQuoterTask : Exec() {
         service.ensureReady()
 
         // Configure the command
-        commandLine(service.getExecutable("mix"), "release", "--overwrite")
+        commandLine(service.getExecutable("mix"), "release", "--overwrite", "intellij_elixir")
         environment(service.getMixEnvironment())
 
         // Execute
