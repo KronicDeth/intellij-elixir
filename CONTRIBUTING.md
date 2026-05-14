@@ -116,6 +116,27 @@ The build system automatically detects your platform:
 **Path with spaces warning:**
 - Cosmetic only - Erlang installed in "Program Files" shows warnings but works correctly
 
+**kerl build fails on Linux as of May 2026**
+
+If you see this:
+```sh
+beam/dist.c:5678:15: error: two or more data types in declaration specifiers
+ 5678 |         Eterm bool = ((monitor_oflags & ERTS_ML_FLG_SPAWN_MONITOR)
+                       ^~~~
+```
+
+As the project still uses OTP 24, which uses a local variable named bool in beam/dist.c, which was legal C in 2022... but is not legal C now, because GCC 15 switched its default C standard to C23, which makes bool a reserved built-in type name. ArchLinux (btw) ships GCC 16.1.1, Deian 13 seems to be 14.2.0.
+
+You can work around this by forcing an older C standard, for example:
+
+```sh
+export CC=gcc
+export CFLAGS="-O2 -g -std=gnu17 -Wno-error -fcommon"
+export CPPFLAGS="-D_FORTIFY_SOURCE=0"
+export KERL_CONFIGURE_OPTIONS="--disable-debug --without-odbc --without-wx"
+unset KERL_USE_AUTOCONF
+```
+
 ### From command line
 > Let's assume that you don't have much knowledge of the Java/Kotlin ecosystem, and just want to help contribute some changes.
 > Here are some tips on how make your changes and test them without hopefully too much fuss,
