@@ -150,9 +150,14 @@
         <annotator implementationClass="org.elixir_lang.annotator.Atom" language="Elixir"/>
         <annotator implementationClass="org.elixir_lang.annotator.Callable" language="Elixir"/>
         <annotator implementationClass="org.elixir_lang.annotator.EscapeSequence" language="Elixir"/>
+        <annotator implementationClass="org.elixir_lang.annotator.Keyword" language="Elixir"/>
         <annotator implementationClass="org.elixir_lang.annotator.Map" language="Elixir"/>
         <annotator implementationClass="org.elixir_lang.annotator.ModuleAttribute" language="Elixir"/>
         <annotator implementationClass="org.elixir_lang.annotator.Textual" language="Elixir"/>
+
+        <!-- Suppress parser errors in Elixir code blocks injected into @doc heredocs -->
+        <highlightErrorFilter
+                implementation="org.elixir_lang.injection.markdown.DocCodeBlockHighlightErrorFilter"/>
 
         <!-- credo -->
         <globalInspection cleanupTool="false" displayName="Credo" enabledByDefault="false" groupName="Elixir"

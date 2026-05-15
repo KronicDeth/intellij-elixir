@@ -1,6 +1,7 @@
 package org.elixir_lang.psi.impl
 
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiNamedElement
 import com.intellij.psi.PsiPolyVariantReference
 import com.intellij.psi.PsiReference
 import com.intellij.psi.ResolveResult
@@ -75,7 +76,7 @@ fun QualifiableAlias.isOutermostQualifiableAlias(): Boolean {
     return outermost
 }
 
-fun QualifiableAlias.maybeModularNameToModulars(maxScope: PsiElement): Set<PsiElement> =
+fun QualifiableAlias.maybeModularNameToModulars(maxScope: PsiElement): Set<PsiNamedElement> =
     if (!recursiveKernelImport(maxScope)) {
         /* need to construct reference directly as qualified aliases don't return a reference except for the
            outermost */
@@ -88,7 +89,7 @@ fun QualifiableAlias.maybeModularNameToModulars(maxScope: PsiElement): Set<PsiEl
 private fun QualifiableAlias.recursiveKernelImport(maxScope: PsiElement): Boolean =
     maxScope is ElixirFile && maxScope.name == "kernel.ex" && name == KERNEL
 
-private fun PsiReference.toModulars(): Set<PsiElement> =
+private fun PsiReference.toModulars(): Set<PsiNamedElement> =
     when (this) {
         is PsiPolyVariantReference -> {
             multiResolve(false).flatMap { resolveResult ->
@@ -107,9 +108,9 @@ private fun PsiReference.toModulars(): Set<PsiElement> =
         }
     }
 
-private fun PsiReference.toModulars(resolved: PsiElement): Set<PsiElement> =
+private fun PsiReference.toModulars(resolved: PsiElement): Set<PsiNamedElement> =
     if (resolved is Call && isModular(resolved)) {
-        setOf(resolved)
+        (resolved as? PsiNamedElement)?.let { setOf(it) } ?: emptySet()
     } else if (resolved is org.elixir_lang.beam.psi.impl.ModuleImpl<*>) {
         setOf(resolved)
     } else if (resolved.isEquivalentTo(element)) {

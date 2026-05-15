@@ -2,9 +2,11 @@ package org.elixir_lang.beam.chunk.beam_documentation.docs.documented
 
 import com.ericsson.otp.erlang.OtpErlangAtom
 import com.ericsson.otp.erlang.OtpErlangBinary
+import com.ericsson.otp.erlang.OtpErlangList
 import com.ericsson.otp.erlang.OtpErlangMap
 import com.ericsson.otp.erlang.OtpErlangObject
 import com.intellij.openapi.diagnostic.Logger
+import org.elixir_lang.beam.chunk.beam_documentation.ErlangHtmlRenderer
 import org.elixir_lang.beam.term.inspect
 
 sealed class Doc {
@@ -33,7 +35,7 @@ sealed class Doc {
                     }
                 }
 
-        private fun from(element: OtpErlangMap): Doc? =
+        private fun from(element: OtpErlangMap): Doc =
                 element
                         .entrySet()
                         .mapNotNull {
@@ -48,7 +50,15 @@ sealed class Doc {
 
         private fun languageFrom(key: OtpErlangObject): String? =
                 when (key) {
-                    is OtpErlangBinary -> String(key.binaryValue())
+                    is OtpErlangBinary -> String(key.binaryValue(), Charsets.UTF_8)
+                    is OtpErlangList -> {
+                        try {
+                            key.stringValue()
+                        } catch (_: Exception) {
+                            logger.error("Doc language key is not a charlist: ${inspect(key)}")
+                            null
+                        }
+                    }
                     else -> {
                         logger.error("Don't know how to decode doc language from ${inspect(key)}")
 
@@ -58,7 +68,15 @@ sealed class Doc {
 
         private fun formattedFrom(value: OtpErlangObject): String? =
                 when (value) {
-                    is OtpErlangBinary -> String(value.binaryValue())
+                    is OtpErlangBinary -> String(value.binaryValue(), Charsets.UTF_8)
+                    is OtpErlangList -> {
+                        try {
+                            value.stringValue()
+                        } catch (_: Exception) {
+                            // Not a charlist -- treat as application/erlang+html structured doc (OTP ≤26)
+                            ErlangHtmlRenderer.render(value)
+                        }
+                    }
                     else -> {
                         logger.error("Don't know how to decode doc formatted from ${inspect(value)}")
 
@@ -70,14 +88,7 @@ sealed class Doc {
             if (first != null) {
                 if (second != null && second != first) {
                     when (first) {
-                        is None -> when (second) {
-                            is None -> first
-                            is Hidden, is MarkdownByLanguage -> second
-                        }
-                        is Hidden -> when (second) {
-                            is Hidden -> first
-                            is None, is MarkdownByLanguage -> second
-                        }
+                        is None, is Hidden -> second
                         is MarkdownByLanguage -> when (second) {
                             is None, is Hidden -> second
                             is MarkdownByLanguage -> {

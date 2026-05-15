@@ -5,6 +5,7 @@ import com.ericsson.otp.erlang.OtpErlangLong
 import com.ericsson.otp.erlang.OtpErlangRangeException
 import com.intellij.psi.ElementDescriptionLocation
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiNamedElement
 import com.intellij.psi.ResolveState
 import com.intellij.psi.util.isAncestor
 import com.intellij.usageView.UsageViewNodeTextLocation
@@ -246,7 +247,7 @@ object Import {
         (keywordValue.quote() as? OtpErlangLong)?.let { quotedKeywordValue ->
             try {
                 quotedKeywordValue.intValue()
-            } catch (e: OtpErlangRangeException) {
+            } catch (_: OtpErlangRangeException) {
                 Logger.error(
                     Import::class.java,
                     "Arity in OtpErlangLong could not be downcast to an int",
@@ -272,7 +273,7 @@ object Import {
      * @return `defmodule`, `defimpl`, or `defprotocol` imported by `importCall`.  It can be
      * `null` if Alias passed to `importCall` cannot be resolved.
      */
-    private fun modulars(importCall: Call): Set<PsiElement> =
+    private fun modulars(importCall: Call): Set<PsiNamedElement> =
         importCall
             .finalArguments()
             ?.firstOrNull()

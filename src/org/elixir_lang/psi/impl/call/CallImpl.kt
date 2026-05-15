@@ -1,6 +1,7 @@
 package org.elixir_lang.psi.impl.call
 
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiNamedElement
 import com.intellij.psi.PsiReference
 import com.intellij.psi.tree.TokenSet
 import com.intellij.psi.util.CachedValueProvider
@@ -32,6 +33,9 @@ import org.elixir_lang.util.AccumulatorContinue
 import org.jetbrains.annotations.Contract
 import java.util.*
 import org.elixir_lang.psi.impl.macroChildCallList as psiElementToMacroChildCallList
+import org.elixir_lang.psi.operation.Normalized as OperationNormalized
+import org.elixir_lang.psi.operation.infix.Normalized as InfixNormalized
+import org.elixir_lang.psi.operation.not_in.Normalized as NotInNormalized
 
 fun Call.computeReference(): PsiReference? =
     /* if the call is just the identifier for a module attribute reference, then don't return a Callable reference,
@@ -95,12 +99,12 @@ private fun PsiElement.isSlashInCaptureNameSlashArity(): Boolean =
     if (this is Infix &&
         (this is ElixirMatchedMultiplicationOperation || this is ElixirUnmatchedMultiplicationOperation)
     ) {
-        val operator = org.elixir_lang.psi.operation.Normalized.operator(this)
+        val operator = OperationNormalized.operator(this)
         val divisionOperatorChildren = operator.node.getChildren(TokenSet.create(ElixirTypes.DIVISION_OPERATOR))
 
         if (divisionOperatorChildren.isNotEmpty()) {
             val rightOperand =
-                org.elixir_lang.psi.operation.infix.Normalized.rightOperand(this)?.stripAccessExpression()
+                InfixNormalized.rightOperand(this)?.stripAccessExpression()
 
             if (rightOperand is ElixirDecimalWholeNumber) {
                 val parent = this.parent
@@ -325,7 +329,7 @@ fun Call.macroDefinitionClauseForArgument(): Call? {
     return macroDefinitionClause
 }
 
-fun Call.maybeModularNameToModulars(useCall: Call? = null): Set<Call> =
+fun Call.maybeModularNameToModulars(useCall: Call? = null): Set<PsiNamedElement> =
     if (isCalling(KERNEL, __MODULE__, 0)) {
         org.elixir_lang.psi.__MODULE__
             .reference(__MODULE__Call = this, useCall = useCall)
@@ -544,9 +548,9 @@ object CallImpl {
     @JvmStatic
     fun primaryArguments(infix: Infix): Array<PsiElement> {
         val children = infix.children
-        val operatorIndex = Normalized.operatorIndex(children)
-        val leftOperand = org.elixir_lang.psi.operation.infix.Normalized.leftOperand(children, operatorIndex)
-        val rightOperand = org.elixir_lang.psi.operation.infix.Normalized.rightOperand(children, operatorIndex)
+        val operatorIndex = OperationNormalized.operatorIndex(children)
+        val leftOperand = InfixNormalized.leftOperand(children, operatorIndex)
+        val rightOperand = InfixNormalized.rightOperand(children, operatorIndex)
 
         return if (leftOperand != null) {
             if (rightOperand != null) {
@@ -590,10 +594,10 @@ object CallImpl {
     @JvmStatic
     fun primaryArguments(notIn: NotIn): Array<PsiElement> {
         val children = notIn.children
-        val leftOperand = org.elixir_lang.psi.operation.not_in.Normalized.leftOperand(children)
+        val leftOperand = NotInNormalized.leftOperand(children)
 
         return if (leftOperand != null) {
-            val rightOperand = org.elixir_lang.psi.operation.not_in.Normalized.rightOperand(children)
+            val rightOperand = NotInNormalized.rightOperand(children)
 
             if (rightOperand != null) {
                 arrayOf(leftOperand, rightOperand)

@@ -1,6 +1,29 @@
 <html>
 <body>
 
+<h1>v23.3.0</h1>
+<ul>
+    <li>
+        <p>Enhancements</p>
+        <ul>
+            <li>Erlang external documentation support: hover docs now work for Erlang functions on OTP installations that store docs in external <code>.chunk</code> files rather than embedding them in <code>.beam</code> files (OTP 23, 26, 27 layouts).</li>
+            <li>Go-to-Declaration, Find Usages, and autocomplete now work for Erlang modules called with atom qualifier syntax (e.g. <code>:math.sqrt(2)</code>, <code>:ets.lookup(table, key)</code>).</li>
+            <li>Code blocks in Quick Documentation popups and the Documentation tool window now have Elixir syntax highlighting, including semantic colouring for aliases, function calls, and macro calls.</li>
+            <li>Erlang atom hover resolution shows richer function head information with spec-derived signatures.</li>
+        </ul>
+    </li>
+    <li>
+        <p>Bug Fixes</p>
+        <ul>
+            <li>Quick Documentation (Ctrl+Q / hover) now shows function docs for qualified calls like <code>Enum.map(list, fun)</code> and <code>GenServer.call(pid, msg)</code> -- previously showed no docs or only the module doc.</li>
+            <li>Hover docs now appear for BEAM macros with default arguments (e.g. <code>Logger.info("hello")</code>).</li>
+            <li>Red error squiggles no longer appear inside Elixir code blocks in <code>@doc</code>/<code>@moduledoc</code>/<code>@typedoc</code> heredocs -- documentation snippets are inherently partial and are no longer flagged as parse errors.</li>
+            <li>Fixed <code>@delegate_to</code> doc attributes triggering unnecessary error log entries.</li>
+            <li><code>do</code>/<code>end</code>/<code>fn</code> keywords in documentation code blocks now highlighted correctly.</li>
+        </ul>
+    </li>
+</ul>
+
 <h1>v23.2.0</h1>
 <ul>
     <li>

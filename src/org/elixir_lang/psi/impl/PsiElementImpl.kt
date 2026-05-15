@@ -5,6 +5,7 @@ import com.intellij.openapi.editor.Document
 import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiNamedElement
 import com.intellij.psi.PsiWhiteSpace
 import com.intellij.psi.impl.source.tree.CompositeElement
 import com.intellij.psi.impl.source.tree.LeafPsiElement
@@ -206,7 +207,7 @@ fun PsiElement.maybeModularNameToModulars(
     maxScope: PsiElement,
     useCall: Call?,
     incompleteCode: Boolean
-): Set<PsiElement> = when (val strippedMaybeModuleName = stripAccessExpression()) {
+): Set<PsiNamedElement> = when (val strippedMaybeModuleName = stripAccessExpression()) {
     is ElixirAtom -> strippedMaybeModuleName.maybeModularNameToModulars(incompleteCode)
     is QualifiableAlias -> strippedMaybeModuleName.maybeModularNameToModulars(maxScope)
     is Call -> strippedMaybeModuleName.maybeModularNameToModulars(useCall)
