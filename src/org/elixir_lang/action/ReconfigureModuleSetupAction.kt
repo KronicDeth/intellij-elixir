@@ -5,6 +5,7 @@ import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.module.ModuleManager
@@ -44,8 +45,11 @@ class ReconfigureModuleSetupAction : AnAction() {
 
         // Enable when at least one module has a mix.exs in its content root,
         // or a project-level Elixir SDK is configured.
-        val hasElixirModule = ModuleManager.getInstance(project).modules.any { it.isElixirMixModule() }
-        val hasElixirSdk = ElixirSdkType.mostSpecificSdk(project) != null
+        val (hasElixirModule, hasElixirSdk) = ReadAction.nonBlocking(java.util.concurrent.Callable {
+            val hasModule = ModuleManager.getInstance(project).modules.any { it.isElixirMixModule() }
+            val hasSdk = ElixirSdkType.mostSpecificSdk(project) != null
+            hasModule to hasSdk
+        }).executeSynchronously()
 
         e.presentation.isEnabledAndVisible = hasElixirModule || hasElixirSdk
     }
