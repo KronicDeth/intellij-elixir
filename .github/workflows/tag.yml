@@ -20,8 +20,14 @@ on:
           - 'false'
           - 'legacy'
         default: 'true'
+      skip_tests:
+        description: 'Skip test-and-verify (e.g. tests already passed on this commit)'
+        required: false
+        type: boolean
+        default: false
 jobs:
   test-and-verify:
+    if: ${{ !inputs.skip_tests }}
     uses: ./.github/workflows/shared-test.yml
     with:
       elixir-version: '1.13.4'
@@ -29,6 +35,7 @@ jobs:
 
   release:
     needs: [ test-and-verify ]
+    if: ${{ always() && (needs.test-and-verify.result == 'success' || needs.test-and-verify.result == 'skipped') }}
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout
