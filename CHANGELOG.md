@@ -1,5 +1,28 @@
 # Changelog
 
+## v23.1.0
+
+### Enhancements
+* [#3816](https://github.com/KronicDeth/intellij-elixir/pull/3816) - [@sh41](https://github.com/sh41)
+  * Project-scoped coroutine service (`ElixirCoroutineService`) with `supervisedChildScope` for structured, lifecycle-bound concurrency across plugin subsystems.
+  * Debugger runtime (Process, Node, MailBox) migrated from unmanaged `executeOnPooledThread` to structured coroutine scopes with cooperative cancellation via `ensureActive()`. Clean `CancellationException` handling prevents false error reports on shutdown.
+  * Serialised node-facing debugger operations on a dedicated single-lane `nodeDispatcher`, preventing concurrent BEAM RPC/network calls and preserving operation ordering.
+  * WSL debugger source resolution: when a BEAM-reported source path is Linux-style and doesn't resolve locally, converts to Windows UNC via WSL compat and retries. Applied to breakpoint hit navigation, stack frame source mapping, and failed-breakpoint presentation. WSL distribution cached on the debugger process to avoid repeated lookups.
+  * `mix format` integration replaced: removed legacy `MixFormatExternalFormatProcessor`, added `MixFormatFormattingService` using `AsyncDocumentFormattingService`. Improved stderr parsing, notification rendering, and error offset navigation.
+  * CLI ANSI toggle: added `ansi` parameter to control ANSI escape codes in subprocess output. Disabled for formatter subprocess to keep parsing deterministic.
+  * Breakpoint availability hot-path optimisation: added `isInsideModule()` for cheap boolean module-boundary checks, avoiding full module-name assembly. `getModuleName()` traversal now stops at file boundaries to avoid directory traversal.
+  * SDK setup modernisation: replaced hand-rolled `invokeAndWait` + boolean-flag pattern in `SdkRegistrar` with `edtWriteAction {}`. `registerOrUpdateErlangSdk` / `registerOrUpdateElixirSdk` are now suspend funs. Replaced `ProgressManager.runProcessWithProgressSynchronously` in `erlang/Type.setupSdkPaths` with `runWithModalProgressBlocking + withContext(Dispatchers.IO)`.
+  * Removed unnecessary environment picker complexity from dependent SDK creation flow.
+  * Removed blocking pooled-thread wrappers from SDK lookup; tightened read-action/background boundaries.
+
+### Bug Fixes
+* [#3816](https://github.com/KronicDeth/intellij-elixir/pull/3816) - [@sh41](https://github.com/sh41)
+  * Debugger node network calls dispatched off EDT via serial `nodeDispatcher`, fixing EDT blocking during debug sessions.
+  * VFS blocking read in debugger breakpoint availability checks -- `getModuleName()` directory traversal triggered blocking disk reads on the VFS, now stops at file boundaries. Partially fixes [#3790](https://github.com/KronicDeth/intellij-elixir/issues/3790).
+  * WSL Linux paths not resolving for debugger source navigation -- breakpoint hits, stack frames, and failed-breakpoint messages now resolve correctly when the BEAM reports Linux-style paths on Windows.
+  * Erlang SDK `detectSdkVersion` EDT path guarded with `runWithModalProgressBlocking` to prevent unguarded EDT blocking.
+  * Debugger deprecation warning and unused variable warning resolved.
+
 ## v23.0.7
 
 ### Enhancements
