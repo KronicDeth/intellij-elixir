@@ -19,6 +19,7 @@ opentest4j = "1.3.0"
 mockito-core = "5.21.0"
 kodein = "7.22.0"
 kotlinx-coroutines = "1.10.2"
+qodana = "2026.1.0"
 
 # Project Constants
 java = "21"
@@ -37,3 +38,4 @@ intellij-platform = { id = "org.jetbrains.intellij.platform", version.ref = "int
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 download = { id = "de.undercouch.download", version.ref = "gradle-download" }
 test-logger = { id = "com.adarshr.test-logger", version.ref = "test-logger" }
+qodana = { id = "org.jetbrains.qodana", version.ref = "qodana" }
