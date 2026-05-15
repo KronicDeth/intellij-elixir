@@ -1,8 +1,5 @@
 package org.elixir_lang.psi.impl
 
-import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.application.runReadAction
-import com.intellij.openapi.util.Computable
 import com.intellij.psi.PsiElement
 import org.elixir_lang.Name
 import org.elixir_lang.errorreport.Logger
@@ -20,7 +17,7 @@ object PsiNamedElementImpl {
     }
 
     @JvmStatic
-    fun getName(qualifiedAlias: QualifiedAlias): String = runReadAction { qualifiedAlias.text }
+    fun getName(qualifiedAlias: QualifiedAlias): String = qualifiedAlias.text
 
     @JvmStatic
     fun getName(atom: ElixirAtom): String? =
@@ -41,8 +38,7 @@ object PsiNamedElementImpl {
             val nameIdentifier = namedElement.nameIdentifier
 
             if (nameIdentifier != null) {
-                val text = ApplicationManager.getApplication().runReadAction(Computable { nameIdentifier.text })
-                unquoteName(namedElement, text)
+                unquoteName(namedElement, nameIdentifier.text)
             } else {
                 if (namedElement is Call) {
                     val call = namedElement as Call

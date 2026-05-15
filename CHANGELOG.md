@@ -1,5 +1,25 @@
 # Changelog
 
+## v23.2.0
+
+### Enhancements
+* [#3818](https://github.com/KronicDeth/intellij-elixir/pull/3818) - [@sh41](https://github.com/sh41)
+  * Code completion deduplication: multi-clause functions (e.g. `Enum.map_every` with 5 clauses) now appear once in completion results instead of once per clause head. Shared `PreferFunctionHead` logic selects bare function heads over implementation clauses.
+  * Parameter info deduplication: parameter hints grouped by `(name, arity)` -- separate arities still show distinct hints, but multiple clauses of the same arity no longer produce duplicate entries.
+  * Completion prefers source-defined modulars over BEAM stubs when both are available, eliminating duplicate completion entries.
+  * Transitive alias resolution: when stub-index lookup finds nothing for a module name that is itself a `QualifiableAlias`, resolution now follows alias chains transitively. Possibly addresses [#1806](https://github.com/KronicDeth/intellij-elixir/issues/1806).
+  * `DefinitionsScopedSearch` cancellation: added `ProgressManager.checkCanceled()` at loop boundaries and honour `Processor.process()` return value for early-exit, preventing hangs during large-project searches.
+
+### Bug Fixes
+* [#3818](https://github.com/KronicDeth/intellij-elixir/pull/3818) - [@sh41](https://github.com/sh41)
+  * **Breaking change**: removed `nameArityInAnyModule` global fallback from resolver. Previously, when `resolveInScope` found no results, the resolver fell back to a global stub-index search returning every function with a matching name from every module (all marked `validResult=false`). This polluted parameter hints with unrelated modules (e.g. hovering `Enum.map()` showed hints from `Stream.Reducers`, `Ecto`, `Phoenix`), caused Go-to-Definition to navigate to wrong-module definitions, and filled the resolution cache with irrelevant results. Calls that were previously "resolved" to functions in unrelated modules will now correctly appear as unresolved references.
+  * Infinite loop in `UnaliasedName.up` when resolving `QualifiedMultipleAliases` -- function overload ordering caused mutual recursion.
+  * Infinite recursion and NPE prevention in PSI resolve/tree-walk paths via `RecursionManager.doPreventingRecursion()` and null-safe `VISITED_ELEMENT_SET` access in `ResolveState`.
+  * `@spec` line marker grouping checked arity equality before name equality -- specs for different functions with the same arity were incorrectly grouped together.
+  * Gutter icons anchored to leaf `PsiElement`s per the `LineMarkerProvider` contract. Non-leaf elements caused markers to blink or appear in wrong positions after edits.
+  * Removed redundant `computeReadAction`/`runReadAction` wrappers from `CallImpl` getters (`functionName`, `moduleName`, `resolvedPrimaryArity`) and `PsiNamedElementImpl` name getters. These trivial PSI reads were called from paths already holding a read lock; under 2025.3+ writer-preference locking, re-acquiring blocks the EDT when a write action is pending. Partially fixes [#3790](https://github.com/KronicDeth/intellij-elixir/issues/3790).
+  * `Elixir.` prefix stripping for module name resolution -- stub index stores names without the prefix, so `Elixir.Enum` lookups now match correctly.
+
 ## v23.1.0
 
 ### Enhancements

@@ -28,10 +28,21 @@ object Module : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Modul
     ): Array<ResolveResult> {
         ApplicationManager.getApplication().assertReadAccessAllowed()
         val element = module.element
-        val name = element.fullyQualifiedName()
+        val name = element.fullyQualifiedName().removeElixirPrefix()
 
         return resolve(element, name, incompleteCode)
     }
+
+    /**
+     * In Elixir, every module `Foo.Bar` is internally named `:Elixir.Foo.Bar` in the
+     * Erlang VM.  Source code can reference modules with the explicit `Elixir.` prefix
+     * (e.g. `Elixir.Enum.map/2`), but the [ModularName] stub index stores modules by
+     * their Elixir-source name (`Enum`, not `Elixir.Enum`).  Strip the prefix so that
+     * resolution, completion, go-to-definition, and all other code insight features work
+     * uniformly for both `Enum.map()` and `Elixir.Enum.map()`.
+     */
+    private fun String.removeElixirPrefix(): String =
+        if (startsWith("Elixir.")) removePrefix("Elixir.") else this
 
     fun resolve(element: PsiElement, name: String, incompleteCode: Boolean): Array<ResolveResult> {
         val preferred = resolvePreferred(element, name, incompleteCode)

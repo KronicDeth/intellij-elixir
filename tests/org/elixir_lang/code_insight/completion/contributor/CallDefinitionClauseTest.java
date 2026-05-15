@@ -6,6 +6,7 @@ import com.intellij.codeInsight.lookup.LookupElementPresentation;
 import org.elixir_lang.PlatformTestCase;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class CallDefinitionClauseTest extends PlatformTestCase {
@@ -180,6 +181,52 @@ public class CallDefinitionClauseTest extends PlatformTestCase {
         assertEquals("(assigns)", lookupElementPresentation.getTailText());
     }
 
+    public void testPrefersBareFunctionHeadSignature() {
+        myFixture.configureByFiles("bare_head_preferred_usage.ex", "bare_head_preferred_declaration.ex");
+        myFixture.complete(CompletionType.BASIC, 1);
+
+        List<String> strings = myFixture.getLookupElementStrings();
+        assertNotNull("Completion lookup not shown", strings);
+        assertCompletion("map_every", strings);
+        assertEquals("Wrong number of completions", 1, strings.size());
+
+        LookupElement mapEvery = lookupElementByItemText("map_every");
+        assertNotNull("No lookup element for map_every", mapEvery);
+
+        LookupElementPresentation lookupElementPresentation = new LookupElementPresentation();
+        mapEvery.renderElement(lookupElementPresentation);
+        assertEquals("map_every", lookupElementPresentation.getItemText());
+        assertEquals("(enumerable, nth, fun) (/src/bare_head_preferred_declaration.ex defmodule Prefix.BareHeadPreferredDeclaration)", lookupElementPresentation.getTailText());
+    }
+
+    public void testSameNameDifferentArityCollapsedToOneCompletion() {
+        myFixture.configureByFiles("same_name_different_arity_usage.ex", "same_name_different_arity_declaration.ex");
+        myFixture.complete(CompletionType.BASIC, 1);
+
+        List<String> strings = myFixture.getLookupElementStrings();
+        assertNotNull("Completion lookup not shown", strings);
+        assertCompletion("process", strings);
+        assertEquals("Completion should collapse same-name different-arity into one entry", 1, strings.size());
+    }
+
+    public void testFallsBackToFirstClauseWhenNoBareHeadExists() {
+        myFixture.configureByFiles("no_bare_head_fallback_usage.ex", "no_bare_head_fallback_declaration.ex");
+        myFixture.complete(CompletionType.BASIC, 1);
+
+        List<String> strings = myFixture.getLookupElementStrings();
+        assertNotNull("Completion lookup not shown", strings);
+        assertCompletion("normalize", strings);
+        assertEquals("Wrong number of completions", 1, strings.size());
+
+        LookupElement normalize = lookupElementByItemText("normalize");
+        assertNotNull("No lookup element for normalize", normalize);
+
+        LookupElementPresentation lookupElementPresentation = new LookupElementPresentation();
+        normalize.renderElement(lookupElementPresentation);
+        assertEquals("normalize", lookupElementPresentation.getItemText());
+        assertEquals("(value, fallback) when is_binary(value) (/src/no_bare_head_fallback_declaration.ex defmodule Prefix.NoBareHeadFallbackDeclaration)", lookupElementPresentation.getTailText());
+    }
+
     /*
      * Protected Instance Methods
      */
@@ -192,6 +239,20 @@ public class CallDefinitionClauseTest extends PlatformTestCase {
     /*
      * Private Instance Methods
      */
+
+    private LookupElement lookupElementByItemText(@NotNull String expectedItemText) {
+        LookupElement[] lookupElements = myFixture.getLookupElements();
+        assertNotNull("Completion lookup not shown", lookupElements);
+
+        return Arrays.stream(lookupElements)
+                .filter(lookupElement -> {
+                    LookupElementPresentation presentation = new LookupElementPresentation();
+                    lookupElement.renderElement(presentation);
+                    return expectedItemText.equals(presentation.getItemText());
+                })
+                .findFirst()
+                .orElse(null);
+    }
 
     void assertCompletion(@NotNull String expectedCompletion, @NotNull List<String> actualCompletions) {
         assertTrue("Did not complete with \"" + expectedCompletion + "\"", actualCompletions.contains(expectedCompletion));

@@ -1,6 +1,30 @@
 <html>
 <body>
 
+<h1>v23.2.0</h1>
+<ul>
+    <li>
+        <p>Enhancements</p>
+        <ul>
+            <li>Code completion no longer shows duplicate entries for functions with multiple clauses or guards (e.g. <code>Enum.map_every</code> previously appeared 5 times).</li>
+            <li>Parameter hints deduplicated -- hovering a function call shows one set of hints per arity, not one per clause.</li>
+            <li>Module alias resolution now follows alias chains transitively, improving Go-to-Declaration and completion for aliased modules.</li>
+            <li>Large-project searches (Find Usages, Go-to-Definition) can now be cancelled mid-search and exit early when results are found, preventing UI hangs.</li>
+        </ul>
+    </li>
+    <li>
+        <p>Bug Fixes</p>
+        <ul>
+            <li><b>Breaking change</b>: parameter hints and Go-to-Definition no longer show results from unrelated modules. Previously, unresolvable calls fell back to a global search returning every function with the same name across the entire project. Calls that cannot be resolved now correctly show no results instead of misleading ones.</li>
+            <li>Fixed infinite loop when resolving multi-aliases (e.g. <code>alias Foo.{Bar, Baz}</code>).</li>
+            <li>Fixed infinite recursion and potential crashes in reference resolution.</li>
+            <li>Fixed <code>@spec</code> gutter icons grouping specs for different functions together when they shared the same arity.</li>
+            <li>Fixed gutter icons (line markers) blinking or appearing in wrong positions after editing code.</li>
+            <li>Reduced UI freezes caused by redundant read-lock acquisition in frequently called PSI accessors under IntelliJ 2025.3+ writer-preference locking.</li>
+        </ul>
+    </li>
+</ul>
+
 <h1>v23.1.0</h1>
 <ul>
     <li>

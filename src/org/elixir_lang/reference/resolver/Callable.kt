@@ -1,30 +1,18 @@
 package org.elixir_lang.reference.resolver
 
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.project.DumbService
+import com.intellij.openapi.util.RecursionManager
 import com.intellij.psi.PsiElementResolveResult
 import com.intellij.psi.ResolveResult
-import com.intellij.psi.ResolveState
 import com.intellij.psi.impl.source.resolve.ResolveCache
-import com.intellij.psi.search.GlobalSearchScope
-import com.intellij.psi.stubs.StubIndex
+import com.intellij.psi.util.PsiUtilCore
 import org.elixir_lang.Arity
-import org.elixir_lang.NameArityInterval
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.*
-import org.elixir_lang.psi.CallDefinitionClause
-import org.elixir_lang.psi.CallDefinitionClause.enclosingModularMacroCall
-import org.elixir_lang.psi.CallDefinitionClause.nameArityInterval
-import org.elixir_lang.psi.Module
 import org.elixir_lang.psi.call.Call
-import org.elixir_lang.psi.call.CanonicallyNamed
 import org.elixir_lang.psi.call.qualification.Qualified
 import org.elixir_lang.psi.impl.call.qualification.qualifiedToModulars
-import org.elixir_lang.psi.scope.CallDefinitionClause.Companion.MODULAR_CANONICAL_NAME
 import org.elixir_lang.psi.scope.VisitedElementSetResolveResult
-import org.elixir_lang.psi.stub.index.AllName
-import org.elixir_lang.structure_view.element.CallDefinitionHead
-import org.elixir_lang.structure_view.element.Callback
 import org.elixir_lang.structure_view.element.Delegation
 
 object Callable : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Callable> {
@@ -66,8 +54,40 @@ object Callable : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Cal
                 listOf(terminalResolveResult) + pathResolveResultList
             }
             // deduplicate shared `defdelegate`, `import`, or `use`
-            .groupBy { it.element }
-            .map { (_, resolveResults) -> resolveResults.first() }
+            .groupBy { resolveResultKey(it) }
+            .map { (_, resolveResults) ->
+                resolveResults.maxByOrNull { if (it.isValidResult) 1 else 0 } ?: resolveResults.first()
+            }
+            .let(::deduplicateEquivalentResults)
+
+    private fun deduplicateEquivalentResults(resolveResults: List<PsiElementResolveResult>): List<PsiElementResolveResult> {
+        val deduplicated = mutableListOf<PsiElementResolveResult>()
+
+        for (candidate in resolveResults) {
+            val existingIndex = deduplicated.indexOfFirst { existing ->
+                existing.element.manager.areElementsEquivalent(existing.element, candidate.element)
+            }
+
+            if (existingIndex == -1) {
+                deduplicated.add(candidate)
+            } else if (candidate.isValidResult && !deduplicated[existingIndex].isValidResult) {
+                deduplicated[existingIndex] = candidate
+            }
+        }
+
+        return deduplicated
+    }
+
+    private fun resolveResultKey(resolveResult: PsiElementResolveResult): String {
+        val element = resolveResult.element.navigationElement
+        val filePath = element.containingFile?.virtualFile?.path ?: ""
+        val range = element.textRange
+        val startOffset = range?.startOffset ?: -1
+        val endOffset = range?.endOffset ?: -1
+        val elementType = PsiUtilCore.getElementType(element)?.toString() ?: ""
+
+        return "$filePath#$startOffset:$endOffset:$elementType"
+    }
 
     private fun resolvePreferred(
         element: Call,
@@ -89,26 +109,27 @@ object Callable : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Cal
 
     private fun resolve(element: Call, name: String, resolvedPrimaryArity: Arity, incompleteCode: Boolean) =
         resolveInScope(element, name, resolvedPrimaryArity, incompleteCode)
-            .takeIf { set -> set.any(ResolveResult::isValidResult) }
-            ?: nameArityInAnyModule(element, name, resolvedPrimaryArity, incompleteCode)
 
     private fun resolveInScope(
         element: Call,
         name: String,
         resolvedPrimaryArity: Arity,
         incompleteCode: Boolean
-    ): List<VisitedElementSetResolveResult> =
-        try {
-            if (element is Qualified) {
-                resolveQualified(element, name, resolvedPrimaryArity, incompleteCode)
-            } else {
-                resolveUnqualified(element, name, resolvedPrimaryArity, incompleteCode)
-            }
-        } catch (_: StackOverflowError) {
-            Logger.error(Callable::class.java, "StackOverflowError when annotating Call", element)
+    ): List<VisitedElementSetResolveResult> {
+        return RecursionManager.doPreventingRecursion(element, true) {
+            try {
+                if (element is Qualified) {
+                    resolveQualified(element, name, resolvedPrimaryArity, incompleteCode)
+                } else {
+                    resolveUnqualified(element, name, resolvedPrimaryArity, incompleteCode)
+                }
+            } catch (_: StackOverflowError) {
+                Logger.error(Callable::class.java, "StackOverflowError when annotating Call", element)
 
-            emptyList()
-        }
+                emptyList()
+            }
+        } ?: emptyList()
+    }
 
     private fun resolveUnqualified(
         element: Call,
@@ -164,104 +185,6 @@ object Callable : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Cal
             }
         } else {
             emptyList()
-        }
-    }
-
-    private fun nameArityInAnyModule(
-        element: Call,
-        name: String,
-        arity: Arity,
-        incompleteCode: Boolean
-    ): List<VisitedElementSetResolveResult> {
-        val project = element.project
-        val resolveResults = mutableListOf<VisitedElementSetResolveResult>()
-
-        if (!DumbService.isDumb(project)) {
-            val keys = mutableListOf<String>()
-            val stubIndex = StubIndex.getInstance()
-
-            stubIndex.processAllKeys(AllName.KEY, project) { key ->
-                if ((incompleteCode && key.startsWith(name)) || key == name) {
-                    keys.add(key)
-                }
-
-                true
-            }
-
-            val scope = GlobalSearchScope.allScope(project)
-            // results are never valid because the qualifier is unknown
-            val validResult = false
-
-            for (key in keys) {
-                try {
-                    stubIndex
-                        .processElements(AllName.KEY, key, project, scope, NamedElement::class.java) { namedElement ->
-                            if (namedElement is Call) {
-                                if (CallDefinitionClause.`is`(namedElement)) {
-                                    if (incompleteCode ||
-                                        nameArityInterval(namedElement, resolveState(namedElement, key))
-                                            ?.arityInterval?.contains(arity) == true
-                                    ) {
-                                        resolveResults.add(
-                                            VisitedElementSetResolveResult(
-                                                namedElement,
-                                                validResult,
-                                                emptySet()
-                                            )
-                                        )
-                                    }
-                                } else if (Callback.`is`(namedElement)) {
-                                    if (incompleteCode ||
-                                        Callback
-                                            .headCall(namedElement as AtUnqualifiedNoParenthesesCall<*>)
-                                            ?.let {
-                                                CallDefinitionHead.nameArityInterval(
-                                                    it,
-                                                    resolveState(namedElement, key)
-                                                )
-                                            }
-                                            ?.arityInterval?.contains(arity) == true
-                                    ) {
-                                        resolveResults.add(
-                                            VisitedElementSetResolveResult(
-                                                namedElement,
-                                                validResult,
-                                                emptySet()
-                                            )
-                                        )
-                                    }
-                                }
-                            }
-
-                            true
-                        }
-                } catch (throwable: Throwable) {
-                    // ignore "Stub ids not found for key" as in #2945
-                    if (throwable.message?.contains("Stub ids not found for key") != true) {
-                        throw throwable
-                    }
-                }
-            }
-        }
-
-        return resolveResults
-    }
-
-    private fun resolveState(call: Call, name: String): ResolveState {
-        val initial = ResolveState.initial()
-
-        return if (NameArityInterval.nameIsAdjusted(name)) {
-            enclosingModularMacroCall(call)?.let { modular ->
-                if (Module.`is`(modular)) {
-                    modular.let { it as CanonicallyNamed }.canonicalName()?.let { modularCanonicalName ->
-                        initial.put(MODULAR_CANONICAL_NAME, modularCanonicalName)
-                    }
-                } else {
-                    null
-                }
-            } ?: initial
-        } else {
-            initial
         }
     }
 }

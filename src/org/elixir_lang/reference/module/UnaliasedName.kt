@@ -20,10 +20,10 @@ object UnaliasedName {
                 ":${namedElement.name}"
             } else if (namedElement is Call && namedElement.isCalling(KERNEL, Function.__MODULE__, 0)) {
                 __MODULE__
-                        .reference(namedElement, useCall = null)
-                        .resolve()
-                        ?.let { it as? PsiNamedElement }
-                        ?.name
+                    .reference(namedElement, useCall = null)
+                    .resolve()
+                    ?.let { it as? PsiNamedElement }
+                    ?.name
             } else {
                 namedElement.name
             }
@@ -32,10 +32,11 @@ object UnaliasedName {
             when (element) {
                 is Call ->
                     element
-                            .maybeModularNameToModulars(null)
-                            .mapNotNull { it.name }
-                            .toSet()
-                            .singleOrNull()
+                        .maybeModularNameToModulars(null)
+                        .mapNotNull { it.name }
+                        .toSet()
+                        .singleOrNull()
+
                 is ElixirAccessExpression -> {
                     val children = element.children
 
@@ -43,13 +44,14 @@ object UnaliasedName {
 
                     down(children[0])
                 }
+
                 is ElixirAtom -> ":${element.name}"
                 is QualifiableAlias -> element.name
                 else -> {
                     Logger.error(
-                            javaClass,
-                            "Don't know how to search down below ${element.javaClass} for unaliased name",
-                            element
+                        javaClass,
+                        "Don't know how to search down below ${element.javaClass} for unaliased name",
+                        element
                     )
 
                     "?"
@@ -74,29 +76,35 @@ object UnaliasedName {
                 entrance.name
             }
 
-    private tailrec fun up(element: PsiElement?, entrance: QualifiableAlias): String? =
-            when (element) {
-                is Call ->
-                    up(element, entrance)
-                is QualifiedMultipleAliases ->
-                    up(element, entrance)
-                is ElixirAccessExpression,
-                is ElixirNoParenthesesOneArgument,
-                is QuotableArguments,
-                is QuotableKeywordList ->
-                    up(element.parent, entrance)
-                is ElixirMultipleAliases ->
-                    entrance.fullyQualifiedName()
-                is QuotableKeywordPair ->
-                    up(element, entrance)
-                else ->
-                    null
-            }
-
     private fun up(element: QuotableKeywordPair, entrance: QualifiableAlias): String? =
             if (element.hasKeywordKey("as")) {
                 up(element.parent, entrance)
             } else {
                 null
             }
+
+    private tailrec fun up(element: PsiElement?, entrance: QualifiableAlias): String? =
+            when (element) {
+                is Call ->
+                    up(element, entrance)
+
+                is QualifiedMultipleAliases ->
+                    entrance.fullyQualifiedName()
+
+                is ElixirAccessExpression,
+                is ElixirNoParenthesesOneArgument,
+                is QuotableArguments,
+                is QuotableKeywordList ->
+                    up(element.parent, entrance)
+
+                is ElixirMultipleAliases ->
+                    entrance.fullyQualifiedName()
+
+                is QuotableKeywordPair ->
+                    up(element, entrance)
+
+                else ->
+                    null
+            }
+
 }

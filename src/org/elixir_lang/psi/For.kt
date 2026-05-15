@@ -13,8 +13,17 @@ object For {
      */
     fun `is`(call: Call): Boolean = call.isCalling(KERNEL, FOR, 2)
 
-    fun treeWalkDown(call: Call, resolveState: ResolveState, function: (PsiElement, ResolveState) -> Boolean): Boolean =
-            call.whileInStabBodyChildExpressions { expression ->
-                function(expression, resolveState)
-            }
+    fun treeWalkDown(call: Call, resolveState: ResolveState, function: (PsiElement, ResolveState) -> Boolean): Boolean {
+        if (resolveState.hasBeenVisited(call)) {
+            return true
+        }
+
+        val forResolveState = resolveState.putVisitedElement(call)
+
+        return call.whileInStabBodyChildExpressions { expression ->
+            expression.takeUnlessHasBeenVisited(forResolveState)
+                ?.let { function(it, forResolveState) }
+                ?: true
+        }
+    }
 }
