@@ -1,5 +1,15 @@
 # Changelog
 
+## v23.7.0
+
+### Enhancements
+* [#3822](https://github.com/KronicDeth/intellij-elixir/pull/3822) - [@sh41](https://github.com/sh41)
+  * Moved 108 hand-written `.kt`/`.java` files from `gen/` to `src/` -- these files were vulnerable to silent overwrite by parser regeneration. Regenerating `gen/` previously clobbered them with GrammarKit stubs, causing `StackOverflowError` at runtime when hand-written interface names matched BNF rule names (visitor generates self-recursive methods).
+  * Renamed 3 PSI interfaces to avoid GrammarKit visitor collisions: `Heredoc` -> `HeredocLiteral`, `HeredocLine` -> `HeredocLineable`, `SigilHeredoc` -> `SigilHeredocLiteral`.
+  * Consolidated ambiguous `ElixirPsiImplUtil` overloads (`processDeclarations`, `getNameIdentifier`, `getReference`) using Java 21 pattern matching switch expressions so that hand edits are no longer needed in generated files after parser regeneration.
+  * Marked `gen/` as generated sources in Gradle (`idea.module.generatedSourceDirs`) to suppress inspections on GrammarKit-generated PSI classes.
+  * `CONTRIBUTING.md` updated with comprehensive GrammarKit usage conventions: rule names vs interface names, visitor collision avoidance, `extends`/`mixin`/`fake` rules, `ElixirPsiImplUtil` method resolution and ambiguity pitfalls, source layout (`gen/` vs `src/`), CRLF conversion, and testing workflow after BNF changes.
+
 ## v23.6.0
 
 ### Enhancements

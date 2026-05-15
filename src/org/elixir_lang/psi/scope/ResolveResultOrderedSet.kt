@@ -1,7 +1,6 @@
 package org.elixir_lang.psi.scope
 
 import com.intellij.psi.PsiElement
-import com.intellij.psi.ResolveResult
 
 class ResolveResultOrderedSet {
     fun add(element: PsiElement, name: String, validResult: Boolean, visitedElementSet: Set<PsiElement>) {

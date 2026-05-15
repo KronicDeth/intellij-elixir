@@ -8,7 +8,6 @@ import com.intellij.psi.ResolveState
 import com.intellij.psi.util.PsiTreeUtil
 import org.elixir_lang.annotator.Parameter
 import org.elixir_lang.beam.psi.impl.CallDefinitionImpl
-import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.Named
@@ -18,7 +17,6 @@ import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.psi.scope.CallDefinitionClause
 import org.elixir_lang.structure_view.element.CallDefinitionHead
 import org.elixir_lang.structure_view.element.Callback
-import java.util.*
 
 class Variants : CallDefinitionClause() {
     private var lookupElementByPsiElementName: MutableMap<Pair<PsiElement, String>, LookupElement> = mutableMapOf()

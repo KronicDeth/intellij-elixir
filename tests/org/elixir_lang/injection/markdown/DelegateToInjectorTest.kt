@@ -7,7 +7,7 @@ import org.elixir_lang.ElixirLanguage
 import org.elixir_lang.PlatformTestCase
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
 import org.elixir_lang.psi.ElixirTypes
-import org.elixir_lang.psi.Heredoc
+import org.elixir_lang.psi.HeredocLiteral
 import org.intellij.plugins.markdown.lang.MarkdownLanguage
 
 /**
@@ -58,7 +58,7 @@ class DelegateToInjectorTest : PlatformTestCase() {
         }
 
         LoggedErrorProcessor.executeWith<RuntimeException>(processor) {
-            // Trigger highlighting — this invokes all MultiHostInjectors including our Injector
+            // Trigger highlighting - this invokes all MultiHostInjectors including our Injector
             myFixture.doHighlighting()
         }
 
@@ -214,7 +214,7 @@ class DelegateToInjectorTest : PlatformTestCase() {
     fun testCodeBlockTrailingEndIsInjectedWithElixir() {
         myFixture.configureByFile("trailing_end_code_block.ex")
 
-        val heredoc = PsiTreeUtil.findChildOfType(myFixture.file, Heredoc::class.java)
+        val heredoc = PsiTreeUtil.findChildOfType(myFixture.file, HeredocLiteral::class.java)
         assertNotNull("Could not find documentation heredoc in fixture", heredoc)
 
         val injectedLanguageManager = InjectedLanguageManager.getInstance(myFixture.project)

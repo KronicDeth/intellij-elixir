@@ -3,7 +3,6 @@ package org.elixir_lang.psi.scope
 import com.intellij.openapi.util.Condition
 import com.intellij.psi.ResolveResult
 import com.intellij.util.containers.ContainerUtil
-import java.util.*
 
 object MultiResolve {
     /*

@@ -80,7 +80,7 @@ public class ElixirInterpolatedSigilHeredocImpl extends ASTWrapperPsiElement imp
   }
 
   @Override
-  public @NotNull List<? extends HeredocLine> getHeredocLineList() {
+  public @NotNull List<? extends HeredocLineable> getHeredocLineList() {
     return ElixirPsiImplUtil.getHeredocLineList(this);
   }
 

@@ -6,7 +6,7 @@ import com.intellij.lang.injection.InjectedLanguageManager
 import com.intellij.psi.PsiFile
 import com.intellij.psi.util.PsiTreeUtil
 import org.elixir_lang.PlatformTestCase
-import org.elixir_lang.psi.SigilHeredoc
+import org.elixir_lang.psi.SigilHeredocLiteral
 import org.elixir_lang.psi.SigilLine
 import org.elixir_lang.reference.Callable.Companion.isVariable
 import org.elixir_lang.settings.ElixirExperimentalSettings
@@ -215,7 +215,7 @@ class RegexSigilInjectionTest : PlatformTestCase() {
 
     private fun assertRegexInjectionPresent(file: PsiFile) {
         val sigilLine = PsiTreeUtil.findChildOfType(file, SigilLine::class.java)
-        val sigilHeredoc = PsiTreeUtil.findChildOfType(file, SigilHeredoc::class.java)
+        val sigilHeredoc = PsiTreeUtil.findChildOfType(file, SigilHeredocLiteral::class.java)
         val host = sigilLine ?: sigilHeredoc
         checkNotNull(host) { "Sigil host not found in test file" }
 

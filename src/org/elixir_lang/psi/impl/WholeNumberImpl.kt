@@ -1,6 +1,7 @@
 package org.elixir_lang.psi.impl
 
 import org.elixir_lang.psi.*
+import org.elixir_lang.psi.Digits
 import org.jetbrains.annotations.Contract
 import java.math.BigInteger
 import java.util.*

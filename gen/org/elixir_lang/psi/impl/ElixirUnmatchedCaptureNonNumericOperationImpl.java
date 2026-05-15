@@ -2,8 +2,6 @@
 package org.elixir_lang.psi.impl;
 
 import java.util.List;
-
-import org.elixir_lang.psi.operation.capture.NonNumeric;
 import org.jetbrains.annotations.*;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
@@ -65,12 +63,12 @@ public class ElixirUnmatchedCaptureNonNumericOperationImpl extends ElixirUnmatch
 
   @Override
   public @Nullable PsiElement getNameIdentifier() {
-    return ElixirPsiImplUtil.getNameIdentifier((NonNumeric) this);
+    return ElixirPsiImplUtil.getNameIdentifier(this);
   }
 
   @Override
   public @Nullable PsiReference getReference() {
-    return ElixirPsiImplUtil.getReference((NonNumeric) this);
+    return ElixirPsiImplUtil.getReference(this);
   }
 
   @Override

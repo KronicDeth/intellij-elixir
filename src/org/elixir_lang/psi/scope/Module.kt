@@ -5,26 +5,16 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiNameIdentifierOwner
 import com.intellij.psi.PsiNamedElement
 import com.intellij.psi.ResolveState
-import com.intellij.psi.impl.source.tree.CompositeElement
 import com.intellij.psi.scope.PsiScopeProcessor
-import com.intellij.psi.util.isAncestor
-import com.intellij.psi.util.siblings
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
-import org.elixir_lang.psi.call.CanonicallyNamed
 import org.elixir_lang.psi.call.Named
-import org.elixir_lang.psi.call.name.Function
-
-import org.elixir_lang.psi.call.name.Function.ALIAS
-import org.elixir_lang.psi.call.name.Function.REQUIRE
-import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.ex_unit.Case
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
 import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.call.keywordArgument
 import org.elixir_lang.psi.impl.call.maybeModularNameToModulars
 import org.elixir_lang.psi.impl.call.whileInStabBodyChildExpressions
-import org.elixir_lang.psi.impl.childExpressions
 import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.psi.impl.whileInChildExpressions
 import org.elixir_lang.psi.scope.WhileIn.whileIn

@@ -21,13 +21,13 @@ public interface ElixirMatchedQualifiedAlias extends ElixirMatchedExpression, Na
   @NotNull
   ElixirMatchedExpression getMatchedExpression();
 
-  @Nullable String fullyQualifiedName();
+  @NotNull String fullyQualifiedName();
 
   @NotNull String getName();
 
   @Nullable PsiElement getNameIdentifier();
 
-  @Nullable ItemPresentation getPresentation();
+  @NotNull ItemPresentation getPresentation();
 
   @Nullable PsiPolyVariantReference getReference();
 

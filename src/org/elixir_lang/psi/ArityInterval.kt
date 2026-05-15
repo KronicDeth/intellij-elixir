@@ -1,17 +1,13 @@
 package org.elixir_lang.psi
 
 import com.intellij.psi.PsiElement
-import com.intellij.psi.ResolveState
 import org.elixir_lang.Arity
 import org.elixir_lang.ArityRange
-import org.elixir_lang.NameArityRange
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Module
-import org.elixir_lang.psi.call.name.Module.KERNEL_SPECIAL_FORMS
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil
 import org.elixir_lang.psi.operation.InMatch
 import org.elixir_lang.psi.operation.Operation
-import org.elixir_lang.psi.scope.CallDefinitionClause.Companion.MODULAR_CANONICAL_NAME
 
 /**
  * While an arity range for a normal function or macro is represented as an

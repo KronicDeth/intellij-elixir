@@ -18,7 +18,7 @@ public interface ElixirAlias extends NamedElement, QualifiableAlias, Quotable {
 
   @Nullable PsiElement getNameIdentifier();
 
-  @Nullable ItemPresentation getPresentation();
+  @NotNull ItemPresentation getPresentation();
 
   @Nullable PsiPolyVariantReference getReference();
 

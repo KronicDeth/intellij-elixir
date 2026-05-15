@@ -26,7 +26,7 @@ class Injector : MultiHostInjector {
 
     private fun getLanguagesToInjectInQuote(registrar: MultiHostRegistrar, documentation: PsiElement) {
         when (documentation) {
-            is Heredoc -> {
+            is HeredocLiteral -> {
                 injectMarkdownInQuote(registrar, documentation)
                 injectElixirInCodeBlocksInQuote(registrar, documentation)
             }
@@ -78,7 +78,7 @@ class Injector : MultiHostInjector {
         }
     }
 
-    private fun injectMarkdownInQuote(registrar: MultiHostRegistrar, documentation: Heredoc) {
+    private fun injectMarkdownInQuote(registrar: MultiHostRegistrar, documentation: HeredocLiteral) {
         var injectionStarted = false
         val prefixLength = documentation.heredocPrefix.textLength
         val quoteOffset = documentation.textOffset
@@ -185,7 +185,7 @@ class Injector : MultiHostInjector {
     }
 
 
-    private fun injectElixirInCodeBlocksInQuote(registrar: MultiHostRegistrar, documentation: Heredoc) {
+    private fun injectElixirInCodeBlocksInQuote(registrar: MultiHostRegistrar, documentation: HeredocLiteral) {
         val prefixLength = documentation.heredocPrefix.textLength
         val quoteOffset = documentation.textOffset
         var inCodeBlock = false

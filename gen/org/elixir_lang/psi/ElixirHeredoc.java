@@ -10,7 +10,7 @@ import com.intellij.lang.ASTNode;
 import com.intellij.psi.LiteralTextEscaper;
 import com.intellij.psi.PsiLanguageInjectionHost;
 
-public interface ElixirHeredoc extends Heredoc, Quote {
+public interface ElixirHeredoc extends HeredocLiteral, Quote {
 
   @NotNull
   List<ElixirHeredocLine> getHeredocLineList();
