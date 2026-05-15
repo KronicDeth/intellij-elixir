@@ -1,5 +1,24 @@
 # Changelog
 
+## v23.3.0
+
+### Enhancements
+* [#3819](https://github.com/KronicDeth/intellij-elixir/pull/3819) - [@sh41](https://github.com/sh41)
+  * Erlang external documentation support: parse external `.chunk` files (`<app>/doc/chunks/<module>.chunk`) and normalise doc payload across binary, charlist, and structured-term (`application/erlang+html`) variants. Covers OTP 23, 26, and 27 packaging layouts. BEAM decompilation now loads external chunk docs into generated mirror source.
+  * Erlang module resolution via atom qualifier syntax: `:math.sqrt(2)`, `:ets.lookup(table, key)` and similar calls now resolve correctly. `maybeModularNameToModulars()` widened from `Set<Call>` to `Set<PsiNamedElement>` to include BEAM-decompiled `ModuleImpl` instances. Unblocks Go-to-Declaration, Find Usages, and autocomplete for all Erlang modules used with atom qualifier syntax.
+  * Syntax highlighting in Quick Documentation code blocks: registered `CodeBlockHtmlProvider` and `CodeFenceHtmlProvider` in `MarkdownFlavourDescriptor`. Indented code blocks default to Elixir; fenced blocks dispatch by language hint with Elixir fallback. `RenderedDocCodeBlockRenderer` applies semantic overlays for alias, function call, macro call, and declaration styling.
+  * Erlang atom hover resolution: atom targets routed explicitly in documentation lookup with richer function head presentation using metadata-derived spec signatures.
+  * `isDocumentationHost` consolidated into single source of truth in `PsiLanguageInjectionHost`, used by both the injection host and the markdown `Injector`.
+
+### Bug Fixes
+* [#3819](https://github.com/KronicDeth/intellij-elixir/pull/3819) - [@sh41](https://github.com/sh41)
+  * Quick Documentation (hover/Ctrl+Q) for qualified function calls like `Enum.map(list, fun)` and `GenServer.call(pid, msg)` -- previously showed no docs or fell back to module doc. Four root causes fixed: `ElixirRelativeIdentifier` not forwarded in `getCustomDocumentationElement`; `singleOrNull` returning `null` for multi-clause resolutions (replaced with `firstOrNull`); `filterIsInstance<Call>()` dropping `CallDefinitionImpl` from BEAM-only modules; arity-relaxed fallback not filtering by exact function name. Fixes [#3636](https://github.com/KronicDeth/intellij-elixir/issues/3636).
+  * Hover docs for BEAM macros with default arguments (e.g. `Logger.info("hello")`): added `Docs.documentedByNameFallback()` that searches the name's `TreeMap` for the nearest arity. `BeamDocsHelper` now dispatches by `Definition` kind (function vs macro). Possibly addresses [#3650](https://github.com/KronicDeth/intellij-elixir/issues/3650), [#3553](https://github.com/KronicDeth/intellij-elixir/issues/3553), [#3552](https://github.com/KronicDeth/intellij-elixir/issues/3552), [#3324](https://github.com/KronicDeth/intellij-elixir/issues/3324), [#3468](https://github.com/KronicDeth/intellij-elixir/issues/3468), [#2691](https://github.com/KronicDeth/intellij-elixir/issues/2691).
+  * Red parser-error squiggles in Elixir code blocks injected into `@doc`/`@moduledoc`/`@typedoc` heredocs suppressed via `DocCodeBlockHighlightErrorFilter` -- documentation snippets are inherently partial and should not show errors.
+  * `@delegate_to` doc attributes no longer trigger "Do not know whether to inject Markdown" error log entries.
+  * `do`/`end`/`fn` keywords in injected doc code blocks now styled correctly via a new `Keyword` annotator scoped to injected fragments.
+  * Erroneous `startInjecting(MarkdownLanguage.INSTANCE)` removed from `injectElixirInCodeBlocksInQuote` -- the function injects Elixir into indented code blocks; starting a competing Markdown injection was incorrect.
+
 ## v23.2.0
 
 ### Enhancements
