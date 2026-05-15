@@ -26,12 +26,15 @@ import com.intellij.ui.ClickListener
 import com.intellij.ui.awt.RelativePoint
 import com.intellij.util.messages.MessageBusConnection
 import com.intellij.util.ui.JBUI
+import com.intellij.openapi.application.EDT
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.elixir_lang.Icons
 import org.elixir_lang.isElixirModule
 import org.elixir_lang.mix.project.ProjectModuleSetupValidator
@@ -217,25 +220,20 @@ class ElixirSdkStatusWidget(@param:NotNull private val project: Project) : Custo
     }
 
     private fun updateWidget() {
-        cachedPresentation = null
-        val presentation = getCurrentPresentation()
-
-        component.text = presentation.text
-        component.icon = presentation.icon
-        component.toolTipText = presentation.tooltip
-
-        statusBar?.updateWidget(ID)
-
-        // Fire notification whenever a discrepancy is detected
-        notifyIfNeeded()
-    }
-
-    private fun getCurrentPresentation(): WidgetPresentation {
-        return cachedPresentation ?: run {
+        widgetScope.launch {
+            cachedPresentation = null
             val sdkStatus = detectSdkStatus()
             val presentation = createPresentation(sdkStatus)
             cachedPresentation = presentation
-            presentation
+
+            withContext(Dispatchers.EDT) {
+                component.text = presentation.text
+                component.icon = presentation.icon
+                component.toolTipText = presentation.tooltip
+                statusBar?.updateWidget(ID)
+            }
+
+            notifyIfNeeded(sdkStatus)
         }
     }
 
@@ -342,8 +340,7 @@ class ElixirSdkStatusWidget(@param:NotNull private val project: Project) : Custo
         }
     }
 
-    private fun notifyIfNeeded() {
-        val sdkStatus = detectSdkStatus()
+    private fun notifyIfNeeded(sdkStatus: SdkStatus) {
         val issueKey = computeIssueKey(sdkStatus)
 
         // No issue -- expire any active notification and reset
