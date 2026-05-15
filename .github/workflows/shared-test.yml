@@ -40,15 +40,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Note, we use ubuntu-22.04, due to 
         os: [ ubuntu-22.04, windows-2025 ]
         idea-version:
-            - '2026.1.1'
+            - '2026.1.2'
             - '2025.3.2'
             # 2026.2 upgrades to Java 25, won't work in CI until we resolve issues. https://github.com/JetBrains/intellij-community/commit/aa1cfa9632ab
             # - 'LATEST-EAP-SNAPSHOT'
-            # revert to 261 eap instead
-            - '261.24374.34'
 
     steps:
       - name: Checkout
@@ -118,7 +115,7 @@ jobs:
         with:
           setup-elixir: false
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          idea-version: '2026.1.1'
+          idea-version: '2026.1.2'
           free-docker-images: false
 
       - name: Build Plugin
@@ -143,10 +140,10 @@ jobs:
       fail-fast: false
       matrix:
         ide-version:
-          - 'ideaIU:253.30387.90'
-          - 'ideaIU:261.23567.138'
-          - 'rubymine:2025.3.2'
-          - 'rubymine:2026.1'
+          - 'ideaIU:253.33514.17'
+          - 'ideaIU:261.24374.151'
+          - 'rubymine:2025.3.5'
+          - 'rubymine:2026.1.2'
 
     steps:
       - name: Download Plugin Zip
