@@ -101,14 +101,14 @@ class ModuleImpl<T : ModuleStub<*>?>(private val stub: T) : ModuleElementImpl(),
                     val message = "No decompiled source function with name/arity (${moduleName(element)}.${name}/${arity})"
 
                     if (BulkDecompilationRunLogger.shouldLogMissingFunctionError(project, message)) {
-                        LOGGER.error(message)
+                        LOGGER.warn(message)
                     }
                 }
             } else if (callDefinitionStub.isExported) {
                 val message = "No decompiled source function with name (${moduleName(element)}.$name)"
 
                 if (BulkDecompilationRunLogger.shouldLogMissingFunctionError(project, message)) {
-                    LOGGER.error(message)
+                    LOGGER.warn(message)
                 }
             }
         }
