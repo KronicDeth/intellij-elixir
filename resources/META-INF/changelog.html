@@ -1,6 +1,27 @@
 <html>
 <body>
 
+<h1>v23.5.0</h1>
+<ul>
+    <li>
+        <p>Enhancements</p>
+        <ul>
+            <li>All Elixir settings (Credo, Dialyzer, SDKs, Experimental Settings) now grouped under a single "Elixir" parent in Settings, for both full IDEs and small IDEs like RubyMine.</li>
+            <li>Elixir settings pages are now discoverable via the Settings search box -- typing "credo", "dialyzer", "elixir", or "liveview" finds the relevant page.</li>
+            <li>Credo inspection now runs once per umbrella root instead of once per app, avoiding duplicate findings and redundant <code>mix credo</code> invocations.</li>
+            <li>Credo execution failures (missing SDK, missing dependency, compilation errors) now surface as inspection results and IDE notifications instead of being silently ignored.</li>
+            <li>When a Credo run partially succeeds before hitting a fatal error, findings from the successful portion are preserved.</li>
+        </ul>
+    </li>
+    <li>
+        <p>Bug Fixes</p>
+        <ul>
+            <li>Reduced UI freezes caused by Credo inspection lock contention under IntelliJ 2025.3+ writer-preference threading.</li>
+            <li>Fixed Credo "Configure credo" notification action using an internal API that could fail on newer platform versions.</li>
+        </ul>
+    </li>
+</ul>
+
 <h1>v23.4.0</h1>
 <ul>
     <li>

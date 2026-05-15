@@ -1,5 +1,25 @@
 # Changelog
 
+## v23.5.0
+
+### Enhancements
+* [#3817](https://github.com/KronicDeth/intellij-elixir/pull/3817) - [@sh41](https://github.com/sh41)
+  * All Elixir settings panels (Credo, Dialyzer, SDKs, Experimental Settings) grouped under a single "Elixir" parent configurable in both full IDEs and small IDEs (RubyMine, PyCharm, etc.). Dropped redundant "Elixir" prefixes from child panel display names.
+  * Top-level configurable selection refactored to a service-provider strategy (`TopLevelElixirConfigurableFactory`) with small IDE and rich platform implementations, replacing the `isSmallIde` class detection approach.
+  * Settings search indexing via `ElixirSearchableOptionContributor` -- typing "credo", "dialyzer", "elixir", or "liveview" in the Settings search box now surfaces the relevant Elixir settings pages.
+  * Credo inspection -- umbrella project support: `resolveCredoWorkingDirectory` walks up from `apps/<app>` content roots to the umbrella root so Credo runs once per umbrella root instead of once per app. Working directories deduplicated by ancestor path.
+  * Credo inspection -- execution failure surfacing: failures (missing SDK, missing Credo dependency, compilation errors) now appear as inspection problems on `mix.exs` and as aggregated IDE notifications, instead of being silently dropped.
+  * Credo inspection -- partial result preservation: when a Credo run emits some findings before hitting a fatal error, the findings are kept and a warning notification is shown alongside them.
+  * Flycheck output parsing extracted and hardened: two-phase approach (record split, then location parse) correctly handles line+column, line-only, and file-level findings. Invalid paths and out-of-range offsets logged at debug level instead of crashing the inspection run.
+  * `--mute-exit-status` added to Credo command line so lint-level exit codes are not treated as execution failures.
+
+### Bug Fixes
+* [#3817](https://github.com/KronicDeth/intellij-elixir/pull/3817) - [@sh41](https://github.com/sh41)
+  * Credo inspection read-action lock churn: consolidated 4-6 separate `runReadAction(Computable { })` calls per output line into a single `runReadAction {}` block per finding. Under 2025.3+ writer-preference locking, the repeated lock acquire/release blocked the EDT when a write action was pending. Partially fixes [#3790](https://github.com/KronicDeth/intellij-elixir/issues/3790).
+  * Credo "Configure credo" notification action used internal `ShowSettingsUtilImpl` API -- replaced with `ShowSettingsUtil.getInstance()` and added `project.isDisposed` guard.
+  * Credo and Dialyzer configurable IDs (`"Credo"`, `"Dialyzer"`) collided with display names -- separated into distinct `language.elixir.credo` / `language.elixir.dialyzer` IDs.
+  * Java-style `//` comment in `plugin.xml` replaced with proper XML `<!-- -->` comment.
+
 ## v23.4.0
 
 ### Enhancements
