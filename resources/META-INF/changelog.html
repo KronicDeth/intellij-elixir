@@ -1,6 +1,18 @@
 <html>
 <body>
 
+<h1>v23.6.0</h1>
+<ul>
+    <li>
+        <p>Enhancements</p>
+        <ul>
+            <li>Go-to-Declaration, Find Usages, and hover documentation now work on function atoms inside <code>{Module, :function, arity}</code> MFA tuples -- covering Supervisor child specs, <code>@doc delegate_to:</code> attributes, and general MFA references. Both Elixir and Erlang modules supported.</li>
+            <li>New "Unresolvable module qualifier" inspection (enabled by default, error level) highlights module qualifiers that cannot be resolved in qualified calls. Dynamic qualifiers, documentation code blocks, non-source roots, Phoenix <code>Router.Helpers</code>, and opaque <code>use</code> macros are excluded from the inspection to minimise false positives.</li>
+            <li>Go-to-Declaration now consistently prefers source code over decompiled BEAM files when both are available.</li>
+        </ul>
+    </li>
+</ul>
+
 <h1>v23.5.0</h1>
 <ul>
     <li>

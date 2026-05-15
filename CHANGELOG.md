@@ -1,5 +1,16 @@
 # Changelog
 
+## v23.6.0
+
+### Enhancements
+* [#3821](https://github.com/KronicDeth/intellij-elixir/pull/3821) - [@sh41](https://github.com/sh41)
+  * MFA tuple reference resolution: Go-to-Declaration, Find Usages, and hover documentation now work on `:function` atoms inside `{Module, :function, arity}` MFA tuples. Covers Supervisor child specs, `@doc delegate_to:` attributes, and general MFA references throughout Elixir code.
+  * Supports both Elixir modules (`{Enum, :map, 2}`) and Erlang modules (`{:math, :sqrt, 1}`). Arity can be an integer literal, an args list (`[arg1, arg2]`), or a dynamic expression/wildcard (resolves with `isValidResult=false` for navigation support without error highlighting).
+  * Implemented via `MfaTupleReferenceContributor` + `MfaTupleReferenceProvider` + `MfaFunctionReference` (poly-variant, uses `ResolveCache`). `ElixirAtomMixin` registered as `HintedReferenceHost` so `PsiReferenceService` picks up contributed references. Soft reference -- unresolvable MFA tuples produce no error highlighting.
+  * New `UnresolvableModuleQualifier` inspection (`enabledByDefault=true`, error level) flags unresolvable module qualifiers in qualified calls. Highlights the qualifier itself, not the entire call expression.
+  * False-positive guards: dynamic qualifiers (module attributes, variables, function call results, bracket access, chained calls), injected doc code fragments (`@doc`/`@moduledoc` heredocs), non-source roots, Phoenix `Router.Helpers` (verifies parent Router module exists, handles both FQN and aliased forms), and opaque `use` calls where `__using__/1` macro cannot be traced (e.g. `ExUnit.CaseTemplate`).
+  * Resolver source-over-decompiled preference consolidated into `Resolver.preferred()`. Previous order: `valid -> same-module`. New order: `valid -> source -> same-module`. Redundant `preferSource()` call removed from `TargetElementEvaluator.getTargetCandidates()`. `Nested.kt` ordering updated to match.
+
 ## v23.5.0
 
 ### Enhancements
