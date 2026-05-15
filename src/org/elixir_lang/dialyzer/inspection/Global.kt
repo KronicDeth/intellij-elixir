@@ -32,7 +32,7 @@ class Global : GlobalInspectionTool() {
         super.runInspection(scope, manager, globalContext, problemDescriptionsProcessor)
     }
 
-    override fun isReadActionNeeded(): Boolean = false
+    override fun isReadActionNeeded(): Boolean = true
 
     private fun moduleSet(scope: AnalysisScope): Set<Module> {
         val moduleSet = mutableSetOf<Module>()
