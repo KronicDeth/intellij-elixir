@@ -1,5 +1,41 @@
 # Changelog
 
+## v23.0.7
+
+### Enhancements
+* [#3815](https://github.com/KronicDeth/intellij-elixir/pull/3815) - [@sh41](https://github.com/sh41)
+  * Unicode identifier and atom support in the JFlex lexer -- Elixir supports Unicode identifiers (e.g. `def ΦΤ§ do`) and bare Unicode atoms (e.g. `:ΦΤ§`), but the lexer only recognised ASCII characters. Added Unicode letter/digit support using JFlex POSIX character classes.
+  * Erlang private functions now decompiled as `defp` instead of `def`, using the BEAM export table to classify functions.
+  * Strip `-type`/`-opaque` prefix from Erlang type signatures, mapping to `@typep`/`@opaque`.
+  * `Elixir.` prefix stripping for uniform module name resolution -- `Enum.map()` and `Elixir.Enum.map()` now resolve consistently.
+  * Type rendering: replaced a `TODO()` crash in `appendTypes()` with actual BEAM doc-chunk signature rendering.
+  * Non-blocking bulk decompilation: moved bulk decompile scan off the EDT with run-scoped log deduplication to prevent log floods during library indexing.
+  * Improved parse error diagnostics: error reports now include the parser error description and failing source line, with top-10 unique error pattern summary in the bulk-decompile run log.
+
+### Bug Fixes
+* [#3815](https://github.com/KronicDeth/intellij-elixir/pull/3815) - [@sh41](https://github.com/sh41)
+  * FD leak fix (WSL/IJent): `InputStream` opened per BEAM file was never closed; after ~20K sequential reads during bulk decompilation, IJent exhausted its vsock FD limit, crashed the gRPC connection, and froze the IDE. Wrapped in `use {}` to release FDs immediately. Fixes [#3613](https://github.com/KronicDeth/intellij-elixir/issues/3613).
+  * Parenthesise block expressions (`case`/`if`/`try`) and nested binary literals inside binary element type specs -- previously emitted unparseable Elixir. Fixes [#3554](https://github.com/KronicDeth/intellij-elixir/issues/3554), [#3555](https://github.com/KronicDeth/intellij-elixir/issues/3555).
+  * Space after word-based unary operators (`not` etc.) to prevent keyword-argument misparse. Fixes [#3556](https://github.com/KronicDeth/intellij-elixir/issues/3556).
+  * Sanitise Erlang compiler-generated variable names (e.g. `f@_1`) containing `@` -- invalid in Elixir identifiers -- replacing with `_`. Fixes [#3557](https://github.com/KronicDeth/intellij-elixir/issues/3557).
+  * Escape interpolation markers (`#{`) in decompiled atom and string values. Fixes [#3519](https://github.com/KronicDeth/intellij-elixir/issues/3519).
+  * Strip `\r` from BEAM documentation chunk strings before inserting into IntelliJ `Document`. Fixes [#3433](https://github.com/KronicDeth/intellij-elixir/issues/3433).
+  * Handle `:elixir_erl` Dbgi metadata value `:none` (modules compiled with `debug_info: false`) gracefully instead of logging SEVERE errors. Fixes [#3454](https://github.com/KronicDeth/intellij-elixir/issues/3454).
+  * Escape `\u{...}` sequences in decompiled doc strings to prevent Elixir misinterpreting them as Unicode code-point escapes -- was silently breaking the entire `String` module mirror mapping. Fixes [#3412](https://github.com/KronicDeth/intellij-elixir/issues/3412).
+  * Emit `def` prefix on overridden `__struct__/1` signatures so PSI mirror mapping resolves arity-1 struct functions. Fixes [#3596](https://github.com/KronicDeth/intellij-elixir/issues/3596).
+  * Handle Erlang wildcard variable `_` in `record_field` -- eliminates ~100 SEVERE log entries per bulk decompile run. Fixes [#3403](https://github.com/KronicDeth/intellij-elixir/issues/3403).
+  * Fix backslash escaping order: escape `\` before `'` in Erlang charlist rendering. Fixes [#3234](https://github.com/KronicDeth/intellij-elixir/issues/3234).
+  * Add `not` to reserved variable keywords. Fixes [#2825](https://github.com/KronicDeth/intellij-elixir/issues/2825).
+  * Emit `()` for zero-argument anonymous function clauses. Fixes [#2916](https://github.com/KronicDeth/intellij-elixir/issues/2916).
+  * Emit source expression for empty map update associations. Fixes [#2745](https://github.com/KronicDeth/intellij-elixir/issues/2745).
+  * Propagate `doBlock` flag through match expressions in comprehension generators. Fixes [#2907](https://github.com/KronicDeth/intellij-elixir/issues/2907), [#2908](https://github.com/KronicDeth/intellij-elixir/issues/2908).
+  * Parenthesise nested bitstring generator expressions and wrap non-literal binary element sizes in `size()`. Fixes [#3469](https://github.com/KronicDeth/intellij-elixir/issues/3469), [#3423](https://github.com/KronicDeth/intellij-elixir/issues/3423).
+  * Render non-integer binary element type specifier values. Fixes [#3240](https://github.com/KronicDeth/intellij-elixir/issues/3240).
+  * Validate alias shape for `Elixir.`-prefixed atoms, falling back to quoted atom form for invalid names. Fixes [#3197](https://github.com/KronicDeth/intellij-elixir/issues/3197), [#3206](https://github.com/KronicDeth/intellij-elixir/issues/3206).
+  * Indexing deadlock prevention: `Cache.from(FileContent)` now uses `Beam.from(fileContent)` instead of reopening `VirtualFile.inputStream` on cache misses. Fixes [#2544](https://github.com/KronicDeth/intellij-elixir/issues/2544), [#2333](https://github.com/KronicDeth/intellij-elixir/issues/2333).
+  * Escape backslashes in quoted strings. Fixes [#2728](https://github.com/KronicDeth/intellij-elixir/issues/2728), [#2635](https://github.com/KronicDeth/intellij-elixir/issues/2635).
+  * Fix decompilation of modules with `Elixir.`-prefixed atoms that contain `do`-`end` operands causing parse cascades. Fixes [#778](https://github.com/KronicDeth/intellij-elixir/issues/778), [#2769](https://github.com/KronicDeth/intellij-elixir/issues/2769), [#3420](https://github.com/KronicDeth/intellij-elixir/issues/3420).
+
 ## v23.0.6
 
 ### Enhancements

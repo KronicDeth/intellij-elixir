@@ -1,6 +1,43 @@
 <html>
 <body>
 
+<h1>v23.0.7</h1>
+<ul>
+    <li>
+        <p>Enhancements</p>
+        <ul>
+            <li>Unicode identifier and atom support -- syntax highlighting and parsing now works for non-ASCII identifiers and atoms (e.g. Unicode function names, bare Unicode atoms).</li>
+            <li>Decompiled Erlang private functions now shown as <code>defp</code> instead of <code>def</code>, giving an accurate picture of each module's public API.</li>
+            <li>Erlang type signatures (<code>-type</code>/<code>-opaque</code>) decompiled as <code>@type</code>/<code>@opaque</code> with proper rendering.</li>
+            <li>Module resolution now treats <code>Elixir.Enum</code> and <code>Enum</code> identically for completion, hover docs, and Go-to-Declaration.</li>
+            <li>Bulk decompilation no longer blocks the UI and produces cleaner log output with deduplicated warnings.</li>
+            <li>Improved diagnostics when BEAM decompilation encounters parse errors, with summarised error patterns in the run log.</li>
+        </ul>
+    </li>
+    <li>
+        <p>Bug Fixes</p>
+        <ul>
+            <li>IDE freeze during bulk decompilation on WSL: file handles were leaked, eventually exhausting the connection to the WSL filesystem and freezing the IDE.</li>
+            <li>Indexing deadlock when opening WSL projects -- BEAM file reads no longer block the write-action queue.</li>
+            <li>Numerous decompiler output corrections that previously produced unparseable Elixir, breaking Go-to-Declaration, hover docs, and completion for BEAM dependencies:
+                <ul>
+                    <li>Block expressions (<code>case</code>/<code>if</code>/<code>try</code>) and nested <code>&lt;&lt;&gt;&gt;</code> literals inside binary specs now parenthesised correctly.</li>
+                    <li>Word-based unary operators (<code>not</code>, etc.) now followed by a space.</li>
+                    <li>Erlang compiler-generated variable names containing <code>@</code> sanitised to valid Elixir identifiers.</li>
+                    <li>Interpolation markers, backslashes, and Unicode escape sequences properly escaped in decompiled strings and atoms.</li>
+                    <li>Carriage returns stripped from BEAM doc strings.</li>
+                    <li>Modules compiled without debug info no longer cause SEVERE log floods.</li>
+                    <li>Struct function resolution (<code>__struct__/1</code>) now works correctly.</li>
+                    <li>Erlang record wildcards handled without log errors.</li>
+                    <li>Zero-argument anonymous functions, empty map updates, bitstring generators, and non-integer type specifiers all render correctly.</li>
+                    <li>Comprehension generators with <code>do</code>-<code>end</code> blocks decompile correctly.</li>
+                    <li>Atoms with invalid alias shapes fall back to quoted form instead of crashing the decompiler.</li>
+                </ul>
+            </li>
+        </ul>
+    </li>
+</ul>
+
 <h1>v23.0.6</h1>
 <ul>
     <li>
