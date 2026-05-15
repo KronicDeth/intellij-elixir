@@ -1,6 +1,20 @@
 <html>
 <body>
 
+<h1>v23.7.0</h1>
+<ul>
+    <li>
+        <p>Enhancements</p>
+        <ul>
+            <li>Hand-written PSI files moved from <code>gen/</code> to <code>src/</code> to prevent silent overwrite during parser regeneration. Previously, regenerating the parser would clobber 108 hand-written files with GrammarKit stubs, which could cause crashes at runtime.</li>
+            <li>Renamed 3 internal PSI interfaces (<code>Heredoc</code>, <code>HeredocLine</code>, <code>SigilHeredoc</code>) to avoid GrammarKit visitor collisions that produced infinite recursion.</li>
+            <li>Consolidated ambiguous method overloads in the PSI utility layer so that parser regeneration no longer requires manual edits to generated files.</li>
+            <li><code>gen/</code> directory marked as generated sources -- IntelliJ no longer shows inspections on generated parser code.</li>
+            <li>CONTRIBUTING.md now documents GrammarKit conventions, parser regeneration workflow, and BNF best practices for contributors.</li>
+        </ul>
+    </li>
+</ul>
+
 <h1>v23.6.0</h1>
 <ul>
     <li>
