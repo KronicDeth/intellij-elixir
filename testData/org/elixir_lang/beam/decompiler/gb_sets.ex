@@ -178,14 +178,14 @@ defmodule :gb_sets do
     # body not decompiled
   end
 
-  def balance(t, s), do: balance_list(to_list_1(t), s)
+  defp balance(t, s), do: balance_list(to_list_1(t), s)
 
-  def balance_list(l, s) do
+  defp balance_list(l, s) do
     {t, _} = balance_list_1(l, s)
     t
   end
 
-  def balance_list_1(l, s) when s > 1 do
+  defp balance_list_1(l, s) when s > 1 do
     sm = s - 1
     s2 = div(sm, 2)
     s1 = sm - s2
@@ -195,16 +195,16 @@ defmodule :gb_sets do
     {t, l2}
   end
 
-  def balance_list_1([key | l], 1), do: {{key, nil, nil}, l}
+  defp balance_list_1([key | l], 1), do: {{key, nil, nil}, l}
 
-  def balance_list_1(l, 0), do: {nil, l}
+  defp balance_list_1(l, 0), do: {nil, l}
 
-  def balance_revlist(l, s) do
+  defp balance_revlist(l, s) do
     {t, _} = balance_revlist_1(l, s)
     t
   end
 
-  def balance_revlist_1(l, s) when s > 1 do
+  defp balance_revlist_1(l, s) when s > 1 do
     sm = s - 1
     s2 = div(sm, 2)
     s1 = sm - s2
@@ -214,35 +214,35 @@ defmodule :gb_sets do
     {t, l2}
   end
 
-  def balance_revlist_1([key | l], 1), do: {{key, nil, nil}, l}
+  defp balance_revlist_1([key | l], 1), do: {{key, nil, nil}, l}
 
-  def balance_revlist_1(l, 0), do: {nil, l}
+  defp balance_revlist_1(l, 0), do: {nil, l}
 
-  def count({_, nil, nil}), do: {1, 1}
+  defp count({_, nil, nil}), do: {1, 1}
 
-  def count({_, sm, bi}) do
+  defp count({_, sm, bi}) do
     {h1, s1} = count(sm)
     {h2, s2} = count(bi)
     {:erlang.max(h1, h2) <<< 1, s1 + s2 + 1}
   end
 
-  def count(nil), do: {1, 0}
+  defp count(nil), do: {1, 0}
 
-  def delete_1(key, {key1, smaller, larger}) when key < key1 do
+  defp delete_1(key, {key1, smaller, larger}) when key < key1 do
     smaller1 = delete_1(key, smaller)
     {key1, smaller1, larger}
   end
 
-  def delete_1(key, {key1, smaller, bigger}) when key > key1 do
+  defp delete_1(key, {key1, smaller, bigger}) when key > key1 do
     bigger1 = delete_1(key, bigger)
     {key1, smaller, bigger1}
   end
 
-  def delete_1(_, {_, smaller, larger}), do: merge(smaller, larger)
+  defp delete_1(_, {_, smaller, larger}), do: merge(smaller, larger)
 
-  def difference(l, n1, t2, n2) when n2 < 10, do: difference_2(l, to_list_1(t2), n1)
+  defp difference(l, n1, t2, n2) when n2 < 10, do: difference_2(l, to_list_1(t2), n1)
 
-  def difference(l, n1, t2, n2) do
+  defp difference(l, n1, t2, n2) do
     x = n1 * round(1.46 * :math.log(n2))
     cond do
       n2 < x ->
@@ -252,9 +252,9 @@ defmodule :gb_sets do
     end
   end
 
-  def difference_1(xs, t), do: difference_1(xs, t, [], 0)
+  defp difference_1(xs, t), do: difference_1(xs, t, [], 0)
 
-  def difference_1([x | xs], t, as, n) do
+  defp difference_1([x | xs], t, as, n) do
     case is_member_1(x, t) do
       true ->
         difference_1(xs, t, as, n)
@@ -263,29 +263,29 @@ defmodule :gb_sets do
     end
   end
 
-  def difference_1([], _, as, n), do: {n, balance_revlist(as, n)}
+  defp difference_1([], _, as, n), do: {n, balance_revlist(as, n)}
 
-  def difference_2(xs, ys, s), do: difference_2(xs, ys, [], s)
+  defp difference_2(xs, ys, s), do: difference_2(xs, ys, [], s)
 
-  def difference_2([x | xs1], [y | _] = ys, as, s) when x < y, do: difference_2(xs1, ys, [x | as], s)
+  defp difference_2([x | xs1], [y | _] = ys, as, s) when x < y, do: difference_2(xs1, ys, [x | as], s)
 
-  def difference_2([x | _] = xs, [y | ys1], as, s) when x > y, do: difference_2(xs, ys1, as, s)
+  defp difference_2([x | _] = xs, [y | ys1], as, s) when x > y, do: difference_2(xs, ys1, as, s)
 
-  def difference_2([_X | xs1], [_Y | ys1], as, s), do: difference_2(xs1, ys1, as, s - 1)
+  defp difference_2([_X | xs1], [_Y | ys1], as, s), do: difference_2(xs1, ys1, as, s - 1)
 
-  def difference_2([], _Ys, as, s), do: {s, balance_revlist(as, s)}
+  defp difference_2([], _Ys, as, s), do: {s, balance_revlist(as, s)}
 
-  def difference_2(xs, [], as, s), do: {s, balance_revlist(push(xs, as), s)}
+  defp difference_2(xs, [], as, s), do: {s, balance_revlist(push(xs, as), s)}
 
-  def fold_1(f, acc0, {key, small, big}) do
+  defp fold_1(f, acc0, {key, small, big}) do
     acc1 = fold_1(f, acc0, small)
     acc = f.(key, acc1)
     fold_1(f, acc, big)
   end
 
-  def fold_1(_, acc, _), do: acc
+  defp fold_1(_, acc, _), do: acc
 
-  def insert_1(key, {key1, smaller, bigger}, s) when key < key1 do
+  defp insert_1(key, {key1, smaller, bigger}, s) when key < key1 do
     case insert_1(key, smaller, s >>> 1) do
       {t1, h1, s1} when is_integer(h1) ->
         t = {key1, t1, bigger}
@@ -304,7 +304,7 @@ defmodule :gb_sets do
     end
   end
 
-  def insert_1(key, {key1, smaller, bigger}, s) when key > key1 do
+  defp insert_1(key, {key1, smaller, bigger}, s) when key > key1 do
     case insert_1(key, bigger, s >>> 1) do
       {t1, h1, s1} when is_integer(h1) ->
         t = {key1, smaller, t1}
@@ -323,15 +323,15 @@ defmodule :gb_sets do
     end
   end
 
-  def insert_1(key, nil, 0), do: {{key, nil, nil}, 1, 1}
+  defp insert_1(key, nil, 0), do: {{key, nil, nil}, 1, 1}
 
-  def insert_1(key, nil, _), do: {key, nil, nil}
+  defp insert_1(key, nil, _), do: {key, nil, nil}
 
-  def insert_1(key, _, _), do: :erlang.error({:key_exists, key})
+  defp insert_1(key, _, _), do: :erlang.error({:key_exists, key})
 
-  def intersection(l, _N1, t2, n2) when n2 < 10, do: intersection_2(l, to_list_1(t2))
+  defp intersection(l, _N1, t2, n2) when n2 < 10, do: intersection_2(l, to_list_1(t2))
 
-  def intersection(l, n1, t2, n2) do
+  defp intersection(l, n1, t2, n2) do
     x = n1 * round(1.46 * :math.log(n2))
     cond do
       n2 < x ->
@@ -341,9 +341,9 @@ defmodule :gb_sets do
     end
   end
 
-  def intersection_1(xs, t), do: intersection_1(xs, t, [], 0)
+  defp intersection_1(xs, t), do: intersection_1(xs, t, [], 0)
 
-  def intersection_1([x | xs], t, as, n) do
+  defp intersection_1([x | xs], t, as, n) do
     case is_member_1(x, t) do
       true ->
         intersection_1(xs, t, [x | as], n + 1)
@@ -352,45 +352,45 @@ defmodule :gb_sets do
     end
   end
 
-  def intersection_1([], _, as, n), do: {n, balance_revlist(as, n)}
+  defp intersection_1([], _, as, n), do: {n, balance_revlist(as, n)}
 
-  def intersection_2(xs, ys), do: intersection_2(xs, ys, [], 0)
+  defp intersection_2(xs, ys), do: intersection_2(xs, ys, [], 0)
 
-  def intersection_2([x | xs1], [y | _] = ys, as, s) when x < y, do: intersection_2(xs1, ys, as, s)
+  defp intersection_2([x | xs1], [y | _] = ys, as, s) when x < y, do: intersection_2(xs1, ys, as, s)
 
-  def intersection_2([x | _] = xs, [y | ys1], as, s) when x > y, do: intersection_2(ys1, xs, as, s)
+  defp intersection_2([x | _] = xs, [y | ys1], as, s) when x > y, do: intersection_2(ys1, xs, as, s)
 
-  def intersection_2([x | xs1], [_ | ys1], as, s), do: intersection_2(xs1, ys1, [x | as], s + 1)
+  defp intersection_2([x | xs1], [_ | ys1], as, s), do: intersection_2(xs1, ys1, [x | as], s + 1)
 
-  def intersection_2([], _, as, s), do: {s, balance_revlist(as, s)}
+  defp intersection_2([], _, as, s), do: {s, balance_revlist(as, s)}
 
-  def intersection_2(_, [], as, s), do: {s, balance_revlist(as, s)}
+  defp intersection_2(_, [], as, s), do: {s, balance_revlist(as, s)}
 
-  def intersection_list(s, [s1 | ss]), do: intersection_list(intersection(s, s1), ss)
+  defp intersection_list(s, [s1 | ss]), do: intersection_list(intersection(s, s1), ss)
 
-  def intersection_list(s, []), do: s
+  defp intersection_list(s, []), do: s
 
-  def is_disjoint_1({k1, smaller1, bigger}, {k2, smaller2, _} = tree) when k1 < k2, do: notis_member_1(k1, smaller2) and is_disjoint_1(smaller1, smaller2) and is_disjoint_1(bigger, tree)
+  defp is_disjoint_1({k1, smaller1, bigger}, {k2, smaller2, _} = tree) when k1 < k2, do: not is_member_1(k1, smaller2) and is_disjoint_1(smaller1, smaller2) and is_disjoint_1(bigger, tree)
 
-  def is_disjoint_1({k1, smaller, bigger1}, {k2, _, bigger2} = tree) when k1 > k2, do: notis_member_1(k1, bigger2) and is_disjoint_1(bigger1, bigger2) and is_disjoint_1(smaller, tree)
+  defp is_disjoint_1({k1, smaller, bigger1}, {k2, _, bigger2} = tree) when k1 > k2, do: not is_member_1(k1, bigger2) and is_disjoint_1(bigger1, bigger2) and is_disjoint_1(smaller, tree)
 
-  def is_disjoint_1({_K1, _, _}, {_K2, _, _}), do: false
+  defp is_disjoint_1({_K1, _, _}, {_K2, _, _}), do: false
 
-  def is_disjoint_1(nil, _), do: true
+  defp is_disjoint_1(nil, _), do: true
 
-  def is_disjoint_1(_, nil), do: true
+  defp is_disjoint_1(_, nil), do: true
 
-  def is_member_1(key, {key1, smaller, _}) when key < key1, do: is_member_1(key, smaller)
+  defp is_member_1(key, {key1, smaller, _}) when key < key1, do: is_member_1(key, smaller)
 
-  def is_member_1(key, {key1, _, bigger}) when key > key1, do: is_member_1(key, bigger)
+  defp is_member_1(key, {key1, _, bigger}) when key > key1, do: is_member_1(key, bigger)
 
-  def is_member_1(_, {_, _, _}), do: true
+  defp is_member_1(_, {_, _, _}), do: true
 
-  def is_member_1(_, nil), do: false
+  defp is_member_1(_, nil), do: false
 
-  def is_subset(l, _N1, t2, n2) when n2 < 10, do: is_subset_2(l, to_list_1(t2))
+  defp is_subset(l, _N1, t2, n2) when n2 < 10, do: is_subset_2(l, to_list_1(t2))
 
-  def is_subset(l, n1, t2, n2) do
+  defp is_subset(l, n1, t2, n2) do
     x = n1 * round(1.46 * :math.log(n2))
     cond do
       n2 < x ->
@@ -400,7 +400,7 @@ defmodule :gb_sets do
     end
   end
 
-  def is_subset_1([x | xs], t) do
+  defp is_subset_1([x | xs], t) do
     case is_member_1(x, t) do
       true ->
         is_subset_1(xs, t)
@@ -409,79 +409,79 @@ defmodule :gb_sets do
     end
   end
 
-  def is_subset_1([], _), do: true
+  defp is_subset_1([], _), do: true
 
-  def is_subset_2([x | _], [y | _]) when x < y, do: false
+  defp is_subset_2([x | _], [y | _]) when x < y, do: false
 
-  def is_subset_2([x | _] = xs, [y | ys1]) when x > y, do: is_subset_2(xs, ys1)
+  defp is_subset_2([x | _] = xs, [y | ys1]) when x > y, do: is_subset_2(xs, ys1)
 
-  def is_subset_2([_ | xs1], [_ | ys1]), do: is_subset_2(xs1, ys1)
+  defp is_subset_2([_ | xs1], [_ | ys1]), do: is_subset_2(xs1, ys1)
 
-  def is_subset_2([], _), do: true
+  defp is_subset_2([], _), do: true
 
-  def is_subset_2(_, []), do: false
+  defp is_subset_2(_, []), do: false
 
-  def iterator({_, nil, _} = t, as), do: [t | as]
+  defp iterator({_, nil, _} = t, as), do: [t | as]
 
-  def iterator({_, l, _} = t, as), do: iterator(l, [t | as])
+  defp iterator({_, l, _} = t, as), do: iterator(l, [t | as])
 
-  def iterator(nil, as), do: as
+  defp iterator(nil, as), do: as
 
-  def iterator_from(s, {k, _, t}, as) when k < s, do: iterator_from(s, t, as)
+  defp iterator_from(s, {k, _, t}, as) when k < s, do: iterator_from(s, t, as)
 
-  def iterator_from(_, {_, nil, _} = t, as), do: [t | as]
+  defp iterator_from(_, {_, nil, _} = t, as), do: [t | as]
 
-  def iterator_from(s, {_, l, _} = t, as), do: iterator_from(s, l, [t | as])
+  defp iterator_from(s, {_, l, _} = t, as), do: iterator_from(s, l, [t | as])
 
-  def iterator_from(_, nil, as), do: as
+  defp iterator_from(_, nil, as), do: as
 
-  def largest_1({key, _Smaller, nil}), do: key
+  defp largest_1({key, _Smaller, nil}), do: key
 
-  def largest_1({_Key, _Smaller, larger}), do: largest_1(larger)
+  defp largest_1({_Key, _Smaller, larger}), do: largest_1(larger)
 
-  def merge(smaller, nil), do: smaller
+  defp merge(smaller, nil), do: smaller
 
-  def merge(nil, larger), do: larger
+  defp merge(nil, larger), do: larger
 
-  def merge(smaller, larger) do
+  defp merge(smaller, larger) do
     {key, larger1} = take_smallest1(larger)
     {key, smaller, larger1}
   end
 
   @spec mk_set(non_neg_integer(), gb_set_node(t)) :: set(t)
-  def mk_set(n, t), do: {n, t}
+  defp mk_set(n, t), do: {n, t}
 
-  def push([x | xs], as), do: push(xs, [x | as])
+  defp push([x | xs], as), do: push(xs, [x | as])
 
-  def push([], as), do: as
+  defp push([], as), do: as
 
-  def smallest_1({key, nil, _Larger}), do: key
+  defp smallest_1({key, nil, _Larger}), do: key
 
-  def smallest_1({_Key, smaller, _Larger}), do: smallest_1(smaller)
+  defp smallest_1({_Key, smaller, _Larger}), do: smallest_1(smaller)
 
-  def take_largest1({key, smaller, nil}), do: {key, smaller}
+  defp take_largest1({key, smaller, nil}), do: {key, smaller}
 
-  def take_largest1({key, smaller, larger}) do
+  defp take_largest1({key, smaller, larger}) do
     {key1, larger1} = take_largest1(larger)
     {key1, {key, smaller, larger1}}
   end
 
-  def take_smallest1({key, nil, larger}), do: {key, larger}
+  defp take_smallest1({key, nil, larger}), do: {key, larger}
 
-  def take_smallest1({key, smaller, larger}) do
+  defp take_smallest1({key, smaller, larger}) do
     {key1, smaller1} = take_smallest1(smaller)
     {key1, {key, smaller1, larger}}
   end
 
-  def to_list({key, small, big}, l), do: to_list(small, [key | to_list(big, l)])
+  defp to_list({key, small, big}, l), do: to_list(small, [key | to_list(big, l)])
 
-  def to_list(nil, l), do: l
+  defp to_list(nil, l), do: l
 
-  def to_list_1(t), do: to_list(t, [])
+  defp to_list_1(t), do: to_list(t, [])
 
-  def union(l, n1, t2, n2) when n2 < 10, do: union_2(l, to_list_1(t2), n1 + n2)
+  defp union(l, n1, t2, n2) when n2 < 10, do: union_2(l, to_list_1(t2), n1 + n2)
 
-  def union(l, n1, t2, n2) do
+  defp union(l, n1, t2, n2) do
     x = n1 * round(1.46 * :math.log(n2))
     cond do
       n2 < x ->
@@ -491,23 +491,23 @@ defmodule :gb_sets do
     end
   end
 
-  def union_1([x | xs], s), do: union_1(xs, add(x, s))
+  defp union_1([x | xs], s), do: union_1(xs, add(x, s))
 
-  def union_1([], s), do: s
+  defp union_1([], s), do: s
 
-  def union_2(xs, ys, s), do: union_2(xs, ys, [], s)
+  defp union_2(xs, ys, s), do: union_2(xs, ys, [], s)
 
-  def union_2([x | xs1], [y | _] = ys, as, s) when x < y, do: union_2(xs1, ys, [x | as], s)
+  defp union_2([x | xs1], [y | _] = ys, as, s) when x < y, do: union_2(xs1, ys, [x | as], s)
 
-  def union_2([x | _] = xs, [y | ys1], as, s) when x > y, do: union_2(ys1, xs, [y | as], s)
+  defp union_2([x | _] = xs, [y | ys1], as, s) when x > y, do: union_2(ys1, xs, [y | as], s)
 
-  def union_2([x | xs1], [_ | ys1], as, s), do: union_2(xs1, ys1, [x | as], s - 1)
+  defp union_2([x | xs1], [_ | ys1], as, s), do: union_2(xs1, ys1, [x | as], s - 1)
 
-  def union_2([], ys, as, s), do: {s, balance_revlist(push(ys, as), s)}
+  defp union_2([], ys, as, s), do: {s, balance_revlist(push(ys, as), s)}
 
-  def union_2(xs, [], as, s), do: {s, balance_revlist(push(xs, as), s)}
+  defp union_2(xs, [], as, s), do: {s, balance_revlist(push(xs, as), s)}
 
-  def union_list(s, [s1 | ss]), do: union_list(union(s, s1), ss)
+  defp union_list(s, [s1 | ss]), do: union_list(union(s, s1), ss)
 
-  def union_list(s, []), do: s
+  defp union_list(s, []), do: s
 end

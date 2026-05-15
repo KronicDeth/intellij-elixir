@@ -21,7 +21,6 @@ import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.attribute.Type
 import org.elixir_lang.beam.decompiler.*
 import org.elixir_lang.beam.term.inspect
-import org.elixir_lang.psi.call.name.Function
 import org.elixir_lang.psi.call.name.Function.*
 import org.elixir_lang.psi.call.name.Module
 import org.elixir_lang.reference.resolver.Type.BUILTIN_ARITY_BY_NAME
@@ -33,10 +32,10 @@ class Decompiler : BinaryFileDecompiler {
     companion object {
         private val logger = Logger.getInstance(Decompiler::class.java)
         private val HEADER_NAME_BY_MACRO: Map<String, String> = mapOf(
-            Function.DEFMACRO to "Macros",
-            Function.DEFMACROP to "Private Macros",
-            Function.DEF to "Functions",
-            Function.DEFP to "Private Functions"
+            DEFMACRO to "Macros",
+            DEFMACROP to "Private Macros",
+            DEF to "Functions",
+            DEFP to "Private Functions"
         )
         private val MACRO_NAME_ARITY_DECOMPILER_LIST: List<org.elixir_lang.beam.decompiler.MacroNameArity> = listOf(
             InfixOperator,
@@ -151,7 +150,7 @@ class Decompiler : BinaryFileDecompiler {
                     documented.doc?.let { doc ->
                         when (doc) {
                             is None -> Unit
-                            is Hidden -> appendDocumentation(decompiled, "typedoc", false)
+                            is Hidden -> appendDocumentation(decompiled, "typedoc")
                             is MarkdownByLanguage -> {
                                 for (formatted in doc.formattedByLanguage.values) {
                                     appendDocumentation(decompiled, "typedoc", formatted)
@@ -163,7 +162,11 @@ class Decompiler : BinaryFileDecompiler {
                     val signatures = documented.signatures
 
                     if (signatures.isNotEmpty()) {
-                        TODO()
+                        for (signature in signatures) {
+                            val cleaned = signature.replace("\r", "")
+                            val (attr, body) = erlangTypeSignatureToElixir(cleaned)
+                            decompiled.append("  @").append(attr).append(' ').append(body).append('\n')
+                        }
                     } else {
                         decompiled.append("  @type ").append(name).append('(')
 
@@ -282,7 +285,7 @@ class Decompiler : BinaryFileDecompiler {
                                 docs.doc(macroNameArity)?.let { doc ->
                                     when (doc) {
                                         is None -> Unit
-                                        is Hidden -> appendDocumentation(decompiled, "doc", false)
+                                        is Hidden -> appendDocumentation(decompiled, "doc")
                                         is MarkdownByLanguage -> {
                                             for (formatted in doc.formattedByLanguage.values) {
                                                 appendDocumentation(decompiled, "doc", formatted)
@@ -329,12 +332,13 @@ class Decompiler : BinaryFileDecompiler {
                 .append("\n")
         }
 
-        private fun appendDocumentation(decompiled: StringBuilder, moduleAttribute: String, shown: Boolean) {
-            decompiled.append("  @").append(moduleAttribute).append(' ').append(shown).append('\n')
+        private fun appendDocumentation(decompiled: StringBuilder, moduleAttribute: String) {
+            decompiled.append("  @").append(moduleAttribute).append(' ').append("false").append('\n')
         }
 
         private fun appendDocumentation(decompiled: StringBuilder, moduleAttribute: String, text: String) {
-            val safePromoterTerminator = safePromoterTerminator(text)
+            val sanitizedText = escapeUnicodeCodePointSequence(text.replace("\r", ""))
+            val safePromoterTerminator = safePromoterTerminator(sanitizedText)
             val promoterTerminator: String = safePromoterTerminator ?: "\"\"\""
             decompiled
                 .append("  @")
@@ -344,7 +348,7 @@ class Decompiler : BinaryFileDecompiler {
                 .append(" ~S")
                 .append(promoterTerminator)
                 .append('\n')
-            appendDocumentationText(decompiled, safePromoterTerminator, text)
+            appendDocumentationText(decompiled, safePromoterTerminator, sanitizedText)
             decompiled
                 .append("\n  ")
                 .append(promoterTerminator)
@@ -458,7 +462,16 @@ class Decompiler : BinaryFileDecompiler {
                     val function = debugInfo.functions.byNameArity[macroNameArity.toNameArity()]
 
                     if (function != null) {
-                        decompiled.append(function.toMacroString(options).prependIndentToNonBlank()).append('\n')
+                        var macroString = function.toMacroString(options)
+
+                        // The Erlang abstract code Function always hardcodes macro as DEF because
+                        // the AST doesn't distinguish exported/unexported. The Decompiler knows the
+                        // correct macro from the export table, so fix it up here.
+                        if (macroNameArity.macro == DEFP) {
+                            macroString = macroString.replaceDefWithDefp()
+                        }
+
+                        decompiled.append(macroString.prependIndentToNonBlank()).append('\n')
 
                         true
                     } else {
@@ -498,8 +511,8 @@ class Decompiler : BinaryFileDecompiler {
                     if (signatures != null && signatures.isNotEmpty()) {
                         for (signature in signatures) {
                             decompiled.append("  ").append(macroNameArity.macro).append(' ')
-                            decompiled.append(signature)
-                            decompiled.append(" do\n    # body not decompiled\n  end\n")
+                            decompiled.append(signature.replace("\r", ""))
+                            appendNotDecompiledBody(decompiled)
                         }
                     } else {
                         decompiler.append(decompiled, macroNameArity)
@@ -546,6 +559,46 @@ class Decompiler : BinaryFileDecompiler {
         } else {
             moduleName
         }
+
+        /**
+         * Converts an Erlang type signature like `-type ascii_binary() :: binary().` or
+         * `-opaque queue(Item) :: {list(Item), list(Item)}.` into an Elixir attribute
+         * name and body: `("type", "ascii_binary() :: binary()")` or
+         * `("opaque", "queue(Item) :: {list(Item), list(Item)}")`.
+         *
+         * Strips the leading `-type `/`-opaque ` prefix and trailing `.` that are
+         * part of Erlang's syntax but invalid in Elixir `@type`/`@opaque` attributes.
+         */
+        private fun erlangTypeSignatureToElixir(signature: String): Pair<String, String> {
+            var body = signature
+            val attr = when {
+                body.startsWith("-opaque ") -> {
+                    body = body.removePrefix("-opaque ")
+                    "opaque"
+                }
+                body.startsWith("-type ") -> {
+                    body = body.removePrefix("-type ")
+                    "type"
+                }
+                else -> "type"
+            }
+            // Strip trailing Erlang period
+            if (body.endsWith(".")) {
+                body = body.dropLast(1)
+            }
+            return Pair(attr, body)
+        }
+    }
+}
+
+// Prevent Elixir parser from treating documentation text as Unicode code point escapes.
+private val UNICODE_CODE_POINT_START = Regex("""(\\+)u\{""")
+
+internal fun escapeUnicodeCodePointSequence(text: String): String {
+    return UNICODE_CODE_POINT_START.replace(text) { match ->
+        val slashes = match.groupValues[1]
+        val escapedSlashes = if (slashes.length % 2 == 1) "$slashes\\" else slashes
+        "${escapedSlashes}u{"
     }
 }
 
@@ -555,6 +608,25 @@ fun String.prependIndentToNonBlank(indent: String = "  "): String =
             when {
                 it.isBlank() -> it
                 else -> indent + it
+            }
+        }
+        .joinToString("\n")
+
+/**
+ * Replaces `def ` with `defp ` at the start of each clause in a multi-clause function string
+ * produced by [org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Function.toMacroString].
+ *
+ * The Erlang abstract code [Function] always produces `def` because the AST doesn't encode
+ * export information. This extension is used by the [Decompiler] when the export table indicates
+ * the function is private.
+ */
+private fun String.replaceDefWithDefp(): String =
+    lineSequence()
+        .map { line ->
+            if (line.startsWith("def ")) {
+                "defp " + line.removePrefix("def ")
+            } else {
+                line
             }
         }
         .joinToString("\n")

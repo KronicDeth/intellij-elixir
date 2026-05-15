@@ -28,7 +28,13 @@ object Map {
             associationsMacroString(term, 3, scope).let { (associationsMacroString, associationsDeclaredScope) ->
                 val sourceString = sourceMacroString(term, scope).group().string
 
-                MacroStringDeclaredScope("%{${sourceString} | ${associationsMacroString.string}}", doBlock = false, associationsDeclaredScope)
+                if (associationsMacroString.string.isEmpty()) {
+                    // A map update with zero associations (`#{ Var | }` in Erlang) is valid in Erlang
+                    // but `%{source | }` is a syntax error in Elixir, so emit just the source expression.
+                    MacroStringDeclaredScope(sourceString, doBlock = false, associationsDeclaredScope)
+                } else {
+                    MacroStringDeclaredScope("%{${sourceString} | ${associationsMacroString.string}}", doBlock = false, associationsDeclaredScope)
+                }
             }
 
     private fun sourceMacroString(term: OtpErlangTuple, scope: Scope): MacroString =

@@ -267,7 +267,7 @@ defmodule :ex_cursor do
   end
 
   def init(config) do
-    :wx.batch(fn  ->
+    :wx.batch(fn () ->
         do_init(config)
     end)
   end
@@ -305,7 +305,7 @@ defmodule :ex_cursor do
     # body not decompiled
   end
 
-  def cursors(), do: [{'Arrow', 1}, {'Right arrow', 2}, {'Blank', 26}, {'Bullseye', 3}, {'Char', 4}, {'Cross', 5}, {'Hand', 6}, {'I-beam', 7}, {'Left button', 8}, {'Magnifier', 9}, {'Middle button', 10}, {'No entry', 11}, {'Paint brush', 12}, {'Pencil', 13}, {'Point left', 14}, {'Point right', 15}, {'Question arrow', 16}, {'Right button', 17}, {'Size NE-SW', 18}, {'Size N-S', 19}, {'Size NW-SE', 20}, {'Size W-E', 21}, {'Sizing', 22}, {'Spraycan', 23}, {'Wait', 24}, {'Watch', 25}, {'Arrow wait', :wxe_util.get_const(:wxCURSOR_ARROWWAIT)}]
+  defp cursors(), do: [{'Arrow', 1}, {'Right arrow', 2}, {'Blank', 26}, {'Bullseye', 3}, {'Char', 4}, {'Cross', 5}, {'Hand', 6}, {'I-beam', 7}, {'Left button', 8}, {'Magnifier', 9}, {'Middle button', 10}, {'No entry', 11}, {'Paint brush', 12}, {'Pencil', 13}, {'Point left', 14}, {'Point right', 15}, {'Question arrow', 16}, {'Right button', 17}, {'Size NE-SW', 18}, {'Size N-S', 19}, {'Size NW-SE', 20}, {'Size W-E', 21}, {'Sizing', 22}, {'Spraycan', 23}, {'Wait', 24}, {'Watch', 25}, {'Arrow wait', :wxe_util.get_const(:wxCURSOR_ARROWWAIT)}]
 
-  def do_init(config), do: ...
+  defp do_init(config), do: ...
 end

@@ -23,6 +23,10 @@ object SignatureOverride : Default() {
     override fun append(decompiled: StringBuilder, macroNameArity: org.elixir_lang.beam.MacroNameArity) {
         when (macroNameArity.arity) {
             1 -> {
+                decompiled
+                    .append("  ")
+                    .append(macroNameArity.macro)
+                    .append(" ")
                 appendSignature(decompiled, macroNameArity, "__struct__", arrayOf("kv"))
                 appendBody(decompiled)
             }

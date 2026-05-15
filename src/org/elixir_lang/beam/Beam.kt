@@ -43,7 +43,7 @@ private fun decompressedInputStream(inputStream: InputStream): InputStream? {
             inputStream.reset()
             inputStream
         }
-    } catch (e: IOException) {
+    } catch (_: IOException) {
         null
     }
 }
@@ -51,7 +51,7 @@ private fun decompressedInputStream(inputStream: InputStream): InputStream? {
 private fun virtualFileToInputStream(virtualFile: VirtualFile): InputStream? =
         try {
             virtualFile.inputStream
-        } catch (e: IOException) {
+        } catch (_: IOException) {
             null
         }
 
@@ -174,16 +174,17 @@ class Beam private constructor(chunkCollection: Collection<Chunk>) {
         fun from(content: ByteArray, path: String): Beam? =
                 decompressedInputStream(ByteArrayInputStream(content))
                         ?.let { DataInputStream(it) }
-                        ?.let { Beam.from(it, path) }
+                        ?.let { from(it, path) }
 
         @Throws(IOException::class, OtpErlangDecodeException::class)
         fun from(fileContent: FileContent): Beam? = from(fileContent.content, fileContent.file.path)
 
         fun from(virtualFile: VirtualFile): Beam? =
-                virtualFileToInputStream(virtualFile)
-                        ?.let { decompressedInputStream(it) }
-                        ?.let { DataInputStream(it) }
-                        ?.let { Beam.from(it, virtualFile.path) }
+                virtualFileToInputStream(virtualFile)?.use { inputStream ->
+                    decompressedInputStream(inputStream)
+                            ?.let { DataInputStream(it) }
+                            ?.let { from(it, virtualFile.path) }
+                }
 
         fun `is`(virtualFile: VirtualFile): Boolean = !virtualFile.isDirectory && "beam" == virtualFile.extension
 

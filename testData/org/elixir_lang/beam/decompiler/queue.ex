@@ -259,9 +259,9 @@ defmodule :queue do
 
   # Private Functions
 
-  def filter_f(_, []), do: []
+  defp filter_f(_, []), do: []
 
-  def filter_f(fun, [x | f]) do
+  defp filter_f(fun, [x | f]) do
     case fun.(x) do
       true ->
         [x | filter_f(fun, f)]
@@ -272,9 +272,9 @@ defmodule :queue do
     end
   end
 
-  def filter_r(_, []), do: []
+  defp filter_r(_, []), do: []
 
-  def filter_r(fun, [x | r0]) do
+  defp filter_r(fun, [x | r0]) do
     r = filter_r(fun, r0)
     case fun.(x) do
       true ->
@@ -287,17 +287,17 @@ defmodule :queue do
   end
 
   @spec get([], []) :: term()
-  def get(r, [h | _]) when is_list(r), do: h
+  defp get(r, [h | _]) when is_list(r), do: h
 
-  def get([h], []), do: h
+  defp get([h], []), do: h
 
-  def get([_ | r], []), do: :lists.last(r)
+  defp get([_ | r], []), do: :lists.last(r)
 
-  def split_f1_to_r2(0, r1, f1, r2, f2), do: {{r2, f2}, {r1, f1}}
+  defp split_f1_to_r2(0, r1, f1, r2, f2), do: {{r2, f2}, {r1, f1}}
 
-  def split_f1_to_r2(n, r1, [x | f1], r2, f2), do: split_f1_to_r2(n - 1, r1, f1, [x | r2], f2)
+  defp split_f1_to_r2(n, r1, [x | f1], r2, f2), do: split_f1_to_r2(n - 1, r1, f1, [x | r2], f2)
 
-  def split_r1_to_f2(0, r1, f1, r2, f2), do: {{r1, f1}, {r2, f2}}
+  defp split_r1_to_f2(0, r1, f1, r2, f2), do: {{r1, f1}, {r2, f2}}
 
-  def split_r1_to_f2(n, [x | r1], f1, r2, f2), do: split_r1_to_f2(n - 1, r1, f1, r2, [x | f2])
+  defp split_r1_to_f2(n, [x | r1], f1, r2, f2), do: split_r1_to_f2(n - 1, r1, f1, r2, [x | f2])
 end

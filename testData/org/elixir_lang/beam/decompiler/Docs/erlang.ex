@@ -1695,99 +1695,99 @@ defmodule :erlang do
     # body not decompiled
   end
 
-  def aa_mem_data(:notsup), do: :notsup
+  defp aa_mem_data(:notsup), do: :notsup
 
-  def aa_mem_data(eMD), do: aa_mem_data(eMD, :erlang.system_info(:allocated_areas))
+  defp aa_mem_data(eMD), do: aa_mem_data(eMD, :erlang.system_info(:allocated_areas))
 
-  def aa_mem_data(memory() = mem, [{:total, tot} | rest]), do: aa_mem_data(memory(mem, total: tot, system: 0), rest)
+  defp aa_mem_data(memory() = mem, [{:total, tot} | rest]), do: aa_mem_data(memory(mem, total: tot, system: 0), rest)
 
-  def aa_mem_data(memory(atom: atom, atom_used: atomU) = mem, [{:atom_space, alloced, used} | rest]), do: aa_mem_data(memory(mem, atom: atom + alloced, atom_used: atomU + used), rest)
+  defp aa_mem_data(memory(atom: atom, atom_used: atomU) = mem, [{:atom_space, alloced, used} | rest]), do: aa_mem_data(memory(mem, atom: atom + alloced, atom_used: atomU + used), rest)
 
-  def aa_mem_data(memory(atom: atom, atom_used: atomU) = mem, [{:atom_table, sz} | rest]), do: aa_mem_data(memory(mem, atom: atom + sz, atom_used: atomU + sz), rest)
+  defp aa_mem_data(memory(atom: atom, atom_used: atomU) = mem, [{:atom_table, sz} | rest]), do: aa_mem_data(memory(mem, atom: atom + sz, atom_used: atomU + sz), rest)
 
-  def aa_mem_data(memory(ets: ets) = mem, [{:ets_misc, sz} | rest]), do: aa_mem_data(memory(mem, ets: ets + sz), rest)
+  defp aa_mem_data(memory(ets: ets) = mem, [{:ets_misc, sz} | rest]), do: aa_mem_data(memory(mem, ets: ets + sz), rest)
 
-  def aa_mem_data(memory(processes: proc, processes_used: procU, system: sys) = mem, [{procData, sz} | rest]) when procData == :bif_timer or procData == :process_table, do: aa_mem_data(memory(mem, processes: proc + sz, processes_used: procU + sz, system: sys - sz), rest)
+  defp aa_mem_data(memory(processes: proc, processes_used: procU, system: sys) = mem, [{procData, sz} | rest]) when procData == :bif_timer or procData == :process_table, do: aa_mem_data(memory(mem, processes: proc + sz, processes_used: procU + sz, system: sys - sz), rest)
 
-  def aa_mem_data(memory(code: code) = mem, [{codeData, sz} | rest]) when codeData == :module_table or codeData == :export_table or codeData == :export_list or codeData == :fun_table or codeData == :module_refs or codeData == :loaded_code, do: aa_mem_data(memory(mem, code: code + sz), rest)
+  defp aa_mem_data(memory(code: code) = mem, [{codeData, sz} | rest]) when codeData == :module_table or codeData == :export_table or codeData == :export_list or codeData == :fun_table or codeData == :module_refs or codeData == :loaded_code, do: aa_mem_data(memory(mem, code: code + sz), rest)
 
-  def aa_mem_data(eMD, [{_, _} | rest]), do: aa_mem_data(eMD, rest)
+  defp aa_mem_data(eMD, [{_, _} | rest]), do: aa_mem_data(eMD, rest)
 
-  def aa_mem_data(memory(total: tot, processes: proc, system: sys) = mem, []) when sys <= 0, do: memory(mem, system: tot - proc)
+  defp aa_mem_data(memory(total: tot, processes: proc, system: sys) = mem, []) when sys <= 0, do: memory(mem, system: tot - proc)
 
-  def aa_mem_data(eMD, []), do: eMD
+  defp aa_mem_data(eMD, []), do: eMD
 
-  def acc_blocks_size([{:size, sz, _, _} | rest], acc), do: acc_blocks_size(rest, acc + sz)
+  defp acc_blocks_size([{:size, sz, _, _} | rest], acc), do: acc_blocks_size(rest, acc + sz)
 
-  def acc_blocks_size([{:size, sz} | rest], acc), do: acc_blocks_size(rest, acc + sz)
+  defp acc_blocks_size([{:size, sz} | rest], acc), do: acc_blocks_size(rest, acc + sz)
 
-  def acc_blocks_size([_ | rest], acc), do: acc_blocks_size(rest, acc)
+  defp acc_blocks_size([_ | rest], acc), do: acc_blocks_size(rest, acc)
 
-  def acc_blocks_size([], acc), do: acc
+  defp acc_blocks_size([], acc), do: acc
 
-  def au_mem_acc(memory(total: tot, processes: proc, processes_used: procU) = mem, :eheap_alloc, data) do
+  defp au_mem_acc(memory(total: tot, processes: proc, processes_used: procU) = mem, :eheap_alloc, data) do
     sz = acc_blocks_size(data, 0)
     memory(mem, total: tot + sz, processes: proc + sz, processes_used: procU + sz)
   end
 
-  def au_mem_acc(memory(total: tot, system: sys, ets: ets) = mem, :ets_alloc, data) do
+  defp au_mem_acc(memory(total: tot, system: sys, ets: ets) = mem, :ets_alloc, data) do
     sz = acc_blocks_size(data, 0)
     memory(mem, total: tot + sz, system: sys + sz, ets: ets + sz)
   end
 
-  def au_mem_acc(memory(total: tot, system: sys, binary: bin) = mem, :binary_alloc, data) do
+  defp au_mem_acc(memory(total: tot, system: sys, binary: bin) = mem, :binary_alloc, data) do
     sz = acc_blocks_size(data, 0)
     memory(mem, total: tot + sz, system: sys + sz, binary: bin + sz)
   end
 
-  def au_mem_acc(memory(total: tot, system: sys) = mem, _Type, data) do
+  defp au_mem_acc(memory(total: tot, system: sys) = mem, _Type, data) do
     sz = acc_blocks_size(data, 0)
     memory(mem, total: tot + sz, system: sys + sz)
   end
 
-  def au_mem_blocks([{:blocks, l} | rest], mem0) do
+  defp au_mem_blocks([{:blocks, l} | rest], mem0) do
     mem = au_mem_blocks_1(l, mem0)
     au_mem_blocks(rest, mem)
   end
 
-  def au_mem_blocks([_ | rest], mem), do: au_mem_blocks(rest, mem)
+  defp au_mem_blocks([_ | rest], mem), do: au_mem_blocks(rest, mem)
 
-  def au_mem_blocks([], mem), do: mem
+  defp au_mem_blocks([], mem), do: mem
 
-  def au_mem_blocks_1([{type, sizeList} | rest], mem), do: au_mem_blocks_1(rest, au_mem_acc(mem, type, sizeList))
+  defp au_mem_blocks_1([{type, sizeList} | rest], mem), do: au_mem_blocks_1(rest, au_mem_acc(mem, type, sizeList))
 
-  def au_mem_blocks_1([], mem), do: mem
+  defp au_mem_blocks_1([], mem), do: mem
 
-  def au_mem_current(mem, type, [{:mbcs_pool, stats} | rest]), do: au_mem_current(au_mem_blocks(stats, mem), type, rest)
+  defp au_mem_current(mem, type, [{:mbcs_pool, stats} | rest]), do: au_mem_current(au_mem_blocks(stats, mem), type, rest)
 
-  def au_mem_current(mem, type, [{:mbcs, stats} | rest]), do: au_mem_current(au_mem_blocks(stats, mem), type, rest)
+  defp au_mem_current(mem, type, [{:mbcs, stats} | rest]), do: au_mem_current(au_mem_blocks(stats, mem), type, rest)
 
-  def au_mem_current(mem, type, [{:sbcs, stats} | rest]), do: au_mem_current(au_mem_blocks(stats, mem), type, rest)
+  defp au_mem_current(mem, type, [{:sbcs, stats} | rest]), do: au_mem_current(au_mem_blocks(stats, mem), type, rest)
 
-  def au_mem_current(mem, type, [_ | rest]), do: au_mem_current(mem, type, rest)
+  defp au_mem_current(mem, type, [_ | rest]), do: au_mem_current(mem, type, rest)
 
-  def au_mem_current(mem, _Type, []), do: mem
+  defp au_mem_current(mem, _Type, []), do: mem
 
-  def au_mem_data(allocs) do
+  defp au_mem_data(allocs) do
     ref = :erlang.make_ref()
     :erlang.system_info({:memory_internal, ref, allocs})
     receive_emd(ref)
   end
 
-  def au_mem_data(:notsup, _), do: :notsup
+  defp au_mem_data(:notsup, _), do: :notsup
 
-  def au_mem_data(_, [{_, false} | _]), do: :notsup
+  defp au_mem_data(_, [{_, false} | _]), do: :notsup
 
-  def au_mem_data(memory() = mem0, [{:fix_alloc, _, data} | rest]) do
+  defp au_mem_data(memory() = mem0, [{:fix_alloc, _, data} | rest]) do
     mem = au_mem_fix(mem0, data)
     au_mem_data(au_mem_current(mem, :fix_alloc, data), rest)
   end
 
-  def au_mem_data(memory() = mem, [{type, _, data} | rest]), do: au_mem_data(au_mem_current(mem, type, data), rest)
+  defp au_mem_data(memory() = mem, [{type, _, data} | rest]), do: au_mem_data(au_mem_current(mem, type, data), rest)
 
-  def au_mem_data(eMD, []), do: eMD
+  defp au_mem_data(eMD, []), do: eMD
 
-  def au_mem_fix(memory(processes: proc, processes_used: procU, system: sys) = mem, data) do
+  defp au_mem_fix(memory(processes: proc, processes_used: procU, system: sys) = mem, data) do
     case fix_proc(data, {0, 0}) do
       {a, u} ->
         memory(mem, processes: proc + a, processes_used: procU + u, system: sys - a)
@@ -1796,13 +1796,13 @@ defmodule :erlang do
     end
   end
 
-  def cput_e2i(:undefined), do: :undefined
+  defp cput_e2i(:undefined), do: :undefined
 
-  def cput_e2i(e), do: rvrs(cput_e2i(e, -1, -1, cpu(), 0, cput_e2i_clvl(e, 0), []))
+  defp cput_e2i(e), do: rvrs(cput_e2i(e, -1, -1, cpu(), 0, cput_e2i_clvl(e, 0), []))
 
-  def cput_e2i([], _NId, _PId, _IS, _PLvl, _Lvl, res), do: res
+  defp cput_e2i([], _NId, _PId, _IS, _PLvl, _Lvl, res), do: res
 
-  def cput_e2i([e | es], nId0, pId, iS, pLvl, lvl, res0) do
+  defp cput_e2i([e | es], nId0, pId, iS, pLvl, lvl, res0) do
     case cput_e2i(e, nId0, pId, iS, pLvl, lvl, res0) do
       [] ->
         cput_e2i(es, nId0, pId, iS, pLvl, lvl, res0)
@@ -1817,43 +1817,43 @@ defmodule :erlang do
     end
   end
 
-  def cput_e2i({tag, [], tagList}, nid, pId, cPU, pLvl, lvl, res), do: cput_e2i({tag, tagList}, nid, pId, cPU, pLvl, lvl, res)
+  defp cput_e2i({tag, [], tagList}, nid, pId, cPU, pLvl, lvl, res), do: cput_e2i({tag, tagList}, nid, pId, cPU, pLvl, lvl, res)
 
-  def cput_e2i({:node, nL}, nid0, pId, _CPU, 0, cpu(:node), res) do
+  defp cput_e2i({:node, nL}, nid0, pId, _CPU, 0, cpu(:node), res) do
     nid1 = nid0 + 1
     lvl = cput_e2i_clvl(nL, cpu(:node))
     cput_e2i(nL, nid1, pId, cpu(node: nid1), cpu(:node), lvl, res)
   end
 
-  def cput_e2i({:processor, pL}, nid, pId0, _CPU, 0, cpu(:node), res) do
+  defp cput_e2i({:processor, pL}, nid, pId0, _CPU, 0, cpu(:node), res) do
     pId1 = pId0 + 1
     lvl = cput_e2i_clvl(pL, cpu(:processor))
     cput_e2i(pL, nid, pId1, cpu(processor: pId1), cpu(:processor), lvl, res)
   end
 
-  def cput_e2i({:processor, pL}, nid, pId0, cPU, pLvl, cLvl, res) when pLvl < cpu(:processor) and cLvl <= cpu(:processor) do
+  defp cput_e2i({:processor, pL}, nid, pId0, cPU, pLvl, cLvl, res) when pLvl < cpu(:processor) and cLvl <= cpu(:processor) do
     pId1 = pId0 + 1
     lvl = cput_e2i_clvl(pL, cpu(:processor))
     cput_e2i(pL, nid, pId1, cpu(cPU, processor: pId1, processor_node: -1, core: -1, thread: -1), cpu(:processor), lvl, res)
   end
 
-  def cput_e2i({:node, nL}, nid0, pId, cPU, cpu(:processor), cpu(:processor_node), res) do
+  defp cput_e2i({:node, nL}, nid0, pId, cPU, cpu(:processor), cpu(:processor_node), res) do
     nid1 = nid0 + 1
     lvl = cput_e2i_clvl(nL, cpu(:processor_node))
     cput_e2i(nL, nid1, pId, cpu(cPU, processor_node: nid1), cpu(:processor_node), lvl, res)
   end
 
-  def cput_e2i({:core, cL}, nid, pId, cpu(core: c0) = cPU, pLvl, cpu(:core), res) when pLvl < cpu(:core) do
+  defp cput_e2i({:core, cL}, nid, pId, cpu(core: c0) = cPU, pLvl, cpu(:core), res) when pLvl < cpu(:core) do
     lvl = cput_e2i_clvl(cL, cpu(:core))
     cput_e2i(cL, nid, pId, cpu(cPU, core: c0 + 1, thread: -1), cpu(:core), lvl, res)
   end
 
-  def cput_e2i({:thread, tL}, nid, pId, cpu(thread: t0) = cPU, pLvl, cpu(:thread), res) when pLvl < cpu(:thread) do
+  defp cput_e2i({:thread, tL}, nid, pId, cpu(thread: t0) = cPU, pLvl, cpu(:thread), res) when pLvl < cpu(:thread) do
     lvl = cput_e2i_clvl(tL, cpu(:thread))
     cput_e2i(tL, nid, pId, cpu(cPU, thread: t0 + 1), cpu(:thread), lvl, res)
   end
 
-  def cput_e2i({:logical, iD}, _Nid, pId, cpu(processor: p, core: c, thread: t) = cPU, pLvl, cpu(:logical), res) when pLvl < cpu(:logical) and :erlang.is_integer(iD) and 0 <= iD and iD < 65536 do
+  defp cput_e2i({:logical, iD}, _Nid, pId, cpu(processor: p, core: c, thread: t) = cPU, pLvl, cpu(:logical), res) when pLvl < cpu(:logical) and :erlang.is_integer(iD) and 0 <= iD and iD < 65536 do
     [cpu(cPU, processor: case p do
       -1 ->
         pId + 1
@@ -1872,9 +1872,9 @@ defmodule :erlang do
     end, logical: iD) | res]
   end
 
-  def cput_e2i_clvl({:logical, _}, _PLvl), do: cpu(:logical)
+  defp cput_e2i_clvl({:logical, _}, _PLvl), do: cpu(:logical)
 
-  def cput_e2i_clvl([e | _], pLvl) do
+  defp cput_e2i_clvl([e | _], pLvl) do
     case :erlang.element(1, e) do
       :node ->
         case pLvl do
@@ -1897,27 +1897,27 @@ defmodule :erlang do
     end
   end
 
-  def cput_i2e(:undefined), do: :undefined
+  defp cput_i2e(:undefined), do: :undefined
 
-  def cput_i2e(is), do: cput_i2e(is, true, cpu(:node), cput_i2e_tag_map())
+  defp cput_i2e(is), do: cput_i2e(is, true, cpu(:node), cput_i2e_tag_map())
 
-  def cput_i2e([], _Frst, _Lvl, _TM), do: []
+  defp cput_i2e([], _Frst, _Lvl, _TM), do: []
 
-  def cput_i2e([cpu(logical: lID) | _], _Frst, lvl, _TM) when lvl == cpu(:logical), do: {:logical, lID}
+  defp cput_i2e([cpu(logical: lID) | _], _Frst, lvl, _TM) when lvl == cpu(:logical), do: {:logical, lID}
 
-  def cput_i2e([cpu() = i | is], frst, lvl, tM), do: cput_i2e(:erlang.element(lvl, i), frst, is, [i], lvl, tM)
+  defp cput_i2e([cpu() = i | is], frst, lvl, tM), do: cput_i2e(:erlang.element(lvl, i), frst, is, [i], lvl, tM)
 
-  def cput_i2e(v, frst, [i | is], sameV, lvl, tM) when v === :erlang.element(lvl, i), do: cput_i2e(v, frst, is, [i | sameV], lvl, tM)
+  defp cput_i2e(v, frst, [i | is], sameV, lvl, tM) when v === :erlang.element(lvl, i), do: cput_i2e(v, frst, is, [i | sameV], lvl, tM)
 
-  def cput_i2e(-1, true, [], sameV, lvl, tM), do: cput_i2e(rvrs(sameV), true, lvl + 1, tM)
+  defp cput_i2e(-1, true, [], sameV, lvl, tM), do: cput_i2e(rvrs(sameV), true, lvl + 1, tM)
 
-  def cput_i2e(_V, true, [], sameV, lvl, tM) when lvl !== cpu(:processor) and lvl !== cpu(:processor_node), do: cput_i2e(rvrs(sameV), true, lvl + 1, tM)
+  defp cput_i2e(_V, true, [], sameV, lvl, tM) when lvl !== cpu(:processor) and lvl !== cpu(:processor_node), do: cput_i2e(rvrs(sameV), true, lvl + 1, tM)
 
-  def cput_i2e(-1, _Frst, is, sameV, cpu(:node), tM), do: cput_i2e(rvrs(sameV), true, cpu(:processor), tM) ++ cput_i2e(is, false, cpu(:node), tM)
+  defp cput_i2e(-1, _Frst, is, sameV, cpu(:node), tM), do: cput_i2e(rvrs(sameV), true, cpu(:processor), tM) ++ cput_i2e(is, false, cpu(:node), tM)
 
-  def cput_i2e(_V, _Frst, is, sameV, lvl, tM), do: [{cput_i2e_tag(lvl, tM), cput_i2e(rvrs(sameV), true, lvl + 1, tM)} | cput_i2e(is, false, lvl, tM)]
+  defp cput_i2e(_V, _Frst, is, sameV, lvl, tM), do: [{cput_i2e_tag(lvl, tM), cput_i2e(rvrs(sameV), true, lvl + 1, tM)} | cput_i2e(is, false, lvl, tM)]
 
-  def cput_i2e_tag(lvl, tM) do
+  defp cput_i2e_tag(lvl, tM) do
     case :erlang.element(lvl, tM) do
       :processor_node ->
         :node
@@ -1926,20 +1926,20 @@ defmodule :erlang do
     end
   end
 
-  def cput_i2e_tag_map(), do: :erlang.list_to_tuple([:cpu | record_info(:fields, :cpu)])
+  defp cput_i2e_tag_map(), do: :erlang.list_to_tuple([:cpu | record_info(:fields, :cpu)])
 
-  def fix_proc([{:fix_types, sizeList} | _Rest], acc), do: get_fix_proc(sizeList, acc)
+  defp fix_proc([{:fix_types, sizeList} | _Rest], acc), do: get_fix_proc(sizeList, acc)
 
-  def fix_proc([{:fix_types, mask, sizeList} | _Rest], acc) do
+  defp fix_proc([{:fix_types, mask, sizeList} | _Rest], acc) do
     {a, u} = get_fix_proc(sizeList, acc)
     {mask, a, u}
   end
 
-  def fix_proc([_ | rest], acc), do: fix_proc(rest, acc)
+  defp fix_proc([_ | rest], acc), do: fix_proc(rest, acc)
 
-  def fix_proc([], acc), do: acc
+  defp fix_proc([], acc), do: acc
 
-  def fun_info_1([k | ks], fun, a) do
+  defp fun_info_1([k | ks], fun, a) do
     case :erlang.fun_info(fun, k) do
       {k, :undefined} ->
         fun_info_1(ks, fun, a)
@@ -1948,87 +1948,87 @@ defmodule :erlang do
     end
   end
 
-  def fun_info_1([], _, a), do: a
+  defp fun_info_1([], _, a), do: a
 
-  def gc_info(_Ref, 0, {colls, recl}), do: {colls, recl, 0}
+  defp gc_info(_Ref, 0, {colls, recl}), do: {colls, recl, 0}
 
-  def gc_info(ref, n, {origColls, origRecl}) do
+  defp gc_info(ref, n, {origColls, origRecl}) do
     receive do
     {^ref, {_, colls, recl}} ->
         gc_info(ref, n - 1, {colls + origColls, recl + origRecl})
     end
   end
 
-  def get_alloc_info(type, aAtom) when :erlang.is_atom(aAtom) do
+  defp get_alloc_info(type, aAtom) when :erlang.is_atom(aAtom) do
     [{^aAtom, result}] = get_alloc_info(type, [aAtom])
     result
   end
 
-  def get_alloc_info(type, aList) when :erlang.is_list(aList) do
+  defp get_alloc_info(type, aList) when :erlang.is_list(aList) do
     ref = :erlang.make_ref()
     :erlang.system_info({type, ref, aList})
     receive_allocator(ref, :erlang.system_info(:schedulers), mk_res_list(aList))
   end
 
-  def get_fix_proc([{procType, a1, u1} | rest], {a0, u0}) when procType == :proc or procType == :monitor or procType == :link or procType == :msg_ref or procType == :ll_ptimer or procType == :hl_ptimer or procType == :bif_timer or procType == :accessor_bif_timer, do: get_fix_proc(rest, {a0 + a1, u0 + u1})
+  defp get_fix_proc([{procType, a1, u1} | rest], {a0, u0}) when procType == :proc or procType == :monitor or procType == :link or procType == :msg_ref or procType == :ll_ptimer or procType == :hl_ptimer or procType == :bif_timer or procType == :accessor_bif_timer, do: get_fix_proc(rest, {a0 + a1, u0 + u1})
 
-  def get_fix_proc([_ | rest], acc), do: get_fix_proc(rest, acc)
+  defp get_fix_proc([_ | rest], acc), do: get_fix_proc(rest, acc)
 
-  def get_fix_proc([], acc), do: acc
+  defp get_fix_proc([], acc), do: acc
 
-  def get_gc_opts([{:async, _ReqId} = asyncTuple | options], gcOpt = gcopt()), do: get_gc_opts(options, gcopt(gcOpt, async: asyncTuple))
+  defp get_gc_opts([{:async, _ReqId} = asyncTuple | options], gcOpt = gcopt()), do: get_gc_opts(options, gcopt(gcOpt, async: asyncTuple))
 
-  def get_gc_opts([{:type, t} | options], gcOpt = gcopt()), do: get_gc_opts(options, gcopt(gcOpt, type: t))
+  defp get_gc_opts([{:type, t} | options], gcOpt = gcopt()), do: get_gc_opts(options, gcopt(gcOpt, type: t))
 
-  def get_gc_opts([], gcOpt), do: gcOpt
+  defp get_gc_opts([], gcOpt), do: gcOpt
 
-  def get_memval(:total, memory(total: v)), do: v
+  defp get_memval(:total, memory(total: v)), do: v
 
-  def get_memval(:processes, memory(processes: v)), do: v
+  defp get_memval(:processes, memory(processes: v)), do: v
 
-  def get_memval(:processes_used, memory(processes_used: v)), do: v
+  defp get_memval(:processes_used, memory(processes_used: v)), do: v
 
-  def get_memval(:system, memory(system: v)), do: v
+  defp get_memval(:system, memory(system: v)), do: v
 
-  def get_memval(:atom, memory(atom: v)), do: v
+  defp get_memval(:atom, memory(atom: v)), do: v
 
-  def get_memval(:atom_used, memory(atom_used: v)), do: v
+  defp get_memval(:atom_used, memory(atom_used: v)), do: v
 
-  def get_memval(:binary, memory(binary: v)), do: v
+  defp get_memval(:binary, memory(binary: v)), do: v
 
-  def get_memval(:code, memory(code: v)), do: v
+  defp get_memval(:code, memory(code: v)), do: v
 
-  def get_memval(:ets, memory(ets: v)), do: v
+  defp get_memval(:ets, memory(ets: v)), do: v
 
-  def get_memval(_, memory()), do: :erlang.error(:badarg)
+  defp get_memval(_, memory()), do: :erlang.error(:badarg)
 
-  def insert_info([], ys), do: ys
+  defp insert_info([], ys), do: ys
 
-  def insert_info([{a, false} | xs], [{^a, _IList} | ys]), do: insert_info(xs, [{a, false} | ys])
+  defp insert_info([{a, false} | xs], [{^a, _IList} | ys]), do: insert_info(xs, [{a, false} | ys])
 
-  def insert_info([{a, n, i} | xs], [{^a, iList} | ys]), do: insert_info(xs, [{a, insert_instance(i, n, iList)} | ys])
+  defp insert_info([{a, n, i} | xs], [{^a, iList} | ys]), do: insert_info(xs, [{a, insert_instance(i, n, iList)} | ys])
 
-  def insert_info([{a1, _} | _] = xs, [{a2, _} = y | ys]) when a1 != a2, do: [y | insert_info(xs, ys)]
+  defp insert_info([{a1, _} | _] = xs, [{a2, _} = y | ys]) when a1 != a2, do: [y | insert_info(xs, ys)]
 
-  def insert_info([{a1, _, _} | _] = xs, [{a2, _} = y | ys]) when a1 != a2, do: [y | insert_info(xs, ys)]
+  defp insert_info([{a1, _, _} | _] = xs, [{a2, _} = y | ys]) when a1 != a2, do: [y | insert_info(xs, ys)]
 
-  def insert_instance(i, n, rest) when :erlang.is_atom(n), do: [{n, i} | rest]
+  defp insert_instance(i, n, rest) when :erlang.is_atom(n), do: [{n, i} | rest]
 
-  def insert_instance(i, n, []), do: [{:instance, n, i}]
+  defp insert_instance(i, n, []), do: [{:instance, n, i}]
 
-  def insert_instance(i, n, [{:instance, m, _} | _] = rest) when n < m, do: [{:instance, n, i} | rest]
+  defp insert_instance(i, n, [{:instance, m, _} | _] = rest) when n < m, do: [{:instance, n, i} | rest]
 
-  def insert_instance(i, n, [prev | rest]), do: [prev | insert_instance(i, n, rest)]
+  defp insert_instance(i, n, [prev | rest]), do: [prev | insert_instance(i, n, rest)]
 
-  def memory_1([type | types], mem), do: [{type, get_memval(type, mem)} | memory_1(types, mem)]
+  defp memory_1([type | types], mem), do: [{type, get_memval(type, mem)} | memory_1(types, mem)]
 
-  def memory_1([], _Mem), do: []
+  defp memory_1([], _Mem), do: []
 
-  def mk_res_list([]), do: []
+  defp mk_res_list([]), do: []
 
-  def mk_res_list([alloc | rest]), do: [{alloc, []} | mk_res_list(rest)]
+  defp mk_res_list([alloc | rest]), do: [{alloc, []} | mk_res_list(rest)]
 
-  def old_remote_spawn_opt(n, m, f, a, o) do
+  defp old_remote_spawn_opt(n, m, f, a, o) do
     case :lists.member(:monitor, o) do
       true ->
         :badarg
@@ -2057,27 +2057,27 @@ defmodule :erlang do
     end
   end
 
-  def receive_allocator(_Ref, 0, acc), do: acc
+  defp receive_allocator(_Ref, 0, acc), do: acc
 
-  def receive_allocator(ref, n, acc) do
+  defp receive_allocator(ref, n, acc) do
     receive do
     {^ref, _, infoList} ->
         receive_allocator(ref, n - 1, insert_info(infoList, acc))
     end
   end
 
-  def receive_emd(ref), do: receive_emd(ref, memory(), :erlang.system_info(:schedulers))
+  defp receive_emd(ref), do: receive_emd(ref, memory(), :erlang.system_info(:schedulers))
 
-  def receive_emd(_Ref, eMD, 0), do: eMD
+  defp receive_emd(_Ref, eMD, 0), do: eMD
 
-  def receive_emd(ref, eMD, n) do
+  defp receive_emd(ref, eMD, n) do
     receive do
     {^ref, _, data} ->
         receive_emd(ref, au_mem_data(eMD, data), n - 1)
     end
   end
 
-  def remote_spawn_error({:"EXIT", {{:nodedown, n}, _}}, {l, ^n, m, f, a, o}) do
+  defp remote_spawn_error({:"EXIT", {{:nodedown, n}, _}}, {l, ^n, m, f, a, o}) do
     {opts, lL} = case l === :link do
       true ->
         {[:link | o], [:link]}
@@ -2087,17 +2087,17 @@ defmodule :erlang do
     :erlang.spawn_opt(:erts_internal, :crasher, [n, m, f, a, opts, :noconnection], lL)
   end
 
-  def remote_spawn_error({:"EXIT", {reason, _}}, _), do: {:fault, reason}
+  defp remote_spawn_error({:"EXIT", {reason, _}}, _), do: {:fault, reason}
 
-  def remote_spawn_error({:"EXIT", reason}, _), do: {:fault, reason}
+  defp remote_spawn_error({:"EXIT", reason}, _), do: {:fault, reason}
 
-  def remote_spawn_error(other, _), do: {:fault, other}
+  defp remote_spawn_error(other, _), do: {:fault, other}
 
-  def rvrs([_] = l), do: l
+  defp rvrs([_] = l), do: l
 
-  def rvrs(xs), do: rvrs(xs, [])
+  defp rvrs(xs), do: rvrs(xs, [])
 
-  def rvrs([], ys), do: ys
+  defp rvrs([], ys), do: ys
 
-  def rvrs([x | xs], ys), do: rvrs(xs, [x | ys])
+  defp rvrs([x | xs], ys), do: rvrs(xs, [x | ys])
 end

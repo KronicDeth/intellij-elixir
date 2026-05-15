@@ -26,13 +26,24 @@ object BinElement {
 
     fun toMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope): MacroStringDeclaredScope {
         val (patternMacroString, patternDeclaredScope) = patternMacroStringDeclaredScope(term, scope)
-        val patternString = patternMacroString.string
         val optionsString = ifOptionsString(term)
 
         val string = if (optionsString != null) {
-            "$patternString :: $optionsString"
+            // Block expressions (case/if/try/receive/cond) need parentheses inside binary element
+            // type specifications, e.g. `(case x do ... end) :: binary` instead of
+            // `case x do ... end :: binary` which the Elixir parser rejects.
+            var groupedPatternString = patternMacroString.group().string
+
+            // Nested binaries also need parentheses: `(<<inner>>) :: binary` instead of
+            // `<<inner>> :: binary` which produces `<<<<inner>> :: binary>>` — a parse error
+            // because Elixir cannot disambiguate the nested `<<` delimiters.
+            if (groupedPatternString.startsWith("<<")) {
+                groupedPatternString = "($groupedPatternString)"
+            }
+
+            "$groupedPatternString :: $optionsString"
         } else {
-            patternString
+            patternMacroString.string
         }
 
         return MacroStringDeclaredScope(string, doBlock = false, patternDeclaredScope)

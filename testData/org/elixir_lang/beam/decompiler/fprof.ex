@@ -205,7 +205,7 @@ defmodule :fprof do
   def setopts(options) when is_list(options), do: :lists.append(options)
 
   def start() do
-    spawn_3step(fn  ->
+    spawn_3step(fn () ->
         try do
           register(:fprof_server, self())
         catch
@@ -422,7 +422,7 @@ defmodule :fprof do
     # body not decompiled
   end
 
-  def apply_1(function, args, options) do
+  defp apply_1(function, args, options) do
     {[_, procs, continue], options_1} = getopts(options, [:start, :procs, :continue])
     procs_1 = case procs do
       [{:procs, p}] when is_list(p) ->
@@ -440,15 +440,15 @@ defmodule :fprof do
     end
   end
 
-  def apply_1(m, f, args, options) do
+  defp apply_1(m, f, args, options) do
     arity = length(args)
     apply_1(&m.f/arity, args, options)
   end
 
-  def apply_continue(function, args, procs, options) do
+  defp apply_continue(function, args, procs, options) do
     ref = make_ref()
     parent = self()
-    child = spawn(fn  ->
+    child = spawn(fn () ->
         mRef = :erlang.monitor(:process, parent)
         receive do
         {parent, ref, :start_trace} ->
@@ -476,9 +476,9 @@ defmodule :fprof do
     end
   end
 
-  def apply_start_stop(function, args, procs, options), do: ...
+  defp apply_start_stop(function, args, procs, options), do: ...
 
-  def clock_add(table, id, clock, t) do
+  defp clock_add(table, id, clock, t) do
     dbg(1, 'clock_add(Table, ~w, ~w, ~w)~n', [id, clock, t])
     try do
       :ets.update_counter(table, id, {clock, t})
@@ -497,7 +497,7 @@ defmodule :fprof do
     end
   end
 
-  def clocks_add(table, clocks(id: id) = clocks) do
+  defp clocks_add(table, clocks(id: id) = clocks) do
     dbg(1, 'clocks_add(Table, ~w)~n', [clocks])
     case :ets.lookup(table, id) do
       [clocks0] ->
@@ -507,22 +507,22 @@ defmodule :fprof do
     end
   end
 
-  def clocks_sort_r(l, e), do: clocks_sort_r_1(l, e, [])
+  defp clocks_sort_r(l, e), do: clocks_sort_r_1(l, e, [])
 
-  def clocks_sort_r_1([], _, r), do: postsort_r(:lists.sort(r))
+  defp clocks_sort_r_1([], _, r), do: postsort_r(:lists.sort(r))
 
-  def clocks_sort_r_1([clocks() = c | l], e, r), do: clocks_sort_r_1(l, e, [[element(e, c) | c] | r])
+  defp clocks_sort_r_1([clocks() = c | l], e, r), do: clocks_sort_r_1(l, e, [[element(e, c) | c] | r])
 
-  def clocks_sum(clocks(id: _Id1, cnt: cnt1, own: own1, acc: acc1), clocks(id: _Id2, cnt: cnt2, own: own2, acc: acc2), id), do: clocks(id: id, cnt: cnt1 + cnt2, own: own1 + own2, acc: acc1 + acc2)
+  defp clocks_sum(clocks(id: _Id1, cnt: cnt1, own: own1, acc: acc1), clocks(id: _Id2, cnt: cnt2, own: own2, acc: acc2), id), do: clocks(id: id, cnt: cnt1 + cnt2, own: own1 + own2, acc: acc1 + acc2)
 
-  def dbg(level, f, a) when level >= 9 do
+  defp dbg(level, f, a) when level >= 9 do
     :io.format(f, a)
     :ok
   end
 
-  def dbg(_, _, _), do: :ok
+  defp dbg(_, _, _), do: :ok
 
-  def do_analyse(table, analyse) do
+  defp do_analyse(table, analyse) do
     dbg(5, 'do_analyse_1(~p, ~p)~n', [table, analyse])
     result = try do
       do_analyse_1(table, analyse)
@@ -534,18 +534,18 @@ defmodule :fprof do
     result
   end
 
-  def do_analyse_1(table, analyse(group_leader: groupLeader, dest: io, cols: cols0, callers: printCallers, sort: sort, totals: printTotals, details: printDetails) = _Analyse), do: ...
+  defp do_analyse_1(table, analyse(group_leader: groupLeader, dest: io, cols: cols0, callers: printCallers, sort: sort, totals: printTotals, details: printDetails) = _Analyse), do: ...
 
-  def dump(:undefined, _), do: false
+  defp dump(:undefined, _), do: false
 
-  def dump(dump, term) do
+  defp dump(dump, term) do
     :io.format(dump, '~tp.~n', [parsify(term)])
     true
   end
 
-  def dump_stack(:undefined, _, _), do: false
+  defp dump_stack(:undefined, _, _), do: false
 
-  def dump_stack(dump, stack, term) do
+  defp dump_stack(dump, stack, term) do
     {depth, _D} = case stack do
       :undefined ->
         {0, 0}
@@ -561,7 +561,7 @@ defmodule :fprof do
     true
   end
 
-  def end_of_trace(table, tS) do
+  defp end_of_trace(table, tS) do
     procs = get()
     put(:table, table)
     dbg(2, 'get() -> ~p~n', [procs])
@@ -572,40 +572,40 @@ defmodule :fprof do
     :ok
   end
 
-  def ensure_open(pid, _Options) when is_pid(pid), do: {:already_open, pid}
+  defp ensure_open(pid, _Options) when is_pid(pid), do: {:already_open, pid}
 
-  def ensure_open([], _Options), do: {:already_open, :undefined}
+  defp ensure_open([], _Options), do: {:already_open, :undefined}
 
-  def ensure_open(filename, options) when is_atom(filename) or is_list(filename), do: :file.open(filename, [{:encoding, :utf8} | options])
+  defp ensure_open(filename, options) when is_atom(filename) or is_list(filename), do: :file.open(filename, [{:encoding, :utf8} | options])
 
-  def ets_select_foreach(table, matchSpec, limit, fun) do
+  defp ets_select_foreach(table, matchSpec, limit, fun) do
     :ets.safe_fixtable(table, true)
     ets_select_foreach_1(:ets.select(table, matchSpec, limit), fun)
   end
 
-  def ets_select_foreach_1(:"$end_of_table", _), do: :ok
+  defp ets_select_foreach_1(:"$end_of_table", _), do: :ok
 
-  def ets_select_foreach_1({matches, continuation}, fun) do
+  defp ets_select_foreach_1({matches, continuation}, fun) do
     dbg(2, 'Matches = ~p~n', [matches])
     :lists.foreach(fun, matches)
     ets_select_foreach_1(:ets.select(continuation), fun)
   end
 
-  def flat_format(f, trailer) when is_float(f), do: :lists.flatten([:io_lib.format('~.3f', [f]), trailer])
+  defp flat_format(f, trailer) when is_float(f), do: :lists.flatten([:io_lib.format('~.3f', [f]), trailer])
 
-  def flat_format(w, trailer), do: :lists.flatten([:io_lib.format('~tp', [w]), trailer])
+  defp flat_format(w, trailer), do: :lists.flatten([:io_lib.format('~tp', [w]), trailer])
 
-  def flat_format(term, trailer, width), do: flat_format(term, trailer, width, :left)
+  defp flat_format(term, trailer, width), do: flat_format(term, trailer, width, :left)
 
-  def flat_format(term, trailer, width, :left), do: flat_format(term, trailer, width, {:left, ?\s})
+  defp flat_format(term, trailer, width, :left), do: flat_format(term, trailer, width, {:left, ?\s})
 
-  def flat_format(term, trailer, width, {:left, filler}), do: pad(flat_format(term, trailer), filler, width)
+  defp flat_format(term, trailer, width, {:left, filler}), do: pad(flat_format(term, trailer), filler, width)
 
-  def flat_format(term, trailer, width, :right), do: flat_format(term, trailer, width, {:right, ?\s})
+  defp flat_format(term, trailer, width, :right), do: flat_format(term, trailer, width, {:right, ?\s})
 
-  def flat_format(term, trailer, width, {:right, filler}), do: pad(filler, flat_format(term, trailer), width)
+  defp flat_format(term, trailer, width, {:right, filler}), do: pad(filler, flat_format(term, trailer), width)
 
-  def funcstat_pd(pid, func1, func0, clocks) do
+  defp funcstat_pd(pid, func1, func0, clocks) do
     put({pid, func0}, (case get({pid, func0}) do
       :undefined ->
         funcstat(callers_sum: clocks(clocks, id: func0), called_sum: clocks(id: func0), callers: [clocks(clocks, id: func1)])
@@ -620,13 +620,13 @@ defmodule :fprof do
     end))
   end
 
-  def funcstat_sort_r(funcstatList, element), do: funcstat_sort_r_1(funcstatList, element, [])
+  defp funcstat_sort_r(funcstatList, element), do: funcstat_sort_r_1(funcstatList, element, [])
 
-  def funcstat_sort_r_1([], _, r), do: postsort_r(:lists.sort(r))
+  defp funcstat_sort_r_1([], _, r), do: postsort_r(:lists.sort(r))
 
-  def funcstat_sort_r_1([funcstat(callers_sum: clocks() = clocks, callers: callers, called: called) = funcstat | l], element, r), do: funcstat_sort_r_1(l, element, [[element(element, clocks) | funcstat(funcstat, callers: clocks_sort_r(callers, element), called: clocks_sort_r(called, element))] | r])
+  defp funcstat_sort_r_1([funcstat(callers_sum: clocks() = clocks, callers: callers, called: called) = funcstat | l], element, r), do: funcstat_sort_r_1(l, element, [[element(element, clocks) | funcstat(funcstat, callers: clocks_sort_r(callers, element), called: clocks_sort_r(called, element))] | r])
 
-  def get_stack(id) do
+  defp get_stack(id) do
     case get(id) do
       :undefined ->
         []
@@ -635,29 +635,29 @@ defmodule :fprof do
     end
   end
 
-  def getopts_1([], list, result), do: {:lists.reverse(result), list}
+  defp getopts_1([], list, result), do: {:lists.reverse(result), list}
 
-  def getopts_1([option | options], list, result) do
+  defp getopts_1([option | options], list, result) do
     {optvals, remaining} = getopts_2(list, option, [], [])
     getopts_1(options, remaining, [optvals | result])
   end
 
-  def getopts_2([], _Option, result, remaining), do: {:lists.reverse(result), :lists.reverse(remaining)}
+  defp getopts_2([], _Option, result, remaining), do: {:lists.reverse(result), :lists.reverse(remaining)}
 
-  def getopts_2([option | tail], ^option, result, remaining), do: getopts_2(tail, option, [option | result], remaining)
+  defp getopts_2([option | tail], ^option, result, remaining), do: getopts_2(tail, option, [option | result], remaining)
 
-  def getopts_2([optval | tail], option, result, remaining) when element(1, optval) === option, do: getopts_2(tail, option, [optval | result], remaining)
+  defp getopts_2([optval | tail], option, result, remaining) when element(1, optval) === option, do: getopts_2(tail, option, [optval | result], remaining)
 
-  def getopts_2([other | tail], option, result, remaining), do: getopts_2(tail, option, result, [other | remaining])
+  defp getopts_2([other | tail], option, result, remaining), do: getopts_2(tail, option, result, [other | remaining])
 
-  def handle_other({:"EXIT", pid, reason} = other, state) when is_pid(pid) or is_port(pid), do: ...
+  defp handle_other({:"EXIT", pid, reason} = other, state) when is_pid(pid) or is_port(pid), do: ...
 
-  def handle_other(other, state) do
+  defp handle_other(other, state) do
     :io.format('~p:handle_other, unknown - ~p', [:fprof, other])
     state
   end
 
-  def handle_req(trace_start(procs: procs, mode: mode, type: :file, dest: filename), tag, state) do
+  defp handle_req(trace_start(procs: procs, mode: mode, type: :file, dest: filename), tag, state) do
     case {get(:trace_state), get(:pending_stop)} do
       {:idle, []} ->
         trace_off()
@@ -679,7 +679,7 @@ defmodule :fprof do
     end
   end
 
-  def handle_req(trace_start(procs: procs, mode: mode, type: :tracer, dest: tracer), tag, state) do
+  defp handle_req(trace_start(procs: procs, mode: mode, type: :tracer, dest: tracer), tag, state) do
     case {get(:trace_state), get(:pending_stop)} do
       {:idle, []} ->
         trace_off()
@@ -700,7 +700,7 @@ defmodule :fprof do
     end
   end
 
-  def handle_req(trace_stop(), tag, state) do
+  defp handle_req(trace_stop(), tag, state) do
     case get(:trace_state) do
       :running ->
         tracePid = get(:trace_pid)
@@ -734,7 +734,7 @@ defmodule :fprof do
     end
   end
 
-  def handle_req(profile(src: filename, group_leader: groupLeader, dump: dump, flags: flags), tag, state) do
+  defp handle_req(profile(src: filename, group_leader: groupLeader, dump: dump, flags: flags), tag, state) do
     case {get(:profile_state), get(:pending_stop)} do
       {{:idle, _}, []} ->
         case ensure_open(dump, [:write | flags]) do
@@ -762,7 +762,7 @@ defmodule :fprof do
     end
   end
 
-  def handle_req(profile_start(group_leader: groupLeader, dump: dump, flags: flags), tag, state) do
+  defp handle_req(profile_start(group_leader: groupLeader, dump: dump, flags: flags), tag, state) do
     case {get(:profile_state), get(:pending_stop)} do
       {{:idle, _}, []} ->
         case ensure_open(dump, [:write | flags]) do
@@ -790,7 +790,7 @@ defmodule :fprof do
     end
   end
 
-  def handle_req(profile_stop(), tag, state) do
+  defp handle_req(profile_stop(), tag, state) do
     case {get(:profile_state), get(:profile_type)} do
       {:running, :tracer} ->
         profilePid = get(:profile_pid)
@@ -815,7 +815,7 @@ defmodule :fprof do
     end
   end
 
-  def handle_req(analyse(dest: dest, flags: flags) = request, tag, state) do
+  defp handle_req(analyse(dest: dest, flags: flags) = request, tag, state) do
     case get(:profile_state) do
       {:idle, :undefined} ->
         reply(tag, {:error, :no_profile})
@@ -827,7 +827,7 @@ defmodule :fprof do
             state
           {destState, destPid} ->
             profileTable = get(:profile_table)
-            reply(tag, spawn_3step(fn  ->
+            reply(tag, spawn_3step(fn () ->
                 do_analyse(profileTable, analyse(request, dest: destPid))
             end, fn result ->
                 {result, :finish}
@@ -848,7 +848,7 @@ defmodule :fprof do
     end
   end
 
-  def handle_req(stop(reason: reason), tag, state) do
+  defp handle_req(stop(reason: reason), tag, state) do
     pendingStop = get(:pending_stop)
     case pendingStop do
       [] ->
@@ -860,12 +860,12 @@ defmodule :fprof do
     try_pending_stop(state)
   end
 
-  def handle_req(get_state(), tag, state) do
+  defp handle_req(get_state(), tag, state) do
     reply(tag, {:ok, get()})
     state
   end
 
-  def handle_req(save_profile(file: file), tag, state) do
+  defp handle_req(save_profile(file: file), tag, state) do
     case get(:profile_state) do
       {:idle, :undefined} ->
         reply(tag, {:error, :no_profile})
@@ -878,7 +878,7 @@ defmodule :fprof do
     end
   end
 
-  def handle_req(load_profile(file: file), tag, state) do
+  defp handle_req(load_profile(file: file), tag, state) do
     case get(:profile_state) do
       {:idle, result} ->
         case :ets.file2tab(file) do
@@ -902,13 +902,13 @@ defmodule :fprof do
     end
   end
 
-  def handle_req(request, tag, state) do
+  defp handle_req(request, tag, state) do
     :io.format('~n~p:handle_req, unknown request - ~p~n', [:fprof, request])
     reply(tag, {:error, :unknown_request})
     state
   end
 
-  def handler(:end_of_trace, {:init, groupLeader, table, dump}) do
+  defp handler(:end_of_trace, {:init, groupLeader, table, dump}) do
     dump(dump, :start_of_trace)
     dump(dump, :end_of_trace)
     info(groupLeader, dump, 'Empty trace!~n', [])
@@ -916,19 +916,19 @@ defmodule :fprof do
     :done
   end
 
-  def handler(:end_of_trace, {:error, reason, _, groupLeader, dump}) do
+  defp handler(:end_of_trace, {:error, reason, _, groupLeader, dump}) do
     info(groupLeader, dump, '~nEnd of erroneous trace!~n', [])
     exit(reason)
   end
 
-  def handler(:end_of_trace, {_, tS, groupLeader, table, dump}) do
+  defp handler(:end_of_trace, {_, tS, groupLeader, table, dump}) do
     dump(dump, :end_of_trace)
     info(groupLeader, dump, '~nEnd of trace!~n', [])
     end_of_trace(table, tS)
     :done
   end
 
-  def handler(trace, {:init, groupLeader, table, dump}) do
+  defp handler(trace, {:init, groupLeader, table, dump}) do
     dump(dump, :start_of_trace)
     info(groupLeader, dump, 'Reading trace data...~n', [])
     try do
@@ -946,13 +946,13 @@ defmodule :fprof do
     end
   end
 
-  def handler(_, {:error, reason, m, groupLeader, dump}) do
+  defp handler(_, {:error, reason, m, groupLeader, dump}) do
     n = m + 1
     info_dots(groupLeader, dump, n)
     {:error, reason, n, groupLeader, dump}
   end
 
-  def handler(trace, {m, tS0, groupLeader, table, dump}) do
+  defp handler(trace, {m, tS0, groupLeader, table, dump}) do
     n = m + 1
     info_dots(groupLeader, dump, n)
     try do
@@ -969,13 +969,13 @@ defmodule :fprof do
     end
   end
 
-  def info(groupLeader, ^groupLeader, _, _), do: :ok
+  defp info(groupLeader, ^groupLeader, _, _), do: :ok
 
-  def info(groupLeader, _, format, list), do: :io.format(groupLeader, format, list)
+  defp info(groupLeader, _, format, list), do: :io.format(groupLeader, format, list)
 
-  def info_dots(groupLeader, ^groupLeader, _), do: :ok
+  defp info_dots(groupLeader, ^groupLeader, _), do: :ok
 
-  def info_dots(groupLeader, _, n) do
+  defp info_dots(groupLeader, _, n) do
     cond do
       rem(n, 100000) === 0 ->
         :io.format(groupLeader, ',~n', [])
@@ -988,21 +988,21 @@ defmodule :fprof do
     end
   end
 
-  def info_suspect_call(groupLeader, ^groupLeader, _, _), do: :ok
+  defp info_suspect_call(groupLeader, ^groupLeader, _, _), do: :ok
 
-  def info_suspect_call(groupLeader, _, func, pid), do: :io.format(groupLeader, '~nWarning: ~tp called in ~p - trace may become corrupt!~n', parsify([func, pid]))
+  defp info_suspect_call(groupLeader, _, func, pid), do: :io.format(groupLeader, '~nWarning: ~tp called in ~p - trace may become corrupt!~n', parsify([func, pid]))
 
-  def init_log(_Table, _Proc, :suspend), do: :ok
+  defp init_log(_Table, _Proc, :suspend), do: :ok
 
-  def init_log(_Table, _Proc, :void), do: :ok
+  defp init_log(_Table, _Proc, :void), do: :ok
 
-  def init_log(_Table, :undefined, _Entry), do: :ok
+  defp init_log(_Table, :undefined, _Entry), do: :ok
 
-  def init_log(_Table, proc(init_cnt: 0), _Entry), do: :ok
+  defp init_log(_Table, proc(init_cnt: 0), _Entry), do: :ok
 
-  def init_log(table, proc(init_cnt: n, init_log: l) = proc, entry), do: :ets.insert(table, proc(proc, init_cnt: n - 1, init_log: [entry | l]))
+  defp init_log(table, proc(init_cnt: n, init_log: l) = proc, entry), do: :ets.insert(table, proc(proc, init_cnt: n - 1, init_log: [entry | l]))
 
-  def init_log(table, id, entry) do
+  defp init_log(table, id, entry) do
     proc = case :ets.lookup(table, id) do
       [p] ->
         p
@@ -1012,28 +1012,28 @@ defmodule :fprof do
     init_log(table, proc, entry)
   end
 
-  def insert_call(clocks, func, clocksList), do: insert_call(clocks, func, clocksList, [])
+  defp insert_call(clocks, func, clocksList), do: insert_call(clocks, func, clocksList, [])
 
-  def insert_call(clocks, func, [clocks(id: ^func) = c | t], acc), do: [clocks_sum(c, clocks, func) | t ++ acc]
+  defp insert_call(clocks, func, [clocks(id: ^func) = c | t], acc), do: [clocks_sum(c, clocks, func) | t ++ acc]
 
-  def insert_call(clocks, func, [h | t], acc), do: insert_call(clocks, func, t, [h | acc])
+  defp insert_call(clocks, func, [h | t], acc), do: insert_call(clocks, func, t, [h | acc])
 
-  def insert_call(clocks, func, [], acc), do: [clocks(clocks, id: func) | acc]
+  defp insert_call(clocks, func, [], acc), do: [clocks(clocks, id: func) | acc]
 
-  def just_call(:undefined, _), do: {:"EXIT", :fprof_server, :noproc}
+  defp just_call(:undefined, _), do: {:"EXIT", :fprof_server, :noproc}
 
-  def just_call(pid, request), do: ...
+  defp just_call(pid, request), do: ...
 
-  def mfarity({m, f, args}) when is_list(args), do: {m, f, length(args)}
+  defp mfarity({m, f, args}) when is_list(args), do: {m, f, length(args)}
 
-  def mfarity(mFA), do: mFA
+  defp mfarity(mFA), do: mFA
 
-  def open_dbg_trace_port(type, spec) do
+  defp open_dbg_trace_port(type, spec) do
     fun = :dbg.trace_port(type, spec)
     fun.()
   end
 
-  def pad(char, l, size) when is_integer(char) and is_list(l) and is_integer(size) do
+  defp pad(char, l, size) when is_integer(char) and is_list(l) and is_integer(size) do
     list = :lists.flatten(l)
     length = length(list)
     cond do
@@ -1044,7 +1044,7 @@ defmodule :fprof do
     end
   end
 
-  def pad(l, char, size) when is_list(l) and is_integer(char) and is_integer(size) do
+  defp pad(l, char, size) when is_list(l) and is_integer(char) and is_integer(size) do
     list = :lists.flatten(l)
     length = length(list)
     cond do
@@ -1055,29 +1055,29 @@ defmodule :fprof do
     end
   end
 
-  def postsort_r(l), do: postsort_r(l, [])
+  defp postsort_r(l), do: postsort_r(l, [])
 
-  def postsort_r([], r), do: r
+  defp postsort_r([], r), do: r
 
-  def postsort_r([[_ | c] | l], r), do: postsort_r(l, [c | r])
+  defp postsort_r([[_ | c] | l], r), do: postsort_r(l, [c | r])
 
-  def print_called_1(dest, [clocks]), do: println(dest, '  {', clocks, '}]}.', "")
+  defp print_called_1(dest, [clocks]), do: println(dest, '  {', clocks, '}]}.', "")
 
-  def print_called_1(dest, [clocks | tail]) do
+  defp print_called_1(dest, [clocks | tail]) do
     println(dest, '  {', clocks, '},', "")
     print_called_1(dest, tail)
   end
 
-  def print_callers_1(dest, [clocks]), do: println(dest, '  {', clocks, '}],', "")
+  defp print_callers_1(dest, [clocks]), do: println(dest, '  {', clocks, '}],', "")
 
-  def print_callers_1(dest, [clocks | tail]) do
+  defp print_callers_1(dest, [clocks | tail]) do
     println(dest, '  {', clocks, '},', "")
     print_callers_1(dest, tail)
   end
 
-  def print_proc({:undefined, _}, _), do: :ok
+  defp print_proc({:undefined, _}, _), do: :ok
 
-  def print_proc(dest, proc(id: _Pid, parent: parent, spawned_as: spawnedAs, init_log: initLog)) do
+  defp print_proc(dest, proc(id: _Pid, parent: parent, spawned_as: spawnedAs, init_log: initLog)) do
     case {parent, spawnedAs, initLog} do
       {:undefined, :undefined, []} ->
         println(dest, '   ', [], '].', "")
@@ -1097,15 +1097,15 @@ defmodule :fprof do
     end
   end
 
-  def println({:undefined, _}), do: :ok
+  defp println({:undefined, _}), do: :ok
 
-  def println({io, _}), do: :io.nl(io)
+  defp println({io, _}), do: :io.nl(io)
 
-  def result(:normal), do: :ok
+  defp result(:normal), do: :ok
 
-  def result(reason), do: {:error, reason}
+  defp result(reason), do: {:error, reason}
 
-  def server_loop(state) do
+  defp server_loop(state) do
     receive do
     {:fprof_server, {mref, pid} = tag, :"$code_change"} when is_reference(mref) and is_pid(pid) ->
         reply(tag, :ok)
@@ -1117,13 +1117,13 @@ defmodule :fprof do
     end
   end
 
-  def spawn_3step(funPrelude, funAck, funBody), do: spawn_3step(:spawn, funPrelude, funAck, funBody)
+  defp spawn_3step(funPrelude, funAck, funBody), do: spawn_3step(:spawn, funPrelude, funAck, funBody)
 
-  def spawn_3step(spawn, funPrelude, funAck, funBody) when spawn === :spawn or spawn === :spawn_link, do: ...
+  defp spawn_3step(spawn, funPrelude, funAck, funBody) when spawn === :spawn or spawn === :spawn_link, do: ...
 
-  def spawn_link_3step(funPrelude, funAck, funBody), do: spawn_3step(:spawn_link, funPrelude, funAck, funBody)
+  defp spawn_link_3step(funPrelude, funAck, funBody), do: spawn_3step(:spawn_link, funPrelude, funAck, funBody)
 
-  def spawn_link_dbg_trace_client(file, table, groupLeader, dump) do
+  defp spawn_link_dbg_trace_client(file, table, groupLeader, dump) do
     case :dbg.trace_client(:file, file, {&handler/2, {:init, groupLeader, table, dump}}) do
       pid when is_pid(pid) ->
         link(pid)
@@ -1133,9 +1133,9 @@ defmodule :fprof do
     end
   end
 
-  def spawn_link_trace_client(table, groupLeader, dump) do
+  defp spawn_link_trace_client(table, groupLeader, dump) do
     parent = self()
-    spawn_link_3step(fn  ->
+    spawn_link_3step(fn () ->
         process_flag(:trap_exit, true)
         {self(), :go}
     end, fn ack ->
@@ -1146,11 +1146,11 @@ defmodule :fprof do
     end)
   end
 
-  def trace_call(table, pid, func, tS, cP), do: ...
+  defp trace_call(table, pid, func, tS, cP), do: ...
 
-  def trace_call_collapse_1(stack, [], _), do: stack
+  defp trace_call_collapse_1(stack, [], _), do: stack
 
-  def trace_call_collapse_1([{func0, _} | _] = stack, [{^func0, _} | s1] = s, n) do
+  defp trace_call_collapse_1([{func0, _} | _] = stack, [{^func0, _} | s1] = s, n) do
     case trace_call_collapse_2(stack, s, n) do
       true ->
         s
@@ -1159,21 +1159,21 @@ defmodule :fprof do
     end
   end
 
-  def trace_call_collapse_1(stack, [_ | s1], n), do: trace_call_collapse_1(stack, s1, n + 1)
+  defp trace_call_collapse_1(stack, [_ | s1], n), do: trace_call_collapse_1(stack, s1, n + 1)
 
-  def trace_call_collapse_2(_, _, 0), do: true
+  defp trace_call_collapse_2(_, _, 0), do: true
 
-  def trace_call_collapse_2([{func1, _} | [{func2, _} | _] = stack2], [{^func1, _} | [{^func2, _} | _] = s2], n), do: trace_call_collapse_2(stack2, s2, n - 1)
+  defp trace_call_collapse_2([{func1, _} | [{func2, _} | _] = stack2], [{^func1, _} | [{^func2, _} | _] = s2], n), do: trace_call_collapse_2(stack2, s2, n - 1)
 
-  def trace_call_collapse_2([{func1, _} | _], [{^func1, _} | _], _N), do: false
+  defp trace_call_collapse_2([{func1, _} | _], [{^func1, _} | _], _N), do: false
 
-  def trace_call_collapse_2(_Stack, [_], _N), do: false
+  defp trace_call_collapse_2(_Stack, [_], _N), do: false
 
-  def trace_call_collapse_2(stack, [_ | s], n), do: trace_call_collapse_2(stack, s, n)
+  defp trace_call_collapse_2(stack, [_ | s], n), do: trace_call_collapse_2(stack, s, n)
 
-  def trace_call_collapse_2(_Stack, [], _N), do: false
+  defp trace_call_collapse_2(_Stack, [], _N), do: false
 
-  def trace_call_push(table, pid, func, tS, stack) do
+  defp trace_call_push(table, pid, func, tS, stack) do
     case stack do
       [] ->
         :ok
@@ -1185,7 +1185,7 @@ defmodule :fprof do
     newStack
   end
 
-  def trace_call_shove(table, pid, func, tS, stack) do
+  defp trace_call_shove(table, pid, func, tS, stack) do
     trace_clock(table, pid, tS, stack, clocks(:own))
     [[_ | newLevel0] | newStack1] = case stack do
       [] ->
@@ -1198,26 +1198,26 @@ defmodule :fprof do
     newStack
   end
 
-  def trace_clock(_Table, _Pid, _T, [[{:suspend, _}], [{:suspend, _}] | _] = _Stack, _Clock) do
+  defp trace_clock(_Table, _Pid, _T, [[{:suspend, _}], [{:suspend, _}] | _] = _Stack, _Clock) do
     dbg(9, 'trace_clock(Table, ~w, ~w, ~w, ~w)~n', [_Pid, _T, _Stack, _Clock])
     :ok
   end
 
-  def trace_clock(table, pid, t, [[{:garbage_collect, tS0}], [{:suspend, _}]], clock), do: trace_clock_1(table, pid, t, tS0, :undefined, :garbage_collect, clock)
+  defp trace_clock(table, pid, t, [[{:garbage_collect, tS0}], [{:suspend, _}]], clock), do: trace_clock_1(table, pid, t, tS0, :undefined, :garbage_collect, clock)
 
-  def trace_clock(table, pid, t, [[{:garbage_collect, tS0}], [{:suspend, _}], [{func2, _} | _] | _], clock), do: trace_clock_1(table, pid, t, tS0, func2, :garbage_collect, clock)
+  defp trace_clock(table, pid, t, [[{:garbage_collect, tS0}], [{:suspend, _}], [{func2, _} | _] | _], clock), do: trace_clock_1(table, pid, t, tS0, func2, :garbage_collect, clock)
 
-  def trace_clock(table, pid, t, [[{func0, tS0}, {func1, _} | _] | _], clock), do: trace_clock_1(table, pid, t, tS0, func1, func0, clock)
+  defp trace_clock(table, pid, t, [[{func0, tS0}, {func1, _} | _] | _], clock), do: trace_clock_1(table, pid, t, tS0, func1, func0, clock)
 
-  def trace_clock(table, pid, t, [[{func0, tS0}], [{func1, _} | _] | _], clock), do: trace_clock_1(table, pid, t, tS0, func1, func0, clock)
+  defp trace_clock(table, pid, t, [[{func0, tS0}], [{func1, _} | _] | _], clock), do: trace_clock_1(table, pid, t, tS0, func1, func0, clock)
 
-  def trace_clock(table, pid, t, [[{func0, tS0}]], clock), do: trace_clock_1(table, pid, t, tS0, :undefined, func0, clock)
+  defp trace_clock(table, pid, t, [[{func0, tS0}]], clock), do: trace_clock_1(table, pid, t, tS0, :undefined, func0, clock)
 
-  def trace_clock(_, _, _, [], _), do: :ok
+  defp trace_clock(_, _, _, [], _), do: :ok
 
-  def trace_clock_1(table, pid, _, _, caller, :suspend, clocks(:own)), do: clock_add(table, {pid, caller, :suspend}, clocks(:own), 0)
+  defp trace_clock_1(table, pid, _, _, caller, :suspend, clocks(:own)), do: clock_add(table, {pid, caller, :suspend}, clocks(:own), 0)
 
-  def trace_clock_1(table, pid, t, tS, caller, func, clock) do
+  defp trace_clock_1(table, pid, t, tS, caller, func, clock) do
     clock_add(table, {pid, caller, func}, clock, (cond do
       is_integer(t) ->
         t
@@ -1226,7 +1226,7 @@ defmodule :fprof do
     end))
   end
 
-  def trace_exit(table, pid, tS) do
+  defp trace_exit(table, pid, tS) do
     stack = erase(pid)
     dbg(0, 'trace_exit(~p, ~p)~n~p~n', [pid, tS, stack])
     case stack do
@@ -1241,11 +1241,11 @@ defmodule :fprof do
     :ok
   end
 
-  def trace_flags(:normal), do: [:call, :return_to, :running, :procs, :garbage_collection, :arity, :timestamp, :set_on_spawn]
+  defp trace_flags(:normal), do: [:call, :return_to, :running, :procs, :garbage_collection, :arity, :timestamp, :set_on_spawn]
 
-  def trace_flags(:verbose), do: [:call, :return_to, :send, :receive, :running, :procs, :garbage_collection, :timestamp, :set_on_spawn]
+  defp trace_flags(:verbose), do: [:call, :return_to, :send, :receive, :running, :procs, :garbage_collection, :timestamp, :set_on_spawn]
 
-  def trace_gc_end(table, pid, tS) do
+  defp trace_gc_end(table, pid, tS) do
     stack = get(pid)
     dbg(0, 'trace_gc_end(~p, ~p)~n~p~n', [pid, tS, stack])
     case stack do
@@ -1262,19 +1262,19 @@ defmodule :fprof do
     end
   end
 
-  def trace_gc_start(table, pid, tS) do
+  defp trace_gc_start(table, pid, tS) do
     stack = get_stack(pid)
     dbg(0, 'trace_gc_start(~p, ~p)~n~p~n', [pid, tS, stack])
     put(pid, trace_call_push(table, pid, :garbage_collect, tS, stack))
   end
 
-  def trace_handler({:trace_ts, pid, :call, _MFA, _TS} = trace, _Table, _, dump) do
+  defp trace_handler({:trace_ts, pid, :call, _MFA, _TS} = trace, _Table, _, dump) do
     stack = get(pid)
     dump_stack(dump, stack, trace)
     throw({:incorrect_trace_data, :fprof, 1522, [trace, stack]})
   end
 
-  def trace_handler({:trace_ts, pid, :call, {_M, _F, arity} = func, {:cp, cP}, tS} = trace, table, groupLeader, dump) when is_integer(arity) do
+  defp trace_handler({:trace_ts, pid, :call, {_M, _F, arity} = func, {:cp, cP}, tS} = trace, table, groupLeader, dump) when is_integer(arity) do
     dump_stack(dump, get(pid), trace)
     case func do
       {:erlang, :trace, 3} ->
@@ -1288,175 +1288,175 @@ defmodule :fprof do
     tS
   end
 
-  def trace_handler({:trace_ts, pid, :call, {_M, _F, args} = mFArgs, {:cp, cP}, tS} = trace, table, _, dump) when is_list(args) do
+  defp trace_handler({:trace_ts, pid, :call, {_M, _F, args} = mFArgs, {:cp, cP}, tS} = trace, table, _, dump) when is_list(args) do
     dump_stack(dump, get(pid), trace)
     func = mfarity(mFArgs)
     trace_call(table, pid, func, tS, cP)
     tS
   end
 
-  def trace_handler({:trace_ts, pid, :return_to, :undefined, tS} = trace, table, _, dump) do
+  defp trace_handler({:trace_ts, pid, :return_to, :undefined, tS} = trace, table, _, dump) do
     dump_stack(dump, get(pid), trace)
     trace_return_to(table, pid, :undefined, tS)
     tS
   end
 
-  def trace_handler({:trace_ts, pid, :return_to, {_M, _F, arity} = func, tS} = trace, table, _, dump) when is_integer(arity) do
+  defp trace_handler({:trace_ts, pid, :return_to, {_M, _F, arity} = func, tS} = trace, table, _, dump) when is_integer(arity) do
     dump_stack(dump, get(pid), trace)
     trace_return_to(table, pid, func, tS)
     tS
   end
 
-  def trace_handler({:trace_ts, pid, :return_to, {_M, _F, args} = mFArgs, tS} = trace, table, _, dump) when is_list(args) do
+  defp trace_handler({:trace_ts, pid, :return_to, {_M, _F, args} = mFArgs, tS} = trace, table, _, dump) when is_list(args) do
     dump_stack(dump, get(pid), trace)
     func = mfarity(mFArgs)
     trace_return_to(table, pid, func, tS)
     tS
   end
 
-  def trace_handler({:trace_ts, pid, :spawn, child, mFArgs, tS} = trace, table, _, dump) do
+  defp trace_handler({:trace_ts, pid, :spawn, child, mFArgs, tS} = trace, table, _, dump) do
     dump_stack(dump, get(pid), trace)
     trace_spawn(table, child, mFArgs, tS, pid)
     tS
   end
 
-  def trace_handler({:trace_ts, pid, :spawned, parent, mFArgs, tS} = trace, table, _, dump) do
+  defp trace_handler({:trace_ts, pid, :spawned, parent, mFArgs, tS} = trace, table, _, dump) do
     dump_stack(dump, get(pid), trace)
     trace_spawn(table, pid, mFArgs, tS, parent)
     tS
   end
 
-  def trace_handler({:trace_ts, pid, :exit, _Reason, tS} = trace, table, _, dump) do
+  defp trace_handler({:trace_ts, pid, :exit, _Reason, tS} = trace, table, _, dump) do
     dump_stack(dump, get(pid), trace)
     trace_exit(table, pid, tS)
     tS
   end
 
-  def trace_handler({:trace_ts, pid, :out, 0, tS} = trace, table, _, dump) do
+  defp trace_handler({:trace_ts, pid, :out, 0, tS} = trace, table, _, dump) do
     dump_stack(dump, get(pid), trace)
     trace_out(table, pid, :undefined, tS)
     tS
   end
 
-  def trace_handler({:trace_ts, pid, :out, {_M, _F, arity} = func, tS} = trace, table, _, dump) when is_integer(arity) do
+  defp trace_handler({:trace_ts, pid, :out, {_M, _F, arity} = func, tS} = trace, table, _, dump) when is_integer(arity) do
     dump_stack(dump, get(pid), trace)
     trace_out(table, pid, func, tS)
     tS
   end
 
-  def trace_handler({:trace_ts, pid, :out, {_M, _F, args} = mFArgs, tS} = trace, table, _, dump) when is_list(args) do
+  defp trace_handler({:trace_ts, pid, :out, {_M, _F, args} = mFArgs, tS} = trace, table, _, dump) when is_list(args) do
     dump_stack(dump, get(pid), trace)
     func = mfarity(mFArgs)
     trace_out(table, pid, func, tS)
     tS
   end
 
-  def trace_handler({:trace_ts, pid, :in, 0, tS} = trace, table, _, dump) do
+  defp trace_handler({:trace_ts, pid, :in, 0, tS} = trace, table, _, dump) do
     dump_stack(dump, get(pid), trace)
     trace_in(table, pid, :undefined, tS)
     tS
   end
 
-  def trace_handler({:trace_ts, pid, :in, {_M, _F, arity} = func, tS} = trace, table, _, dump) when is_integer(arity) do
+  defp trace_handler({:trace_ts, pid, :in, {_M, _F, arity} = func, tS} = trace, table, _, dump) when is_integer(arity) do
     dump_stack(dump, get(pid), trace)
     trace_in(table, pid, func, tS)
     tS
   end
 
-  def trace_handler({:trace_ts, pid, :in, {_M, _F, args} = mFArgs, tS} = trace, table, _, dump) when is_list(args) do
+  defp trace_handler({:trace_ts, pid, :in, {_M, _F, args} = mFArgs, tS} = trace, table, _, dump) when is_list(args) do
     dump_stack(dump, get(pid), trace)
     func = mfarity(mFArgs)
     trace_in(table, pid, func, tS)
     tS
   end
 
-  def trace_handler({:trace_ts, pid, :gc_minor_start, _Func, tS} = trace, table, _, dump) do
+  defp trace_handler({:trace_ts, pid, :gc_minor_start, _Func, tS} = trace, table, _, dump) do
     dump_stack(dump, get(pid), trace)
     trace_gc_start(table, pid, tS)
     tS
   end
 
-  def trace_handler({:trace_ts, pid, :gc_major_start, _Func, tS} = trace, table, _, dump) do
+  defp trace_handler({:trace_ts, pid, :gc_major_start, _Func, tS} = trace, table, _, dump) do
     dump_stack(dump, get(pid), trace)
     trace_gc_start(table, pid, tS)
     tS
   end
 
-  def trace_handler({:trace_ts, pid, :gc_start, _Func, tS} = trace, table, _, dump) do
+  defp trace_handler({:trace_ts, pid, :gc_start, _Func, tS} = trace, table, _, dump) do
     dump_stack(dump, get(pid), trace)
     trace_gc_start(table, pid, tS)
     tS
   end
 
-  def trace_handler({:trace_ts, pid, :gc_minor_end, _Func, tS} = trace, table, _, dump) do
+  defp trace_handler({:trace_ts, pid, :gc_minor_end, _Func, tS} = trace, table, _, dump) do
     dump_stack(dump, get(pid), trace)
     trace_gc_end(table, pid, tS)
     tS
   end
 
-  def trace_handler({:trace_ts, pid, :gc_major_end, _Func, tS} = trace, table, _, dump) do
+  defp trace_handler({:trace_ts, pid, :gc_major_end, _Func, tS} = trace, table, _, dump) do
     dump_stack(dump, get(pid), trace)
     trace_gc_end(table, pid, tS)
     tS
   end
 
-  def trace_handler({:trace_ts, pid, :gc_end, _Func, tS} = trace, table, _, dump) do
+  defp trace_handler({:trace_ts, pid, :gc_end, _Func, tS} = trace, table, _, dump) do
     dump_stack(dump, get(pid), trace)
     trace_gc_end(table, pid, tS)
     tS
   end
 
-  def trace_handler({:trace_ts, pid, :link, _OtherPid, tS} = trace, _Table, _, dump) do
+  defp trace_handler({:trace_ts, pid, :link, _OtherPid, tS} = trace, _Table, _, dump) do
     dump_stack(dump, get(pid), trace)
     tS
   end
 
-  def trace_handler({:trace_ts, pid, :unlink, _OtherPid, tS} = trace, _Table, _, dump) do
+  defp trace_handler({:trace_ts, pid, :unlink, _OtherPid, tS} = trace, _Table, _, dump) do
     dump_stack(dump, get(pid), trace)
     tS
   end
 
-  def trace_handler({:trace_ts, pid, :getting_linked, _OtherPid, tS} = trace, _Table, _, dump) do
+  defp trace_handler({:trace_ts, pid, :getting_linked, _OtherPid, tS} = trace, _Table, _, dump) do
     dump_stack(dump, get(pid), trace)
     tS
   end
 
-  def trace_handler({:trace_ts, pid, :getting_unlinked, _OtherPid, tS} = trace, _Table, _, dump) do
+  defp trace_handler({:trace_ts, pid, :getting_unlinked, _OtherPid, tS} = trace, _Table, _, dump) do
     dump_stack(dump, get(pid), trace)
     tS
   end
 
-  def trace_handler({:trace_ts, pid, :register, _Name, tS} = trace, _Table, _, dump) do
+  defp trace_handler({:trace_ts, pid, :register, _Name, tS} = trace, _Table, _, dump) do
     dump_stack(dump, get(pid), trace)
     tS
   end
 
-  def trace_handler({:trace_ts, pid, :unregister, _Name, tS} = trace, _Table, _, dump) do
+  defp trace_handler({:trace_ts, pid, :unregister, _Name, tS} = trace, _Table, _, dump) do
     dump_stack(dump, get(pid), trace)
     tS
   end
 
-  def trace_handler({:trace_ts, pid, :send, _OtherPid, _Msg, tS} = trace, _Table, _, dump) do
+  defp trace_handler({:trace_ts, pid, :send, _OtherPid, _Msg, tS} = trace, _Table, _, dump) do
     dump_stack(dump, get(pid), trace)
     tS
   end
 
-  def trace_handler({:trace_ts, pid, :send_to_non_existing_process, _OtherPid, _Msg, tS} = trace, _Table, _, dump) do
+  defp trace_handler({:trace_ts, pid, :send_to_non_existing_process, _OtherPid, _Msg, tS} = trace, _Table, _, dump) do
     dump_stack(dump, get(pid), trace)
     tS
   end
 
-  def trace_handler({:trace_ts, pid, :receive, _Msg, tS} = trace, _Table, _, dump) do
+  defp trace_handler({:trace_ts, pid, :receive, _Msg, tS} = trace, _Table, _, dump) do
     dump_stack(dump, get(pid), trace)
     tS
   end
 
-  def trace_handler(trace, _Table, _, dump) do
+  defp trace_handler(trace, _Table, _, dump) do
     dump(dump, trace)
     throw({:incorrect_trace_data, :fprof, 1720, [trace]})
   end
 
-  def trace_in(table, pid, func, tS) do
+  defp trace_in(table, pid, func, tS) do
     stack = get(pid)
     dbg(0, 'trace_in(~p, ~p, ~p)~n~p~n', [pid, func, tS, stack])
     case stack do
@@ -1475,7 +1475,7 @@ defmodule :fprof do
     end
   end
 
-  def trace_out(table, pid, func, tS) do
+  defp trace_out(table, pid, func, tS) do
     stack = get_stack(pid)
     dbg(0, 'trace_out(~p, ~p, ~p)~n~p~n', [pid, func, tS, stack])
     case stack do
@@ -1493,7 +1493,7 @@ defmodule :fprof do
     end
   end
 
-  def trace_return_to(table, pid, func, tS) do
+  defp trace_return_to(table, pid, func, tS) do
     stack = get_stack(pid)
     dbg(0, 'trace_return_to(~p, ~p, ~p)~n~p~n', [pid, func, tS, stack])
     case stack do
@@ -1509,11 +1509,11 @@ defmodule :fprof do
     :ok
   end
 
-  def trace_return_to_1(_, _, :undefined, _, []), do: {[], []}
+  defp trace_return_to_1(_, _, :undefined, _, []), do: {[], []}
 
-  def trace_return_to_1(_, _, _, _, []), do: {:undefined, []}
+  defp trace_return_to_1(_, _, _, _, []), do: {:undefined, []}
 
-  def trace_return_to_1(table, pid, func, tS, [[{^func, _} | level0] | stack1] = stack) do
+  defp trace_return_to_1(table, pid, func, tS, [[{^func, _} | level0] | stack1] = stack) do
     charged = trace_return_to_3([level0 | stack1], [])
     case :lists.member(func, charged) do
       false ->
@@ -1524,13 +1524,13 @@ defmodule :fprof do
     end
   end
 
-  def trace_return_to_1(table, pid, func, tS, stack), do: trace_return_to_2(table, pid, func, tS, stack)
+  defp trace_return_to_1(table, pid, func, tS, stack), do: trace_return_to_2(table, pid, func, tS, stack)
 
-  def trace_return_to_2(table, pid, func, tS, [] = stack), do: trace_return_to_1(table, pid, func, tS, stack)
+  defp trace_return_to_2(table, pid, func, tS, [] = stack), do: trace_return_to_1(table, pid, func, tS, stack)
 
-  def trace_return_to_2(table, pid, func, tS, [[] | stack1]), do: trace_return_to_1(table, pid, func, tS, stack1)
+  defp trace_return_to_2(table, pid, func, tS, [[] | stack1]), do: trace_return_to_1(table, pid, func, tS, stack1)
 
-  def trace_return_to_2(table, pid, func, tS, [[{func0, _} | level1] | stack1] = stack) do
+  defp trace_return_to_2(table, pid, func, tS, [[{func0, _} | level1] | stack1] = stack) do
     case trace_return_to_2(table, pid, func, tS, [level1 | stack1]) do
       {:undefined, _} = r ->
         r
@@ -1545,13 +1545,13 @@ defmodule :fprof do
     end
   end
 
-  def trace_return_to_3([], r), do: r
+  defp trace_return_to_3([], r), do: r
 
-  def trace_return_to_3([[] | stack1], r), do: trace_return_to_3(stack1, r)
+  defp trace_return_to_3([[] | stack1], r), do: trace_return_to_3(stack1, r)
 
-  def trace_return_to_3([[{func0, _} | level0] | stack1], r), do: trace_return_to_3([level0 | stack1], [func0 | r])
+  defp trace_return_to_3([[{func0, _} | level0] | stack1], r), do: trace_return_to_3([level0 | stack1], [func0 | r])
 
-  def trace_return_to_int(table, pid, func, tS, stack) do
+  defp trace_return_to_int(table, pid, func, tS, stack) do
     trace_clock(table, pid, tS, stack, clocks(:own))
     case trace_return_to_2(table, pid, func, tS, stack) do
       {:undefined, _} ->
@@ -1563,7 +1563,7 @@ defmodule :fprof do
     end
   end
 
-  def trace_spawn(table, pid, mFArgs, tS, parent) do
+  defp trace_spawn(table, pid, mFArgs, tS, parent) do
     stack = get(pid)
     dbg(0, 'trace_spawn(~p, ~p, ~p, ~p)~n~p~n', [pid, mFArgs, tS, parent, stack])
     case stack do
@@ -1577,7 +1577,7 @@ defmodule :fprof do
     end
   end
 
-  def tracer_loop(parent, handler, state) do
+  defp tracer_loop(parent, handler, state) do
     receive do
     trace when element(1, trace) === :trace ->
         tracer_loop(parent, handler, handler.(trace, state))
@@ -1591,7 +1591,7 @@ defmodule :fprof do
     end
   end
 
-  def try_pending_stop(state) do
+  defp try_pending_stop(state) do
     case {get(:trace_state), get(:profile_state), get(:pending_stop)} do
       {:idle, {:idle, _}, [_ | _] = pendingStop} ->
         reason = get(:stop_reason)
@@ -1605,7 +1605,7 @@ defmodule :fprof do
     end
   end
 
-  def ts_sub({a, b, c} = _T, {a0, b0, c0} = _T0) do
+  defp ts_sub({a, b, c} = _T, {a0, b0, c0} = _T0) do
     x = a - a0 * 1000000 + b - b0 * 1000000 + c - c0
     cond do
       x >= 0 ->
@@ -1616,5 +1616,5 @@ defmodule :fprof do
     x
   end
 
-  def ts_sub(_, _), do: :undefined
+  defp ts_sub(_, _), do: :undefined
 end

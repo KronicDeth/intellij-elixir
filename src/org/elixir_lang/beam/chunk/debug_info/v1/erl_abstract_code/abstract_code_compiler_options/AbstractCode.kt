@@ -11,17 +11,17 @@ import org.elixir_lang.errorreport.Logger
 
 
 object AbstractCode {
-    inline fun <T> ifTag(term: OtpErlangObject?, tag: String, ifTrue: (OtpErlangTuple) -> T?): T? =
+    inline fun <T> ifTag(term: OtpErlangObject?, tag: String, crossinline ifTrue: (OtpErlangTuple) -> T?): T? =
             ifTag(term, tag, { actualTag, expectedTag -> actualTag == expectedTag }, ifTrue)
 
-    inline fun <T> ifTag(term: OtpErlangObject?, tagSet: Set<String>, ifTrue: (OtpErlangTuple) -> T?): T? =
+    inline fun <T> ifTag(term: OtpErlangObject?, tagSet: Set<String>, crossinline ifTrue: (OtpErlangTuple) -> T?): T? =
             ifTag(term, tagSet, { actualTag, expectedTagSet -> expectedTagSet.contains(actualTag) }, ifTrue)
 
     inline fun <E, R> ifTag(
             term: OtpErlangObject?,
             tag: E,
-            test: (String, E) -> Boolean,
-            ifTrue: (OtpErlangTuple) -> R?
+            crossinline test: (String, E) -> Boolean,
+            crossinline ifTrue: (OtpErlangTuple) -> R?
     ): R? =
             when (term) {
                 is OtpErlangTuple -> ifTag(term, tag, test, ifTrue)
@@ -31,8 +31,8 @@ object AbstractCode {
     inline fun <E, R> ifTag(
             term: OtpErlangTuple,
             tag: E,
-            test: (String, E) -> Boolean,
-            ifTrue: (OtpErlangTuple) -> R?
+            crossinline test: (String, E) -> Boolean,
+            crossinline ifTrue: (OtpErlangTuple) -> R?
     ): R? =
             (term.elementAt(0) as? OtpErlangAtom)?.let { actualTag ->
                 if (test(actualTag.atomValue(), tag)) {
@@ -95,7 +95,3 @@ object AbstractCode {
 
     private val logger by lazy { com.intellij.openapi.diagnostic.Logger.getInstance(AbstractCode::class.java) }
 }
-
-
-
-

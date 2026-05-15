@@ -410,7 +410,7 @@ defmodule :code do
     # body not decompiled
   end
 
-  def all_available([path | tail], acc) do
+  defp all_available([path | tail], acc) do
     case :erl_prim_loader.list_dir(path) do
       {:ok, files} ->
         all_available(tail, all_available(path, files, acc))
@@ -419,7 +419,7 @@ defmodule :code do
     end
   end
 
-  def all_available([], allModules) do
+  defp all_available([], allModules) do
     allLoaded = for {m, path} <- all_loaded() do
       {atom_to_list(m), path, true}
     end
@@ -435,7 +435,7 @@ defmodule :code do
     :lists.umerge(orderFun, :lists.sort(orderFun, allLoaded), :lists.sort(orderFun, allAvailable))
   end
 
-  def all_available(path, [file | t], acc) do
+  defp all_available(path, [file | t], acc) do
     case :filename.extension(file) do
       '.beam' ->
         case :maps.is_key(file, acc) do
@@ -449,9 +449,9 @@ defmodule :code do
     end
   end
 
-  def all_available(_Path, [], acc), do: acc
+  defp all_available(_Path, [], acc), do: acc
 
-  def beam_file_md5(path) do
+  defp beam_file_md5(path) do
     case :beam_lib.md5(path) do
       {:ok, {_Mod, mD5}} ->
         mD5
@@ -460,7 +460,7 @@ defmodule :code do
     end
   end
 
-  def beam_file_native_md5(path, architecture) do
+  defp beam_file_native_md5(path, architecture) do
     try do
       get_beam_chunk(path, :hipe_unified_loader.chunk_name(architecture))
     catch
@@ -472,25 +472,25 @@ defmodule :code do
     end
   end
 
-  def build([]), do: []
+  defp build([]), do: []
 
-  def build([dir | tail]) do
+  defp build([dir | tail]) do
     files = filter(objfile_extension(), dir, :erl_prim_loader.list_dir(dir))
     [decorate(files, dir) | build(tail)]
   end
 
-  def cache_warning() do
+  defp cache_warning() do
     w = 'The code path cache functionality has been removed'
     :error_logger.warning_report(w)
   end
 
-  def call(req), do: :code_server.call(req)
+  defp call(req), do: :code_server.call(req)
 
-  def decorate([], _), do: []
+  defp decorate([], _), do: []
 
-  def decorate([file | tail], dir), do: [{dir, file} | decorate(tail, dir)]
+  defp decorate([file | tail], dir), do: [{dir, file} | decorate(tail, dir)]
 
-  def do_par(fun, l) do
+  defp do_par(fun, l) do
     {_, ref} = spawn_monitor(do_par_fun(fun, l))
     receive do
     {:"DOWN", ^ref, :process, _, res} ->
@@ -499,8 +499,8 @@ defmodule :code do
   end
 
   @spec do_par_fun(prep_fun_type(), []) :: (() -> no_return())
-  def do_par_fun(fun, l) do
-    fn  ->
+  defp do_par_fun(fun, l) do
+    fn () ->
         _ = for item <- l do
           spawn_monitor(do_par_fun_2(fun, item))
         end
@@ -509,8 +509,8 @@ defmodule :code do
   end
 
   @spec do_par_fun_2(prep_fun_type(), {module(), :file.filename(), binary()}) :: (() -> no_return())
-  def do_par_fun_2(fun, item) do
-    fn  ->
+  defp do_par_fun_2(fun, item) do
+    fn () ->
         {mod, filename, bin} = item
         try do
           fun.(mod, filename, bin)
@@ -526,9 +526,9 @@ defmodule :code do
     end
   end
 
-  def do_par_recv(0, good, bad), do: {good, bad}
+  defp do_par_recv(0, good, bad), do: {good, bad}
 
-  def do_par_recv(n, good, bad) do
+  defp do_par_recv(n, good, bad) do
     receive do
     {:"DOWN", _, :process, _, {:good, res}} ->
         do_par_recv(n - 1, [res | good], bad)
@@ -537,7 +537,7 @@ defmodule :code do
     end
   end
 
-  def do_prepare_loading(modules) do
+  defp do_prepare_loading(modules) do
     case partition_load(modules, [], []) do
       {modBins, ms} ->
         case prepare_loading_1(modBins, ms) do
@@ -551,7 +551,7 @@ defmodule :code do
     end
   end
 
-  def do_s(lib) do
+  defp do_s(lib) do
     case lib_dir(lib) do
       {:error, _} ->
         :ok
@@ -561,7 +561,7 @@ defmodule :code do
     end
   end
 
-  def do_start() do
+  defp do_start() do
     maybe_warn_for_cache()
     load_code_server_prerequisites()
     {:ok, [[root0]]} = :init.get_argument(:root)
@@ -574,13 +574,13 @@ defmodule :code do
     res
   end
 
-  def do_stick_dirs() do
+  defp do_stick_dirs() do
     do_s(:compiler)
     do_s(:stdlib)
     do_s(:kernel)
   end
 
-  def ensure_modules_loaded_1(ms0) do
+  defp ensure_modules_loaded_1(ms0) do
     ms = :lists.usort(ms0)
     {prep, error0} = load_mods(ms)
     {onLoad, normal} = partition_on_load(prep)
@@ -593,7 +593,7 @@ defmodule :code do
     ensure_modules_loaded_2(onLoad, error1)
   end
 
-  def ensure_modules_loaded_2([{m, _} | ms], errors) do
+  defp ensure_modules_loaded_2([{m, _} | ms], errors) do
     case ensure_loaded(m) do
       {:module, m} ->
         ensure_modules_loaded_2(ms, errors)
@@ -602,20 +602,20 @@ defmodule :code do
     end
   end
 
-  def ensure_modules_loaded_2([], []), do: :ok
+  defp ensure_modules_loaded_2([], []), do: :ok
 
-  def ensure_modules_loaded_2([], [_ | _] = errors), do: {:error, errors}
+  defp ensure_modules_loaded_2([], [_ | _] = errors), do: {:error, errors}
 
-  def filter(_Ext, dir, :error) do
+  defp filter(_Ext, dir, :error) do
     :io.format('** Bad path can\'t read ~ts~n', [dir])
     []
   end
 
-  def filter(ext, _, {:ok, files}), do: filter2(ext, length(ext), files)
+  defp filter(ext, _, {:ok, files}), do: filter2(ext, length(ext), files)
 
-  def filter2(_Ext, _Extlen, []), do: []
+  defp filter2(_Ext, _Extlen, []), do: []
 
-  def filter2(ext, extlen, [file | tail]) do
+  defp filter2(ext, extlen, [file | tail]) do
     case has_ext(ext, extlen, file) do
       true ->
         [file | filter2(ext, extlen, tail)]
@@ -624,7 +624,7 @@ defmodule :code do
     end
   end
 
-  def finish_loading(prepared0, ensureLoaded) do
+  defp finish_loading(prepared0, ensureLoaded) do
     prepared = for {m, {bin, file, _}} <- prepared0 do
       {m, {bin, file}}
     end
@@ -647,19 +647,19 @@ defmodule :code do
     end
   end
 
-  def finish_loading_native([{mod, code} | ms]) do
+  defp finish_loading_native([{mod, code} | ms]) do
     _ = load_native_partial(mod, code)
     finish_loading_native(ms)
   end
 
-  def finish_loading_native([]), do: :ok
+  defp finish_loading_native([]), do: :ok
 
-  def get_beam_chunk(path, chunk) do
+  defp get_beam_chunk(path, chunk) do
     {:ok, {_, [{_, bin}]}} = :beam_lib.chunks(path, [chunk])
     bin
   end
 
-  def get_doc_chunk(filename, mod) when is_atom(mod) do
+  defp get_doc_chunk(filename, mod) when is_atom(mod) do
     case :beam_lib.chunks(filename, ['Docs']) do
       {:error, :beam_lib, {:missing_chunk, _, _}} ->
         case get_doc_chunk(filename, atom_to_list(mod)) do
@@ -675,7 +675,7 @@ defmodule :code do
     end
   end
 
-  def get_doc_chunk(filename, mod) do
+  defp get_doc_chunk(filename, mod) do
     case :filename.dirname(filename) do
       filename ->
         {:error, :missing}
@@ -692,7 +692,7 @@ defmodule :code do
     end
   end
 
-  def get_doc_chunk_from_ast(filename) do
+  defp get_doc_chunk_from_ast(filename) do
     case :beam_lib.chunks(filename, [:abstract_code]) do
       {:error, :beam_lib, {:missing_chunk, _, _}} ->
         {:error, :missing}
@@ -706,13 +706,13 @@ defmodule :code do
     end
   end
 
-  def get_function_docs_from_ast(aST) do
+  defp get_function_docs_from_ast(aST) do
     :lists.flatmap(fn e ->
         get_function_docs_from_ast(e, aST)
     end, aST)
   end
 
-  def get_function_docs_from_ast({:function, anno, name, arity, _Code}, aST) do
+  defp get_function_docs_from_ast({:function, anno, name, arity, _Code}, aST) do
     signature = :io_lib.format('~p/~p', [name, arity])
     specs = :lists.filter(fn {:attribute, _Ln, :spec, {fA, _}} ->
         case fA do
@@ -733,9 +733,9 @@ defmodule :code do
     [{{:function, name, arity}, anno, [:unicode.characters_to_binary(signature)], :none, specMd}]
   end
 
-  def get_function_docs_from_ast(_, _), do: []
+  defp get_function_docs_from_ast(_, _), do: []
 
-  def get_native_fun() do
+  defp get_native_fun() do
     architecture = :erlang.system_info(:hipe_architecture)
     try do
       :hipe_unified_loader.chunk_name(architecture)
@@ -752,7 +752,7 @@ defmodule :code do
     end
   end
 
-  def has_ext(ext, extlen, file) do
+  defp has_ext(ext, extlen, file) do
     l = length(file)
     try do
       :lists.nthtail(l - extlen, file)
@@ -767,7 +767,7 @@ defmodule :code do
     end
   end
 
-  def load_all_native(loaded, chunkTag) do
+  defp load_all_native(loaded, chunkTag) do
     try do
       load_all_native_1(loaded, chunkTag)
     catch
@@ -775,9 +775,9 @@ defmodule :code do
     end
   end
 
-  def load_all_native_1([{_, :preloaded} | t], chunkTag), do: load_all_native_1(t, chunkTag)
+  defp load_all_native_1([{_, :preloaded} | t], chunkTag), do: load_all_native_1(t, chunkTag)
 
-  def load_all_native_1([{mod, beamFilename} | t], chunkTag) do
+  defp load_all_native_1([{mod, beamFilename} | t], chunkTag) do
     case :code.is_module_native(mod) do
       false ->
         {:ok, beam} = :prim_file.read_file(beamFilename)
@@ -794,16 +794,16 @@ defmodule :code do
     load_all_native_1(t, chunkTag)
   end
 
-  def load_all_native_1([], _), do: :ok
+  defp load_all_native_1([], _), do: :ok
 
-  def load_bins([]), do: {[], []}
+  defp load_bins([]), do: {[], []}
 
-  def load_bins(binItems) do
+  defp load_bins(binItems) do
     f = prepare_loading_fun()
     do_par(f, binItems)
   end
 
-  def load_code_server_prerequisites() do
+  defp load_code_server_prerequisites() do
     needed = [:binary, :ets, :filename, :gb_sets, :gb_trees, :hipe_unified_loader, :lists, :os, :unicode]
     _ = for m <- needed do
       ^m = m.module_info(:module)
@@ -811,9 +811,9 @@ defmodule :code do
     :ok
   end
 
-  def load_mods([]), do: {[], []}
+  defp load_mods([]), do: {[], []}
 
-  def load_mods(mods) do
+  defp load_mods(mods) do
     path = get_path()
     f = prepare_loading_fun()
     {:ok, {succ, error0}} = :erl_prim_loader.get_modules(mods, f, path)
@@ -828,9 +828,9 @@ defmodule :code do
     {succ, error}
   end
 
-  def load_native_code_for_all_loaded(:undefined), do: :ok
+  defp load_native_code_for_all_loaded(:undefined), do: :ok
 
-  def load_native_code_for_all_loaded(architecture) do
+  defp load_native_code_for_all_loaded(architecture) do
     try do
       :hipe_unified_loader.chunk_name(architecture)
     catch
@@ -839,14 +839,14 @@ defmodule :code do
     else
       chunkTag ->
         loaded = all_loaded()
-        _ = spawn(fn  ->
+        _ = spawn(fn () ->
             load_all_native(loaded, chunkTag)
         end)
         :ok
     end
   end
 
-  def maybe_stick_dirs(:interactive) do
+  defp maybe_stick_dirs(:interactive) do
     case :init.get_argument(:nostick) do
       {:ok, [[]]} ->
         :ok
@@ -855,9 +855,9 @@ defmodule :code do
     end
   end
 
-  def maybe_stick_dirs(_), do: :ok
+  defp maybe_stick_dirs(_), do: :ok
 
-  def maybe_warn_for_cache() do
+  defp maybe_warn_for_cache() do
     case :init.get_argument(:code_path_cache) do
       {:ok, _} ->
         cache_warning()
@@ -866,7 +866,7 @@ defmodule :code do
     end
   end
 
-  def module_changed_on_disk(module, path) do
+  defp module_changed_on_disk(module, path) do
     mD5 = :erlang.get_module_info(module, :md5)
     case :erlang.system_info(:hipe_architecture) do
       :undefined ->
@@ -881,7 +881,7 @@ defmodule :code do
     end
   end
 
-  def module_status(module, pathFiles) do
+  defp module_status(module, pathFiles) do
     case :code.is_loaded(module) do
       false ->
         :not_loaded
@@ -911,7 +911,7 @@ defmodule :code do
     end
   end
 
-  def partition_load([item | t], bs, ms) do
+  defp partition_load([item | t], bs, ms) do
     case item do
       {m, file, bin} when is_atom(m) and is_list(file) and is_binary(bin) ->
         partition_load(t, [item | bs], ms)
@@ -922,20 +922,20 @@ defmodule :code do
     end
   end
 
-  def partition_load([], bs, ms), do: {bs, ms}
+  defp partition_load([], bs, ms), do: {bs, ms}
 
-  def partition_on_load(prep) do
+  defp partition_on_load(prep) do
     p = fn {_, {pC, _, _}} ->
         :erlang.has_prepared_code_on_load(pC)
     end
     :lists.partition(p, prep)
   end
 
-  def path_files(), do: path_files(:code.get_path())
+  defp path_files(), do: path_files(:code.get_path())
 
-  def path_files([]), do: []
+  defp path_files([]), do: []
 
-  def path_files([path | tail]) do
+  defp path_files([path | tail]) do
     case :erl_prim_loader.list_dir(path) do
       {:ok, files} ->
         [{path, files} | path_files(tail)]
@@ -944,19 +944,19 @@ defmodule :code do
     end
   end
 
-  def prepare_check_uniq([{m, _, _} | t], ms), do: prepare_check_uniq(t, [m | ms])
+  defp prepare_check_uniq([{m, _, _} | t], ms), do: prepare_check_uniq(t, [m | ms])
 
-  def prepare_check_uniq([], ms), do: prepare_check_uniq_1(:lists.sort(ms), [])
+  defp prepare_check_uniq([], ms), do: prepare_check_uniq_1(:lists.sort(ms), [])
 
-  def prepare_check_uniq_1([m | [m | _] = ms], acc), do: prepare_check_uniq_1(ms, [{m, :duplicated} | acc])
+  defp prepare_check_uniq_1([m | [m | _] = ms], acc), do: prepare_check_uniq_1(ms, [{m, :duplicated} | acc])
 
-  def prepare_check_uniq_1([_ | ms], acc), do: prepare_check_uniq_1(ms, acc)
+  defp prepare_check_uniq_1([_ | ms], acc), do: prepare_check_uniq_1(ms, acc)
 
-  def prepare_check_uniq_1([], []), do: :ok
+  defp prepare_check_uniq_1([], []), do: :ok
 
-  def prepare_check_uniq_1([], [_ | _] = errors), do: {:error, errors}
+  defp prepare_check_uniq_1([], [_ | _] = errors), do: {:error, errors}
 
-  def prepare_ensure([m | ms], acc) when is_atom(m) do
+  defp prepare_ensure([m | ms], acc) when is_atom(m) do
     case :erlang.module_loaded(m) do
       true ->
         prepare_ensure(ms, acc)
@@ -965,11 +965,11 @@ defmodule :code do
     end
   end
 
-  def prepare_ensure([], acc), do: acc
+  defp prepare_ensure([], acc), do: acc
 
-  def prepare_ensure(_, _), do: :error
+  defp prepare_ensure(_, _), do: :error
 
-  def prepare_loading_1(modBins, ms) do
+  defp prepare_loading_1(modBins, ms) do
     case prepare_check_uniq(modBins, ms) do
       :ok ->
         prepare_loading_2(modBins, ms)
@@ -978,7 +978,7 @@ defmodule :code do
     end
   end
 
-  def prepare_loading_2(modBins, ms) do
+  defp prepare_loading_2(modBins, ms) do
     {prep0, error0} = load_bins(modBins)
     {prep1, error1} = load_mods(ms)
     case error0 ++ error1 do
@@ -989,7 +989,7 @@ defmodule :code do
     end
   end
 
-  def prepare_loading_3(prep) do
+  defp prepare_loading_3(prep) do
     case partition_on_load(prep) do
       {[_ | _] = onLoad, _} ->
         error = for {m, _} <- onLoad do
@@ -1002,7 +1002,7 @@ defmodule :code do
   end
 
   @spec prepare_loading_fun() :: prep_fun_type()
-  def prepare_loading_fun() do
+  defp prepare_loading_fun() do
     getNative = get_native_fun()
     fn mod, fullName, beam ->
         case :erlang.prepare_loading(mod, beam) do
@@ -1014,9 +1014,9 @@ defmodule :code do
     end
   end
 
-  def search([]), do: []
+  defp search([]), do: []
 
-  def search([{dir, file} | tail]) do
+  defp search([{dir, file} | tail]) do
     case :lists.keyfind(file, 2, tail) do
       false ->
         search(tail)
@@ -1026,7 +1026,7 @@ defmodule :code do
     end
   end
 
-  def start_get_mode() do
+  defp start_get_mode() do
     case :init.get_argument(:mode) do
       {:ok, [firstMode | rest]} ->
         case rest do
@@ -1051,7 +1051,7 @@ defmodule :code do
     end
   end
 
-  def verify_prepared([{m, {prep, name, _Native}} | t]) when is_atom(m) and is_list(name) do
+  defp verify_prepared([{m, {prep, name, _Native}} | t]) when is_atom(m) and is_list(name) do
     try do
       :erlang.has_prepared_code_on_load(prep)
     catch
@@ -1065,11 +1065,11 @@ defmodule :code do
     end
   end
 
-  def verify_prepared([]), do: :ok
+  defp verify_prepared([]), do: :ok
 
-  def verify_prepared(_), do: :error
+  defp verify_prepared(_), do: :error
 
-  def where_is_file(tail, file, path, files) do
+  defp where_is_file(tail, file, path, files) do
     case :lists.member(file, files) do
       true ->
         :filename.append(path, file)
@@ -1078,7 +1078,7 @@ defmodule :code do
     end
   end
 
-  def which(module, path) when is_atom(module) do
+  defp which(module, path) when is_atom(module) do
     file = atom_to_list(module) ++ objfile_extension()
     where_is_file(path, file)
   end

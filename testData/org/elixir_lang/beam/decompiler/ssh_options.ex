@@ -694,7 +694,7 @@ defmodule :ssh_options do
     # body not decompiled
   end
 
-  def check_dh_gex_groups({:file, file}) when is_list(file) do
+  defp check_dh_gex_groups({:file, file}) when is_list(file) do
     case :file.consult(file) do
       {:ok, groupDefs} ->
         check_dh_gex_groups(groupDefs)
@@ -703,7 +703,7 @@ defmodule :ssh_options do
     end
   end
 
-  def check_dh_gex_groups({:ssh_moduli_file, file}) when is_list(file) do
+  defp check_dh_gex_groups({:ssh_moduli_file, file}) when is_list(file) do
     case :file.open(file, [:read]) do
       {:ok, d} ->
         try do
@@ -722,7 +722,7 @@ defmodule :ssh_options do
     end
   end
 
-  def check_dh_gex_groups(l0) when is_list(l0) and is_tuple(hd(l0)) do
+  defp check_dh_gex_groups(l0) when is_list(l0) and is_tuple(hd(l0)) do
     {true, collect_per_size(:lists.foldl(fn {n, g, p}, acc when is_integer(n) and n > 0 and is_integer(g) and g > 0 and is_integer(p) and p > 0 ->
         [{n, {g, p}} | acc]
       {n, {g, p}}, acc when is_integer(n) and n > 0 and is_integer(g) and g > 0 and is_integer(p) and p > 0 ->
@@ -734,9 +734,9 @@ defmodule :ssh_options do
     end, [], l0))}
   end
 
-  def check_dh_gex_groups(_), do: false
+  defp check_dh_gex_groups(_), do: false
 
-  def check_dir(dir) do
+  defp check_dir(dir) do
     case :file.read_file_info(dir) do
       {:ok, file_info(type: :directory, access: access)} ->
         case access do
@@ -754,7 +754,7 @@ defmodule :ssh_options do
     end
   end
 
-  def check_fun(key, defs) do
+  defp check_fun(key, defs) do
     case :ssh_connection_handler.prohibited_sock_option(key) do
       false ->
         %{:chk => fun} = :maps.get(key, defs)
@@ -766,22 +766,22 @@ defmodule :ssh_options do
     end
   end
 
-  def check_function1(f), do: is_function(f, 1)
+  defp check_function1(f), do: is_function(f, 1)
 
-  def check_function2(f), do: is_function(f, 2)
+  defp check_function2(f), do: is_function(f, 2)
 
-  def check_function3(f), do: is_function(f, 3)
+  defp check_function3(f), do: is_function(f, 3)
 
-  def check_function4(f), do: is_function(f, 4)
+  defp check_function4(f), do: is_function(f, 4)
 
-  def check_input_ok(algs) do
-    for kVs <- algs, notis_tuple(kVs) or size(kVs) !== 2 do
+  defp check_input_ok(algs) do
+    for kVs <- algs, not is_tuple(kVs) or size(kVs) !== 2 do
       error_in_check(kVs, 'Bad preferred_algorithms')
     end
   end
 
-  def check_modify_algorithms(m) when is_list(m) do
-    for op_KVs <- m, notis_tuple(op_KVs) or size(op_KVs) !== 2 or not:lists.member(element(1, op_KVs), [:append, :prepend, :rm]) do
+  defp check_modify_algorithms(m) when is_list(m) do
+    for op_KVs <- m, not is_tuple(op_KVs) or size(op_KVs) !== 2 or not :lists.member(element(1, op_KVs), [:append, :prepend, :rm]) do
       error_in_check(op_KVs, 'Bad modify_algorithms')
     end
     {true, for {op, kVs} <- m do
@@ -789,13 +789,13 @@ defmodule :ssh_options do
     end}
   end
 
-  def check_modify_algorithms(_), do: error_in_check(:modify_algorithms, 'Bad option value. List expected.')
+  defp check_modify_algorithms(_), do: error_in_check(:modify_algorithms, 'Bad option value. List expected.')
 
-  def check_non_neg_integer(i), do: is_integer(i) and i >= 0
+  defp check_non_neg_integer(i), do: is_integer(i) and i >= 0
 
-  def check_pos_integer(i), do: is_integer(i) and i > 0
+  defp check_pos_integer(i), do: is_integer(i) and i > 0
 
-  def check_pref_public_key_algs(v) do
+  defp check_pref_public_key_algs(v) do
     pKs = :ssh_transport.supported_algorithms(:public_key)
     cHK = fn a, ack ->
         case :lists.member(a, pKs) do
@@ -826,27 +826,27 @@ defmodule :ssh_options do
     end
   end
 
-  def check_silently_accept_hosts(b) when is_boolean(b), do: true
+  defp check_silently_accept_hosts(b) when is_boolean(b), do: true
 
-  def check_silently_accept_hosts(f) when is_function(f, 2), do: true
+  defp check_silently_accept_hosts(f) when is_function(f, 2), do: true
 
-  def check_silently_accept_hosts({false, s}) when is_atom(s), do: valid_hash(s)
+  defp check_silently_accept_hosts({false, s}) when is_atom(s), do: valid_hash(s)
 
-  def check_silently_accept_hosts({s, f}) when is_function(f, 2), do: valid_hash(s)
+  defp check_silently_accept_hosts({s, f}) when is_function(f, 2), do: valid_hash(s)
 
-  def check_silently_accept_hosts(_), do: false
+  defp check_silently_accept_hosts(_), do: false
 
-  def check_string(s), do: is_list(s)
+  defp check_string(s), do: is_list(s)
 
-  def check_timeout(:infinity), do: true
+  defp check_timeout(:infinity), do: true
 
-  def check_timeout(i), do: check_pos_integer(i)
+  defp check_timeout(i), do: check_pos_integer(i)
 
-  def cnf_key(:server), do: :server_options
+  defp cnf_key(:server), do: :server_options
 
-  def cnf_key(:client), do: :client_options
+  defp cnf_key(:client), do: :client_options
 
-  def collect_per_size(l) do
+  defp collect_per_size(l) do
     :lists.foldr(fn {sz, gP}, [{^sz, gPs} | acc] ->
         [{sz, [gP | gPs]} | acc]
       {sz, gP}, acc ->
@@ -854,7 +854,7 @@ defmodule :ssh_options do
     end, [], :lists.sort(l))
   end
 
-  def config_val(:modify_algorithms = key, roleCnfs, opts) do
+  defp config_val(:modify_algorithms = key, roleCnfs, opts) do
     v = (case :application.get_env(:ssh, key) do
       {:ok, v0} ->
         v0
@@ -869,7 +869,7 @@ defmodule :ssh_options do
     end
   end
 
-  def config_val(key, roleCnfs, opts) do
+  defp config_val(key, roleCnfs, opts) do
     case :lists.keysearch(key, 1, opts) do
       {:value, {_, v}} ->
         {:ok, v}
@@ -883,7 +883,7 @@ defmodule :ssh_options do
     end
   end
 
-  def def_alg(k, false) do
+  defp def_alg(k, false) do
     case :ssh_transport.algo_two_spec_class(k) do
       false ->
         []
@@ -892,37 +892,37 @@ defmodule :ssh_options do
     end
   end
 
-  def def_alg(k, true), do: :ssh_transport.default_algorithms(k)
+  defp def_alg(k, true), do: :ssh_transport.default_algorithms(k)
 
-  def error_if_empty([{k, []} | _]), do: error({:eoptions, k, 'Empty resulting algorithm list'})
+  defp error_if_empty([{k, []} | _]), do: error({:eoptions, k, 'Empty resulting algorithm list'})
 
-  def error_if_empty([{k, [{:client2server, []}, {:server2client, []}]}]), do: error({:eoptions, k, 'Empty resulting algorithm list'})
+  defp error_if_empty([{k, [{:client2server, []}, {:server2client, []}]}]), do: error({:eoptions, k, 'Empty resulting algorithm list'})
 
-  def error_if_empty([{k, [{:client2server, []} | _]} | _]), do: error({:eoptions, {k, :client2server}, 'Empty resulting algorithm list'})
+  defp error_if_empty([{k, [{:client2server, []} | _]} | _]), do: error({:eoptions, {k, :client2server}, 'Empty resulting algorithm list'})
 
-  def error_if_empty([{k, [_, {:server2client, []} | _]} | _]), do: error({:eoptions, {k, :server2client}, 'Empty resulting algorithm list'})
+  defp error_if_empty([{k, [_, {:server2client, []} | _]} | _]), do: error({:eoptions, {k, :server2client}, 'Empty resulting algorithm list'})
 
-  def error_if_empty([_ | t]), do: error_if_empty(t)
+  defp error_if_empty([_ | t]), do: error_if_empty(t)
 
-  def error_if_empty([]), do: :ok
+  defp error_if_empty([]), do: :ok
 
-  def error_in_check(badValue, extra), do: error({:check, {badValue, extra}})
+  defp error_in_check(badValue, extra), do: error({:check, {badValue, extra}})
 
-  def eval_op({op, algKVs}, prefAlgs), do: eval_op(op, algKVs, prefAlgs, [])
+  defp eval_op({op, algKVs}, prefAlgs), do: eval_op(op, algKVs, prefAlgs, [])
 
-  def eval_op(op, [{c, l1} | t1], [{^c, l2} | t2], acc), do: eval_op(op, t1, t2, [{c, eval_op(op, l1, l2, [])} | acc])
+  defp eval_op(op, [{c, l1} | t1], [{^c, l2} | t2], acc), do: eval_op(op, t1, t2, [{c, eval_op(op, l1, l2, [])} | acc])
 
-  def eval_op(_, [], [], acc), do: :lists.reverse(acc)
+  defp eval_op(_, [], [], acc), do: :lists.reverse(acc)
 
-  def eval_op(:rm, opt, pref, []) when is_list(opt) and is_list(pref), do: pref -- opt
+  defp eval_op(:rm, opt, pref, []) when is_list(opt) and is_list(pref), do: pref -- opt
 
-  def eval_op(:append, opt, pref, []) when is_list(opt) and is_list(pref), do: pref -- opt ++ opt
+  defp eval_op(:append, opt, pref, []) when is_list(opt) and is_list(pref), do: pref -- opt ++ opt
 
-  def eval_op(:prepend, opt, pref, []) when is_list(opt) and is_list(pref), do: opt ++ pref -- opt
+  defp eval_op(:prepend, opt, pref, []) when is_list(opt) and is_list(pref), do: opt ++ pref -- opt
 
-  def eval_ops(prefAlgs, modAlgs), do: :lists.foldl(&eval_op/2, prefAlgs, modAlgs)
+  defp eval_ops(prefAlgs, modAlgs), do: :lists.foldl(&eval_op/2, prefAlgs, modAlgs)
 
-  def final_preferred_algorithms(options0) do
+  defp final_preferred_algorithms(options0) do
     result = case :ssh_options.get_value(:user_options, :modify_algorithms, options0, :ssh_options, 1181) do
       :undefined ->
         rm_non_supported(true, :ssh_options.get_value(:user_options, :preferred_algorithms, options0, :ssh_options, 1184))
@@ -939,10 +939,10 @@ defmodule :ssh_options do
     end
   end
 
-  def handle_options(role, optsList0, opts0) when is_map(opts0) and is_list(optsList0), do: ...
+  defp handle_options(role, optsList0, opts0) when is_map(opts0) and is_list(optsList0), do: ...
 
-  def nml(k, l) do
-    for v <- l, notis_atom(v) do
+  defp nml(k, l) do
+    for v <- l, not is_atom(v) do
       error_in_check(k, 'Bad value for this key')
     end
     case l -- :lists.usort(l) do
@@ -954,30 +954,30 @@ defmodule :ssh_options do
     l
   end
 
-  def nml1(k, {t, v}) when t == :client2server or t == :server2client, do: {t, nml({k, t}, v)}
+  defp nml1(k, {t, v}) when t == :client2server or t == :server2client, do: {t, nml({k, t}, v)}
 
-  def normalize_mod_alg_list(k, vs, useDefaultAlgs), do: normalize_mod_alg_list(k, :ssh_transport.algo_two_spec_class(k), vs, def_alg(k, useDefaultAlgs))
+  defp normalize_mod_alg_list(k, vs, useDefaultAlgs), do: normalize_mod_alg_list(k, :ssh_transport.algo_two_spec_class(k), vs, def_alg(k, useDefaultAlgs))
 
-  def normalize_mod_alg_list(_K, _, [], default), do: default
+  defp normalize_mod_alg_list(_K, _, [], default), do: default
 
-  def normalize_mod_alg_list(k, true, [{:client2server, l1}], [_, {:server2client, l2}]), do: [nml1(k, {:client2server, l1}), {:server2client, l2}]
+  defp normalize_mod_alg_list(k, true, [{:client2server, l1}], [_, {:server2client, l2}]), do: [nml1(k, {:client2server, l1}), {:server2client, l2}]
 
-  def normalize_mod_alg_list(k, true, [{:server2client, l2}], [{:client2server, l1}, _]), do: [{:client2server, l1}, nml1(k, {:server2client, l2})]
+  defp normalize_mod_alg_list(k, true, [{:server2client, l2}], [{:client2server, l1}, _]), do: [{:client2server, l1}, nml1(k, {:server2client, l2})]
 
-  def normalize_mod_alg_list(k, true, [{:server2client, l2}, {:client2server, l1}], _), do: [nml1(k, {:client2server, l1}), nml1(k, {:server2client, l2})]
+  defp normalize_mod_alg_list(k, true, [{:server2client, l2}, {:client2server, l1}], _), do: [nml1(k, {:client2server, l1}), nml1(k, {:server2client, l2})]
 
-  def normalize_mod_alg_list(k, true, [{:client2server, l1}, {:server2client, l2}], _), do: [nml1(k, {:client2server, l1}), nml1(k, {:server2client, l2})]
+  defp normalize_mod_alg_list(k, true, [{:client2server, l1}, {:server2client, l2}], _), do: [nml1(k, {:client2server, l1}), nml1(k, {:server2client, l2})]
 
-  def normalize_mod_alg_list(k, true, l0, _) do
+  defp normalize_mod_alg_list(k, true, l0, _) do
     l = nml(k, l0)
     [{:client2server, l}, {:server2client, l}]
   end
 
-  def normalize_mod_alg_list(k, false, l, _), do: nml(k, l)
+  defp normalize_mod_alg_list(k, false, l, _), do: nml(k, l)
 
-  def normalize_mod_algs(kVs, useDefaultAlgs), do: normalize_mod_algs(:ssh_transport.algo_classes(), kVs, [], useDefaultAlgs)
+  defp normalize_mod_algs(kVs, useDefaultAlgs), do: normalize_mod_algs(:ssh_transport.algo_classes(), kVs, [], useDefaultAlgs)
 
-  def normalize_mod_algs([k | ks], kVs0, acc, useDefaultAlgs) do
+  defp normalize_mod_algs([k | ks], kVs0, acc, useDefaultAlgs) do
     {vs1, kVs} = case :lists.keytake(k, 1, kVs0) do
       {:value, {k, vs0}, kVs1} ->
         {vs0, kVs1}
@@ -988,9 +988,9 @@ defmodule :ssh_options do
     normalize_mod_algs(ks, kVs, [{k, vs} | acc], useDefaultAlgs)
   end
 
-  def normalize_mod_algs([], [], acc, _), do: :lists.reverse(acc)
+  defp normalize_mod_algs([], [], acc, _), do: :lists.reverse(acc)
 
-  def normalize_mod_algs([], [{k, _} | _], _, _) do
+  defp normalize_mod_algs([], [{k, _} | _], _, _) do
     case :ssh_transport.algo_class(k) do
       true ->
         error_in_check(k, 'Duplicate key')
@@ -999,23 +999,23 @@ defmodule :ssh_options do
     end
   end
 
-  def normalize_mod_algs([], [x | _], _, _), do: error_in_check(x, 'Bad list element')
+  defp normalize_mod_algs([], [x | _], _, _), do: error_in_check(x, 'Bad list element')
 
-  def put_internal_value(l, intOpts) when is_list(l), do: :lists.foldl(&put_internal_value/2, intOpts, l)
+  defp put_internal_value(l, intOpts) when is_list(l), do: :lists.foldl(&put_internal_value/2, intOpts, l)
 
-  def put_internal_value({key, value}, intOpts), do: %{intOpts | key => value}
+  defp put_internal_value({key, value}, intOpts), do: %{intOpts | key => value}
 
-  def put_socket_value(l, sockOpts) when is_list(l), do: l ++ sockOpts
+  defp put_socket_value(l, sockOpts) when is_list(l), do: l ++ sockOpts
 
-  def put_socket_value({key, value}, sockOpts), do: [{key, value} | sockOpts]
+  defp put_socket_value({key, value}, sockOpts), do: [{key, value} | sockOpts]
 
-  def put_socket_value(a, sockOpts) when is_atom(a), do: [a | sockOpts]
+  defp put_socket_value(a, sockOpts) when is_atom(a), do: [a | sockOpts]
 
-  def put_user_value(l, opts) when is_list(l), do: :lists.foldl(&put_user_value/2, opts, l)
+  defp put_user_value(l, opts) when is_list(l), do: :lists.foldl(&put_user_value/2, opts, l)
 
-  def put_user_value({key, value}, opts), do: %{opts | key => value}
+  defp put_user_value({key, value}, opts), do: %{opts | key => value}
 
-  def read_moduli_file(d, i, acc) do
+  defp read_moduli_file(d, i, acc) do
     case :io.get_line(d, "") do
       {:error, error} ->
         {:error, error}
@@ -1043,13 +1043,13 @@ defmodule :ssh_options do
     end
   end
 
-  def rm_non_supported(unsupIsErrorFlg, kVs) do
+  defp rm_non_supported(unsupIsErrorFlg, kVs) do
     for {k, vs} <- kVs do
       {k, rmns(k, vs, unsupIsErrorFlg)}
     end
   end
 
-  def rm_unsup(a, b, flg, errInf) do
+  defp rm_unsup(a, b, flg, errInf) do
     case a -- b do
       unsup = [_ | _] when flg == true ->
         error({:eoptions, {:preferred_algorithms, {errInf, unsup}}, 'Unsupported value(s) found'})
@@ -1058,7 +1058,7 @@ defmodule :ssh_options do
     end
   end
 
-  def rmns(k, vs, unsupIsErrorFlg) do
+  defp rmns(k, vs, unsupIsErrorFlg) do
     case :ssh_transport.algo_two_spec_class(k) do
       false ->
         rm_unsup(vs, :ssh_transport.supported_algorithms(k), unsupIsErrorFlg, k)
@@ -1069,17 +1069,17 @@ defmodule :ssh_options do
     end
   end
 
-  def save({:allow_user_interaction, v}, opts, vals), do: save({:user_interaction, v}, opts, vals)
+  defp save({:allow_user_interaction, v}, opts, vals), do: save({:user_interaction, v}, opts, vals)
 
-  def save(inet, defs, optMap) when inet == :inet or inet == :inet6, do: save({:inet, inet}, defs, optMap)
+  defp save(inet, defs, optMap) when inet == :inet or inet == :inet6, do: save({:inet, inet}, defs, optMap)
 
-  def save({inet, true}, defs, optMap) when inet == :inet or inet == :inet6, do: save({:inet, inet}, defs, optMap)
+  defp save({inet, true}, defs, optMap) when inet == :inet or inet == :inet6, do: save({:inet, inet}, defs, optMap)
 
-  def save({inet, false}, _Defs, optMap) when inet == :inet or inet == :inet6, do: optMap
+  defp save({inet, false}, _Defs, optMap) when inet == :inet or inet == :inet6, do: optMap
 
-  def save({:special_trpt_args, t}, _Defs, optMap) when is_map(optMap), do: %{optMap | :socket_options => [t | :maps.get(:socket_options, optMap)]}
+  defp save({:special_trpt_args, t}, _Defs, optMap) when is_map(optMap), do: %{optMap | :socket_options => [t | :maps.get(:socket_options, optMap)]}
 
-  def save({key, value}, defs, optMap) when is_map(optMap) do
+  defp save({key, value}, defs, optMap) when is_map(optMap) do
     try do
       check_fun(key, defs)(value)
     catch
@@ -1101,17 +1101,17 @@ defmodule :ssh_options do
     end
   end
 
-  def save(opt, _Defs, optMap) when is_map(optMap), do: %{optMap | :socket_options => [opt | :maps.get(:socket_options, optMap)]}
+  defp save(opt, _Defs, optMap) when is_map(optMap), do: %{optMap | :socket_options => [opt | :maps.get(:socket_options, optMap)]}
 
-  def valid_hash(s), do: valid_hash(s, :proplists.get_value(:hashs, :crypto.supports()))
+  defp valid_hash(s), do: valid_hash(s, :proplists.get_value(:hashs, :crypto.supports()))
 
-  def valid_hash(s, ss) when is_atom(s), do: :lists.member(s, [:md5, :sha, :sha224, :sha256, :sha384, :sha512]) and :lists.member(s, ss)
+  defp valid_hash(s, ss) when is_atom(s), do: :lists.member(s, [:md5, :sha, :sha224, :sha256, :sha384, :sha512]) and :lists.member(s, ss)
 
-  def valid_hash(l, ss) when is_list(l) do
+  defp valid_hash(l, ss) when is_list(l) do
     :lists.all(fn s ->
         valid_hash(s, ss)
     end, l)
   end
 
-  def valid_hash(x, _), do: error_in_check(x, 'Expect atom or list in fingerprint spec')
+  defp valid_hash(x, _), do: error_in_check(x, 'Expect atom or list in fingerprint spec')
 end

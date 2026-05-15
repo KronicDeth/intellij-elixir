@@ -11,6 +11,7 @@ import com.intellij.psi.impl.source.tree.TreeElement
 import com.intellij.psi.scope.PsiScopeProcessor
 import com.intellij.psi.stubs.IStubElementType
 import com.intellij.util.IncorrectOperationException
+import org.elixir_lang.beam.BulkDecompilationRunLogger
 import org.elixir_lang.beam.psi.Module
 import org.elixir_lang.beam.psi.stubs.ModuleStub
 import org.elixir_lang.beam.psi.stubs.ModuleStubElementTypes
@@ -97,10 +98,18 @@ class ModuleImpl<T : ModuleStub<*>?>(private val stub: T) : ModuleElementImpl(),
                         )
                     )
                 } else if (callDefinitionStub.isExported) {
-                    LOGGER.error("No decompiled source function with name/arity (${moduleName(element)}.${name}/${arity})")
+                    val message = "No decompiled source function with name/arity (${moduleName(element)}.${name}/${arity})"
+
+                    if (BulkDecompilationRunLogger.shouldLogMissingFunctionError(project, message)) {
+                        LOGGER.error(message)
+                    }
                 }
             } else if (callDefinitionStub.isExported) {
-                LOGGER.error("No decompiled source function with name (${moduleName(element)}.$name)")
+                val message = "No decompiled source function with name (${moduleName(element)}.$name)"
+
+                if (BulkDecompilationRunLogger.shouldLogMissingFunctionError(project, message)) {
+                    LOGGER.error(message)
+                }
             }
         }
     }
