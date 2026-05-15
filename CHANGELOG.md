@@ -1,5 +1,25 @@
 # Changelog
 
+## v23.4.0
+
+### Enhancements
+* [#3820](https://github.com/KronicDeth/intellij-elixir/pull/3820) - [@sh41](https://github.com/sh41)
+  * Status bar SDK widget -- module SDK inconsistency detection: detects dangling SDK references (module `.iml` references an SDK name that no longer exists in the JDK table, e.g. project cloned between WSL distributions) and SDK mismatches (module uses a different SDK than the project SDK). Notifications fire reactively with deduplication and include specific navigation instructions.
+  * Status bar SDK widget -- folder mark validation: detects misconfigured source/test/excluded folder marks on Mix project modules. Uses debounced `rootsChanged()` via `MutableSharedFlow` + 2-second debounce to prevent thrashing during bulk operations. Tracks active notifications and expires them when the issue resolves.
+  * "Reconfigure Elixir Module Setup" action (`ReconfigureModuleSetupAction`): additively applies canonical folder marks and fixes dangling/mismatched SDK entries. Preserves user-customised source roots, skips non-existent directories and non-Elixir modules. Available via Tools menu and status bar widget popup.
+  * `CANONICAL_FOLDER_MARKS` unification: New Project Wizard-created projects now get the full mark set (`lib/`, `web/`, `spec/`, `test/`, plus 7 exclusions). Previously NPW projects missed `spec/` (ESpec), `web/` (pre-Phoenix 1.3), and all exclusions.
+  * `ProjectModuleSetupValidator`: inspects every Mix module's content entries against canonical marks and returns a list of discrepancies.
+  * Module type utilities: `isElixirModule()` and `getMixContentRoots()` helpers in `ModuleExtensions.kt`.
+  * `isSmallIde` detection fix: `ApplicationInfo` product codes instead of class detection (class detection broke in 2026.1).
+
+### Bug Fixes
+* [#3820](https://github.com/KronicDeth/intellij-elixir/pull/3820) - [@sh41](https://github.com/sh41)
+  * "Run Mix ExUnit" context menu missing on test directories containing non-matching `.ex` files in subdirectories: `containsFileWithSuffix` recursive directory walker returned `false` (stop) on non-matching `ElixirFile` instead of `true` (continue), and the `PsiDirectory` branch propagated that premature stop. Renamed `Finder.kt` -> `ContainsFileWithSuffix.kt`. Fixes [#3804](https://github.com/KronicDeth/intellij-elixir/issues/3804).
+  * Replaced deprecated `SystemUtils.isWindows`/`isMac` (Apache Commons) with IntelliJ `SystemInfo`/`OS` utilities across the codebase.
+  * Replaced `commons-lang NotImplementedException` with `UnsupportedOperationException` across all uses.
+  * Replaced deprecated `SimpleConfigurable.create(Getter)` with `Supplier` overload.
+  * `detectSdkVersion` EDT guard: guarded with `runWithModalProgressBlocking` to prevent blocking on the EDT. Possibly addresses [#2980](https://github.com/KronicDeth/intellij-elixir/issues/2980).
+
 ## v23.3.0
 
 ### Enhancements
