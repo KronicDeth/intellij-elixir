@@ -1,0 +1,13 @@
+# Qodana configuration:
+# https://www.jetbrains.com/help/qodana/qodana-yaml.html
+version: "1.0"
+linter: jetbrains/qodana-jvm-community:2026.1
+projectJDK: "21"
+profile:
+  name: qodana.recommended
+exclude:
+  - name: All
+    paths:
+      - .qodana
+      - cache
+      - testData
