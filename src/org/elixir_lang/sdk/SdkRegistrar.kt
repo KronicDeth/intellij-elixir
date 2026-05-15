@@ -1,7 +1,6 @@
 package org.elixir_lang.sdk
 
-import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.application.WriteAction
+import com.intellij.openapi.application.edtWriteAction
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.ProjectJdkTable
 import com.intellij.openapi.projectRoots.Sdk
@@ -14,7 +13,7 @@ import org.elixir_lang.sdk.erlang.Type as ErlangSdkType
 import org.elixir_lang.sdk.erlang_dependent.Type as ErlangDependentType
 
 object SdkRegistrar {
-    fun registerOrUpdateErlangSdk(
+    suspend fun registerOrUpdateErlangSdk(
         homePath: String,
         resolvedVersion: String? = null,
     ): Sdk? {
@@ -31,7 +30,7 @@ object SdkRegistrar {
         return registeredSdk
     }
 
-    fun registerOrUpdateElixirSdk(
+    suspend fun registerOrUpdateElixirSdk(
         homePath: String,
         erlangSdk: Sdk?,
         resolvedVersion: String? = null,
@@ -64,8 +63,8 @@ object SdkRegistrar {
         }
     }
 
-    private fun registerOrUpdate(existing: Sdk?, updatedSdk: Sdk): Sdk {
-        return writeAction {
+    private suspend fun registerOrUpdate(existing: Sdk?, updatedSdk: Sdk): Sdk {
+        return edtWriteAction {
             val table = ProjectJdkTable.getInstance()
             if (existing == null) {
                 table.addJdk(updatedSdk)
@@ -75,31 +74,5 @@ object SdkRegistrar {
                 existing
             }
         }
-    }
-
-    private fun <T> writeAction(block: () -> T): T {
-        val app = ApplicationManager.getApplication()
-        if (app.isWriteAccessAllowed) {
-            return block()
-        }
-
-        var result: T? = null
-        var resultSet = false
-        val runnable = Runnable {
-            result = WriteAction.compute<T, Throwable> { block() }
-            resultSet = true
-        }
-
-        if (app.isDispatchThread) {
-            runnable.run()
-        } else {
-            app.invokeAndWait(runnable)
-        }
-
-        if (!resultSet) {
-            throw IllegalStateException("Write action did not execute")
-        }
-        @Suppress("UNCHECKED_CAST")
-        return result as T
     }
 }

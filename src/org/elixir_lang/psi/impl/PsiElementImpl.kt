@@ -9,7 +9,7 @@ import com.intellij.psi.PsiWhiteSpace
 import com.intellij.psi.impl.source.tree.CompositeElement
 import com.intellij.psi.impl.source.tree.LeafPsiElement
 import com.intellij.psi.search.GlobalSearchScope
-import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.psi.util.findParentInFile
 import com.intellij.psi.util.siblings
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
@@ -118,10 +118,19 @@ tailrec fun PsiElement.selfOrEnclosingMacroCall(): Call? =
 @Contract(pure = true)
 fun PsiElement.enclosingMacroCall(): Call? = parent.selfOrEnclosingMacroCall()
 
-fun PsiElement.getModuleName(): String? {
-    val isModuleName = { c: PsiElement -> c is MaybeModuleName && c.isModuleName }
+private val isModuleName = { c: PsiElement -> c is MaybeModuleName && c.isModuleName }
 
-    return PsiTreeUtil.findFirstParent(this) { e ->
+/**
+ * Returns `true` if this element is inside a `defmodule` (or similar module definition).
+ * Unlike [getModuleName], this does not assemble the full module name string - it is a
+ * cheap boolean check suitable for hot paths like breakpoint availability.
+ */
+fun PsiElement.isInsideModule(): Boolean =
+    findParentInFile(withSelf = true) { e -> e.children.any(isModuleName) } != null
+
+fun PsiElement.getModuleName(): String? {
+    // findParentInFile stops at PsiFile boundary, never touches PsiDirectory - avoids DiskQueryRelay VFS I/O
+    return findParentInFile(withSelf = true) { e ->
         e.children.any(isModuleName)
     }?.let { moduleDefinition ->
         moduleDefinition.children.firstOrNull(isModuleName)?.let { moduleName ->

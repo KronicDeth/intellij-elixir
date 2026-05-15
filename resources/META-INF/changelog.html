@@ -1,6 +1,31 @@
 <html>
 <body>
 
+<h1>v23.1.0</h1>
+<ul>
+    <li>
+        <p>Enhancements</p>
+        <ul>
+            <li>Debugger now uses structured coroutines with proper lifecycle management, improving stability during session start, stop, and teardown.</li>
+            <li>Debugger operations serialised to prevent concurrent BEAM network calls, reducing timeout errors and improving reliability under load.</li>
+            <li>WSL debugger support: source navigation now resolves Linux-style paths reported by the BEAM to their Windows equivalents, fixing breakpoint hits, stack frame navigation, and failed-breakpoint messages in WSL projects.</li>
+            <li><code>mix format</code> integration rewritten using modern async formatting APIs. Improved error reporting with clickable error locations and better cancellation handling.</li>
+            <li>ANSI escape codes disabled in formatter subprocess output for reliable error parsing.</li>
+            <li>Breakpoint availability checks optimised to avoid blocking disk reads, reducing UI freezes when setting breakpoints in large projects.</li>
+            <li>SDK setup flows modernised -- progress dialogs now display correctly and no longer block the UI thread.</li>
+        </ul>
+    </li>
+    <li>
+        <p>Bug Fixes</p>
+        <ul>
+            <li>Fixed EDT blocking during debug sessions caused by network calls running on the UI thread.</li>
+            <li>Fixed UI freezes when setting breakpoints in files with deep module nesting -- directory traversal no longer triggers blocking filesystem reads.</li>
+            <li>Fixed debugger source navigation failing in WSL projects when the BEAM reports Linux-style paths.</li>
+            <li>Fixed Erlang SDK version detection blocking the UI thread without a progress indicator.</li>
+        </ul>
+    </li>
+</ul>
+
 <h1>v23.0.7</h1>
 <ul>
     <li>

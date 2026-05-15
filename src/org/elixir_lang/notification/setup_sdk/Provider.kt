@@ -4,8 +4,8 @@ import com.intellij.ide.actions.ShowSettingsUtilImpl
 import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.fileEditor.FileEditor
 import com.intellij.openapi.module.Module
-import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.module.ModuleType
+import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectBundle
 import com.intellij.openapi.roots.ui.configuration.ProjectSettingsService
@@ -31,37 +31,30 @@ class Provider : EditorNotificationProvider {
             return null
         }
 
-        return Function {
-            createNotificationPanel(file, project)
+        // Keep PSI/model access explicitly scoped to a read action.
+        return ReadAction.compute<Function<in FileEditor, out JComponent?>?, Throwable> {
+            val psiFile = PsiManager.getInstance(project).findFile(file) ?: return@compute null
+
+            if (psiFile.language !== ElixirLanguage) return@compute null
+
+            // Resolve the module once; use it for both the SDK check and panel decision
+            // to avoid calling findModuleForPsiElement twice.
+            val module = ModuleUtilCore.findModuleForPsiElement(psiFile)
+
+            // mostSpecificSdk(module) / mostSpecificSdk(project) avoid the internal
+            // re-lookup that mostSpecificSdk(PsiElement) would perform.
+            val sdk = if (module != null) Type.mostSpecificSdk(module) else Type.mostSpecificSdk(project)
+            if (sdk != null) return@compute null
+
+            // IMPORTANT: this lambda is applied later on the EDT.
+            // Keep it UI-only and PSI/model-free; all PSI decisions must stay in this read action.
+            when {
+                module != null && ModuleType.get(module).id == "ELIXIR_MODULE" -> Function { createModulePanel(project, module) }
+                ProcessOutput.isSmallIde -> Function { createSmallIDEFacetPanel(project) }
+                else -> Function { createProjectPanel(project) }
+            }
         }
     }
-
-    private fun createNotificationPanel(
-        virtualFile: VirtualFile,
-        project: Project,
-    ): EditorNotificationPanel? =
-        ReadAction.compute<EditorNotificationPanel?, Throwable> {
-            val psiFile = PsiManager.getInstance(project).findFile(virtualFile)
-
-            if (psiFile == null ||
-                psiFile.language !== ElixirLanguage ||
-                Type.mostSpecificSdk(psiFile) != null
-            ) {
-                return@compute null
-            }
-
-            // Avoid slow ModuleUtilCore.findModuleForPsiElement call
-            // Instead, check if there are any Elixir modules in the project
-            val elixirModule = ModuleManager.getInstance(project).modules
-                .find { ModuleType.get(it).id == "ELIXIR_MODULE" }
-
-            when {
-                elixirModule != null -> createModulePanel(project, elixirModule)
-                ProcessOutput.isSmallIde -> createSmallIDEFacetPanel(project)
-                else -> createProjectPanel(project)
-            }
-        }
-
 }
 
 fun showFacetSettings(project: Project) {

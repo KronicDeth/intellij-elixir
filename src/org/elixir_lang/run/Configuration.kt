@@ -246,4 +246,11 @@ private fun workingDirectory(module: com.intellij.openapi.module.Module): String
 
 private fun com.intellij.openapi.module.Module.sdkPaths(): List<String> = ensureMostSpecificSdk(this).paths()
 
-private fun Sdk.paths(): List<String> = rootProvider.getFiles(OrderRootType.CLASSES).map { it.canonicalPath!! }
+private fun Sdk.paths(): List<String> {
+    val rawPaths = rootProvider.getFiles(OrderRootType.CLASSES).map { it.canonicalPath!! }
+    return if (org.elixir_lang.sdk.wsl.wslCompat.isWslUncPath(homePath)) {
+        rawPaths.map { org.elixir_lang.sdk.wsl.wslCompat.parseWindowsUncPath(it) ?: it }
+    } else {
+        rawPaths
+    }
+}

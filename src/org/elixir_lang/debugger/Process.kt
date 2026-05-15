@@ -26,7 +26,8 @@ import com.intellij.execution.process.ProcessHandler
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.execution.ui.ExecutionConsole
 import com.intellij.icons.AllIcons
-import com.intellij.openapi.application.ApplicationManager
+import com.intellij.execution.wsl.WSLDistribution
+import com.intellij.openapi.components.service
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileTypes.FileType
@@ -40,6 +41,7 @@ import com.intellij.util.containers.ContainerUtil
 import com.intellij.util.indexing.FileBasedIndex
 import com.intellij.xdebugger.XDebugProcess
 import com.intellij.xdebugger.XDebugSession
+import com.intellij.xdebugger.XExpression
 import com.intellij.xdebugger.XSourcePosition
 import com.intellij.xdebugger.breakpoints.XBreakpointHandler
 import com.intellij.xdebugger.breakpoints.XLineBreakpoint
@@ -54,7 +56,7 @@ import org.elixir_lang.debugger.configuration.Debuggable
 import org.elixir_lang.debugger.configuration.doNotInterpretPatterns
 import org.elixir_lang.debugger.line_breakpoint.Handler
 import org.elixir_lang.debugger.line_breakpoint.Properties
-import org.elixir_lang.debugger.node.Exception
+import org.elixir_lang.debugger.node.Exception as NodeException
 import org.elixir_lang.debugger.node.ProcessSnapshot
 import org.elixir_lang.debugger.node.event.Listener
 import org.elixir_lang.debugger.node.ok_error_reason.ErrorReason
@@ -63,7 +65,14 @@ import org.elixir_lang.psi.ElixirFile
 import org.elixir_lang.psi.impl.getModuleName
 import org.elixir_lang.run.Configuration
 import org.elixir_lang.run.ensureWorkingDirectory
+import org.elixir_lang.util.ElixirCoroutineService
+import org.elixir_lang.util.supervisedChildScope
 import org.elixir_lang.utils.ElixirModulesUtil.elixirModuleNameToErlang
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
@@ -73,6 +82,26 @@ import kotlin.system.measureNanoTime
 
 class Process(session: XDebugSession, private val executionEnvironment: ExecutionEnvironment) :
     XDebugProcess(session), Listener {
+    private val projectCoroutineService = session.project.service<ElixirCoroutineService>()
+
+    private val scope: CoroutineScope =
+        projectCoroutineService.supervisedChildScope("DebuggerProcess")
+
+    /**
+     * Serial dispatcher for all operations that touch [Node] (breakpoint set/remove, interpret, attach).
+     * `limitedParallelism(1)` ensures ordering and prevents concurrent network calls to the BEAM node.
+     */
+    private val nodeDispatcher = Dispatchers.IO.limitedParallelism(1)
+
+    /**
+     * Cached WSL distribution for the project, used for converting Linux file paths
+     * reported by the Erlang VM back to Windows UNC paths for source navigation.
+     * `null` for non-WSL projects (fast path — no overhead).
+     */
+    internal val wslDistribution: WSLDistribution? by lazy {
+        org.elixir_lang.sdk.wsl.wslCompat.getDistributionByWindowsUncPath(session.project.basePath)
+    }
+
     init {
         session.setPauseActionSupported(false)
     }
@@ -103,16 +132,24 @@ class Process(session: XDebugSession, private val executionEnvironment: Executio
     private val debuggedName by lazy { debuggableConfiguration.nodeName ?: "debugged$nodesUUID@127.0.0.1" }
     private val debuggerName by lazy { "debugger$nodesUUID@127.0.0.1" }
 
-    private val node by lazy {
+    private val nodeDelegate = lazy {
         try {
             //TODO add the debugger node to disposable hierarchy (we may fail to initialize session so the session will not be stopped!)
-            Node(debuggerName, debuggedName, cookie, { debuggedExecutionResult }, this)
-        } catch (e: Exception) {
+            Node(
+                debuggerName,
+                debuggedName,
+                cookie,
+                { debuggedExecutionResult },
+                this,
+                scope.supervisedChildScope("DebuggerNode")
+            )
+        } catch (e: NodeException) {
             session.reportError(e.message ?: "Exception creating JInterface node")
             session.stop()
             throw ExecutionException(e)
         }
     }
+    private val node by nodeDelegate
 
     private val debuggableConfiguration: Debuggable<*>
         get() = session.runProfile as Debuggable<*>
@@ -145,7 +182,15 @@ class Process(session: XDebugSession, private val executionEnvironment: Executio
 
     private fun afterInitialized(task: () -> Unit) {
         if (initialized.get()) {
-            task()
+            scope.launch(nodeDispatcher) {
+                try {
+                    task()
+                } catch (exception: Exception) {
+                    if (exception is CancellationException) throw exception
+
+                    session.reportError(exception.message ?: exception.toString())
+                }
+            }
         } else {
             initializers.add(task)
         }
@@ -182,7 +227,7 @@ class Process(session: XDebugSession, private val executionEnvironment: Executio
     override fun breakpointReached(pid: OtpErlangPid, snapshots: List<ProcessSnapshot>) {
         val processInBreakpoint =
             ContainerUtil.find(snapshots) { elixirProcessSnapshot -> elixirProcessSnapshot.pid == pid }!!
-        val breakPosition = SourcePosition.create(processInBreakpoint)
+        val breakPosition = SourcePosition.create(processInBreakpoint, wslDistribution)
         val breakpoint = getLineBreakpoint(breakPosition)
         val suspendContext = SuspendContext(this, pid, snapshots)
         if (breakpoint == null) {
@@ -238,7 +283,7 @@ class Process(session: XDebugSession, private val executionEnvironment: Executio
         line: Int,
         errorMessage: OtpErlangObject
     ) {
-        val sourcePosition = SourcePosition.create(file, line)
+        val sourcePosition = SourcePosition.create(file, line, wslDistribution)
         val breakpoint = getLineBreakpoint(sourcePosition)
 
         if (breakpoint != null) {
@@ -265,11 +310,11 @@ class Process(session: XDebugSession, private val executionEnvironment: Executio
         return object : XDebuggerEditorsProvider() {
             override fun createDocument(
                 project: Project,
-                text: String,
+                expression: XExpression,
                 sourcePosition: XSourcePosition?,
                 mode: EvaluationMode
             ): Document {
-                val file = LightVirtualFile("plain-text-elixir-debugger.txt", text)
+                val file = LightVirtualFile("plain-text-elixir-debugger.txt", expression.expression)
 
                 return FileDocumentManager.getInstance().getDocument(file)!!
             }
@@ -305,7 +350,7 @@ class Process(session: XDebugSession, private val executionEnvironment: Executio
                             java.io.File(path).relativeTo(
                                 java.io.File(rootDirectory)
                             )
-                        } catch (illegalArgumentException: IllegalArgumentException) {
+                        } catch (_: IllegalArgumentException) {
                             null
                         }?.let { relativeFile ->
                             val filename = relativeFile.path
@@ -332,17 +377,28 @@ class Process(session: XDebugSession, private val executionEnvironment: Executio
         sourcePosition(breakpoint)?.let { breakpointPosition ->
             sourcePositionToBreakpoint.remove(breakpointPosition)
 
-            moduleNameSet(breakpointPosition).forEach { moduleName ->
-                moduleName
-                    .let(::elixirModuleNameToErlang)
-                    .let(::OtpErlangAtom)
-                    .let { node.removeBreakpoint(it, breakpointPosition.line) }
+            val moduleNames = moduleNameSet(breakpointPosition)
+            val line = breakpointPosition.line
+
+            scope.launch(nodeDispatcher) {
+                try {
+                    moduleNames.forEach { moduleName ->
+                        moduleName
+                            .let(::elixirModuleNameToErlang)
+                            .let(::OtpErlangAtom)
+                            .let { node.removeBreakpoint(it, line) }
+                    }
+                } catch (exception: Exception) {
+                    if (exception is CancellationException) throw exception
+
+                    session.reportError(exception.message ?: exception.toString())
+                }
             }
         }
     }
 
     override fun resume(context: XSuspendContext?) {
-        node.resume()
+        scope.launch(nodeDispatcher) { node.resume() }
     }
 
     private val initialized = AtomicBoolean(false)
@@ -370,7 +426,7 @@ class Process(session: XDebugSession, private val executionEnvironment: Executio
     }
 
     private fun asyncRunInitializers() {
-        ApplicationManager.getApplication().executeOnPooledThread {
+        scope.launch(nodeDispatcher) {
             try {
                 runInitializers()
 
@@ -379,6 +435,8 @@ class Process(session: XDebugSession, private val executionEnvironment: Executio
                 // run anything inserted between first runInitializers and above line
                 runInitializers()
             } catch (exception: Exception) {
+                if (exception is CancellationException) throw exception
+
                 session.reportError(exception.message ?: exception.toString())
                 session.stop()
             }
@@ -396,21 +454,26 @@ class Process(session: XDebugSession, private val executionEnvironment: Executio
     }
 
     override fun startStepInto(context: XSuspendContext?) {
-        node.stepInto()
+        scope.launch(nodeDispatcher) { node.stepInto() }
     }
 
     override fun startStepOut(context: XSuspendContext?) {
-        node.stepOut()
+        scope.launch(nodeDispatcher) { node.stepOut() }
     }
 
     override fun startStepOver(context: XSuspendContext?) {
-        node.stepOver()
+        scope.launch(nodeDispatcher) { node.stepOver() }
     }
 
     override fun stop() {
-        node.stop()
-        debuggedExecutionResult.processHandler.destroyProcess()
+        if (nodeIsInitialized()) {
+            node.stop()
+        }
+
+        scope.cancel()
     }
+
+    private fun nodeIsInitialized(): Boolean = nodeDelegate.isInitialized()
 
     override fun unknownMessage(messageText: String) {
         session.reportMessage("Unknown message received: $messageText", MessageType.WARNING)
@@ -428,6 +491,8 @@ class Process(session: XDebugSession, private val executionEnvironment: Executio
         expression: String,
         callback: XDebuggerEvaluator.XEvaluationCallback
     ) {
-        node.evaluate(pid, stackPointer, module, function, arity, file, line, expression, callback)
+        scope.launch(nodeDispatcher) {
+            node.evaluate(pid, stackPointer, module, function, arity, file, line, expression, callback)
+        }
     }
 }

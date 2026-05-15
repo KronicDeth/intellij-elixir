@@ -1,7 +1,10 @@
 package org.elixir_lang.action
 
+import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.platform.ide.progress.ModalTaskOwner
+import com.intellij.platform.ide.progress.runWithModalProgressBlocking
 import org.elixir_lang.notification.setup_sdk.Notifier
 import org.elixir_lang.sdk.SdkRegistrar
 import org.elixir_lang.sdk.erlang.Type as ErlangSdkType
@@ -37,35 +40,37 @@ class AddDevelopmentSdksAction : AnAction() {
         }
 
         try {
-            var erlangSdk: com.intellij.openapi.projectRoots.Sdk? = null
-            var elixirSdkCreated = false
+            runWithModalProgressBlocking(ModalTaskOwner.project(project), "Adding Development SDKs") {
+                var erlangSdk: com.intellij.openapi.projectRoots.Sdk? = null
+                var elixirSdkCreated = false
 
-            // Create Erlang SDK first (Elixir depends on it)
-            if (!erlangPath.isNullOrBlank()) {
-                erlangSdk = createErlangSdk(erlangPath)
-                if (erlangSdk != null) {
-                    Notifier.sdkRefreshSuccess(project, 0, 0, 1, 1)
+                // Create Erlang SDK first (Elixir depends on it)
+                if (!erlangPath.isNullOrBlank()) {
+                    erlangSdk = createErlangSdk(erlangPath)
+                    if (erlangSdk != null) {
+                        Notifier.sdkRefreshSuccess(project, 0, 0, 1, 1)
+                    }
                 }
-            }
 
-            // Create Elixir SDK
-            if (!elixirPath.isNullOrBlank()) {
-                val createdElixirSdk = createElixirSdk(elixirPath, erlangSdk, project)
-                elixirSdkCreated = createdElixirSdk != null
-                if (elixirSdkCreated) {
-                    Notifier.sdkRefreshSuccess(project, 1, 1, 0, 0)
+                // Create Elixir SDK
+                if (!elixirPath.isNullOrBlank()) {
+                    val createdElixirSdk = createElixirSdk(elixirPath, erlangSdk, project)
+                    elixirSdkCreated = createdElixirSdk != null
+                    if (elixirSdkCreated) {
+                        Notifier.sdkRefreshSuccess(project, 1, 1, 0, 0)
+                    }
                 }
-            }
 
-            if (erlangSdk == null && !elixirSdkCreated) {
-                Notifier.sdkRefreshWarning(project, "Failed to create SDKs. Check paths are valid.")
+                if (erlangSdk == null && !elixirSdkCreated) {
+                    Notifier.sdkRefreshWarning(project, "Failed to create SDKs. Check paths are valid.")
+                }
             }
         } catch (ex: Exception) {
             Notifier.sdkRefreshError(project, ex.message ?: "Unknown error creating SDKs")
         }
     }
 
-    private fun createErlangSdk(homePath: String): com.intellij.openapi.projectRoots.Sdk? {
+    private suspend fun createErlangSdk(homePath: String): com.intellij.openapi.projectRoots.Sdk? {
         if (!File(homePath).exists()) {
             return null
         }
@@ -73,7 +78,7 @@ class AddDevelopmentSdksAction : AnAction() {
         return SdkRegistrar.registerOrUpdateErlangSdk(homePath)
     }
 
-    private fun createElixirSdk(
+    private suspend fun createElixirSdk(
         homePath: String,
         erlangSdk: com.intellij.openapi.projectRoots.Sdk?,
         project: com.intellij.openapi.project.Project
@@ -118,4 +123,6 @@ class AddDevelopmentSdksAction : AnAction() {
     }
 
     override fun isDumbAware(): Boolean = true
+
+    override fun getActionUpdateThread(): ActionUpdateThread = ActionUpdateThread.BGT
 }

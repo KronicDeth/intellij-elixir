@@ -207,7 +207,7 @@ public class Builder extends TargetBuilder<SourceRootDescriptor, Target> {
         String elixirHomePath = sdk.getHomePath();
         String elixirVersion = sdk.getVersionString();
 
-        return CliArguments.args(elixirHomePath, elixirVersion, erlangHomePath, tool, java.util.Collections.emptyList(), java.util.Collections.emptyList(), OS.CURRENT);
+        return CliArguments.args(elixirHomePath, elixirVersion, erlangHomePath, tool, java.util.Collections.emptyList(), java.util.Collections.emptyList(), OS.CURRENT, true);
     }
 
     private static String sdkToErlHomepath(@NotNull JpsSdk<SdkProperties> sdk, @NotNull JpsModule module) throws MissingSdkProperties, ErlangSdkNameMissing, LibraryNotFound {

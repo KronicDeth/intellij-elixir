@@ -9,6 +9,8 @@ import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.fileChooser.FileChooserDescriptor
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleUtilCore
+import com.intellij.platform.ide.progress.ModalTaskOwner
+import com.intellij.platform.ide.progress.runWithModalProgressBlocking
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.projectRoots.*
@@ -287,6 +289,20 @@ ELIXIR_SDK_HOME
                 return cached
             }
 
+            val app = ApplicationManager.getApplication()
+            if (app.isDispatchThread) {
+                return runWithModalProgressBlocking(
+                    ModalTaskOwner.guess(),
+                    "Detecting Elixir SDK version..."
+                ) {
+                    elixirVersionBackground(canonicalHome, exePath, cacheKey)
+                }
+            }
+
+            return elixirVersionBackground(canonicalHome, exePath, cacheKey)
+        }
+
+        private fun elixirVersionBackground(canonicalHome: String, exePath: String, cacheKey: String): String? {
             return try {
                 val output =
                     ProcessOutput.getProcessOutput(
@@ -794,28 +810,13 @@ ELIXIR_SDK_HOME
 
         fun mostSpecificSdk(psiElement: PsiElement): Sdk? {
             val project = psiElement.project
+            if (project.isDisposed) return null
 
-            return if (!project.isDisposed) {
-                run {
-                    // Use a background thread to perform the ReadAction
-                    val module =
-                        ApplicationManager
-                            .getApplication()
-                            .executeOnPooledThread<Module?> {
-                                ReadAction.compute<Module, Throwable> {
-                                    ModuleUtilCore.findModuleForPsiElement(psiElement)
-                                }
-                            }.get() // Wait for the result
-
-                    if (module != null) {
-                        mostSpecificSdk(module)
-                    } else {
-                        mostSpecificSdk(project)
-                    }
-                }
-            } else {
-                null
+            val module = ReadAction.compute<Module?, Throwable> {
+                ModuleUtilCore.findModuleForPsiElement(psiElement)
             }
+
+            return if (module != null) mostSpecificSdk(module) else mostSpecificSdk(project)
         }
 
         @JvmStatic

@@ -4,6 +4,10 @@ import com.intellij.execution.ExecutionException
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.fileChooser.FileChooserDescriptor
+import com.intellij.platform.ide.progress.ModalTaskOwner
+import com.intellij.platform.ide.progress.runWithModalProgressBlocking
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.projectRoots.Sdk
@@ -224,14 +228,11 @@ class Type : SdkType(ErlangSdkTypeId.ERLANG_SDK_TYPE_ID) {
         // Following Java SDK pattern: if on EDT, run VirtualFile access in background thread
         // This avoids EEL environment check issues with WSL paths
         if (app.isDispatchThread && !app.isWriteAccessAllowed) {
-            com.intellij.openapi.progress.ProgressManager.getInstance().runProcessWithProgressSynchronously(
-                {
+            runWithModalProgressBlocking(ModalTaskOwner.guess(), "Setting Up Erlang SDK Paths...") {
+                withContext(Dispatchers.IO) {
                     setupSdkPathsImpl(sdk)
-                },
-                "Setting Up Erlang SDK Paths...",
-                false,
-                null
-            )
+                }
+            }
         } else {
             setupSdkPathsImpl(sdk)
         }
@@ -332,48 +333,55 @@ class Type : SdkType(ErlangSdkTypeId.ERLANG_SDK_TYPE_ID) {
             return null
         }
 
-        var release: Release? = null
+        // runBlockingMaybeCancellable can be reached transitively in WSL/Eel process startup,
+        // and that path is forbidden on EDT. Guard EDT callers with modal progress.
+        val app = ApplicationManager.getApplication()
+        if (app.isDispatchThread) {
+            return runWithModalProgressBlocking(
+                ModalTaskOwner.guess(),
+                "Detecting Erlang SDK version..."
+            ) {
+                detectSdkVersionBackground(sdkHome, erl)
+            }
+        }
 
+        return detectSdkVersionBackground(sdkHome, erl)
+    }
+
+    private fun detectSdkVersionBackground(sdkHome: String, erl: File): Release? {
         LOGGER.debug("=== ERLANG SDK: Executing erl to detect version")
-        ApplicationManager
-            .getApplication()
-            .executeOnPooledThread {
-                try {
-                    val erlPath = erl.absolutePath
-                    LOGGER.debug("=== ERLANG SDK: Calling getProcessOutput with workDir: $sdkHome, exe: $erlPath")
-                    val output =
-                        org.elixir_lang.sdk.ProcessOutput.getProcessOutput(
-                            10 * 1000,
-                            sdkHome,
-                            erlPath,
-                            "-noshell",
-                            "-eval",
-                            PRINT_VERSION_INFO_EXPRESSION,
-                        )
+        return try {
+            val erlPath = erl.absolutePath
+            LOGGER.debug("=== ERLANG SDK: Calling getProcessOutput with workDir: $sdkHome, exe: $erlPath")
+            val output =
+                org.elixir_lang.sdk.ProcessOutput.getProcessOutput(
+                    10 * 1000,
+                    sdkHome,
+                    erlPath,
+                    "-noshell",
+                    "-eval",
+                    PRINT_VERSION_INFO_EXPRESSION,
+                )
 
-
-                    if (output.exitCode == 0 && !output.isCancelled && !output.isTimeout) {
-                        release =
-                            parseSdkVersion(output.stdoutLines)?.also { detectedRelease ->
-                                LOGGER.debug("=== ERLANG SDK: Detected release: ${detectedRelease.otpRelease}")
-                                getVersionCacheKey(sdkHome)?.let { key ->
-                                    releaseBySdkHome[key] = detectedRelease
-                                }
-                            }
-                    } else {
-                        LOGGER.warn(
-                            "=== ERLANG SDK: Failed to detect Erlang version. Workdir: '$sdkHome' " +
-                                "ErlPath: '$erlPath' Exit Code: ${output.exitCode}\nStdOut: ${output.stdout}\n" +
-                                "StdErr: ${output.stderr}"
-                        )
+            if (output.exitCode == 0 && !output.isCancelled && !output.isTimeout) {
+                parseSdkVersion(output.stdoutLines)?.also { detectedRelease ->
+                    LOGGER.debug("=== ERLANG SDK: Detected release: ${detectedRelease.otpRelease}")
+                    getVersionCacheKey(sdkHome)?.let { key ->
+                        releaseBySdkHome[key] = detectedRelease
                     }
-                } catch (e: ExecutionException) {
-                    LOGGER.warn("=== ERLANG SDK: Exception during version detection", e)
                 }
-            }.get() // Wait for the task to complete
-
-        LOGGER.debug("=== ERLANG SDK: Final release result: ${release?.otpRelease ?: "null"}")
-        return release
+            } else {
+                LOGGER.warn(
+                    "=== ERLANG SDK: Failed to detect Erlang version. Workdir: '$sdkHome' " +
+                        "ErlPath: '$erlPath' Exit Code: ${output.exitCode}\nStdOut: ${output.stdout}\n" +
+                        "StdErr: ${output.stderr}"
+                )
+                null
+            }
+        } catch (e: ExecutionException) {
+            LOGGER.warn("=== ERLANG SDK: Exception during version detection", e)
+            null
+        }
     }
 
     private fun erlExecutable(sdkHome: String): File = File(CliTool.ERL.getExecutableFilepathWslSafe(sdkHome))

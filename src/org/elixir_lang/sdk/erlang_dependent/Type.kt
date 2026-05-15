@@ -14,7 +14,6 @@ import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.Ref
 import org.elixir_lang.sdk.ProcessOutput.isSmallIde
 import org.elixir_lang.sdk.elixir.Type.Companion.erlangSdkType
-import org.elixir_lang.sdk.erlang.Type
 import org.elixir_lang.sdk.wsl.wslCompat
 import org.jdom.Element
 import java.nio.file.Path
@@ -55,84 +54,13 @@ abstract class Type protected constructor(name: String) : DependentSdkType(name)
     }
 
     /**
-     * Override fixDependency to use the new selectSdkHome API with proper Path handling.
-     * This allows WSL paths to be selected when creating the dependency (Erlang) SDK.
+     * Override fixDependency to use the Path-aware selectSdkHome API.
      *
-     * The parent class uses the deprecated selectSdkHome(sdkType, consumer) which defaults
-     * to user.home on Windows, preventing WSL SDK selection.
-     *
-     * When creating the first Erlang SDK, we ask the user which environment they want.
+     * The starting directory is inferred by [getBasePath] from project context when there is no
+     * dependency SDK yet (first Erlang SDK), so no environment picker is needed.
      */
     override fun fixDependency(sdkModel: SdkModel, sdkCreatedCallback: Consumer<in Sdk?>): Sdk? {
-        // Load WSL distributions on background thread to avoid EDT blocking
-        val availableDistributions = ApplicationManager.getApplication().executeOnPooledThread<List<com.intellij.execution.wsl.WSLDistribution>> {
-            wslCompat.getInstalledDistributions()
-        }.get()
-
-        // If no WSL distributions available, just use Windows (no need to ask)
-        if (availableDistributions.isEmpty()) {
-            return createSdkOfType(sdkModel, dependencyType, null, sdkCreatedCallback)
-        }
-
-        // Build list of options: "Windows (Local)" + WSL distributions
-        val environmentOptions = mutableListOf("Windows (Local)")
-        environmentOptions.addAll(availableDistributions.map { it.presentableName })
-
-        // Ask the user which environment they want to create the Erlang SDK in
-        val environmentChoice = Messages.showEditableChooseDialog(
-            "Where would you like to create the ${dependencyType.presentableName}?",
-            "Select Environment",
-            Messages.getQuestionIcon(),
-            environmentOptions.toTypedArray(),
-            environmentOptions[0],
-            null
-        )
-
-        if (environmentChoice == null) {
-            // User cancelled
-            return null
-        }
-
-        // Create a mock SDK to represent the environment choice
-        // This allows getBasePath() to determine the correct starting path
-        val environmentHintSdk = if (environmentChoice == "Windows (Local)") {
-            // Use null for Windows (will use user.home)
-            null
-        } else {
-            // Find the selected WSL distribution and create a mock SDK
-            val selectedDistribution = availableDistributions.find { it.presentableName == environmentChoice }
-            if (selectedDistribution != null) {
-                createMockWslSdkForDistribution(selectedDistribution)
-            } else {
-                null
-            }
-        }
-
-        return createSdkOfType(sdkModel, dependencyType, environmentHintSdk, sdkCreatedCallback)
-    }
-
-    /**
-     * Creates a mock SDK for a specific WSL distribution to use as an environment hint.
-     * This tells getBasePath() to start the file chooser in the selected WSL distribution.
-     */
-    @Suppress("NonExtendableApiUsage")
-    private fun createMockWslSdkForDistribution(distribution: com.intellij.execution.wsl.WSLDistribution): Sdk {
-        // Get the Windows UNC path for the WSL distribution root
-        val wslRootPath = distribution.getWindowsPath("/")
-
-        return object : Sdk {
-            override fun getHomePath(): String = wslRootPath
-            override fun getHomeDirectory(): com.intellij.openapi.vfs.VirtualFile? = null
-            override fun getName(): String = "Mock WSL SDK (${distribution.presentableName})"
-            override fun getSdkType(): SdkType = dependencyType
-            override fun getVersionString(): String? = null
-            override fun getSdkModificator(): SdkModificator = throw UnsupportedOperationException()
-            override fun getSdkAdditionalData(): SdkAdditionalData? = null
-            override fun getRootProvider(): com.intellij.openapi.roots.RootProvider = throw UnsupportedOperationException()
-            override fun clone(): Sdk = throw UnsupportedOperationException()
-            override fun <T> getUserData(key: com.intellij.openapi.util.Key<T>): T? = null
-            override fun <T> putUserData(key: com.intellij.openapi.util.Key<T>, value: T?) {}
-        }
+        return createSdkOfType(sdkModel, dependencyType, null, sdkCreatedCallback)
     }
 
     override fun showCustomCreateUI(
@@ -229,15 +157,16 @@ abstract class Type protected constructor(name: String) : DependentSdkType(name)
     }
 
     /**
-     * Determines the appropriate base path for SDK home selection, ensuring it matches the
-     * dependency SDK's environment (EelDescriptor).
+     * Determines a preferred base path hint for SDK home selection.
      *
-     * For dependent SDKs (like Elixir depending on Erlang), this ensures that:
-     * 1. If the dependency SDK is in WSL, the base path points to that WSL distribution
-     * 2. If the dependency SDK is in Windows, the base path points to Windows
+     * For dependent SDKs (like Elixir depending on Erlang), this prefers:
+     * 1. WSL paths when the dependency SDK is in WSL.
+     * 2. Windows paths when the dependency SDK is local Windows.
+     * 3. `user.home` when no dependency SDK is available.
      *
-     * This guarantees that the EelDescriptor check in SdkConfigurationUtil.selectSdkHome passes,
-     * and that the dependent SDK is accessible from the same environment as its dependency.
+     * This value is passed to `SdkConfigurationUtil.selectSdkHome` as the initial directory hint.
+     * The chooser may still apply platform-specific behavior (for example, native dialogs on
+     * Windows can override the suggested start directory).
      *
      * @param dependencySdk the SDK that this SDK depends on (e.g. Erlang SDK for Elixir SDK)
      * @return the base path to use for SDK home selection
@@ -252,13 +181,16 @@ abstract class Type protected constructor(name: String) : DependentSdkType(name)
                     LOG.debug("Using WSL base path from dependency SDK: $wslRootPath")
                     return Path.of(wslRootPath)
                 }
+
+                // Keep WSL context even if distro lookup fails.
+                LOG.debug("Using WSL dependency SDK path directly as base: $dependencyHomePath")
+                return Path.of(dependencyHomePath)
             } else {
                 // Dependency is in Windows - use its home path as base
                 LOG.debug("Using Windows base path from dependency SDK: $dependencyHomePath")
                 return Path.of(dependencyHomePath).parent ?: Path.of(dependencyHomePath)
             }
         }
-
         // Fallback: default to user home directory
         LOG.debug("Using default base path: user.home")
         return Path.of(System.getProperty("user.home"))
@@ -268,7 +200,8 @@ abstract class Type protected constructor(name: String) : DependentSdkType(name)
     companion object {
         private val LOG = Logger.getInstance(Type::class.java)
         private const val ERLANG_SDK_TYPE_CANONICAL_NAME = "org.intellij.erlang.sdk.ErlangSdkType"
-        private val ERLANG_SDK_FOR_ELIXIR_SDK_TYPE_CANONICAL_NAME: String = Type::class.java.canonicalName
+        private val ERLANG_SDK_FOR_ELIXIR_SDK_TYPE_CANONICAL_NAME: String =
+            org.elixir_lang.sdk.erlang.Type::class.java.canonicalName
 
         /**
          * UserData key to pass the Erlang SDK from showCustomCreateUI to configureSdkPaths.

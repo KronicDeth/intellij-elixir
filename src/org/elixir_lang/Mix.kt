@@ -12,13 +12,14 @@ import org.elixir_lang.run.baseCommandLine
 object Mix {
     @JvmStatic
     fun commandLine(
-            environment: Map<String, String>,
-            workingDirectory: String?,
-            elixirSdk: Sdk,
-            erlParameters: kotlin.collections.List<String> = emptyList(),
-            elixirParameters: kotlin.collections.List<String> = emptyList(),
-            pty: Boolean = false,
-            project: Project? = null
+        environment: Map<String, String>,
+        workingDirectory: String?,
+        elixirSdk: Sdk,
+        erlParameters: kotlin.collections.List<String> = emptyList(),
+        elixirParameters: kotlin.collections.List<String> = emptyList(),
+        pty: Boolean = false,
+        project: Project? = null,
+        ansiEnabled: Boolean = true
     ): GeneralCommandLine {
         val updatedEnvironment = environment.toMutableMap()
         SdkPaths.maybeUpdateMixHome(updatedEnvironment, elixirSdk.homePath)
@@ -30,6 +31,7 @@ object Mix {
                 extraElixirArguments = elixirParameters,
                 extraErlangArguments = erlParameters,
                 project = project,
+                ansiEnabled = ansiEnabled,
             )
         val commandLine = baseCommandLine(pty, updatedEnvironment, workingDirectory)
         commandLine.exePath = args.exePath
