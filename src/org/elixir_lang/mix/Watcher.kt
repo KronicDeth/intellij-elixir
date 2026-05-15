@@ -1,5 +1,6 @@
 package org.elixir_lang.mix
 
+import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.components.service
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
@@ -97,9 +98,11 @@ class Watcher(private val project: Project) : DebouncedBulkFileListener(project.
     }
 
     fun syncLibraries(module: Module, progressIndicator: ProgressIndicator) {
-        ModuleRootManager
-            .getInstance(module)
-            .contentRoots
+        val contentRoots = ReadAction.nonBlocking(java.util.concurrent.Callable {
+            ModuleRootManager.getInstance(module).contentRoots
+        }).executeSynchronously()
+
+        contentRoots
             .let { transitiveResolution(project, PsiManager.getInstance(project), progressIndicator, *it) }
             .let { deps -> syncLibraries(module, deps, progressIndicator) }
     }
