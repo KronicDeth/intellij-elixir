@@ -409,7 +409,7 @@ class ElixirSdkStatusWidget(@param:NotNull private val project: Project) : Custo
         return when (status) {
             is SdkStatus.Configured -> null
             is SdkStatus.NotConfigured -> "not-configured"
-            is SdkStatus.InvalidSdk -> "partial:${status.issue}"
+            is SdkStatus.InvalidSdk -> "invalid-sdk:${status.issue}"
             is SdkStatus.ClasspathIssue -> "warning:${status.issues.sorted().joinToString(",")}"
             is SdkStatus.ModuleSdkError -> "module-error:${status.moduleSdkIssues.map { "${it.moduleName}:${it.isDangling}:${it.issue}" }.sorted().joinToString(",")}"
             is SdkStatus.FolderMarkWarning -> "folder-marks:${status.folderMarkIssues.map { "${it.moduleName}:${it.folderRelativePath}:${it.folderMark}" }.sorted().joinToString(",")}"
