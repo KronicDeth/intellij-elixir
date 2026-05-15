@@ -31,6 +31,9 @@
         <applicationService serviceInterface="org.elixir_lang.configuration.BeforeRunTaskProvider"
                             serviceImplementation="org.elixir_lang.configuration.JpsBeforeRunTaskProvider"
                             overrides="true"/>
+        <applicationService serviceInterface="org.elixir_lang.facet.configurable.TopLevelElixirConfigurableFactory"
+                            serviceImplementation="org.elixir_lang.facet.configurable.RichPlatformTopLevelElixirConfigurableFactory"
+                            overrides="true"/>
         <applicationService serviceInterface="org.elixir_lang.sdk.elixir.SdkSettingsOpener"
                             serviceImplementation="org.elixir_lang.sdk.elixir.ProjectStructureSdkSettingsOpener"
                             overrides="true"/>
