@@ -1,6 +1,28 @@
 <html>
 <body>
 
+<h1>v23.4.0</h1>
+<ul>
+    <li>
+        <p>Enhancements</p>
+        <ul>
+            <li>Status bar widget now detects module SDK inconsistencies: dangling SDK references (e.g. from cloning projects between WSL distributions) and SDK mismatches across modules. Notifications include specific instructions on where to fix the issue.</li>
+            <li>Status bar widget detects misconfigured source/test/excluded folder marks on Mix project modules, with debounced updates to avoid notification spam during bulk operations.</li>
+            <li>New "Reconfigure Elixir Module Setup" action (Tools menu and status bar popup) -- automatically applies canonical folder marks and fixes SDK configuration issues while preserving custom source roots.</li>
+            <li>New Project Wizard now applies the full set of canonical folder marks including <code>spec/</code> (ESpec), <code>web/</code> (pre-Phoenix 1.3), and all standard exclusions (<code>_build/</code>, <code>deps/</code>, <code>_elixir_ls/</code>, etc.).</li>
+            <li>Small IDE detection (RubyMine, PyCharm, etc.) now uses product codes instead of class detection, fixing settings panel layout in 2026.1+.</li>
+        </ul>
+    </li>
+    <li>
+        <p>Bug Fixes</p>
+        <ul>
+            <li>"Run Mix ExUnit" context menu now correctly appears on test directories that contain non-test <code>.ex</code> support files in subdirectories.</li>
+            <li>Resolved plugin verifier deprecation warnings for OS detection utilities, exception types, and configurable API usage.</li>
+            <li>SDK version detection no longer blocks the UI thread.</li>
+        </ul>
+    </li>
+</ul>
+
 <h1>v23.3.0</h1>
 <ul>
     <li>

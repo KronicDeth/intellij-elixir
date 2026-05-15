@@ -15,7 +15,7 @@ import com.intellij.driver.sdk.ui.components.elements.jBlist
 import com.intellij.driver.sdk.ui.components.idea.ProjectStructureUI
 import com.intellij.driver.sdk.ui.remote.Window
 import com.intellij.driver.sdk.waitForIndicators
-import com.intellij.openapi.util.SystemInfo
+import com.intellij.util.system.OS
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -181,7 +181,7 @@ private interface AppIcon {
  * Ensures the IDE window is foregrounded so input events are delivered reliably.
  */
 fun Driver.ensureIdeInForeground() = step("Bring IDE window to foreground") {
-    if (SystemInfo.isWindows) {
+    if (OS.CURRENT == OS.Windows) {
         // Allow the IDE to request focus even when the app is inactive on Windows.
         withContext {
             utility(WinFocusStealer::class).setFocusStealingEnabled(true)
@@ -204,7 +204,7 @@ fun Driver.ensureIdeInForeground() = step("Bring IDE window to foreground") {
 }
 
 fun Driver.ensureWelcomeScreenInForeground() = step("Bring Welcome Screen to foreground") {
-    if (SystemInfo.isWindows) {
+    if (OS.CURRENT == OS.Windows) {
         // Allow the IDE to request focus even when the app is inactive on Windows.
         withContext {
             utility(WinFocusStealer::class).setFocusStealingEnabled(true)

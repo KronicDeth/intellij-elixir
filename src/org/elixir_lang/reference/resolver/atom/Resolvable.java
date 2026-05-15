@@ -4,7 +4,6 @@ import com.intellij.lang.ASTNode;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.ResolveResult;
 import com.intellij.psi.tree.IElementType;
-import org.apache.commons.lang3.NotImplementedException;
 import org.elixir_lang.psi.*;
 import org.elixir_lang.reference.resolver.atom.resolvable.Exact;
 import org.elixir_lang.reference.resolver.atom.resolvable.Pattern;
@@ -82,7 +81,7 @@ public abstract class Resolvable {
                         elementType == ElixirTypes.SIGIL_HEXADECIMAL_ESCAPE_SEQUENCE) {
                     codePointList = parent.addHexadecimalEscapeSequenceCodePoints(codePointList, child);
                 } else {
-                    throw new NotImplementedException("Can't convert to Resolvable " + child);
+                    throw new UnsupportedOperationException("Can't convert to Resolvable " + child);
                 }
             }
 
@@ -136,7 +135,7 @@ public abstract class Resolvable {
             stringAccumulator.appendCodePoint(codePoint);
         }
 
-        return new Exact(":" + stringAccumulator.toString());
+        return new Exact(":" + stringAccumulator);
     }
 
     public abstract ResolveResult[] resolve(@NotNull Project project);

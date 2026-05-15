@@ -358,6 +358,12 @@
                     icon="org.elixir_lang.mix.configuration.Icons.TYPE"
                     description="Installs hex, rebar, fetches Mix deps, and compiles them"/>
             <separator/>
+            <action id="Elixir.ReconfigureModuleSetup"
+                    class="org.elixir_lang.action.ReconfigureModuleSetupAction"
+                    text="Reconfigure Elixir Module Setup"
+                    icon="AllIcons.Actions.Refresh"
+                    description="Apply canonical folder marks and fix module SDK references for all Elixir modules"/>
+            <separator/>
             <add-to-group group-id="ToolsMenu" anchor="last"/>
         </group>
         <group id="Internal.Elixir" popup="true" internal="true" compact="true" text="Elixir">

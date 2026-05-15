@@ -5,7 +5,7 @@ import com.intellij.execution.lineMarker.RunLineMarkerContributor
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.impl.source.tree.LeafPsiElement
-import org.apache.commons.lang.SystemUtils
+import com.intellij.util.system.OS
 import org.elixir_lang.exunit.configuration.SUFFIX
 import org.elixir_lang.exunit.configuration.lineNumber
 import org.elixir_lang.mix.TestFinder
@@ -56,7 +56,7 @@ class ExUnitLineMarkerProvider : RunLineMarkerContributor() {
 
         val number = lineNumber(element)
         var url = "file://${element.containingFile.virtualFile.path}:${number}"
-        if (SystemUtils.IS_OS_WINDOWS) {
+        if (OS.CURRENT == OS.Windows) {
             // In Elixir, the drive letter is lowercase for some reason.
             val location = "file://".length
             url = url.replaceRange(location, location + 1, url[location].lowercaseChar().toString())

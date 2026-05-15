@@ -200,3 +200,11 @@ jobs:
             ${{ steps.verify-plugin.outputs.verification-output-log-filename }}
             ${{ steps.verify-plugin.outputs.verification-reports-dir }}
           retention-days: 30
+
+      - name: Upload Plugin Artifact
+        id: upload-plugin
+        uses: actions/upload-artifact@v6
+        with:
+          name: plugin-artifact
+          path: build/distributions/*.zip
+          retention-days: 1
