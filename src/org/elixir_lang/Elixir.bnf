@@ -2675,18 +2675,19 @@ unknownBaseWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX UNKNOWN_WHOLE_NUMBER_BASE un
 
 atom ::= COLON (ATOM_FRAGMENT | line)
          {
-           implements = [
-             "com.intellij.psi.NavigatablePsiElement"
-             "com.intellij.psi.PsiNamedElement"
-             "org.elixir_lang.psi.Quotable"
-           ]
-           methods = [
-             getReference
-             quote
-             getName
-             setName
-           ]
-         }
+            mixin = "org.elixir_lang.psi.impl.ElixirAtomMixin"
+            implements = [
+              "com.intellij.psi.NavigatablePsiElement"
+              "com.intellij.psi.PsiNamedElement"
+              "org.elixir_lang.psi.Quotable"
+            ]
+            methods = [
+              getReference
+              quote
+              getName
+              setName
+            ]
+          }
 
 private infixComma ::= COMMA eolStar
 private infixCommaMaybe ::= infixComma?

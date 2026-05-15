@@ -11,7 +11,6 @@ import org.elixir_lang.psi.operation.capture.NonNumeric
 import org.elixir_lang.psi.scope.ancestorTypeSpec
 import org.elixir_lang.psi.scope.hasMapFieldOptionalityName
 import org.elixir_lang.reference.Module
-import org.elixir_lang.reference.Resolver
 
 class TargetElementEvaluator : TargetElementEvaluatorEx2() {
     override fun isAcceptableNamedParent(parent: PsiElement): Boolean = when (parent) {
@@ -45,13 +44,12 @@ class TargetElementEvaluator : TargetElementEvaluatorEx2() {
 
     override fun getTargetCandidates(reference: PsiReference): MutableCollection<PsiElement>? =
         when (reference) {
-            // Module references need to resolve to decompiled element in case a call is only defined in the decompiled
-            // code and not the source, but users prefer source for the actual Alias Go To Declaration.
+            // Module references resolve through Resolver.preferred() which already prefers source over decompiled,
+            // but falls back to decompiled if no source exists (e.g. for a call only defined in .beam).
             is Module -> {
                 reference
                         .multiResolve(false)
                         .mapNotNull(ResolveResult::getElement)
-                        .let { Resolver.preferSource(it) }
                         .toMutableList()
             }
             else -> super.getTargetCandidates(reference)

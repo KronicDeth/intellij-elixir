@@ -112,7 +112,7 @@ open class Nested(val name: String, private val arityRangesByName: Map<String, A
                     true
                 }
 
-        return Resolver.preferUnderSameModule(call, modulars).let { Resolver.preferSource(it) }
+        return Resolver.preferredElements(call, modulars)
     }
 
     private val MODULARS_BY_NAME = Key<Map<String, List<Call>>>("MODULARS_BY_NAME")

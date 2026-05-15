@@ -215,6 +215,8 @@
         <lang.findUsagesProvider language="Elixir" implementationClass="org.elixir_lang.find_usages.Provider"/>
         <readWriteAccessDetector implementation="org.elixir_lang.ReadWriteAccessDetector"/>
         <referencesSearch implementation="org.elixir_lang.ReferencesSearch"/>
+        <psi.referenceContributor language="Elixir"
+                                  implementation="org.elixir_lang.reference.MfaTupleReferenceContributor"/>
         <targetElementEvaluator implementationClass="org.elixir_lang.TargetElementEvaluator" language="Elixir"/>
         <usageTargetProvider implementation="org.elixir_lang.UsageTargetProvider"/>
         <usageTypeProvider implementation="org.elixir_lang.UsageTypeProvider"/>
@@ -274,6 +276,9 @@
         <localInspection displayName="Elixir references" shortName="ElixirReferences" enabledByDefault="false"
                          groupName="Elixir" implementationClass="org.elixir_lang.inspection.References"
                          language="Elixir" level="ERROR"/>
+        <localInspection displayName="Unresolvable module qualifier" enabledByDefault="true" groupName="Elixir"
+                         implementationClass="org.elixir_lang.inspection.UnresolvableModuleQualifier"
+                         language="Elixir" level="ERROR" shortName="UnresolvableModuleQualifier"/>
         <spellchecker.support implementationClass="org.elixir_lang.spell_checking.Strategy" language="Elixir"/>
         <spellchecker.bundledDictionaryProvider
                 implementation="org.elixir_lang.spell_checking.BundledDictionaryProvider"/>
