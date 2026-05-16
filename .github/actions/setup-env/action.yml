@@ -56,7 +56,7 @@ runs:
         path: ${{ runner.tool_cache }}/Java_JetBrains_*
         key: jbr-${{ runner.os }}-${{ runner.arch }}-21
         restore-keys: |
-          jbr-${{ runner.os }}-${{ runner.arch }}-21
+          jbr-${{ runner.os }}-${{ runner.arch }}-
 
     - name: Setup JBR 21
       id: setup-java
@@ -143,7 +143,7 @@ runs:
 
     - name: Save Elixir cache
       id: cache-elixir-save
-      if: always() && steps.cache-elixir-restore.outputs.cache-hit != 'true' && inputs.setup-elixir == 'true'
+      if: always() && steps.cache-elixir-restore.outputs.cache-hit != 'true' && inputs.setup-elixir == 'true' && steps.setup-elixir.outcome == 'success'
       uses: actions/cache/save@v5
       with:
         path: |
