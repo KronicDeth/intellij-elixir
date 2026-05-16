@@ -7,7 +7,7 @@
 [versions]
 # Plugin Versions
 kotlin = "2.3.21"
-intellij-platform = "2.15.0"
+intellij-platform = "2.16.0"
 gradle-download = "5.7.0"
 test-logger = "4.0.0"
 
