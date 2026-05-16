@@ -1,6 +1,7 @@
 package org.elixir_lang
 
 import com.intellij.ide.projectView.impl.ProjectRootsUtil.isModuleContentRoot
+import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.components.service
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.module.ModuleUtil
@@ -280,11 +281,14 @@ class DepsWatcher(val project: Project) : DebouncedBulkFileListener(project.serv
     }
 
     fun syncLibraries(progressIndicator: ProgressIndicator) {
-        ProjectRootManager
-                .getInstance(project)
-                .contentRootsFromAllModules
-                .mapNotNull { it.findChild("deps") }
-                .forEach { syncLibraries(it, progressIndicator) }
+        val depsRoots = ReadAction.nonBlocking(java.util.concurrent.Callable {
+            ProjectRootManager
+                    .getInstance(project)
+                    .contentRootsFromAllModules
+                    .mapNotNull { it.findChild("deps") }
+        }).executeSynchronously()
+
+        depsRoots.forEach { syncLibraries(it, progressIndicator) }
     }
 
     private fun syncLibrary(dep: VirtualFile, progressIndicator: ProgressIndicator) = syncLibraries(arrayOf(dep), progressIndicator)
@@ -300,7 +304,11 @@ class DepsWatcher(val project: Project) : DebouncedBulkFileListener(project.serv
                 syncLibraries(deps, libraryTable, progressIndicator)
             }
 
-            for (module in ModuleManager.getInstance(project).modules) {
+            val modules = ReadAction.nonBlocking(java.util.concurrent.Callable {
+                ModuleManager.getInstance(project).modules
+            }).executeSynchronously()
+
+            for (module in modules) {
                 if (progressIndicator.isCanceled) {
                     break
                 }
@@ -348,10 +356,14 @@ class DepsWatcher(val project: Project) : DebouncedBulkFileListener(project.serv
         libraryModifiableModel.clearRoots(OrderRootType.CLASSES)
         libraryModifiableModel.clearRoots(OrderRootType.SOURCES)
 
-        ProjectRootManager
-                .getInstance(project)
-                .contentRootsFromAllModules
-                .mapNotNull { it.findChild("_build") }
+        val buildRoots = ReadAction.nonBlocking(java.util.concurrent.Callable {
+            ProjectRootManager
+                    .getInstance(project)
+                    .contentRootsFromAllModules
+                    .mapNotNull { it.findChild("_build") }
+        }).executeSynchronously()
+
+        buildRoots
                 .forEach { build ->
                     build
                             .children
@@ -372,8 +384,9 @@ class DepsWatcher(val project: Project) : DebouncedBulkFileListener(project.serv
                                                             /* Mark build output as excluded when marking it as CLASSES, so that
                                                                dependency will show up in External Libraries AND be pushed out into
                                                                non-project results */
-                                                            ModuleUtil
-                                                                    .findModuleForFile(depEnvironmentLibrary, project)
+                                                            ReadAction.nonBlocking(java.util.concurrent.Callable {
+                                                                ModuleUtil.findModuleForFile(depEnvironmentLibrary, project)
+                                                            }).executeSynchronously()
                                                                     ?.let { module ->
                                                                         ModuleRootManager.getInstance(module).modifiableModel.apply {
                                                                             progressIndicator.text2 = "Excluding _build/lib/$depName/ebin from project so it is treated as an External Library"

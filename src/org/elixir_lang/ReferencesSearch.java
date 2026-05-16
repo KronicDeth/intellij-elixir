@@ -1,6 +1,7 @@
 package org.elixir_lang;
 
 import com.intellij.openapi.application.QueryExecutorBase;
+import com.intellij.openapi.application.ReadAction;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiPolyVariantReference;
 import com.intellij.psi.search.searches.ReferencesSearch.SearchParameters;
@@ -25,24 +26,28 @@ public final class ReferencesSearch extends QueryExecutorBase<PsiPolyVariantRefe
         if (elementToSearch instanceof Named) {
             Named elementToSearchNamed = (Named) elementToSearch;
 
-            if (Implementation.is(elementToSearchNamed)
-                    || Module.is(elementToSearchNamed)
-                    || Protocol.is(elementToSearchNamed)) {
-                String name = elementToSearchNamed.getName();
+            // PSI access (Implementation.is, Module.is, getName, getLanguage) requires a read
+            // action.  processQuery runs on a pooled thread without one.
+            ReadAction.nonBlocking(() -> {
+                if (Implementation.is(elementToSearchNamed)
+                        || Module.is(elementToSearchNamed)
+                        || Protocol.is(elementToSearchNamed)) {
+                    String name = elementToSearchNamed.getName();
 
-                if (name != null) {
-                    List relativeNames = org.elixir_lang.Module.split(name);
+                    if (name != null) {
+                        List relativeNames = org.elixir_lang.Module.split(name);
 
-                    if (relativeNames.size() > 1) {
-                        queryParameters.getOptimizer().searchWord(
-                                (String) CollectionsKt.last(relativeNames),
-                                queryParameters.getEffectiveSearchScope(),
-                                elementToSearchNamed.getLanguage().isCaseSensitive(),
-                                elementToSearchNamed
-                        );
+                        if (relativeNames.size() > 1) {
+                            queryParameters.getOptimizer().searchWord(
+                                    (String) CollectionsKt.last(relativeNames),
+                                    queryParameters.getEffectiveSearchScope(),
+                                    elementToSearchNamed.getLanguage().isCaseSensitive(),
+                                    elementToSearchNamed
+                            );
+                        }
                     }
                 }
-            }
+            }).executeSynchronously();
         }
     }
 }

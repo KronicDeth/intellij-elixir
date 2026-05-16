@@ -29,8 +29,10 @@ private fun app(appMixFile: VirtualFile): String =
     }
 
 private fun app(appMixFile: VirtualFile, appMixFileText: String): String {
-    val elixirFile = elixirFile(appMixFileText)
-    val appList = appList(elixirFile)
+    val appList = computeReadAction {
+        val elixirFile = elixirFile(appMixFileText)
+        appList(elixirFile)
+    }
 
     return if (appList.isEmpty()) {
         appFromPath(appMixFile)
@@ -74,10 +76,10 @@ private fun appFromPath(appMixFile: VirtualFile): String = Paths.get(appMixFile.
 fun <T> computeReadAction(computable: Computable<T>): T =
         ApplicationManager.getApplication().runReadAction(computable)
 
-private fun elixirFile(text: String): ElixirFile = computeReadAction {
+private fun elixirFile(text: String): ElixirFile {
     val defaultProject = ProjectManager.getInstance().defaultProject
 
-    PsiFileFactory
+    return PsiFileFactory
         .getInstance(defaultProject)
         .createFileFromText(Project.MIX_EXS, ElixirScriptFileType.INSTANCE, text) as ElixirFile
 }

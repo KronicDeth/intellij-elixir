@@ -88,7 +88,7 @@ object AbstractCode {
             error("unknown_$default", "$title is unknown", term)
 
     fun error(default: String, title: String, term: OtpErlangObject): String {
-        Logger.error(logger, "Erlang Abst $title", term)
+        logger.warn("Erlang Abst $title\n\n### Term\n\n$term\n")
 
         return default
     }

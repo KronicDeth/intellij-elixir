@@ -1,5 +1,21 @@
 # Changelog
 
+## v23.8.0
+
+### Bug Fixes
+* Dialyzer inspection -- use explicit `runReadAction` blocks around PSI and module-model access instead of `isReadActionNeeded = true`. The previous approach (`isReadActionNeeded = true`) held the read lock for the entire inspection run including `waitFor()` on the Dialyzer process, blocking writes. Now the read lock is acquired only for the PSI/model access windows. - [@joshuataylor](https://github.com/joshuataylor)
+* Status bar SDK widget -- restructured `updateWidget()` to run `detectSdkStatus()` on the widget's coroutine scope (background thread with read action) and dispatch UI updates via `Dispatchers.EDT`. Previously ran SDK/module-model queries without a read lock, crashing on 2025.2+. - [@joshuataylor](https://github.com/joshuataylor)
+* Reference search (`ReferencesSearch.java`) -- wrapped PSI access (`Implementation.is`, `Module.is`, `getName`, `getLanguage`) in `ReadAction.nonBlocking().executeSynchronously()`. `processQuery` runs on a pooled thread without a read lock. - [@joshuataylor](https://github.com/joshuataylor)
+* `OtpApp.kt` -- merged `elixirFile()` and `appList()` PSI traversal into a single read action. Previously `appList()` ran heavy PSI walking (`.modulars()`, `.macroChildCallList()`, `nameArityInterval()`) outside the read action returned by `computeReadAction`. - [@joshuataylor](https://github.com/joshuataylor)
+* `DepsWatcher` and `DepsCheckerService` -- wrapped `ProjectRootManager`, `ModuleManager`, and `ModuleRootManager` access in `ReadAction.nonBlocking`. These run on `Alarm(POOLED_THREAD)` callbacks without a read lock. - [@joshuataylor](https://github.com/joshuataylor)
+* Mix `Watcher` -- wrapped `ModuleRootManager.getInstance(module).contentRoots` in `ReadAction.nonBlocking`. Runs inside `Task.Backgroundable` without a read lock. - [@joshuataylor](https://github.com/joshuataylor)
+* Credo inspection -- wrapped `ModuleManager.getInstance(project).modules` model access in the `workingDirectorySet()` method with a read action. The inspection uses `isReadActionNeeded = false` and module-model access was unprotected. - [@joshuataylor](https://github.com/joshuataylor)
+* `ReconfigureModuleSetupAction` -- wrapped `ModuleManager.getInstance(project).modules` and `ElixirSdkType.mostSpecificSdk(project)` in `update()` with `ReadAction.nonBlocking`. `ActionUpdateThread.BGT` does not guarantee a read lock since 2024.2. - [@joshuataylor](https://github.com/joshuataylor)
+* Downgraded non-critical decompiler/documentation-provider errors from `Logger.error()` to `logger.warn()`. `Logger.error()` creates a `Throwable` and shows an IDE error notification in internal mode -- too noisy for situations where code simply doesn't recognise an element (unknown Erlang AST nodes from newer OTP versions, missing decompiled functions, unhandled element types). - [@joshuataylor](https://github.com/joshuataylor)
+
+### Build
+* Bumped JetBrains JDK to `jetbrains-21.0.10-b1163.110`. - [@joshuataylor](https://github.com/joshuataylor)
+
 ## v23.7.0
 
 ### Enhancements

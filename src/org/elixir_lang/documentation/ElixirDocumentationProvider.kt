@@ -16,7 +16,7 @@ import org.elixir_lang.beam.chunk.beam_documentation.docs.documented.MarkdownByL
 import org.elixir_lang.beam.chunk.beam_documentation.docs.documented.None
 import org.elixir_lang.beam.psi.BeamFileImpl
 import org.elixir_lang.beam.psi.impl.CallDefinitionImpl
-import org.elixir_lang.errorreport.Logger
+import com.intellij.openapi.diagnostic.logger
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.CallDefinitionClause.enclosingModularMacroCall
 import org.elixir_lang.psi.call.Call
@@ -34,6 +34,8 @@ import java.util.function.Consumer
 import java.util.regex.Pattern
 import com.intellij.psi.DummyBlockType.DummyBlock as ExperimentalPsiDummyBlock
 
+
+private val LOG = logger<ElixirDocumentationProvider>()
 
 class ElixirDocumentationProvider : DocumentationProvider {
     override fun generateDoc(element: PsiElement, originalElement: PsiElement?): String? =
@@ -84,7 +86,7 @@ class ElixirDocumentationProvider : DocumentationProvider {
                 -> Unit
 
             else -> {
-                Logger.error(javaClass, "Don't know how to collect doc comments", element)
+                LOG.warn("Don't know how to collect doc comments for ${element.javaClass.name}")
             }
         }
     }
@@ -247,10 +249,7 @@ class ElixirDocumentationProvider : DocumentationProvider {
                 }
 
                 else -> {
-                    Logger.error(
-                        javaClass, "Don't know how to find element for link (${link}) of kind (${kind})",
-                        context
-                    )
+                    LOG.warn("Don't know how to find element for link ($link) of kind ($kind) for ${context.javaClass.name}")
 
                     null
                 }
@@ -484,7 +483,7 @@ class ElixirDocumentationProvider : DocumentationProvider {
                     .let { html(project, it) }
 
             else -> {
-                Logger.error(javaClass, "Don't know how to render deprecated metadata", otpErlangObject)
+                LOG.warn("Don't know how to render deprecated metadata: $otpErlangObject")
 
                 ""
             }

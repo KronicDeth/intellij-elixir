@@ -183,14 +183,16 @@ class Global : GlobalInspectionTool() {
     }
 
     private fun workingDirectorySet(module: Module): Set<String> =
-        ModuleRootManager
-            .getInstance(module)
-            .contentRoots
-            .filter { virtualFile ->
-                virtualFile.findChild(Project.MIX_EXS) != null
-            }
-            .map(::resolveCredoWorkingDirectory)
-            .toHashSet()
+        ApplicationManager.getApplication().runReadAction<Set<String>> {
+            ModuleRootManager
+                .getInstance(module)
+                .contentRoots
+                .filter { virtualFile ->
+                    virtualFile.findChild(Project.MIX_EXS) != null
+                }
+                .map(::resolveCredoWorkingDirectory)
+                .toHashSet()
+        }
 
     private fun resolveCredoWorkingDirectory(contentRoot: VirtualFile): String {
         val parent = contentRoot.parent

@@ -2,6 +2,7 @@ package org.elixir_lang.mix
 
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.module.ModuleManager
@@ -73,8 +74,11 @@ class DepsCheckerService(private val project: Project) : Disposable {
                 return
             }
             LOG.debug("DepsCheckerService: Checking Mix deps ($reason)")
-            val sdk = findElixirSdk(project)
-            val projectRoots = selectTopLevelMixRoots(ProjectRootManager.getInstance(project).contentRootsFromAllModules)
+            val (sdk, projectRoots) = ReadAction.nonBlocking(java.util.concurrent.Callable {
+                val sdk = findElixirSdk(project)
+                val roots = selectTopLevelMixRoots(ProjectRootManager.getInstance(project).contentRootsFromAllModules)
+                sdk to roots
+            }).executeSynchronously()
 
             var sawSupported = false
             var sawNonOk = false

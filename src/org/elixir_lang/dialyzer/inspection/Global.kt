@@ -2,6 +2,7 @@ package org.elixir_lang.dialyzer.inspection
 
 import com.intellij.analysis.AnalysisScope
 import com.intellij.codeInspection.*
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleUtil
 import com.intellij.psi.PsiElement
@@ -14,7 +15,11 @@ import org.elixir_lang.psi.impl.document
 import java.io.File
 
 /**
- * Implements an inspection showing dialyzer warnings
+ * Implements an inspection showing dialyzer warnings.
+ *
+ * Uses [isReadActionNeeded] = false because [dialyzerWarnsByModule] runs external processes
+ * (mix dialyzer) which must NOT execute under a read lock (2026.1: waitFor() under read lock
+ * logs an error). PSI and model access is wrapped in explicit runReadAction blocks instead.
  */
 class Global : GlobalInspectionTool() {
 
@@ -24,7 +29,10 @@ class Global : GlobalInspectionTool() {
 
         scope.accept(object : PsiElementVisitor() {
             override fun visitFile(file: PsiFile) {
-                for (problem in checkFile(file, manager, dialyzerWarnsByModule)) {
+                val problems = ApplicationManager.getApplication().runReadAction<List<ProblemDescriptor>> {
+                    checkFile(file, manager, dialyzerWarnsByModule)
+                }
+                for (problem in problems) {
                     problemDescriptionsProcessor.addProblemElement(globalContext.refManager.getReference(file), problem)
                 }
             }
@@ -39,8 +47,10 @@ class Global : GlobalInspectionTool() {
 
         scope.accept(object : PsiElementVisitor() {
             override fun visitFile(file: PsiFile) {
-                ModuleUtil.findModuleForFile(file)?.let { module ->
-                    moduleSet.add(module)
+                ApplicationManager.getApplication().runReadAction {
+                    ModuleUtil.findModuleForFile(file)?.let { module ->
+                        moduleSet.add(module)
+                    }
                 }
             }
         })
@@ -58,8 +68,6 @@ class Global : GlobalInspectionTool() {
                   dialyzerWarnsByModule: Map<Module, MutableList<DialyzerWarn>>): List<ProblemDescriptor> {
         val problemsHolder = ProblemsHolder(manager, file, false)
 
-        // if the file isn't in a module, then we can't find its working directory or the SDK, so don't check the file
-        // further.
         ModuleUtil.findModuleForFile(file)?.let { module ->
             dialyzerWarnsByModule[module]?.let { dialyzerWarns ->
                 val filePath = (file.containingDirectory.toString() + File.separator + file.name)
