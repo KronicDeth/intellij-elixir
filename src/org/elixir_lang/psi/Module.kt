@@ -5,9 +5,11 @@ import com.intellij.openapi.util.Computable
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function
 import org.elixir_lang.psi.call.name.Module
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.jetbrains.annotations.Contract
 
 object Module {
+    @RequiresReadLock
     @JvmStatic
     fun `is`(call: Call): Boolean =
             (call.isCallingMacro(Module.KERNEL, Function.DEFMODULE, 2) &&
@@ -25,6 +27,7 @@ object Module {
                             }) != true) ||
                     call.isCalling(Module.MODULE, Function.CREATE, 3)
 
+    @RequiresReadLock
     @Contract(pure = true)
     fun name(call: Call): String = call.primaryArguments()!!.first()!!.text
 }

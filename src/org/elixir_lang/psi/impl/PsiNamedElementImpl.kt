@@ -8,17 +8,21 @@ import org.elixir_lang.module.RegisterAttribute
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function.UNQUOTE
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.jetbrains.annotations.Contract
 
 object PsiNamedElementImpl {
+    @RequiresReadLock
     @JvmStatic
     fun getName(alias: ElixirAlias): String {
         return alias.text
     }
 
+    @RequiresReadLock
     @JvmStatic
     fun getName(qualifiedAlias: QualifiedAlias): String = qualifiedAlias.text
 
+    @RequiresReadLock
     @JvmStatic
     fun getName(atom: ElixirAtom): String? =
         if (atom.line == null) {
@@ -27,6 +31,7 @@ object PsiNamedElementImpl {
             null
         }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun getName(namedElement: NamedElement): String? =
