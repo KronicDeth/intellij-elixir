@@ -7,6 +7,7 @@ import com.intellij.facet.impl.FacetUtil
 import com.intellij.ide.impl.OpenProjectTask
 import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
+import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
@@ -114,7 +115,11 @@ class DirectoryConfigurator : DirectoryProjectConfigurator {
                     true
                 ) {
                     override fun run(progressIndicator: ProgressIndicator) {
-                        for (module in ModuleManager.getInstance(otpAppProject).modules) {
+                        val modules = ReadAction.nonBlocking(java.util.concurrent.Callable {
+                            ModuleManager.getInstance(otpAppProject).modules
+                        }).executeSynchronously()
+
+                        for (module in modules) {
                             if (progressIndicator.isCanceled) {
                                 LOG.debug("canceled scanning libraries for newly attached project for OTP app ${otpApp.name}")
                                 break
