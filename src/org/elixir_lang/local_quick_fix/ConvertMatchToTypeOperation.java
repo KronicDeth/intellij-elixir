@@ -6,19 +6,11 @@ import com.intellij.lang.ASTNode;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.text.BlockSupport;
+import org.elixir_lang.psi.Operator;
+import org.elixir_lang.psi.impl.OperatorImplKt;
 import org.jetbrains.annotations.NotNull;
 
 public class ConvertMatchToTypeOperation implements LocalQuickFix {
-    @NotNull
-    private final ASTNode matchOperatorASTNode;
-
-    /*
-     * Constructors
-     */
-
-    public ConvertMatchToTypeOperation(@NotNull ASTNode matchOperatorASTNode) {
-        this.matchOperatorASTNode = matchOperatorASTNode;
-    }
 
     /*
      * Instance Methods
@@ -32,6 +24,7 @@ public class ConvertMatchToTypeOperation implements LocalQuickFix {
      */
     @Override
     public void applyFix(@NotNull Project project, @NotNull ProblemDescriptor descriptor) {
+        ASTNode matchOperatorASTNode = OperatorImplKt.operatorTokenNode((Operator) descriptor.getPsiElement());
         BlockSupport blockSupport = BlockSupport.getInstance(project);
         TextRange textRange = matchOperatorASTNode.getTextRange();
         blockSupport.reparseRange(
