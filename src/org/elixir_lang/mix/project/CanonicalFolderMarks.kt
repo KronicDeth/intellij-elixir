@@ -10,7 +10,7 @@ import com.intellij.openapi.project.ProjectBundle
  * terminology exactly (e.g. the "Mark Directory as" context menu labels).  This avoids hardcoded
  * strings that could drift if the platform renames these labels.
  *
- * Verified present in platform tags `idea/253.28294.334` (2025.3.2) and `idea/261.23567.138`
+ * Verified present in platform tags `idea/253.28294.334` (2025.3.2) and `idea/261.24374.151`
  * (2026.1.1) on 2026-05-03.
  */
 enum class FolderMark(private val bundleKey: String) {

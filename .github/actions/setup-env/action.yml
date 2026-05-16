@@ -14,7 +14,7 @@ inputs:
   idea-version:
     description: 'IntelliJ IDEA version to test against. Keep in sync with the matrix in shared-test.yml'
     required: false
-    default: '2026.1.1'  # should match first version in shared-test.yml
+    default: '2026.1.2'  # should match first version in shared-test.yml
   github-token:
     description: 'GitHub token for API access (required for setup-java to download JBR)'
     required: true
