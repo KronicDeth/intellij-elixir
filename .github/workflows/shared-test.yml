@@ -146,6 +146,12 @@ jobs:
           - 'rubymine:2026.1.2'
 
     steps:
+      - name: Sanitise IDE version for artifact names
+        id: sanitise
+        run: echo "ide-version=${IDE_VERSION//:/-}" >> "$GITHUB_OUTPUT"
+        env:
+          IDE_VERSION: ${{ matrix.ide-version }}
+
       - name: Download Plugin Zip
         id: download-plugin-zip
         uses: actions/download-artifact@v6
@@ -192,7 +198,7 @@ jobs:
         uses: actions/upload-artifact@v6
         if: ${{ always() && inputs.upload-reports }}
         with:
-          name: verify-plugin-reports-${{ matrix.ide-version }}
+          name: verify-plugin-reports-${{ steps.sanitise.outputs.ide-version }}
           path: |
             ${{ steps.verify-plugin.outputs.verification-output-log-filename }}
             ${{ steps.verify-plugin.outputs.verification-reports-dir }}
@@ -202,6 +208,6 @@ jobs:
         id: upload-plugin
         uses: actions/upload-artifact@v6
         with:
-          name: plugin-artifact-${{ matrix.ide-version }}
+          name: plugin-artifact-${{ steps.sanitise.outputs.ide-version }}
           path: build/distributions/*.zip
           retention-days: 1
