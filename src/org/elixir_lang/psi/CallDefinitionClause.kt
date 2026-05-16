@@ -4,6 +4,7 @@ import com.intellij.psi.ElementDescriptionLocation
 import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveState
 import com.intellij.usageView.UsageViewTypeLocation
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.NameArityInterval
 import org.elixir_lang.find_usages.Provider
 import org.elixir_lang.psi.call.Call
@@ -19,6 +20,7 @@ object CallDefinitionClause {
      *
      * @param call a def(macro)?p?
      */
+    @RequiresReadLock
     @JvmStatic
     fun enclosingModularMacroCall(call: Call): Call? {
         var enclosedCall = call
@@ -60,30 +62,42 @@ object CallDefinitionClause {
      * @param call a call that [.is].
      * @return element for `name(arg, ...) when ...` in `def* name(arg, ...) when ...`
      */
+    @RequiresReadLock
     @JvmStatic
     fun head(call: Call): PsiElement? = call.primaryArguments()?.firstOrNull()
 
+    @RequiresReadLock
     @JvmStatic
     fun `is`(call: Call): Boolean = isFunction(call) || isMacro(call) || isGuard(call)
 
+    @RequiresReadLock
     @JvmStatic
     fun isFunction(call: Call): Boolean = isPrivateFunction(call) || isPublicFunction(call)
+    @RequiresReadLock
     @JvmStatic
     fun isPublicFunction(call: Call): Boolean =
             isCallingKernelMacroOrHead(call, DEF) || isCallingKernelMacroOrHead(call, DEFMEMO)
+    @RequiresReadLock
     fun isPrivateFunction(call: Call): Boolean =
             isCallingKernelMacroOrHead(call, DEFP) || isCallingKernelMacroOrHead(call, DEFMEMOP)
 
+    @RequiresReadLock
     @JvmStatic
     fun isMacro(call: Call): Boolean = isPrivateMacro(call) || isPublicMacro(call)
+    @RequiresReadLock
     @JvmStatic
     fun isPublicMacro(call: Call): Boolean = isCallingKernelMacroOrHead(call, DEFMACRO)
+    @RequiresReadLock
     fun isPrivateMacro(call: Call): Boolean = isCallingKernelMacroOrHead(call, DEFMACROP)
 
+    @RequiresReadLock
     fun isGuard(call: Call): Boolean = isPrivateGuard(call) || isPublicGuard(call)
+    @RequiresReadLock
     fun isPublicGuard(call: Call): Boolean = isCallingKernelMacroOrHead(call, DEFGUARD)
+    @RequiresReadLock
     fun isPrivateGuard(call: Call): Boolean = isCallingKernelMacroOrHead(call, DEFGUARDP)
 
+    @RequiresReadLock
     fun isPublic(call: Call): Boolean = isPublicFunction(call) || isPublicMacro(call) || isPublicGuard(call)
 
     /**
@@ -94,10 +108,12 @@ object CallDefinitionClause {
      * default arguments are used, which produces an arity for each default argument that is turned on and off.
      * @see Call.resolvedFinalArityInterval
      */
+    @RequiresReadLock
     @JvmStatic
     fun nameArityInterval(call: Call, state: ResolveState): NameArityInterval? =
             head(call)?.let { CallDefinitionHead.nameArityInterval(it, state) }
 
+    @RequiresReadLock
     fun nameIdentifier(call: Call): PsiElement? = head(call)?.let { CallDefinitionHead.nameIdentifier(it) }
 
     private fun functionElementDescription(

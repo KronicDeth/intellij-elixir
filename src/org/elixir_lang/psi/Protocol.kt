@@ -6,6 +6,7 @@ import com.intellij.psi.ResolveState
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
 import com.intellij.util.Processor
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.beam.psi.impl.CallDefinitionImpl
 import org.elixir_lang.beam.psi.impl.ModuleImpl
 import org.elixir_lang.beam.psi.stubs.ModuleStub
@@ -15,6 +16,7 @@ import org.elixir_lang.psi.call.name.Function
 import org.elixir_lang.psi.stub.index.ImplementedProtocolName
 
 object Protocol {
+    @RequiresReadLock
     @JvmStatic
     fun `is`(call: Call): Boolean =
         call.isCallingMacro(org.elixir_lang.psi.call.name.Module.KERNEL, Function.DEFPROTOCOL, 2)

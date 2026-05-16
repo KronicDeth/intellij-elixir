@@ -23,8 +23,10 @@ import org.elixir_lang.psi.operation.Pipe
 import org.elixir_lang.psi.scope.WhileIn.whileIn
 import org.elixir_lang.util.AccumulatorContinue
 import org.elixir_lang.util.foldWhile
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.jetbrains.annotations.Contract
 
+@RequiresReadLock
 fun PsiElement.ancestorSequence() = generateSequence(this) { it.parent }
 fun PsiElement.document(): Document? = containingFile.viewProvider.let { viewProvider ->
     runReadAction {
@@ -32,6 +34,7 @@ fun PsiElement.document(): Document? = containingFile.viewProvider.let { viewPro
     }
 }
 
+@RequiresReadLock
 tailrec fun PsiElement.selfOrEnclosingMacroCall(): Call? =
     when (this) {
         is ElixirDoBlock ->
@@ -115,6 +118,7 @@ tailrec fun PsiElement.selfOrEnclosingMacroCall(): Call? =
 /**
  * @return `null` if this element is at top-level
  */
+@RequiresReadLock
 @Contract(pure = true)
 fun PsiElement.enclosingMacroCall(): Call? = parent.selfOrEnclosingMacroCall()
 
@@ -128,6 +132,7 @@ private val isModuleName = { c: PsiElement -> c is MaybeModuleName && c.isModule
 fun PsiElement.isInsideModule(): Boolean =
     findParentInFile(withSelf = true) { e -> e.children.any(isModuleName) } != null
 
+@RequiresReadLock
 fun PsiElement.getModuleName(): String? {
     // findParentInFile stops at PsiFile boundary, never touches PsiDirectory - avoids DiskQueryRelay VFS I/O
     return findParentInFile(withSelf = true) { e ->
@@ -174,6 +179,7 @@ fun <R> PsiElement.foldChildrenWhile(
             AccumulatorContinue(initial, true)
     }
 
+@RequiresReadLock
 fun PsiElement.macroChildCallList(): MutableList<Call> {
     val callList: MutableList<Call>
 
