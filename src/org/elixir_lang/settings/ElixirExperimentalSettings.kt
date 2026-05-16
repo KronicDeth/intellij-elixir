@@ -23,7 +23,8 @@ class ElixirExperimentalSettings : PersistentStateComponent<ElixirExperimentalSe
         var enableHtmlInjection: Boolean = false,
 //        var enableDeleteSdkSmallIDE: Boolean = false,
         var enableStatusBarWidget : Boolean = false,
-        var enableLiteralSigilInjection: Boolean = false
+        var enableLiteralSigilInjection: Boolean = false,
+        var enableMixDepsCheck: Boolean = true
     )
 
     private var elixirSettingsState = State()

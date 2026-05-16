@@ -62,6 +62,16 @@ internal class ElixirExperimentalSettingsConfigurable : Configurable, Configurab
 //                        )
 //                }
 //            }
+            group("Mix Deps Checker") {
+                row {
+                    checkBox("Enable automatic Mix deps checking")
+                        .comment("Checks dependency status on project open and when mix.exs/mix.lock changes. Requires an Elixir SDK to be configured.")
+                        .bindSelected(
+                            getter = { settings.state.enableMixDepsCheck },
+                            setter = { settings.state.enableMixDepsCheck = it }
+                        )
+                }
+            }
             //
         }
         return settingsPanel!!
@@ -97,7 +107,7 @@ internal class ElixirExperimentalSettingsConfigurable : Configurable, Configurab
         messageBus.syncPublisher(ElixirExperimentalSettings.SETTINGS_CHANGED_TOPIC).settingsChanged(oldState, newState)
     }
 
-    override fun getDisplayName(): String = "Experimental Settings"
+    override fun getDisplayName(): String = "Elixir Settings"
 
     override fun reset() {
         settingsPanel?.reset()

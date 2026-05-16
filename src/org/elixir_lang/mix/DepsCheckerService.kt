@@ -19,6 +19,7 @@ import com.intellij.util.Alarm
 import org.elixir_lang.notification.setup_sdk.Notifier
 import org.elixir_lang.package_manager.DepsStatusResult
 import org.elixir_lang.package_manager.virtualFile
+import org.elixir_lang.settings.ElixirExperimentalSettings
 import org.elixir_lang.sdk.elixir.Type as ElixirSdkType
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -73,12 +74,23 @@ class DepsCheckerService(private val project: Project) : Disposable {
             if (project.isDisposed) {
                 return
             }
+
+            if (!ElixirExperimentalSettings.instance.state.enableMixDepsCheck) {
+                LOG.debug("DepsCheckerService: Mix deps check disabled in settings")
+                return
+            }
+
             LOG.debug("DepsCheckerService: Checking Mix deps ($reason)")
             val (sdk, projectRoots) = ReadAction.nonBlocking(java.util.concurrent.Callable {
                 val sdk = findElixirSdk(project)
                 val roots = selectTopLevelMixRoots(ProjectRootManager.getInstance(project).contentRootsFromAllModules)
                 sdk to roots
             }).executeSynchronously()
+
+            if (sdk == null) {
+                LOG.debug("DepsCheckerService: Skipping mix deps check, no Elixir SDK configured")
+                return
+            }
 
             var sawSupported = false
             var sawNonOk = false
