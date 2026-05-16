@@ -49,12 +49,14 @@ runs:
         large-packages: false
         docker-images: ${{ inputs.free-docker-images == 'true' }}
 
-    - name: Cache JetBrains JDK
-      id: cache-jdk
-      uses: actions/cache@v5
+    - name: Restore JetBrains Runtime cache
+      id: cache-jbr
+      uses: actions/cache/restore@v5
       with:
-        path: /opt/hostedtoolcache/Java_JetBrains_*
-        key: jdk-${{ runner.os }}-${{ runner.arch }}-jetbrains-21
+        path: ${{ runner.tool_cache }}/Java_JetBrains_*
+        key: jbr-${{ runner.os }}-${{ runner.arch }}-21
+        restore-keys: |
+          jbr-${{ runner.os }}-${{ runner.arch }}-21
 
     - name: Setup JBR 21
       id: setup-java
@@ -66,6 +68,14 @@ runs:
         token: ${{ inputs.github-token }}
       env:
         GITHUB_TOKEN: ${{ inputs.github-token }}
+
+    - name: Save JetBrains Runtime cache
+      id: cache-jbr-save
+      if: always() && steps.cache-jbr.outputs.cache-hit != 'true' && steps.setup-java.outcome == 'success'
+      uses: actions/cache/save@v5
+      with:
+        path: ${{ runner.tool_cache }}/Java_JetBrains_*
+        key: jbr-${{ runner.os }}-${{ runner.arch }}-${{ steps.setup-java.outputs.version }}
 
     # This sets project properties, allowing us to override gradle.properties via environment variables,
     # applying to all Gradle tasks. Means we don't need to do like `./gradlew -PplatformVersion=xxx`
