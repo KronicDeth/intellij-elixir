@@ -1,5 +1,16 @@
 # Changelog
 
+## v23.8.2
+
+### Enhancements
+* Added `@RequiresReadLock` annotations to PSI-accessing methods across 10 files (`CallDefinitionClause`, `Definition`, `Implementation`, `Module`, `Protocol`, `ElixirPsiImplUtil`, `PsiElementImpl`, `PsiNamedElementImpl`, `CallImpl`, `CanonicallyNamedImpl`). Enables the `ThreadingConcurrency` inspection to statically detect callers that don't hold the read lock. - [@joshuataylor](https://github.com/joshuataylor)
+
+### Build
+* [#3830](https://github.com/KronicDeth/intellij-elixir/pull/3830) - [@joshuataylor](https://github.com/joshuataylor)
+  * Bumped IntelliJ 2026.1.x target to 2026.1.2.
+* Bumped Gradle to 9.5.1. - [@joshuataylor](https://github.com/joshuataylor)
+* Bumped intellij-platform plugin to 2.16.0. - [@joshuataylor](https://github.com/joshuataylor)
+
 ## v23.8.1
 
 ### Bug Fixes
