@@ -3,6 +3,7 @@ package org.elixir_lang.psi.impl
 import com.intellij.openapi.application.runReadAction
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.module.ModuleUtilCore
+import com.intellij.openapi.progress.ProgressManager
 import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiNamedElement
@@ -190,6 +191,7 @@ fun PsiElement.macroChildCallList(): MutableList<Call> {
 
         var child: PsiElement? = firstChild
         while (child != null) {
+            ProgressManager.checkCanceled()
             if (child is Call) {
                 callList.add(child)
             } else if (child is ElixirAccessExpression) {

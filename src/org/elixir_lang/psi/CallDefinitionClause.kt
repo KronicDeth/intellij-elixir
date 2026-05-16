@@ -1,5 +1,6 @@
 package org.elixir_lang.psi
 
+import com.intellij.openapi.progress.ProgressManager
 import com.intellij.psi.ElementDescriptionLocation
 import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveState
@@ -27,6 +28,7 @@ object CallDefinitionClause {
         var enclosingMacroCall: Call?
 
         while (true) {
+            ProgressManager.checkCanceled()
             enclosingMacroCall = enclosedCall.enclosingMacroCall()
 
             if (enclosingMacroCall != null &&

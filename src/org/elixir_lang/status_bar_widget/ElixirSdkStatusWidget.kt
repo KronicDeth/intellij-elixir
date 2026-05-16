@@ -26,7 +26,7 @@ import com.intellij.ui.ClickListener
 import com.intellij.ui.awt.RelativePoint
 import com.intellij.util.messages.MessageBusConnection
 import com.intellij.util.ui.JBUI
-import com.intellij.openapi.application.EDT
+import com.intellij.openapi.application.UI
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.cancel
@@ -226,7 +226,7 @@ class ElixirSdkStatusWidget(@param:NotNull private val project: Project) : Custo
             val presentation = createPresentation(sdkStatus)
             cachedPresentation = presentation
 
-            withContext(Dispatchers.EDT) {
+            withContext(Dispatchers.UI) {
                 component.text = presentation.text
                 component.icon = presentation.icon
                 component.toolTipText = presentation.tooltip
