@@ -43,7 +43,7 @@ jobs:
         os: [ ubuntu-22.04, windows-2025 ]
         idea-version:
             - '2026.1.2'
-            - '2025.3.2'
+            - '2025.3.5'
             # 2026.2 upgrades to Java 25, won't work in CI until we resolve issues. https://github.com/JetBrains/intellij-community/commit/aa1cfa9632ab
             # - 'LATEST-EAP-SNAPSHOT'
 
