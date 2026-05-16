@@ -35,9 +35,9 @@ class ElixirSearchableOptionContributor : SearchableOptionContributor() {
         addAliases(
             processor = processor,
             configurableId = "org.elixir_lang.settings.ElixirExperimentalSettingsConfigurable",
-            configurableDisplayName = "Experimental Settings",
-            hit = "Experimental Settings",
-            text = "elixir experimental settings liveview heex sigil injection"
+            configurableDisplayName = "Elixir Settings",
+            hit = "Elixir Settings",
+            text = "elixir settings liveview heex sigil injection mix deps"
         )
 
         addAliases(

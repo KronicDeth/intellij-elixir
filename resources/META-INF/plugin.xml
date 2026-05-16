@@ -99,7 +99,7 @@
 
         <projectConfigurable
                 parentId="language.elixir"
-                displayName="Experimental Settings"
+                displayName="Elixir Settings"
                 id="org.elixir_lang.settings.ElixirExperimentalSettingsConfigurable"
                 instance="org.elixir_lang.settings.ElixirExperimentalSettingsConfigurable"/>
 
