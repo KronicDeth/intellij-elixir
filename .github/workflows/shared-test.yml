@@ -202,6 +202,6 @@ jobs:
         id: upload-plugin
         uses: actions/upload-artifact@v6
         with:
-          name: plugin-artifact
+          name: plugin-artifact-${{ matrix.ide-version }}
           path: build/distributions/*.zip
           retention-days: 1
