@@ -1,6 +1,19 @@
 <html>
 <body>
 
+<h1>v23.8.0</h1>
+<ul>
+    <li>
+        <p>Bug Fixes</p>
+        <ul>
+            <li>Fixed "Read access is allowed from inside read-action only" crashes across multiple subsystems on IntelliJ 2025.2+ -- Dialyzer inspection, Credo inspection, status bar SDK widget, reference search, Mix watcher, dependency watcher, dependency checker, OTP app detection, and the Reconfigure Module Setup action.</li>
+            <li>Dialyzer inspection no longer holds the read lock for the entire duration of the Dialyzer process execution. Read access is now acquired only when accessing PSI/model data, reducing write-action contention.</li>
+            <li>Status bar SDK widget now detects SDK status on a background thread and updates the UI on the EDT, preventing freezes during project root or SDK changes.</li>
+            <li>Reduced spurious IDE error notifications from the BEAM decompiler and documentation provider when encountering newer OTP AST nodes or unhandled element types.</li>
+        </ul>
+    </li>
+</ul>
+
 <h1>v23.7.0</h1>
 <ul>
     <li>
