@@ -58,7 +58,7 @@ class MatchOperatorInsteadOfTypeOperator : LocalInspectionTool() {
                                             relativeStart + nodeTextLength
                                     )
 
-                                    val localQuickFix = ConvertMatchToTypeOperation(astNode)
+                                    val localQuickFix = ConvertMatchToTypeOperation()
 
                                     problemsHolder.registerProblem(
                                             operator,
