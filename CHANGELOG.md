@@ -1,5 +1,11 @@
 # Changelog
 
+## v23.8.1
+
+### Bug Fixes
+* `BulkDecompilation` -- wrapped `ModuleManager.modules`, `ModuleRootManager.sdk`/`.contentRoots`, and `ProjectRootManager.projectSdk` access in `readAction {}`. Previously accessed on `Dispatchers.Default` without a read lock, causing crashes on 2025.2+. - [@joshuataylor](https://github.com/joshuataylor)
+* `DirectoryConfigurator` -- wrapped `ModuleManager.getInstance(otpAppProject).modules` in `ReadAction.nonBlocking` inside `Task.Backgroundable` for newly attached umbrella sub-projects. - [@joshuataylor](https://github.com/joshuataylor)
+
 ## v23.8.0
 
 ### Bug Fixes

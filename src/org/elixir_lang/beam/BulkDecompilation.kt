@@ -36,18 +36,25 @@ class BulkDecompilation : AnAction() {
                     withContext(Dispatchers.Default) {
                         val sdkSet = mutableSetOf<Sdk>()
                         val psiManager = PsiManager.getInstance(project)
-                        val modules = ModuleManager.getInstance(project).modules
 
-                        if (modules.isNotEmpty()) {
-                            reportSequentialProgress(modules.size) { reporter ->
-                                for (module in modules) {
-                                    reporter.itemStep("Module ${module.name}") {
+                        data class ModuleInfo(val name: String, val sdk: Sdk?, val contentRoots: Array<VirtualFile>)
+
+                        val moduleInfos = readAction {
+                            ModuleManager.getInstance(project).modules.map { module ->
+                                val mrm = ModuleRootManager.getInstance(module)
+                                ModuleInfo(module.name, mrm.sdk, mrm.contentRoots)
+                            }
+                        }
+
+                        if (moduleInfos.isNotEmpty()) {
+                            reportSequentialProgress(moduleInfos.size) { reporter ->
+                                for (info in moduleInfos) {
+                                    reporter.itemStep("Module ${info.name}") {
                                         ProgressManager.checkCanceled()
 
-                                        val moduleRootManager = ModuleRootManager.getInstance(module)
-                                        moduleRootManager.sdk?.let { sdkSet.add(it) }
+                                        info.sdk?.let { sdkSet.add(it) }
 
-                                        for (contentRoot in moduleRootManager.contentRoots) {
+                                        for (contentRoot in info.contentRoots) {
                                             ProgressManager.checkCanceled()
                                             decompile(psiManager, contentRoot)
                                         }
@@ -56,7 +63,9 @@ class BulkDecompilation : AnAction() {
                             }
                         }
 
-                        ProjectRootManager.getInstance(project).projectSdk?.let { sdkSet.add(it) }
+                        readAction {
+                            ProjectRootManager.getInstance(project).projectSdk
+                        }?.let { sdkSet.add(it) }
 
                         if (sdkSet.isNotEmpty()) {
                             reportSequentialProgress(sdkSet.size) { reporter ->
