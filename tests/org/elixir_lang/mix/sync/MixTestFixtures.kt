@@ -248,7 +248,12 @@ object MixTestFixtures {
         val toRemove = ModuleRootManager.getInstance(module).contentEntries
             .filter { entry -> entry.url.startsWith(tempDirUrl) }
         if (toRemove.isNotEmpty()) {
-            // ModuleRootModificationUtil.updateModel runs inside a write action internally.
+            // ModuleRootModificationUtil.updateModel uses ApplicationManager.invokeAndWait
+            // internally. In test tearDown the call always originates from the EDT thread,
+            // so invokeAndWait is a same-thread no-op and there is no deadlock risk.
+            // Production sync code must NOT use this helper (it would deadlock on any
+            // coroutine-dispatched thread), which is why WritePlanApplicator uses direct
+            // modifiableModel.commit() inside edtWriteAction instead.
             ModuleRootModificationUtil.updateModel(module) { model ->
                 toRemove.forEach { entry ->
                     model.contentEntries

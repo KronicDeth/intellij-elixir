@@ -94,7 +94,7 @@ sealed class SyncRequest(
     }
 }
 
-private val SOURCE_NAMES = setOf("c_src", "lib", "priv", "src")
+private val SOURCE_NAMES get() = MIX_DEP_SOURCE_DIR_NAMES
 
 /**
  * Classifies a single VFS event into a [SyncRequest], or returns `null` if the event does not
@@ -188,11 +188,12 @@ internal fun classifyByPath(file: VirtualFile): SyncRequest? {
         return SyncRequest.BuildPath(greatGrandParent)
     }
 
-    // deps/<dep>/lib|src|priv|c_src
+    // deps/<dep>/lib|src|priv|c_src - early return; greatGreatGrandParent not needed
     if (fileName in SOURCE_NAMES && grandParent.name == "deps") {
         return SyncRequest.DepRoot(parent)
     }
 
+    // Only compute the fourth-level ancestor when the remaining checks actually need it.
     val greatGreatGrandParent = greatGrandParent.parent ?: return null
 
     // _build/<env>/lib/<dep>
