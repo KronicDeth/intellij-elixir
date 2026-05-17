@@ -107,7 +107,7 @@ runs:
         cache-disabled: true
         add-job-summary-as-pr-comment: 'on-failure'
         build-scan-publish: ${{ inputs.build-scan-publish }}
-        build-scan-terms-of-use-url: 'https://gradle.com/terms-of-service'
+        build-scan-terms-of-use-url: 'https://gradle.com/help/legal-terms-of-use'
         build-scan-terms-of-use-agree: 'yes'
         github-token: ${{ inputs.github-token }}
 

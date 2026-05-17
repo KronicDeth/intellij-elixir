@@ -2,5 +2,5 @@ plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
 rootProject.name = "intellij-elixir"
-include( "jps-shared")
-include( "jps-builder")
+include("jps-shared")
+include("jps-builder")
