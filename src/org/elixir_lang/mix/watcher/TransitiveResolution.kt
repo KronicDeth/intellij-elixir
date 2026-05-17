@@ -8,7 +8,13 @@ import org.elixir_lang.mix.Dep
 import java.util.*
 
 object TransitiveResolution {
-    fun transitiveResolution(
+    /**
+     * Computes the full set of transitive deps reachable from [rootVirtualFiles].
+     *
+     * Delegates PSI reads to [Resolution.resolution] which uses WARA ([com.intellij.openapi.application.readAction]) internally,
+     * allowing write actions to preempt without blocking the EDT.
+     */
+    suspend fun transitiveResolution(
             project: Project,
             psiManager: PsiManager,
             progressIndicator: ProgressIndicator,
@@ -17,6 +23,7 @@ object TransitiveResolution {
         Resolution.resolution(project, psiManager, progressIndicator, *rootVirtualFiles)
                 .let { transitiveResolution(it, *rootVirtualFiles) }
 
+    // Non-suspend: walks pre-computed maps with no PSI access.
     private fun transitiveResolution(resolution: Resolution, vararg rootVirtualFiles: VirtualFile): Set<Dep> {
         val visitedDepSet = mutableSetOf<Dep>()
         val unvisitedDepQueue = ArrayDeque<Dep>()
