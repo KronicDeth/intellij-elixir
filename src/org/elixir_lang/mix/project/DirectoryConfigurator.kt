@@ -7,7 +7,7 @@ import com.intellij.facet.impl.FacetUtil
 import com.intellij.ide.impl.OpenProjectTask
 import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
-import com.intellij.openapi.application.ReadAction
+import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
@@ -24,10 +24,10 @@ import com.intellij.platform.DirectoryProjectConfigurator
 import com.intellij.platform.PlatformProjectOpenProcessor.Companion.runDirectoryProjectConfigurators
 import com.intellij.projectImport.ProjectAttachProcessor
 import kotlinx.coroutines.runBlocking
-import org.elixir_lang.DepsWatcher
 import org.elixir_lang.Facet
 import org.elixir_lang.mix.Project.addFolders
-import org.elixir_lang.mix.Watcher
+import org.elixir_lang.mix.sync.MixDepsSyncService
+import org.elixir_lang.mix.sync.SyncRequest
 import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.io.path.exists
@@ -93,12 +93,7 @@ class DirectoryConfigurator : DirectoryProjectConfigurator {
                 addFolders(modifiableRootModel, otpApp.root)
             }
 
-            ProgressManager.getInstance()
-                .run(object : Task.Backgroundable(project, "Scanning deps for Libraries", true) {
-                    override fun run(indicator: ProgressIndicator) {
-                        DepsWatcher(project).syncLibraries(indicator)
-                    }
-                })
+            project.service<MixDepsSyncService>().enqueue(SyncRequest.All)
         }
     }
 
@@ -109,27 +104,7 @@ class DirectoryConfigurator : DirectoryProjectConfigurator {
                 attachToProject(rootProject, Paths.get(otpApp.root.path))
 
                 LOG.debug("scanning libraries for newly attached project for OTP app ${otpApp.name}")
-                ProgressManager.getInstance().run(object : Task.Backgroundable(
-                    otpAppProject,
-                    "Scanning mix.exs to connect libraries for newly attached project for OTP app ${otpApp.name}",
-                    true
-                ) {
-                    override fun run(progressIndicator: ProgressIndicator) {
-                        val modules = ReadAction.nonBlocking(java.util.concurrent.Callable {
-                            ModuleManager.getInstance(otpAppProject).modules
-                        }).executeSynchronously()
-
-                        for (module in modules) {
-                            if (progressIndicator.isCanceled) {
-                                LOG.debug("canceled scanning libraries for newly attached project for OTP app ${otpApp.name}")
-                                break
-                            }
-                            LOG.debug("scanning libraries for newly attached project for OTP app ${otpApp.name} for module ${module.name}")
-
-                            Watcher(otpAppProject).syncLibraries(module, progressIndicator)
-                        }
-                    }
-                })
+                otpAppProject.service<MixDepsSyncService>().enqueue(SyncRequest.All)
             }
         }
     }
