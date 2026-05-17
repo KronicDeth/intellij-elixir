@@ -2,6 +2,7 @@ package org.elixir_lang.mix.sync
 
 import com.google.common.annotations.VisibleForTesting
 import com.intellij.openapi.application.edtWriteAction
+import com.intellij.openapi.application.readAction
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.module.Module
@@ -17,7 +18,6 @@ import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar
 import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.platform.ide.progress.withBackgroundProgress
-import com.intellij.platform.util.progress.reportSequentialProgress
 import com.intellij.psi.PsiManager
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
@@ -26,6 +26,7 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.elixir_lang.mix.Dep
+import org.elixir_lang.mix.Project as MixProject
 import org.elixir_lang.mix.library.Kind
 import org.elixir_lang.mix.watcher.TransitiveResolution.transitiveResolution
 import java.net.URI
@@ -58,6 +59,50 @@ import kotlin.time.Duration.Companion.milliseconds
  */
 @Service(Service.Level.PROJECT)
 class MixDepsSyncService(private val project: Project, cs: CoroutineScope) {
+    private data class CoalescedRequests(
+        val deleteAlls: List<SyncRequest.DeleteAll>,
+        val deleteOnes: List<SyncRequest.DeleteOne>,
+        val hasAll: Boolean,
+        val depsRoots: List<SyncRequest.DepsRoot>,
+        val depRoots: List<SyncRequest.DepRoot>,
+        val syncModuleNames: Set<String>,
+    )
+
+    private data class DeleteAllPlan(val depsUrl: String)
+
+    private data class DeleteOnePlan(val depName: String)
+
+    private data class ExcludeFolderPlan(
+        val moduleName: String,
+        val folderUrl: String,
+    )
+
+    private data class LibraryRootsPlan(
+        val depName: String,
+        val classRootUrls: List<String>,
+        val sourceRootUrls: List<String>,
+        val excludeFolders: List<ExcludeFolderPlan>,
+    )
+
+    private data class ModuleDepsPlan(
+        val moduleName: String,
+        val moduleDeps: Set<String>,
+        val libraryDeps: Set<String>,
+        val externalLibraryPlans: List<LibraryRootsPlan>,
+    )
+
+    private data class SyncPlan(
+        val deleteAlls: List<DeleteAllPlan> = emptyList(),
+        val deleteOnes: List<DeleteOnePlan> = emptyList(),
+        val libraryPlans: List<LibraryRootsPlan> = emptyList(),
+        val modulePlans: List<ModuleDepsPlan> = emptyList(),
+    ) {
+        val isEmpty: Boolean
+            get() = deleteAlls.isEmpty() &&
+                deleteOnes.isEmpty() &&
+                libraryPlans.isEmpty() &&
+                modulePlans.isEmpty()
+    }
 
     // ------------------------------------------------------------------
     // Pending request accumulator (thread-safe, filled from VFS callbacks)
@@ -164,165 +209,353 @@ class MixDepsSyncService(private val project: Project, cs: CoroutineScope) {
             // old (now-returned) set (if they completed before getAndSet) or in the new empty set
             // (if they run after), where they will be picked up by the next drain triggered by
             // their own tryEmit(). No request can be silently dropped.
-            val requests: List<SyncRequest> = pendingRequests.getAndSet(emptySet()).toList()
+            val rawRequests: List<SyncRequest> = pendingRequests.getAndSet(emptySet()).toList()
+            if (rawRequests.isEmpty()) return
+
+            val requests = resolvePathShapedRequests(rawRequests)
             if (requests.isEmpty()) return
 
             val drainStartNs = System.nanoTime()
             LOG.debug("MixDepsSyncService: draining ${requests.size} request(s)")
 
-            // Coalesce: separate into typed buckets.
-            val deleteAlls = requests.filterIsInstance<SyncRequest.DeleteAll>()
-            val deleteOnes = requests.filterIsInstance<SyncRequest.DeleteOne>()
-            val hasAll = requests.any { it is SyncRequest.All }
-            // URLs of every tree being deleted - used to suppress syncs for the same tree.
-            // A DepsRoot or DepRoot whose path falls under a DeleteAll URL is dropped:
-            // the delete will already remove those libraries, and a sync against a
-            // (possibly deleted) tree immediately after would race or re-populate incorrectly.
-            val deleteAllUrls: Set<String> = deleteAlls.map { it.depsUrl }.toSet()
-            val depsRoots = if (hasAll) emptyList() else {
-                requests.filterIsInstance<SyncRequest.DepsRoot>()
-                    .filter { dr -> deleteAllUrls.none { url -> dr.depsRoot.url == url } }
-            }
-            val depRoots = if (hasAll) emptyList() else {
-                // Drop any DepRoot whose parent DepsRoot is already being synced.
-                val depsRootUrls = depsRoots.map { it.depsRoot.url }.toSet()
-                requests.filterIsInstance<SyncRequest.DepRoot>()
-                    .filter { r -> depsRootUrls.none { url -> r.depRoot.parent?.url == url } }
-                    // Drop any DepRoot whose parent is being deleted by a DeleteAll.
-                    .filter { r -> deleteAllUrls.none { url -> r.depRoot.parent?.url == url } }
-            }
-            val syncModules = requests.filterIsInstance<SyncRequest.SyncModule>()
-                .map { it.module }
-                .filter { !it.isDisposed }
-                .toSet()
-
-            // Execute deletes first so that a delete followed by a re-sync in the same drain
-            // does not re-populate libraries that were intentionally removed.
-            if (deleteAlls.isNotEmpty() || deleteOnes.isNotEmpty()) {
-                withBackgroundProgress(project, "Removing Elixir dep libraries") {
-                    // Single edtWriteAction batch: groups all deletes into one EDT round-trip.
-                    edtWriteAction {
-                        for (req in deleteAlls) {
-                            if (!project.isDisposed) deleteAllLibraries(req.depsUrl)
-                        }
-                        for (req in deleteOnes) {
-                            if (!project.isDisposed) deleteLibrary(req.depName)
-                        }
-                    }
+            val coalescedRequests = coalesceRequests(requests)
+            val syncPlan = withBackgroundProgress(project, "Syncing Elixir dependencies") {
+                withContext(Dispatchers.Default) {
+                    buildSyncPlan(coalescedRequests)
                 }
             }
 
-            // Execute dep-tree syncs.
-            if (hasAll) {
-                executeSyncAll()
-            } else if (depsRoots.isNotEmpty() || depRoots.isNotEmpty()) {
-                executeSyncRequests(
-                    depsRoots.map { it.depsRoot }.filter { it.isValid }.toSet(),
-                    depRoots.map { it.depRoot }.filter { it.isValid }.toSet()
-                )
-            }
-
-            // Execute per-module mix.exs re-syncs.
-            if (syncModules.isNotEmpty()) {
-                withBackgroundProgress(project, "Syncing Libraries from mix.exs") {
-                    withContext(Dispatchers.Default) {
-                        reportSequentialProgress(syncModules.size) { reporter ->
-                            for (module in syncModules) {
-                                reporter.itemStep("Syncing ${module.name}") {
-                                    ProgressManager.checkCanceled()
-                                    if (!module.isDisposed && !project.isDisposed) {
-                                        syncLibrariesForModule(module)
-                                    }
-                                }
-                            }
-                        }
-                    }
+            if (!syncPlan.isEmpty) {
+                withBackgroundProgress(project, "Applying Elixir dependency sync") {
+                    applySyncPlan(syncPlan)
                 }
             }
 
             val elapsedMs = (System.nanoTime() - drainStartNs) / 1_000_000
             LOG.debug(
                 "MixDepsSyncService: drain complete - ${requests.size} request(s) in ${elapsedMs}ms " +
-                    "(deleteAlls=${deleteAlls.size}, deleteOnes=${deleteOnes.size}, " +
-                    "hasAll=$hasAll, depsRoots=${depsRoots.size}, depRoots=${depRoots.size}, " +
-                    "syncModules=${syncModules.size})"
+                    "(deleteAlls=${coalescedRequests.deleteAlls.size}, " +
+                    "deleteOnes=${coalescedRequests.deleteOnes.size}, " +
+                    "hasAll=${coalescedRequests.hasAll}, " +
+                    "depsRoots=${coalescedRequests.depsRoots.size}, " +
+                    "depRoots=${coalescedRequests.depRoots.size}, " +
+                    "syncModules=${coalescedRequests.syncModuleNames.size}, " +
+                    "libraryPlans=${syncPlan.libraryPlans.size}, " +
+                    "modulePlans=${syncPlan.modulePlans.size})"
             )
         }
     }
 
-    // ------------------------------------------------------------------
-    // Dep-tree sync execution
-    // ------------------------------------------------------------------
+    private fun coalesceRequests(requests: List<SyncRequest>): CoalescedRequests {
+        val deleteAlls = requests.filterIsInstance<SyncRequest.DeleteAll>()
+        val deleteOnes = requests.filterIsInstance<SyncRequest.DeleteOne>()
+        val hasAll = requests.any { it is SyncRequest.All }
+        val deleteAllUrls = deleteAlls.map { it.depsUrl }.toSet()
 
-    private suspend fun executeSyncAll() {
-        withBackgroundProgress(project, "Syncing Elixir libraries") {
-            withContext(Dispatchers.Default) {
-                syncAllLibraries()
+        val depsRoots = if (hasAll) emptyList() else {
+            requests.filterIsInstance<SyncRequest.DepsRoot>()
+                .filter { depsRoot -> deleteAllUrls.none { url -> depsRoot.depsRoot.url == url } }
+        }
+
+        val depRoots = if (hasAll) emptyList() else {
+            val depsRootUrls = depsRoots.map { it.depsRoot.url }.toSet()
+            requests.filterIsInstance<SyncRequest.DepRoot>()
+                .filter { depRoot -> depsRootUrls.none { url -> depRoot.depRoot.parent?.url == url } }
+                .filter { depRoot -> deleteAllUrls.none { url -> depRoot.depRoot.parent?.url == url } }
+        }
+
+        val syncModuleNames = requests.filterIsInstance<SyncRequest.SyncModule>()
+            .mapTo(LinkedHashSet()) { it.moduleName }
+
+        return CoalescedRequests(
+            deleteAlls = deleteAlls,
+            deleteOnes = deleteOnes,
+            hasAll = hasAll,
+            depsRoots = depsRoots,
+            depRoots = depRoots,
+            syncModuleNames = syncModuleNames,
+        )
+    }
+
+    private suspend fun buildSyncPlan(requests: CoalescedRequests): SyncPlan {
+        val requestedLibraryPlans = when {
+            requests.hasAll -> buildLibraryRootsPlans(allDepRoots())
+            requests.depsRoots.isNotEmpty() || requests.depRoots.isNotEmpty() -> {
+                val depRoots = readAction {
+                    requests.depsRoots.flatMap { depsRoot ->
+                        if (depsRoot.depsRoot.isValid) depsRoot.depsRoot.children.toList() else emptyList()
+                    } + requests.depRoots.mapNotNull { depRoot ->
+                        depRoot.depRoot.takeIf { it.isValid }
+                    }
+                }
+                buildLibraryRootsPlans(depRoots)
             }
+            else -> emptyList()
+        }
+
+        val moduleNames = LinkedHashSet(requests.syncModuleNames)
+        if (requestedLibraryPlans.isNotEmpty()) {
+            moduleNames += allModuleNames()
+        }
+
+        val modulePlans = buildModuleDepsPlans(moduleNames)
+        val externalLibraryPlans = modulePlans.flatMap { it.externalLibraryPlans }
+        val libraryPlans = deduplicateLibraryPlans(requestedLibraryPlans + externalLibraryPlans)
+
+        return SyncPlan(
+            deleteAlls = requests.deleteAlls.map { DeleteAllPlan(it.depsUrl) },
+            deleteOnes = requests.deleteOnes.map { DeleteOnePlan(it.depName) },
+            libraryPlans = libraryPlans,
+            modulePlans = modulePlans,
+        )
+    }
+
+    private suspend fun allDepRoots(): List<VirtualFile> =
+        readAction {
+            ProjectRootManager
+                .getInstance(project)
+                .contentRootsFromAllModules
+                .flatMap { contentRoot -> contentRoot.findChild("deps")?.children?.toList() ?: emptyList() }
+        }
+
+    private suspend fun allModuleNames(): List<String> =
+        readAction {
+            ModuleManager
+                .getInstance(project)
+                .modules
+                .filter { !it.isDisposed }
+                .map { it.name }
+        }
+
+    private suspend fun buildModuleDepsPlans(moduleNames: Set<String>): List<ModuleDepsPlan> {
+        if (moduleNames.isEmpty()) return emptyList()
+
+        return moduleNames.mapNotNull { moduleName ->
+            ProgressManager.checkCanceled()
+            buildModuleDepsPlan(moduleName)
         }
     }
 
-    private suspend fun executeSyncRequests(
-        depsRoots: Set<VirtualFile>,
-        depRoots: Set<VirtualFile>
-    ) {
-        if (depsRoots.isEmpty() && depRoots.isEmpty()) return
+    private suspend fun buildModuleDepsPlan(moduleName: String): ModuleDepsPlan? {
+        val contentRoots = readAction {
+            ModuleManager
+                .getInstance(project)
+                .findModuleByName(moduleName)
+                ?.takeIf { !it.isDisposed }
+                ?.let { ModuleRootManager.getInstance(it).contentRoots }
+                ?: return@readAction null
+        } ?: return null
 
-        val totalWork = depsRoots.size + depRoots.size
-        withBackgroundProgress(project, "Syncing Elixir libraries") {
-            withContext(Dispatchers.Default) {
-                reportSequentialProgress(totalWork) { reporter ->
-                    for (depsRoot in depsRoots) {
-                        reporter.itemStep("Syncing deps under ${depsRoot.name}") {
-                            ProgressManager.checkCanceled()
-                            syncLibrariesUnderDepsRoot(depsRoot)
-                        }
-                    }
-                    for (depRoot in depRoots) {
-                        reporter.itemStep("Syncing dep ${depRoot.name}") {
-                            ProgressManager.checkCanceled()
-                            syncSingleDepRoot(depRoot)
-                        }
+        val psiManager = PsiManager.getInstance(project)
+        val indicator = EmptyProgressIndicator()
+        val deps = transitiveResolution(project, psiManager, indicator, *contentRoots).toList()
+        if (deps.isEmpty()) return null
+
+        val externalLibraryPlans = buildExternalLibraryPlans(deps)
+
+        return ModuleDepsPlan(
+            moduleName = moduleName,
+            moduleDeps = deps.filter { it.type == Dep.Type.MODULE }.mapTo(LinkedHashSet()) { it.application },
+            libraryDeps = deps.filter { it.type == Dep.Type.LIBRARY }.mapTo(LinkedHashSet()) { it.application },
+            externalLibraryPlans = externalLibraryPlans,
+        )
+    }
+
+    /** Syncs libraries for dep paths that live outside this project's content roots. */
+    private suspend fun buildExternalLibraryPlans(deps: Collection<Dep>): List<LibraryRootsPlan> {
+        val externalPaths = readAction {
+            val projectRootManager = ProjectRootManager.getInstance(project)
+            val projectFileIndex = projectRootManager.fileIndex
+            deps.mapNotNull { dep ->
+                ProgressManager.checkCanceled()
+                dep.virtualFile(project)?.let { virtualFile ->
+                    if (projectFileIndex.getContentRootForFile(virtualFile) == null &&
+                        !projectFileIndex.isInLibrary(virtualFile) &&
+                        !projectFileIndex.isExcluded(virtualFile)
+                    ) {
+                        virtualFile
+                    } else {
+                        null
                     }
                 }
             }
         }
+
+        return buildLibraryRootsPlans(externalPaths)
     }
 
-    // ------------------------------------------------------------------
-    // Dep-tree sync helpers
-    // ------------------------------------------------------------------
+    private suspend fun buildLibraryRootsPlans(deps: Collection<VirtualFile>): List<LibraryRootsPlan> =
+        readAction {
+            buildLibraryRootsPlansInCurrentContext(deps)
+        }
 
-    private suspend fun syncAllLibraries() {
-        ProjectRootManager
+    private fun buildLibraryRootsPlansInCurrentContext(deps: Collection<VirtualFile>): List<LibraryRootsPlan> {
+        if (deps.isEmpty()) return emptyList()
+
+        val buildRoots = ProjectRootManager
             .getInstance(project)
             .contentRootsFromAllModules
-            .mapNotNull { it.findChild("deps") }
-            .forEach { syncLibrariesUnderDepsRoot(it) }
+            .mapNotNull { it.findChild("_build") }
+
+        return deps
+            .filter { it.isValid && it.isDirectory }
+            .map { dep ->
+                ProgressManager.checkCanceled()
+                val depName = dep.name
+                val classRoots = ArrayList<VirtualFile>()
+                val excludeFolders = ArrayList<ExcludeFolderPlan>()
+
+                for (build in buildRoots) {
+                    ProgressManager.checkCanceled()
+                    for (environment in build.children.filter { it.isDirectory }) {
+                        ProgressManager.checkCanceled()
+                        for (environmentChild in environment.children.filter { it.isDirectory }) {
+                            when (environmentChild.name) {
+                                "consolidated" -> classRoots += environmentChild
+                                "lib" -> environmentChild.findChild(depName)?.let { depEnvLib ->
+                                    depEnvLib.findChild("ebin")?.let { ebin ->
+                                        if (ebin.isDirectory) {
+                                            ModuleUtil.findModuleForFile(depEnvLib, project)?.let { module ->
+                                                excludeFolders += ExcludeFolderPlan(module.name, depEnvLib.url)
+                                            }
+                                            classRoots += ebin
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                LibraryRootsPlan(
+                    depName = depName,
+                    classRootUrls = classRoots.map { it.url }.distinct(),
+                    sourceRootUrls = dep.children
+                        .filter { child -> child.isDirectory && child.name in SOURCE_NAMES }
+                        .map { child -> child.url }
+                        .distinct(),
+                    excludeFolders = excludeFolders.distinctBy { it.moduleName to it.folderUrl },
+                )
+            }
     }
 
-    private suspend fun syncLibrariesUnderDepsRoot(depsRoot: VirtualFile) {
-        syncLibrariesArray(depsRoot.children)
-    }
+    private fun deduplicateLibraryPlans(plans: List<LibraryRootsPlan>): List<LibraryRootsPlan> =
+        plans.associateBy { it.depName }.values.toList()
 
-    private suspend fun syncSingleDepRoot(depRoot: VirtualFile) {
-        syncLibrariesArray(arrayOf(depRoot))
-    }
-
-    private suspend fun syncLibrariesArray(deps: Array<VirtualFile>) {
-        if (deps.isEmpty()) return
-
+    private suspend fun applySyncPlan(plan: SyncPlan) {
         edtWriteAction {
+            if (project.isDisposed) return@edtWriteAction
+
+            for (deleteAll in plan.deleteAlls) {
+                if (project.isDisposed) break
+                deleteAllLibraries(deleteAll.depsUrl)
+            }
+            for (deleteOne in plan.deleteOnes) {
+                if (project.isDisposed) break
+                deleteLibrary(deleteOne.depName)
+            }
+
             val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
-            syncLibraries(deps, libraryTable)
+            val plannedLibraryNames = plan.libraryPlans.mapTo(HashSet()) { it.depName }
+            val missingLibraryDeps = plan.modulePlans
+                .flatMap { it.libraryDeps }
+                .filterNot { libraryName ->
+                    libraryName in plannedLibraryNames || libraryTable.getLibraryByName(libraryName) != null
+                }
+                .toSet()
+
+            applyLibraryPlans(plan.libraryPlans, missingLibraryDeps, libraryTable)
+            applyModulePlans(plan.modulePlans, plan.libraryPlans.flatMap { it.excludeFolders }, libraryTable)
+        }
+    }
+
+    /**
+     * Validates and resolves listener-produced path-shaped requests under read access.
+     *
+     * The listener is intentionally limited to string/path-shape checks. This method is the first
+     * point where project-model APIs are consulted for candidate content roots or owning modules.
+     */
+    private suspend fun resolvePathShapedRequests(requests: List<SyncRequest>): List<SyncRequest> =
+        readAction {
+            val contentRootUrls = ProjectRootManager
+                .getInstance(project)
+                .contentRootsFromAllModules
+                .mapTo(HashSet()) { it.url }
+
+            requests.mapNotNull { request -> resolvePathShapedRequest(request, contentRootUrls) }
         }
 
-        // Preserve all-module fan-out: after syncing the project-level library table,
-        // wire the newly synced libraries into each module's order entries via mix.exs PSI.
-        for (module in ModuleManager.getInstance(project).modules) {
-            if (project.isDisposed) break
-            if (!module.isDisposed) syncLibrariesForModule(module)
+    private fun resolvePathShapedRequest(
+        request: SyncRequest,
+        contentRootUrls: Set<String>,
+    ): SyncRequest? =
+        when (request) {
+            is SyncRequest.BuildPath ->
+                if (isContentRootCandidate(request.contentRootCandidate, contentRootUrls)) {
+                    SyncRequest.All
+                } else {
+                    null
+                }
+
+            is SyncRequest.BuildDep -> {
+                val contentRoot = request.contentRootCandidate
+                if (!isContentRootCandidate(contentRoot, contentRootUrls)) {
+                    null
+                } else {
+                    contentRoot
+                        .findChild("deps")
+                        ?.findChild(request.depName)
+                        ?.takeIf { it.isValid && it.isDirectory }
+                        ?.let { SyncRequest.DepRoot(it) }
+                }
+            }
+
+            is SyncRequest.DepsRoot ->
+                if (request.depsRoot.isValid &&
+                    request.depsRoot.name == "deps" &&
+                    request.depsRoot.parent?.url in contentRootUrls
+                ) {
+                    request
+                } else {
+                    null
+                }
+
+            is SyncRequest.DepRoot ->
+                if (request.depRoot.isValid &&
+                    request.depRoot.parent?.name == "deps" &&
+                    request.depRoot.parent?.parent?.url in contentRootUrls
+                ) {
+                    request
+                } else {
+                    null
+                }
+
+            is SyncRequest.DeleteAll ->
+                if (request.contentRootUrl == null || request.contentRootUrl in contentRootUrls) request else null
+
+            is SyncRequest.DeleteOne ->
+                if (request.contentRootUrl == null || request.contentRootUrl in contentRootUrls) request else null
+
+            is SyncRequest.MixFile ->
+                resolveMixFileRequest(request.mixFile)
+
+            SyncRequest.All,
+            is SyncRequest.SyncModule ->
+                request
         }
+
+    private fun isContentRootCandidate(file: VirtualFile, contentRootUrls: Set<String>): Boolean =
+        file.isValid && file.url in contentRootUrls
+
+    private fun resolveMixFileRequest(mixFile: VirtualFile): SyncRequest.SyncModule? {
+        if (!mixFile.isValid || mixFile.name != MixProject.MIX_EXS) return null
+        val module = ModuleUtil.findModuleForFile(mixFile, project) ?: return null
+        val mixRoot = mixFile.parent ?: return null
+        val inContentRoot = ModuleRootManager
+            .getInstance(module)
+            .contentRoots
+            .any { contentRoot -> contentRoot == mixRoot }
+        return if (inContentRoot) SyncRequest.SyncModule(module) else null
     }
 
     // ------------------------------------------------------------------
@@ -331,86 +564,13 @@ class MixDepsSyncService(private val project: Project, cs: CoroutineScope) {
 
     @VisibleForTesting
     internal suspend fun syncLibrariesForModule(module: Module) {
-        val psiManager = PsiManager.getInstance(project)
-        val indicator = EmptyProgressIndicator()
-        val contentRoots = ModuleRootManager.getInstance(module).contentRoots
-        val deps = transitiveResolution(project, psiManager, indicator, *contentRoots)
-        if (deps.isNotEmpty()) {
-            syncModuleDeps(module, deps)
-        }
-    }
-
-    private suspend fun syncModuleDeps(module: Module, deps: Collection<Dep>) {
-        if (deps.isEmpty()) return
-
-        edtWriteAction {
-            val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
-            val moduleManager = ModuleManager.getInstance(project)
-
-            if (!module.isDisposed) {
-                val moduleRootManager = ModuleRootManager.getInstance(module)
-
-                for (dep in deps) {
-                    if (project.isDisposed) break
-                    val depName = dep.application
-
-                    when (dep.type) {
-                        Dep.Type.MODULE -> {
-                            val depModule = moduleManager.findModuleByName(depName)
-                            if (depModule != null) {
-                                if (!moduleRootManager.isDependsOn(depModule)) {
-                                    ModuleRootModificationUtil.addDependency(module, depModule)
-                                }
-                            } else {
-                                moduleRootManager.modifiableModel.run {
-                                    addInvalidModuleEntry(depName)
-                                    commit()
-                                }
-                            }
-                        }
-
-                        Dep.Type.LIBRARY -> {
-                            val depLibrary = libraryTable.getLibraryByName(depName)
-                            if (depLibrary != null) {
-                                if (moduleRootManager.orderEntries.none {
-                                        it is LibraryOrderEntry && it.libraryName == depName
-                                    }) {
-                                    ModuleRootModificationUtil.addDependency(module, depLibrary)
-                                }
-                            } else {
-                                val libraryTableModifiableModel = libraryTable.modifiableModel
-                                val invalidLibrary = libraryTableModifiableModel.createLibrary(depName, Kind)
-                                libraryTableModifiableModel.commit()
-                                moduleRootManager.modifiableModel.run {
-                                    addLibraryEntry(invalidLibrary)
-                                    commit()
-                                }
-                            }
-                        }
-                    }
-                }
-
-                syncExternalPathLibraries(deps)
-            }
-        }
-    }
-
-    /** Syncs libraries for dep paths that live outside this project's content roots. */
-    private fun syncExternalPathLibraries(deps: Collection<Dep>) {
-        val projectRootManager = ProjectRootManager.getInstance(project)
-        val projectFileIndex = projectRootManager.fileIndex
-        val externalPaths = deps.mapNotNull { dep ->
-            dep.virtualFile(project)?.let { vf ->
-                if (projectFileIndex.getContentRootForFile(vf) == null &&
-                    !projectFileIndex.isInLibrary(vf) &&
-                    !projectFileIndex.isExcluded(vf)
-                ) vf else null
-            }
-        }.toTypedArray()
-
-        if (externalPaths.isNotEmpty()) {
-            val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
-            syncLibraries(externalPaths, libraryTable)
+        val modulePlan = buildModuleDepsPlan(module.name) ?: return
+        val syncPlan = SyncPlan(
+            libraryPlans = deduplicateLibraryPlans(modulePlan.externalLibraryPlans),
+            modulePlans = listOf(modulePlan),
+        )
+        if (!syncPlan.isEmpty) {
+            applySyncPlan(syncPlan)
         }
     }
 
@@ -420,79 +580,147 @@ class MixDepsSyncService(private val project: Project, cs: CoroutineScope) {
 
     @VisibleForTesting
     internal fun syncLibraries(deps: Array<VirtualFile>, libraryTable: LibraryTable) {
-        val libraryTableModifiableModel = libraryTable.modifiableModel
-
-        for (dep in deps) {
-            if (project.isDisposed) break
-
-            val depName = dep.name
-            val library = libraryTable.getLibraryByName(depName)
-                ?: libraryTableModifiableModel.createLibrary(dep.name, Kind)
-
-            syncLibraryRoots(library, dep, depName)
-        }
-
-        libraryTableModifiableModel.commit()
+        val libraryPlans = buildLibraryRootsPlansInCurrentContext(deps.toList())
+        applyLibraryPlans(libraryPlans, emptySet(), libraryTable)
+        applyModulePlans(emptyList(), libraryPlans.flatMap { it.excludeFolders }, libraryTable)
     }
 
-    private fun syncLibraryRoots(library: Library, dep: VirtualFile, depName: String) {
-        val libraryModifiableModel = library.modifiableModel
+    private fun applyLibraryPlans(
+        libraryPlans: List<LibraryRootsPlan>,
+        emptyLibraryNames: Set<String>,
+        libraryTable: LibraryTable,
+    ) {
+        if (libraryPlans.isEmpty() && emptyLibraryNames.isEmpty()) return
 
-        libraryModifiableModel.clearRoots(OrderRootType.CLASSES)
-        libraryModifiableModel.clearRoots(OrderRootType.SOURCES)
-
-        ProjectRootManager
-            .getInstance(project)
-            .contentRootsFromAllModules
-            .mapNotNull { it.findChild("_build") }
-            .forEach { build ->
-                build.children
-                    .filter { it.isDirectory }
-                    .forEach { environment ->
-                        environment.children
-                            .filter { it.isDirectory }
-                            .forEach { environmentChild ->
-                                when (environmentChild.name) {
-                                    "consolidated" ->
-                                        libraryModifiableModel.addRoot(environmentChild, OrderRootType.CLASSES)
-                                    "lib" ->
-                                        environmentChild.findChild(depName)?.let { depEnvLib ->
-                                            depEnvLib.findChild("ebin")?.let { ebin ->
-                                                if (ebin.isDirectory) {
-                                                    ModuleUtil
-                                                        .findModuleForFile(depEnvLib, project)
-                                                    ?.let { module ->
-                                                        ModuleRootManager.getInstance(module).modifiableModel.apply {
-                                                            for (contentEntry in contentEntries) {
-                                                                val contentRoot = contentEntry.file ?: continue
-                                                                // Only exclude under content entries that actually
-                                                                // contain depEnvLib - cross-test or umbrella roots
-                                                                // may be registered on the same module and would
-                                                                // cause IllegalStateException if used here.
-                                                                if (VfsUtilCore.isAncestor(contentRoot, depEnvLib, false)) {
-                                                                    contentEntry.addExcludeFolder(depEnvLib)
-                                                                }
-                                                            }
-                                                            commit()
-                                                        }
-                                                    }
-                                                    libraryModifiableModel.addRoot(ebin, OrderRootType.CLASSES)
-                                                }
-                                            }
-                                        }
-                                }
-                            }
-                    }
+        val libraryTableModifiableModel = libraryTable.modifiableModel
+        var committed = false
+        try {
+            for (plan in libraryPlans) {
+                if (project.isDisposed) break
+                val library = libraryTableModifiableModel.getLibraryByName(plan.depName)
+                    ?: libraryTableModifiableModel.createLibrary(plan.depName, Kind)
+                applyLibraryRootsPlan(library, plan)
             }
 
-        for (child in dep.children) {
+            for (libraryName in emptyLibraryNames) {
+                if (project.isDisposed) break
+                if (libraryTableModifiableModel.getLibraryByName(libraryName) == null) {
+                    libraryTableModifiableModel.createLibrary(libraryName, Kind)
+                }
+            }
+
+            if (libraryTableModifiableModel.isChanged) {
+                libraryTableModifiableModel.commit()
+                committed = true
+            }
+        } finally {
+            if (!committed) {
+                libraryTableModifiableModel.dispose()
+            }
+        }
+    }
+
+    private fun applyLibraryRootsPlan(library: Library, plan: LibraryRootsPlan) {
+        val libraryModifiableModel = library.modifiableModel
+        var committed = false
+        try {
+            libraryModifiableModel.syncRoots(OrderRootType.CLASSES, plan.classRootUrls)
+            libraryModifiableModel.syncRoots(OrderRootType.SOURCES, plan.sourceRootUrls)
+
+            if (libraryModifiableModel.isChanged) {
+                libraryModifiableModel.commit()
+                committed = true
+            }
+        } finally {
+            if (!committed) {
+                libraryModifiableModel.dispose()
+            }
+        }
+    }
+
+    private fun applyModulePlans(
+        modulePlans: List<ModuleDepsPlan>,
+        excludeFolderPlans: List<ExcludeFolderPlan>,
+        libraryTable: LibraryTable,
+    ) {
+        val moduleNames = (modulePlans.map { it.moduleName } + excludeFolderPlans.map { it.moduleName })
+            .toCollection(LinkedHashSet())
+        if (moduleNames.isEmpty()) return
+
+        val moduleManager = ModuleManager.getInstance(project)
+        val modulePlansByName = modulePlans.associateBy { it.moduleName }
+        val excludeFoldersByModule = excludeFolderPlans.groupBy { it.moduleName }
+
+        for (moduleName in moduleNames) {
             if (project.isDisposed) break
-            if (child.isDirectory && child.name in SOURCE_NAMES) {
-                libraryModifiableModel.addRoot(child, OrderRootType.SOURCES)
+            val module = moduleManager.findModuleByName(moduleName)?.takeIf { !it.isDisposed } ?: continue
+            val modifiableModel = ModuleRootManager.getInstance(module).modifiableModel
+            var committed = false
+            try {
+                applyExcludeFolderPlans(modifiableModel, excludeFoldersByModule[moduleName].orEmpty())
+                modulePlansByName[moduleName]?.let { modulePlan ->
+                    applyModuleDepsPlan(modifiableModel, modulePlan, moduleManager, libraryTable)
+                }
+
+                if (modifiableModel.isChanged) {
+                    modifiableModel.commit()
+                    committed = true
+                }
+            } finally {
+                if (!committed) {
+                    modifiableModel.dispose()
+                }
+            }
+        }
+    }
+
+    private fun applyExcludeFolderPlans(
+        modifiableModel: ModifiableRootModel,
+        excludeFolderPlans: List<ExcludeFolderPlan>,
+    ) {
+        for (excludeFolderPlan in excludeFolderPlans) {
+            ProgressManager.checkCanceled()
+            val folderUrl = excludeFolderPlan.folderUrl
+            for (contentEntry in modifiableModel.contentEntries) {
+                ProgressManager.checkCanceled()
+                if (VfsUtilCore.isEqualOrAncestor(contentEntry.url, folderUrl) &&
+                    folderUrl !in contentEntry.excludeFolderUrls
+                ) {
+                    contentEntry.addExcludeFolder(folderUrl)
+                }
+            }
+        }
+    }
+
+    private fun applyModuleDepsPlan(
+        modifiableModel: ModifiableRootModel,
+        modulePlan: ModuleDepsPlan,
+        moduleManager: ModuleManager,
+        libraryTable: LibraryTable,
+    ) {
+        for (depName in modulePlan.moduleDeps) {
+            val depModule = moduleManager.findModuleByName(depName)
+            when {
+                depModule != null && modifiableModel.findModuleOrderEntry(depModule) == null ->
+                    modifiableModel.addModuleOrderEntry(depModule)
+                depModule == null && modifiableModel.orderEntries.none {
+                    it is ModuleOrderEntry && it.moduleName == depName
+                } ->
+                    modifiableModel.addInvalidModuleEntry(depName)
             }
         }
 
-        libraryModifiableModel.commit()
+        for (depName in modulePlan.libraryDeps) {
+            val depLibrary = libraryTable.getLibraryByName(depName)
+            when {
+                depLibrary != null && modifiableModel.findLibraryOrderEntry(depLibrary) == null ->
+                    modifiableModel.addLibraryEntry(depLibrary)
+                depLibrary == null && modifiableModel.orderEntries.none {
+                    it is LibraryOrderEntry && it.libraryName == depName
+                } ->
+                    modifiableModel.addInvalidLibrary(depName, LibraryTablesRegistrar.PROJECT_LEVEL)
+            }
+        }
     }
 
     // ------------------------------------------------------------------
@@ -542,7 +770,21 @@ class MixDepsSyncService(private val project: Project, cs: CoroutineScope) {
     }
 }
 
-// Extension to clear all roots of a given type from a Library.ModifiableModel.
-private fun Library.ModifiableModel.clearRoots(orderRootType: OrderRootType) {
-    getUrls(orderRootType).forEach { removeRoot(it, orderRootType) }
+private fun Library.ModifiableModel.syncRoots(orderRootType: OrderRootType, desiredUrls: List<String>) {
+    val desiredUrlSet = desiredUrls.toSet()
+
+    for (existingUrl in getUrls(orderRootType)) {
+        ProgressManager.checkCanceled()
+        if (existingUrl !in desiredUrlSet) {
+            removeRoot(existingUrl, orderRootType)
+        }
+    }
+
+    val existingUrlSet = getUrls(orderRootType).toSet()
+    for (desiredUrl in desiredUrls) {
+        ProgressManager.checkCanceled()
+        if (desiredUrl !in existingUrlSet) {
+            addRoot(desiredUrl, orderRootType)
+        }
+    }
 }
