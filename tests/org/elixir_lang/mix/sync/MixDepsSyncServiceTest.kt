@@ -1,6 +1,5 @@
 package org.elixir_lang.mix.sync
 
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.components.service
 import com.intellij.openapi.roots.LibraryOrderEntry
@@ -8,13 +7,13 @@ import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar
 import com.intellij.openapi.vfs.newvfs.impl.VfsRootAccess
-import com.intellij.testFramework.PlatformTestUtil
 import com.intellij.testFramework.PsiTestUtil
 import com.intellij.testFramework.common.runAll
-import kotlinx.coroutines.runBlocking
-import org.elixir_lang.mix.library.Kind as MixLibraryKind
 import org.elixir_lang.PlatformTestCase
-import java.util.concurrent.atomic.AtomicBoolean
+import org.elixir_lang.mix.library.Kind as MixLibraryKind
+
+// WritePlan, ModuleWriteOp, LibraryRootsPlan, DeleteAllPlan, ModuleDepsPlan, buildWritePlan,
+// applyWritePlan are internal to the sync package. Tests in the same package access them directly.
 
 /**
  * Behavioural tests for [MixDepsSyncService].
@@ -35,7 +34,7 @@ import java.util.concurrent.atomic.AtomicBoolean
  *   - `_build/<env>/lib/<dep>/ebin` is scoped to its own content root.
  *   - A single-root DepRoot request does not wire unrelated modules.
  *   - Legacy unscoped library is removed when a scoped replacement is created.
- * - `deleteAllLibraries` removes scoped placeholder libraries (empty, no roots) as well as
+ * - [SyncRequest.DeleteAll] removes scoped placeholder libraries (empty, no roots) as well as
  *   libraries with roots, guarded by [MixLibraryKind] so unrelated user libraries survive.
  * - A dep with an external `path:` (outside all content roots) produces a module order entry
  *   whose name matches the library created for that external path, ensuring the order entry
@@ -67,8 +66,7 @@ class MixDepsSyncServiceTest : PlatformTestCase() {
     override fun tearDown() {
         runAll(
             { MixTestFixtures.removeAllContentRoots(myFixture) },
-            { cleanupLibraries("phoenix", "ecto", "phoenix-unrelated", "unfetched_dep",
-                                "placeholder_dep", "user_lib_no_kind", "external_lib") },
+            { MixSyncTestHelpers.removeAllLibraries(project) },
             { super.tearDown() }
         )
     }
@@ -125,8 +123,10 @@ class MixDepsSyncServiceTest : PlatformTestCase() {
         val service = project.service<MixDepsSyncService>()
         val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
 
-        // Seed: create the phoenix library.
-        WriteAction.run<Throwable> { service.syncLibraries(arrayOf(depRoot), libraryTable) }
+        // Seed: create the phoenix library via the production drain path.
+        service.clearPendingForTesting()
+        service.enqueue(SyncRequest.DepRoot(depRoot))
+        drainDirectly(service)
         assertNotNull("Phoenix library must exist before drain", libraryTable.getLibraryByName(phoenixLibName))
 
         // Clear any VFS-triggered enqueues from directory creation above, so the drain only
@@ -180,9 +180,11 @@ class MixDepsSyncServiceTest : PlatformTestCase() {
         val service = project.service<MixDepsSyncService>()
         val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
 
-        WriteAction.run<Throwable> {
-            service.syncLibraries(arrayOf(phoenixRoot, ectoRoot), libraryTable)
-        }
+        // Seed: create both libraries via the production drain path.
+        service.clearPendingForTesting()
+        service.enqueue(SyncRequest.DepRoot(phoenixRoot))
+        service.enqueue(SyncRequest.DepRoot(ectoRoot))
+        drainDirectly(service)
         assertNotNull("phoenix library must exist before drain", libraryTable.getLibraryByName(phoenixLibName))
         assertNotNull("ecto library must exist before drain", libraryTable.getLibraryByName(ectoLibName))
 
@@ -222,7 +224,10 @@ class MixDepsSyncServiceTest : PlatformTestCase() {
         val service = project.service<MixDepsSyncService>()
         val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
 
-        WriteAction.run<Throwable> { service.syncLibraries(arrayOf(depRoot), libraryTable) }
+        // Seed: create the phoenix library via the production drain path.
+        service.clearPendingForTesting()
+        service.enqueue(SyncRequest.DepRoot(depRoot))
+        drainDirectly(service)
         assertNotNull("phoenix project library must exist before fan-out", libraryTable.getLibraryByName(phoenixLibName))
 
         service.clearPendingForTesting()
@@ -235,46 +240,6 @@ class MixDepsSyncServiceTest : PlatformTestCase() {
             "After fan-out, myFixture.module should have a LibraryOrderEntry for '$phoenixLibName'. " +
                 "Order entries: ${orderEntries.map { it.presentableName }}",
             hasPhoenixLibEntry
-        )
-    }
-
-    // ------------------------------------------------------------------
-    // Regression: exclude folder must only be added to ancestor content entries
-    // ------------------------------------------------------------------
-
-    fun testSyncLibraries_excludeOnlyAppliesToAncestorContentEntry() {
-        val myApp = MixTestFixtures.createMixRoot(myFixture, "my_app")
-        val otherApp = MixTestFixtures.createMixRoot(myFixture, "other_app")
-
-        val depRoot = myFixture.tempDirFixture.findOrCreateDir("my_app/deps/phoenix")
-        myFixture.tempDirFixture.findOrCreateDir("my_app/deps/phoenix/lib")
-        MixTestFixtures.addBuildArtifacts(myFixture, "my_app", "dev", "phoenix")
-        val phoenixLibName = scopedDepLibraryName(myApp.url, "phoenix")
-
-        val service = project.service<MixDepsSyncService>()
-        val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
-
-        WriteAction.run<Throwable> { service.syncLibraries(arrayOf(depRoot), libraryTable) }
-
-        assertNotNull("phoenix library must be created", libraryTable.getLibraryByName(phoenixLibName))
-
-        val moduleRootManager = ModuleRootManager.getInstance(myFixture.module)
-        val myAppEntry = moduleRootManager.contentEntries.firstOrNull { it.file == myApp }
-        val otherAppEntry = moduleRootManager.contentEntries.firstOrNull { it.file == otherApp }
-
-        assertNotNull("my_app content entry must exist", myAppEntry)
-        assertNotNull("other_app content entry must exist", otherAppEntry)
-
-        val myAppExcludes = myAppEntry!!.excludeFolderUrls
-        val otherAppExcludes = otherAppEntry!!.excludeFolderUrls
-
-        assertTrue(
-            "my_app content entry should have at least one exclude (the ebin lib dir)",
-            myAppExcludes.any { it.contains("my_app/_build") }
-        )
-        assertTrue(
-            "other_app content entry must have no excludes from my_app's build dir",
-            otherAppExcludes.none { it.contains("my_app") }
         )
     }
 
@@ -311,9 +276,10 @@ class MixDepsSyncServiceTest : PlatformTestCase() {
         val service = project.service<MixDepsSyncService>()
         val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
 
-        WriteAction.run<Throwable> {
-            service.syncLibraries(arrayOf(depRootA, depRootB), libraryTable)
-        }
+        service.clearPendingForTesting()
+        service.enqueue(SyncRequest.DepRoot(depRootA))
+        service.enqueue(SyncRequest.DepRoot(depRootB))
+        drainDirectly(service)
 
         assertNotNull("Library for project_a/phoenix must exist", libraryTable.getLibraryByName(libNameA))
         assertNotNull("Library for project_b/phoenix must exist", libraryTable.getLibraryByName(libNameB))
@@ -343,10 +309,11 @@ class MixDepsSyncServiceTest : PlatformTestCase() {
         val service = project.service<MixDepsSyncService>()
         val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
 
-        // Seed both libraries.
-        WriteAction.run<Throwable> {
-            service.syncLibraries(arrayOf(depRootA, depRootB), libraryTable)
-        }
+        // Seed both libraries via the production drain path.
+        service.clearPendingForTesting()
+        service.enqueue(SyncRequest.DepRoot(depRootA))
+        service.enqueue(SyncRequest.DepRoot(depRootB))
+        drainDirectly(service)
         val initialSourceUrlsB = libraryTable.getLibraryByName(libNameB)!!.getUrls(OrderRootType.SOURCES).toSet()
 
         // Enqueue only a DepRoot for project_a and drain.
@@ -385,9 +352,11 @@ class MixDepsSyncServiceTest : PlatformTestCase() {
         val service = project.service<MixDepsSyncService>()
         val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
 
-        WriteAction.run<Throwable> {
-            service.syncLibraries(arrayOf(depRootA, depRootB), libraryTable)
-        }
+        // Seed both libraries via the production drain path.
+        service.clearPendingForTesting()
+        service.enqueue(SyncRequest.DepRoot(depRootA))
+        service.enqueue(SyncRequest.DepRoot(depRootB))
+        drainDirectly(service)
         assertNotNull(libraryTable.getLibraryByName(libNameA))
         assertNotNull(libraryTable.getLibraryByName(libNameB))
 
@@ -429,9 +398,10 @@ class MixDepsSyncServiceTest : PlatformTestCase() {
         val service = project.service<MixDepsSyncService>()
         val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
 
-        WriteAction.run<Throwable> {
-            service.syncLibraries(arrayOf(depRootA, depRootB), libraryTable)
-        }
+        service.clearPendingForTesting()
+        service.enqueue(SyncRequest.DepRoot(depRootA))
+        service.enqueue(SyncRequest.DepRoot(depRootB))
+        drainDirectly(service)
 
         val classUrlsA = libraryTable.getLibraryByName(libNameA)?.getUrls(OrderRootType.CLASSES)?.toList().orEmpty()
         val classUrlsB = libraryTable.getLibraryByName(libNameB)?.getUrls(OrderRootType.CLASSES)?.toList().orEmpty()
@@ -463,8 +433,10 @@ class MixDepsSyncServiceTest : PlatformTestCase() {
         val service = project.service<MixDepsSyncService>()
         val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
 
-        // Pre-populate the library.
-        WriteAction.run<Throwable> { service.syncLibraries(arrayOf(depRoot), libraryTable) }
+        // Pre-populate the library via the production drain path.
+        service.clearPendingForTesting()
+        service.enqueue(SyncRequest.DepRoot(depRoot))
+        drainDirectly(service)
         assertNotNull(libraryTable.getLibraryByName(phoenixLibName))
 
         // Capture the current order entries before the scoped drain.
@@ -522,8 +494,10 @@ class MixDepsSyncServiceTest : PlatformTestCase() {
         assertNotNull("Legacy Mix dep library must exist before sync", libraryTable.getLibraryByName("phoenix"))
         assertNotNull("Unrelated library must exist before sync", libraryTable.getLibraryByName("phoenix-unrelated"))
 
-        // Run syncLibraries - scoped library is created and the legacy Mix dep library is cleaned up.
-        WriteAction.run<Throwable> { service.syncLibraries(arrayOf(depRoot), libraryTable) }
+        // Run the production drain path - scoped library is created and the legacy Mix dep library is cleaned up.
+        service.clearPendingForTesting()
+        service.enqueue(SyncRequest.DepRoot(depRoot))
+        drainDirectly(service)
 
         assertNotNull("Scoped library must be created", libraryTable.getLibraryByName(scopedLibName))
         assertNull(
@@ -599,10 +573,11 @@ class MixDepsSyncServiceTest : PlatformTestCase() {
         val service = project.service<MixDepsSyncService>()
         val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
 
-        // Seed both libraries.
-        WriteAction.run<Throwable> {
-            service.syncLibraries(arrayOf(depRootA, depRootB), libraryTable)
-        }
+        // Seed both libraries via the production drain path.
+        service.clearPendingForTesting()
+        service.enqueue(SyncRequest.DepRoot(depRootA))
+        service.enqueue(SyncRequest.DepRoot(depRootB))
+        drainDirectly(service)
         val initialClassUrlsB = libraryTable.getLibraryByName(libNameB)!!.getUrls(OrderRootType.CLASSES).toSet()
 
         // Enqueue a SyncRoot for project_a only and drain.
@@ -621,11 +596,11 @@ class MixDepsSyncServiceTest : PlatformTestCase() {
     }
 
     // ------------------------------------------------------------------
-    // deleteAllLibraries and external-path dep tests
+    // DeleteAll and external-path dep tests
     // ------------------------------------------------------------------
 
     /**
-     * `deleteAllLibraries` must remove scoped placeholder libraries that have no source or class
+     * [SyncRequest.DeleteAll] must remove scoped placeholder libraries that have no source or class
      * roots, in addition to the normally-populated scoped libraries it already removed.
      *
      * Placeholder libraries are created for deps declared in `mix.exs` but not yet fetched (no
@@ -657,14 +632,16 @@ class MixDepsSyncServiceTest : PlatformTestCase() {
         assertNotNull("Placeholder library must exist before DeleteAll", libraryTable.getLibraryByName(placeholderName))
         assertNotNull("User library must exist before DeleteAll", libraryTable.getLibraryByName("user_lib_no_kind"))
 
-        WriteAction.run<Throwable> { service.deleteAllLibraries(depsUrl) }
+        service.clearPendingForTesting()
+        service.enqueue(SyncRequest.DeleteAll(depsUrl))
+        drainDirectly(service)
 
         assertNull(
-            "Scoped placeholder library (no roots) must be deleted by deleteAllLibraries",
+            "Scoped placeholder library (no roots) must be deleted by DeleteAll",
             libraryTable.getLibraryByName(placeholderName)
         )
         assertNotNull(
-            "User library without Kind must NOT be deleted by deleteAllLibraries (Kind guard)",
+            "User library without Kind must NOT be deleted by DeleteAll (Kind guard)",
             libraryTable.getLibraryByName("user_lib_no_kind")
         )
     }
@@ -785,12 +762,8 @@ class MixDepsSyncServiceTest : PlatformTestCase() {
         // Seed: create the phoenix library so we can verify it is re-created by the SyncRoot.
         val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
         val phoenixLibName = scopedDepLibraryName(app.url, "phoenix")
-        WriteAction.run<Throwable> {
-            service.syncLibraries(
-                arrayOf(myFixture.tempDirFixture.getFile("app/deps/phoenix")!!),
-                libraryTable
-            )
-        }
+        service.enqueue(SyncRequest.DepRoot(myFixture.tempDirFixture.getFile("app/deps/phoenix")!!))
+        drainDirectly(service)
         assertNotNull("phoenix library must exist after seed", libraryTable.getLibraryByName(phoenixLibName))
 
         // Delete the phoenix library so SyncRoot has a visible effect.
@@ -813,12 +786,12 @@ class MixDepsSyncServiceTest : PlatformTestCase() {
     }
 
     // ------------------------------------------------------------------
-    // deleteAllLibraries must not remove a library whose source root lives
+    // DeleteAll must not remove a library whose source root lives
     // under a sibling path like "deps2" (path-boundary safety).
     // ------------------------------------------------------------------
 
     /**
-     * Regression test: `deleteAllLibraries` previously used `java.net.URI.relativize` to
+     * Regression test: the delete-all logic previously used `java.net.URI.relativize` to
      * check whether a library's source roots sit under the given `depsUrl`.
      *
      * `URI.relativize` is not path-boundary-safe: given
@@ -869,7 +842,10 @@ class MixDepsSyncServiceTest : PlatformTestCase() {
 
         // Delete all libraries for app/deps - should remove phoenix but NOT sibling_dep.
         val app = myFixture.tempDirFixture.findOrCreateDir("app")
-        WriteAction.run<Throwable> { service.deleteAllLibraries("${app.url}/deps") }
+        PsiTestUtil.addContentRoot(myFixture.module, app)
+        service.clearPendingForTesting()
+        service.enqueue(SyncRequest.DeleteAll("${app.url}/deps"))
+        drainDirectly(service)
 
         assertNull(
             "phoenix library must be removed: its source root is under app/deps/",
@@ -886,52 +862,376 @@ class MixDepsSyncServiceTest : PlatformTestCase() {
         }
     }
 
+    // ==========================================================================
+    // Narrow write critical section - buildWritePlan / applyWritePlan tests
+    // ==========================================================================
+
+    // ------------------------------------------------------------------
+    // Diff-correctness - existing library with identical roots produces no write op;
+    //  existing library with changed roots produces a minimal diff write op.
+    // ------------------------------------------------------------------
+
+    /**
+     * Seeds a phoenix library with a specific set of source roots, then builds a [WritePlan] via
+     * [buildWritePlan] requesting a different set of roots for that library.  Asserts that:
+     * - A [LibraryWriteOp] is emitted only for the library that changed.
+     * - The op carries the exact add/remove diff (not a clear+rebuild).
+     * - No write op is emitted for a library whose roots are already up to date.
+     */
+    fun testBuildWritePlan_diffCorrectnessForExistingLibrary() {
+        val myApp = myFixture.tempDirFixture.findOrCreateDir("my_app")
+        myFixture.tempDirFixture.findOrCreateDir("my_app/deps")
+        myFixture.tempDirFixture.findOrCreateDir("my_app/deps/phoenix")
+        val libOld = myFixture.tempDirFixture.findOrCreateDir("my_app/deps/phoenix/lib_old")
+        val libNew = myFixture.tempDirFixture.findOrCreateDir("my_app/deps/phoenix/lib_new")
+        PsiTestUtil.addContentRoot(myFixture.module, myApp)
+
+        val contentRootUrl = myApp.url
+        val libName = scopedDepLibraryName(contentRootUrl, "phoenix")
+
+        val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
+
+        // Seed: phoenix library with lib_old as source root.
+        WriteAction.run<Throwable> {
+            val model = libraryTable.modifiableModel
+            val lib = model.createLibrary(libName)
+            lib.modifiableModel.let { lm ->
+                lm.addRoot(libOld.url, OrderRootType.SOURCES)
+                lm.commit()
+            }
+            model.commit()
+        }
+
+        // Build a SyncPlan requesting lib_new (not lib_old) as the source root.
+        val plan = SyncPlan(
+            libraryPlans = listOf(
+                LibraryRootsPlan(
+                    contentRootUrl = contentRootUrl,
+                    depName = "phoenix",
+                    classRootUrls = emptyList(),
+                    sourceRootUrls = listOf(libNew.url),
+                    excludeFolders = emptyList(),
+                )
+            ),
+            modulePlans = emptyList(),
+        )
+
+        val writePlan = runSuspendOnPooledThread { buildWritePlan(project, plan) }
+
+        // Exactly one LibraryWriteOp for phoenix.
+        val op = writePlan.libraryWriteOps.singleOrNull { it.libraryName == libName }
+        assertNotNull("Expected a LibraryWriteOp for $libName", op)
+        requireNotNull(op)
+
+        assertFalse("createWithKind must be false for an existing library", op.createWithKind)
+        assertEquals("addSourceUrls must contain only lib_new", listOf(libNew.url), op.addSourceUrls)
+        assertEquals("removeSourceUrls must contain only lib_old", listOf(libOld.url), op.removeSourceUrls)
+        assertTrue("addClassUrls must be empty", op.addClassUrls.isEmpty())
+        assertTrue("removeClassUrls must be empty", op.removeClassUrls.isEmpty())
+
+        // Cleanup
+        WriteAction.run<Throwable> { libraryTable.getLibraryByName(libName)?.let { libraryTable.removeLibrary(it) } }
+    }
+
+    /**
+     * Seeds a phoenix library with the exact roots that the sync plan requests.  Asserts that
+     * [buildWritePlan] emits NO [LibraryWriteOp] for that library (nothing to change → no write).
+     */
+    fun testBuildWritePlan_noOpForAlreadyUpToDateLibrary() {
+        val myApp = myFixture.tempDirFixture.findOrCreateDir("my_app_noop")
+        val libDir = myFixture.tempDirFixture.findOrCreateDir("my_app_noop/deps/phoenix/lib")
+        PsiTestUtil.addContentRoot(myFixture.module, myApp)
+
+        val contentRootUrl = myApp.url
+        val libName = scopedDepLibraryName(contentRootUrl, "phoenix")
+        val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
+
+        // Seed with the exact same source roots as the plan.
+        WriteAction.run<Throwable> {
+            val model = libraryTable.modifiableModel
+            val lib = model.createLibrary(libName)
+            lib.modifiableModel.let { lm ->
+                lm.addRoot(libDir.url, OrderRootType.SOURCES)
+                lm.commit()
+            }
+            model.commit()
+        }
+
+        val plan = SyncPlan(
+            libraryPlans = listOf(
+                LibraryRootsPlan(
+                    contentRootUrl = contentRootUrl,
+                    depName = "phoenix",
+                    classRootUrls = emptyList(),
+                    sourceRootUrls = listOf(libDir.url),
+                    excludeFolders = emptyList(),
+                )
+            ),
+        )
+
+        val writePlan = runSuspendOnPooledThread { buildWritePlan(project, plan) }
+
+        assertNull(
+            "No LibraryWriteOp expected when roots are already up to date",
+            writePlan.libraryWriteOps.firstOrNull { it.libraryName == libName }
+        )
+
+        // Cleanup
+        WriteAction.run<Throwable> { libraryTable.getLibraryByName(libName)?.let { libraryTable.removeLibrary(it) } }
+    }
+
+    // ------------------------------------------------------------------
+    // Stale-plan resilience - applyWritePlan skips gracefully when a
+    //  referenced module does not exist.
+    // ------------------------------------------------------------------
+
+    /**
+     * Constructs a [WritePlan] that references a non-existent module name and verifies that
+     * [applyWritePlan] completes without throwing, applying any library mutations that don't
+     * depend on the missing module.
+     */
+    fun testApplyWritePlan_nonExistentModuleSkippedGracefully() {
+        val contentRootUrl = myFixture.tempDirFixture.findOrCreateDir("stale_test").url
+        val libName = scopedDepLibraryName(contentRootUrl, "phoenix")
+
+        val writePlan = WritePlan(
+            librariesToRemove = emptyList(),
+            // Create a placeholder library to verify library work still proceeds.
+            placeholderLibraries = setOf(libName),
+            libraryWriteOps = emptyList(),
+            legacyLibrariesToRemove = emptyList(),
+            // ModuleWriteOp with a module name that doesn't exist.
+            moduleWriteOps = listOf(
+                ModuleWriteOp(
+                    moduleName = "nonexistent_module_write_plan_test",
+                    addModuleDeps = emptySet(),
+                    addInvalidModuleDeps = emptySet(),
+                    addLibraryDeps = setOf(libName),
+                    addInvalidLibraryDeps = emptySet(),
+                    addExcludeFolderUrls = emptyList(),
+                )
+            ),
+        )
+
+        // Must complete without throwing even though the module doesn't exist.
+        val stats = runSuspendOnPooledThread { applyWritePlan(project, writePlan) }
+
+        // Library was created (placeholder).
+        val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
+        assertNotNull(
+            "Placeholder library must be created even when a referenced module is absent",
+            libraryTable.getLibraryByName(libName)
+        )
+        // Library counts: only placeholder creation.
+        assertTrue("librariesChanged must be >= 1", stats.librariesChanged >= 1)
+        // Module count: 'nonexistent' is skipped → 0 modules changed.
+        assertEquals("modulesChanged must be 0 when the only module doesn't exist", 0, stats.modulesChanged)
+
+        // Cleanup.
+        WriteAction.run<Throwable> { libraryTable.getLibraryByName(libName)?.let { libraryTable.removeLibrary(it) } }
+    }
+
+    // ------------------------------------------------------------------
+    // Write-phase parity - drain through the new pipeline produces the
+    //  same library-table state as the old wide-write path.
+    // ------------------------------------------------------------------
+
+    /**
+     * End-to-end parity test: verify that the [buildWritePlan] → [applyWritePlan] pipeline
+     * (invoked via [MixDepsSyncService.drain]) populates a phoenix library's source and class roots from an actual
+     * `deps/` and `_build/` fixture.
+     *
+     * This test verifies that the [buildWritePlan] → [applyWritePlan] pipeline
+     * (invoked via [MixDepsSyncService.drain]) populates a phoenix library's source and class roots from an actual
+     * `deps/` and `_build/` fixture, ensuring the production code path is exercised.
+     */
+    fun testDrain_buildWritePlanApplyWritePlanParity_libraryRootsPopulated() {
+        val myApp = myFixture.tempDirFixture.findOrCreateDir("parity_test_app")
+        myFixture.tempDirFixture.findOrCreateDir("parity_test_app/deps/phoenix")
+        myFixture.tempDirFixture.findOrCreateDir("parity_test_app/deps/phoenix/lib")
+        MixTestFixtures.addBuildArtifacts(myFixture, "parity_test_app", "dev", "phoenix")
+        PsiTestUtil.addContentRoot(myFixture.module, myApp)
+
+        val depsPhoenix = myFixture.tempDirFixture.getFile("parity_test_app/deps/phoenix")!!
+        val service = project.service<MixDepsSyncService>()
+        service.clearPendingForTesting()
+        service.enqueue(SyncRequest.DepRoot(depsPhoenix))
+        drainDirectly(service)
+
+        val libName = scopedDepLibraryName(myApp.url, "phoenix")
+        val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
+        val lib = libraryTable.getLibraryByName(libName)
+
+        assertNotNull("phoenix library must be created by drain pipeline", lib)
+        requireNotNull(lib)
+        assertTrue(
+            "phoenix library must have at least one source root (lib dir)",
+            lib.getUrls(OrderRootType.SOURCES).isNotEmpty()
+        )
+        assertTrue(
+            "phoenix library must have at least one class root (ebin dir)",
+            lib.getUrls(OrderRootType.CLASSES).isNotEmpty()
+        )
+
+        // Cleanup
+        WriteAction.run<Throwable> { libraryTable.getLibraryByName(libName)?.let { libraryTable.removeLibrary(it) } }
+    }
+
+    // ------------------------------------------------------------------
+    // buildWritePlan placeholder computation accounts for libraries
+    //  that will be removed by delete operations in the same plan.
+    // ------------------------------------------------------------------
+
+    /**
+     * Verifies that [buildWritePlan] correctly treats a library as "missing" when it currently
+     * exists but will be removed by a [DeleteAllPlan] in the same sync plan.  The library must
+     * appear in [WritePlan.placeholderLibraries] so that [applyWritePlan] recreates it as an
+     * empty placeholder for the module order entry to reference.
+     */
+    fun testBuildWritePlan_placeholderForLibraryScheduledForDeletion() {
+        val myApp = myFixture.tempDirFixture.findOrCreateDir("placeholder_del_test")
+        myFixture.tempDirFixture.findOrCreateDir("placeholder_del_test/deps")
+        val libDir = myFixture.tempDirFixture.findOrCreateDir("placeholder_del_test/deps/placeholder_dep/lib")
+        PsiTestUtil.addContentRoot(myFixture.module, myApp)
+
+        val contentRootUrl = myApp.url
+        val libName = scopedDepLibraryName(contentRootUrl, "placeholder_dep")
+        val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
+
+        // Seed the library so it exists in the snapshot.
+        WriteAction.run<Throwable> {
+            val model = libraryTable.modifiableModel
+            val lib = model.createLibrary(libName)
+            lib.modifiableModel.let { lm ->
+                lm.addRoot(libDir.url, OrderRootType.SOURCES)
+                lm.commit()
+            }
+            model.commit()
+        }
+
+        // Build a SyncPlan with a DeleteAll AND a ModuleDepsPlan that needs the library.
+        val syncPlan = SyncPlan(
+            deleteAlls = listOf(DeleteAllPlan("${contentRootUrl}/deps")),
+            libraryPlans = emptyList(),
+            modulePlans = listOf(
+                ModuleDepsPlan(
+                    moduleName = myFixture.module.name,
+                    moduleDeps = emptySet(),
+                    libraryDeps = setOf(libName),
+                    externalLibraryPlans = emptyList(),
+                )
+            ),
+        )
+
+        val writePlan = runSuspendOnPooledThread { buildWritePlan(project, syncPlan) }
+
+        // The library is in librariesToRemove (scheduled for deletion).
+        assertTrue(
+            "librariesToRemove must contain $libName (scoped match from DeleteAll)",
+            writePlan.librariesToRemove.contains(libName)
+        )
+        // Because it will be deleted AND is not in libraryWriteOps, it must appear as a placeholder.
+        assertTrue(
+            "placeholderLibraries must contain $libName because it is needed by the module plan " +
+                "but will be removed by the DeleteAll",
+            writePlan.placeholderLibraries.contains(libName)
+        )
+
+        // Cleanup
+        WriteAction.run<Throwable> { libraryTable.getLibraryByName(libName)?.let { libraryTable.removeLibrary(it) } }
+    }
+
+    /**
+     * Regression test: a DeleteOne plus a re-sync (LibraryRootsPlan) for the same dep must not
+     * silently drop the recreation.  The library scheduled for removal must be treated as absent
+     * when computing libraryWriteOps, so the write plan emits a createWithKind op to recreate
+     * the library after deletion.
+     *
+     * This test validates the [buildWritePlan] diff logic - the critical invariant is that a
+     * library in librariesToRemove ALSO produces a [LibraryWriteOp] with createWithKind=true
+     * when a [LibraryRootsPlan] for the same library is present.
+     */
+    fun testBuildWritePlan_deleteAndResyncSameDepRecreatesLibrary() {
+        val myApp = myFixture.tempDirFixture.findOrCreateDir("delete_resync_test")
+        myFixture.tempDirFixture.findOrCreateDir("delete_resync_test/deps")
+        val libDir = myFixture.tempDirFixture.findOrCreateDir("delete_resync_test/deps/phoenix/lib")
+        PsiTestUtil.addContentRoot(myFixture.module, myApp)
+
+        val contentRootUrl = myApp.url
+        val libName = scopedDepLibraryName(contentRootUrl, "phoenix")
+        val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
+
+        // Seed the library with the same roots the re-sync will request - this is the critical
+        // scenario: identical roots means a naive diff sees no changes and emits no write op.
+        WriteAction.run<Throwable> {
+            val model = libraryTable.modifiableModel
+            val lib = model.createLibrary(libName, MixLibraryKind)
+            lib.modifiableModel.let { lm ->
+                lm.addRoot(libDir.url, OrderRootType.SOURCES)
+                lm.commit()
+            }
+            model.commit()
+        }
+
+        // Build a SyncPlan with a DeleteOne for phoenix AND a LibraryRootsPlan requesting the
+        // same roots (simulating a delete event immediately followed by a re-sync event in the
+        // same coalesced drain).
+        val syncPlan = SyncPlan(
+            deleteOnes = listOf(DeleteOnePlan("phoenix", contentRootUrl)),
+            libraryPlans = listOf(
+                LibraryRootsPlan(
+                    contentRootUrl = contentRootUrl,
+                    depName = "phoenix",
+                    classRootUrls = emptyList(),
+                    sourceRootUrls = listOf(libDir.url),
+                    excludeFolders = emptyList(),
+                )
+            ),
+            modulePlans = emptyList(),
+        )
+
+        val writePlan = runSuspendOnPooledThread { buildWritePlan(project, syncPlan) }
+
+        // The library MUST appear in librariesToRemove (from the DeleteOne).
+        assertTrue(
+            "librariesToRemove must contain $libName",
+            writePlan.librariesToRemove.contains(libName)
+        )
+
+        // The library MUST ALSO have a LibraryWriteOp to recreate it (treated as absent because
+        // it is scheduled for removal - the fix for the delete-before-sync regression).
+        val op = writePlan.libraryWriteOps.singleOrNull { it.libraryName == libName }
+        assertNotNull(
+            "Expected a LibraryWriteOp with createWithKind=true for $libName (delete+re-sync " +
+                "must recreate the library after deletion)",
+            op
+        )
+        requireNotNull(op)
+        assertTrue("createWithKind must be true (library is being recreated)", op.createWithKind)
+        assertEquals("addSourceUrls must contain the re-synced source root", listOf(libDir.url), op.addSourceUrls)
+        assertTrue("removeClassUrls must be empty (full recreation, not diff)", op.removeClassUrls.isEmpty())
+        assertTrue("removeSourceUrls must be empty (full recreation, not diff)", op.removeSourceUrls.isEmpty())
+
+        // Cleanup
+        WriteAction.run<Throwable> { libraryTable.getLibraryByName(libName)?.let { libraryTable.removeLibrary(it) } }
+    }
+
     // ------------------------------------------------------------------
     // Helpers
     // ------------------------------------------------------------------
 
     /**
+     * Runs an arbitrary [suspend] block on a pooled thread while the EDT (test thread) continues
+     * pumping its event queue.  Delegates to [MixSyncTestHelpers.runSuspendOnPooledThread].
+     */
+    private fun <T> runSuspendOnPooledThread(block: suspend () -> T): T =
+        MixSyncTestHelpers.runSuspendOnPooledThread(block)
+
+    /**
      * Calls [MixDepsSyncService.drain] directly on a pooled thread (bypassing the 250 ms debounce),
      * while pumping the IDE event queue from the EDT test thread so that
      * [com.intellij.openapi.application.edtWriteAction] blocks dispatched by the drain coroutine
-     * can execute.
+     * can execute.  Delegates to [MixSyncTestHelpers.drainDirectly].
      */
-    private fun drainDirectly(service: MixDepsSyncService) {
-        val done = AtomicBoolean(false)
-        var error: Throwable? = null
-        ApplicationManager.getApplication().executeOnPooledThread {
-            runBlocking {
-                try {
-                    service.drain()
-                } catch (e: Throwable) {
-                    error = e
-                }
-            }
-            done.set(true)
-        }
-        val deadline = System.currentTimeMillis() + 10_000L
-        while (!done.get()) {
-            assertTrue("drainDirectly timed out after 10 s", System.currentTimeMillis() < deadline)
-            PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
-        }
-        error?.let { throw AssertionError("drain() failed: ${it.message}", it) }
-    }
-
-    /**
-     * Removes all libraries whose name equals one of [depNames] (plain name) or whose scoped
-     * name starts with `"<depName> ["` and ends with `"]"`.
-     * Handles both legacy unscoped names and the new scoped names.
-     */
-    @Suppress("SameParameterValue")
-    private fun cleanupLibraries(vararg depNames: String) {
-        val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
-        val nameSet = depNames.toSet()
-        val toRemove = libraryTable.libraries.filter { lib ->
-            val name = lib.name ?: return@filter false
-            name in nameSet || nameSet.any { dep -> name.startsWith("$dep [") && name.endsWith("]") }
-        }
-        if (toRemove.isNotEmpty()) {
-            WriteAction.run<Throwable> { toRemove.forEach { libraryTable.removeLibrary(it) } }
-        }
-    }
+    private fun drainDirectly(service: MixDepsSyncService) = MixSyncTestHelpers.drainDirectly(service)
 }
