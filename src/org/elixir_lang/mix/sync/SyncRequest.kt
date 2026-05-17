@@ -43,10 +43,20 @@ sealed class SyncRequest(
     data class DepRoot(val depRoot: VirtualFile) : SyncRequest()
 
     /**
-     * Unresolved `_build` path that maps to a full dep sync if [contentRootCandidate] is an actual
-     * module content root. The service validates that under read access before converting to [All].
+     * Unresolved `_build` path that maps to a dep sync scoped to [contentRootCandidate]'s content
+     * root. The service validates the candidate under read access and converts it to [SyncRoot].
      */
     data class BuildPath(val contentRootCandidate: VirtualFile) : SyncRequest()
+
+    /**
+     * Resolved content-root-scoped sync request produced from [BuildPath] once the service has
+     * confirmed [contentRootUrl] is a real module content root.
+     *
+     * The service enumerates `deps/` under that single content root rather than scanning all
+     * content roots as [All] would. This scopes `_build` structural events to the one root that
+     * changed, avoiding unnecessary cross-root work.
+     */
+    data class SyncRoot(val contentRootUrl: String) : SyncRequest()
 
     /**
      * Unresolved `_build/<env>/lib/<dep>` or `_build/<env>/lib/<dep>/ebin` path.
@@ -93,7 +103,7 @@ sealed class SyncRequest(
     }
 }
 
-private val SOURCE_NAMES = setOf("c_src", "lib", "priv", "src")
+private val SOURCE_NAMES get() = MIX_DEP_SOURCE_DIR_NAMES
 
 /**
  * Classifies a single VFS event into a [SyncRequest], or returns `null` if the event does not
@@ -187,11 +197,12 @@ internal fun classifyByPath(file: VirtualFile): SyncRequest? {
         return SyncRequest.BuildPath(greatGrandParent)
     }
 
-    // deps/<dep>/lib|src|priv|c_src
+    // deps/<dep>/lib|src|priv|c_src - early return; greatGreatGrandParent not needed
     if (fileName in SOURCE_NAMES && grandParent.name == "deps") {
         return SyncRequest.DepRoot(parent)
     }
 
+    // Only compute the fourth-level ancestor when the remaining checks actually need it.
     val greatGreatGrandParent = greatGrandParent.parent ?: return null
 
     // _build/<env>/lib/<dep>
