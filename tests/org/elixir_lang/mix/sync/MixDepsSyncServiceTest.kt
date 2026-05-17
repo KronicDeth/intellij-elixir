@@ -22,8 +22,8 @@ import java.util.concurrent.atomic.AtomicBoolean
  * - Service registration: the service is reachable via `project.service<MixDepsSyncService>()`.
  * - Delete-before-sync ordering: delete and sync requests for independent targets both execute
  *   in a single drain, with deletes always running first.
- * - All-module fan-out: a [SyncRequest.SyncModule] resolves the module's `mix.exs` via PSI and
- *   wires any declared library deps into the module's order entries.
+ * - mix.exs resolution: a listener-produced [SyncRequest.MixFile] resolves to the owning module
+ *   during drain and wires any declared library deps into the module's order entries.
  *
  * Intentionally deferred (not covered here):
  * - Cancellation robustness: the platform WARA guarantees that a cancelled `readAction` leaves
@@ -35,7 +35,7 @@ import java.util.concurrent.atomic.AtomicBoolean
  * - Full service-lifecycle (scope cancelled on project close): requires creating and disposing a
  *   separate project instance; the registration smoke test covers the normal liveness path.
  *
- * The delete-coalescing and delete+sync tests use [drainDirectly] rather than [waitUntil] to
+ * The delete-coalescing and delete+sync tests use [drainDirectly] to
  * avoid VFS-event interference from directories created during fixture setup.
  */
 class MixDepsSyncServiceTest : PlatformTestCase() {
@@ -168,17 +168,20 @@ class MixDepsSyncServiceTest : PlatformTestCase() {
         assertNotNull("phoenix library must exist before drain", libraryTable.getLibraryByName("phoenix"))
         assertNotNull("ecto library must exist before drain", libraryTable.getLibraryByName("ecto"))
 
+        // Clear VFS-triggered setup events so this test drains exactly the two explicit
+        // requests below. Otherwise fixture-created _build events can add SyncRequest.All,
+        // which legitimately rebuilds phoenix from the still-present test fixture dep root.
+        service.clearPendingForTesting()
+
         // Delete phoenix only (DeleteOne); re-sync ecto (DepRoot).
         // DeleteOne does NOT suppress DepRoot syncs - the two requests are independent.
         // Expected after drain: phoenix absent (deleted), ecto present (re-synced from files).
         service.enqueue(SyncRequest.DeleteOne("phoenix"))
         service.enqueue(SyncRequest.DepRoot(ectoRoot))
 
-        // Wait for the delete to take effect.
-        waitUntil("Phoenix must be absent - it was targeted by DeleteOne") {
-            libraryTable.getLibraryByName("phoenix") == null
-        }
-        // At this point the drain has completed; ecto was re-synced in the same drain.
+        drainDirectly(service)
+
+        assertNull("Phoenix must be absent - it was targeted by DeleteOne", libraryTable.getLibraryByName("phoenix"))
         assertNotNull(
             "Ecto must be present - its DepRoot sync ran in the same drain " +
                 "(delete-before-sync ordering preserved)",
@@ -187,12 +190,13 @@ class MixDepsSyncServiceTest : PlatformTestCase() {
     }
 
     // ------------------------------------------------------------------
-    // Test 9 - all-module fan-out: SyncModule wires library into module order entries
+    // Test 9 - unresolved mix.exs request resolves to module and wires library order entries
     // ------------------------------------------------------------------
 
-    fun testSyncModule_wiresLibraryIntoModuleOrderEntries() {
+    fun testMixFileRequest_resolvesOwningModuleAndWiresLibraryIntoModuleOrderEntries() {
         // Set up a content root with a mix.exs that declares phoenix as a library dep.
-        MixTestFixtures.createMixRootWithDeps(myFixture, "my_app", "phoenix")
+        val root = MixTestFixtures.createMixRootWithDeps(myFixture, "my_app", "phoenix")
+        val mixFile = root.findChild("mix.exs")!!
         val depRoot = myFixture.tempDirFixture.findOrCreateDir("my_app/deps/phoenix")
         myFixture.tempDirFixture.findOrCreateDir("my_app/deps/phoenix/lib")
         MixTestFixtures.addBuildArtifacts(myFixture, "my_app", "dev", "phoenix")
@@ -204,12 +208,11 @@ class MixDepsSyncServiceTest : PlatformTestCase() {
         WriteAction.run<Throwable> { service.syncLibraries(arrayOf(depRoot), libraryTable) }
         assertNotNull("phoenix project library must exist before fan-out", libraryTable.getLibraryByName("phoenix"))
 
-        // Step 2: fan-out - enqueue a SyncModule request and run drain() directly so that
-        // syncLibrariesForModule resolves mix.exs via PSI and wires phoenix into the module's
-        // order entries.  drainDirectly() is used (instead of waitUntil) to avoid VFS-event
-        // interference from the fixture directories created above.
+        // Step 2: enqueue the unresolved listener-side mix.exs request and run drain() directly
+        // so that the service resolves the owning module under read access, then wires phoenix
+        // into the module's order entries.
         service.clearPendingForTesting()
-        service.enqueue(SyncRequest.SyncModule(myFixture.module))
+        service.enqueue(SyncRequest.MixFile(mixFile))
         drainDirectly(service)
 
         val orderEntries = ModuleRootManager.getInstance(myFixture.module).orderEntries
@@ -226,7 +229,7 @@ class MixDepsSyncServiceTest : PlatformTestCase() {
     // ------------------------------------------------------------------
 
     /**
-     * Regression test for the ancestor-guard in [MixDepsSyncService.syncLibraryRoots].
+     * Regression test for the ancestor-guard in [MixDepsSyncService.syncLibraries].
      *
      * When the module has multiple content entries (e.g. `my_app` AND an unrelated `other_app`
      * entry left over from umbrella tests or a multi-root project), calling
@@ -285,7 +288,7 @@ class MixDepsSyncServiceTest : PlatformTestCase() {
      * can execute.
      *
      * Use this when you need the drain result synchronously and VFS-event interference from the test
-     * fixture setup would corrupt a [waitUntil]-based assertion.
+     * fixture setup would corrupt a debounce-based assertion.
      */
     private fun drainDirectly(service: MixDepsSyncService) {
         val done = AtomicBoolean(false)
@@ -306,29 +309,6 @@ class MixDepsSyncServiceTest : PlatformTestCase() {
             PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
         }
         error?.let { throw AssertionError("drain() failed: ${it.message}", it) }
-    }
-
-    /**
-     * Polls [condition] in a tight EDT-pumping loop until it returns `true` or the
-     * [timeoutMs] is exceeded (default 10 s).
-     *
-     * Must be called from the EDT test thread **without** holding a write action.
-     * Uses [PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue] which explicitly releases
-     * and re-acquires the write-intent lock (WIL) between dispatches, allowing background
-     * coroutines' `edtWriteAction` blocks to acquire the write lock and execute.
-     * (Unlike [com.intellij.util.ui.UIUtil.dispatchAllInvocationEvents], which does NOT release
-     * WIL and therefore deadlocks with edtWriteAction in tests.)
-     */
-    private fun waitUntil(
-        message: String,
-        timeoutMs: Long = 10_000,
-        condition: () -> Boolean,
-    ) {
-        val deadline = System.currentTimeMillis() + timeoutMs
-        while (!condition()) {
-            assertTrue(message, System.currentTimeMillis() < deadline)
-            PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
-        }
     }
 
     @Suppress("SameParameterValue")

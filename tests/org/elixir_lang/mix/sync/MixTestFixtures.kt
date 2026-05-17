@@ -186,7 +186,7 @@ object MixTestFixtures {
      * why `VirtualFile.name` is not used here.
      *
      * Also adds `_build/<env>/consolidated/` to mirror the full `_build` layout expected by
-     * `DepsWatcher.syncLibrary`.
+     * `MixDepsSyncService.syncLibraryRoots`.
      *
      * Returns the list of ebin [VirtualFile]s.
      */

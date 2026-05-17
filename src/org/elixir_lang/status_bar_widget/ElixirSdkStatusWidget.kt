@@ -66,7 +66,7 @@ class ElixirSdkStatusWidget(@param:NotNull private val project: Project) : Custo
     // Cancelled explicitly in dispose(); also cancelled automatically on project close / plugin unload.
     private val widgetScope = project.service<ElixirCoroutineService>().supervisedChildScope("ElixirSdkStatusWidget")
 
-    // Debounce rapid rootsChanged() events (e.g. bulk module import, DepsWatcher) into a single update.
+    // Debounce rapid rootsChanged() events (e.g. bulk module import, Mix dep sync) into a single update.
     // DROP_OLDEST + extraBufferCapacity = 1 means tryEmit() never blocks and never fails.
     private val rootsChangedFlow = MutableSharedFlow<Unit>(
         extraBufferCapacity = 1,
@@ -504,7 +504,7 @@ class ElixirSdkStatusWidget(@param:NotNull private val project: Project) : Custo
         })
 
         // Listen for project root changes (project SDK changes).
-        // Debounced: bulk operations (import wizard, DepsWatcher) fire rootsChanged() rapidly;
+        // Debounced: bulk operations (import wizard, Mix dep sync) fire rootsChanged() rapidly;
         // collapse them into a single update after a 2-second quiet window.
         messageBusConnection?.subscribe(
             com.intellij.openapi.roots.ModuleRootListener.TOPIC,
