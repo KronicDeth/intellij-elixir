@@ -1,8 +1,18 @@
 package org.elixir_lang.mix.sync
 
+import com.intellij.openapi.roots.ModuleRootManager
+import com.intellij.openapi.roots.ModuleRootModificationUtil
 import com.intellij.openapi.util.io.FileUtil
+import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.testFramework.PsiTestUtil
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
+import org.elixir_lang.mix.sync.MixTestFixtures.addBuildArtifacts
+import org.elixir_lang.mix.sync.MixTestFixtures.addDeps
+import org.elixir_lang.mix.sync.MixTestFixtures.createMixRoot
+import org.elixir_lang.mix.sync.MixTestFixtures.createMixRootWithDeps
+import org.elixir_lang.mix.sync.MixTestFixtures.createSeparateRoots
+import org.elixir_lang.mix.sync.MixTestFixtures.createUmbrellaRoot
 
 /**
  * Shared VFS fixture helpers for Mix-related tests.
@@ -32,7 +42,9 @@ object MixTestFixtures {
         "defmodule ${moduleName}.MixProject do\n  use Mix.Project\nend\n"
 
     /**
-     * Creates a single Mix project root at [rootPath] inside the fixture temp dir.
+     * Creates a single Mix project root at [rootPath] inside the fixture temp dir and registers
+     * it as a module content root so that `isModuleContentRoot` in the path classifier
+     * recognises it during classification tests.
      *
      * Creates:
      * - `<rootPath>/mix.exs`
@@ -43,6 +55,10 @@ object MixTestFixtures {
         val root = fixture.tempDirFixture.findOrCreateDir(rootPath)
         val moduleName = rootPath.split("/").last().split("_").joinToString("") { it.replaceFirstChar(Char::uppercase) }
         fixture.tempDirFixture.createFile("$rootPath/mix.exs", mixExsContent(moduleName))
+        // Register as a content root so isModuleContentRoot() returns true for this directory.
+        // PsiTestUtil.addContentRoot handles the write action internally and the test framework
+        // cleans up content root entries on tearDown.
+        PsiTestUtil.addContentRoot(fixture.module, root)
         return root
     }
 
@@ -66,6 +82,51 @@ object MixTestFixtures {
             createMixRoot(fixture, "$umbrellaPath/apps/$appName")
         }
         return umbrellaRoot to appRoots
+    }
+
+    /**
+     * Creates a Mix project root at [rootPath] whose `mix.exs` declares [depNames] as library deps.
+     *
+     * The generated `mix.exs` includes a `def deps` function listing each dep as
+     * `{:<depName>, ">= 0.0.0"}` so that [org.elixir_lang.mix.watcher.TransitiveResolution] can
+     * resolve them via PSI and [org.elixir_lang.mix.sync.MixDepsSyncService.syncLibrariesForModule]
+     * can wire the corresponding project libraries into the module's order entries.
+     *
+     * Registers the root as a module content root (same as [createMixRoot]).
+     */
+    fun createMixRootWithDeps(
+        fixture: CodeInsightTestFixture,
+        rootPath: String,
+        vararg depNames: String,
+    ): VirtualFile {
+        val root = fixture.tempDirFixture.findOrCreateDir(rootPath)
+        val moduleName = rootPath.split("/").last().split("_")
+            .joinToString("") { it.replaceFirstChar(Char::uppercase) }
+        val appAtom = rootPath.split("/").last()
+        val depsList = if (depNames.isEmpty()) "[]" else
+            "[\n" + depNames.joinToString(",\n") { "      {:$it, \">= 0.0.0\"}" } + "\n    ]"
+        // DepGatherer requires a project/0 function whose keyword list has `deps: deps()`;
+        // it then finds the `def deps` function and reads its returned list.
+        fixture.tempDirFixture.createFile(
+            "$rootPath/mix.exs",
+            "defmodule ${moduleName}.MixProject do\n" +
+                "  use Mix.Project\n" +
+                "\n" +
+                "  def project do\n" +
+                "    [\n" +
+                "      app: :$appAtom,\n" +
+                "      version: \"0.1.0\",\n" +
+                "      deps: deps()\n" +
+                "    ]\n" +
+                "  end\n" +
+                "\n" +
+                "  def deps do\n" +
+                "    $depsList\n" +
+                "  end\n" +
+                "end\n"
+        )
+        PsiTestUtil.addContentRoot(fixture.module, root)
+        return root
     }
 
     /**
@@ -147,6 +208,7 @@ object MixTestFixtures {
      * Derives the temp-dir-relative path from [root] automatically, so call sites that already
      * hold a [VirtualFile] cannot pass a mismatched string path by accident.
      */
+    @Suppress("unused")
     fun addBuildArtifacts(
         fixture: CodeInsightTestFixture,
         root: VirtualFile,
@@ -165,5 +227,35 @@ object MixTestFixtures {
         val rootPath = FileUtil.toSystemIndependentName(root.path)
         return FileUtil.getRelativePath(tempDir, rootPath, '/')
             ?: error("VirtualFile '${root.path}' is not under fixture temp dir '${fixture.tempDirPath}'")
+    }
+
+    /**
+     * Removes all content entries that were added to [CodeInsightTestFixture.module] inside the
+     * fixture's temp directory by [createMixRoot], [createUmbrellaRoot], [createSeparateRoots],
+     * or [createMixRootWithDeps].
+     *
+     * [PsiTestUtil.addContentRoot] is **not** tracked by the IntelliJ fixture teardown machinery;
+     * callers that use these factory methods must invoke this helper in their `tearDown` (wrapped
+     * in `runAll`) to prevent content-root leakage into subsequent test classes that share the
+     * same light module.
+     *
+     * Only entries whose URL is under the fixture's temp dir are affected; framework-registered
+     * roots outside that tree are left untouched.
+     */
+    fun removeAllContentRoots(fixture: CodeInsightTestFixture) {
+        val module = fixture.module
+        val tempDirUrl = VfsUtilCore.pathToUrl(FileUtil.toSystemIndependentName(fixture.tempDirPath))
+        val toRemove = ModuleRootManager.getInstance(module).contentEntries
+            .filter { entry -> entry.url.startsWith(tempDirUrl) }
+        if (toRemove.isNotEmpty()) {
+            // ModuleRootModificationUtil.updateModel runs inside a write action internally.
+            ModuleRootModificationUtil.updateModel(module) { model ->
+                toRemove.forEach { entry ->
+                    model.contentEntries
+                        .firstOrNull { it.url == entry.url }
+                        ?.let { model.removeContentEntry(it) }
+                }
+            }
+        }
     }
 }

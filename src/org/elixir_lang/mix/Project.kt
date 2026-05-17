@@ -1,12 +1,11 @@
 package org.elixir_lang.mix
 
 import com.intellij.openapi.application.WriteAction
+import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.module.ModifiableModuleModel
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.progress.ProgressIndicator
-import com.intellij.openapi.progress.ProgressManager
-import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ContentEntry
 import com.intellij.openapi.roots.ModifiableRootModel
@@ -14,10 +13,12 @@ import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileVisitor
-import org.elixir_lang.DepsWatcher
+import com.intellij.util.concurrency.annotations.RequiresEdt
 import org.elixir_lang.mix.project.CANONICAL_FOLDER_MARKS
 import org.elixir_lang.mix.project.FolderMark
 import org.elixir_lang.mix.project.OtpApp
+import org.elixir_lang.mix.sync.MixDepsSyncService
+import org.elixir_lang.mix.sync.SyncRequest
 import org.elixir_lang.module.ElixirModuleType
 import java.io.EOFException
 import java.io.File
@@ -110,6 +111,7 @@ object Project {
         return result
     }
 
+    @RequiresEdt
     fun createModulesForOtpApps(
         project: Project,
         otpApps: List<OtpApp>,
@@ -132,12 +134,7 @@ object Project {
 
                     moduleModel.commit()
                 }
-                ProgressManager.getInstance()
-                    .run(object : Task.Backgroundable(project, "Scanning deps for Libraries", true) {
-                        override fun run(indicator: ProgressIndicator) {
-                            DepsWatcher(project).syncLibraries(indicator)
-                        }
-                    })
+                project.service<MixDepsSyncService>().enqueue(SyncRequest.All)
             }
 
             createdRootModels.map { it.module }
