@@ -1,5 +1,23 @@
 # Changelog
 
+## v23.9.0
+
+### Enhancements
+* Elixir settings consolidated -- renamed "Experimental Settings" to "Elixir Settings" and moved all settings into the top-level Elixir configurable (no more separate child page). - [@joshuataylor](https://github.com/joshuataylor)
+* Mix deps checker setting -- added an "Enable automatic Mix deps checking" toggle (default enabled) under Elixir Settings. When disabled, no deps check runs on project open or file changes. The checker also skips with a debug log when no Elixir SDK is configured, instead of showing the unhelpful "Mix deps check failed" notification. - [@joshuataylor](https://github.com/joshuataylor)
+* Erlang SDK prompt for mise Elixir SDKs -- when adding a mise-detected Elixir SDK without an Erlang SDK registered, a chooser dialog now lists valid mise-installed Erlang SDKs (sorted newest first, broken installations filtered out). The selected Erlang SDK is registered and linked automatically. - [@joshuataylor](https://github.com/joshuataylor)
+* Status bar widget -- when no Elixir SDK is configured, the widget popup now shows a "Detected Elixir SDKs" section listing valid mise installations. Clicking one registers the Elixir SDK, prompts for Erlang if needed, and sets it as the project SDK. - [@joshuataylor](https://github.com/joshuataylor)
+* When an Elixir SDK is added via Project Structure and no Erlang SDK is explicitly set, `configureInternalErlangSdk` now falls back to any Erlang SDK already registered in `ProjectJdkTable`. - [@joshuataylor](https://github.com/joshuataylor)
+
+### Bug Fixes
+* [#3834](https://github.com/KronicDeth/intellij-elixir/pull/3834) - [@joshuataylor](https://github.com/joshuataylor)
+  * Rethrow `ProcessCanceledException` in spell checking `Splitter` instead of swallowing it.
+  * Fix intention preview for `ConvertMatchToTypeOperation`.
+* [#3835](https://github.com/KronicDeth/intellij-elixir/pull/3835) - [@joshuataylor](https://github.com/joshuataylor)
+  * `ProgressManager.checkCanceled()` added to `while` loops in `@RequiresReadLock` methods.
+  * Replace `Dispatchers.EDT` with `Dispatchers.UI` in `ElixirSdkStatusWidget` (EDT holds write-intent lock unnecessarily for pure UI updates).
+  * Use no-arg `AnAction` constructor in `RefreshAllElixirSdksAction` to fix DevKit inspection.
+
 ## v23.8.2
 
 ### Enhancements

@@ -1,6 +1,28 @@
 <html>
 <body>
 
+<h1>v23.9.0</h1>
+<ul>
+    <li>
+        <p>Enhancements</p>
+        <ul>
+            <li>Elixir settings moved from a separate "Experimental Settings" child page into the main Elixir settings page for easier access.</li>
+            <li>Mix deps checker is now a configurable setting -- disable it under Elixir Settings if you don't want automatic dependency checking. The checker also no longer shows a notification when no Elixir SDK is configured.</li>
+            <li>When adding a mise Elixir SDK without an Erlang SDK, a dialog now prompts you to select from your mise-installed Erlang versions (sorted newest first).</li>
+            <li>The status bar SDK widget now shows detected mise Elixir SDKs when no SDK is configured -- click one to set up Elixir and Erlang SDKs in one step.</li>
+            <li>Adding an Elixir SDK now auto-links an existing Erlang SDK if one is already registered.</li>
+        </ul>
+    </li>
+    <li>
+        <p>Bug Fixes</p>
+        <ul>
+            <li>Fixed <code>ProcessCanceledException</code> being swallowed in spell checking, which could cause stale results.</li>
+            <li>Fixed intention preview for <code>ConvertMatchToTypeOperation</code>.</li>
+            <li>Added cancellation checks to loops in read-lock-annotated methods to improve IDE responsiveness during indexing.</li>
+        </ul>
+    </li>
+</ul>
+
 <h1>v23.8.2</h1>
 <ul>
     <li>
