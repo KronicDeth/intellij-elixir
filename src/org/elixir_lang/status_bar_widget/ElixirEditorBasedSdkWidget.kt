@@ -10,6 +10,7 @@ import com.intellij.openapi.application.readAction
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.module.ModuleUtilCore
+import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.ProjectJdkTable
 import com.intellij.openapi.projectRoots.Sdk
@@ -30,6 +31,7 @@ import com.intellij.platform.ide.progress.runWithModalProgressBlocking
 import com.intellij.ui.EditorNotifications
 import com.intellij.util.concurrency.ThreadingAssertions
 import com.intellij.util.concurrency.annotations.RequiresBackgroundThread
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import com.intellij.util.messages.MessageBusConnection
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
@@ -138,7 +140,7 @@ class ElixirEditorBasedSdkWidget(
      * avoid redundant work during bulk rootsChanged events.
      *
      * Primary trigger: `mix deps.get` → VFS detects new files under `deps/` and `_build/` →
-     * [org.elixir_lang.DepsWatcher] syncs libraries → each per-dep `libraryModifiableModel.commit()` and
+     * Mix dep sync updates libraries → each per-dep `libraryModifiableModel.commit()` and
      * `ModuleRootManager.modifiableModel.commit()` fires a separate rootsChanged event.
      * A Phoenix project with 30 deps can easily generate 60–90+ events in quick succession.
      */
@@ -610,8 +612,10 @@ class ElixirEditorBasedSdkWidget(
      * that actually drives code insight - rather than the project-level one. The mismatch between them
      * is reported separately by [detectModuleSdkIssues].
      */
+    @RequiresReadLock
     internal fun findModuleLevelElixirSdk(): Sdk? {
         for (module in ModuleManager.getInstance(project).modules) {
+            ProgressManager.checkCanceled()
             if (!module.isElixirModule()) continue
             val moduleSdk = ElixirSdkLookup.mostSpecificSdk(module)
             if (moduleSdk != null) return moduleSdk
@@ -629,12 +633,14 @@ class ElixirEditorBasedSdkWidget(
      * or call this inside a `readAction { }` block.
      */
     @RequiresBackgroundThread
+    @RequiresReadLock
     internal fun detectModuleSdkIssues(): List<ModuleSdkIssue> {
         ThreadingAssertions.assertBackgroundThread()
         val issues = mutableListOf<ModuleSdkIssue>()
         val projectSdk = ProjectRootManager.getInstance(project).projectSdk
 
         for (module in ModuleManager.getInstance(project).modules) {
+            ProgressManager.checkCanceled()
             if (!module.isElixirModule()) continue
 
             val rootManager = ModuleRootManager.getInstance(module)
@@ -642,6 +648,7 @@ class ElixirEditorBasedSdkWidget(
             // --- Rich IDE path: detect dangling/mismatch JdkOrderEntry ---
             var hasJdkEntry = false
             for (entry in rootManager.orderEntries) {
+                ProgressManager.checkCanceled()
                 if (entry !is JdkOrderEntry) continue
 
                 val jdkName = entry.jdkName ?: continue
@@ -729,6 +736,7 @@ class ElixirEditorBasedSdkWidget(
         val classpathIssues: List<String>,
     )
 
+    @RequiresReadLock
     private fun collectNotificationScanModelData(): NotificationScanModelData {
         val moduleSdkIssues = detectModuleSdkIssues()
         val folderMarkIssues = ProjectModuleSetupValidator.detectFolderMarkIssues(project)
@@ -743,6 +751,7 @@ class ElixirEditorBasedSdkWidget(
         )
     }
 
+    @RequiresReadLock
     private fun collectProjectSdkSnapshot(): ProjectSdkSnapshot {
         val elixirSdk = findModuleLevelElixirSdk()
         val elixirVersion = elixirSdk?.versionString?.let {

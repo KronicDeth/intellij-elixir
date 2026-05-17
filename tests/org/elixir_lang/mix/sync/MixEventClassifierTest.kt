@@ -8,7 +8,7 @@ import org.elixir_lang.PlatformTestCase
  * Unit tests for [MixEventClassifier].
  *
  * Covers the root-detection API shared by [org.elixir_lang.mix.DepsCheckerService] and the
- * dep-sync listener adapters in [org.elixir_lang.DepsWatcher] / [org.elixir_lang.mix.Watcher].
+ * dep-sync listener adapter in [MixDepsBulkFileListener].
  *
  * Tests for the fine-grained per-event `SyncRequest` mapping live in `DepsWatcherTest`.
  *
