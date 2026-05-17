@@ -62,10 +62,11 @@ jobs:
           otp-version: ${{ inputs.otp-version || '24.3.4.6' }}
           idea-version: ${{ matrix.idea-version }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          build-scan-publish: 'true'
 
       - name: Run Tests
         id: test
-        run: ./gradlew --stacktrace check --scan
+        run: ./gradlew --stacktrace check
 
       - name: Publish Test Results
         id: publish-test-results-linux
@@ -85,19 +86,20 @@ jobs:
           check_name: Test Results (${{ matrix.os }}, ${{ matrix.idea-version }})
           report_suite_logs: "error"
 
-      - name: Upload Test Reports
+      - name: Upload Test Reports (on failure or when requested)
         id: upload-test-reports
         uses: actions/upload-artifact@v6
-        if: ${{ always() && inputs.upload-reports }}
+        if: ${{ always() && (failure() || inputs.upload-reports) }}
         with:
           name: test-reports-${{ matrix.os }}-${{ matrix.idea-version }}
           path: |
             **/build/reports/tests/**
             **/build/test-results/**
+            **/build/reports/problems/**
           retention-days: 30
           include-hidden-files: true
           overwrite: true
-          if-no-files-found: 'error'
+          if-no-files-found: 'warn'
 
   build-plugin:
     runs-on: ubuntu-22.04

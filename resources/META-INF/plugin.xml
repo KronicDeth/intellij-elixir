@@ -97,12 +97,6 @@
         <fileType name="Elixir Script" implementationClass="org.elixir_lang.ElixirScriptFileType" fieldName="INSTANCE"
                   language="Elixir" extensions="exs"/>
 
-        <projectConfigurable
-                parentId="language.elixir"
-                displayName="Experimental Settings"
-                id="org.elixir_lang.settings.ElixirExperimentalSettingsConfigurable"
-                instance="org.elixir_lang.settings.ElixirExperimentalSettingsConfigurable"/>
-
         <!-- Facet -->
         <applicationConfigurable id="language.elixir.sdks.elixir"
                                  parentId="language.elixir"

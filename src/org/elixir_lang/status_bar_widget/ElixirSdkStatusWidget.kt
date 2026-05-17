@@ -37,11 +37,14 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.elixir_lang.Icons
 import org.elixir_lang.isElixirModule
+import org.elixir_lang.sdk.SdkHomeKey
+import org.elixir_lang.sdk.SdkHomePaths
 import org.elixir_lang.mix.project.ProjectModuleSetupValidator
 import org.elixir_lang.mix.project.ProjectModuleSetupValidator.FolderMarkIssue
 import org.elixir_lang.sdk.SdkEbinPaths
 import org.elixir_lang.sdk.elixir.SdkSettingsOpener
 import org.elixir_lang.sdk.elixir.Type
+import org.elixir_lang.sdk.elixir.Type.Companion.SKIP_ERLANG_SETTINGS_HINT_KEY
 import org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData
 import org.elixir_lang.util.ElixirCoroutineService
 import org.jetbrains.annotations.NotNull
@@ -97,6 +100,9 @@ class ElixirSdkStatusWidget(@param:NotNull private val project: Project) : Custo
     // Cached widget presentation data - computed once per update
     @Volatile
     private var cachedPresentation: WidgetPresentation? = null
+
+    @Volatile
+    private var cachedSdkConfigured: Boolean = true
 
     private data class WidgetPresentation(
         val text: String,
@@ -168,6 +174,16 @@ class ElixirSdkStatusWidget(@param:NotNull private val project: Project) : Custo
     private fun showPopup(e: MouseEvent) {
         val actionGroup = DefaultActionGroup().apply {
             add(createAddSdkAction())
+
+            // When no SDK is configured, show detected mise Elixir SDKs for quick setup
+            if (!cachedSdkConfigured) {
+                val detectedActions = createDetectedSdkActions()
+                if (detectedActions.isNotEmpty()) {
+                    add(Separator.create("Detected Elixir SDKs"))
+                    detectedActions.forEach { add(it) }
+                }
+            }
+
             val actionManager = ActionManager.getInstance()
             actionManager.getAction("Elixir.RefreshAllElixirSdks")?.let { add(it) }
             actionManager.getAction("Elixir.InstallMixDependencies")?.let { add(it) }
@@ -219,10 +235,57 @@ class ElixirSdkStatusWidget(@param:NotNull private val project: Project) : Custo
         }
     }
 
+    private fun createDetectedSdkActions(): List<AnAction> {
+        val miseHomes = mutableMapOf<SdkHomeKey, String>()
+        SdkHomePaths.mergeMise(miseHomes, "elixir")
+
+        val elixirSdkType = Type.instance
+        return miseHomes.entries
+            .filter { (_, path) -> elixirSdkType.isValidSdkHome(path) }
+            .map { (_, homePath) ->
+                val sdkName = Type.suggestSdkNameForHome(homePath, null)
+                object : AnAction(sdkName, "Add $sdkName and set as project SDK", Icons.LANGUAGE) {
+                    override fun actionPerformed(e: AnActionEvent) {
+                        addDetectedElixirSdk(homePath)
+                    }
+
+                    override fun getActionUpdateThread(): ActionUpdateThread = ActionUpdateThread.BGT
+                }
+            }
+    }
+
+    private fun addDetectedElixirSdk(homePath: String) {
+        val elixirSdkType = Type.instance
+        val canonicalHome = org.elixir_lang.sdk.wsl.wslCompat.canonicalizePath(homePath)
+        val versionString = Type.versionStringForHome(canonicalHome, null) ?: return
+        val sdkName = Type.suggestSdkNameForHome(canonicalHome, null)
+
+        val newSdk = com.intellij.openapi.projectRoots.impl.ProjectJdkImpl(
+            sdkName, elixirSdkType, canonicalHome, versionString
+        )
+
+        val app = com.intellij.openapi.application.ApplicationManager.getApplication()
+        app.invokeLater {
+            app.runWriteAction {
+                ProjectJdkTable.getInstance().addJdk(newSdk)
+            }
+            // setupSdkPaths triggers the Erlang SDK prompt if needed.
+            // Skip the "reopen settings" hint since we're not in the settings dialog.
+            newSdk.putUserData(SKIP_ERLANG_SETTINGS_HINT_KEY, true)
+            elixirSdkType.setupSdkPaths(newSdk)
+
+            // Set as project SDK
+            app.runWriteAction {
+                ProjectRootManager.getInstance(project).projectSdk = newSdk
+            }
+        }
+    }
+
     private fun updateWidget() {
         widgetScope.launch {
             cachedPresentation = null
             val sdkStatus = detectSdkStatus()
+            cachedSdkConfigured = sdkStatus !is SdkStatus.NotConfigured
             val presentation = createPresentation(sdkStatus)
             cachedPresentation = presentation
 
