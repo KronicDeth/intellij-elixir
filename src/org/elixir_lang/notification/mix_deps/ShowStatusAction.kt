@@ -18,8 +18,8 @@ import com.intellij.openapi.vfs.VirtualFile
 import org.elixir_lang.mix.DepsCheckerService
 import org.elixir_lang.mix.createMixDepsStatusRunConfiguration
 import org.elixir_lang.notification.setup_sdk.Notifier
-import org.elixir_lang.util.ElixirProjectDisposable
 import org.elixir_lang.sdk.elixir.findElixirSdkForRoot
+import org.elixir_lang.util.ElixirProjectDisposable
 
 class ShowStatusAction : NotificationAction("Run mix deps") {
     override fun actionPerformed(e: AnActionEvent, notification: Notification) {
@@ -33,20 +33,20 @@ class ShowStatusAction : NotificationAction("Run mix deps") {
 
         val projectRoot = getProjectRoot(project)
         if (projectRoot == null) {
-            Notifier.mixDepsError(project, "Could not determine project root directory")
+            Notifier.mixDepsError(project, project.name, "Could not determine project root directory")
             return
         }
 
         val sdk = findElixirSdkForRoot(project, projectRoot)
         if (sdk == null) {
-            Notifier.mixDepsNoSdk(project)
+            Notifier.mixDepsNoSdk(project, projectRoot.name)
             return
         }
 
         try {
             val settings = createMixDepsStatusRunConfiguration(project, projectRoot)
             if (settings == null) {
-                Notifier.mixDepsError(project, "Could not determine module for ${projectRoot.path}")
+                Notifier.mixDepsError(project, projectRoot.name, "Could not determine module for ${projectRoot.path}")
                 return
             }
 
@@ -76,12 +76,12 @@ class ShowStatusAction : NotificationAction("Run mix deps") {
 
             ProgramRunnerUtil.executeConfiguration(settings, DefaultRunExecutor.getRunExecutorInstance())
         } catch (e: Exception) {
-            Notifier.mixDepsError(project, e.message ?: "Unknown error")
+            Notifier.mixDepsError(project, projectRoot.name, e.message ?: "Unknown error")
         }
     }
 
     private fun getProjectRoot(project: Project): VirtualFile? {
-        val contentRoots = ProjectRootManager.getInstance(project).contentRootsFromAllModules
+        val contentRoots = ProjectRootManager.getInstance(project).contentRoots
 
         return contentRoots.firstOrNull { root ->
             root.findChild("mix.exs") != null

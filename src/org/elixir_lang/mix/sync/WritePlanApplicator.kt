@@ -21,7 +21,7 @@ internal data class ApplyStats(val librariesChanged: Int, val modulesChanged: In
  *
  * **Threading contract:** the [edtWriteAction] block performs ONLY model mutations.  No VFS child
  * enumeration, PSI resolution, [com.intellij.openapi.module.ModuleUtil.findModuleForFile],
- * [com.intellij.openapi.roots.ProjectRootManager.contentRootsFromAllModules], or transitive
+ * [com.intellij.openapi.roots.ProjectRootManager.contentRoots], or transitive
  * dependency discovery runs inside the write lock.  All scanning was done by [buildWritePlan] in
  * a prior [com.intellij.openapi.application.readAction].
  *

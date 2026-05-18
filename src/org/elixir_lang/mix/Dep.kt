@@ -17,12 +17,10 @@ import java.nio.file.Paths
  */
 data class Dep(val application: String, val path: String, val type: Type = Type.LIBRARY) {
     fun virtualFile(project: Project): VirtualFile? =
-        ProjectRootManager
-            .getInstance(project)
-            .contentRootsFromAllModules
-            .mapNotNull { it.findFileByRelativePath(path) }
-            .firstOrNull()
-            ?: VfsUtil.findFile(Paths.get(path), true)
+            ProjectRootManager
+                .getInstance(project)
+                .contentRoots.firstNotNullOfOrNull { it.findFileByRelativePath(path) }
+                ?: VfsUtil.findFile(Paths.get(path), true)
 
     enum class Type {
         LIBRARY,
@@ -78,7 +76,7 @@ data class Dep(val application: String, val path: String, val type: Type = Type.
                 else -> null
             }
 
-        private fun name(atom: ElixirAtom): String? =
+        private fun name(atom: ElixirAtom): String =
             atom.line?.let { name(it) }
                 ?: atom.node.lastChildNode.text
 
