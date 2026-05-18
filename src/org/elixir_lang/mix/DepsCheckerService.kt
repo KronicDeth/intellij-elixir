@@ -24,6 +24,14 @@ import org.elixir_lang.sdk.elixir.findElixirSdkForRoot
 import org.elixir_lang.settings.ElixirExperimentalSettings
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.time.Duration.Companion.milliseconds
+
+private sealed interface DepsCheckResult {
+    data object NoSupported : DepsCheckResult
+    data class NonOk(val root: VirtualFile) : DepsCheckResult
+    data object AllOk : DepsCheckResult
+    data class Error(val rootName: String, val message: String) : DepsCheckResult
+}
+
 @Service(Service.Level.PROJECT)
 class DepsCheckerService(private val project: Project, private val cs: CoroutineScope) {
     private val checkMutex = Mutex()
@@ -33,6 +41,7 @@ class DepsCheckerService(private val project: Project, private val cs: Coroutine
         extraBufferCapacity = 1,
         onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
+
     init {
         project.messageBus.connect(cs).subscribe(
             VirtualFileManager.VFS_CHANGES,
@@ -69,69 +78,81 @@ class DepsCheckerService(private val project: Project, private val cs: Coroutine
                 }
         }
     }
+
     fun scheduleInitialCheck() {
         cs.launch { runCheck("startup") }
     }
+
+    // skips the debounce to run the check immediately, i.e. the user requested the check, so don't wait.
     fun scheduleCheckNow(reason: String) {
         cs.launch { runCheck(reason) }
     }
+
     private suspend fun runCheck(reason: String) {
         if (!ElixirExperimentalSettings.instance.state.enableMixDepsCheck) {
             LOG.debug("DepsCheckerService: Mix deps check disabled in settings")
             return
         }
-        checkMutex.withLock {
-            if (project.isDisposed) {
-                return
-            }
-            // Drain the roots accumulated during the debounce window atomically.
-            // When empty (startup or explicit scheduleCheckNow), fall back to all Mix roots.
-            val rootsToCheck: List<VirtualFile> = pendingRoots.getAndSet(emptySet()).toList()
-                .ifEmpty {
-                    val allRoots = readAction { ProjectRootManager.getInstance(project).contentRoots.asList() }
-                    MixEventClassifier.selectTopLevelMixRoots(allRoots)
-                }
-            LOG.debug("DepsCheckerService: Checking Mix deps ($reason) for ${rootsToCheck.size} root(s)")
-            var sawSupported = false
-            var sawNonOk = false
-            for (root in rootsToCheck) {
-                val sdk = readAction { findElixirSdkForRoot(project, root) }
-                when (val statusResult = withContext(Dispatchers.IO) { depsStatusResult(project, root, sdk) }) {
-                    is DepsStatusResult.Available -> {
-                        sawSupported = true
-                        if (statusResult.status.hasNonOk) {
-                            sawNonOk = true
-                        }
-                    }
-                    is DepsStatusResult.Error -> {
-                        withContext(Dispatchers.EDT) {
-                            if (!project.isDisposed) Notifier.mixDepsCheckFailed(project, statusResult.message)
-                        }
-                        return
-                    }
-                    DepsStatusResult.Unsupported -> Unit
-                }
-            }
-            if (!sawSupported) {
-                return
-            }
-            withContext(Dispatchers.EDT) {
-                if (!project.isDisposed) {
-                    if (sawNonOk) {
-                        Notifier.mixDepsOutdated(project)
-                    } else {
-                        Notifier.clearMixDepsOutdated(project)
-                    }
-                }
+
+        val result = checkDepsStatus(reason) ?: return
+
+        withContext(Dispatchers.EDT) {
+            if (project.isDisposed) return@withContext
+            when (result) {
+                is DepsCheckResult.Error -> Notifier.mixDepsCheckFailed(project, result.rootName, result.message)
+                is DepsCheckResult.NonOk -> Notifier.mixDepsOutdated(project, result.root)
+                DepsCheckResult.AllOk -> Notifier.clearMixDepsOutdated(project)
+                DepsCheckResult.NoSupported -> Unit
             }
         }
     }
+
+    /**
+     * Runs the deps status check under [checkMutex], returning the result for notification.
+     * Returns `null` if the project is disposed (caller should bail out).
+     */
+    private suspend fun checkDepsStatus(reason: String): DepsCheckResult? = checkMutex.withLock {
+        if (project.isDisposed) return@withLock null
+
+        val rootsToCheck: List<VirtualFile> = pendingRoots.getAndSet(emptySet()).toList()
+            .ifEmpty {
+                val allRoots = readAction { ProjectRootManager.getInstance(project).contentRoots.asList() }
+                MixEventClassifier.selectTopLevelMixRoots(allRoots)
+            }
+        LOG.debug("DepsCheckerService: Checking Mix deps ($reason) for ${rootsToCheck.size} root(s)")
+
+        var sawSupported = false
+        var firstNonOkRoot: VirtualFile? = null
+        for (root in rootsToCheck) {
+            val sdk = readAction { findElixirSdkForRoot(project, root) }
+            when (val statusResult = withContext(Dispatchers.IO) { depsStatusResult(project, root, sdk) }) {
+                is DepsStatusResult.Available -> {
+                    sawSupported = true
+                    if (statusResult.status.hasNonOk && firstNonOkRoot == null) {
+                        firstNonOkRoot = root
+                    }
+                }
+                is DepsStatusResult.Error -> {
+                    return@withLock DepsCheckResult.Error(root.name, statusResult.message)
+                }
+                DepsStatusResult.Unsupported -> Unit
+            }
+        }
+
+        when {
+            !sawSupported -> DepsCheckResult.NoSupported
+            firstNonOkRoot != null -> DepsCheckResult.NonOk(firstNonOkRoot)
+            else -> DepsCheckResult.AllOk
+        }
+    }
+
     private fun depsStatusResult(project: Project, projectRoot: VirtualFile, sdk: Sdk?): DepsStatusResult {
         val packageManagerVirtualFile = virtualFile(projectRoot)
             ?: return DepsStatusResult.Unsupported
         val (packageManager, packageVirtualFile) = packageManagerVirtualFile
         return packageManager.depsStatus(project, packageVirtualFile, sdk)
     }
+
     companion object {
         private const val DEPS_CHECK_DEBOUNCE_MS: Long = 1500
         private val LOG = logger<DepsCheckerService>()

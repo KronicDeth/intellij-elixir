@@ -33,20 +33,20 @@ class ShowStatusAction : NotificationAction("Run mix deps") {
 
         val projectRoot = getProjectRoot(project)
         if (projectRoot == null) {
-            Notifier.mixDepsError(project, "Could not determine project root directory")
+            Notifier.mixDepsError(project, project.name, "Could not determine project root directory")
             return
         }
 
         val sdk = findElixirSdkForRoot(project, projectRoot)
         if (sdk == null) {
-            Notifier.mixDepsNoSdk(project)
+            Notifier.mixDepsNoSdk(project, projectRoot.name)
             return
         }
 
         try {
             val settings = createMixDepsStatusRunConfiguration(project, projectRoot)
             if (settings == null) {
-                Notifier.mixDepsError(project, "Could not determine module for ${projectRoot.path}")
+                Notifier.mixDepsError(project, projectRoot.name, "Could not determine module for ${projectRoot.path}")
                 return
             }
 
@@ -76,7 +76,7 @@ class ShowStatusAction : NotificationAction("Run mix deps") {
 
             ProgramRunnerUtil.executeConfiguration(settings, DefaultRunExecutor.getRunExecutorInstance())
         } catch (e: Exception) {
-            Notifier.mixDepsError(project, e.message ?: "Unknown error")
+            Notifier.mixDepsError(project, projectRoot.name, e.message ?: "Unknown error")
         }
     }
 
