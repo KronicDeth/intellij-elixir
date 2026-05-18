@@ -89,19 +89,19 @@ class DepsCheckerService(private val project: Project, private val cs: Coroutine
                 .ifEmpty { MixEventClassifier.selectTopLevelMixRoots(ProjectRootManager.getInstance(project).contentRootsFromAllModules) }
             LOG.debug("DepsCheckerService: Checking Mix deps ($reason) for ${rootsToCheck.size} root(s)")
             var sawSupported = false
-            var sawNonOk = false
+            var firstNonOkRoot: VirtualFile? = null
             for (root in rootsToCheck) {
                 val sdk = findElixirSdkForRoot(project, root)
                 when (val statusResult = withContext(Dispatchers.IO) { depsStatusResult(project, root, sdk) }) {
                     is DepsStatusResult.Available -> {
                         sawSupported = true
-                        if (statusResult.status.hasNonOk) {
-                            sawNonOk = true
+                        if (statusResult.status.hasNonOk && firstNonOkRoot == null) {
+                            firstNonOkRoot = root
                         }
                     }
                     is DepsStatusResult.Error -> {
                         withContext(Dispatchers.EDT) {
-                            if (!project.isDisposed) Notifier.mixDepsCheckFailed(project, statusResult.message)
+                            if (!project.isDisposed) Notifier.mixDepsCheckFailed(project, root.name, statusResult.message)
                         }
                         return
                     }
@@ -113,8 +113,8 @@ class DepsCheckerService(private val project: Project, private val cs: Coroutine
             }
             withContext(Dispatchers.EDT) {
                 if (!project.isDisposed) {
-                    if (sawNonOk) {
-                        Notifier.mixDepsOutdated(project)
+                    if (firstNonOkRoot != null) {
+                        Notifier.mixDepsOutdated(project, firstNonOkRoot.name)
                     } else {
                         Notifier.clearMixDepsOutdated(project)
                     }
