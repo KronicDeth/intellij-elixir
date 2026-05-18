@@ -5,15 +5,12 @@ import com.intellij.icons.AllIcons
 import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.*
-import com.intellij.openapi.application.readAction
 import com.intellij.openapi.application.edtWriteAction
-import com.intellij.platform.ide.progress.ModalTaskOwner
-import com.intellij.platform.ide.progress.runWithModalProgressBlocking
+import com.intellij.openapi.application.readAction
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.openapi.project.Project
-import com.intellij.ui.EditorNotifications
 import com.intellij.openapi.projectRoots.ProjectJdkTable
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.roots.JdkOrderEntry
@@ -28,19 +25,17 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.toNioPathOrNull
 import com.intellij.openapi.wm.StatusBarWidget
 import com.intellij.openapi.wm.impl.status.EditorBasedStatusBarPopup
+import com.intellij.platform.ide.progress.ModalTaskOwner
+import com.intellij.platform.ide.progress.runWithModalProgressBlocking
+import com.intellij.ui.EditorNotifications
 import com.intellij.util.concurrency.ThreadingAssertions
 import com.intellij.util.concurrency.annotations.RequiresBackgroundThread
 import com.intellij.util.messages.MessageBusConnection
-import java.nio.file.Path
-import java.util.concurrent.CancellationException
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.onStart
 import org.elixir_lang.Facet
 import org.elixir_lang.Icons
 import org.elixir_lang.isElixirModule
@@ -53,6 +48,9 @@ import org.elixir_lang.sdk.SdkRegistrar
 import org.elixir_lang.sdk.elixir.SdkSettingsOpener
 import org.elixir_lang.sdk.elixir.Type
 import org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData
+import org.elixir_lang.sdk.wsl.wslCompat
+import java.nio.file.Path
+import java.util.concurrent.CancellationException
 import kotlin.time.Duration.Companion.milliseconds
 
 private val LOG = logger<ElixirEditorBasedSdkWidget>()
@@ -154,6 +152,11 @@ class ElixirEditorBasedSdkWidget(
         // multiframe widget instances would leave behind active collectors until project close.
         val notificationScanJob = scope.launch {
             notificationScanRequests
+                // Emit a synthetic Unit on start so the initial scan fires ~500 ms after the
+                // coroutine starts (same debounce path as a rootsChanged event), without waiting
+                // for the first external trigger.  onStart { emit(Unit) } is safe here because
+                // we are already inside the subscribed collector, so the event is not dropped.
+                .onStart { emit(Unit) }
                 .debounce(500.milliseconds)  // slightly longer than widget debounce since notifications are less urgent
                 // Use `collect` (not `collectLatest`) deliberately: if events arrive while a scan
                 // is running, they queue in the debounce operator and trigger one follow-up scan
@@ -169,14 +172,17 @@ class ElixirEditorBasedSdkWidget(
                         ioData.elixirVersionBySdk,
                         ioData.miseByContentRoot,
                     )
-                    val miseSuggestion = detectMiseSdkForUnconfiguredModules(
+                    // Build per-module mise assignments: module name → the MiseVersions that mise
+                    // resolves for that module's own content root.  Covers all modules with an
+                    // installed elixir entry, regardless of whether they already have an SDK.
+                    val miseAssignments = buildMiseAssignments(
                         modelData.moduleMiseCheckData,
                         ioData.miseByContentRoot,
                     )
                     notifyIfNeeded(
                         moduleSdkIssues = modelData.moduleSdkIssues + miseIssues,
                         folderMarkIssues = modelData.folderMarkIssues,
-                        miseSuggestion = miseSuggestion,
+                        miseAssignments = miseAssignments,
                         projectSdkSnapshot = modelData.projectSdkSnapshot,
                         classpathIssues = ioData.classpathIssues,
                     )
@@ -234,7 +240,7 @@ class ElixirEditorBasedSdkWidget(
     }
 
     override fun createInstance(project: Project): StatusBarWidget =
-        ElixirEditorBasedSdkWidget(project, scope)
+            ElixirEditorBasedSdkWidget(project, scope)
 
     override fun registerCustomListeners(connection: MessageBusConnection) {
         // JDK table changes (SDK added/removed/renamed) - affects both widget display and
@@ -330,7 +336,9 @@ class ElixirEditorBasedSdkWidget(
             return state
         }
 
-        val tooltipBase = if (showModuleName) "Elixir SDK: $elixirVersion (module '${module.name}')" else "Elixir SDK: $elixirVersion"
+        val tooltipBase =
+                if (showModuleName) "Elixir SDK: $elixirVersion (module '${module.name}')"
+                else "Elixir SDK: $elixirVersion"
         val state = WidgetState(
             toolTip = tooltipBase,
             text = "Elixir $elixirVersion",
@@ -357,7 +365,8 @@ class ElixirEditorBasedSdkWidget(
     private fun notifyIfNeeded(
         moduleSdkIssues: List<ModuleSdkIssue>,
         folderMarkIssues: List<FolderMarkIssue>,
-        miseSuggestion: MiseVersions? = null,
+        /** Per-module mise assignments: module name → MiseVersions for that module's own content root. */
+        miseAssignments: Map<String, MiseVersions> = emptyMap(),
         projectSdkSnapshot: ProjectSdkSnapshot,
         classpathIssues: List<String>,
     ) {
@@ -368,16 +377,22 @@ class ElixirEditorBasedSdkWidget(
         val sdkStatus: SdkStatus = when {
             moduleSdkIssues.isNotEmpty() ->
                 SdkStatus.ModuleSdkError(elixirSdk, projectSdkSnapshot.elixirVersion, moduleSdkIssues)
+
             folderMarkIssues.isNotEmpty() && elixirSdk != null ->
                 SdkStatus.FolderMarkWarning(elixirSdk, elixirVersion, folderMarkIssues)
-            elixirSdk == null && miseSuggestion != null ->
-                SdkStatus.NotConfiguredMiseAvailable(miseSuggestion)
+
+            elixirSdk == null && miseAssignments.isNotEmpty() ->
+                SdkStatus.NotConfiguredMiseAvailable(miseAssignments.values.first())
+
             elixirSdk == null ->
                 SdkStatus.NotConfigured
+
             erlangSdk == null ->
                 SdkStatus.InvalidSdk(elixirSdk, elixirVersion, "Missing internal Erlang SDK dependency")
+
             classpathIssues.isNotEmpty() ->
                 SdkStatus.ClasspathIssue(elixirSdk, erlangSdk, elixirVersion, classpathIssues)
+
             else ->
                 SdkStatus.Configured(elixirSdk, erlangSdk, elixirVersion)
         }
@@ -405,7 +420,39 @@ class ElixirEditorBasedSdkWidget(
             .getNotificationGroup("Elixir")
             .createNotification(title, message, type)
 
-        // For module SDK errors or folder mark warnings, offer one-click fix via ReconfigureModuleSetupAction
+        // "Configure from Mise" is added first so it appears as the primary inline action.
+        // When any module SDK issue has a corresponding mise assignment (covering both dangling
+        // references and version mismatches), offer it.  Each affected module is assigned the
+        // SDK that mise resolves for *its own* content root - umbrella apps with different
+        // mise.toml entries get different SDKs rather than a shared one.
+        if (sdkStatus is SdkStatus.ModuleSdkError) {
+            val affectedNames = sdkStatus.moduleSdkIssues.mapTo(HashSet()) { it.moduleName }
+            val relevantAssignments = miseAssignments.filterKeys { it in affectedNames }
+            if (relevantAssignments.isNotEmpty()) {
+                notification.addAction(object : AnAction("Configure from Mise") {
+                    override fun actionPerformed(e: AnActionEvent) {
+                        notification.expire()
+                        lastNotifiedIssueKey = null
+                        activeNotification = null
+                        configureSdkFromMise(project, relevantAssignments)
+                    }
+                })
+            }
+        }
+
+        // For mise-available case (no SDK configured at all), offer one-click SDK configuration.
+        // Each module is assigned the SDK for its own content root.
+        if (sdkStatus is SdkStatus.NotConfiguredMiseAvailable) {
+            notification.addAction(object : AnAction("Configure from Mise") {
+                override fun actionPerformed(e: AnActionEvent) {
+                    notification.expire()
+                    configureSdkFromMise(project, miseAssignments)
+                }
+            })
+        }
+
+        // For module SDK errors or folder mark warnings, offer the reconfigure action as a
+        // secondary option (after "Configure from Mise" when both are present).
         if (sdkStatus is SdkStatus.ModuleSdkError || sdkStatus is SdkStatus.FolderMarkWarning) {
             val reconfigureAction = ActionManager.getInstance().getAction("Elixir.ReconfigureModuleSetup")
             if (reconfigureAction != null) {
@@ -420,16 +467,6 @@ class ElixirEditorBasedSdkWidget(
                     }
                 })
             }
-        }
-
-        // For mise-available case, offer one-click SDK configuration from mise install paths.
-        if (sdkStatus is SdkStatus.NotConfiguredMiseAvailable) {
-            notification.addAction(object : AnAction("Configure from Mise") {
-                override fun actionPerformed(e: AnActionEvent) {
-                    notification.expire()
-                    configureSdkFromMise(project, sdkStatus.miseVersions)
-                }
-            })
         }
 
         notification.addAction(object : AnAction("Open Project Structure") {
@@ -461,10 +498,20 @@ class ElixirEditorBasedSdkWidget(
             is SdkStatus.NotConfigured -> "not-configured"
             is SdkStatus.NotConfiguredMiseAvailable ->
                 "not-configured-mise:${status.miseVersions.elixir?.let { Mise.stripElixirOtpSuffix(it.version) }}"
+
             is SdkStatus.InvalidSdk -> "partial:${status.issue}"
             is SdkStatus.ClasspathIssue -> "warning:${status.issues.sorted().joinToString(",")}"
-            is SdkStatus.ModuleSdkError -> "module-error:${status.moduleSdkIssues.map { "${it.moduleName}:${it.isDangling}:${it.issue}" }.sorted().joinToString(",")}"
-            is SdkStatus.FolderMarkWarning -> "folder-marks:${status.folderMarkIssues.map { "${it.moduleName}:${it.folderRelativePath}:${it.folderMark}" }.sorted().joinToString(",")}"
+            is SdkStatus.ModuleSdkError -> "module-error:${
+                status.moduleSdkIssues.map { "${it.moduleName}:${it.isDangling}:${it.issue}" }
+                    .sorted()
+                    .joinToString(",")
+            }"
+
+            is SdkStatus.FolderMarkWarning -> "folder-marks:${
+                status.folderMarkIssues.map { "${it.moduleName}:${it.folderRelativePath}:${it.folderMark}" }
+                    .sorted()
+                    .joinToString(",")
+            }"
         }
     }
 
@@ -508,7 +555,8 @@ class ElixirEditorBasedSdkWidget(
                 if (hasDangling) {
                     val danglingIssues = status.moduleSdkIssues.filter { it.isDangling }
                     val moduleNames = danglingIssues.map { it.moduleName }.distinct()
-                    val sdkNames = danglingIssues.map { it.issue.substringAfter("SDK '").substringBefore("'") }.distinct()
+                    val sdkNames =
+                            danglingIssues.map { it.issue.substringAfter("SDK '").substringBefore("'") }.distinct()
                     NotificationContent(
                         "Elixir SDK Error: Module SDK ${StringUtil.pluralize("reference", moduleNames.size)} broken",
                         formatDanglingMessage(moduleNames, sdkNames),
@@ -531,7 +579,9 @@ class ElixirEditorBasedSdkWidget(
                     val issue = status.folderMarkIssues.first()
                     "${issue.folderRelativePath}/ is not marked as ${issue.folderMark.displayName} in module '${issue.moduleName}'"
                 } else {
-                    "$issueCount folder mark ${StringUtil.pluralize("issue", issueCount)} across $moduleCount ${StringUtil.pluralize("module", moduleCount)}"
+                    val issuesPlural=StringUtil.pluralize("issue", issueCount)
+                    val modulesPlural=StringUtil.pluralize("module", moduleCount)
+                    "$issueCount folder mark $issuesPlural across $moduleCount $modulesPlural"
                 }
                 NotificationContent(
                     "Elixir: Project Structure Suboptimal",
@@ -606,7 +656,11 @@ class ElixirEditorBasedSdkWidget(
                     // MISMATCH: Module uses different Elixir SDK than project in a single-version project.
                     // Only meaningful when the project SDK is itself Elixir; skip when it is Java/Python/etc.
                     issues.add(
-                        ModuleSdkIssue(module.name, "uses '$jdkName' but project SDK is '${projectSdk.name}'", isDangling = false)
+                        ModuleSdkIssue(
+                            module.name,
+                            "uses '$jdkName' but project SDK is '${projectSdk.name}'",
+                            isDangling = false
+                        )
                     )
                 }
             }
@@ -761,65 +815,120 @@ class ElixirEditorBasedSdkWidget(
     }
 
     /**
-     * Feature A: for Elixir modules with no SDK configured, checks if mise has an installed
-     * Elixir version for that module's content root.
+     * Builds a map of module name → [MiseVersions] for every Elixir module whose content root
+     * has an installed mise Elixir version.
      *
-     * Returns the first [MiseVersions] with an installed Elixir entry, or null if no unconfigured
-     * module has mise data available.
+     * Intentionally covers **all** modules - both those without a configured SDK (dangling /
+     * unconfigured) and those that already have one (for mismatch detection and correction).
+     * The caller decides which subset to act on.
      *
-     * Must NOT be called under a read lock - runs `mise ls` as a subprocess.
+     * The value for each entry is the [MiseVersions] that mise resolves specifically for *that
+     * module's own content root*, so umbrella apps with per-app `mise.toml` entries each get
+     * their own versions rather than inheriting a single shared value.
+     *
+     * Must NOT be called under a read lock - [miseByContentRoot] was populated by calling
+     * [Mise.resolveVersions] (a subprocess) on a background thread.
      */
-    private fun detectMiseSdkForUnconfiguredModules(
+    private fun buildMiseAssignments(
         moduleDataList: List<ModuleMiseCheckData>,
         miseByContentRoot: Map<Path, MiseVersions?>,
-    ): MiseVersions? {
-        for (moduleData in moduleDataList) {
-            if (moduleData.elixirSdk != null) continue
-            val contentRoot = moduleData.contentRoot ?: continue
+    ): Map<String, MiseVersions> {
+        val result = LinkedHashMap<String, MiseVersions>()
+        for (data in moduleDataList) {
+            val contentRoot = data.contentRoot ?: continue
             val versions = miseByContentRoot[contentRoot] ?: continue
             if (versions.elixir?.installed == true) {
-                return versions
+                result[data.moduleName] = versions
             }
         }
-        return null
+        return result
     }
 
-    /**
-     * Registers Erlang and Elixir SDKs from mise install paths, pairs them, and assigns the
-     * Elixir SDK to the first unconfigured Elixir module.
-     *
-     * Called from the EDT (notification action click handler). Uses
-     * [runWithModalProgressBlocking] so the user sees a modal progress dialog while SDKs are
-     * being registered. Write-action mutations use [edtWriteAction].
-     */
-    private fun configureSdkFromMise(project: Project, miseVersions: MiseVersions) {
+    private fun configureSdkFromMise(project: Project, miseAssignments: Map<String, MiseVersions>) {
         runWithModalProgressBlocking(ModalTaskOwner.project(project), "Configuring Elixir SDK from mise") {
-            val erlangSdk = miseVersions.erlang?.let { erlang ->
-                SdkRegistrar.registerOrUpdateErlangSdk(erlang.installPath)
+            // Collect content roots so Linux install paths returned by WSL-side mise
+            // (e.g. /home/steve/.local/share/mise/installs/erlang/23.3.4.20) can be
+            // converted to the Windows UNC form that SdkRegistrar and WslCompatService expect
+            // (e.g. \\wsl.localhost\ItronUbuntu\home\steve\.local\share\mise\installs\erlang\23.3.4.20).
+            val contentRootByModule: Map<String, Path?> = readAction {
+                miseAssignments.keys.associateWith { name ->
+                    ModuleManager.getInstance(project).findModuleByName(name)
+                        ?.let { ModuleRootManager.getInstance(it).contentRoots.firstOrNull()?.toNioPathOrNull() }
+                }
             }
 
-            val elixirSdk = miseVersions.elixir?.let { elixir ->
-                SdkRegistrar.registerOrUpdateElixirSdk(
-                    homePath = elixir.installPath,
+            // Register unique (erlang, elixir) install-path combinations once each.
+            // Deduplication key = resolved elixir install path (post Linux→UNC conversion)
+            // so that multiple modules sharing the same mise config register the SDK only once.
+            val elixirSdkByInstallPath = mutableMapOf<String, Sdk>()
+
+            for ((moduleName, miseVersions) in miseAssignments) {
+                val elixirEntry = miseVersions.elixir ?: continue
+                val contentRoot = contentRootByModule[moduleName]
+                val resolvedElixirPath = resolveInstallPathForWsl(elixirEntry.installPath, contentRoot)
+                if (resolvedElixirPath in elixirSdkByInstallPath) continue
+
+                val erlangSdk = miseVersions.erlang?.let { erlang ->
+                    val resolvedErlangPath = resolveInstallPathForWsl(erlang.installPath, contentRoot)
+                    SdkRegistrar.registerOrUpdateErlangSdk(resolvedErlangPath)
+                }
+                val elixirSdk = SdkRegistrar.registerOrUpdateElixirSdk(
+                    homePath = resolvedElixirPath,
                     erlangSdk = erlangSdk,
                     project = project,
-                )
-            } ?: return@runWithModalProgressBlocking
+                ) ?: continue
 
-            // Assign to the first unconfigured Elixir module.
-            val module = readAction {
-                ModuleManager.getInstance(project).modules
-                    .firstOrNull { it.isElixirModule() && Type.mostSpecificSdk(it) == null }
-            } ?: return@runWithModalProgressBlocking
+                elixirSdkByInstallPath[resolvedElixirPath] = elixirSdk
+            }
 
+            if (elixirSdkByInstallPath.isEmpty()) return@runWithModalProgressBlocking
+
+            // Assign per-module SDKs in a single write action.
             edtWriteAction {
-                val modifiableModel = ModuleRootManager.getInstance(module).modifiableModel
-                modifiableModel.sdk = elixirSdk
-                modifiableModel.commit()
+                for ((moduleName, miseVersions) in miseAssignments) {
+                    val elixirEntry = miseVersions.elixir ?: continue
+                    val contentRoot = contentRootByModule[moduleName]
+                    val resolvedElixirPath = resolveInstallPathForWsl(elixirEntry.installPath, contentRoot)
+                    val elixirSdk = elixirSdkByInstallPath[resolvedElixirPath] ?: continue
+                    val module = ModuleManager.getInstance(project).findModuleByName(moduleName)
+                        ?.takeIf { !it.isDisposed } ?: continue
+
+                    val modifiableModel = ModuleRootManager.getInstance(module).modifiableModel
+                    var committed = false
+                    try {
+                        modifiableModel.sdk = elixirSdk
+                        modifiableModel.commit()
+                        committed = true
+                    } finally {
+                        if (!committed) modifiableModel.dispose()
+                    }
+                }
             }
 
             EditorNotifications.getInstance(project).updateAllNotifications()
         }
+    }
+
+    /**
+     * Converts a Linux absolute path (e.g. `/home/steve/.local/share/mise/installs/elixir/1.11.3`)
+     * to the Windows UNC form expected by [SdkRegistrar] and `wslCompat`
+     * (e.g. `\\wsl.localhost\ItronUbuntu\home\steve\.local\share\mise\installs\elixir\1.11.3`).
+     *
+     * The WSL distribution is inferred from [contentRoot], which must be a Windows UNC path for
+     * a WSL filesystem (e.g. `\\wsl.localhost\ItronUbuntu\home\steve\workspace\intelliconnect`).
+     *
+     * Returns [installPath] unchanged when:
+     * - it is not a Linux absolute path (does not start with `/`),
+     * - [contentRoot] is null,
+     * - [contentRoot] is not a WSL UNC path, or
+     * - the distribution cannot be resolved or the conversion fails.
+     */
+    private fun resolveInstallPathForWsl(installPath: String, contentRoot: Path?): String {
+        if (!installPath.startsWith("/")) return installPath
+        val contentRootStr = contentRoot?.toString() ?: return installPath
+        if (!wslCompat.isWslUncPath(contentRootStr)) return installPath
+        val distribution = wslCompat.getDistributionByWindowsUncPath(contentRootStr) ?: return installPath
+        return wslCompat.convertLinuxPathToWindowsUnc(distribution, installPath) ?: installPath
     }
 
     /**
@@ -851,7 +960,7 @@ class ElixirEditorBasedSdkWidget(
                 if (configuredVersion != null && configuredVersion != miseVersion) {
                     LOG.info(
                         "Mise version mismatch in module '${data.moduleName}': " +
-                        "SDK=$configuredVersion, mise=$miseVersion"
+                                "SDK=$configuredVersion, mise=$miseVersion"
                     )
                     issues.add(
                         ModuleSdkIssue(
@@ -872,7 +981,7 @@ class ElixirEditorBasedSdkWidget(
                 if (miseErlangMajor != data.erlangOtpRelease) {
                     LOG.info(
                         "Mise OTP mismatch in module '${data.moduleName}': " +
-                        "SDK OTP=${data.erlangOtpRelease}, mise=${miseErlang.version}"
+                                "SDK OTP=${data.erlangOtpRelease}, mise=${miseErlang.version}"
                     )
                     issues.add(
                         ModuleSdkIssue(
