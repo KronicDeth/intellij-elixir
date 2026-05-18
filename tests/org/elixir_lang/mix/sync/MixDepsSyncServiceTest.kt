@@ -510,6 +510,50 @@ class MixDepsSyncServiceTest : PlatformTestCase() {
         )
     }
 
+    /**
+     * Orphaned unscoped Mix-Kind libraries (name has no " [" content-root marker) are removed by
+     * [buildWritePlan] on every drain, even when no delete event targets them.
+     *
+     * This covers projects configured with an older plugin version before root-scoped library
+     * naming was introduced: the first sync event after upgrade sweeps the stale entry.
+     * A user-created library without [MixLibraryKind] must NOT be removed.
+     */
+    fun testOrphanedUnscopedLibraryRemovedOnNextDrain() {
+        MixTestFixtures.createMixRoot(myFixture, "orphan_sweep_app")
+        myFixture.tempDirFixture.findOrCreateDir("orphan_sweep_app/deps/phoenix")
+        myFixture.tempDirFixture.findOrCreateDir("orphan_sweep_app/deps/phoenix/lib")
+        MixTestFixtures.addBuildArtifacts(myFixture, "orphan_sweep_app", "dev", "phoenix")
+
+        val service = project.service<MixDepsSyncService>()
+        val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
+
+        // Pre-plant an orphaned unscoped Mix-Kind library (pre-C3 naming)
+        // and a user library without Kind that must survive.
+        WriteAction.run<Throwable> {
+            val model = libraryTable.modifiableModel
+            model.createLibrary("phoenix", MixLibraryKind)      // orphaned pre-C3 library
+            model.createLibrary("user-phoenix", null)           // user library, no Kind - must survive
+            model.commit()
+        }
+        assertNotNull("Orphaned library must exist before drain", libraryTable.getLibraryByName("phoenix"))
+        assertNotNull("User library must exist before drain", libraryTable.getLibraryByName("user-phoenix"))
+
+        // Trigger any drain - the orphaned library is removed by the sweep in buildWritePlan
+        // regardless of whether a scoped replacement is requested in the same batch.
+        service.clearPendingForTesting()
+        service.enqueue(SyncRequest.DepRoot(myFixture.tempDirFixture.getFile("orphan_sweep_app/deps/phoenix")!!))
+        drainDirectly(service)
+
+        assertNull(
+            "Orphaned unscoped Mix-Kind library must be removed by the drain-time sweep",
+            libraryTable.getLibraryByName("phoenix")
+        )
+        assertNotNull(
+            "User library without Kind must NOT be removed by the sweep",
+            libraryTable.getLibraryByName("user-phoenix")
+        )
+    }
+
     // ------------------------------------------------------------------
     // C3 remediation tests
     // ------------------------------------------------------------------

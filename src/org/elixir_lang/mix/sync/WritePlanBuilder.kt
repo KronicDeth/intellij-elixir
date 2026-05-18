@@ -165,6 +165,16 @@ private fun buildWritePlanInCurrentContext(project: Project, syncPlan: SyncPlan)
         }
     }
 
+    // Sweep orphaned unscoped Mix-Kind libraries (no " [" content-root marker in name).
+    // Runs on every drain at negligible cost; removes stale entries from projects that were
+    // configured with an older plugin version before root-scoped library naming was introduced.
+    // Scoped replacements are created by the libraryWriteOps in Step 2 if a matching plan exists.
+    for ((name, snap) in libSnap) {
+        if (snap.isKind && " [" !in name && name !in librariesToRemove) {
+            librariesToRemove += name
+        }
+    }
+
     // -----------------------------------------------------------------------
     // Step 2 - Compute libraryWriteOps and legacyLibrariesToRemove
     //
