@@ -124,55 +124,19 @@ jobs:
         id: build-plugin
         run: ./gradlew buildPlugin
 
-      - name: Upload Plugin Zip
-        id: upload-plugin-zip
-        uses: actions/upload-artifact@v6
-        with:
-          name: plugin-zip
-          path: build/distributions/*.zip
-          retention-days: 1
-          if-no-files-found: 'error'
-
-  # Verify one IDE at a time to avoid OOM -- the verifier runs all IDEs concurrently
-  # and there is no CLI flag to control parallelism.
-  verify-plugin:
-    needs: build-plugin
-    runs-on: ubuntu-22.04
-    strategy:
-      fail-fast: false
-      matrix:
-        ide-version:
-          - 'ideaIU:253.33514.17'
-          - 'ideaIU:261.24374.151'
-          - 'rubymine:2025.3.5'
-          - 'rubymine:2026.1.2'
-
-    steps:
-      - name: Sanitise IDE version for artifact names
-        id: sanitise
-        run: echo "ide-version=${IDE_VERSION//:/-}" >> "$GITHUB_OUTPUT"
-        env:
-          IDE_VERSION: ${{ matrix.ide-version }}
-
-      - name: Download Plugin Zip
-        id: download-plugin-zip
-        uses: actions/download-artifact@v6
-        with:
-          name: plugin-zip
-          path: build/distributions
-
-      # Fork to be replaced when/if https://github.com/ChrisCarini/intellij-platform-plugin-verifier-action/pull/102 merges
       - name: Verify Plugin
         id: verify-plugin
+        # Fork to be replaced when/if https://github.com/ChrisCarini/intellij-platform-plugin-verifier-action/pull/102 merges
         uses: sh41/intellij-platform-plugin-verifier-action@add_format_options
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          # Pin to 1.384 (2025-03-19): versions >=1.385 introduced https://youtrack.jetbrains.com/issue/MP-7267 which
-          # causes the pipeline to fail on a regular basis.
-          verifier-version: '1.384'
+          verifier-version: 1.404
           ide-versions: |
-            ${{ matrix.ide-version }}
+            ideaIU:253.33514.17
+            ideaIU:261.24374.151
+            rubymine:2025.3.5
+            rubymine:2026.1.2
           failure-levels: |
             COMPATIBILITY_PROBLEMS
             INVALID_PLUGIN
@@ -184,7 +148,7 @@ jobs:
           # MISSING_DEPENDENCIES
           external-prefixes: 'org.jetbrains.jps'
           verification-reports-formats: 'plain,markdown,html'
-          add-to-summary: 'verification-verdict.txt,compatibility-problems.txt,invalid-plugin.txt,dependencies.txt,override-only-usages.txt,non-extendable-api-usages.txt,markdown'
+          add-to-summary: 'verification-verdict.txt,compatibility-problems.txt,invalid-plugin.txt'
 
       - name: Print Verification Output
         id: print-verification-output
@@ -200,7 +164,7 @@ jobs:
         uses: actions/upload-artifact@v6
         if: ${{ always() && inputs.upload-reports }}
         with:
-          name: verify-plugin-reports-${{ steps.sanitise.outputs.ide-version }}
+          name: verify-plugin-reports
           path: |
             ${{ steps.verify-plugin.outputs.verification-output-log-filename }}
             ${{ steps.verify-plugin.outputs.verification-reports-dir }}
@@ -210,6 +174,6 @@ jobs:
         id: upload-plugin
         uses: actions/upload-artifact@v6
         with:
-          name: plugin-artifact-${{ steps.sanitise.outputs.ide-version }}
+          name: plugin-artifact
           path: build/distributions/*.zip
           retention-days: 1

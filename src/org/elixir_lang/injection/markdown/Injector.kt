@@ -263,6 +263,7 @@ class Injector : MultiHostInjector {
 
                                     if (!inCodeBlock) {
                                         registrar.startInjecting(ElixirLanguage)
+                                            .frankensteinInjection(true)
 
                                         inCodeBlock = true
                                     }
