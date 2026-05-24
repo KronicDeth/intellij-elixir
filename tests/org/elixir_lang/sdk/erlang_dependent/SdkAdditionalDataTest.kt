@@ -1,11 +1,10 @@
 package org.elixir_lang.sdk.erlang_dependent
 
 import com.intellij.openapi.projectRoots.Sdk
-import com.intellij.openapi.projectRoots.SdkTypeId
+import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl
 import org.elixir_lang.PlatformTestCase
+import org.elixir_lang.sdk.erlang.Type as ErlangSdkType
 import org.jdom.Element
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.`when`
 
 /**
  * Unit tests for SdkAdditionalData Phase 1 refactoring.
@@ -17,147 +16,162 @@ import org.mockito.Mockito.`when`
 class SdkAdditionalDataTest: PlatformTestCase() {
 
     /**
-     * Verify that creating SdkAdditionalData with an Erlang SDK sets both name and cache.
+     * Verify that creating SdkAdditionalData with an Erlang SDK sets both name and home path.
      */
-    fun testNewSdkCreation_SetsNameAndCache() {
-        val elixirSdk = createMockSdk("Elixir 1.15.0")
-        val erlangSdk = createMockSdk("Erlang 26.0")
+    fun testNewSdkCreation_SetsNameAndHomePath() {
+        val elixirSdk = createMockSdk("Elixir 1.15.0", "/fake/elixir/1.15")
+        val erlangSdk = createMockSdk("Erlang 26.0", "/fake/erlang/26.0")
 
         val additionalData = SdkAdditionalData(erlangSdk, elixirSdk)
 
-        // Both name and cache should be set
         assertEquals("Erlang 26.0", additionalData.getErlangSdkName())
-        // Note: Cannot directly test cachedErlangSdk as it's private
-        // But getErlangSdk() should return it from cache without lookup
+        assertEquals("/fake/erlang/26.0", additionalData.getErlangSdkHomePath())
     }
 
     /**
-     * Verify that setErlangSdk() updates both the name and cache atomically.
+     * Verify that setErlangSdk() updates both the name, home path, and cache atomically.
      */
-    fun testSetErlangSdk_UpdatesNameAndCache() {
-        val elixirSdk = createMockSdk("Elixir 1.15.0")
-        val erlangSdk1 = createMockSdk("Erlang 25.0")
-        val erlangSdk2 = createMockSdk("Erlang 26.0")
+    fun testSetErlangSdk_UpdatesNameHomePathAndCache() {
+        val elixirSdk = createMockSdk("Elixir 1.15.0", "/fake/elixir/1.15")
+        val erlangSdk1 = createMockSdk("Erlang 25.0", "/fake/erlang/25.0")
+        val erlangSdk2 = createMockSdk("Erlang 26.0", "/fake/erlang/26.0")
 
         val additionalData = SdkAdditionalData(erlangSdk1, elixirSdk)
         assertEquals("Erlang 25.0", additionalData.getErlangSdkName())
+        assertEquals("/fake/erlang/25.0", additionalData.getErlangSdkHomePath())
 
         // Update to a different Erlang SDK
         additionalData.setErlangSdk(erlangSdk2)
 
-        // Name should be updated
         assertEquals("Erlang 26.0", additionalData.getErlangSdkName())
+        assertEquals("/fake/erlang/26.0", additionalData.getErlangSdkHomePath())
     }
 
     /**
-     * Verify that setting null clears both name and cache.
+     * Verify that setting null clears name, home path, and cache.
      */
-    fun testSetErlangSdk_WithNull_ClearsNameAndCache() {
-        val elixirSdk = createMockSdk("Elixir 1.15.0")
-        val erlangSdk = createMockSdk("Erlang 26.0")
+    fun testSetErlangSdk_WithNull_ClearsAll() {
+        val elixirSdk = createMockSdk("Elixir 1.15.0", "/fake/elixir/1.15")
+        val erlangSdk = createMockSdk("Erlang 26.0", "/fake/erlang/26.0")
 
         val additionalData = SdkAdditionalData(erlangSdk, elixirSdk)
         assertEquals("Erlang 26.0", additionalData.getErlangSdkName())
+        assertEquals("/fake/erlang/26.0", additionalData.getErlangSdkHomePath())
 
         // Clear the Erlang SDK
         additionalData.setErlangSdk(null)
 
-        // Name should be null
         assertNull(additionalData.getErlangSdkName())
+        assertNull(additionalData.getErlangSdkHomePath())
     }
 
     /**
-     * Verify that readExternal() loads only the name and clears the cache.
+     * Verify that readExternal() loads both name and home path, and clears the cache.
      */
-    fun testReadExternal_LoadsNameAndClearsCache() {
-        val elixirSdk = createMockSdk("Elixir 1.15.0")
+    fun testReadExternal_LoadsNameAndHomePathAndClearsCache() {
+        val elixirSdk = createMockSdk("Elixir 1.15.0", "/fake/elixir/1.15")
         val additionalData = SdkAdditionalData(elixirSdk)
 
         val element = Element("additional")
         element.setAttribute("erlang-sdk-name", "Erlang 26.0")
+        element.setAttribute("erlang-sdk-home-path", "/fake/erlang/26.0")
 
         additionalData.readExternal(element)
 
-        // Name should be loaded
         assertEquals("Erlang 26.0", additionalData.getErlangSdkName())
-        // Cache would be null (tested implicitly by getErlangSdk needing to do lookup)
+        assertEquals("/fake/erlang/26.0", additionalData.getErlangSdkHomePath())
     }
 
     /**
-     * Verify that writeExternal() persists only the name.
+     * Verify readExternal with legacy data (name only, no home path).
      */
-    fun testWriteExternal_PersistsNameOnly() {
-        val elixirSdk = createMockSdk("Elixir 1.15.0")
-        val erlangSdk = createMockSdk("Erlang 26.0")
+    fun testReadExternal_LegacyNameOnly() {
+        val elixirSdk = createMockSdk("Elixir 1.15.0", "/fake/elixir/1.15")
+        val additionalData = SdkAdditionalData(elixirSdk)
+
+        val element = Element("additional")
+        element.setAttribute("erlang-sdk-name", "Erlang 26.0")
+        // No erlang-sdk-home-path attribute - simulates legacy config
+
+        additionalData.readExternal(element)
+
+        assertEquals("Erlang 26.0", additionalData.getErlangSdkName())
+        assertNull(additionalData.getErlangSdkHomePath())
+    }
+
+    /**
+     * Verify that writeExternal() persists both name and home path.
+     */
+    fun testWriteExternal_PersistsNameAndHomePath() {
+        val elixirSdk = createMockSdk("Elixir 1.15.0", "/fake/elixir/1.15")
+        val erlangSdk = createMockSdk("Erlang 26.0", "/fake/erlang/26.0")
 
         val additionalData = SdkAdditionalData(erlangSdk, elixirSdk)
 
         val element = Element("additional")
         additionalData.writeExternal(element)
 
-        // Name should be persisted
         assertEquals("Erlang 26.0", element.getAttributeValue("erlang-sdk-name"))
+        assertEquals("/fake/erlang/26.0", element.getAttributeValue("erlang-sdk-home-path"))
     }
 
     /**
-     * Verify that writeExternal() doesn't write anything if name is null.
+     * Verify that writeExternal() doesn't write anything if both name and home path are null.
      */
-    fun testWriteExternal_WithNullName_WritesNothing() {
-        val elixirSdk = createMockSdk("Elixir 1.15.0")
+    fun testWriteExternal_WithNullNameAndPath_WritesNothing() {
+        val elixirSdk = createMockSdk("Elixir 1.15.0", "/fake/elixir/1.15")
         val additionalData = SdkAdditionalData(elixirSdk)
 
         val element = Element("additional")
         additionalData.writeExternal(element)
 
-        // No attribute should be written
         assertNull(element.getAttributeValue("erlang-sdk-name"))
+        assertNull(element.getAttributeValue("erlang-sdk-home-path"))
     }
 
     /**
-     * Verify that clone() creates a new instance with the same name but no shared cache.
+     * Verify that clone() creates a new instance with the same name and home path but no shared cache.
      */
     fun testClone_CreatesIndependentCopy() {
-        val elixirSdk = createMockSdk("Elixir 1.15.0")
-        val erlangSdk = createMockSdk("Erlang 26.0")
+        val elixirSdk = createMockSdk("Elixir 1.15.0", "/fake/elixir/1.15")
+        val erlangSdk = createMockSdk("Erlang 26.0", "/fake/erlang/26.0")
 
         val original = SdkAdditionalData(erlangSdk, elixirSdk)
         val cloned = original.clone() as SdkAdditionalData
 
-        // Name should be copied
+        // Name and home path should be copied
         assertEquals(original.getErlangSdkName(), cloned.getErlangSdkName())
+        assertEquals(original.getErlangSdkHomePath(), cloned.getErlangSdkHomePath())
 
         // Modifying the clone should not affect the original
         cloned.setErlangSdk(null)
         assertNull(cloned.getErlangSdkName())
+        assertNull(cloned.getErlangSdkHomePath())
         assertEquals("Erlang 26.0", original.getErlangSdkName())
+        assertEquals("/fake/erlang/26.0", original.getErlangSdkHomePath())
     }
 
     /**
      * Verify that getErlangSdkName() returns the stored name without triggering SDK lookup.
      */
     fun testGetErlangSdkName_ReturnsNameWithoutLookup() {
-        val elixirSdk = createMockSdk("Elixir 1.15.0")
+        val elixirSdk = createMockSdk("Elixir 1.15.0", "/fake/elixir/1.15")
         val additionalData = SdkAdditionalData(elixirSdk)
 
         // Set name directly via readExternal
         val element = Element("additional")
         element.setAttribute("erlang-sdk-name", "Erlang 26.0")
+        element.setAttribute("erlang-sdk-home-path", "/fake/erlang/26.0")
         additionalData.readExternal(element)
 
         // getErlangSdkName should return the name immediately
         // (no lookup happens, no ProjectJdkTable access)
         assertEquals("Erlang 26.0", additionalData.getErlangSdkName())
+        assertEquals("/fake/erlang/26.0", additionalData.getErlangSdkHomePath())
     }
 
-    // Helper method to create mock SDK
-    private fun createMockSdk(name: String): Sdk {
-        val sdk = mock(Sdk::class.java)
-        `when`(sdk.name).thenReturn(name)
-
-        // Mock the sdkType to be a valid Erlang type for validation
-        val sdkType = mock(SdkTypeId::class.java)
-        `when`(sdk.sdkType).thenReturn(sdkType)
-
-        return sdk
+    // Helper method to create a lightweight SDK instance
+    private fun createMockSdk(name: String, homePath: String? = null): Sdk {
+        return ProjectJdkImpl(name, ErlangSdkType.instance, homePath ?: "", "")
     }
 }

@@ -1,130 +1,94 @@
 package org.elixir_lang.sdk.erlang
 
-import com.intellij.execution.ExecutionException
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.Logger
-import com.intellij.platform.ide.progress.ModalTaskOwner
-import com.intellij.platform.ide.progress.runWithModalProgressBlocking
-import org.elixir_lang.cli.getExecutableFilepathWslSafe
-import org.elixir_lang.jps.shared.cli.CliTool
-import org.elixir_lang.sdk.ProcessOutput
+import com.intellij.util.concurrency.ThreadingAssertions
 import org.elixir_lang.sdk.wsl.wslCompat
 import java.io.File
-import java.util.Collections
-import java.util.WeakHashMap
+import java.util.concurrent.ConcurrentHashMap
 
+/**
+ * Detects the installed Erlang/OTP SDK version by reading the filesystem - no subprocess required.
+ *
+ * The canonical source of truth for an installed OTP release is:
+ *   `<sdkHome>/releases/<N>/OTP_VERSION`
+ * where `<N>` is the OTP major release directory (e.g. `26`).
+ *
+ * [detectRelease] must NOT be called on the EDT. WSL paths (\\wsl.localhost\...) involve
+ * the Plan 9 filesystem redirector and directory/file access can take 50–200 ms.
+ * Call only from background threads or [kotlinx.coroutines.Dispatchers.IO] contexts.
+ * The result is stored on the SDK object at registration time; subsequent accesses read
+ * the persisted value and do not call this function.
+ */
 object ErlangVersionDetector {
-    private const val OTP_RELEASE_PREFIX_LINE = "org.elixir_lang.sdk.erlang.Type OTP_RELEASE:"
-    private const val ERTS_VERSION_PREFIX_LINE = "org.elixir_lang.sdk.erlang.Type ERTS_VERSION:"
-    private const val PRINT_VERSION_INFO_EXPRESSION =
-        "io:format(\"~n~s~n~s~n~s~n~s~n\",[" +
-                "\"$OTP_RELEASE_PREFIX_LINE\"," +
-                "erlang:system_info(otp_release)," +
-                "\"$ERTS_VERSION_PREFIX_LINE\"," +
-                "erlang:system_info(version)" +
-                "]),erlang:halt()."
-
     private val LOGGER = Logger.getInstance(ErlangVersionDetector::class.java)
-    // Weak keys so entries for old "$canonicalHome@$mtime" cache keys are collected after
-    // the erl binary is updated. Synchronized because this object is shared across threads.
-    private val releaseBySdkHome: MutableMap<String, Release> =
-        Collections.synchronizedMap(WeakHashMap())
 
-    fun detectSdkVersion(sdkHome: String): Release? {
-        val canonicalHomePath = wslCompat.canonicalizePath(sdkHome)
-        val cachedRelease = getVersionCacheKey(canonicalHomePath)?.let { releaseBySdkHome[it] }
-        if (cachedRelease != null) {
-            return cachedRelease
+    // Keyed by "$canonicalHomePath@$otpVersionFileMtime" so entries for replaced OTP installs
+    // are superseded automatically.
+    private val cache: ConcurrentHashMap<String, Release> = ConcurrentHashMap()
+
+    /**
+     * Reads the installed Erlang/OTP version from `<sdkHome>/releases/<N>/OTP_VERSION`.
+     *
+     * Returns a [Release] with the OTP major and full patch version, or `null` if the
+     * `releases/` directory or `OTP_VERSION` file is absent or unreadable.
+     *
+     * When Erlang is patched in place via `otp_patch_apply`, the version string is
+     * suffixed with `**` (e.g. `"26.2.5.1**"`). This suffix is stripped before
+     * constructing the [Release].
+     *
+     * Must NOT be called on the EDT - see class KDoc.
+     */
+    fun detectRelease(sdkHome: String): Release? {
+        ThreadingAssertions.assertBackgroundThread()
+
+        val canonicalHome = wslCompat.canonicalizePath(sdkHome)
+        val releasesDir = File(canonicalHome, "releases")
+
+        val otpMajorDir = if (!releasesDir.exists()) {
+            LOGGER.warn("Can't detect Erlang version: ${releasesDir.path} is missing")
+            return null
+        } else {
+            releasesDir.listFiles { f -> f.isDirectory && f.name.all { it.isDigit() } }
+                ?.maxByOrNull { it.name.toIntOrNull() ?: 0 }
+                ?: run {
+                    LOGGER.debug("No numeric releases/ subdirectory found in $canonicalHome")
+                    return null
+                }
         }
 
-        val erl = erlExecutable(canonicalHomePath)
-        LOGGER.debug("=== ERLANG SDK: Erl executable path: ${erl.absolutePath}")
-        if (!erl.canExecute()) {
-            val message =
-                buildString {
-                    append("Can't detect Erlang version: ${erl.path}")
-                    if (erl.exists()) append(" is not executable.") else append(" is missing.")
-                }
-            LOGGER.warn(message)
+        val otpVersionFile = File(otpMajorDir, "OTP_VERSION")
+        val mtime = otpVersionFile.lastModified()
+        if (mtime == 0L) {
+            LOGGER.debug("OTP_VERSION file not found or unreadable: ${otpVersionFile.path}")
             return null
         }
 
-        // runBlockingMaybeCancellable can be reached transitively in WSL/Eel process startup,
-        // and that path is forbidden on EDT. Guard EDT callers with modal progress.
-        val app = ApplicationManager.getApplication()
-        if (app.isDispatchThread) {
-            return runWithModalProgressBlocking(
-                ModalTaskOwner.guess(),
-                "Detecting Erlang SDK version..."
-            ) {
-                detectSdkVersionBackground(sdkHome, erl)
-            }
-        }
+        val cacheKey = "$canonicalHome@$mtime"
+        // Fast path: return cached result if present.
+        // Two threads with the same key can both miss and both compute - this is intentional.
+        // The computation is a single file-read, the result is deterministic, and ConcurrentHashMap
+        // guarantees the winning put is visible to all subsequent reads. Wrapping in computeIfAbsent
+        // would prevent the double-compute but requires the entire fallible read to live inside the
+        // lambda, where early returns are not possible (non-inline). The benign race is the simpler
+        // and correct tradeoff here.
+        cache[cacheKey]?.let { return it }
 
-        return detectSdkVersionBackground(sdkHome, erl)
-    }
-
-    private fun detectSdkVersionBackground(sdkHome: String, erl: File): Release? {
-        LOGGER.debug("=== ERLANG SDK: Executing erl to detect version")
-        return try {
-            val erlPath = erl.absolutePath
-            LOGGER.debug("=== ERLANG SDK: Calling getProcessOutput with workDir: $sdkHome, exe: $erlPath")
-            val output =
-                ProcessOutput.getProcessOutput(
-                    10 * 1000,
-                    sdkHome,
-                    erlPath,
-                    "-noshell",
-                    "-eval",
-                    PRINT_VERSION_INFO_EXPRESSION,
-                )
-
-            if (output.exitCode == 0 && !output.isCancelled && !output.isTimeout) {
-                parseSdkVersion(output.stdoutLines)?.also { detectedRelease ->
-                    LOGGER.debug("=== ERLANG SDK: Detected release: ${detectedRelease.otpRelease}")
-                    getVersionCacheKey(sdkHome)?.let { key ->
-                        releaseBySdkHome[key] = detectedRelease
-                    }
-                }
-            } else {
-                LOGGER.warn(
-                    "=== ERLANG SDK: Failed to detect Erlang version. Workdir: '$sdkHome' " +
-                        "ErlPath: '$erlPath' Exit Code: ${output.exitCode}\nStdOut: ${output.stdout}\n" +
-                        "StdErr: ${output.stderr}"
-                )
-                null
-            }
-        } catch (e: ExecutionException) {
-            LOGGER.warn("=== ERLANG SDK: Exception during version detection", e)
-            null
-        }
-    }
-
-    private fun parseSdkVersion(printVersionInfoOutput: List<String>): Release? {
-        var otpRelease: String? = null
-        var ertsVersion: String? = null
-
-        val iterator = printVersionInfoOutput.listIterator()
-        while (iterator.hasNext()) {
-            when (iterator.next()) {
-                OTP_RELEASE_PREFIX_LINE -> if (iterator.hasNext()) otpRelease = iterator.next()
-                ERTS_VERSION_PREFIX_LINE -> if (iterator.hasNext()) ertsVersion = iterator.next()
-            }
-        }
-
-        return if (otpRelease != null && ertsVersion != null) Release(otpRelease, ertsVersion) else null
-    }
-
-    private fun getVersionCacheKey(sdkHome: String?): String? {
-        val homePath = sdkHome ?: return null
-        val canonicalHomePath = wslCompat.canonicalizePath(homePath)
-        val erlPath = CliTool.ERL.getExecutableFilepathWslSafe(canonicalHomePath)
-        val lastModified = File(erlPath).lastModified()
-        if (lastModified == 0L) {
+        val otpVersion = try {
+            otpVersionFile.readText().trim().trimEnd('*')
+        } catch (e: Exception) {
+            LOGGER.warn("Could not read OTP_VERSION from ${otpVersionFile.path}", e)
             return null
         }
-        return "$canonicalHomePath@$lastModified"
-    }
 
-    private fun erlExecutable(sdkHome: String): File = File(CliTool.ERL.getExecutableFilepathWslSafe(sdkHome))
+        if (otpVersion.isBlank()) {
+            LOGGER.warn("OTP_VERSION file is empty: ${otpVersionFile.path}")
+            return null
+        }
+
+        val otpMajor = otpMajorDir.name
+        val release = Release(otpMajor, otpVersion)
+        cache[cacheKey] = release
+        LOGGER.debug("Detected Erlang release: $release (from ${otpVersionFile.path})")
+        return release
+    }
 }

@@ -15,8 +15,16 @@ import org.jdom.Element
  *
  * ## Persistence Model
  *
- * Only the Erlang SDK **name** is persisted to disk (in the `erlang-sdk-name` XML attribute).
- * The actual SDK reference is resolved lazily when [getErlangSdk] is called.
+ * Both the Erlang SDK **home path** (`erlang-sdk-home-path`) and **name** (`erlang-sdk-name`)
+ * are persisted to disk. Home path is the primary stable identity - it survives SDK renames.
+ * Name is retained as a display hint and legacy fallback for configs written before the
+ * home-path field was added.
+ *
+ * ## Resolution Order
+ *
+ * 1. `erlangSdkHomePath` (stable, survives rename) - looked up by home path in ProjectJdkTable
+ * 2. `erlangSdkName` (legacy fallback) - looked up by name; self-heals by writing resolved path back
+ * 3. Both absent → NOT_CONFIGURED
  *
  * ## Cache Behavior
  *
@@ -40,7 +48,14 @@ class SdkAdditionalData :
     Cloneable {
     private val elixirSdk: Sdk
 
-    // Persistence layer - the ONLY thing saved to disk
+    // Primary stable identity - survives SDK renames.
+    // @Volatile ensures background-thread writes (self-heal in ErlangSdkResolver) are immediately
+    // visible to the EDT reading these fields in writeExternal, without requiring a write lock.
+    @Volatile
+    private var erlangSdkHomePath: String? = null
+
+    // Display hint + legacy fallback for configs written before erlangSdkHomePath was added
+    @Volatile
     private var erlangSdkName: String? = null
 
     // Runtime cache - lazily populated, cleared when invalid
@@ -49,6 +64,7 @@ class SdkAdditionalData :
     private var cachedErlangSdk: Sdk? = null
 
     companion object {
+        private const val ERLANG_SDK_HOME_PATH = "erlang-sdk-home-path"
         private const val ERLANG_SDK_NAME = "erlang-sdk-name"
         private val LOG = Logger.getInstance(SdkAdditionalData::class.java)
     }
@@ -61,6 +77,7 @@ class SdkAdditionalData :
     // Secondary constructor for creating new SDKs with a known Erlang SDK
     constructor(erlangSdk: Sdk?, elixirSdk: Sdk) : this(elixirSdk) {
         this.erlangSdkName = erlangSdk?.name
+        this.erlangSdkHomePath = erlangSdk?.homePath
         this.cachedErlangSdk = erlangSdk
     }
 
@@ -100,20 +117,25 @@ class SdkAdditionalData :
 
     @Throws(InvalidDataException::class)
     fun readExternal(element: Element) {
+        erlangSdkHomePath = element.getAttributeValue(ERLANG_SDK_HOME_PATH)
         erlangSdkName = element.getAttributeValue(ERLANG_SDK_NAME)
         cachedErlangSdk = null  // Force re-lookup on next access
     }
 
     @Throws(WriteExternalException::class)
     fun writeExternal(element: Element) {
-        erlangSdkName?.let {
-            element.setAttribute(ERLANG_SDK_NAME, it)
-        }
+        // Snapshot both @Volatile fields into locals before writing so that a concurrent
+        // self-heal write in ErlangSdkResolver cannot produce a torn (home, name) pair.
+        val homePath = erlangSdkHomePath
+        val name = erlangSdkName
+        homePath?.let { element.setAttribute(ERLANG_SDK_HOME_PATH, it) }
+        name?.let { element.setAttribute(ERLANG_SDK_NAME, it) }
     }
 
     @Throws(CloneNotSupportedException::class)
     public override fun clone(): Any {
         val cloned = SdkAdditionalData(elixirSdk)
+        cloned.erlangSdkHomePath = this.erlangSdkHomePath
         cloned.erlangSdkName = this.erlangSdkName
         // Don't clone cachedErlangSdk - let it be lazily resolved
         return cloned
@@ -125,8 +147,11 @@ class SdkAdditionalData :
      */
     fun getErlangSdkName(): String? = erlangSdkName
 
+    fun getErlangSdkHomePath(): String? = erlangSdkHomePath
+
     fun setErlangSdk(sdk: Sdk?) {
         erlangSdkName = sdk?.name
+        erlangSdkHomePath = sdk?.homePath
         cachedErlangSdk = sdk
     }
 

@@ -172,6 +172,7 @@ class ElixirEditorBasedSdkWidget(
                         modelData.moduleMiseCheckData,
                         ioData.elixirVersionBySdk,
                         ioData.miseByContentRoot,
+                        ioData.erlangOtpMajorByHomePath,
                     )
                     // Build per-module mise assignments: module name → the MiseVersions that mise
                     // resolves for that module's own content root.  Covers all modules with an
@@ -688,7 +689,7 @@ class ElixirEditorBasedSdkWidget(
     }
 
     // -------------------------------------------------------------------------
-    // Mise version mismatch detection (Features B & C)
+    // Mise version mismatch detection
     // -------------------------------------------------------------------------
 
     /**
@@ -699,8 +700,8 @@ class ElixirEditorBasedSdkWidget(
         val moduleName: String,
         /** Elixir SDK configured for the module (if any). */
         val elixirSdk: Sdk?,
-        /** OTP major release reported by the Internal Erlang SDK (e.g. `"25"`). */
-        val erlangOtpRelease: String?,
+        /** Home path of the Internal Erlang SDK (if any). Resolved to OTP major in IO phase. */
+        val erlangSdkHomePath: String?,
         /** First content root of the module, used as the working directory for `mise ls`. */
         val contentRoot: Path?,
     )
@@ -721,6 +722,9 @@ class ElixirEditorBasedSdkWidget(
     private data class NotificationScanIoData(
         val miseByContentRoot: Map<Path, MiseVersions?>,
         val elixirVersionBySdk: Map<Sdk, String?>,
+        /** OTP major (e.g. `"26"`) keyed by canonical Erlang SDK home path. Populated from
+         *  `releases/<N>/OTP_VERSION` - no subprocess. */
+        val erlangOtpMajorByHomePath: Map<String, String?>,
         val classpathIssues: List<String>,
     )
 
@@ -763,11 +767,19 @@ class ElixirEditorBasedSdkWidget(
             .distinct()
             .associateWith { sdk -> Type.canonicalVersion(sdk) }
 
+        val erlangOtpMajorByHomePath = modelData.moduleMiseCheckData
+            .mapNotNull { it.erlangSdkHomePath }
+            .distinct()
+            .associateWith { homePath ->
+                org.elixir_lang.sdk.erlang.ErlangVersionDetector.detectRelease(homePath)?.otpMajor
+            }
+
         val classpathIssues = detectClasspathIssues(modelData.projectSdkSnapshot)
 
         return NotificationScanIoData(
             miseByContentRoot = miseByContentRoot,
             elixirVersionBySdk = elixirVersionBySdk,
+            erlangOtpMajorByHomePath = erlangOtpMajorByHomePath,
             classpathIssues = classpathIssues,
         )
     }
@@ -808,8 +820,7 @@ class ElixirEditorBasedSdkWidget(
                 ModuleMiseCheckData(
                     moduleName = module.name,
                     elixirSdk = elixirSdk,
-                    erlangOtpRelease = erlangSdk?.versionString
-                        ?.let { org.elixir_lang.sdk.erlang.Release.fromString(it)?.otpRelease },
+                    erlangSdkHomePath = erlangSdk?.homePath,
                     contentRoot = contentRoot,
                 )
             }
@@ -933,11 +944,9 @@ class ElixirEditorBasedSdkWidget(
     }
 
     /**
-     * Feature B: warns when the configured Elixir SDK version differs from the version mise
-     * resolves for the module directory.
-     *
-     * Feature C: warns when the Internal Erlang SDK OTP major release differs from the OTP major
-     * in the mise-resolved erlang version string.
+     * Warns when the configured Elixir SDK version differs from the version mise resolves for
+     * the module directory, or when the Internal Erlang SDK OTP major release differs from the
+     * OTP major in the mise-resolved erlang version.
      *
      * Runs `mise ls --local --json` (a subprocess) for each module. Must NOT be called inside a
      * read lock - use [collectModuleMiseCheckData] first to extract what you need, then call this.
@@ -946,6 +955,7 @@ class ElixirEditorBasedSdkWidget(
         moduleDataList: List<ModuleMiseCheckData>,
         elixirVersionBySdk: Map<Sdk, String?>,
         miseByContentRoot: Map<Path, MiseVersions?>,
+        erlangOtpMajorByHomePath: Map<String, String?>,
     ): List<ModuleSdkIssue> {
         val issues = mutableListOf<ModuleSdkIssue>()
 
@@ -953,7 +963,7 @@ class ElixirEditorBasedSdkWidget(
             val contentRoot = data.contentRoot ?: continue
             val miseVersions = miseByContentRoot[contentRoot] ?: continue
 
-            // Feature B: Elixir version mismatch
+            // Elixir version mismatch: configured SDK vs mise-resolved version
             val miseElixir = miseVersions.elixir
             if (miseElixir != null) {
                 val configuredVersion = data.elixirSdk?.let { elixirVersionBySdk[it] }
@@ -975,19 +985,20 @@ class ElixirEditorBasedSdkWidget(
                 }
             }
 
-            // Feature C: OTP version mismatch between Internal Erlang SDK and mise erlang
+            // OTP version mismatch: Internal Erlang SDK vs mise-resolved erlang
             val miseErlang = miseVersions.erlang
-            if (miseErlang != null && data.erlangOtpRelease != null) {
+            val erlangOtpMajor = data.erlangSdkHomePath?.let { erlangOtpMajorByHomePath[it] }
+            if (miseErlang != null && erlangOtpMajor != null) {
                 val miseErlangMajor = miseErlang.version.substringBefore(".")
-                if (miseErlangMajor != data.erlangOtpRelease) {
+                if (miseErlangMajor != erlangOtpMajor) {
                     LOG.info(
                         "Mise OTP mismatch in module '${data.moduleName}': " +
-                                "SDK OTP=${data.erlangOtpRelease}, mise=${miseErlang.version}"
+                                "SDK OTP=$erlangOtpMajor, mise=${miseErlang.version}"
                     )
                     issues.add(
                         ModuleSdkIssue(
                             moduleName = data.moduleName,
-                            issue = "Internal Erlang SDK OTP ${data.erlangOtpRelease} does not " +
+                            issue = "Internal Erlang SDK OTP $erlangOtpMajor does not " +
                                     "match mise (${miseErlang.version}). " +
                                     "Run 'Refresh Active Elixir SDKs' or reconfigure.",
                             isDangling = false,

@@ -256,6 +256,43 @@ ELIXIR_SDK_HOME
             return org.elixir_lang.sdk.Type.appendWslSuffix(base, sdkHome)
         }
 
+        /**
+         * Produces a variant-qualified SDK name that includes the compiled-against OTP major and the
+         * full Erlang release version, so two Elixir SDKs with the same base version but different
+         * Erlang pairings get distinct names in the SDK table.
+         *
+         * Example: `"mise Elixir 1.13.4-otp-24 (Erlang 24.3.4.6)"`
+         *
+         * Falls back to [suggestSdkNameForHome] when [otpMajor] is null (pre-Elixir-1.6 installs
+         * where BEAM parsing is unavailable).
+         */
+        @JvmStatic
+        internal fun suggestSdkNameForHome(
+            sdkHome: String,
+            resolvedVersion: String?,
+            otpMajor: String?,
+            erlangFullVersion: String?,
+        ): String {
+            if (otpMajor == null) return suggestSdkNameForHome(sdkHome, resolvedVersion)
+            val source = SdkPaths.detectSource(sdkHome)
+            val elixirVersion = ElixirVersionDetector.elixirVersion(sdkHome, resolvedVersion)
+            val base = buildString {
+                if (source != null) {
+                    append(source).append(" ")
+                }
+                append("Elixir ")
+                if (elixirVersion != null) {
+                    append(elixirVersion).append("-otp-").append(otpMajor)
+                } else {
+                    append("at ").append(sdkHome)
+                }
+                if (erlangFullVersion != null) {
+                    append(" (Erlang ").append(erlangFullVersion).append(")")
+                }
+            }
+            return org.elixir_lang.sdk.Type.appendWslSuffix(base, sdkHome)
+        }
+
         @JvmStatic
         @RequiresBackgroundThread
         fun canonicalVersion(sdk: Sdk): String? = ElixirVersionDetector.canonicalVersion(sdk)
