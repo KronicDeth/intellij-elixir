@@ -8,6 +8,7 @@ import org.elixir_lang.PlatformTestCase
 import org.elixir_lang.sdk.SdkHomeKey
 import org.elixir_lang.sdk.SdkHomePaths
 import org.elixir_lang.sdk.erlang.Type as ErlangSdkType
+import org.elixir_lang.sdk.erlang_dependent.ErlangSdkResolver
 
 class TypeErlangAutoLinkTest : PlatformTestCase() {
 
@@ -40,7 +41,7 @@ class TypeErlangAutoLinkTest : PlatformTestCase() {
         }
         registeredSdks.add(erlangSdk)
 
-        val result = Type.findRegisteredErlangSdk()
+        val result = ErlangSdkResolver.findAnyRegistered()
         assertNotNull("Should find the registered Erlang SDK", result)
         assertEquals("Test Erlang SDK", result!!.name)
     }
@@ -53,7 +54,7 @@ class TypeErlangAutoLinkTest : PlatformTestCase() {
             existing.forEach { table.removeJdk(it) }
         }
 
-        val result = Type.findRegisteredErlangSdk()
+        val result = ErlangSdkResolver.findAnyRegistered()
         assertNull("Should return null when no Erlang SDK is registered", result)
     }
 
@@ -73,7 +74,7 @@ class TypeErlangAutoLinkTest : PlatformTestCase() {
         }
         registeredSdks.add(sdkWithHome)
 
-        val result = Type.findRegisteredErlangSdk()
+        val result = ErlangSdkResolver.findAnyRegistered()
         assertNotNull("Should find the Erlang SDK with homePath", result)
         assertEquals("Erlang With Home", result!!.name)
     }
@@ -115,7 +116,7 @@ class TypeErlangAutoLinkTest : PlatformTestCase() {
         }
         registeredSdks.add(elixirSdk)
 
-        val result = Type.findRegisteredErlangSdk()
+        val result = ErlangSdkResolver.findAnyRegistered()
         assertNull("Should not return non-Erlang SDK", result)
     }
 

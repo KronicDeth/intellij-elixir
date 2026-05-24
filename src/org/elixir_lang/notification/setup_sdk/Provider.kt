@@ -16,6 +16,7 @@ import com.intellij.ui.EditorNotificationProvider
 import org.elixir_lang.ElixirFileType
 import org.elixir_lang.ElixirLanguage
 import org.elixir_lang.sdk.ProcessOutput
+import org.elixir_lang.sdk.elixir.ElixirSdkLookup
 import org.elixir_lang.sdk.elixir.Type
 import java.util.function.Function
 import javax.swing.JComponent
@@ -35,7 +36,7 @@ class Provider : EditorNotificationProvider {
 
         val module = ModuleUtilCore.findModuleForPsiElement(psiFile)
 
-        val sdk = module?.let { Type.mostSpecificSdk(it) } ?: Type.mostSpecificSdk(project)
+        val sdk = module?.let { ElixirSdkLookup.mostSpecificSdk(it) } ?: ElixirSdkLookup.mostSpecificSdk(project)
         if (sdk != null) return null
 
         // No SDK configured. Mise-based suggestion is handled by the status bar widget's

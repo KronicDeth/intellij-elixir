@@ -24,7 +24,7 @@ import org.elixir_lang.isElixirMixModule
 import org.elixir_lang.jps.shared.ParametersList
 import org.elixir_lang.mix.Project
 import org.elixir_lang.notification.setup_sdk.Notifier
-import org.elixir_lang.sdk.elixir.Type.Companion.mostSpecificSdk
+import org.elixir_lang.sdk.elixir.ElixirSdkLookup.mostSpecificSdk
 import java.nio.charset.StandardCharsets
 import java.nio.file.InvalidPathException
 import java.nio.file.Paths

@@ -18,7 +18,7 @@ import org.elixir_lang.Mix
 import org.elixir_lang.code_style.CodeStyleSettings
 import org.elixir_lang.mix.Project as MixProject
 import org.elixir_lang.psi.ElixirFile
-import org.elixir_lang.sdk.elixir.Type.Companion.mostSpecificSdk
+import org.elixir_lang.sdk.elixir.ElixirSdkLookup.mostSpecificSdk
 import java.io.FileNotFoundException
 import java.nio.charset.StandardCharsets
 

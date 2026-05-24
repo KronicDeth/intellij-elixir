@@ -17,7 +17,7 @@ import org.elixir_lang.Mix
 import org.elixir_lang.isElixirMixModule
 import org.elixir_lang.notification.setup_sdk.Notifier
 import org.elixir_lang.run.ensureWorkingDirectory
-import org.elixir_lang.sdk.elixir.Type.Companion.mostSpecificSdk
+import org.elixir_lang.sdk.elixir.ElixirSdkLookup.mostSpecificSdk
 
 data class DialyzerWarn(
     val fileName: String,
