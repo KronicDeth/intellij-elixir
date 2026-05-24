@@ -907,4 +907,4 @@ enum class Code(val number: Int, val function: String, val arguments: Array<Argu
     fun arity() = arguments.size
 }
 
-val codeByNumber = Code.values().associateBy(Code::number)
+val codeByNumber = Code.entries.associateBy(Code::number)

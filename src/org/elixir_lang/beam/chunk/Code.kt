@@ -36,7 +36,7 @@ class Code(private val operationList: List<Operation>) {
         }
 
         companion object {
-            val UNAMBIGUOUS = Options(Inline.Companion.UNAMBIGUOUS)
+            val UNAMBIGUOUS = Options(Inline.UNAMBIGUOUS)
         }
     }
 
@@ -181,14 +181,14 @@ class Code(private val operationList: List<Operation>) {
             if (version != 0L) {
                 LOGGER.error(
                         "Code version ($version) differs from expect 0.  There was an incompatible change in " +
-                                "https://github.com/erlang/otp/blob/master/lib/compiler/src/genop.tab."
+                                "https://github.com/erlang/otp/blob/master/lib/compiler/src/genop.tab"
                 )
             }
 
             val (maxOpcode, maxOpcodeByteCount) = unsignedInt(data, offset)
             offset += maxOpcodeByteCount
 
-            val expectedMaxOpcode = org.elixir_lang.beam.chunk.code.operation.Code.values().max()?.number ?: 0
+            val expectedMaxOpcode = org.elixir_lang.beam.chunk.code.operation.Code.entries.max().number
             if (maxOpcode > expectedMaxOpcode) {
                 LOGGER.warn(
                     "Max opcode ($maxOpcode) exceeds expected max opcode ($expectedMaxOpcode).  Additional " +
