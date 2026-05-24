@@ -190,10 +190,10 @@ class Code(private val operationList: List<Operation>) {
 
             val expectedMaxOpcode = org.elixir_lang.beam.chunk.code.operation.Code.values().max()?.number ?: 0
             if (maxOpcode > expectedMaxOpcode) {
-                LOGGER.error(
-                        "Max opcode ($maxOpcode) exceeds expected max opcode ($expectedMaxOpcode).  Additional " +
-                                "opcodes have been added to the end of " +
-                                "https://github.com/erlang/otp/blob/master/lib/compiler/src/genop.tab."
+                LOGGER.warn(
+                    "Max opcode ($maxOpcode) exceeds expected max opcode ($expectedMaxOpcode).  Additional " +
+                            "opcodes have been added to the end of " +
+                            "https://github.com/erlang/otp/blob/master/lib/compiler/src/genop.tab"
                 )
             }
 
