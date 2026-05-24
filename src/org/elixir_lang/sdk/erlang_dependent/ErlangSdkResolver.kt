@@ -6,6 +6,7 @@ import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.projectRoots.ProjectJdkTable
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.projectRoots.SdkModel
+import org.elixir_lang.sdk.wsl.wslCompat
 
 
 /**
@@ -41,18 +42,21 @@ interface ErlangSdkResolver {
 }
 
 /**
- * Default implementation extracted from SdkAdditionalData
+ * Default implementation.
+ *
+ * Resolution priority:
+ * 1. `erlangSdkHomePath` (stable; survives SDK renames) - WSL-aware path match in ProjectJdkTable
+ * 2. `erlangSdkName` (legacy fallback for configs written before home-path was added) - name match;
+ *    self-heals by writing the resolved path back to `erlangSdkHomePath` so future lookups use path
+ * 3. Both absent → NOT_CONFIGURED
  */
 class DefaultErlangSdkResolver : ErlangSdkResolver {
     override fun resolveErlangSdkResult(elixirSdk: Sdk, sdkModel: SdkModel?): ErlangSdkResult {
         val elixirName = elixirSdk.name
         val additionalData = elixirSdk.elixirAdditionalData
-        val configuredName = additionalData?.getErlangSdkName()?.takeIf { it.isNotBlank() }
-            ?: return ErlangSdkResult.Missing(
-                elixirSdk,
-                MissingErlangSdkReason.NOT_CONFIGURED,
-            )
+            ?: return ErlangSdkResult.Missing(elixirSdk, MissingErlangSdkReason.NOT_CONFIGURED)
 
+        // Check cache first
         additionalData.getCachedErlangSdk()?.let { cached ->
             if (isValidAndExists(cached, sdkModel)) {
                 if (cached.homePath.isNullOrBlank()) {
@@ -68,17 +72,47 @@ class DefaultErlangSdkResolver : ErlangSdkResolver {
             additionalData.setCachedErlangSdk(null)
         }
 
-        logger.debug { "[$elixirName] Looking up Erlang SDK by name: $configuredName" }
+        // 1. Path-first lookup (stable; survives renames)
+        val configuredHomePath = additionalData.getErlangSdkHomePath()?.takeIf { it.isNotBlank() }
+        if (configuredHomePath != null) {
+            logger.debug { "[$elixirName] Looking up Erlang SDK by home path: $configuredHomePath" }
+            val found = findErlangSdkByHomePath(configuredHomePath, sdkModel)
+            if (found != null) {
+                logger.debug { "[$elixirName] Found Erlang SDK by home path: ${found.name}" }
+                additionalData.setCachedErlangSdk(found)
+                // Self-heal: keep name in sync with current SDK name after a rename.
+                // Not wrapped in a write action - see name-fallback path below for rationale.
+                if (additionalData.getErlangSdkName() != found.name) {
+                    additionalData.setErlangSdk(found)
+                }
+                if (found.homePath.isNullOrBlank()) {
+                    return ErlangSdkResult.Missing(elixirSdk, MissingErlangSdkReason.MISSING_HOME_PATH, found.name)
+                }
+                return ErlangSdkResult.Success(found)
+            }
+            logger.debug { "[$elixirName] No Erlang SDK found at home path: $configuredHomePath" }
+        }
+
+        // 2. Name-based fallback (legacy configs without erlangSdkHomePath)
+        val configuredName = additionalData.getErlangSdkName()?.takeIf { it.isNotBlank() }
+            ?: return ErlangSdkResult.Missing(elixirSdk, MissingErlangSdkReason.NOT_CONFIGURED)
+
+        logger.debug { "[$elixirName] Falling back to name lookup: $configuredName" }
         val found = findErlangSdkByName(configuredName, sdkModel)
         if (found != null) {
-            logger.debug { "[$elixirName] Found Erlang SDK '$configuredName'" }
+            logger.debug { "[$elixirName] Found Erlang SDK by name: $configuredName - self-healing home path and name" }
             additionalData.setCachedErlangSdk(found)
+            // Self-heal: atomically write both home path and name so that future lookups use
+            // path-first resolution and the name stays in sync with the current SDK name.
+            // Not wrapped in a write action intentionally - this resolver can be called while
+            // already holding a read lock (e.g. from EditorNotificationProvider.collectNotificationData
+            // which is @RequiresReadLock), and acquiring a write action from under a read lock
+            // deadlocks. String field assignment is an atomic JVM reference write; a stale value
+            // is only visible until the next project save, at which point commitChanges() in
+            // SdkRegistrar / attachErlangDependency writes the authoritative value.
+            additionalData.setErlangSdk(found)
             if (found.homePath.isNullOrBlank()) {
-                return ErlangSdkResult.Missing(
-                    elixirSdk,
-                    MissingErlangSdkReason.MISSING_HOME_PATH,
-                    found.name,
-                )
+                return ErlangSdkResult.Missing(elixirSdk, MissingErlangSdkReason.MISSING_HOME_PATH, found.name)
             }
             return ErlangSdkResult.Success(found)
         }
@@ -93,11 +127,7 @@ class DefaultErlangSdkResolver : ErlangSdkResolver {
             else -> MissingErlangSdkReason.NOT_FOUND
         }
 
-        return ErlangSdkResult.Missing(
-            elixirSdk,
-            reason,
-            configuredName,
-        )
+        return ErlangSdkResult.Missing(elixirSdk, reason, configuredName)
     }
 
     private fun isValidAndExists(sdk: Sdk, sdkModel: SdkModel?): Boolean {
@@ -106,6 +136,16 @@ class DefaultErlangSdkResolver : ErlangSdkResolver {
         val jdkTable = ProjectJdkTable.getInstance()
         return (sdkModel?.sdks?.any { it.name == name } == true)
             || (jdkTable.findJdk(name) != null)
+    }
+
+    private fun findErlangSdkByHomePath(homePath: String, sdkModel: SdkModel?): Sdk? {
+        val fromModel = sdkModel?.sdks?.find { sdk ->
+            Type.staticIsValidDependency(sdk) && wslCompat.pathsEqualWslAware(sdk.homePath, homePath)
+        }
+        if (fromModel != null) return fromModel
+        return ProjectJdkTable.getInstance().allJdks.firstOrNull { sdk ->
+            Type.staticIsValidDependency(sdk) && wslCompat.pathsEqualWslAware(sdk.homePath, homePath)
+        }
     }
 
     private fun findErlangSdkByName(name: String, sdkModel: SdkModel?): Sdk? {

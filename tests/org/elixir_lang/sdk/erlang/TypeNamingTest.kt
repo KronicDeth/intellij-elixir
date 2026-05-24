@@ -54,8 +54,6 @@ class TypeNamingTest : PlatformTestCase() {
     }
 
     fun testGetDefaultSdkName_unknownSource() {
-        val logger = com.intellij.openapi.diagnostic.Logger.getInstance("org.elixir_lang.sdk.erlang.Type")
-        logger.setLevel(com.intellij.openapi.diagnostic.LogLevel.ERROR)
         val name = Type.getDefaultSdkName(
             "/custom/path/erlang/26.0",
             null
@@ -64,19 +62,15 @@ class TypeNamingTest : PlatformTestCase() {
     }
 
     fun testGetDefaultSdkName_withVersion() {
-        val release = Release("26.0.1", "14.0.2")
-        val result: Pair<String?, String?> = captureLoggedWarning<String?>(
-            "org.elixir_lang.sdk.erlang.Type"
-        ) {
-            Type.getDefaultSdkName(
-                "/Users/josh/.local/share/mise/installs/erlang/26.0.1",
-                release
-            )
-        }
-        val name = result.first
+        val release = Release("26", "26.0.1")
+        val name = Type.getDefaultSdkName(
+            "/Users/josh/.local/share/mise/installs/erlang/26.0.1",
+            release
+        )
         assertNotNull(name)
-        // Should use directory name if more specific
-        assertTrue("Name should contain mise", name?.contains("mise") ?: false)
-        assertTrue("Name should contain Erlang for Elixir", name?.contains("Erlang for Elixir") ?: false)
+        // Should use directory name since it starts with the OTP major
+        assertTrue("Name should contain mise", name.contains("mise"))
+        assertTrue("Name should contain Erlang for Elixir", name.contains("Erlang for Elixir"))
+        assertTrue("Name should contain 26.0.1", name.contains("26.0.1"))
     }
 }

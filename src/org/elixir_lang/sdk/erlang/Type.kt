@@ -2,11 +2,8 @@ package org.elixir_lang.sdk.erlang
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.fileChooser.FileChooserDescriptor
-import com.intellij.platform.ide.progress.ModalTaskOwner
-import com.intellij.platform.ide.progress.runWithModalProgressBlocking
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import com.intellij.openapi.project.Project
+import org.elixir_lang.util.runWithEdtGuard
 import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.projectRoots.SdkModel
@@ -67,7 +64,7 @@ class Type : SdkType(ErlangSdkTypeId.ERLANG_SDK_TYPE_ID) {
                 if (version != null) {
                     // Use directory name for version if it's more specific (e.g., "28.3" vs "28")
                     val dirVersion = File(sdkHome).name
-                    val displayVersion = if (dirVersion.startsWith(version.otpRelease)) dirVersion else version.otpRelease
+                    val displayVersion = if (dirVersion.startsWith(version.otpMajor)) dirVersion else version.otpVersion
                     append(displayVersion)
                 } else {
                     append("at ").append(sdkHome)
@@ -82,7 +79,10 @@ class Type : SdkType(ErlangSdkTypeId.ERLANG_SDK_TYPE_ID) {
             val normalizedVersion = resolvedVersion?.takeIf { it.isNotBlank() }
             val baseName =
                 if (normalizedVersion == null) {
-                    getDefaultSdkName(sdkHome, ErlangVersionDetector.detectSdkVersion(sdkHome))
+                    getDefaultSdkName(
+                        sdkHome,
+                        runWithEdtGuard("Detecting Erlang SDK…") { ErlangVersionDetector.detectRelease(sdkHome) },
+                    )
                 } else {
                     val source = SdkPaths.detectSource(sdkHome)
                     val dirVersion = File(sdkHome).name
@@ -105,7 +105,9 @@ class Type : SdkType(ErlangSdkTypeId.ERLANG_SDK_TYPE_ID) {
             resolvedVersion: String?,
         ): String? {
             val normalizedVersion = resolvedVersion?.takeIf { it.isNotBlank() }
-            val version = normalizedVersion ?: ErlangVersionDetector.detectSdkVersion(sdkHome)?.otpRelease ?: return null
+            val version = normalizedVersion
+                ?: runWithEdtGuard("Detecting Erlang SDK…") { ErlangVersionDetector.detectRelease(sdkHome) }?.otpVersion
+                ?: return null
             val displayVersion =
                 if (normalizedVersion == null) {
                     val dirVersion = File(sdkHome).name
@@ -151,21 +153,14 @@ class Type : SdkType(ErlangSdkTypeId.ERLANG_SDK_TYPE_ID) {
         }
     }
 
-    override fun setupSdkPaths(sdk: Sdk) {
-        val app = ApplicationManager.getApplication()
-
-        // Following Java SDK pattern: if on EDT, run VirtualFile access in background thread
-        // This avoids EEL environment check issues with WSL paths
-        if (app.isDispatchThread && !app.isWriteAccessAllowed) {
-            runWithModalProgressBlocking(ModalTaskOwner.guess(), "Setting Up Erlang SDK Paths...") {
-                withContext(Dispatchers.IO) {
-                    setupSdkPathsImpl(sdk)
-                }
-            }
-        } else {
-            setupSdkPathsImpl(sdk)
-        }
-    }
+    // If called from inside a write action the modal progress dialog would deadlock, so skip
+    // it in that case and call setupSdkPathsImpl directly (see ElixirSdkPathConfigurator for
+    // the same pattern).
+    override fun setupSdkPaths(sdk: Sdk) =
+            runWithEdtGuard(
+                "Setting Up Erlang SDK Paths...",
+                skipModalIf = { ApplicationManager.getApplication().isWriteAccessAllowed },
+            ) { setupSdkPathsImpl(sdk) }
 
     private fun setupSdkPathsImpl(sdk: Sdk) {
         val sdkModificator = sdk.sdkModificator
@@ -215,10 +210,19 @@ class Type : SdkType(ErlangSdkTypeId.ERLANG_SDK_TYPE_ID) {
         return suggestSdkNameForHome(sdkHome, null)
     }
 
+    /**
+     * Returns a display string for the Erlang/OTP version at [sdkHome], or `null` if the
+     * version cannot be detected.
+     *
+     * The platform calls this override from the EDT (e.g. in the SDK settings dialog).
+     * [runWithEdtGuard] ensures [ErlangVersionDetector.detectRelease] (which asserts a background
+     * thread) is never called directly on the EDT.
+     */
     override fun getVersionString(sdkHome: String): String? {
-        val detectedVersion = ErlangVersionDetector.detectSdkVersion(sdkHome)?.otpRelease ?: return null
+        val release = runWithEdtGuard("Detecting Erlang SDK…") { ErlangVersionDetector.detectRelease(sdkHome) }
+            ?: return null
         val dirVersion = File(sdkHome).name
-        val displayVersion = if (dirVersion.startsWith(detectedVersion)) dirVersion else detectedVersion
+        val displayVersion = if (dirVersion.startsWith(release.otpMajor)) dirVersion else release.otpVersion
         return erlangDisplayString(SdkPaths.detectSource(sdkHome), displayVersion)
     }
 
