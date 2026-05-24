@@ -115,6 +115,8 @@ data class Argument(val name: String, val supportedOptions: Code.Options = Code.
                     else -> "literal($index)"
                 }
             }
+            is TypedRegister ->
+                "{tr, ${valueAssembly(term.register, cache, configuredOptions)}, ${valueAssembly(term.type, cache, configuredOptions)}}"
             is XRegister ->
                 "x(${term.index})"
             is YRegister ->
