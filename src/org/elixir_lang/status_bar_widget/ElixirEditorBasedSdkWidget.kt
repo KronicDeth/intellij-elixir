@@ -48,6 +48,7 @@ import org.elixir_lang.sdk.SdkRegistrar
 import org.elixir_lang.sdk.elixir.SdkSettingsOpener
 import org.elixir_lang.sdk.elixir.ElixirSdkLookup
 import org.elixir_lang.sdk.elixir.Type
+import org.elixir_lang.sdk.erlang.ErlangVersionDetector
 import org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData
 import org.elixir_lang.sdk.wsl.wslCompat
 import java.nio.file.Path
@@ -293,6 +294,7 @@ class ElixirEditorBasedSdkWidget(
     // -------------------------------------------------------------------------
 
     private fun buildModuleWidgetState(module: com.intellij.openapi.module.Module): WidgetState {
+        LOG.trace("buildModuleWidgetState: ${module.name}")
         val elixirSdk = ElixirSdkLookup.mostSpecificSdk(module)
 
         // Determine whether to show module name in tooltip (only in multi-module projects).
@@ -314,12 +316,9 @@ class ElixirEditorBasedSdkWidget(
             return state
         }
 
-        val versionString = elixirSdk.versionString ?: "Unknown"
-        val elixirVersion = org.elixir_lang.sdk.Type.appendWslSuffix(versionString, elixirSdk.homePath)
-
         if (!isValidSdk(elixirSdk)) {
             val state = WidgetState(
-                toolTip = if (showModuleName) "Elixir SDK: $elixirVersion - Invalid SDK (module '${module.name}')" else "Elixir SDK: $elixirVersion - Invalid SDK",
+                toolTip = if (showModuleName) "Elixir SDK: ${elixirSdk.name} - Invalid SDK (module '${module.name}')" else "Elixir SDK: ${elixirSdk.name} - Invalid SDK",
                 text = "Elixir: SDK Error",
                 isActionEnabled = true
             )
@@ -330,7 +329,7 @@ class ElixirEditorBasedSdkWidget(
         val erlangSdk = getErlangSdk(elixirSdk)
         if (erlangSdk == null) {
             val state = WidgetState(
-                toolTip = if (showModuleName) "Elixir SDK: $elixirVersion - Missing Erlang SDK (module '${module.name}')" else "Elixir SDK: $elixirVersion - Missing Erlang SDK",
+                toolTip = if (showModuleName) "Elixir SDK: ${elixirSdk.name} - Missing Erlang SDK (module '${module.name}')" else "Elixir SDK: ${elixirSdk.name} - Missing Erlang SDK",
                 text = "Elixir: SDK Error",
                 isActionEnabled = true
             )
@@ -338,12 +337,14 @@ class ElixirEditorBasedSdkWidget(
             return state
         }
 
-        val tooltipBase =
-                if (showModuleName) "Elixir SDK: $elixirVersion (module '${module.name}')"
-                else "Elixir SDK: $elixirVersion"
+        val tooltipBase = buildString {
+            append("Elixir: <b>${elixirSdk.name}</b>")
+            append("<br>Erlang: <b>${erlangSdk.name}</b>")
+            if (showModuleName) append("<br>Module: <b>${module.name}</b>")
+        }
         val state = WidgetState(
             toolTip = tooltipBase,
-            text = "Elixir $elixirVersion",
+            text = elixirSdk.name,
             isActionEnabled = true
         )
         state.icon = Icons.LANGUAGE
@@ -771,7 +772,7 @@ class ElixirEditorBasedSdkWidget(
             .mapNotNull { it.erlangSdkHomePath }
             .distinct()
             .associateWith { homePath ->
-                org.elixir_lang.sdk.erlang.ErlangVersionDetector.detectRelease(homePath)?.otpMajor
+                ErlangVersionDetector.detectRelease(homePath)?.otpMajor
             }
 
         val classpathIssues = detectClasspathIssues(modelData.projectSdkSnapshot)
