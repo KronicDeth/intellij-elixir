@@ -12,11 +12,24 @@ import com.intellij.psi.PsiElement
 import org.elixir_lang.Facet
 
 object ElixirSdkLookup {
-    fun mostSpecificSdk(module: Module): Sdk? =
-        FacetManager.getInstance(module).getFacetByType(Facet.ID)?.sdk
-            ?: moduleSdk(module)
-            ?: mostSpecificSdk(module.project)
+    private val LOG = com.intellij.openapi.diagnostic.logger<ElixirSdkLookup>()
+    fun mostSpecificSdk(module: Module): Sdk? {
+        val facetSdk = FacetManager.getInstance(module).getFacetByType(Facet.ID)?.sdk
+        if (facetSdk != null) {
+            LOG.trace("ElixirSdkLookup.mostSpecificSdk(module='${module.name}'): resolved from Facet → '${facetSdk.name}'")
+            return facetSdk
+        }
 
+        val modSdk = moduleSdk(module)
+        if (modSdk != null) {
+            LOG.trace("ElixirSdkLookup.mostSpecificSdk(module='${module.name}'): resolved from ModuleRootManager → '${modSdk.name}'")
+            return modSdk
+        }
+
+        val projSdk = mostSpecificSdk(module.project)
+        LOG.trace("ElixirSdkLookup.mostSpecificSdk(module='${module.name}'): fell through to project SDK → '${projSdk?.name}'")
+        return projSdk
+    }
     fun mostSpecificSdk(psiElement: PsiElement): Sdk? {
         val project = psiElement.project
         if (project.isDisposed) return null
@@ -30,7 +43,14 @@ object ElixirSdkLookup {
 
     fun mostSpecificSdk(project: Project): Sdk? = projectSdk(project)
 
-    private fun moduleSdk(module: Module): Sdk? = sdk(ModuleRootManager.getInstance(module).sdk)
+    private fun moduleSdk(module: Module): Sdk? {
+        val raw = ModuleRootManager.getInstance(module).sdk
+        val filtered = sdk(raw)
+        if (raw != null && filtered == null) {
+            LOG.trace("ElixirSdkLookup.moduleSdk(module='${module.name}'): raw SDK '${raw.name}' (type=${raw.sdkType.name}) rejected by type filter")
+        }
+        return filtered
+    }
 
     private fun projectSdk(project: Project): Sdk? = sdk(ProjectRootManager.getInstance(project).projectSdk)
 
