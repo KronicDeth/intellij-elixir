@@ -7,8 +7,8 @@ import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl
 import org.elixir_lang.PlatformTestCase
 import org.elixir_lang.sdk.SdkHomeKey
 import org.elixir_lang.sdk.SdkHomePaths
-import org.elixir_lang.sdk.erlang.Type as ErlangSdkType
 import org.elixir_lang.sdk.erlang_dependent.ErlangSdkResolver
+import org.elixir_lang.sdk.erlang.Type as ErlangSdkType
 
 class TypeErlangAutoLinkTest : PlatformTestCase() {
 
@@ -89,14 +89,14 @@ class TypeErlangAutoLinkTest : PlatformTestCase() {
             }
         }
 
-        val result = Type.promptForMiseErlangSdk(elixirSdk)
+        val result = ElixirInternalErlangSdkSetup.promptForMiseErlangSdk(elixirSdk)
         assertNull("Should return null for non-mise Elixir SDK", result)
     }
 
     fun testPromptForMiseErlangSdk_returnsNullWhenNoHomePath() {
         val elixirSdk = ProjectJdkImpl("Test Elixir SDK", Type.instance)
 
-        val result = Type.promptForMiseErlangSdk(elixirSdk)
+        val result = ElixirInternalErlangSdkSetup.promptForMiseErlangSdk(elixirSdk)
         assertNull("Should return null when Elixir SDK has no homePath", result)
     }
 
@@ -122,7 +122,7 @@ class TypeErlangAutoLinkTest : PlatformTestCase() {
 
     fun testRegisterErlangSdk_returnsNullForInvalidPath() {
         // Use a path that exists but isn't a valid Erlang home
-        val result = Type.registerErlangSdk(System.getProperty("java.io.tmpdir"))
+        val result = ElixirInternalErlangSdkSetup.registerErlangSdk(System.getProperty("java.io.tmpdir"))
         assertNull("Should return null for invalid Erlang home path", result)
     }
 
@@ -135,7 +135,7 @@ class TypeErlangAutoLinkTest : PlatformTestCase() {
         val validHome = miseHomes.values.firstOrNull { erlangSdkType.isValidSdkHome(it) }
             ?: return // Skip if no valid mise Erlang on this machine
 
-        val sdk = Type.registerErlangSdk(validHome)
+        val sdk = ElixirInternalErlangSdkSetup.registerErlangSdk(validHome)
         assertNotNull("registerErlangSdk should return non-null for valid home", sdk)
         registeredSdks.add(sdk!!)
 

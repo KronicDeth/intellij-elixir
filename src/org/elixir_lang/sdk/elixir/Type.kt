@@ -13,7 +13,10 @@ import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.util.InvalidDataException
 import com.intellij.openapi.util.WriteExternalException
 import com.intellij.openapi.util.io.FileUtil
-import com.intellij.openapi.vfs.*
+import com.intellij.openapi.vfs.LocalFileSystem
+import com.intellij.openapi.vfs.VfsUtilCore
+import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.openapi.vfs.toNioPathOrNull
 import com.intellij.psi.PsiElement
 import com.intellij.util.concurrency.annotations.RequiresBackgroundThread
 import org.apache.commons.io.FilenameUtils
@@ -24,9 +27,7 @@ import org.elixir_lang.jps.shared.cli.CliTool
 import org.elixir_lang.jps.shared.sdk.SdkPaths
 import org.elixir_lang.sdk.*
 import org.elixir_lang.sdk.erlang_dependent.AdditionalDataConfigurable
-import org.elixir_lang.sdk.erlang_dependent.ErlangSdkResolver
 import org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData
-import org.elixir_lang.sdk.wsl.wslCompat
 import org.elixir_lang.util.WriteActions
 import org.jdom.Element
 import org.jetbrains.annotations.Contract
@@ -217,8 +218,6 @@ ELIXIR_SDK_HOME
     }
 
     companion object {
-        val SKIP_ERLANG_SETTINGS_HINT_KEY = com.intellij.openapi.util.Key.create<Boolean>("SKIP_ERLANG_SETTINGS_HINT")
-
         private const val LINUX_DEFAULT_HOME_PATH = SdkHomePaths.LINUX_DEFAULT_HOME_PATH + "/elixir"
         private const val LINUX_MINT_HOME_PATH = SdkHomePaths.LINUX_MINT_HOME_PATH + "/elixir"
         private val LOG = Logger.getInstance(Type::class.java)
@@ -378,139 +377,6 @@ ELIXIR_SDK_HOME
                 }
             }
         }
-
-        internal fun configureInternalErlangSdk(
-            elixirSdk: Sdk,
-            elixirSdkModificator: SdkModificator,
-        ): Sdk? {
-            // Check if additional data is already set (happens when SDK was just created)
-            val existingAdditionalData = elixirSdk.sdkAdditionalData as? SdkAdditionalData
-            val existingErlangSdk = existingAdditionalData?.getErlangSdk()
-
-            // First, check if an Erlang SDK was explicitly set via UserData
-            // This happens when creating a new Elixir SDK right after creating its Erlang SDK
-            val explicitErlangSdk = elixirSdk.getUserData(ERLANG_SDK_KEY)
-
-            val erlangSdk = explicitErlangSdk
-                ?: existingErlangSdk
-                ?: ErlangSdkResolver.findAnyRegistered()
-                ?: promptForMiseErlangSdk(elixirSdk)
-
-            if (erlangSdk != null) {
-                if (explicitErlangSdk == null && existingErlangSdk == null) {
-                    LOG.info("Auto-linked Erlang SDK '${erlangSdk.name}' to Elixir SDK '${elixirSdk.name}'")
-                }
-
-                // Only set additional data if it's not already set
-                if (existingAdditionalData == null || existingErlangSdk == null) {
-                    val sdkAdditionData: com.intellij.openapi.projectRoots.SdkAdditionalData =
-                        SdkAdditionalData(erlangSdk, elixirSdk)
-                    elixirSdkModificator.sdkAdditionalData = sdkAdditionData
-                }
-
-                ElixirErlangClasspath.addNewCodePathsFromInternErlangSdk(elixirSdk, erlangSdk, elixirSdkModificator)
-
-                // Clear the UserData after use
-                elixirSdk.putUserData(ERLANG_SDK_KEY, null)
-            } else {
-                LOG.warn("No Erlang SDK found, Elixir SDK will be incomplete")
-            }
-            return erlangSdk
-        }
-
-        /**
-         * For mise Elixir SDKs only: finds mise-installed Erlang SDK homes,
-         * presents a chooser dialog, and registers the selected one.
-         */
-        internal fun promptForMiseErlangSdk(elixirSdk: Sdk): Sdk? {
-            val homePath = elixirSdk.homePath ?: return null
-            if (SdkPaths.detectSource(homePath) != SdkPaths.SOURCE_NAME_MISE) return null
-
-            val erlangSdkType = org.elixir_lang.sdk.erlang.Type.instance
-            val miseHomes = java.util.TreeMap<SdkHomeKey, String>()
-            SdkHomePaths.mergeMise(miseHomes, "erlang")
-
-            // Filter to valid Erlang homes only (erl binary must exist and be executable)
-            val validHomes = miseHomes.entries.filter { (_, path) ->
-                erlangSdkType.isValidSdkHome(path)
-            }
-            if (validHomes.isEmpty()) return null
-
-            val displayNames = validHomes.map { (_, path) ->
-                org.elixir_lang.sdk.erlang.Type.suggestSdkNameForHome(path, null)
-            }.toTypedArray()
-
-            var selectedIndex = -1
-            val app = ApplicationManager.getApplication()
-            val showDialog = Runnable {
-                selectedIndex = com.intellij.openapi.ui.Messages.showChooseDialog(
-                    "No Erlang SDK is configured. Select one to use with this Elixir SDK:",
-                    "Select Erlang SDK",
-                    displayNames,
-                    displayNames[0],
-                    null
-                )
-            }
-
-            if (app.isDispatchThread) {
-                showDialog.run()
-            } else {
-                app.invokeAndWait(showDialog)
-            }
-
-            if (selectedIndex < 0) return null
-
-            val erlangSdk = registerErlangSdk(validHomes[selectedIndex].value)
-            if (erlangSdk != null && elixirSdk.getUserData(SKIP_ERLANG_SETTINGS_HINT_KEY) != true) {
-                val sdkName = erlangSdk.name
-                val showInfo = Runnable {
-                    com.intellij.openapi.ui.Messages.showInfoMessage(
-                        "Erlang SDK '$sdkName' has been registered.\n\n" +
-                            "Please save settings and reopen this dialog to see it in the Internal Erlang SDK dropdown.",
-                        "Erlang SDK Added"
-                    )
-                }
-                if (app.isDispatchThread) {
-                    showInfo.run()
-                } else {
-                    app.invokeAndWait(showInfo)
-                }
-            }
-            elixirSdk.putUserData(SKIP_ERLANG_SETTINGS_HINT_KEY, null)
-            return erlangSdk
-        }
-
-        internal fun registerErlangSdk(homePath: String): Sdk? {
-            val erlangSdkType = org.elixir_lang.sdk.erlang.Type.instance
-            val canonicalHome = wslCompat.canonicalizePath(homePath)
-            val versionString = org.elixir_lang.sdk.erlang.Type.versionStringForHome(canonicalHome, null)
-                ?: return null
-            val sdkName = org.elixir_lang.sdk.erlang.Type.suggestSdkNameForHome(canonicalHome, null)
-
-            val newSdk = com.intellij.openapi.projectRoots.impl.ProjectJdkImpl(
-                sdkName, erlangSdkType, canonicalHome, versionString
-            )
-
-            val app = ApplicationManager.getApplication()
-            val table = ProjectJdkTable.getInstance()
-
-            val addSdk = Runnable {
-                app.runWriteAction {
-                    table.addJdk(newSdk)
-                }
-            }
-
-            if (app.isDispatchThread) {
-                addSdk.run()
-            } else {
-                app.invokeAndWait(addSdk)
-            }
-
-            erlangSdkType.setupSdkPaths(newSdk)
-            LOG.info("Registered Erlang SDK '${newSdk.name}' from $canonicalHome")
-            return newSdk
-        }
-
 
         private fun getDefaultDocumentationUrl(version: Release?): String? =
             if (version == null) null else "https://elixir-lang.org/docs/stable/elixir/"
