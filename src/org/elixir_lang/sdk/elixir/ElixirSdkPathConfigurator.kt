@@ -1,13 +1,14 @@
 package org.elixir_lang.sdk.elixir
 
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.diagnostic.debug
+import com.intellij.openapi.projectRoots.ProjectJdkTable
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.projectRoots.SdkModificator
 import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.vfs.VfsUtil
 import org.elixir_lang.sdk.SdkEbinPaths
+import org.elixir_lang.util.WriteActions
 import java.io.File
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -28,29 +29,26 @@ object ElixirSdkPathConfigurator {
         // is registered to consume JavadocOrderRootType roots.
         addSourcePaths(sdkModificator)
 
-        // Configure internal Erlang SDK - this will now create and fully setup the Erlang SDK synchronously
-        val erlangSdk = Type.configureInternalErlangSdk(sdk, sdkModificator)
-
-        // Commit changes - check if we're already in a write action to avoid deadlock
-        val app = ApplicationManager.getApplication()
-        if (app.isWriteAccessAllowed) {
-            LOG.debug { "Committing SDK changes for ${sdk.name} (already in write action)" }
-            sdkModificator.commitChanges()
-        } else {
-            val runnable = Runnable {
-                app.runWriteAction {
-                    LOG.debug { "Committing SDK changes for ${sdk.name}" }
-                    sdkModificator.commitChanges()
-                    LOG.debug { "Committed SDK changes for ${sdk.name}" }
-                }
-            }
-            if (app.isDispatchThread) {
-                runnable.run()
+        val erlangSdk = ElixirInternalErlangSdkSetup.configureInternalErlangSdk(sdk, sdkModificator)
+        if (erlangSdk == null) {
+            // Only remove SDKs that are not yet in ProjectJdkTable (wizard/new-SDK path).
+            // An existing SDK that temporarily can't resolve its Erlang pairing must not be removed -
+            // the caller (e.g. SdkRegistrar.registerOrUpdateElixirSdk) owns the SDK's lifecycle.
+            if (ProjectJdkTable.getInstance().findJdk(sdk.name) == null) {
+                LOG.warn("No Erlang SDK found for new Elixir SDK '${sdk.name}'; removing incomplete SDK")
+                WriteActions.runWriteAction { ProjectJdkTable.getInstance().removeJdk(sdk) }
             } else {
-                app.invokeAndWait(runnable)
+                LOG.warn("No Erlang SDK found for Elixir SDK '${sdk.name}'; leaving existing SDK in table")
             }
+            return
         }
-        LOG.info("SDK paths configured for ${sdk.name} (Erlang SDK: ${erlangSdk?.name ?: "none"})")
+
+        WriteActions.runWriteAction {
+            LOG.debug { "Committing SDK changes for ${sdk.name}" }
+            sdkModificator.commitChanges()
+            LOG.debug { "Committed SDK changes for ${sdk.name}" }
+        }
+        LOG.info("SDK paths configured for ${sdk.name} (Erlang SDK: ${erlangSdk.name})")
     }
 
     private fun addSourcePaths(sdkModificator: SdkModificator) {

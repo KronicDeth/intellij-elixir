@@ -1,20 +1,23 @@
 package org.elixir_lang.sdk.elixir
 
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.ModalityState
+import com.intellij.openapi.application.asContextElement
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.diagnostic.trace
 import com.intellij.openapi.projectRoots.ProjectJdkTable
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.projectRoots.SdkModificator
-import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl
 import com.intellij.openapi.ui.Messages
+import kotlinx.coroutines.runBlocking
 import org.elixir_lang.jps.shared.sdk.SdkPaths
 import org.elixir_lang.sdk.SdkHomeKey
 import org.elixir_lang.sdk.SdkHomePaths
+import org.elixir_lang.sdk.SdkRegistrar
 import org.elixir_lang.sdk.erlang_dependent.ErlangSdkResolver
 import org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData
 import org.elixir_lang.sdk.erlang_dependent.Type.Companion.ERLANG_SDK_KEY
-import org.elixir_lang.sdk.wsl.wslCompat
+import org.elixir_lang.util.WriteActions
 import org.elixir_lang.sdk.erlang.Type as ErlangSdkType
 
 /**
@@ -75,8 +78,20 @@ object ElixirInternalErlangSdkSetup {
     }
 
     /**
-     * For mise Elixir SDKs only: finds mise-installed Erlang SDK homes,
-     * presents a chooser dialog, and registers the selected one.
+     * For mise Elixir SDKs only: finds mise-installed Erlang SDK homes, presents a chooser dialog, and registers the
+     * selected one.
+     *
+     * This is normally called from within `setupSdkPaths`, which IntelliJ runs inside its own "Configuring SDK…" modal
+     * (see `ProjectSdksModel.doAdd`). In that context the EDT loop is pumping at the modal modality level.
+     *
+     * When on a background thread we capture [ModalityState.defaultModalityState] - which, from a `ProgressManager`
+     * background thread, returns the modality of the enclosing progress dialog - and pass it as a coroutine context
+     * element so that [com.intellij.openapi.application.edtWriteAction] inside [SdkRegistrar] dispatches at the correct
+     * modality level and is processed by the modal loop.
+     *
+     * When already on the EDT we cannot use [runBlocking] (it would deadlock), so we fall back to the classical
+     * [com.intellij.openapi.application.Application.invokeAndWait] + [com.intellij.openapi.application.runWriteAction]
+     * path via [org.elixir_lang.sdk.elixir.ElixirInternalErlangSdkSetup.registerErlangSdk].
      */
     internal fun promptForMiseErlangSdk(elixirSdk: Sdk): Sdk? {
         val homePath = elixirSdk.homePath ?: return null
@@ -95,7 +110,6 @@ object ElixirInternalErlangSdkSetup {
             ErlangSdkType.suggestSdkNameForHome(path, null)
         }.toTypedArray()
 
-        // Build a reverse map from display name → home path for lookup after dialog
         val nameToHome = validHomes.associate { (_, path) ->
             ErlangSdkType.suggestSdkNameForHome(path, null) to path
         }
@@ -117,50 +131,45 @@ object ElixirInternalErlangSdkSetup {
                 validator
             )
         }
-
-        if (app.isDispatchThread) {
-            showDialog.run()
-        } else {
-            app.invokeAndWait(showDialog)
-        }
+        if (app.isDispatchThread) showDialog.run() else app.invokeAndWait(showDialog)
 
         val selectedHome = selectedName?.let { nameToHome[it] } ?: return null
 
-        val erlangSdk = registerErlangSdk(selectedHome) ?: return null
-
-        return erlangSdk
-    }
-
-    internal fun registerErlangSdk(homePath: String): Sdk? {
-        val erlangSdkType = ErlangSdkType.instance
-        val canonicalHome = wslCompat.canonicalizePath(homePath)
-        val versionString = ErlangSdkType.versionStringForHome(canonicalHome, null)
-            ?: return null
-        val sdkName = ErlangSdkType.suggestSdkNameForHome(canonicalHome, null)
-
-        val newSdk = ProjectJdkImpl(sdkName, erlangSdkType, canonicalHome, versionString)
-        LOG.trace { "registerErlangSdk: created SDK '$sdkName' (identity: ${System.identityHashCode(newSdk)})" }
-
-        val app = ApplicationManager.getApplication()
-        val addSdk = Runnable {
-            app.runWriteAction {
-                ProjectJdkTable.getInstance().addJdk(newSdk)
-                val tableEntry = ProjectJdkTable.getInstance().findJdk(sdkName)
-                LOG.trace { "registerErlangSdk: after addJdk, findJdk('$sdkName') = ${tableEntry?.let { "'${it.name}' (identity: ${System.identityHashCode(it)})" } ?: "NOT FOUND"}" }
+        return if (app.isDispatchThread) {
+            // Can't use runBlocking on EDT - fall back to modal-aware invokeAndWait + runWriteAction.
+            registerErlangSdk(selectedHome)
+        } else {
+            // Capture the current ProgressManager modality (the "Configuring SDK…" modal) so that
+            // edtWriteAction inside SdkRegistrar dispatches at the correct modality level.
+            //
+            // Safety invariant: ErlangSdkType.setupSdkPaths (called inside registerOrUpdateErlangSdk)
+            // must not block waiting for this background thread. Any invokeAndWait it issues dispatches
+            // to the EDT, which is safe because we are not holding any lock the EDT needs. If
+            // setupSdkPaths ever changed to block on the calling thread, this runBlocking would deadlock.
+            val modality = ModalityState.defaultModalityState()
+            runBlocking(modality.asContextElement()) {
+                SdkRegistrar.registerOrUpdateErlangSdk(selectedHome)
             }
         }
+    }
 
-        if (app.isDispatchThread) {
-            addSdk.run()
+    /**
+     * Registers an Erlang SDK using [com.intellij.openapi.application.Application.invokeAndWait] +
+     * [com.intellij.openapi.application.runWriteAction], which is modal-aware and works whether called from the EDT or
+     * from a background thread inside a modal context.
+     *
+     * Reuses an already-registered SDK at the same home path rather than creating a duplicate.
+     */
+    internal fun registerErlangSdk(homePath: String): Sdk? {
+        val prep = SdkRegistrar.prepareErlangSdk(homePath) ?: return null
+        val sdk = if (prep.existing != null) {
+            prep.existing
         } else {
-            app.invokeAndWait(addSdk)
+            WriteActions.runWriteAction { ProjectJdkTable.getInstance().addJdk(prep.template) }
+            prep.template
         }
-
-        LOG.trace { "registerErlangSdk: before setupSdkPaths, findJdk('$sdkName') = ${ProjectJdkTable.getInstance().findJdk(sdkName)?.let { "found (identity: ${System.identityHashCode(it)})" } ?: "NOT FOUND"}" }
-        erlangSdkType.setupSdkPaths(newSdk)
-        LOG.trace { "registerErlangSdk: after setupSdkPaths, findJdk('$sdkName') = ${ProjectJdkTable.getInstance().findJdk(sdkName)?.let { "found (identity: ${System.identityHashCode(it)})" } ?: "NOT FOUND"}" }
-
-        LOG.info("Registered Erlang SDK '${newSdk.name}' from $canonicalHome")
-        return newSdk
+        ErlangSdkType.instance.setupSdkPaths(sdk)
+        LOG.info("${if (prep.existing != null) "Reused" else "Registered"} Erlang SDK '${sdk.name}' from ${sdk.homePath}")
+        return sdk
     }
 }
