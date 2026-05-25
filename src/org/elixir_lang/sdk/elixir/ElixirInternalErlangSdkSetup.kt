@@ -161,15 +161,14 @@ object ElixirInternalErlangSdkSetup {
      * Reuses an already-registered SDK at the same home path rather than creating a duplicate.
      */
     internal fun registerErlangSdk(homePath: String): Sdk? {
-        val prep = SdkRegistrar.prepareErlangSdk(homePath) ?: return null
-        val sdk = if (prep.existing != null) {
-            prep.existing
-        } else {
-            WriteActions.runWriteAction { ProjectJdkTable.getInstance().addJdk(prep.template) }
-            prep.template
+        val template = SdkRegistrar.prepareErlangSdk(homePath) ?: return null
+        var sdk: Sdk? = null
+        WriteActions.runWriteAction {
+            sdk = SdkRegistrar.registerOrUpdatePreparedErlangSdk(template, ProjectJdkTable.getInstance())
         }
-        ErlangSdkType.instance.setupSdkPaths(sdk)
-        LOG.info("${if (prep.existing != null) "Reused" else "Registered"} Erlang SDK '${sdk.name}' from ${sdk.homePath}")
-        return sdk
+        val resolvedSdk = sdk ?: return null
+        ErlangSdkType.instance.setupSdkPaths(resolvedSdk)
+        LOG.info("${if (resolvedSdk === template) "Registered" else "Reused"} Erlang SDK '${resolvedSdk.name}' from ${resolvedSdk.homePath}")
+        return resolvedSdk
     }
 }
