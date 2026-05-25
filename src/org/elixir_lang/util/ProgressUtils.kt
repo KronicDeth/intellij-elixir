@@ -1,4 +1,4 @@
-package org.elixir_lang.sdk
+package org.elixir_lang.util
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.platform.ide.progress.ModalTaskOwner

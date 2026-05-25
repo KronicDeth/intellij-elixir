@@ -10,8 +10,8 @@ import com.intellij.util.concurrency.annotations.RequiresBackgroundThread
 import org.elixir_lang.cli.getExecutableFilepathWslSafe
 import org.elixir_lang.jps.shared.cli.CliTool
 import org.elixir_lang.sdk.ProcessOutput
-import org.elixir_lang.sdk.runWithEdtGuard
 import org.elixir_lang.sdk.wsl.wslCompat
+import org.elixir_lang.util.runWithEdtGuard
 import org.jetbrains.annotations.Contract
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
@@ -81,7 +81,7 @@ object ElixirVersionDetector {
      *
      * The result is cached on the [sdk] instance via [UserDataHolderEx] after the first call.
      * On a cold start (after IDE restart, before any SDK setup has run), the backing
-     * [elixirVersion] may shell out to `elixir --short-version`.  That subprocess call
+     * [ElixirVersionDetector.elixirVersion] may shell out to `elixir --short-version`.  That subprocess call
      * **must not** happen while a read lock is held - doing so blocks write actions and
      * triggers a platform SEVERE.  Always call this from a background thread or an IO
      * coroutine dispatcher, never from inside `readAction { }`.
@@ -117,14 +117,14 @@ object ElixirVersionDetector {
      * release cannot be determined.
      *
      * This method is read-lock-safe and may be called from any thread, including the EDT
-     * and under a read action.  It uses only the pre-cached [ELIXIR_VERSION_KEY] user data
-     * (populated by a prior [canonicalVersion] call from an IO phase) and falls back to
+     * and under a read action.  It uses only the pre-cached [ElixirVersionDetector.ELIXIR_VERSION_KEY] user data
+     * (populated by a prior [ElixirVersionDetector.canonicalVersion] call from an IO phase) and falls back to
      * parsing the SDK home directory name.  It deliberately does **not** call
-     * [canonicalVersion] - that would spawn `elixir --short-version` on a cold start and
+     * [ElixirVersionDetector.canonicalVersion] - that would spawn `elixir --short-version` on a cold start and
      * is forbidden under a read lock.
      *
      * Callers that need a guaranteed-accurate version at the cost of a subprocess on cold
-     * start should call [canonicalVersion] from a background/IO thread instead.
+     * start should call [ElixirVersionDetector.canonicalVersion] from a background/IO thread instead.
      */
     @Contract("null -> null")
     fun getRelease(sdk: Sdk?): Release? =
