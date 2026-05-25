@@ -3,6 +3,7 @@ package org.elixir_lang.cli
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.projectRoots.SdkModel
+import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.testFramework.registerOrReplaceServiceInstance
 import com.intellij.util.execution.ParametersListUtil
@@ -15,11 +16,10 @@ import org.elixir_lang.sdk.erlang_dependent.MissingErlangSdkReason
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.`when`
 import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.absolutePathString
+import org.elixir_lang.sdk.erlang.Type as ErlangSdkType
 
 /**
  * Generate new data for this with the [testData/org/elixir_lang/cli/gen_elixir_cli_base_args.sh](../../../testData/org/elixir_lang/cli/gen_elixir_cli_base_args.sh) script.
@@ -122,11 +122,9 @@ class CliArgumentsDataTest(private val case: Case) : PlatformTestCase() {
     }
 
     private fun mockSdk(version: String?, homePath: Path, erlangSdk: Sdk? = null): Sdk {
-        val sdk = mock(Sdk::class.java)
-        `when`(sdk.versionString).thenReturn(version)
-        `when`(sdk.homePath).thenReturn(homePath.toString())
-        `when`(sdk.name).thenReturn(version ?: homePath.fileName.toString())
-        if (erlangSdk != null ) {
+        val name = version ?: homePath.fileName.toString()
+        val sdk = ProjectJdkImpl(name, ErlangSdkType.instance, homePath.toString(), version ?: "")
+        if (erlangSdk != null) {
             erlangSdkByElixirSdk[sdk] = erlangSdk
         }
         return sdk
