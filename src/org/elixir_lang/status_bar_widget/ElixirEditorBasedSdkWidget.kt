@@ -45,6 +45,7 @@ import org.elixir_lang.mix.project.ProjectModuleSetupValidator
 import org.elixir_lang.mix.project.ProjectModuleSetupValidator.FolderMarkIssue
 import org.elixir_lang.sdk.SdkEbinPaths
 import org.elixir_lang.sdk.SdkRegistrar
+import org.elixir_lang.sdk.elixir.ElixirVersionDetector
 import org.elixir_lang.sdk.elixir.SdkSettingsOpener
 import org.elixir_lang.sdk.elixir.ElixirSdkLookup
 import org.elixir_lang.sdk.elixir.Type
@@ -100,8 +101,16 @@ internal sealed interface SdkStatus {
     /**
      * No Elixir SDK is configured, but mise has an installed Elixir version for the module's
      * content root. Surfaces a notification with a one-click "Configure from mise" action.
+     *
+     * [miseVersions] carries the full mise resolution result (used for configuration).
+     * [elixirCanonicalVersion] is the bare version string read from the mise install's
+     * `elixir.app` (e.g. `"1.15.7"`), pre-computed in the IO phase so Phase 3 display
+     * can use it without further file I/O or string parsing.
      */
-    data class NotConfiguredMiseAvailable(val miseVersions: MiseVersions) : SdkStatus
+    data class NotConfiguredMiseAvailable(
+        val miseVersions: MiseVersions,
+        val elixirCanonicalVersion: String?,
+    ) : SdkStatus
 }
 
 internal data class ModuleSdkIssue(val moduleName: String, val issue: String, val isDangling: Boolean)
@@ -174,6 +183,7 @@ class ElixirEditorBasedSdkWidget(
                         ioData.elixirVersionBySdk,
                         ioData.miseByContentRoot,
                         ioData.erlangOtpMajorByHomePath,
+                        ioData.elixirVersionByInstallPath,
                     )
                     // Build per-module mise assignments: module name → the MiseVersions that mise
                     // resolves for that module's own content root.  Covers all modules with an
@@ -188,6 +198,7 @@ class ElixirEditorBasedSdkWidget(
                         miseAssignments = miseAssignments,
                         projectSdkSnapshot = modelData.projectSdkSnapshot,
                         classpathIssues = ioData.classpathIssues,
+                        elixirVersionByInstallPath = ioData.elixirVersionByInstallPath,
                     )
                 }
         }
@@ -372,6 +383,7 @@ class ElixirEditorBasedSdkWidget(
         miseAssignments: Map<String, MiseVersions> = emptyMap(),
         projectSdkSnapshot: ProjectSdkSnapshot,
         classpathIssues: List<String>,
+        elixirVersionByInstallPath: Map<String, String?> = emptyMap(),
     ) {
         val elixirSdk = projectSdkSnapshot.elixirSdk
         val erlangSdk = projectSdkSnapshot.erlangSdk
@@ -384,8 +396,11 @@ class ElixirEditorBasedSdkWidget(
             folderMarkIssues.isNotEmpty() && elixirSdk != null ->
                 SdkStatus.FolderMarkWarning(elixirSdk, elixirVersion, folderMarkIssues)
 
-            elixirSdk == null && miseAssignments.isNotEmpty() ->
-                SdkStatus.NotConfiguredMiseAvailable(miseAssignments.values.first())
+            elixirSdk == null && miseAssignments.isNotEmpty() -> {
+                val firstMise = miseAssignments.values.first()
+                val canonicalVersion = firstMise.elixir?.installPath?.let { elixirVersionByInstallPath[it] }
+                SdkStatus.NotConfiguredMiseAvailable(firstMise, canonicalVersion)
+            }
 
             elixirSdk == null ->
                 SdkStatus.NotConfigured
@@ -500,7 +515,7 @@ class ElixirEditorBasedSdkWidget(
             is SdkStatus.Configured -> null
             is SdkStatus.NotConfigured -> "not-configured"
             is SdkStatus.NotConfiguredMiseAvailable ->
-                "not-configured-mise:${status.miseVersions.elixir?.let { Mise.stripElixirOtpSuffix(it.version) }}"
+                "not-configured-mise:${status.elixirCanonicalVersion ?: status.miseVersions.elixir?.version}"
 
             is SdkStatus.InvalidSdk -> "partial:${status.issue}"
             is SdkStatus.ClasspathIssue -> "warning:${status.issues.sorted().joinToString(",")}"
@@ -531,9 +546,9 @@ class ElixirEditorBasedSdkWidget(
             )
 
             is SdkStatus.NotConfiguredMiseAvailable -> {
-                val displayVersion = status.miseVersions.elixir?.let {
-                    Mise.stripElixirOtpSuffix(it.version)
-                } ?: "unknown"
+                val displayVersion = status.elixirCanonicalVersion
+                    ?: status.miseVersions.elixir?.version
+                    ?: "unknown"
                 NotificationContent(
                     "Elixir SDK Not Configured",
                     "No Elixir SDK configured, but Elixir $displayVersion is available via mise.",
@@ -726,6 +741,10 @@ class ElixirEditorBasedSdkWidget(
         /** OTP major (e.g. `"26"`) keyed by canonical Erlang SDK home path. Populated from
          *  `releases/<N>/OTP_VERSION` - no subprocess. */
         val erlangOtpMajorByHomePath: Map<String, String?>,
+        /** Canonical Elixir version (e.g. `"1.15.7"`) keyed by install path, read from
+         *  `lib/elixir/ebin/elixir.app` inside each tool-manager install directory.
+         *  Works for mise, asdf, or any other manager that populates [org.elixir_lang.mise.MiseToolEntry.installPath]. */
+        val elixirVersionByInstallPath: Map<String, String?>,
         val classpathIssues: List<String>,
     )
 
@@ -775,12 +794,24 @@ class ElixirEditorBasedSdkWidget(
                 ErlangVersionDetector.detectRelease(homePath)?.otpMajor
             }
 
+        // Read the canonical Elixir version from each unique mise install's elixir.app.
+        // This avoids string-mangling the mise-reported version (e.g. "1.15.7-otp-26") and
+        // uses the same authoritative source as the SDK version detection.
+        val elixirVersionByInstallPath: Map<String, String?> = miseByContentRoot.values
+            .filterNotNull()
+            .mapNotNull { it.elixir?.installPath }
+            .distinct()
+            .associateWith { installPath ->
+                ElixirVersionDetector.elixirVersion(installPath, null)
+            }
+
         val classpathIssues = detectClasspathIssues(modelData.projectSdkSnapshot)
 
         return NotificationScanIoData(
             miseByContentRoot = miseByContentRoot,
             elixirVersionBySdk = elixirVersionBySdk,
             erlangOtpMajorByHomePath = erlangOtpMajorByHomePath,
+            elixirVersionByInstallPath = elixirVersionByInstallPath,
             classpathIssues = classpathIssues,
         )
     }
@@ -957,6 +988,7 @@ class ElixirEditorBasedSdkWidget(
         elixirVersionBySdk: Map<Sdk, String?>,
         miseByContentRoot: Map<Path, MiseVersions?>,
         erlangOtpMajorByHomePath: Map<String, String?>,
+        elixirVersionByInstallPath: Map<String, String?>,
     ): List<ModuleSdkIssue> {
         val issues = mutableListOf<ModuleSdkIssue>()
 
@@ -968,8 +1000,11 @@ class ElixirEditorBasedSdkWidget(
             val miseElixir = miseVersions.elixir
             if (miseElixir != null) {
                 val configuredVersion = data.elixirSdk?.let { elixirVersionBySdk[it] }
-                val miseVersion = Mise.stripElixirOtpSuffix(miseElixir.version)
-                if (configuredVersion != null && configuredVersion != miseVersion) {
+                // Use the canonical version read from elixir.app in the mise install directory.
+                // This is the same source as the SDK version, so both sides are bare strings
+                // (e.g. "1.15.7") with no OTP suffix manipulation.
+                val miseVersion = elixirVersionByInstallPath[miseElixir.installPath]
+                if (configuredVersion != null && miseVersion != null && configuredVersion != miseVersion) {
                     LOG.info(
                         "Mise version mismatch in module '${data.moduleName}': " +
                                 "SDK=$configuredVersion, mise=$miseVersion"

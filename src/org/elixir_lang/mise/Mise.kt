@@ -72,7 +72,7 @@ object Mise {
      * produces output that cannot be parsed. Callers should treat `null` as "mise unavailable".
      *
      * **Threading**: Must not be called on the EDT or under a read lock. This method spawns
-     * a subprocess and blocks for up to [TIMEOUT_MS]ms. Callers must ensure they are running
+     * a subprocess and blocks for up to [Mise.TIMEOUT_MS]ms. Callers must ensure they are running
      * on a background thread outside of any read lock (e.g. inside `withContext(Dispatchers.IO)`
      * after releasing any read lock).
      */
@@ -106,7 +106,7 @@ object Mise {
      *
      * Takes the first entry for each tool key where `installed == true && active == true`.
      *
-     * `internal` for testing - use [resolveVersions] in production code.
+     * `internal` for testing - use [Mise.resolveVersions] in production code.
      */
     @VisibleForTesting
     internal fun parseOutput(json: String): MiseVersions? {
@@ -147,19 +147,5 @@ object Mise {
             installed = installed ?: false,
             active = active ?: false,
         )
-    }
-
-    /**
-     * Strips the `-otp-XX` suffix that mise appends to Elixir version strings
-     * (e.g. `"1.13.4-otp-24"` → `"1.13.4"`).
-     *
-     * **Note**: this is a temporary workaround. Once `ElixirVersionDetector` reads
-     * the `vsn` field from `elixir.app` directly, both sides of the version comparison
-     * will be bare version strings and this function can be removed.
-     */
-    @VisibleForTesting
-    internal fun stripElixirOtpSuffix(version: String): String {
-        val idx = version.indexOf("-otp-")
-        return if (idx >= 0) version.substring(0, idx) else version
     }
 }

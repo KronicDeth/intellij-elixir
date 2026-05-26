@@ -28,9 +28,10 @@ import org.elixir_lang.jps.shared.sdk.SdkPaths
 import org.elixir_lang.sdk.*
 import org.elixir_lang.sdk.erlang_dependent.AdditionalDataConfigurable
 import org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData
+import org.elixir_lang.sdk.wsl.wslCompat
 import org.elixir_lang.util.WriteActions
+import org.elixir_lang.util.runWithEdtGuard
 import org.jdom.Element
-import org.jetbrains.annotations.Contract
 import org.jetbrains.annotations.Unmodifiable
 import java.io.File
 import java.nio.file.Path
@@ -73,7 +74,8 @@ class Type : org.elixir_lang.sdk.erlang_dependent.Type(ElixirSdkTypeId.ELIXIR_SD
         return adjustedSdkHome
     }
 
-    override fun getDefaultDocumentationUrl(sdk: Sdk): String? = getDefaultDocumentationUrl(getRelease(sdk))
+    override fun getDefaultDocumentationUrl(sdk: Sdk): String? =
+        getDefaultDocumentationUrl(sdk.getUserData(ElixirVersionDetector.ELIXIR_VERSION_KEY))
 
     override fun getHomeChooserDescriptor(): FileChooserDescriptor =
         org.elixir_lang.sdk.Type.createHomeChooserDescriptor(presentableName, ::validateSdkHomePath)
@@ -172,7 +174,11 @@ ELIXIR_SDK_HOME
         currentSdkName: String?,
         sdkHome: String,
     ): String {
-        return suggestSdkNameForHome(sdkHome, null)
+        val canonicalHome = wslCompat.canonicalizePath(sdkHome)
+        val otpMajor = runWithEdtGuard("Detecting Elixir SDK...") {
+            ElixirBuildInfo.elixirOtpRelease(canonicalHome)
+        }
+        return suggestSdkNameForHome(sdkHome, null, otpMajor, null)
     }
 
     private fun validateSdkHomePath(virtualFile: VirtualFile) {
@@ -230,11 +236,18 @@ ELIXIR_SDK_HOME
         internal fun versionStringForHome(sdkHome: String, resolvedVersion: String?): String? {
             val version = ElixirVersionDetector.elixirVersion(sdkHome, resolvedVersion) ?: return null
             val source = SdkPaths.detectSource(sdkHome)
+            val canonicalHome = wslCompat.canonicalizePath(sdkHome)
+            val otpMajor = runWithEdtGuard("Detecting Elixir SDK...") {
+                ElixirBuildInfo.elixirOtpRelease(canonicalHome)
+            }
             return buildString {
                 if (source != null) {
                     append(source).append(" ")
                 }
                 append("Elixir ").append(version)
+                if (otpMajor != null) {
+                    append(" (OTP ").append(otpMajor).append(")")
+                }
             }
         }
 
@@ -263,7 +276,7 @@ ELIXIR_SDK_HOME
          *
          * Example: `"mise Elixir 1.13.4-otp-24 (Erlang 24.3.4.6)"`
          *
-         * Falls back to [suggestSdkNameForHome] when [otpMajor] is null (pre-Elixir-1.6 installs
+         * Falls back to [Type.suggestSdkNameForHome] when [otpMajor] is null (pre-Elixir-1.6 installs
          * where BEAM parsing is unavailable).
          */
         @JvmStatic
@@ -296,10 +309,6 @@ ELIXIR_SDK_HOME
         @JvmStatic
         @RequiresBackgroundThread
         fun canonicalVersion(sdk: Sdk): String? = ElixirVersionDetector.canonicalVersion(sdk)
-
-        @JvmStatic
-        @Contract("null -> null")
-        fun getRelease(sdk: Sdk?): Release? = ElixirVersionDetector.getRelease(sdk)
 
         @JvmStatic
         internal fun setupSdkTableListener() {
@@ -415,7 +424,7 @@ ELIXIR_SDK_HOME
             }
         }
 
-        private fun getDefaultDocumentationUrl(version: Release?): String? =
+        private fun getDefaultDocumentationUrl(version: String?): String? =
             if (version == null) null else "https://elixir-lang.org/docs/stable/elixir/"
 
         @JvmStatic

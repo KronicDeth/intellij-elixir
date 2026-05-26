@@ -1,13 +1,20 @@
 package org.elixir_lang.sdk.elixir
 
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.vfs.newvfs.impl.VfsRootAccess
 import com.intellij.testFramework.registerOrReplaceServiceInstance
 import org.elixir_lang.PlatformTestCase
 import org.elixir_lang.sdk.wsl.MockWslCompatService
 import org.elixir_lang.sdk.wsl.WslCompatService
+import java.io.File
+import java.nio.file.Files
 
 /**
  * Tests for Elixir SDK Type naming methods.
+ *
+ * Version detection now uses `elixir.app` file parsing (no subprocess, no directory-name parsing).
+ * Tests verify source detection via [Type.suggestSdkNameForHome] with an explicit `resolvedVersion`,
+ * and end-to-end version reading via a temp directory containing a real `elixir.app` file.
  */
 class TypeNamingTest : PlatformTestCase() {
 
@@ -15,8 +22,6 @@ class TypeNamingTest : PlatformTestCase() {
 
     override fun setUp() {
         super.setUp()
-
-        // Replace the real WslCompatService with MockWslCompatService for testing
         ApplicationManager.getApplication().registerOrReplaceServiceInstance(
             WslCompatService::class.java,
             MockWslCompatService(),
@@ -25,57 +30,145 @@ class TypeNamingTest : PlatformTestCase() {
         elixirType = Type.instance
     }
 
-    fun testSuggestSdkName_miseElixir() {
-        val name = elixirType.suggestSdkName(null, "/Users/josh/.local/share/mise/installs/elixir/1.15.7")
+    // ---------------------------------------------------------------
+    // suggestSdkNameForHome (static, resolvedVersion bypasses file I/O)
+    // These tests verify source detection without needing a real .app file.
+    // ---------------------------------------------------------------
+
+    fun testSuggestSdkNameForHome_miseElixir() {
+        val name = Type.suggestSdkNameForHome(
+            "/Users/josh/.local/share/mise/installs/elixir/1.15.7",
+            "1.15.7",
+        )
         assertEquals("mise Elixir 1.15.7", name)
     }
 
-    fun testSuggestSdkName_miseElixirWithOtp() {
-        val name = elixirType.suggestSdkName(null, "/Users/josh/.local/share/mise/installs/elixir/1.15.7-otp-26")
-        assertEquals("mise Elixir 1.15.7-otp-26", name)
+    fun testSuggestSdkNameForHome_miseElixirWithOtpSuffix() {
+        // resolvedVersion from .app is the bare version; OTP suffix is stripped on the mise side
+        val name = Type.suggestSdkNameForHome(
+            "/Users/josh/.local/share/mise/installs/elixir/1.15.7-otp-26",
+            "1.15.7",
+        )
+        assertEquals("mise Elixir 1.15.7", name)
     }
 
-    fun testSuggestSdkName_asdfElixir() {
-        val name = elixirType.suggestSdkName(null, "/Users/josh/.asdf/installs/elixir/1.14.0")
+    fun testSuggestSdkNameForHome_asdfElixir() {
+        val name = Type.suggestSdkNameForHome(
+            "/Users/josh/.asdf/installs/elixir/1.14.0",
+            "1.14.0",
+        )
         assertEquals("asdf Elixir 1.14.0", name)
     }
 
-    fun testSuggestSdkName_homebrewElixir() {
-        val name = elixirType.suggestSdkName(null, "/opt/homebrew/Cellar/elixir/1.15.0/libexec")
-        // Homebrew paths have nested structure, version comes from directory name
-        assertTrue("Name should contain Homebrew", name.contains("Homebrew") || name.contains("Elixir"))
-    }
-
-    fun testSuggestSdkName_unknownSource() {
-        val name = elixirType.suggestSdkName(null, "/custom/path/1.15.0")
+    fun testSuggestSdkNameForHome_unknownSource() {
+        val name = Type.suggestSdkNameForHome("/custom/path/elixir", "1.15.0")
         assertEquals("Elixir 1.15.0", name)
     }
 
-    fun testSuggestSdkName_noDuplicateElixir() {
-        // This was a bug where "Elixir" appeared twice
-        val name = elixirType.suggestSdkName(null, "/Users/josh/.local/share/mise/installs/elixir/1.15.7")
-        val elixirCount = name.split("Elixir").size - 1
-        assertEquals("Should contain exactly one 'Elixir'", 1, elixirCount)
+    fun testSuggestSdkNameForHome_variantQualified() {
+        val name = Type.suggestSdkNameForHome(
+            "/Users/josh/.local/share/mise/installs/elixir/1.15.7-otp-26",
+            "1.15.7",
+            "26",
+            "26.2.5",
+        )
+        assertEquals("mise Elixir 1.15.7-otp-26 (Erlang 26.2.5)", name)
     }
 
-    fun testGetVersionString_miseElixir() {
-        val version = elixirType.getVersionString("/Users/josh/.local/share/mise/installs/elixir/1.15.7")
-        assertEquals("mise Elixir 1.15.7", version)
+    fun testSuggestSdkNameForHome_noOtpMajorFallsBackToTwoArg() {
+        val name = Type.suggestSdkNameForHome(
+            "/Users/josh/.local/share/mise/installs/elixir/1.15.7",
+            "1.15.7",
+            null,
+            null,
+        )
+        assertEquals("mise Elixir 1.15.7", name)
     }
 
-    fun testGetVersionString_asdfElixir() {
-        val version = elixirType.getVersionString("/Users/josh/.asdf/installs/elixir/1.14.0")
-        assertEquals("asdf Elixir 1.14.0", version)
+    // ---------------------------------------------------------------
+    // suggestSdkName (instance, reads .app file or falls back to "at <path>")
+    // ---------------------------------------------------------------
+
+    fun testSuggestSdkName_withRealAppFile() {
+        val sdkHome = createElixirSdkHome("1.15.7")
+        VfsRootAccess.allowRootAccess(testRootDisposable, sdkHome)
+
+        val name = elixirType.suggestSdkName(null, sdkHome)
+        assertTrue("Name should contain version; was: $name", name.contains("1.15.7"))
+        assertTrue("Name should contain 'Elixir'; was: $name", name.contains("Elixir"))
     }
 
-    fun testGetVersionString_unknownSource() {
-        val version = elixirType.getVersionString("/custom/path/1.15.0")
-        assertEquals("Elixir 1.15.0", version)
+    fun testSuggestSdkName_fallbackWhenNoAppFile() {
+        val fakePath = "/not/a/real/elixir/install"
+        val name = elixirType.suggestSdkName(null, fakePath)
+        assertTrue("Name should show path when version unreadable; was: $name", name.contains("at"))
+        assertEquals(
+            "Should contain exactly one 'Elixir'; was: $name",
+            1,
+            name.split("Elixir").size - 1,
+        )
+    }
+
+    fun testSuggestSdkName_noDuplicateElixir_withAppFile() {
+        val sdkHome = createElixirSdkHome("1.17.4")
+        VfsRootAccess.allowRootAccess(testRootDisposable, sdkHome)
+
+        val name = elixirType.suggestSdkName(null, sdkHome)
+        assertEquals("Should contain exactly one 'Elixir'; was: $name", 1, name.split("Elixir").size - 1)
+    }
+
+    // ---------------------------------------------------------------
+    // getVersionString
+    // ---------------------------------------------------------------
+
+    fun testGetVersionString_withRealAppFile() {
+        val sdkHome = createElixirSdkHome("1.15.7")
+        VfsRootAccess.allowRootAccess(testRootDisposable, sdkHome)
+
+        val version = elixirType.getVersionString(sdkHome)
+        assertNotNull(version)
+        assertTrue("Version string should contain 1.15.7; was: $version", version.contains("1.15.7"))
+        assertTrue("Version string should contain 'Elixir'; was: $version", version.contains("Elixir"))
+    }
+
+    fun testGetVersionString_unknownWhenNoAppFile() {
+        val version = elixirType.getVersionString("/not/a/real/path/elixir")
+        assertTrue("Fallback should still contain 'Elixir'; was: $version", version.contains("Elixir"))
     }
 
     fun testGetVersionString_includesElixir() {
-        // Version string should include "Elixir" for clarity in detected SDKs list
+        // Even the fallback path must contain "Elixir" for display correctness
         val version = elixirType.getVersionString("/Users/josh/.local/share/mise/installs/elixir/1.15.7")
-        assertTrue("Version string should contain 'Elixir'", version.contains("Elixir"))
+        assertTrue("Version string should contain 'Elixir'; was: $version", version.contains("Elixir"))
+    }
+
+    // ---------------------------------------------------------------
+    // Helpers
+    // ---------------------------------------------------------------
+
+    /**
+     * Creates a temporary Elixir SDK home directory containing a minimal `elixir.app`.
+     *
+     * Structure: `<tmpDir>/lib/elixir/ebin/elixir.app`
+     *
+     * @return the path to the SDK home root (the directory containing `lib/`).
+     */
+    private fun createElixirSdkHome(version: String): String {
+        val tmpRoot = Files.createTempDirectory("elixir-sdk-test-").toFile()
+        tmpRoot.deleteOnExit()
+        val ebinDir = File(tmpRoot, "lib/elixir/ebin")
+        ebinDir.mkdirs()
+        File(ebinDir, "elixir.app").writeText(
+            """
+            {application, elixir, [
+              {description, "elixir"},
+              {vsn, "$version"},
+              {modules, []},
+              {registered, []},
+              {applications, [kernel, stdlib]}
+            ]}.
+            """.trimIndent(),
+        )
+        return tmpRoot.path
     }
 }
