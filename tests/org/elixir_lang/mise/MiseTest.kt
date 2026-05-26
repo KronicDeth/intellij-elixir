@@ -3,9 +3,9 @@ package org.elixir_lang.mise
 import org.elixir_lang.PlatformTestCase
 
 /**
- * Tests for [Mise.parseOutput] (internal) and [Mise.stripElixirOtpSuffix].
+ * Tests for [Mise.parseOutput] (internal).
  *
- * Both functions are pure with no IDE dependencies, so no sandbox setup is needed.
+ * Pure with no IDE dependencies, so no sandbox setup is needed.
  */
 class MiseTest : PlatformTestCase() {
 
@@ -187,25 +187,5 @@ class MiseTest : PlatformTestCase() {
         assertNotNull(result)
         assertNull(result!!.elixir!!.sourceType)
         assertNull(result.elixir.sourcePath)
-    }
-
-    // -------------------------------------------------------------------------
-    // stripElixirOtpSuffix
-    // -------------------------------------------------------------------------
-
-    fun testStripElixirOtpSuffix_withSuffix() {
-        assertEquals("1.13.4", Mise.stripElixirOtpSuffix("1.13.4-otp-24"))
-    }
-
-    fun testStripElixirOtpSuffix_noSuffix() {
-        assertEquals("1.15.7", Mise.stripElixirOtpSuffix("1.15.7"))
-    }
-
-    fun testStripElixirOtpSuffix_preReleaseWithSuffix() {
-        assertEquals("1.18.0-rc.1", Mise.stripElixirOtpSuffix("1.18.0-rc.1-otp-27"))
-    }
-
-    fun testStripElixirOtpSuffix_emptyString() {
-        assertEquals("", Mise.stripElixirOtpSuffix(""))
     }
 }

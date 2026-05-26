@@ -150,18 +150,4 @@ object Mise {
             active = active ?: false,
         )
     }
-
-    /**
-     * Strips the `-otp-XX` suffix that mise appends to Elixir version strings
-     * (e.g. `"1.13.4-otp-24"` → `"1.13.4"`).
-     *
-     * **Note**: this is a temporary workaround. Once `ElixirVersionDetector` reads
-     * the `vsn` field from `elixir.app` directly, both sides of the version comparison
-     * will be bare version strings and this function can be removed.
-     */
-    @VisibleForTesting
-    internal fun stripElixirOtpSuffix(version: String): String {
-        val idx = version.indexOf("-otp-")
-        return if (idx >= 0) version.substring(0, idx) else version
-    }
 }
