@@ -17,7 +17,7 @@ import com.intellij.util.ui.JBUI
 import org.elixir_lang.debug
 import org.elixir_lang.sdk.elixir.ElixirErlangClasspath.addNewCodePathsFromInternErlangSdk
 import org.elixir_lang.sdk.elixir.ElixirErlangClasspath.removeCodePathsFromInternalErlangSdk
-import org.elixir_lang.sdk.elixir.Type.Companion.hasErlangClasspathInRoots
+import org.elixir_lang.sdk.elixir.ElixirSdkValidation.hasErlangClasspathInRoots
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
 import java.awt.event.ItemEvent

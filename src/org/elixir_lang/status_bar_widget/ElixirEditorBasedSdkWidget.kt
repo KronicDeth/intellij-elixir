@@ -47,6 +47,7 @@ import org.elixir_lang.mix.project.ProjectModuleSetupValidator
 import org.elixir_lang.mix.project.ProjectModuleSetupValidator.FolderMarkIssue
 import org.elixir_lang.sdk.SdkEbinPaths
 import org.elixir_lang.sdk.SdkRegistrar
+import org.elixir_lang.sdk.elixir.ElixirSdkValidation
 import org.elixir_lang.sdk.elixir.ElixirVersionDetector
 import org.elixir_lang.sdk.elixir.SdkSettingsOpener
 import org.elixir_lang.sdk.elixir.ElixirSdkLookup
@@ -836,7 +837,7 @@ class ElixirEditorBasedSdkWidget(
         if (hasErlangSdkIssues(erlangSdk)) {
             classpathIssues.add("Erlang SDK configuration issues")
         }
-        if (!Type.hasErlangClasspathInElixirSdk(elixirSdk, erlangSdk)) {
+        if (!ElixirSdkValidation.hasErlangClasspathInElixirSdk(elixirSdk, erlangSdk)) {
             classpathIssues.add("Erlang SDK classpath entries missing - reopen SDK settings to fix")
         }
 
