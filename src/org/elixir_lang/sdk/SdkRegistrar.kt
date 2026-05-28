@@ -11,13 +11,13 @@ import com.intellij.util.concurrency.ThreadingAssertions
 import com.intellij.util.concurrency.annotations.RequiresBackgroundThread
 import com.intellij.util.concurrency.annotations.RequiresWriteLock
 import org.elixir_lang.sdk.elixir.ElixirBuildInfo
+import org.elixir_lang.sdk.elixir.ElixirSdkMutation
 import org.elixir_lang.sdk.erlang.ErlangVersionDetector
 import org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData
 import org.elixir_lang.sdk.erlang_dependent.resolveErlangSdkOrNullAndNotify
 import org.elixir_lang.sdk.wsl.wslCompat
 import org.elixir_lang.sdk.elixir.Type as ElixirSdkType
 import org.elixir_lang.sdk.erlang.Type as ErlangSdkType
-import org.elixir_lang.sdk.erlang_dependent.Type as ErlangDependentType
 
 object SdkRegistrar {
     /**
@@ -76,12 +76,7 @@ object SdkRegistrar {
             // pairing. Home path still matches, so no re-registration is needed.
             if (nameIsStale && erlangSdk != null) {
                 edtWriteAction {
-                    val modificator = confirmedExisting.sdkModificator
-                    val existingData = (modificator.sdkAdditionalData as? SdkAdditionalData)
-                        ?: (confirmedExisting.sdkAdditionalData as? SdkAdditionalData)
-                    existingData?.setErlangSdk(erlangSdk)
-                    existingData?.let { modificator.sdkAdditionalData = it }
-                    modificator.commitChanges()
+                    ElixirSdkMutation.applyDependencySelection(confirmedExisting, erlangSdk)
                 }
             }
             return confirmedExisting
@@ -110,22 +105,11 @@ object SdkRegistrar {
 
             // Attach Erlang dependency - done inside the same write action for atomicity
             sdk.putUserData(ElixirBuildInfo.ELIXIR_OTP_MAJOR_KEY, otpMajor)
-            val modificator = sdk.sdkModificator
-            val existingData = (modificator.sdkAdditionalData as? SdkAdditionalData)
-                ?: (sdk.sdkAdditionalData as? SdkAdditionalData)
-            if (existingData != null) {
-                // Preserve an existing Erlang pairing when no specific Erlang SDK was requested.
-                // setErlangSdk(null) would silently clear a valid pairing on a legacy SDK that
-                // matched via the null-requestedHome (branch 1) path in sameErlangHome.
-                if (erlangSdk != null || existingData.getErlangSdkName() == null) {
-                    existingData.setErlangSdk(erlangSdk)
-                }
-                modificator.sdkAdditionalData = existingData
-            } else {
-                modificator.sdkAdditionalData = SdkAdditionalData(erlangSdk, sdk)
-            }
-            modificator.commitChanges()
-            sdk.putUserData(ErlangDependentType.ERLANG_SDK_KEY, erlangSdk)
+            ElixirSdkMutation.applyDependencySelection(
+                elixirSdk = sdk,
+                erlangSdk = erlangSdk,
+                preserveExistingWhenRequestedNull = true,
+            )
             sdk
         }
 
