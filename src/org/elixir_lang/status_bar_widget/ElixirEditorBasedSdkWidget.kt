@@ -47,6 +47,7 @@ import org.elixir_lang.mix.project.ProjectModuleSetupValidator
 import org.elixir_lang.mix.project.ProjectModuleSetupValidator.FolderMarkIssue
 import org.elixir_lang.sdk.SdkEbinPaths
 import org.elixir_lang.sdk.SdkRegistrar
+import org.elixir_lang.sdk.elixir.ElixirSdkMutation
 import org.elixir_lang.sdk.elixir.ElixirSdkValidation
 import org.elixir_lang.sdk.elixir.ElixirVersionDetector
 import org.elixir_lang.sdk.elixir.SdkSettingsOpener
@@ -55,6 +56,7 @@ import org.elixir_lang.sdk.elixir.sdk
 import org.elixir_lang.sdk.elixir.Type
 import org.elixir_lang.sdk.erlang.ErlangVersionDetector
 import org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData
+import org.elixir_lang.util.WriteActions
 import java.nio.file.Path
 import java.util.concurrent.CancellationException
 import kotlin.time.Duration.Companion.milliseconds
@@ -113,6 +115,23 @@ internal sealed interface SdkStatus {
     data class NotConfiguredMiseAvailable(
         val miseVersions: MiseVersions,
         val elixirCanonicalVersion: String?,
+    ) : SdkStatus
+
+    /**
+     * The Elixir SDK was compiled for a different OTP major than the paired Erlang SDK.
+     * This can cause `{undef,[{elixir,start_cli,[],[]}]}` at runtime.
+     *
+     * Only surfaced when `suppressOtpMismatchWarning` is `false` on the Elixir SDK's
+     * [SdkAdditionalData].
+     */
+    data class OtpMismatch(
+        val elixirSdk: Sdk,
+        val erlangSdk: Sdk,
+        val elixirVersion: String,
+        /** OTP major baked into the Elixir BEAM (from `otp_release` in `Elixir.System.beam`). */
+        val elixirOtpMajor: String,
+        /** OTP major of the paired Erlang SDK (from `releases/<N>/OTP_VERSION`). */
+        val erlangOtpMajor: String,
     ) : SdkStatus
 }
 
@@ -202,6 +221,7 @@ class ElixirEditorBasedSdkWidget(
                         projectSdkSnapshot = modelData.projectSdkSnapshot,
                         classpathIssues = ioData.classpathIssues,
                         elixirVersionByInstallPath = ioData.elixirVersionByInstallPath,
+                        projectSdkOtpMismatch = ioData.projectSdkOtpMismatch,
                     )
                 }
         }
@@ -387,6 +407,9 @@ class ElixirEditorBasedSdkWidget(
         projectSdkSnapshot: ProjectSdkSnapshot,
         classpathIssues: List<String>,
         elixirVersionByInstallPath: Map<String, String?> = emptyMap(),
+        /** Pre-computed OTP mismatch for the project's primary Elixir SDK, or `null` when there
+         *  is no mismatch, when detection failed, or when the user suppressed warnings. */
+        projectSdkOtpMismatch: Pair<String, String>? = null,
     ) {
         val elixirSdk = projectSdkSnapshot.elixirSdk
         val erlangSdk = projectSdkSnapshot.erlangSdk
@@ -413,6 +436,14 @@ class ElixirEditorBasedSdkWidget(
 
             classpathIssues.isNotEmpty() ->
                 SdkStatus.ClasspathIssue(elixirSdk, erlangSdk, elixirVersion, classpathIssues)
+
+            // OTP mismatch pre-computed by ElixirSdkValidation.detectOtpMismatch in the IO phase.
+            // Suppress is handled inside the check itself - null here means "match or suppressed".
+            projectSdkOtpMismatch != null ->
+                SdkStatus.OtpMismatch(
+                    elixirSdk, erlangSdk, elixirVersion,
+                    projectSdkOtpMismatch.first, projectSdkOtpMismatch.second
+                )
 
             else ->
                 SdkStatus.Configured(elixirSdk, erlangSdk, elixirVersion)
@@ -459,6 +490,23 @@ class ElixirEditorBasedSdkWidget(
                     }
                 })
             }
+        }
+
+        // For OTP mismatch, offer "Don't warn for this SDK" (suppress flag) and "Configure…".
+        if (sdkStatus is SdkStatus.OtpMismatch) {
+            val affectedElixirSdk = sdkStatus.elixirSdk
+            notification.addAction(object : AnAction("Don't Warn for This SDK") {
+                override fun actionPerformed(e: AnActionEvent) {
+                    notification.expire()
+                    lastNotifiedIssueKey = null
+                    activeNotification = null
+                    WriteActions.runWriteAction {
+                        ElixirSdkMutation.setOtpMismatchWarningSuppressed(affectedElixirSdk, true)
+                    }
+                    // Re-scan so the notification stays dismissed.
+                    notificationScanRequests.tryEmit(Unit)
+                }
+            })
         }
 
         // For mise-available case (no SDK configured at all), offer one-click SDK configuration.
@@ -522,6 +570,9 @@ class ElixirEditorBasedSdkWidget(
 
             is SdkStatus.InvalidSdk -> "partial:${status.issue}"
             is SdkStatus.ClasspathIssue -> "warning:${status.issues.sorted().joinToString(",")}"
+            is SdkStatus.OtpMismatch ->
+                "otp-mismatch:${status.elixirSdk.name}:${status.elixirOtpMajor}:${status.erlangOtpMajor}"
+
             is SdkStatus.ModuleSdkError -> "module-error:${
                 status.moduleSdkIssues.map { "${it.moduleName}:${it.isDangling}:${it.issue}" }
                     .sorted()
@@ -568,6 +619,14 @@ class ElixirEditorBasedSdkWidget(
             is SdkStatus.ClasspathIssue -> NotificationContent(
                 "Elixir SDK Warning",
                 "Elixir SDK ${status.elixirVersion}: ${status.issues.joinToString("; ")}.",
+                NotificationType.WARNING
+            )
+
+            is SdkStatus.OtpMismatch -> NotificationContent(
+                "Elixir SDK OTP Version Mismatch",
+                "Elixir ${status.elixirVersion} was compiled for OTP ${status.elixirOtpMajor} " +
+                        "but is paired with OTP ${status.erlangOtpMajor}. " +
+                        "This may cause runtime errors (e.g. {undef,[{elixir,start_cli,...}]}).",
                 NotificationType.WARNING
             )
 
@@ -747,8 +806,12 @@ class ElixirEditorBasedSdkWidget(
         val miseByContentRoot: Map<Path, MiseVersions?>,
         val elixirVersionBySdk: Map<Sdk, String?>,
         /** OTP major (e.g. `"26"`) keyed by canonical Erlang SDK home path. Populated from
-         *  `releases/<N>/OTP_VERSION` - no subprocess. */
+         *  `releases/<N>/OTP_VERSION` - no subprocess. Used for OTP mismatch detection. */
         val erlangOtpMajorByHomePath: Map<String, String?>,
+        /** OTP mismatch for the project's primary Elixir SDK, computed via [ElixirSdkValidation.detectOtpMismatch].
+         *  `null` when OTP majors match, when either side is undetermined, or when the user has
+         *  dismissed the warning - [ElixirSdkValidation.detectOtpMismatch] handles that internally. */
+        val projectSdkOtpMismatch: Pair<String, String>?,
         /** Canonical Elixir version (e.g. `"1.15.7"`) keyed by install path, read from
          *  `lib/elixir/ebin/elixir.app` inside each tool-manager install directory.
          *  Works for mise, asdf, or any other manager that populates [org.elixir_lang.mise.MiseToolEntry.installPath]. */
@@ -786,7 +849,7 @@ class ElixirEditorBasedSdkWidget(
         )
     }
 
-    private fun collectNotificationScanIoData(modelData: NotificationScanModelData): NotificationScanIoData {
+    private suspend fun collectNotificationScanIoData(modelData: NotificationScanModelData): NotificationScanIoData {
         val contentRoots = modelData.moduleMiseCheckData.mapNotNull { it.contentRoot }.distinct()
         LOG.trace("collectNotificationScanIoData: ${contentRoots.size} content root(s) to check with mise: $contentRoots")
 
@@ -827,12 +890,19 @@ class ElixirEditorBasedSdkWidget(
                 v
             }
 
+        // Detect OTP mismatch for the project's primary Elixir SDK.
+        // ElixirSdkValidation.detectOtpMismatch handles the suppress flag internally,
+        // returning null when the user has dismissed the warning for this SDK.
+        val projectSdkOtpMismatch: Pair<String, String>? =
+            modelData.projectSdkSnapshot.elixirSdk?.let { readAction { ElixirSdkValidation.detectOtpMismatch(it) } }
+
         val classpathIssues = detectClasspathIssues(modelData.projectSdkSnapshot)
 
         return NotificationScanIoData(
             miseByContentRoot = miseByContentRoot,
             elixirVersionBySdk = elixirVersionBySdk,
             erlangOtpMajorByHomePath = erlangOtpMajorByHomePath,
+            projectSdkOtpMismatch = projectSdkOtpMismatch,
             elixirVersionByInstallPath = elixirVersionByInstallPath,
             classpathIssues = classpathIssues,
         )
