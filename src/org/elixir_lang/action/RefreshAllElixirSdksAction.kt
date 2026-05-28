@@ -18,8 +18,7 @@ import org.elixir_lang.sdk.erlang.Type as ErlangSdkType
 private val LOG = logger<RefreshAllElixirSdksAction>()
 
 class RefreshAllElixirSdksAction : AnAction() {
-    
-    
+
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return
 

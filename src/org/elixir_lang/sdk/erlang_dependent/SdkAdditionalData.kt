@@ -58,6 +58,11 @@ class SdkAdditionalData :
     @Volatile
     private var erlangSdkName: String? = null
 
+    // User acknowledged the OTP mismatch for this SDK - skip warnings until re-enabled.
+    // Does NOT reset on Erlang SDK pairing change (the user said "I know what I'm doing").
+    @Volatile
+    private var suppressOtpMismatchWarning: Boolean = false
+
     // Runtime cache - lazily populated, cleared when invalid
     // Not persisted, not cloned
     @Transient
@@ -66,6 +71,7 @@ class SdkAdditionalData :
     companion object {
         private const val ERLANG_SDK_HOME_PATH = "erlang-sdk-home-path"
         private const val ERLANG_SDK_NAME = "erlang-sdk-name"
+        private const val SUPPRESS_OTP_MISMATCH = "suppress-otp-mismatch"
         private val LOG = Logger.getInstance(SdkAdditionalData::class.java)
     }
 
@@ -119,6 +125,7 @@ class SdkAdditionalData :
     fun readExternal(element: Element) {
         erlangSdkHomePath = element.getAttributeValue(ERLANG_SDK_HOME_PATH)
         erlangSdkName = element.getAttributeValue(ERLANG_SDK_NAME)
+        suppressOtpMismatchWarning = element.getAttributeValue(SUPPRESS_OTP_MISMATCH)?.toBooleanStrictOrNull() ?: false
         cachedErlangSdk = null  // Force re-lookup on next access
     }
 
@@ -130,6 +137,7 @@ class SdkAdditionalData :
         val name = erlangSdkName
         homePath?.let { element.setAttribute(ERLANG_SDK_HOME_PATH, it) }
         name?.let { element.setAttribute(ERLANG_SDK_NAME, it) }
+        if (suppressOtpMismatchWarning) element.setAttribute(SUPPRESS_OTP_MISMATCH, "true")
     }
 
     @Throws(CloneNotSupportedException::class)
@@ -137,6 +145,7 @@ class SdkAdditionalData :
         val cloned = SdkAdditionalData(elixirSdk)
         cloned.erlangSdkHomePath = this.erlangSdkHomePath
         cloned.erlangSdkName = this.erlangSdkName
+        cloned.suppressOtpMismatchWarning = this.suppressOtpMismatchWarning
         // Don't clone cachedErlangSdk - let it be lazily resolved
         return cloned
     }
@@ -148,6 +157,12 @@ class SdkAdditionalData :
     fun getErlangSdkName(): String? = erlangSdkName
 
     fun getErlangSdkHomePath(): String? = erlangSdkHomePath
+
+    fun isSuppressOtpMismatchWarning(): Boolean = suppressOtpMismatchWarning
+
+    fun setSuppressOtpMismatchWarning(value: Boolean) {
+        suppressOtpMismatchWarning = value
+    }
 
     fun setErlangSdk(sdk: Sdk?) {
         erlangSdkName = sdk?.name
