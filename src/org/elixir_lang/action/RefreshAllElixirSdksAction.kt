@@ -3,8 +3,6 @@ package org.elixir_lang.action
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.application.readAction
-import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.projectRoots.ProjectJdkTable
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.platform.ide.progress.ModalTaskOwner
@@ -15,8 +13,6 @@ import org.elixir_lang.status_bar_widget.ElixirSdkRefreshListener
 import org.elixir_lang.sdk.elixir.Type as ElixirSdkType
 import org.elixir_lang.sdk.erlang.Type as ErlangSdkType
 
-private val LOG = logger<RefreshAllElixirSdksAction>()
-
 class RefreshAllElixirSdksAction : AnAction() {
 
     override fun actionPerformed(e: AnActionEvent) {
@@ -25,7 +21,6 @@ class RefreshAllElixirSdksAction : AnAction() {
         try {
             refreshAllElixirSdkPaths(project)
         } catch (ex: Exception) {
-            LOG.warn("Failed to refresh SDK paths (RefreshAllElixirSdksAction)", ex)
             Notifier.sdkRefreshError(project, ex.message ?: "Unknown error")
         }
     }
@@ -78,9 +73,8 @@ class RefreshAllElixirSdksAction : AnAction() {
 
             // Check OTP mismatches for each Elixir SDK after refresh (informational).
             // ElixirSdkValidation.detectOtpMismatch handles the suppress flag internally.
-            // getErlangSdk() → findErlangSdkByHomePath asserts read access, so wrap in readAction.
             for (elixirSdk in allElixirSdks) {
-                val mismatch = readAction { ElixirSdkValidation.detectOtpMismatch(elixirSdk) } ?: continue
+                val mismatch = ElixirSdkValidation.detectOtpMismatch(elixirSdk) ?: continue
                 otpMismatches.add(
                     "'${elixirSdk.name}' compiled for OTP ${mismatch.first} but paired with OTP ${mismatch.second}"
                 )
