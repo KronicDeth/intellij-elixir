@@ -13,6 +13,7 @@ import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.Ref
 import org.elixir_lang.sdk.ProcessOutput.isSmallIde
+import org.elixir_lang.sdk.elixir.ElixirSdkMutation
 import org.elixir_lang.sdk.elixir.Type.Companion.erlangSdkType
 import org.elixir_lang.sdk.wsl.wslCompat
 import org.jdom.Element
@@ -138,15 +139,11 @@ abstract class Type protected constructor(name: String) : DependentSdkType(name)
                 SdkConfigurationUtil.createSdk(sdkModel.sdks.toList(), home!!, sdkType, null, null)
 
             // If creating an Elixir SDK and we have a specific Erlang SDK to use,
-            // store it for use during configureSdkPaths AND set additional data immediately
+            // store it for use during configureSdkPaths and persist additional data immediately
+            // to avoid workspace model mismatch.
             if (erlangSdkToUse != null && sdkType is org.elixir_lang.sdk.elixir.Type) {
-                newSdk.putUserData(ERLANG_SDK_KEY, erlangSdkToUse)
-
-                // Set additional data immediately to avoid workspace model mismatch
                 ApplicationManager.getApplication().runWriteAction {
-                    val modificator = newSdk.sdkModificator
-                    modificator.sdkAdditionalData = SdkAdditionalData(erlangSdkToUse, newSdk)
-                    modificator.commitChanges()
+                    ElixirSdkMutation.applyDependencySelection(newSdk, erlangSdkToUse)
                 }
             }
 
@@ -210,40 +207,6 @@ abstract class Type protected constructor(name: String) : DependentSdkType(name)
          */
         @JvmStatic
         val ERLANG_SDK_KEY = com.intellij.openapi.util.Key.create<Sdk>("ERLANG_SDK_FOR_ELIXIR")
-
-        /**
-         * Attaches or updates the Erlang dependency for an Elixir SDK and commits the SDK changes.
-         * Keeps ERLANG_SDK_KEY in sync so configureSdkPaths can resolve the dependency reliably.
-         */
-        @JvmStatic
-        fun attachErlangDependency(elixirSdk: Sdk, erlangSdk: Sdk?) {
-            val app = ApplicationManager.getApplication()
-            val action = {
-                elixirSdk.putUserData(ERLANG_SDK_KEY, erlangSdk)
-                val modificator = elixirSdk.sdkModificator
-                val existing =
-                    (modificator.sdkAdditionalData as? org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData)
-                        ?: (elixirSdk.sdkAdditionalData as? org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData)
-                if (existing != null) {
-                    existing.setErlangSdk(erlangSdk)
-                    modificator.sdkAdditionalData = existing
-                } else {
-                    modificator.sdkAdditionalData =
-                        SdkAdditionalData(erlangSdk, elixirSdk)
-                }
-                modificator.commitChanges()
-            }
-            if (app.isWriteAccessAllowed) {
-                action()
-            } else {
-                val runnable = Runnable { app.runWriteAction { action() } }
-                if (app.isDispatchThread) {
-                    runnable.run()
-                } else {
-                    app.invokeAndWait(runnable)
-                }
-            }
-        }
 
         fun staticIsValidDependency(sdk: Sdk): Boolean {
             val sdkTypeCanonicalName = sdk.sdkType.javaClass.canonicalName
