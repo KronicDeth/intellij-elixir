@@ -4,7 +4,6 @@ import com.intellij.notification.NotificationAction
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.fileChooser.FileChooserDescriptor
-import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.projectRoots.*
@@ -17,7 +16,6 @@ import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.toNioPathOrNull
-import com.intellij.psi.PsiElement
 import com.intellij.util.concurrency.annotations.RequiresBackgroundThread
 import org.apache.commons.io.FilenameUtils
 import org.elixir_lang.Icons
@@ -453,13 +451,5 @@ ELIXIR_SDK_HOME
                 ?: return false
             return classRoots.any { root -> VfsUtilCore.isAncestor(erlangHomePathVf, root, true) }
         }
-
-        @JvmStatic
-        fun mostSpecificSdk(module: Module): Sdk? = ElixirSdkLookup.mostSpecificSdk(module)
-
-        fun mostSpecificSdk(psiElement: PsiElement): Sdk? = ElixirSdkLookup.mostSpecificSdk(psiElement)
-
-        @JvmStatic
-        fun mostSpecificSdk(project: Project): Sdk? = ElixirSdkLookup.mostSpecificSdk(project)
     }
 }

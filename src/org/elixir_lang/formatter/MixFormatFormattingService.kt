@@ -8,7 +8,7 @@ import com.intellij.execution.process.ProcessEvent
 import com.intellij.formatting.service.AsyncDocumentFormattingService
 import com.intellij.formatting.service.AsyncFormattingRequest
 import com.intellij.formatting.service.FormattingService.Feature
-import com.intellij.openapi.application.runReadAction
+import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.util.text.StringUtil
@@ -21,6 +21,7 @@ import org.elixir_lang.psi.ElixirFile
 import org.elixir_lang.sdk.elixir.ElixirSdkLookup.mostSpecificSdk
 import java.io.FileNotFoundException
 import java.nio.charset.StandardCharsets
+import java.util.concurrent.Callable
 
 class MixFormatFormattingService : AsyncDocumentFormattingService() {
 
@@ -40,7 +41,7 @@ class MixFormatFormattingService : AsyncDocumentFormattingService() {
         val project = formattingContext.project
 
         val workingDirectory = workingDirectory(psiFile) ?: return null
-        val sdk = mostSpecificSdk(psiFile)?.takeIf(::elixirSdkHasErlangSdk) ?: return null
+        val sdk = ReadAction.nonBlocking(Callable { mostSpecificSdk(psiFile)?.takeIf(::elixirSdkHasErlangSdk) }).executeSynchronously() ?: return null
 
         // Build the command line in createFormattingTask() (must be fast and EDT-safe;
         // in sync/headless mode may still run on caller thread). Defer OSProcessHandler
@@ -118,7 +119,7 @@ class MixFormatFormattingService : AsyncDocumentFormattingService() {
 }
 
 private fun workingDirectory(psiFile: PsiFile): String? =
-    runReadAction<String?> {
+    ReadAction.nonBlocking(Callable<String?> {
         psiFile
             .virtualFile
             ?.let { virtualFile ->
@@ -131,7 +132,7 @@ private fun workingDirectory(psiFile: PsiFile): String? =
                 contentRoot.findChild(MixProject.MIX_EXS) != null
             }
             ?.path
-    }
+    }).executeSynchronously()
 
 /**
  * Wraps a plain-text error message in HTML suitable for an IntelliJ notification balloon.
