@@ -11,10 +11,7 @@ import com.intellij.notification.Notification
 import com.intellij.notification.NotificationAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.components.service
-import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.projectRoots.Sdk
-import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.vfs.VirtualFile
@@ -22,7 +19,7 @@ import org.elixir_lang.mix.DepsCheckerService
 import org.elixir_lang.mix.createMixDepsStatusRunConfiguration
 import org.elixir_lang.notification.setup_sdk.Notifier
 import org.elixir_lang.util.ElixirProjectDisposable
-import org.elixir_lang.sdk.elixir.Type as ElixirSdkType
+import org.elixir_lang.sdk.elixir.findElixirSdkForRoot
 
 class ShowStatusAction : NotificationAction("Run mix deps") {
     override fun actionPerformed(e: AnActionEvent, notification: Notification) {
@@ -34,15 +31,15 @@ class ShowStatusAction : NotificationAction("Run mix deps") {
             return
         }
 
-        val sdk = getProjectElixirSdk(project)
-        if (sdk == null) {
-            Notifier.mixDepsNoSdk(project)
-            return
-        }
-
         val projectRoot = getProjectRoot(project)
         if (projectRoot == null) {
             Notifier.mixDepsError(project, "Could not determine project root directory")
+            return
+        }
+
+        val sdk = findElixirSdkForRoot(project, projectRoot)
+        if (sdk == null) {
+            Notifier.mixDepsNoSdk(project)
             return
         }
 
@@ -81,24 +78,6 @@ class ShowStatusAction : NotificationAction("Run mix deps") {
         } catch (e: Exception) {
             Notifier.mixDepsError(project, e.message ?: "Unknown error")
         }
-    }
-
-    private fun getProjectElixirSdk(project: Project): Sdk? {
-        val elixirSdkType = ElixirSdkType.instance
-
-        val projectSdk = ProjectRootManager.getInstance(project).projectSdk
-        if (projectSdk?.sdkType === elixirSdkType) {
-            return projectSdk
-        }
-
-        ModuleManager.getInstance(project).modules.forEach { module ->
-            val moduleSdk = ModuleRootManager.getInstance(module).sdk
-            if (moduleSdk?.sdkType === elixirSdkType) {
-                return moduleSdk
-            }
-        }
-
-        return null
     }
 
     private fun getProjectRoot(project: Project): VirtualFile? {

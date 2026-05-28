@@ -3,7 +3,6 @@ package org.elixir_lang.sdk.elixir
 import com.intellij.facet.FacetManager
 import com.intellij.notification.NotificationAction
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.fileChooser.FileChooserDescriptor
@@ -18,6 +17,10 @@ import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.util.InvalidDataException
+import com.intellij.openapi.util.Key
+import com.intellij.openapi.util.UserDataHolderEx
+import com.intellij.util.concurrency.ThreadingAssertions
+import com.intellij.util.concurrency.annotations.RequiresBackgroundThread
 import com.intellij.openapi.util.WriteExternalException
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vfs.LocalFileSystem
@@ -241,6 +244,7 @@ ELIXIR_SDK_HOME
         private val SDK_HOME_CHILD_BASE_NAME_SET: Set<String> = setOf("lib", "src")
         private const val WINDOWS_32BIT_DEFAULT_HOME_PATH = "C:\\Program Files\\Elixir"
         private const val WINDOWS_64BIT_DEFAULT_HOME_PATH = "C:\\Program Files (x86)\\Elixir"
+        private val ELIXIR_VERSION_KEY = Key.create<String>("ELIXIR_CANONICAL_VERSION")
         private val versionByHomePath: MutableMap<String, String> = ConcurrentHashMap()
 
         @JvmStatic
@@ -339,13 +343,6 @@ ELIXIR_SDK_HOME
         internal fun setupSdkTableListener() {
             val messageBus = ApplicationManager.getApplication().messageBus
             messageBus.connect().subscribe(ProjectJdkTable.JDK_TABLE_TOPIC, object : ProjectJdkTable.Listener {
-                override fun jdkAdded(jdk: Sdk) {
-                    // When an Elixir SDK is added, auto-set it as the project SDK if appropriate
-                    if (jdk.sdkType is Type) {
-                        autoSetProjectSdkIfNeeded(jdk)
-                    }
-                }
-
                 override fun jdkRemoved(jdk: Sdk) {
                     // When an Erlang SDK is removed, clean up any Elixir SDKs that reference it
                     if (staticIsValidDependency(jdk)) {
@@ -376,70 +373,6 @@ ELIXIR_SDK_HOME
                         projectRootManager.projectSdk = null
                         LOG.info("Cleared removed Elixir SDK '${deletedSdk.name}' from project '${project.name}'")
                     }
-                }
-            }
-        }
-
-        private fun autoSetProjectSdkIfNeeded(newElixirSdk: Sdk) {
-            LOG.debug { "Auto-set check for newly added Elixir SDK: ${newElixirSdk.name}" }
-
-            // Get all non-disposed projects
-            val openProjects = com.intellij.openapi.project.ProjectManager.getInstance().openProjects.filter {
-                !it.isDisposed
-            }
-
-            // Only auto-set if exactly one project is open
-            // This ensures we don't accidentally set the wrong project's SDK
-            val project = when (openProjects.size) {
-                0 -> {
-                    LOG.debug { "No open projects, skipping auto-set" }
-                    return
-                }
-
-                1 -> openProjects.first()
-                else -> {
-                    LOG.debug { "Multiple projects open (${openProjects.size}), skipping auto-set to avoid ambiguity" }
-                    return
-                }
-            }
-
-            val projectRootManager = ProjectRootManager.getInstance(project)
-            val currentProjectSdk = projectRootManager.projectSdk
-
-            // Only auto-set if current SDK is null or (is Elixir and invalid)
-            val shouldAutoSet = if (currentProjectSdk == null) {
-                LOG.debug { "Project '${project.name}' has no SDK, will auto-set to '${newElixirSdk.name}'" }
-                true
-            } else if (currentProjectSdk.sdkType !is Type) {
-                // Don't replace non-Elixir SDKs (Java, Python, etc.)
-                LOG.debug {
-                    "Project '${project.name}' has non-Elixir SDK '${currentProjectSdk.name}', skipping auto-set"
-                }
-                false
-            } else {
-                // Current SDK is Elixir - check if it's valid
-                val isValid = try {
-                    val additionalData = currentProjectSdk.sdkAdditionalData as? SdkAdditionalData
-                    val erlangSdk = additionalData?.getErlangSdk()
-                    erlangSdk != null
-                } catch (e: Exception) {
-                    LOG.debug { "Error checking validity of current SDK: ${e.message}" }
-                    false
-                }
-
-                if (!isValid) {
-                    LOG.debug {
-                        "Project '${project.name}' SDK '${currentProjectSdk.name}' is invalid, " +
-                                "will auto-set to '${newElixirSdk.name}'"
-                    }
-                }
-                !isValid
-            }
-
-            if (shouldAutoSet) {
-                WriteActions.runWriteActionLater {
-                    projectRootManager.projectSdk = newElixirSdk
-                    LOG.info("Auto-set project '${project.name}' SDK to '${newElixirSdk.name}'")
                 }
             }
         }
@@ -521,7 +454,7 @@ ELIXIR_SDK_HOME
         }
 
         private fun releaseVersion(sdkModificator: SdkModificator): String? =
-            sdkModificator.versionString?.let { Release.fromString(it) }?.version()
+            sdkModificator.homePath?.let { elixirVersion(it, null) }
 
         private fun addDocumentationPath(
             sdkModificator: SdkModificator,
@@ -893,11 +826,66 @@ ELIXIR_SDK_HOME
             return classRoots.any { root -> VfsUtilCore.isAncestor(erlangHomePathVf, root, true) }
         }
 
+        /**
+         * Returns the bare canonical Elixir version string for [sdk] (e.g. `"1.15.7"`), or `null`
+         * if the SDK is not an Elixir SDK or the version cannot be determined.
+         *
+         * The result is cached on the [sdk] instance via [UserDataHolderEx] after the first call.
+         * On a cold start (after IDE restart, before any SDK setup has run), the backing
+         * [elixirVersion] may shell out to `elixir --short-version`.  That subprocess call
+         * **must not** happen while a read lock is held - doing so blocks write actions and
+         * triggers a platform SEVERE.  Always call this from a background thread or an IO
+         * coroutine dispatcher, never from inside `readAction { }`.
+         */
+        @JvmStatic
+        @RequiresBackgroundThread
+        fun canonicalVersion(sdk: Sdk): String? {
+            ThreadingAssertions.assertBackgroundThread()
+
+            if (sdk.sdkType !== instance) return null
+
+            sdk.getUserData(ELIXIR_VERSION_KEY)?.let { return it }
+
+            // Cold path: may shell out to `elixir --short-version`.
+            // Calling elixirVersion() under a read lock blocks write actions - assert early.
+            check(!ApplicationManager.getApplication().holdsReadLock()) {
+                "canonicalVersion() may shell out to `elixir --short-version` and must not be called under a read lock"
+            }
+
+            val homePath = sdk.homePath ?: return null
+            val version = elixirVersion(homePath, null) ?: return null
+
+            val existing = (sdk as? UserDataHolderEx)?.putUserDataIfAbsent(ELIXIR_VERSION_KEY, version)
+            if (existing != null) {
+                return existing
+            }
+
+            sdk.putUserData(ELIXIR_VERSION_KEY, version)
+            return version
+        }
+
+        /**
+         * Returns the [Release] for [sdk], or `null` if the SDK is not an Elixir SDK or the
+         * release cannot be determined.
+         *
+         * This method is read-lock-safe and may be called from any thread, including the EDT
+         * and under a read action.  It uses only the pre-cached [ELIXIR_VERSION_KEY] user data
+         * (populated by a prior [canonicalVersion] call from an IO phase) and falls back to
+         * parsing the SDK home directory name.  It deliberately does **not** call
+         * [canonicalVersion] - that would spawn `elixir --short-version` on a cold start and
+         * is forbidden under a read lock.
+         *
+         * Callers that need a guaranteed-accurate version at the cost of a subprocess on cold
+         * start should call [canonicalVersion] from a background/IO thread instead.
+         */
         @JvmStatic
         @Contract("null -> null")
         fun getRelease(sdk: Sdk?): Release? =
             if (sdk != null && sdk.sdkType === instance) {
-                Release.fromString(sdk.versionString)
+                // Prefer the pre-cached bare version (set by canonicalVersion() in IO phase).
+                // Fall back to directory name parsing - never spawn a subprocess here.
+                val cachedVersion = sdk.getUserData(ELIXIR_VERSION_KEY)
+                cachedVersion?.let { Release.fromString(it) }
                     ?: sdk.homePath?.let { Release.fromString(File(it).name) }
             } else {
                 null
@@ -924,7 +912,7 @@ ELIXIR_SDK_HOME
             val project = psiElement.project
             if (project.isDisposed) return null
 
-            val module = ReadAction.compute<Module?, Throwable> {
+            val module = ApplicationManager.getApplication().runReadAction<Module?> {
                 ModuleUtilCore.findModuleForPsiElement(psiElement)
             }
 

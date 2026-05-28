@@ -2,16 +2,14 @@ package org.elixir_lang.action
 
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.Sdk
-import com.intellij.openapi.roots.ModuleRootManager
-import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.platform.ide.progress.ModalTaskOwner
 import com.intellij.platform.ide.progress.runWithModalProgressBlocking
 import org.elixir_lang.notification.setup_sdk.Notifier
 import org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData
 import org.elixir_lang.sdk.elixir.Type as ElixirSdkType
+import org.elixir_lang.sdk.elixir.findAllActiveElixirSdks
 import org.elixir_lang.sdk.erlang.Type as ErlangSdkType
 
 class RefreshActiveElixirSdkAction : AnAction() {
@@ -27,7 +25,7 @@ class RefreshActiveElixirSdkAction : AnAction() {
 
     private fun refreshElixirSdkPaths(project: Project) {
         // Find active SDKs in the project
-        val activeElixirSdks = getActiveElixirSdks(project)
+        val activeElixirSdks = findAllActiveElixirSdks(project)
         val activeErlangSdks = getActiveErlangSdks(project)
 
         val totalElixirSdks = activeElixirSdks.size
@@ -88,55 +86,15 @@ class RefreshActiveElixirSdkAction : AnAction() {
 
     override fun isDumbAware(): Boolean = true
 
-    // Utility functions to detect active Elixir SDKs
-    private fun getActiveElixirSdks(project: Project): Set<Sdk> {
-        val activeSdks = mutableSetOf<Sdk>()
-        val elixirSdkType = ElixirSdkType.instance
-
-        // Check project-level SDK
-        val projectSdk = ProjectRootManager.getInstance(project).projectSdk
-        if (projectSdk?.sdkType === elixirSdkType) {
-            activeSdks.add(projectSdk)
-        }
-
-        // Check module-level SDKs
-        ModuleManager.getInstance(project).modules.forEach { module ->
-            val moduleSdk = ModuleRootManager.getInstance(module).sdk
-            if (moduleSdk?.sdkType === elixirSdkType) {
-                activeSdks.add(moduleSdk)
-            }
-        }
-
-        return activeSdks
-    }
-
+    // Utility functions to detect active Erlang SDKs
     private fun getActiveErlangSdks(project: Project): Set<Sdk> {
         val activeSdks = mutableSetOf<Sdk>()
-
-        // Check project-level SDK
-        val projectSdk = ProjectRootManager.getInstance(project).projectSdk
-        if (projectSdk?.sdkType is ErlangSdkType) {
-            activeSdks.add(projectSdk)
-        }
-
-        // Check module-level SDKs
-        ModuleManager.getInstance(project).modules.forEach { module ->
-            val moduleSdk = ModuleRootManager.getInstance(module).sdk
-            if (moduleSdk?.sdkType is ErlangSdkType) {
-                activeSdks.add(moduleSdk)
-            }
-        }
-
-        // Also include Erlang SDKs referenced by active Elixir SDKs
-        val activeElixirSdks = getActiveElixirSdks(project)
-        activeElixirSdks.forEach { elixirSdk ->
+        // Erlang SDKs referenced by active Elixir SDKs
+        for (elixirSdk in findAllActiveElixirSdks(project)) {
             val additionalData = elixirSdk.sdkAdditionalData as? SdkAdditionalData
             val erlangSdk = additionalData?.getErlangSdk()
-            if (erlangSdk != null) {
-                activeSdks.add(erlangSdk)
-            }
+            if (erlangSdk != null) activeSdks.add(erlangSdk)
         }
-
         return activeSdks
     }
 }

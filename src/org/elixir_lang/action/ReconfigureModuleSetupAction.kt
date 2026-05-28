@@ -5,7 +5,6 @@ import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.module.ModuleManager
@@ -16,6 +15,7 @@ import com.intellij.openapi.vfs.VirtualFile
 import org.elixir_lang.mix.project.CANONICAL_FOLDER_MARKS
 import org.elixir_lang.mix.project.FolderMark
 import org.elixir_lang.isElixirMixModule
+import org.elixir_lang.sdk.elixir.findAllActiveElixirSdks
 import org.elixir_lang.sdk.elixir.Type as ElixirSdkType
 
 private val LOG = logger<ReconfigureModuleSetupAction>()
@@ -44,12 +44,9 @@ class ReconfigureModuleSetupAction : AnAction() {
         }
 
         // Enable when at least one module has a mix.exs in its content root,
-        // or a project-level Elixir SDK is configured.
-        val (hasElixirModule, hasElixirSdk) = ReadAction.nonBlocking(java.util.concurrent.Callable {
-            val hasModule = ModuleManager.getInstance(project).modules.any { it.isElixirMixModule() }
-            val hasSdk = ElixirSdkType.mostSpecificSdk(project) != null
-            hasModule to hasSdk
-        }).executeSynchronously()
+        // or any module has an active Elixir SDK configured.
+        val hasElixirModule = ModuleManager.getInstance(project).modules.any { it.isElixirMixModule() }
+        val hasElixirSdk = findAllActiveElixirSdks(project).isNotEmpty()
 
         e.presentation.isEnabledAndVisible = hasElixirModule || hasElixirSdk
     }
@@ -67,6 +64,12 @@ class ReconfigureModuleSetupAction : AnAction() {
         var sdksFixed = 0
 
         WriteCommandAction.runWriteCommandAction(project, "Reconfigure Elixir Modules", null, {
+            // Collect all content entry URLs upfront so umbrella sub-app detection can skip
+            // sub-apps that are already covered by their own content entry.
+            val allContentEntryUrls: Set<String> = ModuleManager.getInstance(project).modules
+                .flatMap { ModuleRootManager.getInstance(it).contentEntries.map { ce -> ce.url } }
+                .toSet()
+
             for (module in ModuleManager.getInstance(project).modules) {
                 val rootManager = ModuleRootManager.getInstance(module)
                 val model = rootManager.modifiableModel
@@ -87,9 +90,17 @@ class ReconfigureModuleSetupAction : AnAction() {
                         foldersAdded += added
                         moduleChanged = true
                     }
+
+                    // Also apply marks for umbrella sub-apps that are not already covered by
+                    // their own content entry.
+                    val umbrellaAdded = addMissingUmbrellaSubAppFolderMarks(contentEntry, root, allContentEntryUrls)
+                    if (umbrellaAdded > 0) {
+                        foldersAdded += umbrellaAdded
+                        moduleChanged = true
+                    }
                 }
 
-                if (hasRootMixExs && projectSdk != null) {
+                if (hasRootMixExs && projectSdk != null && projectSdk.sdkType is ElixirSdkType) {
                     if (fixModuleSdk(model, projectSdk)) {
                         sdksFixed++
                         moduleChanged = true
@@ -117,7 +128,47 @@ class ReconfigureModuleSetupAction : AnAction() {
      * to [contentEntry] by URL (even if the backing directory does not yet exist on disk).
      * Returns the number of marks added.
      */
-    private fun addMissingFolderMarks(contentEntry: ContentEntry, root: VirtualFile): Int {
+    private fun addMissingFolderMarks(contentEntry: ContentEntry, root: VirtualFile): Int =
+        applyCanonicalMarksForBaseUrl(contentEntry, root.url)
+
+    /**
+     * Scans the `apps/` directory under [root] for umbrella sub-apps that are NOT already
+     * covered by their own content entry (i.e. whose URL is absent from [allContentEntryUrls]),
+     * and additively applies missing canonical folder marks for each such sub-app on [contentEntry].
+     *
+     * Returns the total number of marks added across all discovered sub-apps.
+     */
+    private fun addMissingUmbrellaSubAppFolderMarks(
+        contentEntry: ContentEntry,
+        root: VirtualFile,
+        allContentEntryUrls: Set<String>,
+    ): Int {
+        val appsDir = root.findChild("apps") ?: return 0
+
+        var added = 0
+
+        for (subAppDir in appsDir.children) {
+            if (!subAppDir.isDirectory) continue
+            if (subAppDir.findChild("mix.exs") == null) continue
+
+            // Skip sub-apps already covered by their own content entry.
+            if (subAppDir.url in allContentEntryUrls) continue
+
+            added += applyCanonicalMarksForBaseUrl(contentEntry, "${root.url}/apps/${subAppDir.name}")
+        }
+
+        return added
+    }
+
+    /**
+     * Applies [CANONICAL_FOLDER_MARKS] to [contentEntry] for every canonical folder relative to
+     * [baseUrl].  Existing correct marks are left untouched; incorrect source marks are replaced;
+     * missing exclusions are added.  Returns the number of marks added or replaced.
+     *
+     * This is the single implementation shared by [addMissingFolderMarks] (top-level content root)
+     * and [addMissingUmbrellaSubAppFolderMarks] (umbrella sub-apps).
+     */
+    private fun applyCanonicalMarksForBaseUrl(contentEntry: ContentEntry, baseUrl: String): Int {
         val existingSourceUrls = contentEntry.sourceFolders.associate {
             it.url to if (it.isTestSource) FolderMark.TEST_SOURCES else FolderMark.SOURCES
         }
@@ -126,7 +177,7 @@ class ReconfigureModuleSetupAction : AnAction() {
         var added = 0
 
         for (canonical in CANONICAL_FOLDER_MARKS) {
-            val url = "${root.url}/${canonical.relativePath}"
+            val url = "$baseUrl/${canonical.relativePath}"
 
             when (canonical.folderMark) {
                 FolderMark.SOURCES, FolderMark.TEST_SOURCES -> {
@@ -138,8 +189,7 @@ class ReconfigureModuleSetupAction : AnAction() {
                                 .find { it.url == url }
                                 ?.let { contentEntry.removeSourceFolder(it) }
                         }
-                        val isTest = canonical.folderMark == FolderMark.TEST_SOURCES
-                        contentEntry.addSourceFolder(url, isTest)
+                        contentEntry.addSourceFolder(url, canonical.folderMark == FolderMark.TEST_SOURCES)
                         added++
                     }
                 }

@@ -1,7 +1,6 @@
 package org.elixir_lang.notification.setup_sdk
 
 import com.intellij.ide.actions.ShowSettingsUtilImpl
-import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.fileEditor.FileEditor
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleType
@@ -26,33 +25,32 @@ class Provider : EditorNotificationProvider {
         project: Project,
         file: VirtualFile,
     ): Function<in FileEditor, out JComponent?>? {
-        // Quick check without read action - file type check is thread-safe
-        if (file.fileType !is ElixirFileType) {
-            return null
-        }
+        // Quick check without additional read - file type check is thread-safe.
+        if (file.fileType !is ElixirFileType) return null
 
-        // Keep PSI/model access explicitly scoped to a read action.
-        return ReadAction.compute<Function<in FileEditor, out JComponent?>?, Throwable> {
-            val psiFile = PsiManager.getInstance(project).findFile(file) ?: return@compute null
+        // collectNotificationData is always called under a platform-held read lock
+        // (@RequiresReadLock, see EditorNotificationProvider), so PSI/model access here is safe.
+        val psiFile = PsiManager.getInstance(project).findFile(file) ?: return null
+        if (psiFile.language !== ElixirLanguage) return null
 
-            if (psiFile.language !== ElixirLanguage) return@compute null
+        val module = ModuleUtilCore.findModuleForPsiElement(psiFile)
 
-            // Resolve the module once; use it for both the SDK check and panel decision
-            // to avoid calling findModuleForPsiElement twice.
-            val module = ModuleUtilCore.findModuleForPsiElement(psiFile)
+        val sdk = module?.let { Type.mostSpecificSdk(it) } ?: Type.mostSpecificSdk(project)
+        if (sdk != null) return null
 
-            // mostSpecificSdk(module) / mostSpecificSdk(project) avoid the internal
-            // re-lookup that mostSpecificSdk(PsiElement) would perform.
-            val sdk = if (module != null) Type.mostSpecificSdk(module) else Type.mostSpecificSdk(project)
-            if (sdk != null) return@compute null
-
-            // IMPORTANT: this lambda is applied later on the EDT.
-            // Keep it UI-only and PSI/model-free; all PSI decisions must stay in this read action.
-            when {
-                module != null && ModuleType.get(module).id == "ELIXIR_MODULE" -> Function { createModulePanel(project, module) }
-                ProcessOutput.isSmallIde -> Function { createSmallIDEFacetPanel(project) }
-                else -> Function { createProjectPanel(project) }
-            }
+        // No SDK configured. Mise-based suggestion is handled by the status bar widget's
+        // notification scan (ElixirEditorBasedSdkWidget), which runs off the read lock on
+        // Dispatchers.IO and surfaces a balloon notification with a one-click configure action.
+        // This panel remains as a persistent per-file indicator for manual setup, but is a candidate
+        // for removal in the future if the Experimental Widget becomes stable.
+        return when {
+            module != null && ModuleType.get(module).id == "ELIXIR_MODULE" ->
+                Function { createModulePanel(project, module) }
+            module != null && ProcessOutput.isSmallIde ->
+                Function { createSmallIDEFacetPanel(project) }
+            module != null ->
+                Function { createProjectPanel(project) }
+            else -> null
         }
     }
 }
@@ -107,7 +105,7 @@ private fun createModulePanel(
 
 private fun createProjectPanel(project: Project): EditorNotificationPanel =
     EditorNotificationPanel().apply {
-        text = "Project SDK is not defined"
+        text = "Elixir SDK is not defined"
         createActionLabel(ProjectBundle.message("project.sdk.setup")) {
             showProjectSettings(project)
         }

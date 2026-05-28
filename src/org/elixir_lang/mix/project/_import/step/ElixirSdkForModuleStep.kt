@@ -18,6 +18,7 @@ import com.intellij.util.ui.JBInsets
 import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.StartupUiUtil
 import org.elixir_lang.Elixir
+import org.elixir_lang.mix.project._import.Builder
 import org.elixir_lang.sdk.elixir.Type
 import org.jetbrains.annotations.NonNls
 import org.jetbrains.annotations.SystemDependent
@@ -166,7 +167,7 @@ class ElixirSdkForModuleStep(private val wizardContext: WizardContext) : ModuleW
     override fun getComponent(): JComponent = panel
 
     override fun updateDataModel() {
-        wizardContext.projectJdk = jdk
+        (wizardContext.projectBuilder as? Builder)?.elixirSdk = jdk
     }
 
     override fun updateStep() {

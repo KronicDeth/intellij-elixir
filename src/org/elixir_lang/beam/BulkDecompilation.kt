@@ -23,6 +23,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.elixir_lang.errorreport.Logger
+import org.elixir_lang.sdk.elixir.Type
 
 class BulkDecompilation : AnAction() {
     override fun actionPerformed(event: AnActionEvent) {
@@ -36,25 +37,18 @@ class BulkDecompilation : AnAction() {
                     withContext(Dispatchers.Default) {
                         val sdkSet = mutableSetOf<Sdk>()
                         val psiManager = PsiManager.getInstance(project)
+                        val modules = ModuleManager.getInstance(project).modules
 
-                        data class ModuleInfo(val name: String, val sdk: Sdk?, val contentRoots: Array<VirtualFile>)
-
-                        val moduleInfos = readAction {
-                            ModuleManager.getInstance(project).modules.map { module ->
-                                val mrm = ModuleRootManager.getInstance(module)
-                                ModuleInfo(module.name, mrm.sdk, mrm.contentRoots)
-                            }
-                        }
-
-                        if (moduleInfos.isNotEmpty()) {
-                            reportSequentialProgress(moduleInfos.size) { reporter ->
-                                for (info in moduleInfos) {
-                                    reporter.itemStep("Module ${info.name}") {
+                        if (modules.isNotEmpty()) {
+                            reportSequentialProgress(modules.size) { reporter ->
+                                for (module in modules) {
+                                    reporter.itemStep("Module ${module.name}") {
                                         ProgressManager.checkCanceled()
 
-                                        info.sdk?.let { sdkSet.add(it) }
+                                        val moduleRootManager = ModuleRootManager.getInstance(module)
+                                        moduleRootManager.sdk?.let { sdkSet.add(it) }
 
-                                        for (contentRoot in info.contentRoots) {
+                                        for (contentRoot in moduleRootManager.contentRoots) {
                                             ProgressManager.checkCanceled()
                                             decompile(psiManager, contentRoot)
                                         }
@@ -63,9 +57,11 @@ class BulkDecompilation : AnAction() {
                             }
                         }
 
-                        readAction {
-                            ProjectRootManager.getInstance(project).projectSdk
-                        }?.let { sdkSet.add(it) }
+                        ProjectRootManager.getInstance(project).projectSdk?.let { sdk ->
+                            if (sdk.sdkType is Type) {
+                                sdkSet.add(sdk)
+                            }
+                        }
 
                         if (sdkSet.isNotEmpty()) {
                             reportSequentialProgress(sdkSet.size) { reporter ->
