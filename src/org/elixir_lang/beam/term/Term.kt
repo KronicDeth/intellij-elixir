@@ -61,6 +61,9 @@ sealed class Term {
                                 AllocationList.from(data, internalOffset, literalFloat)
                             0b1000 ->
                                 ExtendedLiteral.from(data, internalOffset, literalFloat)
+                            // OTP 25+: typed register {tr, Reg, Type} used by JIT-annotated operands
+                            0b1010 ->
+                                TypedRegister.from(data, internalOffset, literalFloat)
                             else ->
                                 throw IllegalArgumentException(
                                         "Extended tag ($extendedTag) is not properly shifted and masked"
@@ -381,6 +384,27 @@ class ExtendedLiteral: Term() {
             }
 
             return Pair(Literal(index), internalOffset - offset)
+        }
+    }
+}
+
+/**
+ * Typed register operand {tr, Reg, Type} introduced in OTP 25 for JIT type-annotated operands.
+ * Extended tag sub-type 5 (encoded as 0b1010 in the shifted-masked extended tag field).
+ * See https://github.com/erlang/otp/blob/main/lib/compiler/src/beam_disasm.erl
+ */
+class TypedRegister(val register: Term, val type: Term) : Term() {
+    companion object {
+        fun from(data: ByteArray, offset: Int, literalFloat: Boolean): Pair<TypedRegister, ByteCount> {
+            var internalOffset = offset
+
+            val (register, registerByteCount) = Term.from(data, internalOffset, literalFloat)
+            internalOffset += registerByteCount
+
+            val (type, typeByteCount) = Term.from(data, internalOffset, literalFloat)
+            internalOffset += typeByteCount
+
+            return Pair(TypedRegister(register, type), internalOffset - offset)
         }
     }
 }

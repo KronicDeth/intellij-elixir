@@ -832,7 +832,77 @@ enum class Code(val number: Int, val function: String, val arguments: Array<Argu
     // @spec recv_marker_use Reference
     // @doc  Sets the current receive cursor to the marker associated with
     //       the given Reference
-    RECV_MARKER_USE(176, "recv_marker_user", arrayOf(REFERENCE));
+    RECV_MARKER_USE(176, "recv_marker_user", arrayOf(REFERENCE)),
+
+    // OTP 25
+
+    // @spec bs_create_bin Fail Alloc Live Unit Dst OpList
+    // @doc  Build a new binary using the binary syntax.
+    BS_CREATE_BIN(177, "bs_create_bin", SIX),
+
+    // @spec call_fun2 Tag Arity Func
+    // @doc  Calls the fun Func with arity Arity.
+    CALL_FUN2(178, "call_fun2", THREE),
+
+    // @spec nif_start
+    // @doc  No-op at start of each function declared in -nifs().
+    NIF_START(179, "nif_start"),
+
+    // @spec badrecord Value
+    // @doc  Raises a {badrecord,Value} error exception.
+    BADRECORD(180, "badrecord", ONE),
+
+    // OTP 26
+
+    // @spec update_record Hint Size Src Dst Updates
+    // @doc  Sets Dst to a copy of Src with the update list applied.
+    UPDATE_RECORD(181, "update_record", FIVE),
+
+    // @spec bs_match Fail Ctx Commands
+    // @doc  Match one or more binary segments of fixed size.
+    BS_MATCH(182, "bs_match", THREE),
+
+    // OTP 27
+
+    // @spec executable_line Location Index
+    // @doc  Provide location for an executable line.
+    EXECUTABLE_LINE(183, "executable_line", TWO),
+
+    // OTP 28
+
+    // @spec debug_line Kind Location Index Live
+    // @doc  Provide location for a place where a break point can be placed.
+    DEBUG_LINE(184, "debug_line", FOUR),
+
+    // OTP 29
+
+    // @spec bif3 Lbl Bif Arg1 Arg2 Arg3 Reg
+    // @doc  Call the bif Bif with the arguments Arg1, Arg2, and Arg3.
+    BIF3(185, "bif3", SIX),
+
+    // @spec is_any_native_record Lbl Term
+    // @doc  Check whether Term is a native record.
+    IS_ANY_NATIVE_RECORD(186, "is_any_native_record", UNARY),
+
+    // @spec is_native_record Lbl Rec Module Name
+    // @doc  Check whether record Rec is the record Name defined in module Module.
+    IS_NATIVE_RECORD(187, "is_native_record", FOUR),
+
+    // @spec get_record_elements Lbl Rec Elements
+    // @doc  Extract the values for each field name and store into the corresponding register.
+    GET_RECORD_ELEMENTS(188, "get_record_elements", THREE),
+
+    // @spec put_record Lbl Id Src Dst Live Updates
+    // @doc  Create (Src is nil) or update (Src is a register) a native record.
+    PUT_RECORD(189, "put_record", SIX),
+
+    // @spec is_record_accessible Lbl Rec Scope
+    // @doc  Check whether the fields of native record Rec are accessible from the executing module.
+    IS_RECORD_ACCESSIBLE(190, "is_record_accessible", THREE),
+
+    // @spec get_record_field Lbl Rec Id Field Dst
+    // @doc  Get a single field from a record.
+    GET_RECORD_FIELD(191, "get_record_field", FIVE);
 
     fun arity() = arguments.size
 }
