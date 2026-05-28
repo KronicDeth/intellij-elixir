@@ -26,7 +26,7 @@ class SdkTableListenerInitializationService {
                 if (!initialized) {
                     LOG.debug("Setting up SDK table listeners")
                     org.elixir_lang.sdk.elixir.Type.setupSdkTableListener()
-                    org.elixir_lang.sdk.erlang.Type.setupSdkTableListener()
+                    org.elixir_lang.sdk.erlang.ErlangSdkTableListener.setup()
                     initialized = true
                     LOG.debug("SDK table listeners initialized successfully")
                 }

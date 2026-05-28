@@ -46,6 +46,7 @@ import org.elixir_lang.mix.project.ProjectModuleSetupValidator.FolderMarkIssue
 import org.elixir_lang.sdk.SdkEbinPaths
 import org.elixir_lang.sdk.SdkRegistrar
 import org.elixir_lang.sdk.elixir.SdkSettingsOpener
+import org.elixir_lang.sdk.elixir.ElixirSdkLookup
 import org.elixir_lang.sdk.elixir.Type
 import org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData
 import org.elixir_lang.sdk.wsl.wslCompat
@@ -291,7 +292,7 @@ class ElixirEditorBasedSdkWidget(
     // -------------------------------------------------------------------------
 
     private fun buildModuleWidgetState(module: com.intellij.openapi.module.Module): WidgetState {
-        val elixirSdk = Type.mostSpecificSdk(module)
+        val elixirSdk = ElixirSdkLookup.mostSpecificSdk(module)
 
         // Determine whether to show module name in tooltip (only in multi-module projects).
         // Uses the cached count (refreshed on rootsChanged) to keep getWidgetState() O(1).
@@ -610,7 +611,7 @@ class ElixirEditorBasedSdkWidget(
     internal fun findModuleLevelElixirSdk(): Sdk? {
         for (module in ModuleManager.getInstance(project).modules) {
             if (!module.isElixirModule()) continue
-            val moduleSdk = Type.mostSpecificSdk(module)
+            val moduleSdk = ElixirSdkLookup.mostSpecificSdk(module)
             if (moduleSdk != null) return moduleSdk
         }
         return null
@@ -798,7 +799,7 @@ class ElixirEditorBasedSdkWidget(
         return ModuleManager.getInstance(project).modules
             .filter { it.isElixirModule() }
             .map { module ->
-                val elixirSdk = Type.mostSpecificSdk(module)
+                val elixirSdk = ElixirSdkLookup.mostSpecificSdk(module)
                 val erlangSdk = elixirSdk?.let { getErlangSdk(it) }
                 val contentRoot = ModuleRootManager.getInstance(module)
                     .contentRoots

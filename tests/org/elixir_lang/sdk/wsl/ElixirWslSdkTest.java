@@ -370,7 +370,7 @@ public class ElixirWslSdkTest extends PlatformTestCase {
         // Test WSL path - use forward slashes which work cross-platform
         String wslPath = "//wsl$/Ubuntu/usr/lib/erlang";
         kotlin.Pair<String, String> result = captureLoggedWarning(
-                "org.elixir_lang.sdk.erlang.Type",
+                "org.elixir_lang.sdk.erlang.ErlangVersionDetector",
                 () -> erlangSdkType.suggestSdkName(null, wslPath)
         );
         String suggestedName = result.getFirst();
@@ -386,7 +386,7 @@ public class ElixirWslSdkTest extends PlatformTestCase {
         // Test local path - should NOT include WSL suffix
         String localPath = "/usr/lib/erlang";
         kotlin.Pair<String, String> localResult = captureLoggedWarning(
-                "org.elixir_lang.sdk.erlang.Type",
+                "org.elixir_lang.sdk.erlang.ErlangVersionDetector",
                 () -> erlangSdkType.suggestSdkName(null, localPath)
         );
         String localName = localResult.getFirst();
@@ -408,7 +408,7 @@ public class ElixirWslSdkTest extends PlatformTestCase {
 
         // This line emits a warning - capture it
         kotlin.Pair<String, String> result = captureLoggedWarning(
-            "org.elixir_lang.sdk.erlang.Type",
+            "org.elixir_lang.sdk.erlang.ErlangVersionDetector",
             () -> erlangSdkType.suggestSdkName(null, wslPath)
         );
         String erlangName = result.getFirst();

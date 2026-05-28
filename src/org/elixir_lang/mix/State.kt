@@ -15,7 +15,7 @@ import org.elixir_lang.console.ElixirConsoleUtil
 import org.elixir_lang.notification.setup_sdk.Notifier
 import org.elixir_lang.run.ElixirProcessHandler
 import org.elixir_lang.run.WslSafeCommandLineState
-import org.elixir_lang.sdk.elixir.Type.Companion.mostSpecificSdk
+import org.elixir_lang.sdk.elixir.ElixirSdkLookup.mostSpecificSdk
 
 fun ensureMostSpecificSdk(module: Module): Sdk = mostSpecificSdk(module) ?: throw MissingSdk(module)
 

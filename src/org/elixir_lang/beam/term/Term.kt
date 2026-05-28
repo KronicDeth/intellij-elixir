@@ -130,9 +130,10 @@ fun value(fullTag: UnsignedByte, data: ByteArray, offset: Int): Pair<Any, ByteCo
     val bit3 = fullTag.ushr(3).and(0b1)
 
     return if (bit3 == 0) {
+        // Value is encoded entirely in bits 7-4 of the tag byte; no additional bytes consumed.
         val value = fullTag.ushr(4)
 
-        Pair(value, internalOffset - offset)
+        Pair(value, 0)
     } else {
         val bit4 = fullTag.ushr(4).and(0b1)
         val bits7to5 = fullTag.and(0b1110_0000).shr(5)
@@ -210,7 +211,7 @@ class Character(val codePoint: Int) : Term() {
 class Float : Term() {
     companion object {
         fun from(data: ByteArray, offset: Int): Pair<Float, ByteCount> {
-            TODO("decode $data at offset $offset as Float")
+            TODO("decode ${data.toHexString()} at offset $offset as Float")
         }
     }
 }
@@ -345,7 +346,7 @@ class AllocationList(val allocationList: kotlin.collections.List<Allocation>) : 
     }
 
     companion object {
-        private val typeByNumber = Type.values().associateBy(Type::number)
+        private val typeByNumber = Type.entries.associateBy(Type::number)
 
         // https://github.com/erlang/otp/blob/OTP-20.2.2/lib/compiler/src/beam_disasm.erl#L559-L573
         fun from(data: ByteArray, offset: Int, literalFloat: Boolean): Pair<AllocationList, ByteCount> {

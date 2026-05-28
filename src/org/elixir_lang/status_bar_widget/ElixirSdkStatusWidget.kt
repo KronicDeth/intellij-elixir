@@ -41,6 +41,7 @@ import org.elixir_lang.isElixirModule
 import org.elixir_lang.mix.project.ProjectModuleSetupValidator
 import org.elixir_lang.mix.project.ProjectModuleSetupValidator.FolderMarkIssue
 import org.elixir_lang.sdk.SdkEbinPaths
+import org.elixir_lang.sdk.elixir.ElixirSdkLookup
 import org.elixir_lang.sdk.elixir.SdkSettingsOpener
 import org.elixir_lang.sdk.elixir.Type
 import org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData
@@ -542,7 +543,7 @@ class ElixirSdkStatusWidget(@param:NotNull private val project: Project) : Custo
     internal fun findModuleLevelElixirSdk(): Sdk? {
         for (module in ModuleManager.getInstance(project).modules) {
             if (!module.isElixirModule()) continue
-            val moduleSdk = Type.mostSpecificSdk(module)
+            val moduleSdk = ElixirSdkLookup.mostSpecificSdk(module)
             if (moduleSdk != null) return moduleSdk
         }
         return null

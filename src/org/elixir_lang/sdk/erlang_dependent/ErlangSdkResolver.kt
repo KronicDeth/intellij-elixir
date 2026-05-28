@@ -27,6 +27,16 @@ interface ErlangSdkResolver {
     companion object {
         fun getInstance(): ErlangSdkResolver =
             ApplicationManager.getApplication().getService(ErlangSdkResolver::class.java)
+
+        /**
+         * Returns the first registered Erlang SDK that has a non-null home path, or null if none
+         * are registered. Used as a fallback when no Erlang SDK has been explicitly paired with an
+         * Elixir SDK.
+         */
+        fun findAnyRegistered(): Sdk? =
+            ProjectJdkTable.getInstance()
+                .getSdksOfType(org.elixir_lang.sdk.erlang.Type.instance)
+                .firstOrNull { it.homePath != null }
     }
 }
 

@@ -13,7 +13,7 @@ import org.elixir_lang.file.containsFileWithSuffix
 import org.elixir_lang.mix.Project
 import org.elixir_lang.psi.ElixirFile
 import org.elixir_lang.sdk.elixir.Type
-import org.elixir_lang.sdk.elixir.Type.Companion.mostSpecificSdk
+import org.elixir_lang.sdk.elixir.ElixirSdkLookup.mostSpecificSdk
 import java.io.File
 
 class MixExUnitRunConfigurationProducer :
