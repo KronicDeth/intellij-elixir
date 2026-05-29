@@ -1,7 +1,6 @@
 package org.elixir_lang.mix
 
-import com.intellij.openapi.project.Project
-import com.intellij.openapi.roots.ProjectRootManager
+import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiElement
@@ -10,17 +9,24 @@ import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.psi.impl.stripAccessExpressions
-import java.nio.file.Paths
 
 /**
  * `Mix.Dep`
  */
 data class Dep(val application: String, val path: String, val type: Type = Type.LIBRARY) {
-    fun virtualFile(project: Project): VirtualFile? =
-            ProjectRootManager
-                .getInstance(project)
-                .contentRoots.firstNotNullOfOrNull { it.findFileByRelativePath(path) }
-                ?: VfsUtil.findFile(Paths.get(path), true)
+    /**
+     * Resolves the virtual file for this dependency relative to [moduleRoot].
+     *
+     * [path] is typically "deps/<name>" (relative) or an absolute path from a `path:` option.
+     * Relative paths are resolved against [moduleRoot]; absolute paths fall back to
+     * [VfsUtil.findFile] which handles paths like "/home/user/external_lib".
+     *
+     * @param moduleRoot The content root of the module that declared this dependency.
+     * @return The VirtualFile for the dep directory, or null if not found.
+     */
+    fun virtualFile(moduleRoot: VirtualFile): VirtualFile? =
+        moduleRoot.findFileByRelativePath(path)
+            ?: LocalFileSystem.getInstance().refreshAndFindFileByPath(path)
 
     enum class Type {
         LIBRARY,

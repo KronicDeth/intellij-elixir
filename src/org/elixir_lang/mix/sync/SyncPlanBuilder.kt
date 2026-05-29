@@ -428,10 +428,10 @@ internal suspend fun buildModuleDepsPlan(
 
     val psiManager = PsiManager.getInstance(project)
     val indicator = EmptyProgressIndicator()
-    val deps = transitiveResolution(project, psiManager, indicator, *contentRoots).toList()
+    val deps = transitiveResolution(psiManager, indicator, *contentRoots).toList()
     if (deps.isEmpty()) return null
 
-    val externalLibraryPlans = buildExternalLibraryPlans(project, deps)
+    val externalLibraryPlans = buildExternalLibraryPlans(project, deps, contentRoots)
 
     // Compute scoped library names for the module's library deps.
     // Resolution is restricted to this module's own content roots (not global) to prevent
@@ -504,14 +504,24 @@ internal suspend fun buildModuleDepsPlan(
     )
 }
 
-/** Syncs libraries for dep paths that live outside this project's content roots. */
-private suspend fun buildExternalLibraryPlans(project: Project, deps: Collection<Dep>): List<LibraryRootsPlan> {
+/**
+ * Syncs libraries for dep paths that live outside this module's content roots.
+ *
+ * @param contentRoots The content roots of the module that declared these deps. Used to resolve
+ *   relative dep paths; deps found under these roots are not considered "external".
+ */
+private suspend fun buildExternalLibraryPlans(
+    project: Project,
+    deps: Collection<Dep>,
+    contentRoots: Array<VirtualFile>,
+): List<LibraryRootsPlan> {
     val externalPaths = readAction {
-        val projectRootManager = ProjectRootManager.getInstance(project)
-        val projectFileIndex = projectRootManager.fileIndex
+        val projectFileIndex = ProjectRootManager.getInstance(project).fileIndex
         deps.mapNotNull { dep ->
             ProgressManager.checkCanceled()
-            dep.virtualFile(project)?.let { virtualFile ->
+            // Search only this module's content roots for the dep, not all project roots.
+            // This prevents cross-module contamination in umbrella projects.
+            contentRoots.firstNotNullOfOrNull { root -> dep.virtualFile(root) }?.let { virtualFile ->
                 if (projectFileIndex.getContentRootForFile(virtualFile) == null &&
                     !projectFileIndex.isInLibrary(virtualFile) &&
                     !projectFileIndex.isExcluded(virtualFile)
