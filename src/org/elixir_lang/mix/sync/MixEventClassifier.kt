@@ -5,6 +5,8 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.newvfs.events.VFileEvent
+import com.intellij.util.concurrency.ThreadingAssertions
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.isElixirMixModule
 import org.elixir_lang.mixContentRoots
 import org.elixir_lang.package_manager.virtualFile
@@ -36,6 +38,7 @@ object MixEventClassifier {
      *
      * Returns an empty set if [project] is disposed.
      */
+    @RequiresReadLock
     fun findAffectedMixRoots(project: Project, events: List<VFileEvent>): Set<VirtualFile> {
         if (project.isDisposed) return emptySet()
         val eventPaths = events.map { FileUtil.toSystemIndependentName(it.path) }
@@ -66,8 +69,13 @@ object MixEventClassifier {
      * Non-Elixir modules are excluded before any path comparison happens.
      *
      * Returns an empty list if [project] is disposed.
+     *
+     * Must be called under a read lock. The primary caller is `BulkFileListener.after`, which fires
+     * inside a write action (which subsumes the read lock).
      */
+    @RequiresReadLock
     fun elixirMixContentRoots(project: Project): List<VirtualFile> {
+        ThreadingAssertions.assertReadAccess()
         if (project.isDisposed) return emptyList()
         val allMixRoots = ModuleManager.getInstance(project).modules
             .filter { it.isElixirMixModule() }

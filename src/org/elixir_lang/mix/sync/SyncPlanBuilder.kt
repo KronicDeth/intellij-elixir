@@ -11,6 +11,8 @@ import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiManager
+import com.intellij.util.concurrency.ThreadingAssertions
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.mix.Dep
 import org.elixir_lang.mix.watcher.TransitiveResolution.transitiveResolution
 import org.elixir_lang.mix.Project as MixProject
@@ -531,7 +533,9 @@ private suspend fun buildLibraryRootsPlans(project: Project, deps: Collection<Vi
         buildLibraryRootsPlansInCurrentContext(project, deps)
     }
 
+@RequiresReadLock
 internal fun buildLibraryRootsPlansInCurrentContext(project: Project, deps: Collection<VirtualFile>): List<LibraryRootsPlan> {
+    ThreadingAssertions.assertReadAccess()
     if (deps.isEmpty()) return emptyList()
 
     // Fall-back _build roots for external deps that don't sit under a project content root.
@@ -565,6 +569,7 @@ internal fun buildLibraryRootsPlansInCurrentContext(project: Project, deps: Coll
                 for (environment in build.children.filter { it.isDirectory }) {
                     ProgressManager.checkCanceled()
                     for (environmentChild in environment.children.filter { it.isDirectory }) {
+                        ProgressManager.checkCanceled()
                         when (environmentChild.name) {
                             "consolidated" -> classRoots += environmentChild
                             "lib" -> environmentChild.findChild(depName)?.let { depEnvLib ->
