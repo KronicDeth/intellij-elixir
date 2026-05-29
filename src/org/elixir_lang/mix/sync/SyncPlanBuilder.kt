@@ -13,6 +13,8 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiManager
 import com.intellij.util.concurrency.ThreadingAssertions
 import com.intellij.util.concurrency.annotations.RequiresReadLock
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import org.elixir_lang.mix.Dep
 import org.elixir_lang.mix.watcher.TransitiveResolution.transitiveResolution
 import org.elixir_lang.mix.Project as MixProject
@@ -394,6 +396,7 @@ private suspend fun buildModuleDepsPlans(
     if (moduleNames.isEmpty()) return emptyList()
 
     return moduleNames.mapNotNull { moduleName ->
+        currentCoroutineContext().ensureActive()
         ProgressManager.checkCanceled()
         buildModuleDepsPlan(project, moduleName, requestedLibraryPlans)
     }
