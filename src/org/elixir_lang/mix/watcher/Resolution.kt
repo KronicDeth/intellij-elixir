@@ -3,7 +3,6 @@ package org.elixir_lang.mix.watcher
 import com.intellij.openapi.application.readAction
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
-import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiFile
@@ -31,7 +30,6 @@ class Resolution(
          * changed since the previous attempt, keeping restarts cheap.
          */
         suspend fun resolution(
-            project: Project,
             psiManager: PsiManager,
             progressIndicator: ProgressIndicator,
             vararg rootVirtualFiles: VirtualFile
@@ -58,7 +56,7 @@ class Resolution(
                            Module deps handle transitivity while Library deps don't */
                         if (dep.type == Dep.Type.LIBRARY) {
                             if (!depToRootVirtualFile.contains(dep)) {
-                                val depRootVirtualFile = dep.virtualFile(project)
+                                val depRootVirtualFile = dep.virtualFile(rootVirtualFile)
 
                                 depToRootVirtualFile[dep] = depRootVirtualFile
 
