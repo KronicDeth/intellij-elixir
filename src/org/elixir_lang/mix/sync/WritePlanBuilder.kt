@@ -11,6 +11,8 @@ import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.roots.impl.libraries.LibraryEx
 import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar
 import com.intellij.openapi.vfs.VfsUtilCore
+import com.intellij.util.concurrency.ThreadingAssertions
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.mix.library.Kind
 
 /**
@@ -106,7 +108,9 @@ internal suspend fun buildWritePlan(project: Project, syncPlan: SyncPlan): Write
 /**
  * Core snapshot + diff logic.  Must only be called from within [readAction] or write context.
  */
+@RequiresReadLock
 private fun buildWritePlanInCurrentContext(project: Project, syncPlan: SyncPlan): WritePlan {
+    ThreadingAssertions.assertReadAccess()
     val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
 
     // -----------------------------------------------------------------------
@@ -115,6 +119,7 @@ private fun buildWritePlanInCurrentContext(project: Project, syncPlan: SyncPlan)
     data class LibSnap(val isKind: Boolean, val classUrls: Set<String>, val sourceUrls: Set<String>)
     val libSnap: Map<String, LibSnap> = buildMap {
         for (lib in libraryTable.libraries) {
+            ProgressManager.checkCanceled()
             val name = lib.name ?: continue
             put(
                 name,
@@ -170,6 +175,7 @@ private fun buildWritePlanInCurrentContext(project: Project, syncPlan: SyncPlan)
     // configured with an older plugin version before root-scoped library naming was introduced.
     // Scoped replacements are created by the libraryWriteOps in Step 2 if a matching plan exists.
     for ((name, snap) in libSnap) {
+        ProgressManager.checkCanceled()
         if (snap.isKind && " [" !in name && name !in librariesToRemove) {
             librariesToRemove += name
         }
