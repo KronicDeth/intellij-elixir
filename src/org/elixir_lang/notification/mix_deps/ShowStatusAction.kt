@@ -18,8 +18,8 @@ import com.intellij.openapi.vfs.VirtualFile
 import org.elixir_lang.mix.DepsCheckerService
 import org.elixir_lang.mix.createMixDepsStatusRunConfiguration
 import org.elixir_lang.notification.setup_sdk.Notifier
-import org.elixir_lang.util.ElixirProjectDisposable
 import org.elixir_lang.sdk.elixir.findElixirSdkForRoot
+import org.elixir_lang.util.ElixirProjectDisposable
 
 class ShowStatusAction : NotificationAction("Run mix deps") {
     override fun actionPerformed(e: AnActionEvent, notification: Notification) {
@@ -81,7 +81,7 @@ class ShowStatusAction : NotificationAction("Run mix deps") {
     }
 
     private fun getProjectRoot(project: Project): VirtualFile? {
-        val contentRoots = ProjectRootManager.getInstance(project).contentRootsFromAllModules
+        val contentRoots = ProjectRootManager.getInstance(project).contentRoots
 
         return contentRoots.firstOrNull { root ->
             root.findChild("mix.exs") != null

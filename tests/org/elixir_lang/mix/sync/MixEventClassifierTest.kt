@@ -128,14 +128,6 @@ class MixEventClassifierTest : PlatformTestCase() {
         assertTrue(FileUtil.pathsEqual(realApp.path, result.single().path))
     }
 
-    fun testSelectTopLevelMixRoots_arrayOverload() {
-        val (appOne, appTwo) = MixTestFixtures.createSeparateRoots(myFixture, "arr_app_one", "arr_app_two")
-
-        val result = MixEventClassifier.selectTopLevelMixRoots(arrayOf(appOne, appTwo))
-        val resultPaths = result.map { it.path }.toSet()
-        assertEquals(setOf(appOne.path, appTwo.path), resultPaths)
-    }
-
     // ------------------------------------------------------------------
     // findAffectedMixRoots(candidateRoots, eventPaths) - internal overload
     //

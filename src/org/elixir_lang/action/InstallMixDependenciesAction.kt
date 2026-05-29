@@ -12,13 +12,13 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ProjectRootManager
-import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.util.Disposer
-import org.elixir_lang.mix.createInstallMixDependenciesRunConfiguration
+import com.intellij.openapi.vfs.VirtualFile
 import org.elixir_lang.mix.DepsCheckerService
+import org.elixir_lang.mix.createInstallMixDependenciesRunConfiguration
 import org.elixir_lang.notification.setup_sdk.Notifier
-import org.elixir_lang.util.ElixirProjectDisposable
 import org.elixir_lang.sdk.elixir.findElixirSdkForRoot
+import org.elixir_lang.util.ElixirProjectDisposable
 
 class InstallMixDependenciesAction : AnAction() {
     override fun actionPerformed(e: AnActionEvent) {
@@ -80,7 +80,7 @@ class InstallMixDependenciesAction : AnAction() {
     override fun isDumbAware(): Boolean = true
 
     private fun getProjectRoot(project: Project): VirtualFile? {
-        val contentRoots = ProjectRootManager.getInstance(project).contentRootsFromAllModules
+        val contentRoots = ProjectRootManager.getInstance(project).contentRoots
 
         // Find first root that has mix.exs
         return contentRoots.firstOrNull { root ->

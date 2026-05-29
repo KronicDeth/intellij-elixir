@@ -114,11 +114,4 @@ object MixEventClassifier {
             }
         }
     }
-
-    /**
-     * Array-accepting overload of [selectTopLevelMixRoots] for call sites using
-     * [com.intellij.openapi.roots.ProjectRootManager.contentRootsFromAllModules].
-     */
-    fun selectTopLevelMixRoots(roots: Array<out VirtualFile>): List<VirtualFile> =
-        selectTopLevelMixRoots(roots.asList())
 }

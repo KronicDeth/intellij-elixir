@@ -57,7 +57,7 @@ internal suspend fun resolvePathShapedRequests(project: Project, requests: List<
     readAction {
         val contentRootUrls = ProjectRootManager
             .getInstance(project)
-            .contentRootsFromAllModules
+            .contentRoots
             .mapTo(HashSet()) { it.url }
 
         requests.mapNotNull { request -> resolvePathShapedRequest(project, request, contentRootUrls) }
@@ -206,7 +206,7 @@ internal suspend fun buildSyncPlan(project: Project, requests: CoalescedRequests
                 // module content root (see resolvePathShapedRequest), so the firstOrNull lookup
                 // always succeeds in production.
                 val fromSyncRoots = requests.syncRoots.flatMap { syncRoot ->
-                    ProjectRootManager.getInstance(project).contentRootsFromAllModules
+                    ProjectRootManager.getInstance(project).contentRoots
                         .firstOrNull { it.url == syncRoot.contentRootUrl }
                         ?.findChild("deps")?.children?.toList()
                         ?: emptyList()
@@ -291,7 +291,7 @@ private suspend fun allDepRoots(project: Project): List<VirtualFile> =
     readAction {
         ProjectRootManager
             .getInstance(project)
-            .contentRootsFromAllModules
+            .contentRoots
             .flatMap { contentRoot -> contentRoot.findChild("deps")?.children?.toList() ?: emptyList() }
     }
 
@@ -538,7 +538,7 @@ internal fun buildLibraryRootsPlansInCurrentContext(project: Project, deps: Coll
     val allBuildRoots by lazy {
         ProjectRootManager
             .getInstance(project)
-            .contentRootsFromAllModules
+            .contentRoots
             .mapNotNull { it.findChild("_build") }
     }
 
