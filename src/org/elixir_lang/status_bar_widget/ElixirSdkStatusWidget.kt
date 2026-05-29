@@ -532,7 +532,7 @@ class ElixirSdkStatusWidget(@param:NotNull private val project: Project) : Custo
     /**
      * Finds the active Elixir SDK by scanning all Elixir modules.
      *
-     * Uses [Type.mostSpecificSdk] (module overload) which checks Facet SDK → module SDK → project SDK,
+     * Uses [ElixirSdkLookup.mostSpecificSdk] (module overload) which checks Facet SDK → module SDK → project SDK,
      * returning the first non-null result. This covers both Rich IDEs (JdkOrderEntry) and Small IDEs
      * (Facet library entry) without additional branching.
      *
