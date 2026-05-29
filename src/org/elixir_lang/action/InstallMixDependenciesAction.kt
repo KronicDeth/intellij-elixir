@@ -1,90 +1,50 @@
 package org.elixir_lang.action
 
-import com.intellij.execution.ExecutionListener
-import com.intellij.execution.ExecutionManager
-import com.intellij.execution.ProgramRunnerUtil
-import com.intellij.execution.RunManager
-import com.intellij.execution.executors.DefaultRunExecutor
-import com.intellij.execution.process.ProcessHandler
-import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.components.service
-import com.intellij.openapi.project.Project
-import com.intellij.openapi.roots.ProjectRootManager
-import com.intellij.openapi.util.Disposer
-import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.openapi.progress.currentThreadCoroutineScope
+import kotlinx.coroutines.launch
 import org.elixir_lang.mix.DepsCheckerService
 import org.elixir_lang.mix.createInstallMixDependenciesRunConfiguration
+import org.elixir_lang.mix.runner.runMixRunConfiguration
 import org.elixir_lang.notification.setup_sdk.Notifier
-import org.elixir_lang.sdk.elixir.findElixirSdkForRoot
-import org.elixir_lang.util.ElixirProjectDisposable
 
 class InstallMixDependenciesAction : AnAction() {
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return
+        val fileHint = e.getData(CommonDataKeys.VIRTUAL_FILE)
 
-        val projectRoot = getProjectRoot(project)
-        if (projectRoot == null) {
-            Notifier.mixDepsError(project, project.name, "Could not determine project root directory")
-            return
-        }
-
-        val sdk = findElixirSdkForRoot(project, projectRoot)
-        if (sdk == null) {
-            Notifier.mixDepsNoSdk(project, projectRoot.name)
-            return
-        }
-
-        try {
-            val settings = createInstallMixDependenciesRunConfiguration(project, projectRoot)
-            if (settings == null) {
-                Notifier.mixDepsError(project, projectRoot.name, "Could not determine module for ${projectRoot.path}")
-                return
-            }
-
-            val runManager = RunManager.getInstance(project)
-            runManager.setTemporaryConfiguration(settings)
-            runManager.selectedConfiguration = settings
-
-            val listenerDisposable = Disposer.newDisposable("mix-deps-install-listener")
-            Disposer.register(ElixirProjectDisposable.getInstance(project), listenerDisposable)
-            project.messageBus.connect(listenerDisposable).subscribe(
-                ExecutionManager.EXECUTION_TOPIC,
-                object : ExecutionListener {
-                override fun processTerminated(
-                    executorId: String,
-                    env: ExecutionEnvironment,
-                    handler: ProcessHandler,
-                    exitCode: Int
-                ) {
-                    if (env.runProfile === settings.configuration) {
-                        project.service<DepsCheckerService>()
-                            .scheduleCheckNow("mix deps install completed")
-                        if (exitCode == 0) {
-                            Notifier.mixDepsInstallSuccess(project, projectRoot.name)
-                        } else {
-                            Notifier.mixDepsInstallError(project, projectRoot.name, "Non-zero exit code")
-                        }
-                        Disposer.dispose(listenerDisposable)
+        currentThreadCoroutineScope().launch {
+            runMixRunConfiguration(
+                project = project,
+                fileHint = fileHint,
+                createSettings = ::createInstallMixDependenciesRunConfiguration,
+                listenerDisposableName = "mix-deps-install-listener",
+                onNoRoot = {
+                    Notifier.mixDepsError(project, project.name, "Could not determine project root directory")
+                },
+                onNoSdk = { rootName ->
+                    Notifier.mixDepsNoSdk(project, rootName)
+                },
+                onNoModule = { rootName, rootPath ->
+                    Notifier.mixDepsError(project, rootName, "Could not determine module for $rootPath")
+                },
+                onProcessTerminated = { exitCode, rootName ->
+                    project.service<DepsCheckerService>().scheduleCheckNow("mix deps install completed")
+                    if (exitCode == 0) {
+                        Notifier.mixDepsInstallSuccess(project, rootName)
+                    } else {
+                        Notifier.mixDepsInstallError(project, rootName, "Non-zero exit code")
                     }
+                },
+                onException = { rootName, message ->
+                    Notifier.mixDepsInstallError(project, rootName, message)
                 }
-            })
-
-            ProgramRunnerUtil.executeConfiguration(settings, DefaultRunExecutor.getRunExecutorInstance())
-        } catch (e: Exception) {
-            Notifier.mixDepsInstallError(project, projectRoot.name, e.message ?: "Unknown error")
+            )
         }
     }
 
     override fun isDumbAware(): Boolean = true
-
-    private fun getProjectRoot(project: Project): VirtualFile? {
-        val contentRoots = ProjectRootManager.getInstance(project).contentRoots
-
-        // Find first root that has mix.exs
-        return contentRoots.firstOrNull { root ->
-            root.findChild("mix.exs") != null
-        } ?: contentRoots.firstOrNull()
-    }
 }

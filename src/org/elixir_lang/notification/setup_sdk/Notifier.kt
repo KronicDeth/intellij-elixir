@@ -7,6 +7,7 @@ import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.vfs.VirtualFile
 import org.elixir_lang.sdk.erlang_dependent.ErlangSdkResult
 import org.elixir_lang.sdk.erlang_dependent.MissingErlangSdkReason
 import org.elixir_lang.sdk.elixir.SdkSettingsOpener
@@ -124,7 +125,7 @@ object Notifier {
     }
 
     // Mix Dependencies notification methods
-    fun mixDepsOutdated(project: Project, moduleName: String) {
+    fun mixDepsOutdated(project: Project, root: VirtualFile) {
         if (mixDepsNotifications.containsKey(project)) {
             return
         }
@@ -133,12 +134,12 @@ object Notifier {
             .getInstance()
             .getNotificationGroup(MIX_DEPS_GROUP_ID)
             .createNotification(
-                "$MIX_DEPS_OUTDATED_TITLE ($moduleName)",
+                "$MIX_DEPS_OUTDATED_TITLE (${root.name})",
                 "Mix deps reported missing, outdated, or uncompiled deps",
                 NotificationType.WARNING
             )
-            .addAction(org.elixir_lang.notification.mix_deps.InstallAction())
-            .addAction(org.elixir_lang.notification.mix_deps.ShowStatusAction())
+            .addAction(org.elixir_lang.notification.mix_deps.InstallAction(root))
+            .addAction(org.elixir_lang.notification.mix_deps.ShowStatusAction(root))
             .whenExpired { mixDepsNotifications.remove(project) }
         mixDepsNotifications[project] = notification
         notification.notify(project)
