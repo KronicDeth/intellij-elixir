@@ -53,7 +53,6 @@ import org.elixir_lang.sdk.elixir.ElixirSdkLookup
 import org.elixir_lang.sdk.elixir.Type
 import org.elixir_lang.sdk.erlang.ErlangVersionDetector
 import org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData
-import org.elixir_lang.sdk.wsl.wslCompat
 import java.nio.file.Path
 import java.util.concurrent.CancellationException
 import kotlin.time.Duration.Companion.milliseconds
@@ -899,39 +898,26 @@ class ElixirEditorBasedSdkWidget(
 
     private fun configureSdkFromMise(project: Project, miseAssignments: Map<String, MiseVersions>) {
         runWithModalProgressBlocking(ModalTaskOwner.project(project), "Configuring Elixir SDK from mise") {
-            // Collect content roots so Linux install paths returned by WSL-side mise
-            // (e.g. /home/steve/.local/share/mise/installs/erlang/23.3.4.20) can be
-            // converted to the Windows UNC form that SdkRegistrar and WslCompatService expect
-            // (e.g. \\wsl.localhost\ItronUbuntu\home\steve\.local\share\mise\installs\erlang\23.3.4.20).
-            val contentRootByModule: Map<String, Path?> = readAction {
-                miseAssignments.keys.associateWith { name ->
-                    ModuleManager.getInstance(project).findModuleByName(name)
-                        ?.let { ModuleRootManager.getInstance(it).contentRoots.firstOrNull()?.toNioPathOrNull() }
-                }
-            }
-
             // Register unique (erlang, elixir) install-path combinations once each.
-            // Deduplication key = resolved elixir install path (post Linux→UNC conversion)
-            // so that multiple modules sharing the same mise config register the SDK only once.
+            // Deduplication key = Elixir install path so that multiple modules sharing the same
+            // resolved tool-manager config register the SDK only once.
             val elixirSdkByInstallPath = mutableMapOf<String, Sdk>()
 
-            for ((moduleName, miseVersions) in miseAssignments) {
+            for (miseVersions in miseAssignments.values) {
                 val elixirEntry = miseVersions.elixir ?: continue
-                val contentRoot = contentRootByModule[moduleName]
-                val resolvedElixirPath = resolveInstallPathForWsl(elixirEntry.installPath, contentRoot)
-                if (resolvedElixirPath in elixirSdkByInstallPath) continue
+                val elixirPath = elixirEntry.installPath
+                if (elixirPath in elixirSdkByInstallPath) continue
 
                 val erlangSdk = miseVersions.erlang?.let { erlang ->
-                    val resolvedErlangPath = resolveInstallPathForWsl(erlang.installPath, contentRoot)
-                    SdkRegistrar.registerOrUpdateErlangSdk(resolvedErlangPath)
+                    SdkRegistrar.registerOrUpdateErlangSdk(erlang.installPath)
                 }
                 val elixirSdk = SdkRegistrar.registerOrUpdateElixirSdk(
-                    homePath = resolvedElixirPath,
+                    homePath = elixirPath,
                     erlangSdk = erlangSdk,
                     project = project,
                 ) ?: continue
 
-                elixirSdkByInstallPath[resolvedElixirPath] = elixirSdk
+                elixirSdkByInstallPath[elixirPath] = elixirSdk
             }
 
             if (elixirSdkByInstallPath.isEmpty()) return@runWithModalProgressBlocking
@@ -940,9 +926,7 @@ class ElixirEditorBasedSdkWidget(
             edtWriteAction {
                 for ((moduleName, miseVersions) in miseAssignments) {
                     val elixirEntry = miseVersions.elixir ?: continue
-                    val contentRoot = contentRootByModule[moduleName]
-                    val resolvedElixirPath = resolveInstallPathForWsl(elixirEntry.installPath, contentRoot)
-                    val elixirSdk = elixirSdkByInstallPath[resolvedElixirPath] ?: continue
+                    val elixirSdk = elixirSdkByInstallPath[elixirEntry.installPath] ?: continue
                     val module = ModuleManager.getInstance(project).findModuleByName(moduleName)
                         ?.takeIf { !it.isDisposed } ?: continue
 
@@ -960,28 +944,6 @@ class ElixirEditorBasedSdkWidget(
 
             EditorNotifications.getInstance(project).updateAllNotifications()
         }
-    }
-
-    /**
-     * Converts a Linux absolute path (e.g. `/home/steve/.local/share/mise/installs/elixir/1.11.3`)
-     * to the Windows UNC form expected by [SdkRegistrar] and `wslCompat`
-     * (e.g. `\\wsl.localhost\ItronUbuntu\home\steve\.local\share\mise\installs\elixir\1.11.3`).
-     *
-     * The WSL distribution is inferred from [contentRoot], which must be a Windows UNC path for
-     * a WSL filesystem (e.g. `\\wsl.localhost\ItronUbuntu\home\steve\workspace\intelliconnect`).
-     *
-     * Returns [installPath] unchanged when:
-     * - it is not a Linux absolute path (does not start with `/`),
-     * - [contentRoot] is null,
-     * - [contentRoot] is not a WSL UNC path, or
-     * - the distribution cannot be resolved or the conversion fails.
-     */
-    private fun resolveInstallPathForWsl(installPath: String, contentRoot: Path?): String {
-        if (!installPath.startsWith("/")) return installPath
-        val contentRootStr = contentRoot?.toString() ?: return installPath
-        if (!wslCompat.isWslUncPath(contentRootStr)) return installPath
-        val distribution = wslCompat.getDistributionByWindowsUncPath(contentRootStr) ?: return installPath
-        return wslCompat.convertLinuxPathToWindowsUnc(distribution, installPath) ?: installPath
     }
 
     /**
