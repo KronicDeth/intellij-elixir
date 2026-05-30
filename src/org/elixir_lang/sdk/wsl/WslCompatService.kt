@@ -212,6 +212,32 @@ interface WslCompatService {
     fun convertLinuxPathToWindowsUnc(distribution: WSLDistribution, linuxPath: String?): String?
 
     /**
+     * Converts a Linux absolute path (for example `/home/user/.local/share/mise/...`) to a canonical Windows UNC path
+     * by inferring the WSL distribution from a known WSL UNC context path.
+     *
+     * Returns `null` when:
+     * - [contextWindowsUncPath] is empty or not a WSL UNC path,
+     * - [linuxPath] is not a Linux absolute path,
+     * - the WSL distribution cannot be inferred, or
+     * - conversion fails.
+     */
+    fun convertLinuxPathToWindowsUncFromContext(contextWindowsUncPath: String, linuxPath: String): String? {
+        if (!linuxPath.startsWith("/")) return null
+        if (!isWslUncPath(contextWindowsUncPath)) return null
+        val distribution = getDistributionByWindowsUncPath(contextWindowsUncPath) ?: return null
+        return convertLinuxPathToWindowsUnc(distribution, linuxPath)
+    }
+
+    /**
+     * Best-effort variant of [convertLinuxPathToWindowsUncFromContext].
+     *
+     * Returns [linuxPath] unchanged when conversion cannot be performed.
+     */
+    fun maybeConvertLinuxPathToWindowsUncFromContext(contextWindowsUncPath: String, linuxPath: String): String {
+        return convertLinuxPathToWindowsUncFromContext(contextWindowsUncPath, linuxPath) ?: linuxPath
+    }
+
+    /**
      * Detects if the command line runs on WSL, caches the result, and returns the distribution.
      */
     private fun determineDistribution(commandLine: GeneralCommandLine): WSLDistribution? {
