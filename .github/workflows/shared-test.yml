@@ -66,7 +66,7 @@ jobs:
 
       - name: Run Tests
         id: test
-        run: ./gradlew --stacktrace check
+        run: ./gradlew -Dtestlogger.theme=standard -Dorg.gradle.console=plain --stacktrace check
 
       - name: Publish Test Results
         id: publish-test-results-linux
@@ -85,6 +85,58 @@ jobs:
           files: '**/build/test-results/**/*.xml'
           check_name: Test Results (${{ matrix.os }}, ${{ matrix.idea-version }})
           report_suite_logs: "error"
+
+      - name: Summarize first failed tests
+        id: summarize-failed-tests
+        if: always()
+        run: |
+          PYTHON_BIN="$(command -v python3 || command -v python || true)"
+          [ -n "$PYTHON_BIN" ] || exit 0
+
+          "$PYTHON_BIN" - <<'PY'
+          import glob
+          import os
+          import xml.etree.ElementTree as ET
+
+          MAX_FAILURES = 10
+          seen = set()
+          failed = []
+
+          files = glob.glob("**/build/test-results/**/*.xml", recursive=True)
+          if not files:
+              raise SystemExit(0)
+
+          for path in files:
+              try:
+                  root = ET.parse(path).getroot()
+              except Exception:
+                  continue
+
+              for tc in root.iter("testcase"):
+                  if tc.find("failure") is None and tc.find("error") is None:
+                      continue
+
+                  classname = " ".join(tc.get("classname", "<unknown>").split())
+                  testname = " ".join(tc.get("name", "<unknown>").split())
+                  item = (classname, testname)
+                  if item in seen:
+                      continue
+
+                  seen.add(item)
+                  failed.append(item)
+                  if len(failed) >= MAX_FAILURES:
+                      break
+
+              if len(failed) >= MAX_FAILURES:
+                  break
+
+          if not failed:
+              raise SystemExit(0)
+
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as s:
+              s.write("### Failed tests (max 10)\n\n")
+              s.writelines(f"- `{cls}.{name}`\n" for cls, name in failed)
+          PY
 
       - name: Upload Test Reports (on failure or when requested)
         id: upload-test-reports
