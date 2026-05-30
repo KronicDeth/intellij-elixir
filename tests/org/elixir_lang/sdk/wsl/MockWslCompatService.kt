@@ -3,6 +3,8 @@ package org.elixir_lang.sdk.wsl
 import com.intellij.execution.wsl.WSLDistribution
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.util.system.OS
+import org.jetbrains.annotations.TestOnly
+import org.mockito.Mockito
 
 /**
  * Mock implementation of WslCompatService for testing purposes.
@@ -11,7 +13,12 @@ import com.intellij.util.system.OS
  * without requiring WSL installation. In production, the real WslCompatServiceImpl
  * is used, while in tests this mock can be injected.
  */
-class MockWslCompatService : WslCompatService {
+@TestOnly
+class MockWslCompatService(
+    private val distributionOverride: ((String?) -> WSLDistribution?)? = null,
+    private val conversionOverride: ((WSLDistribution, String?) -> String?)? = null,
+    private val canonicalWslPrefixOverride: String? = null,
+) : WslCompatService {
     override val log = Logger.getInstance(MockWslCompatService::class.java)
 
     override fun isWslUncPath(path: String?): Boolean {
@@ -30,6 +37,8 @@ class MockWslCompatService : WslCompatService {
     }
 
     override fun getDistributionByWindowsUncPath(path: String?): WSLDistribution? {
+        distributionOverride?.let { return it(path) }
+
         if (!isWslUncPath(path)) {
             return null
         }
@@ -42,8 +51,8 @@ class MockWslCompatService : WslCompatService {
             else -> "WSL"
         }
 
-        return org.mockito.Mockito.mock(WSLDistribution::class.java).also {
-            org.mockito.Mockito.`when`(it.msId).thenReturn(distroName)
+        return Mockito.mock(WSLDistribution::class.java).also {
+            Mockito.`when`(it.msId).thenReturn(distroName)
         }
     }
 
@@ -99,12 +108,20 @@ class MockWslCompatService : WslCompatService {
     }
 
     override fun convertLinuxPathToWindowsUnc(distribution: WSLDistribution, linuxPath: String?): String? {
+        conversionOverride?.let { return it(distribution, linuxPath) }
+
         if (linuxPath.isNullOrEmpty()) {
             return null
         }
 
-        // Mock implementation returns a Windows UNC path
-        return "\\\\wsl.localhost\\${distribution.msId}$linuxPath"
+        // Mock implementation returns a well-formed Windows UNC path
+        val linuxAsWindows = linuxPath.replace('/', '\\')
+        val converted = "\\\\wsl.localhost\\${distribution.msId}$linuxAsWindows"
+        return try {
+            canonicalizePath(converted)
+        } catch (_: Exception) {
+            converted
+        }
     }
 
     override fun convertSingleWslPath(windowsPath: String, distribution: WSLDistribution): String? {
@@ -126,12 +143,25 @@ class MockWslCompatService : WslCompatService {
         return null
     }
 
-    override fun canonicalizePath(path: String, currentOs: OS): String = when {
-        currentOs != OS.Windows -> path
+    // Only performs prefix normalization (\\wsl$\ ↔ \\wsl.localhost\) without calling toRealPath(),
+    // since test paths don't exist on the filesystem.
+    override fun canonicalizePath(path: String, currentOs: OS): String {
+        val forcedPrefix = canonicalWslPrefixOverride
+        if (forcedPrefix != null) {
+            return when {
+                forcedPrefix == MODERN_WSL_PREFIX -> path.replacePrefix(LEGACY_WSL_PREFIX, MODERN_WSL_PREFIX)
+                forcedPrefix == LEGACY_WSL_PREFIX -> path.replacePrefix(MODERN_WSL_PREFIX, LEGACY_WSL_PREFIX)
+                else -> path
+            }
+        }
 
-        currentOs.isAtLeast(11, 0) ->
-            path.replacePrefix(LEGACY_WSL_PREFIX, MODERN_WSL_PREFIX)
+        return when {
+            currentOs != OS.Windows -> path
 
-        else -> path.replacePrefix(MODERN_WSL_PREFIX, LEGACY_WSL_PREFIX)
+            currentOs.isAtLeast(11, 0) ->
+                path.replacePrefix(LEGACY_WSL_PREFIX, MODERN_WSL_PREFIX)
+
+            else -> path.replacePrefix(MODERN_WSL_PREFIX, LEGACY_WSL_PREFIX)
+        }
     }
 }

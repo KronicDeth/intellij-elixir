@@ -90,7 +90,13 @@ internal class WslCompatServiceImpl : WslCompatService {
         return try {
             // Delegate to native IntelliJ API
             val wslPath = WslPath(distribution.msId, linuxPath)
-            wslPath.toWindowsUncPath()
+            val converted = wslPath.toWindowsUncPath()
+            try {
+                canonicalizePath(converted)
+            } catch (e: Exception) {
+                log.debug("Failed to canonicalize converted WSL path '$converted'; using raw converted path", e)
+                converted
+            }
         } catch (e: Exception) {
             log.debug("Error converting Linux path to Windows UNC: $linuxPath", e)
             null
