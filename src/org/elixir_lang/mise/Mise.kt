@@ -9,6 +9,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.util.concurrency.ThreadingAssertions
 import com.intellij.util.concurrency.annotations.RequiresBackgroundThread
+import org.elixir_lang.sdk.wsl.wslCompat
 import org.jetbrains.annotations.VisibleForTesting
 import java.nio.file.Path
 
@@ -67,7 +68,7 @@ object Mise {
     private const val TIMEOUT_MS = 10_000
 
     /**
-     * Invokes `mise ls --local --json` in `workDir` and parses the result.
+     * Invokes `mise ls --local --json` in [workDir] and parses the result.
      *
      * Returns `null` if mise is not on PATH, returns a non-zero exit code, times out, or
      * produces output that cannot be parsed. Callers should treat `null` as "mise unavailable".
@@ -83,7 +84,7 @@ object Mise {
         ThreadingAssertions.assertBackgroundThread()
         check(!ApplicationManager.getApplication().holdsReadLock()) {
             "Mise.resolveVersions() must not be called under a read lock - " +
-            "it spawns a subprocess that blocks for up to ${TIMEOUT_MS}ms"
+                    "it spawns a subprocess that blocks for up to ${TIMEOUT_MS}ms"
         }
         return try {
             val commandLine = GeneralCommandLine("mise", "ls", "--local", "--json")
@@ -96,7 +97,7 @@ object Mise {
                 return null
             }
 
-            parseOutput(output.stdout)
+            parseOutput(output.stdout, workDir)
         } catch (e: Exception) {
             LOG.debug("mise ls --local --json failed in $workDir: ${e.message}")
             null
@@ -111,7 +112,7 @@ object Mise {
      * `internal` for testing - use [Mise.resolveVersions] in production code.
      */
     @VisibleForTesting
-    internal fun parseOutput(json: String): MiseVersions? {
+    internal fun parseOutput(json: String, workDir: Path): MiseVersions? {
         return try {
             val gson = GsonBuilder()
                 .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
@@ -124,11 +125,11 @@ object Mise {
 
             val elixir = allTools["elixir"]
                 ?.firstOrNull { it.installed == true && it.active == true }
-                ?.toMiseToolEntry()
+                ?.toMiseToolEntry(workDir)
 
             val erlang = allTools["erlang"]
                 ?.firstOrNull { it.installed == true && it.active == true }
-                ?.toMiseToolEntry()
+                ?.toMiseToolEntry(workDir)
 
             MiseVersions(elixir, erlang)
         } catch (e: Exception) {
@@ -137,9 +138,11 @@ object Mise {
         }
     }
 
-    private fun RawMiseEntry.toMiseToolEntry(): MiseToolEntry? {
+    private fun RawMiseEntry.toMiseToolEntry(workDir: Path): MiseToolEntry? {
         val v = version ?: return null
-        val ip = install_path ?: return null
+        val ip = install_path?.let {
+            wslCompat.maybeConvertLinuxPathToWindowsUncFromContext(workDir.toString(), it)
+        } ?: return null
         return MiseToolEntry(
             version = v,
             requestedVersion = requested_version ?: v,

@@ -1,6 +1,7 @@
 package org.elixir_lang.mise
 
 import org.elixir_lang.PlatformTestCase
+import java.nio.file.Path
 
 /**
  * Tests for [Mise.parseOutput] (internal).
@@ -8,6 +9,7 @@ import org.elixir_lang.PlatformTestCase
  * Pure with no IDE dependencies, so no sandbox setup is needed.
  */
 class MiseTest : PlatformTestCase() {
+    private val workDir: Path = Path.of(".")
 
     // -------------------------------------------------------------------------
     // parseOutput
@@ -21,7 +23,7 @@ class MiseTest : PlatformTestCase() {
             }
         """.trimIndent()
 
-        val result = Mise.parseOutput(json)
+        val result = Mise.parseOutput(json, workDir)
 
         assertNotNull(result)
         assertNotNull(result!!.elixir)
@@ -38,7 +40,7 @@ class MiseTest : PlatformTestCase() {
             }
         """.trimIndent()
 
-        val result = Mise.parseOutput(json)
+        val result = Mise.parseOutput(json, workDir)
 
         assertNotNull(result)
         assertNotNull(result!!.elixir)
@@ -52,7 +54,7 @@ class MiseTest : PlatformTestCase() {
             }
         """.trimIndent()
 
-        val result = Mise.parseOutput(json)
+        val result = Mise.parseOutput(json, workDir)
 
         assertNotNull(result)
         assertNull(result!!.elixir)
@@ -61,7 +63,7 @@ class MiseTest : PlatformTestCase() {
     }
 
     fun testParseOutput_emptyObject_returnsBothNull() {
-        val result = Mise.parseOutput("{}")
+        val result = Mise.parseOutput("{}", workDir)
 
         assertNotNull(result)
         assertNull(result!!.elixir)
@@ -79,7 +81,7 @@ class MiseTest : PlatformTestCase() {
             }
         """.trimIndent()
 
-        val result = Mise.parseOutput(json)
+        val result = Mise.parseOutput(json, workDir)
 
         assertNotNull(result)
         assertEquals("1.13.4", result!!.elixir!!.version)
@@ -92,7 +94,7 @@ class MiseTest : PlatformTestCase() {
             }
         """.trimIndent()
 
-        val result = Mise.parseOutput(json)
+        val result = Mise.parseOutput(json, workDir)
 
         assertNotNull(result)
         assertNull(result!!.elixir)
@@ -105,7 +107,7 @@ class MiseTest : PlatformTestCase() {
             }
         """.trimIndent()
 
-        val result = Mise.parseOutput(json)
+        val result = Mise.parseOutput(json, workDir)
 
         assertNotNull(result)
         assertNull(result!!.elixir)
@@ -119,7 +121,7 @@ class MiseTest : PlatformTestCase() {
             }
         """.trimIndent()
 
-        val result = Mise.parseOutput(json)
+        val result = Mise.parseOutput(json, workDir)
 
         assertNotNull(result)
         assertNotNull(result!!.elixir)
@@ -134,7 +136,7 @@ class MiseTest : PlatformTestCase() {
             }
         """.trimIndent()
 
-        val result = Mise.parseOutput(json)
+        val result = Mise.parseOutput(json, workDir)
 
         assertNotNull(result)
         assertNull(result!!.elixir)
@@ -147,18 +149,18 @@ class MiseTest : PlatformTestCase() {
             }
         """.trimIndent()
 
-        val result = Mise.parseOutput(json)
+        val result = Mise.parseOutput(json, workDir)
 
         assertNotNull(result)
         assertNull(result!!.elixir)
     }
 
     fun testParseOutput_emptyString_returnsNull() {
-        assertNull(Mise.parseOutput(""))
+        assertNull(Mise.parseOutput("", workDir))
     }
 
     fun testParseOutput_malformedJson_returnsNull() {
-        assertNull(Mise.parseOutput("not json at all {{{"))
+        assertNull(Mise.parseOutput("not json at all {{{", workDir))
     }
 
     fun testParseOutput_sourceFieldPresent_populatedCorrectly() {
@@ -168,7 +170,7 @@ class MiseTest : PlatformTestCase() {
             }
         """.trimIndent()
 
-        val result = Mise.parseOutput(json)
+        val result = Mise.parseOutput(json, workDir)
 
         assertNotNull(result)
         assertEquals("file", result!!.elixir!!.sourceType)
@@ -182,7 +184,7 @@ class MiseTest : PlatformTestCase() {
             }
         """.trimIndent()
 
-        val result = Mise.parseOutput(json)
+        val result = Mise.parseOutput(json, workDir)
 
         assertNotNull(result)
         assertNull(result!!.elixir!!.sourceType)

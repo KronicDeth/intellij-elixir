@@ -72,7 +72,12 @@ object ElixirVersionDetector {
         if (!resolvedVersion.isNullOrBlank()) {
             return resolvedVersion
         }
-        val canonicalHome = wslCompat.canonicalizePath(sdkHome)
+        val canonicalHome = try {
+            wslCompat.canonicalizePath(sdkHome)
+        } catch (e: Exception) {
+            LOG.debug("Failed to canonicalize Elixir SDK home '$sdkHome'; using raw path", e)
+            sdkHome
+        }
         return runWithEdtGuard("Detecting Elixir SDK version...") {
             readElixirAppVersion(canonicalHome)
         }
