@@ -9,7 +9,8 @@ import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_
 object Comprehension {
     fun ifToMacroStringDeclaredScope(term: OtpErlangObject, scope: Scope): MacroStringDeclaredScope? =
             ifTag(term, "bc") { toMacroStringDeclaredScope(it, scope) } ?:
-            ifTag(term, "lc") { toMacroStringDeclaredScope(it, scope) }
+            ifTag(term, "lc") { toMacroStringDeclaredScope(it, scope) } ?:
+            ifTag(term, "mc") { toMacroStringDeclaredScope(it, scope) }
 
     fun toMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope): MacroStringDeclaredScope {
         val (qualifiersMacroString, qualifiersDeclaredScope) = qualifiersMacroStringDeclaredScope(term, scope)
