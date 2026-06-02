@@ -57,7 +57,7 @@ private data class RawMiseSource(
 /**
  * Integrates with [mise](https://mise.jdx.dev/) to resolve tool versions for the current project.
  *
- * Shells out to `mise ls --local --json` using the module content root as the working directory,
+ * Shells out to `mise ls --current --json` using the module content root as the working directory,
  * which causes mise to apply its normal walk-up resolution rules (.tool-versions, mise.toml, etc.)
  * for that directory.
  *
@@ -68,7 +68,7 @@ object Mise {
     private const val TIMEOUT_MS = 10_000
 
     /**
-     * Invokes `mise ls --local --json` in [workDir] and parses the result.
+     * Invokes `mise ls --current --json` in [workDir] and parses the result.
      *
      * Returns `null` if mise is not on PATH, returns a non-zero exit code, times out, or
      * produces output that cannot be parsed. Callers should treat `null` as "mise unavailable".
@@ -86,20 +86,27 @@ object Mise {
             "Mise.resolveVersions() must not be called under a read lock - " +
                     "it spawns a subprocess that blocks for up to ${TIMEOUT_MS}ms"
         }
+        LOG.trace("resolveVersions: invoked for workDir=$workDir")
         return try {
-            val commandLine = GeneralCommandLine("mise", "ls", "--local", "--json")
+            val commandLine = GeneralCommandLine("mise", "ls", "--current", "--json")
                 .withWorkDirectory(workDir.toFile())
+            LOG.trace("resolveVersions: running '${commandLine.commandLineString}' in $workDir")
             val handler = CapturingProcessHandler(commandLine)
             val output = handler.runProcess(TIMEOUT_MS)
 
+            LOG.trace("resolveVersions: exit=${output.exitCode}, stdout.length=${output.stdout.length}, stderr.length=${output.stderr.length}")
             if (output.exitCode != 0) {
-                LOG.debug("mise ls --local --json exited with ${output.exitCode} in $workDir: ${output.stderr.take(200)}")
+                LOG.debug("mise ls --current --json exited with ${output.exitCode} in $workDir: ${output.stderr.take(200)}")
                 return null
             }
 
-            parseOutput(output.stdout, workDir)
+            LOG.trace("resolveVersions: stdout=${output.stdout.take(500)}")
+            val result = parseOutput(output.stdout, workDir)
+            LOG.trace("resolveVersions: parsed result=$result")
+            result
         } catch (e: Exception) {
-            LOG.debug("mise ls --local --json failed in $workDir: ${e.message}")
+            LOG.debug("mise ls --current --json failed in $workDir: ${e.message}")
+            LOG.trace("resolveVersions: exception class=${e::class.simpleName} message=${e.message}")
             null
         }
     }
