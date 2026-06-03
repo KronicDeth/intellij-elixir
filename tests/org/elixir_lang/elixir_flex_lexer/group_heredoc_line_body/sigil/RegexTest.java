@@ -8,7 +8,7 @@ import org.junit.runners.Parameterized;
 import java.util.Collection;
 
 /**
- * Created by luke.imhoff on 9/3/14.
+ * Created by kadie.enheduanna.inanna on 9/3/14.
  */
 @RunWith(Parameterized.class)
 public class RegexTest extends PromoterTest {

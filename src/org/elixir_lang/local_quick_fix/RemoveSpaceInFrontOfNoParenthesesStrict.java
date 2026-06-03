@@ -9,7 +9,7 @@ import com.intellij.psi.text.BlockSupport;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Created by luke.imhoff on 12/7/14.
+ * Created by kadie.enheduanna.inanna on 12/7/14.
  */
 public class RemoveSpaceInFrontOfNoParenthesesStrict extends LocalQuickFixOnPsiElement {
     /*

@@ -3,7 +3,7 @@ package org.elixir_lang.lexer;
 import com.intellij.psi.tree.IElementType;
 
 /**
- * Created by luke.imhoff on 8/19/14.
+ * Created by kadie.enheduanna.inanna on 8/19/14.
  */
 public class Stack {
     private final java.util.Stack<StackFrame> stack = new java.util.Stack<>();

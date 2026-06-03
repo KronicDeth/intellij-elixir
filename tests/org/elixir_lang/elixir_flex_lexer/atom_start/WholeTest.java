@@ -14,7 +14,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Created by luke.imhoff on 9/28/14.
+ * Created by kadie.enheduanna.inanna on 9/28/14.
  */
 @RunWith(Theories.class)
 public class WholeTest extends org.elixir_lang.elixir_flex_lexer.Test {

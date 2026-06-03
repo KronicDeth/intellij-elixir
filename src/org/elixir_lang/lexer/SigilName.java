@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by luke.imhoff on 8/20/14.
+ * Created by kadie.enheduanna.inanna on 8/20/14.
  */
 public class SigilName {
     public static IElementType elementType(char sigilName) {

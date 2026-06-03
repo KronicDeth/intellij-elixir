@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Created by luke.imhoff on 8/2/14.
+ * Created by kadie.enheduanna.inanna on 8/2/14.
  */
 public class ElixirSyntaxHighlighterFactory extends SyntaxHighlighterFactory implements SyntaxHighlighterProvider {
     @NotNull

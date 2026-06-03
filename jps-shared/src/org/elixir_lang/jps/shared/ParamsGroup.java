@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Luke Imhoff
+ * Copyright 2016 Kadie Enheduanna Inanna
  * Copyright 2000-2011 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");

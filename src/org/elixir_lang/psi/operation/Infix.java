@@ -6,7 +6,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * A binary operator with a left operand, operator, and right operand
  *
- * Created by luke.imhoff on 3/18/15.
+ * Created by kadie.enheduanna.inanna on 3/18/15.
  */
 public interface Infix extends Operation {
   /**

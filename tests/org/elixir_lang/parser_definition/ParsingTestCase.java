@@ -13,7 +13,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Created by luke.imhoff on 8/7/14.
+ * Created by kadie.enheduanna.inanna on 8/7/14.
  */
 public abstract class ParsingTestCase extends com.intellij.testFramework.ParsingTestCase {
     public ParsingTestCase() {

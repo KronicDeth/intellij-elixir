@@ -1,7 +1,7 @@
 package org.elixir_lang.parser_definition;
 
 /**
- * Created by luke.imhoff on 11/22/14.
+ * Created by kadie.enheduanna.inanna on 11/22/14.
  */
 public class ListParsingTestCase extends ParsingTestCase {
     public void testEmptyParentheses() {

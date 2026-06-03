@@ -16,7 +16,7 @@ import org.junit.ComparisonFailure
 import java.io.IOException
 
 /**
- * Created by luke.imhoff on 12/31/14.
+ * Created by kadie.enheduanna.inanna on 12/31/14.
  */
 object Quoter {
     /* remote name is Elixir.IntellijElixir.Quoter because all aliases in Elixir look like atoms prefixed with

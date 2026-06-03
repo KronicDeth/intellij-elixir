@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 /**
- * Created by luke.imhoff on 2/4/15.
+ * Created by kadie.enheduanna.inanna on 2/4/15.
  */
 public interface Parent extends PsiLanguageInjectionHost, PsiElement {
     @NotNull
