@@ -15,7 +15,7 @@ import com.intellij.openapi.vfs.VirtualFile
 import org.elixir_lang.mix.project.CANONICAL_FOLDER_MARKS
 import org.elixir_lang.mix.project.FolderMark
 import org.elixir_lang.isElixirMixModule
-import org.elixir_lang.sdk.elixir.findAllActiveElixirSdks
+import org.elixir_lang.sdk.elixir.ElixirSdkLookup
 import org.elixir_lang.sdk.elixir.Type as ElixirSdkType
 
 private val LOG = logger<ReconfigureModuleSetupAction>()
@@ -46,7 +46,7 @@ class ReconfigureModuleSetupAction : AnAction() {
         // Enable when at least one module has a mix.exs in its content root,
         // or any module has an active Elixir SDK configured.
         val hasElixirModule = ModuleManager.getInstance(project).modules.any { it.isElixirMixModule() }
-        val hasElixirSdk = findAllActiveElixirSdks(project).isNotEmpty()
+        val hasElixirSdk = ElixirSdkLookup.resolveAll(project).isNotEmpty()
 
         e.presentation.isEnabledAndVisible = hasElixirModule || hasElixirSdk
     }
