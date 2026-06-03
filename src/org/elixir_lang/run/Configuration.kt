@@ -13,9 +13,11 @@ import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.vfs.VfsUtil
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.debugger.settings.stepping.ModuleFilter
 import org.elixir_lang.mix.ensureMostSpecificSdk
 import org.elixir_lang.run.configuration.Module
+import org.elixir_lang.sdk.wsl.wslCompat
 import org.jdom.Element
 import java.io.File
 
@@ -224,6 +226,7 @@ abstract class Configuration(name: String, project: Project, configurationFactor
     override fun getValidModules(): Collection<com.intellij.openapi.module.Module> =
             project.let { ModuleManager.getInstance(it) }.modules.asList()
 
+    @RequiresReadLock
     fun sdkPaths(): List<String> = ensureModule().sdkPaths()
 
     protected val _envs = mutableMapOf<String, String>()
@@ -244,13 +247,11 @@ private fun ensureModule(workingDirectory: String, project: Project): com.intell
 private fun workingDirectory(module: com.intellij.openapi.module.Module): String? =
         ModuleRootManager.getInstance(module).contentRoots.firstOrNull()?.path
 
+@RequiresReadLock
 private fun com.intellij.openapi.module.Module.sdkPaths(): List<String> = ensureMostSpecificSdk(this).paths()
 
-private fun Sdk.paths(): List<String> {
-    val rawPaths = rootProvider.getFiles(OrderRootType.CLASSES).map { it.canonicalPath!! }
-    return if (org.elixir_lang.sdk.wsl.wslCompat.isWslUncPath(homePath)) {
-        rawPaths.map { org.elixir_lang.sdk.wsl.wslCompat.parseWindowsUncPath(it) ?: it }
-    } else {
-        rawPaths
-    }
-}
+@RequiresReadLock
+private fun Sdk.paths(): List<String> =
+        rootProvider.getFiles(OrderRootType.CLASSES)
+            .mapNotNull { it.canonicalPath }
+            .map { wslCompat.maybeParseWindowsUncPath(it) }

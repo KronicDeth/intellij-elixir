@@ -25,9 +25,11 @@ import com.intellij.execution.ExecutionException
 import com.intellij.execution.process.ProcessHandler
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.execution.ui.ExecutionConsole
-import com.intellij.icons.AllIcons
 import com.intellij.execution.wsl.WSLDistribution
+import com.intellij.icons.AllIcons
+import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.components.service
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileTypes.FileType
@@ -49,6 +51,11 @@ import com.intellij.xdebugger.evaluation.EvaluationMode
 import com.intellij.xdebugger.evaluation.XDebuggerEditorsProvider
 import com.intellij.xdebugger.evaluation.XDebuggerEvaluator
 import com.intellij.xdebugger.frame.XSuspendContext
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import org.elixir_lang.ElixirFileType
 import org.elixir_lang.beam.chunk.lines.file_names.Index
 import org.elixir_lang.beam.term.inspect
@@ -56,7 +63,6 @@ import org.elixir_lang.debugger.configuration.Debuggable
 import org.elixir_lang.debugger.configuration.doNotInterpretPatterns
 import org.elixir_lang.debugger.line_breakpoint.Handler
 import org.elixir_lang.debugger.line_breakpoint.Properties
-import org.elixir_lang.debugger.node.Exception as NodeException
 import org.elixir_lang.debugger.node.ProcessSnapshot
 import org.elixir_lang.debugger.node.event.Listener
 import org.elixir_lang.debugger.node.ok_error_reason.ErrorReason
@@ -68,20 +74,21 @@ import org.elixir_lang.run.ensureWorkingDirectory
 import org.elixir_lang.util.ElixirCoroutineService
 import org.elixir_lang.util.supervisedChildScope
 import org.elixir_lang.utils.ElixirModulesUtil.elixirModuleNameToErlang
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
 import java.util.*
+import java.util.concurrent.Callable
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.system.measureNanoTime
+import org.elixir_lang.debugger.node.Exception as NodeException
 
 class Process(session: XDebugSession, private val executionEnvironment: ExecutionEnvironment) :
     XDebugProcess(session), Listener {
+    companion object {
+        private val LOG = logger<Process>()
+    }
+
     private val projectCoroutineService = session.project.service<ElixirCoroutineService>()
 
     private val scope: CoroutineScope =
@@ -409,8 +416,12 @@ class Process(session: XDebugSession, private val executionEnvironment: Executio
             session.reportMessage("Interpreting modules... ", MessageType.INFO)
 
             val interpretationSeconds = measureNanoTime {
+                val sdkPaths = ReadAction.nonBlocking(Callable {
+                    debuggableConfiguration.let { it as Configuration }.sdkPaths()
+                }).executeSynchronously()
+
                 node.interpret(
-                    debuggableConfiguration.let { it as Configuration }.sdkPaths(),
+                    sdkPaths,
                     debuggableConfiguration.doNotInterpretPatterns()
                 )
             }.let { TimeUnit.NANOSECONDS.toSeconds(it) }
@@ -448,7 +459,14 @@ class Process(session: XDebugSession, private val executionEnvironment: Executio
             val initializer = initializers.poll()
 
             if (initializer != null) {
-                initializer()
+                try {
+                    initializer()
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    LOG.error("Debugger initializer failed", e)
+                    throw e
+                }
             }
         }
     }
