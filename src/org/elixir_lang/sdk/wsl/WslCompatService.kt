@@ -200,6 +200,15 @@ interface WslCompatService {
     fun parseWindowsUncPath(windowsUncPath: String?): String?
 
     /**
+     * Converts a Windows UNC path (e.g., //wsl.localhost/Ubuntu/usr/lib) to a Linux path (e.g., /usr/lib) or just returns the input string.
+     *
+     * @param possibleWindowsUncPath the Windows UNC path to convert
+     * @return the Linux path, or the input if the path is not a Windows UNC path.
+     */
+    fun maybeParseWindowsUncPath(possibleWindowsUncPath: String): String =
+            parseWindowsUncPath(possibleWindowsUncPath) ?: possibleWindowsUncPath
+
+    /**
      * Gets a list of available WSL distributions installed on the system.
      *
      * @return list of available WSL distributions, empty list if none found or WSL not available
