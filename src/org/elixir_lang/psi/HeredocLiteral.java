@@ -5,7 +5,7 @@ import com.intellij.psi.PsiElement;
 import java.util.List;
 
 /**
- * Created by luke.imhoff on 1/19/15.
+ * Created by kadie.enheduanna.inanna on 1/19/15.
  */
 public interface HeredocLiteral extends Parent, PsiElement, Quotable {
     ElixirHeredocPrefix getHeredocPrefix();

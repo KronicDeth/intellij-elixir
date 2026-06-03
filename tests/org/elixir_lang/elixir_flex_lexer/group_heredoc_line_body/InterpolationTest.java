@@ -13,7 +13,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 /**
- * Created by luke.imhoff on 9/2/14.
+ * Created by kadie.enheduanna.inanna on 9/2/14.
  */
 @RunWith(Parameterized.class)
 public class InterpolationTest extends TokenTest {

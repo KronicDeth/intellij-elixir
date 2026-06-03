@@ -3,7 +3,7 @@ package org.elixir_lang;
 import com.intellij.psi.tree.IElementType;
 
 /**
- * Created by luke.imhoff on 12/8/14.
+ * Created by kadie.enheduanna.inanna on 12/8/14.
  */
 public class TokenTypeState {
     public IElementType tokenType;

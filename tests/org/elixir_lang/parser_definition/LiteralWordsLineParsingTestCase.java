@@ -3,7 +3,7 @@ package org.elixir_lang.parser_definition;
 import java.lang.reflect.InvocationTargetException;
 
 /**
- * Created by luke.imhoff on 8/8/14.
+ * Created by kadie.enheduanna.inanna on 8/8/14.
  */
 public class LiteralWordsLineParsingTestCase extends ParsingTestCase {
     public void testBraces() {

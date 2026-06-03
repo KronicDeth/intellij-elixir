@@ -7,7 +7,7 @@ import java.io.IOException;
 import static org.junit.Assert.*;
 
 /**
- * Created by luke.imhoff on 9/8/14.
+ * Created by kadie.enheduanna.inanna on 9/8/14.
  */
 public abstract class TokenTest extends Test {
     /*

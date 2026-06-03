@@ -14,7 +14,7 @@ import java.util.List;
 import static org.junit.Assert.*;
 
 /**
- * Created by luke.imhoff on 9/1/14.
+ * Created by kadie.enheduanna.inanna on 9/1/14.
  */
 @RunWith(Parameterized.class)
 public class ResetTest extends Test {

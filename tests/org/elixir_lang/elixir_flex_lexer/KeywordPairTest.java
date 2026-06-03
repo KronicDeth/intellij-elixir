@@ -15,7 +15,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Created by luke.imhoff on 12/7/14.
+ * Created by kadie.enheduanna.inanna on 12/7/14.
  */
 @RunWith(Parameterized.class)
 public class KeywordPairTest extends Test {

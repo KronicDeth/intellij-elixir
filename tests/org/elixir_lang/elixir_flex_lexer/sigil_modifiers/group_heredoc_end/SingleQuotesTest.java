@@ -5,7 +5,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 /**
- * Created by luke.imhoff on 10/23/14.
+ * Created by kadie.enheduanna.inanna on 10/23/14.
  */
 @RunWith(Parameterized.class)
 public class SingleQuotesTest extends Test {

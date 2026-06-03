@@ -258,7 +258,7 @@ defmodule IntelliJElixir.Debugger.Server do
             #   nil, # export_vars
             #   [], # extra guards
             #   %{_: 2}, # counter
-            #   "/Users/luke.imhoff/github/C-S-D/alembic/lib/alembic/fetch/sort.ex" # file
+            #   "/Users/kadie.enheduanna.inanna/github/C-S-D/alembic/lib/alembic/fetch/sort.ex" # file
             # }
             # ```
             # but we know the correct erlang variable names from `elixir_variable_name_to_erlang_variable_name`, so
