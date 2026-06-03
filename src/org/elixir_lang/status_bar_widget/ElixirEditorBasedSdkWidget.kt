@@ -51,6 +51,7 @@ import org.elixir_lang.sdk.elixir.ElixirSdkValidation
 import org.elixir_lang.sdk.elixir.ElixirVersionDetector
 import org.elixir_lang.sdk.elixir.SdkSettingsOpener
 import org.elixir_lang.sdk.elixir.ElixirSdkLookup
+import org.elixir_lang.sdk.elixir.sdk
 import org.elixir_lang.sdk.elixir.Type
 import org.elixir_lang.sdk.erlang.ErlangVersionDetector
 import org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData
@@ -308,7 +309,7 @@ class ElixirEditorBasedSdkWidget(
 
     private fun buildModuleWidgetState(module: com.intellij.openapi.module.Module): WidgetState {
         LOG.trace("buildModuleWidgetState: ${module.name}")
-        val elixirSdk = ElixirSdkLookup.mostSpecificSdk(module)
+        val elixirSdk = ElixirSdkLookup.resolve(module).sdk
 
         // Determine whether to show module name in tooltip (only in multi-module projects).
         // Uses the cached count (refreshed on rootsChanged) to keep getWidgetState() O(1).
@@ -619,7 +620,7 @@ class ElixirEditorBasedSdkWidget(
     /**
      * Finds the active Elixir SDK by scanning all Elixir modules.
      *
-     * Uses [ElixirSdkLookup.mostSpecificSdk] (module overload) which checks Facet SDK → module SDK → project SDK,
+     * Uses [ElixirSdkLookup.resolve] (module overload) which checks Facet SDK → module SDK → project SDK,
      * returning the first non-null result. This covers both Rich IDEs (JdkOrderEntry) and Small IDEs
      * (Facet library entry) without additional branching.
      *
@@ -632,7 +633,7 @@ class ElixirEditorBasedSdkWidget(
         for (module in ModuleManager.getInstance(project).modules) {
             ProgressManager.checkCanceled()
             if (!module.isElixirModule()) continue
-            val moduleSdk = ElixirSdkLookup.mostSpecificSdk(module)
+            val moduleSdk = ElixirSdkLookup.resolve(module).sdk
             if (moduleSdk != null) return moduleSdk
         }
         return null
@@ -786,15 +787,25 @@ class ElixirEditorBasedSdkWidget(
     }
 
     private fun collectNotificationScanIoData(modelData: NotificationScanModelData): NotificationScanIoData {
-        val miseByContentRoot = modelData.moduleMiseCheckData
-            .mapNotNull { it.contentRoot }
-            .distinct()
-            .associateWith { contentRoot -> Mise.resolveVersions(contentRoot) }
+        val contentRoots = modelData.moduleMiseCheckData.mapNotNull { it.contentRoot }.distinct()
+        LOG.trace("collectNotificationScanIoData: ${contentRoots.size} content root(s) to check with mise: $contentRoots")
+
+        val miseByContentRoot = contentRoots
+            .associateWith { contentRoot ->
+                LOG.trace("collectNotificationScanIoData: calling Mise.resolveVersions for $contentRoot")
+                val result = Mise.resolveVersions(contentRoot)
+                LOG.trace("collectNotificationScanIoData: Mise.resolveVersions($contentRoot) = $result")
+                result
+            }
 
         val elixirVersionBySdk = modelData.moduleMiseCheckData
             .mapNotNull { it.elixirSdk }
             .distinct()
-            .associateWith { sdk -> Type.canonicalVersion(sdk) }
+            .associateWith { sdk ->
+                val v = Type.canonicalVersion(sdk)
+                LOG.trace("collectNotificationScanIoData: canonicalVersion(sdk='${sdk.name}') = $v")
+                v
+            }
 
         val erlangOtpMajorByHomePath = modelData.moduleMiseCheckData
             .mapNotNull { it.erlangSdkHomePath }
@@ -811,7 +822,9 @@ class ElixirEditorBasedSdkWidget(
             .mapNotNull { it.elixir?.installPath }
             .distinct()
             .associateWith { installPath ->
-                ElixirVersionDetector.elixirVersion(installPath, null)
+                val v = ElixirVersionDetector.elixirVersion(installPath, null)
+                LOG.trace("collectNotificationScanIoData: ElixirVersionDetector.elixirVersion('$installPath') = $v")
+                v
             }
 
         val classpathIssues = detectClasspathIssues(modelData.projectSdkSnapshot)
@@ -852,12 +865,13 @@ class ElixirEditorBasedSdkWidget(
         return ModuleManager.getInstance(project).modules
             .filter { it.isElixirModule() }
             .map { module ->
-                val elixirSdk = ElixirSdkLookup.mostSpecificSdk(module)
+                val elixirSdk = ElixirSdkLookup.resolve(module).sdk
                 val erlangSdk = elixirSdk?.let { getErlangSdk(it) }
                 val contentRoot = ModuleRootManager.getInstance(module)
                     .contentRoots
                     .firstOrNull()
                     ?.toNioPathOrNull()
+                LOG.trace("collectModuleMiseCheckData: module='${module.name}' elixirSdk='${elixirSdk?.name}' contentRoot=$contentRoot")
                 ModuleMiseCheckData(
                     moduleName = module.name,
                     elixirSdk = elixirSdk,
@@ -898,6 +912,7 @@ class ElixirEditorBasedSdkWidget(
     }
 
     private fun configureSdkFromMise(project: Project, miseAssignments: Map<String, MiseVersions>) {
+        LOG.trace("configureSdkFromMise: miseAssignments keys=${miseAssignments.keys}")
         runWithModalProgressBlocking(ModalTaskOwner.project(project), "Configuring Elixir SDK from mise") {
             // Register unique (erlang, elixir) install-path combinations once each.
             // Deduplication key = Elixir install path so that multiple modules sharing the same
@@ -910,33 +925,56 @@ class ElixirEditorBasedSdkWidget(
                 if (elixirPath in elixirSdkByInstallPath) continue
 
                 val erlangSdk = miseVersions.erlang?.let { erlang ->
+                    LOG.trace("configureSdkFromMise: registering Erlang SDK at '${erlang.installPath}'")
                     SdkRegistrar.registerOrUpdateErlangSdk(erlang.installPath)
                 }
+                LOG.trace("configureSdkFromMise: registering Elixir SDK at '$elixirPath' (erlang='${erlangSdk?.name}')")
                 val elixirSdk = SdkRegistrar.registerOrUpdateElixirSdk(
                     homePath = elixirPath,
                     erlangSdk = erlangSdk,
                     project = project,
-                ) ?: continue
-
+                )
+                if (elixirSdk == null) {
+                    LOG.warn("configureSdkFromMise: registerOrUpdateElixirSdk returned null for path '$elixirPath'")
+                    continue
+                }
+                LOG.trace("configureSdkFromMise: registered Elixir SDK '${elixirSdk.name}' for path '$elixirPath'")
                 elixirSdkByInstallPath[elixirPath] = elixirSdk
             }
 
-            if (elixirSdkByInstallPath.isEmpty()) return@runWithModalProgressBlocking
+            LOG.trace("configureSdkFromMise: elixirSdkByInstallPath keys=${elixirSdkByInstallPath.keys}")
+            if (elixirSdkByInstallPath.isEmpty()) {
+                LOG.warn("configureSdkFromMise: no SDKs registered, skipping module assignment")
+                return@runWithModalProgressBlocking
+            }
 
             // Assign per-module SDKs in a single write action.
             edtWriteAction {
                 for ((moduleName, miseVersions) in miseAssignments) {
-                    val elixirEntry = miseVersions.elixir ?: continue
-                    val elixirSdk = elixirSdkByInstallPath[elixirEntry.installPath] ?: continue
+                    val elixirEntry = miseVersions.elixir ?: run {
+                        LOG.trace("configureSdkFromMise: skipping '$moduleName' - no elixir entry in miseVersions")
+                        continue
+                    }
+                    val elixirSdk = elixirSdkByInstallPath[elixirEntry.installPath] ?: run {
+                        LOG.warn("configureSdkFromMise: SDK not found in elixirSdkByInstallPath for installPath='${elixirEntry.installPath}' (module='$moduleName')")
+                        continue
+                    }
                     val module = ModuleManager.getInstance(project).findModuleByName(moduleName)
-                        ?.takeIf { !it.isDisposed } ?: continue
+                        ?.takeIf { !it.isDisposed } ?: run {
+                        LOG.warn("configureSdkFromMise: module '$moduleName' not found or disposed")
+                        continue
+                    }
 
+                    LOG.trace("configureSdkFromMise: assigning SDK '${elixirSdk.name}' to module '$moduleName'")
                     val modifiableModel = ModuleRootManager.getInstance(module).modifiableModel
                     var committed = false
                     try {
                         modifiableModel.sdk = elixirSdk
                         modifiableModel.commit()
                         committed = true
+                        LOG.trace("configureSdkFromMise: committed SDK '${elixirSdk.name}' to module '$moduleName'")
+                    } catch (ex: Exception) {
+                        LOG.warn("configureSdkFromMise: failed to commit SDK '${elixirSdk.name}' to module '$moduleName'", ex)
                     } finally {
                         if (!committed) modifiableModel.dispose()
                     }
@@ -965,8 +1003,14 @@ class ElixirEditorBasedSdkWidget(
         val issues = mutableListOf<ModuleSdkIssue>()
 
         for (data in moduleDataList) {
-            val contentRoot = data.contentRoot ?: continue
-            val miseVersions = miseByContentRoot[contentRoot] ?: continue
+            val contentRoot = data.contentRoot ?: run {
+                LOG.trace("detectMiseSdkMismatchIssues: module='${data.moduleName}' skipped - no content root")
+                continue
+            }
+            val miseVersions = miseByContentRoot[contentRoot] ?: run {
+                LOG.trace("detectMiseSdkMismatchIssues: module='${data.moduleName}' skipped - no mise result for contentRoot=$contentRoot")
+                continue
+            }
 
             // Elixir version mismatch: configured SDK vs mise-resolved version
             val miseElixir = miseVersions.elixir
@@ -976,6 +1020,11 @@ class ElixirEditorBasedSdkWidget(
                 // This is the same source as the SDK version, so both sides are bare strings
                 // (e.g. "1.15.7") with no OTP suffix manipulation.
                 val miseVersion = elixirVersionByInstallPath[miseElixir.installPath]
+                LOG.trace(
+                    "detectMiseSdkMismatchIssues: module='${data.moduleName}' " +
+                            "configuredVersion=$configuredVersion miseVersion=$miseVersion " +
+                            "miseInstallPath=${miseElixir.installPath}"
+                )
                 if (configuredVersion != null && miseVersion != null && configuredVersion != miseVersion) {
                     LOG.info(
                         "Mise version mismatch in module '${data.moduleName}': " +

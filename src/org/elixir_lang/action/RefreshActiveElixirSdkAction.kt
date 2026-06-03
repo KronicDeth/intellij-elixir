@@ -2,15 +2,23 @@ package org.elixir_lang.action
 
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.application.ReadAction
+import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.platform.ide.progress.ModalTaskOwner
 import com.intellij.platform.ide.progress.runWithModalProgressBlocking
+import com.intellij.util.concurrency.ThreadingAssertions
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.notification.setup_sdk.Notifier
 import org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData
 import org.elixir_lang.sdk.elixir.Type as ElixirSdkType
-import org.elixir_lang.sdk.elixir.findAllActiveElixirSdks
+import org.elixir_lang.sdk.elixir.ElixirSdkLookup
 import org.elixir_lang.sdk.erlang.Type as ErlangSdkType
+import java.util.concurrent.Callable
+
+private val LOG = logger<RefreshActiveElixirSdkAction>()
 
 class RefreshActiveElixirSdkAction : AnAction() {
     override fun actionPerformed(e: AnActionEvent) {
@@ -19,14 +27,13 @@ class RefreshActiveElixirSdkAction : AnAction() {
         try {
             refreshElixirSdkPaths(project)
         } catch (ex: Exception) {
+            LOG.warn("Failed to refresh SDK paths (RefreshActiveElixirSdkAction)", ex)
             Notifier.sdkRefreshError(project, ex.message ?: "Unknown error")
         }
     }
 
     private fun refreshElixirSdkPaths(project: Project) {
-        // Find active SDKs in the project
-        val activeElixirSdks = findAllActiveElixirSdks(project)
-        val activeErlangSdks = getActiveErlangSdks(project)
+        val (activeElixirSdks, activeErlangSdks) = collectActiveSdks(project)
 
         val totalElixirSdks = activeElixirSdks.size
         val totalErlangSdks = activeErlangSdks.size
@@ -50,7 +57,7 @@ class RefreshActiveElixirSdkAction : AnAction() {
                 try {
                     refreshSingleElixirSdk(elixirSdk, elixirSdkType)
                     refreshedElixirCount++
-                } catch (ex: Exception) {
+                } catch (_: Exception) {
                     // Continue with other SDKs if one fails
                     continue
                 }
@@ -61,7 +68,7 @@ class RefreshActiveElixirSdkAction : AnAction() {
                 try {
                     refreshSingleErlangSdk(erlangSdk, erlangSdk.sdkType as ErlangSdkType)
                     refreshedErlangCount++
-                } catch (ex: Exception) {
+                } catch (_: Exception) {
                     // Continue with other SDKs if one fails
                     continue
                 }
@@ -86,11 +93,19 @@ class RefreshActiveElixirSdkAction : AnAction() {
 
     override fun isDumbAware(): Boolean = true
 
-    // Utility functions to detect active Erlang SDKs
-    private fun getActiveErlangSdks(project: Project): Set<Sdk> {
+    private fun collectActiveSdks(project: Project): Pair<Set<Sdk>, Set<Sdk>> =
+        ReadAction.nonBlocking(Callable {
+            val elixirSdks = ElixirSdkLookup.resolveAll(project)
+            Pair(elixirSdks, collectActiveErlangSdks(elixirSdks))
+        }).executeSynchronously()
+
+    // Must be called under a read action: SdkAdditionalData.getErlangSdk() resolves via ErlangSdkResolver.
+    @RequiresReadLock
+    private fun collectActiveErlangSdks(elixirSdks: Set<Sdk>): Set<Sdk> {
+        ThreadingAssertions.assertReadAccess()
         val activeSdks = mutableSetOf<Sdk>()
-        // Erlang SDKs referenced by active Elixir SDKs
-        for (elixirSdk in findAllActiveElixirSdks(project)) {
+        for (elixirSdk in elixirSdks) {
+            ProgressManager.checkCanceled()
             val additionalData = elixirSdk.sdkAdditionalData as? SdkAdditionalData
             val erlangSdk = additionalData?.getErlangSdk()
             if (erlangSdk != null) activeSdks.add(erlangSdk)

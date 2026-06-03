@@ -14,7 +14,6 @@ import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar
 import com.intellij.openapi.ui.Messages
 import com.intellij.platform.ide.progress.runWithModalProgressBlocking
 import org.elixir_lang.notification.setup_sdk.Notifier
-import org.elixir_lang.sdk.ProcessOutput
 import org.elixir_lang.sdk.elixir.Type as ElixirSdkType
 import org.elixir_lang.sdk.erlang.Type as ErlangSdkType
 
@@ -29,6 +28,7 @@ class DeleteAllSdksAction : AnAction() {
         try {
             removeAllElixirAndErlangSdks(project)
         } catch (ex: Exception) {
+            LOG.warn("Failed to refresh SDK paths (DeleteAllSdksAction)", ex)
             Notifier.sdkRefreshError(project, "Error removing SDKs: ${ex.message ?: "Unknown error"}")
         }
     }
@@ -72,21 +72,21 @@ class DeleteAllSdksAction : AnAction() {
         // Remove SDKs and their associated libraries using modal progress with proper threading
         val sdksRemoved = runWithModalProgressBlocking(project, "Removing All Elixir/Erlang SDKs") {
             var removedCount = 0
-            
+
             edtWriteAction {
                 LOG.info("Starting removal of ${allTargetSdks.size} SDK(s) and associated libraries")
-                
+
                 for (sdk in allTargetSdks) {
                     try {
                         LOG.debug("Removing SDK and library: ${sdk.name}")
-                        
+
                         // First remove associated library (like the SDK listeners do)
                         removeAssociatedLibrary(sdk)
-                        
+
                         // Then remove the SDK itself
                         projectJdkTable.removeJdk(sdk)
                         removedCount++
-                        
+
                         LOG.debug("Successfully removed SDK and library: ${sdk.name}")
                     } catch (ex: Exception) {
                         LOG.error("Failed to remove SDK: ${sdk.name}", ex)
@@ -96,7 +96,7 @@ class DeleteAllSdksAction : AnAction() {
                 }
                 LOG.info("Completed removal of $removedCount SDK(s) and associated libraries")
             }
-            
+
             removedCount
         }
 
@@ -105,7 +105,7 @@ class DeleteAllSdksAction : AnAction() {
             NotificationGroupManager.getInstance()
                 .getNotificationGroup("Elixir")
                 .createNotification(
-                    "Elixir SDKs Removed Successfully",
+                    "Elixir SDKs removed successfully",
                     "Successfully removed $sdksRemoved SDK${if (sdksRemoved == 1) "" else "s"} (${elixirSdks.size} Elixir, ${erlangSdks.size} Erlang) from the IDE.",
                     NotificationType.INFORMATION
                 )
@@ -121,7 +121,7 @@ class DeleteAllSdksAction : AnAction() {
     override fun isDumbAware(): Boolean = true
 
     override fun getActionUpdateThread(): ActionUpdateThread = ActionUpdateThread.BGT
-    
+
     /**
      * Removes the library associated with an SDK, following the same pattern as the SDK listeners
      * in sdks/Configurable.kt
@@ -130,7 +130,7 @@ class DeleteAllSdksAction : AnAction() {
         try {
             val libraryTable = LibraryTablesRegistrar.getInstance().libraryTable
             val library = libraryTable.getLibraryByName(sdk.name)
-            
+
             if (library != null) {
                 LOG.debug("Removing associated library: ${sdk.name}")
                 libraryTable.removeLibrary(library)
