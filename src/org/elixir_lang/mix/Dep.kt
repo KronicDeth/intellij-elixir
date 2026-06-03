@@ -1,7 +1,6 @@
 package org.elixir_lang.mix
 
 import com.intellij.openapi.vfs.LocalFileSystem
-import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiElement
 import org.elixir_lang.errorreport.Logger
@@ -18,15 +17,37 @@ data class Dep(val application: String, val path: String, val type: Type = Type.
      * Resolves the virtual file for this dependency relative to [moduleRoot].
      *
      * [path] is typically "deps/<name>" (relative) or an absolute path from a `path:` option.
-     * Relative paths are resolved against [moduleRoot]; absolute paths fall back to
-     * [VfsUtil.findFile] which handles paths like "/home/user/external_lib".
+     * Relative paths (including ones with `../` traversal like `"../../../exc1"`) are first
+     * resolved via [VirtualFile.findFileByRelativePath]; if that fails (e.g. because parent
+     * directories above the content root are not yet in the VFS), the path is resolved against
+     * [moduleRoot]'s filesystem path using [java.nio.file.Path] before attempting a
+     * [LocalFileSystem.refreshAndFindFileByPath] lookup.
      *
      * @param moduleRoot The content root of the module that declared this dependency.
      * @return The VirtualFile for the dep directory, or null if not found.
      */
-    fun virtualFile(moduleRoot: VirtualFile): VirtualFile? =
-        moduleRoot.findFileByRelativePath(path)
-            ?: LocalFileSystem.getInstance().refreshAndFindFileByPath(path)
+    fun virtualFile(moduleRoot: VirtualFile): VirtualFile? {
+        // First try VFS traversal - VirtualFile.findFileByRelativePath handles ../ by walking up
+        // via getParent(), so this works whenever the ancestor directories are in the VFS.
+        moduleRoot.findFileByRelativePath(path)?.let { return it }
+
+        // Compute an absolute path for the fallback refresh.
+        // For absolute paths (Unix "/" or Windows "C:\") use as-is.
+        // For relative paths, resolve against the module root's *filesystem* path so that
+        // directories above the content root (not tracked by the VFS) can still be found.
+        // Passing a bare relative path like "../../../exc1" to refreshAndFindFileByPath
+        // is meaningless because the method has no working-directory context.
+        val absolutePath: String = if (java.io.File(path).isAbsolute) {
+            path
+        } else {
+            try {
+                java.nio.file.Path.of(moduleRoot.path).resolve(path).normalize().toString()
+            } catch (_: Throwable) {
+                return null
+            }
+        }
+        return LocalFileSystem.getInstance().refreshAndFindFileByPath(absolutePath)
+    }
 
     enum class Type {
         LIBRARY,
