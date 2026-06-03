@@ -16,10 +16,11 @@ import org.elixir_lang.console.ElixirConsoleUtil
 import org.elixir_lang.notification.setup_sdk.Notifier
 import org.elixir_lang.run.ElixirProcessHandler
 import org.elixir_lang.run.WslSafeCommandLineState
-import org.elixir_lang.sdk.elixir.ElixirSdkLookup.mostSpecificSdk
+import org.elixir_lang.sdk.elixir.ElixirSdkLookup
+import org.elixir_lang.sdk.elixir.sdk
 
 @RequiresReadLock
-fun ensureMostSpecificSdk(module: Module): Sdk = mostSpecificSdk(module) ?: throw MissingSdk(module)
+fun ensureMostSpecificSdk(module: Module): Sdk = ElixirSdkLookup.resolve(module).sdk ?: throw MissingSdk(module)
 
 /**
  * https://github.com/ignatov/intellij-erlang/blob/master/src/org/intellij/erlang/rebar/runner/RebarRunningState.java

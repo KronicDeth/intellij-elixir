@@ -12,11 +12,12 @@ import org.elixir_lang.exunit.Configuration
 import org.elixir_lang.file.containsFileWithSuffix
 import org.elixir_lang.mix.Project
 import org.elixir_lang.psi.ElixirFile
+import org.elixir_lang.sdk.elixir.ElixirSdkLookup
 import org.elixir_lang.sdk.elixir.Type
-import org.elixir_lang.sdk.elixir.ElixirSdkLookup.mostSpecificSdk
+import org.elixir_lang.sdk.elixir.sdk
 import java.io.File
 
-class MixExUnitRunConfigurationProducer :
+internal class MixExUnitRunConfigurationProducer :
     LazyRunConfigurationProducer<Configuration>() {
     override fun getConfigurationFactory(): ConfigurationFactory = Factory
 
@@ -128,7 +129,7 @@ private fun setupConfigurationFromContextImpl(
         is PsiDirectory -> {
             val module = ModuleUtilCore.findModuleForPsiElement(psiElement)
             val sdk = if (module != null) {
-                mostSpecificSdk(module)
+                ElixirSdkLookup.resolve(module).sdk
             } else {
                 val projectRootManager = ProjectRootManager.getInstance(psiElement.project)
                 projectRootManager.projectSdk

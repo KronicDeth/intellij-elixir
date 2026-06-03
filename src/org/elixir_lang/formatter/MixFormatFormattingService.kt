@@ -13,17 +13,17 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.PsiFile
-import org.elixir_lang.Elixir.elixirSdkHasErlangSdk
 import org.elixir_lang.Mix
 import org.elixir_lang.code_style.CodeStyleSettings
 import org.elixir_lang.mix.Project as MixProject
 import org.elixir_lang.psi.ElixirFile
-import org.elixir_lang.sdk.elixir.ElixirSdkLookup.mostSpecificSdk
+import org.elixir_lang.sdk.elixir.ElixirSdkLookup
+import org.elixir_lang.sdk.elixir.sdk
 import java.io.FileNotFoundException
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.Callable
 
-class MixFormatFormattingService : AsyncDocumentFormattingService() {
+internal class MixFormatFormattingService : AsyncDocumentFormattingService() {
 
     override fun canFormat(file: PsiFile): Boolean =
         file is ElixirFile &&
@@ -41,7 +41,7 @@ class MixFormatFormattingService : AsyncDocumentFormattingService() {
         val project = formattingContext.project
 
         val workingDirectory = workingDirectory(psiFile) ?: return null
-        val sdk = ReadAction.nonBlocking(Callable { mostSpecificSdk(psiFile)?.takeIf(::elixirSdkHasErlangSdk) }).executeSynchronously() ?: return null
+        val sdk = ReadAction.nonBlocking(Callable { ElixirSdkLookup.resolveWithErlang(psiFile).sdk }).executeSynchronously() ?: return null
 
         // Build the command line in createFormattingTask() (must be fast and EDT-safe;
         // in sync/headless mode may still run on caller thread). Defer OSProcessHandler

@@ -7,7 +7,9 @@ import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.vfs.VirtualFile
+import org.elixir_lang.sdk.elixir.ElixirSdkResolution
 import org.elixir_lang.sdk.erlang_dependent.ErlangSdkResult
 import org.elixir_lang.sdk.erlang_dependent.MissingErlangSdkReason
 import org.elixir_lang.sdk.elixir.SdkSettingsOpener
@@ -301,5 +303,32 @@ object Notifier {
             missingErlangSdkNotifications[project] = notification
         }
         notification.notify(project)
+    }
+}
+
+/**
+ * Fires the appropriate setup-SDK notification and returns the [Sdk] or null.
+ *
+ * - [ElixirSdkResolution.Ready] → returns the SDK, no notification.
+ * - [ElixirSdkResolution.MissingElixirSdk] → fires [Notifier.error] "Missing module Elixir SDK".
+ * - [ElixirSdkResolution.MissingErlangSdk] → delegates to [Notifier.elixirSdkMissingErlangDependency]
+ *   (deduplicated per-project, rich reason details).
+ *
+ * Callers that want custom failure handling (e.g. a different return type) should `when`-match
+ * the [ElixirSdkResolution] directly and avoid calling this function.
+ */
+fun ElixirSdkResolution.sdkOrNotify(module: Module): Sdk? = when (this) {
+    is ElixirSdkResolution.Ready -> sdk
+    is ElixirSdkResolution.MissingElixirSdk -> {
+        Notifier.error(
+            module,
+            "Missing module Elixir SDK",
+            "There is no configured Elixir SDK for the module ${module.name} or its project ${module.project.name}"
+        )
+        null
+    }
+    is ElixirSdkResolution.MissingErlangSdk -> {
+        Notifier.elixirSdkMissingErlangDependency(module.project, detail)
+        null
     }
 }

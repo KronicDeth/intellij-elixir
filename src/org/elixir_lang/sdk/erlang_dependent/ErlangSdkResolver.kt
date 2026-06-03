@@ -51,7 +51,7 @@ interface ErlangSdkResolver {
  *    self-heals by writing the resolved path back to `erlangSdkHomePath` so future lookups use path
  * 3. Both absent → NOT_CONFIGURED
  */
-class DefaultErlangSdkResolver : ErlangSdkResolver {
+internal class DefaultErlangSdkResolver : ErlangSdkResolver {
     override fun resolveErlangSdkResult(elixirSdk: Sdk, sdkModel: SdkModel?): ErlangSdkResult {
         val elixirName = elixirSdk.name
         val additionalData = elixirSdk.elixirAdditionalData
