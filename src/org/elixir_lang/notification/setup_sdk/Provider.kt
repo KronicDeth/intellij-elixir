@@ -17,11 +17,12 @@ import org.elixir_lang.ElixirFileType
 import org.elixir_lang.ElixirLanguage
 import org.elixir_lang.sdk.ProcessOutput
 import org.elixir_lang.sdk.elixir.ElixirSdkLookup
+import org.elixir_lang.sdk.elixir.sdk
 import org.elixir_lang.sdk.elixir.Type
 import java.util.function.Function
 import javax.swing.JComponent
 
-class Provider : EditorNotificationProvider {
+internal class Provider : EditorNotificationProvider {
     override fun collectNotificationData(
         project: Project,
         file: VirtualFile,
@@ -36,7 +37,7 @@ class Provider : EditorNotificationProvider {
 
         val module = ModuleUtilCore.findModuleForPsiElement(psiFile)
 
-        val sdk = module?.let { ElixirSdkLookup.mostSpecificSdk(it) } ?: ElixirSdkLookup.mostSpecificSdk(project)
+        val sdk = module?.let { ElixirSdkLookup.resolve(it).sdk } ?: ElixirSdkLookup.resolve(project).sdk
         if (sdk != null) return null
 
         // No SDK configured. Mise-based suggestion is handled by the status bar widget's
