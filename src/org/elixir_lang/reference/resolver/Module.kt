@@ -1,15 +1,11 @@
 package org.elixir_lang.reference.resolver
 
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.module.ModuleUtil
 import com.intellij.openapi.project.DumbService
-import com.intellij.openapi.roots.ProjectRootManager
-import com.intellij.openapi.roots.impl.LibraryScopeCache
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiElementResolveResult
 import com.intellij.psi.ResolveResult
 import com.intellij.psi.impl.source.resolve.ResolveCache
-import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
 import org.elixir_lang.psi.Alias
 import org.elixir_lang.psi.NamedElement
@@ -103,30 +99,7 @@ object Module : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Modul
         val project = entrance.project
 
         if (!DumbService.isDumb(project)) {
-            val projectFileIndex = ProjectRootManager.getInstance(project).fileIndex
-            val module = ModuleUtil.findModuleForPsiElement(entrance)
-            // MUST use `originalFile` to get the PsiFile with a VirtualFile for decompiled elements
-            val entranceVirtualFile = entrance.containingFile.originalFile.virtualFile
-
-            val globalSearchScope = if (module != null) {
-                val includeTests = entranceVirtualFile?.let { projectFileIndex.isInTestSourceContent(it) } ?: false
-                // DOES NOT include the libraries sources, but...
-                val moduleWithDependenciesAndLibrariesScope =
-                    GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(module, includeTests)
-
-                entranceVirtualFile?.let {
-                    // ... we prefer sources compared to decompiled, so use LibraryScope to get the Library source too.
-                    val orderEntries = projectFileIndex.getOrderEntriesForFile(entranceVirtualFile)
-                    val libraryScope =
-                        LibraryScopeCache
-                            .getInstance(project)
-                            .getLibraryScope(orderEntries)
-
-                    moduleWithDependenciesAndLibrariesScope.uniteWith(libraryScope)
-                } ?: moduleWithDependenciesAndLibrariesScope
-            } else {
-                GlobalSearchScope.allScope(project)
-            }
+            val searchScope = narrowedScope(entrance, project)
 
             StubIndex
                 .getInstance()
@@ -134,7 +107,7 @@ object Module : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Modul
                     ModularName.KEY,
                     name,
                     project,
-                    globalSearchScope,
+                    searchScope,
                     null,
                     NamedElement::class.java
                 ) { namedElement ->

@@ -19,6 +19,6 @@ public class Atom implements ResolveCache.PolyVariantResolver<org.elixir_lang.re
         ElixirAtom element = atom.getElement();
         Resolvable resolvable = resolvable(element);
 
-        return resolvable.resolve(element.getProject());
+        return resolvable.resolve(element);
     }
 }
