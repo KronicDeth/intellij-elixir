@@ -1,6 +1,7 @@
 package org.elixir_lang.mix.library
 
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.roots.libraries.DummyLibraryProperties
 import com.intellij.openapi.roots.libraries.LibraryType
 import com.intellij.openapi.roots.libraries.NewLibraryConfiguration
@@ -11,7 +12,7 @@ import org.elixir_lang.mix.Icons
 import javax.swing.Icon
 import javax.swing.JComponent
 
-class Type : LibraryType<DummyLibraryProperties>(Kind) {
+internal class Type : LibraryType<DummyLibraryProperties>(Kind) {
     override fun getCreateActionName(): String? = null
     override fun createNewLibrary(parentComponent: JComponent, contextDirectory: VirtualFile?, project: Project): NewLibraryConfiguration? = null
     override fun createPropertiesEditor(editorComponent: LibraryEditorComponent<DummyLibraryProperties>): LibraryPropertiesEditor? = null
@@ -24,6 +25,14 @@ class Type : LibraryType<DummyLibraryProperties>(Kind) {
         }
 
     override fun getIcon(properties: DummyLibraryProperties?): Icon = Icons.LIBRARY
+
+    /**
+     * Show both class roots (ebin/*.beam) AND source roots (lib/ **/*.ex) in the
+     * External Libraries tree.  The platform default is [OrderRootType.CLASSES] only,
+     * which hides the .ex sources even when they are attached to the library.
+     */
+    override fun getExternalRootTypes(): Array<OrderRootType> =
+        arrayOf(OrderRootType.CLASSES, OrderRootType.SOURCES)
 }
 
 private val CLASS_ROOT_NAMES = arrayOf("consolidated", "ebin")
