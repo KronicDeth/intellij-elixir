@@ -12,6 +12,7 @@ import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
+import com.intellij.workspaceModel.ide.JpsProjectLoadingManager
 import com.intellij.openapi.projectRoots.ProjectJdkTable
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.roots.JdkOrderEntry
@@ -37,7 +38,6 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.onStart
 import org.elixir_lang.Facet
 import org.elixir_lang.Icons
 import org.elixir_lang.isElixirModule
@@ -179,17 +179,40 @@ class ElixirEditorBasedSdkWidget(
     )
 
     init {
-        // Cancel the notification scan collector when this widget instance is disposed.
-        // This mirrors the semantics of the platform's own debounce collector in
-        // EditorBasedStatusBarPopup (which uses @Internal cancelOnDispose).  Without this,
-        // multiframe widget instances would leave behind active collectors until project close.
+        // Trigger the initial notification scan only after the JPS project model sync completes.
+        //
+        // At startup the platform loads the workspace model from a cache, then runs the
+        // `DelayedProjectSynchronizer` project activity which reads the actual .iml and
+        // jdk.table.xml files from disk and applies them to the workspace model.  This sync
+        // takes several seconds (WSL projects: 5–13 s).  Any SDK assignment we commit before
+        // the sync completes is overwritten when the sync applies the persisted .iml state.
+        //
+        // `JpsProjectLoadingManager.jpsProjectLoaded` fires immediately if the JPS model is
+        // already loaded, or after `DelayedProjectSynchronizer` finishes otherwise.  This
+        // guarantees the workspace model is stable (reflects the on-disk .iml) before we show
+        // the notification or let the user click an action.
+        //
+        // `JpsProjectLoadingManager` is @ApiStatus.Internal + @Deprecated in favour of
+        // `WorkspaceModelInternal.awaitSynchronizationWithJpsModel`.  We cannot use the
+        // replacement because it is both @ApiStatus.Experimental *and* absent from the 2025.3
+        // platform (verified: not present in tag idea/253.28294.334).  Since pluginSinceBuild
+        // is 253, using it directly would throw NoSuchMethodError on 2025.3.
+        // JpsProjectLoadingManager works across all supported versions (253 through 261+)
+        // and is the documented mechanism for this use case ("add a missing SDK").
+        // The Python plugin (PySdkFromEnvironmentVariableConfigurator) uses it for the same
+        // purpose.
+        @Suppress("UnstableApiUsage", "DEPRECATION")
+        scope.launch {
+            suspendCancellableCoroutine<Unit> { cont ->
+                JpsProjectLoadingManager.getInstance(project).jpsProjectLoaded {
+                    cont.resumeWith(Result.success(Unit))
+                }
+            }
+            notificationScanRequests.tryEmit(Unit)
+        }
+
         val notificationScanJob = scope.launch {
             notificationScanRequests
-                // Emit a synthetic Unit on start so the initial scan fires ~500 ms after the
-                // coroutine starts (same debounce path as a rootsChanged event), without waiting
-                // for the first external trigger.  onStart { emit(Unit) } is safe here because
-                // we are already inside the subscribed collector, so the event is not dropped.
-                .onStart { emit(Unit) }
                 .debounce(500.milliseconds)  // slightly longer than widget debounce since notifications are less urgent
                 // Use `collect` (not `collectLatest`) deliberately: if events arrive while a scan
                 // is running, they queue in the debounce operator and trigger one follow-up scan
@@ -225,9 +248,10 @@ class ElixirEditorBasedSdkWidget(
                     )
                 }
         }
-        // Bind job lifecycle to widget disposal using only public Disposer API.
-        // When dispose() is called on this widget, the registered child cancels the job.
-        // When the job completes naturally, it disposes the child to avoid leaking Disposer entries.
+        // Cancel the notification scan collector when this widget instance is disposed.
+        // This mirrors the semantics of the platform's own debounce collector in
+        // EditorBasedStatusBarPopup (which uses @Internal cancelOnDispose).  Without this,
+        // multiframe widget instances would leave behind active collectors until project close.
         val jobDisposable = Disposer.newDisposable("ElixirEditorBasedSdkWidget.notificationScanJob")
         Disposer.register(this, jobDisposable)
         notificationScanJob.invokeOnCompletion { Disposer.dispose(jobDisposable) }
