@@ -27,6 +27,7 @@ import org.elixir_lang.psi.impl.keywordValue
 import org.elixir_lang.psi.impl.siblingExpressions
 import org.elixir_lang.psi.scope.WhileIn.whileIn
 import org.elixir_lang.psi.stub.type.call.Stub.isModular
+import org.elixir_lang.reference.resolver.narrowedScope
 import org.elixir_lang.structure_view.element.Callback
 import org.elixir_lang.structure_view.element.Delegation
 
@@ -94,7 +95,7 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
     protected abstract fun executeOnException(element: Call, state: ResolveState): Boolean
 
     /**
-     * Called on every [Call] where [org.elixir_lang.mix.Generator.isEmbed] is `true`.
+     * Called on every [Call] where [org.elixir_lang.psi.mix.Generator.isEmbed] is `true`.
      *
      * @return `true` to keep searching up tree; `false` to stop searching.
      */
@@ -144,7 +145,7 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
                     Import.treeWalkUp(element, state) { call, accResolveState ->
                         execute(call, accResolveState)
                     }
-                } catch (stackOverflowError: StackOverflowError) {
+                } catch (_: StackOverflowError) {
                     Logger.error(
                         CallDefinitionClause::class.java,
                         "StackOverflowError while processing import",
@@ -279,51 +280,68 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
 
     private fun implicitImports(element: PsiElement, state: ResolveState): Boolean {
         val project = element.project
+        // Use the entrance element (the call being resolved) for narrowedScope so the search
+        // is limited to the SDK / libraries attached to the module that contains the reference.
+        // Falling back to `element` covers the ElixirFile case where ENTRANCE may be absent.
+        val entrance = state.get(ENTRANCE) ?: element
+        val scope = narrowedScope(entrance, project)
 
-        val keepProcessing = implicitImport(project, KERNEL, state)
+        val keepProcessing = implicitImport(project, scope, KERNEL, state)
 
         return if (keepProcessing) {
             val modularCanonicalNameState = state.put(MODULAR_CANONICAL_NAME, KERNEL_SPECIAL_FORMS)
 
-            implicitImport(project, KERNEL_SPECIAL_FORMS, modularCanonicalNameState)
+            implicitImport(project, scope, KERNEL_SPECIAL_FORMS, modularCanonicalNameState)
         } else {
             false
         }
     }
 
-    private fun implicitImport(project: Project, moduleName: String, state: ResolveState): Boolean =
+    private fun implicitImport(project: Project, scope: GlobalSearchScope, moduleName: String, state: ResolveState): Boolean =
         if (DumbService.isDumb(project)) {
             true
         } else {
-            StubIndex
-                .getInstance()
-                .processElements(
-                    org.elixir_lang.psi.stub.index.ModularName.KEY,
-                    moduleName,
-                    project,
-                    GlobalSearchScope.allScope(project),
-                    NamedElement::class.java
-                ) { namedElement ->
-                    when (namedElement) {
-                        is Call -> {
-                            val namedElementResolveState = state.putVisitedElement(namedElement)
+            whileIn(sourceFirstNamedElements(project, scope, moduleName)) { namedElement ->
+                when (namedElement) {
+                    is Call -> {
+                        val namedElementResolveState = state.putVisitedElement(namedElement)
 
-                            Modular.callDefinitionClauseCallWhile(
-                                namedElement, namedElementResolveState
-                            ) { callDefinitionClause, accResolveState ->
-                                executeOnCallDefinitionClause(
-                                    callDefinitionClause,
-                                    accResolveState
-                                )
-                            }
+                        Modular.callDefinitionClauseCallWhile(
+                            namedElement, namedElementResolveState
+                        ) { callDefinitionClause, accResolveState ->
+                            executeOnCallDefinitionClause(
+                                callDefinitionClause,
+                                accResolveState
+                            )
                         }
-                        is ModuleImpl<*> -> whileIn(namedElement.callDefinitions()) {
-                            execute(it, state)
-                        }
-                        else -> true
                     }
+                    is ModuleImpl<*> -> whileIn(namedElement.callDefinitions()) {
+                        execute(it, state)
+                    }
+                    else -> true
                 }
+            }
         }
+
+    /**
+     * Returns all [NamedElement]s for [moduleName] within [scope], with source [Call]s ordered before
+     * decompiled [ModuleImpl]s. This ensures the scope walker visits source definitions first so that
+     * [keepProcessing] stops the walk before beam stubs are ever reached when source is available.
+     *
+     * [StubIndex.processElements] returns elements in an unspecified order; without this ordering a
+     * [ModuleImpl] arriving first would add a valid result, set [keepProcessing] to false, and
+     * short-circuit the loop before the corresponding source [Call] (e.g. `kernel.ex`) was visited.
+     */
+    private fun sourceFirstNamedElements(project: Project, scope: GlobalSearchScope, moduleName: String): List<NamedElement> =
+        buildList {
+            StubIndex.getInstance().processElements(
+                org.elixir_lang.psi.stub.index.ModularName.KEY,
+                moduleName,
+                project,
+                scope,
+                NamedElement::class.java
+            ) { add(it); true }
+        }.sortedWith(compareBy { it is ModuleImpl<*> })
 
     companion object {
         val MODULAR_CANONICAL_NAME = Key<String>("MODULAR_CANONICAL_NAME")
