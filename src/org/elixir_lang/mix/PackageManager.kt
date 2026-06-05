@@ -2,6 +2,7 @@ package org.elixir_lang.mix
 
 import com.intellij.execution.ExecutionException
 import com.intellij.execution.util.ExecUtil
+import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.Sdk
@@ -9,6 +10,7 @@ import com.intellij.openapi.vfs.VirtualFile
 import org.elixir_lang.Mix
 import org.elixir_lang.package_manager.DepGatherer
 import org.elixir_lang.package_manager.DepsStatusResult
+import java.util.concurrent.Callable
 
 private val LOG = logger<PackageManager>()
 private val ANSI_REGEX = Regex("\u001B\\[[;\\d]*m")
@@ -27,7 +29,17 @@ class PackageManager : org.elixir_lang.PackageManager {
         val workingDirectory = packageVirtualFile.parent?.path
             ?: return DepsStatusResult.Error("Missing working directory for ${packageVirtualFile.path}")
 
-        val commandLine = Mix.commandLine(emptyMap(), workingDirectory, sdk)
+        // Mix.commandLine() -> CliArguments.argsOrThrow() -> requireErlangSdkOrNotifyAndThrow()
+        // -> resolveErlangSdkResult() -> findErlangSdkByHomePath() which asserts a read lock.
+        // Build the command line under a cancellable read action, then run the process outside it.
+        val commandLine = try {
+            ReadAction.nonBlocking(Callable { Mix.commandLine(emptyMap(), workingDirectory, sdk) })
+                .executeSynchronously()
+        } catch (e: ExecutionException) {
+            // Erlang SDK missing or misconfigured (CantRunException extends ExecutionException);
+            // the notifier was already invoked by requireErlangSdkOrNotifyAndThrow.
+            return DepsStatusResult.Error(e.message ?: "Erlang SDK not configured for ${sdk.name}")
+        }
         commandLine.addParameters("deps")
 
         return try {
