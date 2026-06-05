@@ -47,6 +47,7 @@
 
         <editorNotificationProvider implementation="org.elixir_lang.notification.setup_sdk.Provider"/>
         <notificationGroup displayType="BALLOON" id="Elixir"/>
+        <notificationGroup displayType="STICKY_BALLOON" id="Elixir SDK"/>
         <notificationGroup displayType="STICKY_BALLOON" id="Elixir Mix Deps"/>
 
         <!-- Distillery -->
@@ -309,6 +310,7 @@
                           language="Elixir" level="ERROR"/>
         <projectService serviceInterface="org.elixir_lang.dialyzer.service.DialyzerService"
                         serviceImplementation="org.elixir_lang.dialyzer.service.DialyzerServiceImpl"/>
+        <projectService serviceImplementation="org.elixir_lang.tool_manager.ToolManagerSettings"/>
         <projectConfigurable id="language.elixir.dialyzer"
                              parentId="language.elixir"
                              instance="org.elixir_lang.dialyzer.service.Configurable"
