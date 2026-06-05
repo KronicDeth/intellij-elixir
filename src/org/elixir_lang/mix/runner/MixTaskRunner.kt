@@ -5,6 +5,7 @@ import com.intellij.execution.process.ProcessEvent
 import com.intellij.execution.process.ProcessHandlerFactory
 import com.intellij.execution.process.ProcessListener
 import com.intellij.execution.process.ProcessTerminatedListener
+import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
@@ -14,6 +15,7 @@ import com.intellij.openapi.util.Key
 import com.intellij.platform.ide.progress.ModalTaskOwner
 import com.intellij.platform.ide.progress.runWithModalProgressBlocking
 import org.elixir_lang.Mix
+import java.util.concurrent.Callable
 
 private val LOG = logger<MixTaskRunner>()
 
@@ -85,14 +87,11 @@ object MixTaskRunner {
         val indicator = ProgressManager.getInstance().progressIndicator
         indicator?.isIndeterminate = true
 
-        val commandLine = Mix.commandLine(
-            emptyMap(),
-            workingDirectory,
-            sdk,
-            emptyList(),
-            emptyList(),
-            project = project,
-        )
+        // Mix.commandLine() -> argsOrThrow() -> requireErlangSdkOrNotifyAndThrow()
+        // -> findErlangSdkByHomePath() asserts a read lock; acquire one here.
+        val commandLine = ReadAction.nonBlocking(Callable {
+            Mix.commandLine(emptyMap(), workingDirectory, sdk, emptyList(), emptyList(), project = project)
+        }).executeSynchronously()
         commandLine.addParameter(task)
         commandLine.addParameters(*taskParameters)
 

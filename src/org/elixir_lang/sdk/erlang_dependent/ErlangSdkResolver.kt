@@ -6,6 +6,8 @@ import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.projectRoots.ProjectJdkTable
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.projectRoots.SdkModel
+import com.intellij.util.concurrency.ThreadingAssertions
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.sdk.wsl.wslCompat
 
 
@@ -51,6 +53,7 @@ interface ErlangSdkResolver {
  * 3. Both absent → NOT_CONFIGURED
  */
 class DefaultErlangSdkResolver : ErlangSdkResolver {
+    @RequiresReadLock
     override fun resolveErlangSdkResult(elixirSdk: Sdk, sdkModel: SdkModel?): ErlangSdkResult {
         val elixirName = elixirSdk.name
         val additionalData = elixirSdk.elixirAdditionalData
@@ -138,7 +141,9 @@ class DefaultErlangSdkResolver : ErlangSdkResolver {
             || (jdkTable.findJdk(name) != null)
     }
 
+    @RequiresReadLock
     private fun findErlangSdkByHomePath(homePath: String, sdkModel: SdkModel?): Sdk? {
+        ThreadingAssertions.assertReadAccess()
         val fromModel = sdkModel?.sdks?.find { sdk ->
             Type.staticIsValidDependency(sdk) && wslCompat.pathsEqualWslAware(sdk.homePath, homePath)
         }
