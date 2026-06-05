@@ -37,6 +37,8 @@ jobs:
     needs: [ test-and-verify ]
     if: ${{ always() && (needs.test-and-verify.result == 'success' || needs.test-and-verify.result == 'skipped') }}
     runs-on: ubuntu-22.04
+    permissions:
+      contents: write
     steps:
       - name: Checkout
         id: checkout
@@ -49,35 +51,24 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           skip-searchable-options: 'false'
 
-      - name: Build with Gradle
-        id: build-plugin
-        run: ./gradlew buildPlugin --no-scan -PpublishChannels=default -PisRelease=true
+      - name: Build with Gradle (canary)
+        id: build-plugin-canary
+        if: ${{ inputs.prerelease }}
+        run: ./gradlew buildPlugin --no-scan -PpublishChannels=canary --stacktrace
 
-      - name: Export ASSET_PATH
-        run: echo "ASSET_PATH=$(ls -1 build/distributions/intellij-elixir-*.zip)" >> $GITHUB_ENV
-
-      - name: Tag Commit
-        id: tag-commit
-        uses: mathieudutour/github-tag-action@v6.2
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          custom_tag: ${{ inputs.tag }}
-          tag_prefix: ''
+      - name: Build with Gradle (release)
+        id: build-plugin-default
+        if: ${{ !inputs.prerelease }}
+        run: ./gradlew buildPlugin --no-scan -PpublishChannels=default --stacktrace
 
       - name: Create Release
         id: create_release
-        uses: softprops/action-gh-release@v2.5.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v3.0.0
         with:
           tag_name: ${{ inputs.tag }}
+          target_commitish: ${{ github.sha }}
           name: ${{ inputs.tag }}
           prerelease: ${{ inputs.prerelease }}
           make_latest: ${{ inputs.make_latest }}
-          files: ${{ env.ASSET_PATH }}
+          files: build/distributions/intellij-elixir-*.zip
           fail_on_unmatched_files: true
-
-#     - name: Publish
-#       env:
-#         JET_BRAINS_MARKETPLACE_TOKEN: ${{ secrets.JetBrainsMarketplaceToken }}
-#       run: ./gradlew --stacktrace publishPlugin

@@ -27,4 +27,4 @@ jobs:
 
       - name: Build with Gradle
         id: build-plugin
-        run: ./gradlew buildPlugin --no-scan -PpublishChannels=default -PisRelease=true --stacktrace
+        run: ./gradlew buildPlugin --no-scan -PpublishChannels=default --stacktrace
