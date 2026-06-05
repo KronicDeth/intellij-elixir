@@ -4,6 +4,7 @@ import com.intellij.facet.FacetManager
 import com.intellij.facet.FacetType
 import com.intellij.facet.impl.FacetUtil
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.projectRoots.ProjectJdkTable
 import com.intellij.openapi.projectRoots.SimpleJavaSdkType
@@ -13,6 +14,7 @@ import com.intellij.openapi.roots.ModuleRootModificationUtil
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.util.concurrency.annotations.RequiresEdt
 import com.intellij.util.concurrency.annotations.RequiresReadLock
+import java.util.concurrent.Callable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
@@ -20,6 +22,7 @@ import org.elixir_lang.Facet
 import org.elixir_lang.PlatformTestCase
 import org.elixir_lang.facet.Type
 import org.elixir_lang.sdk.elixir.Type as ElixirSdkType
+import org.elixir_lang.tool_manager.ModuleSdkIssue
 
 /**
  * Tests for [ElixirEditorBasedSdkWidget] detection logic (notification scan methods).
@@ -168,7 +171,7 @@ class ElixirSdkStatusWidgetTest : PlatformTestCase() {
         setModuleSdk(elixirSdk)
 
         val widget = createWidget()
-        val foundSdk = widget.findModuleLevelElixirSdk()
+        val foundSdk = ReadAction.nonBlocking(Callable<Sdk?> { widget.findModuleLevelElixirSdk() }).executeSynchronously()
 
         assertNotNull("Should find Elixir SDK from module even when project SDK is Java", foundSdk)
         assertEquals("Should return the module's Elixir SDK", elixirSdk, foundSdk)
@@ -202,7 +205,7 @@ class ElixirSdkStatusWidgetTest : PlatformTestCase() {
         setModuleSdk(elixirSdk)
 
         val widget = createWidget()
-        val foundSdk = widget.findModuleLevelElixirSdk()
+        val foundSdk = ReadAction.nonBlocking(Callable<Sdk?> { widget.findModuleLevelElixirSdk() }).executeSynchronously()
 
         assertNotNull("Should find Elixir SDK from module when project SDK is null", foundSdk)
         assertEquals(elixirSdk, foundSdk)
