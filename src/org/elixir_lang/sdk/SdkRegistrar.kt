@@ -113,7 +113,7 @@ object SdkRegistrar {
             sdk
         }
 
-        registeredSdk.resolveErlangSdkOrNullAndNotify(sdkModel = null, project = project)
+        readAction { registeredSdk.resolveErlangSdkOrNullAndNotify(sdkModel = null, project = project) }
         sdkType.setupSdkPaths(registeredSdk)
         return registeredSdk
     }
