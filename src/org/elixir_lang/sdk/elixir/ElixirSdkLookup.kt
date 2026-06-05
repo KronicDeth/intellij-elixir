@@ -53,6 +53,15 @@ val ElixirSdkResolution.sdk: Sdk? get() = (this as? ElixirSdkResolution.Ready)?.
 object ElixirSdkLookup {
     private val LOG = com.intellij.openapi.diagnostic.logger<ElixirSdkLookup>()
 
+    @RequiresReadLock
+    fun mostSpecificSdk(module: Module): Sdk? = resolve(module).sdk
+
+    @RequiresReadLock
+    fun mostSpecificSdk(psiElement: PsiElement): Sdk? = resolve(psiElement).sdk
+
+    @RequiresReadLock
+    fun mostSpecificSdk(project: Project): Sdk? = resolve(project).sdk
+
     /** Resolves to [ElixirSdkResolution.Ready] or [ElixirSdkResolution.MissingElixirSdk]. */
     @RequiresReadLock
     fun resolve(module: Module): ElixirSdkResolution {
@@ -171,3 +180,16 @@ object ElixirSdkLookup {
     private fun sdk(sdk: Sdk?): Sdk? =
         if (sdk != null && sdk.sdkType === Type.instance) sdk else null
 }
+
+@RequiresReadLock
+fun mostSpecificSdk(module: Module): Sdk? = ElixirSdkLookup.resolve(module).sdk
+
+@RequiresReadLock
+fun mostSpecificSdk(psiElement: PsiElement): Sdk? = ElixirSdkLookup.resolve(psiElement).sdk
+
+@RequiresReadLock
+fun mostSpecificSdk(project: Project): Sdk? = ElixirSdkLookup.resolve(project).sdk
+
+@RequiresReadLock
+@RequiresBackgroundThread
+fun findElixirSdkForRoot(project: Project, root: VirtualFile): Sdk? = ElixirSdkLookup.resolve(project, root)
