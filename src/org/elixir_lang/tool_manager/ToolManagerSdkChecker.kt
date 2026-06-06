@@ -39,7 +39,7 @@ private val LOG = logger<ToolManagerSdkChecker>()
  *                      managers in order and uses the first non-null result per content root.
  * @param settings      Project-level enable/disable flags for each tool manager.
  */
-class ToolManagerSdkChecker(
+internal class ToolManagerSdkChecker(
     private val project: Project,
     private val toolManagers: List<ElixirToolManager>,
     private val settings: ToolManagerSettings,
@@ -67,6 +67,25 @@ class ToolManagerSdkChecker(
     // -------------------------------------------------------------------------
     // Phase 1 - model data (call inside readAction)
     // -------------------------------------------------------------------------
+
+    /**
+     * Collects the first content root path for every Elixir module in the project.
+     *
+     * Lighter than [collectModuleCheckData] - only returns paths, no SDK lookups.
+     * Used by [ToolManagerSdkCheckerService] to determine which roots to pass to tool managers.
+     * Must be called inside a `readAction { }` block.
+     */
+    @RequiresReadLock
+    fun collectContentRoots(): List<Path> =
+        ModuleManager.getInstance(project).modules
+            .filter { it.isElixirModule() }
+            .mapNotNull { module ->
+                ModuleRootManager.getInstance(module)
+                    .contentRoots
+                    .firstOrNull()
+                    ?.toNioPathOrNull()
+            }
+            .distinct()
 
     /**
      * Collects per-module data needed by the tool-manager scan.
@@ -295,14 +314,17 @@ class ToolManagerSdkChecker(
 
     /**
      * Registers Elixir and Erlang SDKs from [assignments] and assigns them to their respective
-     * modules.  All work - SDK registration, classpath root setup, and module assignment - is
-     * performed inside a **single** write action with module assignment coming **last**.
+     * modules.
      *
-     * Root setup (`setupSdkPaths` equivalent) is moved inside the write action so that the
-     * `applyStateToProject` events fired by `sdkModificator.commitChanges()` (via
-     * `GlobalWorkspaceModel.onChanged`) happen *before* the module assignment rather than after
-     * it.  The VirtualFile lookups that would normally happen inside `setupSdkPaths` are
-     * pre-gathered on the background thread (off EDT) to avoid VFS refresh inside the write lock.
+     * Performed in three ordered phases so that the global SDK table is durably persisted before
+     * any module is pointed at a newly registered SDK:
+     * 1. SDK registration (and classpath root setup) for every unique install-path combination,
+     *    via [SdkRegistrar]. The VirtualFile lookups that `setupSdkPaths` needs are pre-gathered
+     *    on the background thread (off EDT) to avoid VFS refresh inside the write lock.
+     * 2. A `jdk.table.xml` flush on [Dispatchers.IO] (see the inline comment below) so that
+     *    `DelayedProjectSynchronizer` Attempt 2 reads the newly registered SDKs from disk instead
+     *    of removing them as stale - which would undo the module assignment.
+     * 3. Module assignment **last**, inside a single [edtWriteAction].
      *
      * Uses [runWithModalProgressBlocking] internally, so this must be called from a blocking
      * context on the EDT (e.g. an `AnAction.actionPerformed` handler).

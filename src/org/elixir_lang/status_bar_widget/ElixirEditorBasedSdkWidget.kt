@@ -49,15 +49,13 @@ import org.elixir_lang.sdk.elixir.SdkSettingsOpener
 import org.elixir_lang.sdk.elixir.Type
 import org.elixir_lang.sdk.elixir.sdk
 import org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData
-import org.elixir_lang.tool_manager.allBuiltInToolManagers
 import org.elixir_lang.tool_manager.ModuleSdkIssue
 import org.elixir_lang.tool_manager.SdkVersionTable
-import org.elixir_lang.tool_manager.ToolManagerResult
-import org.elixir_lang.tool_manager.ToolManagerSettings
-import org.elixir_lang.tool_manager.ToolManagerSdkChecker
+import org.elixir_lang.tool_manager.ToolManagerAnalysisResult
+import org.elixir_lang.tool_manager.ToolManagerSdkAnalyser
+import org.elixir_lang.tool_manager.ToolManagerSdkCheckerService
 import org.elixir_lang.tool_manager.ToolManagerVersions
 import org.elixir_lang.util.WriteActions
-import java.nio.file.Path
 import java.util.concurrent.CancellationException
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -146,11 +144,11 @@ class ElixirEditorBasedSdkWidget(
         const val ID = "ElixirSdkStatus"
     }
 
-    private val checker = ToolManagerSdkChecker(
-        project = project,
-        toolManagers = allBuiltInToolManagers,
-        settings = ToolManagerSettings.getInstance(project),
-    )
+    // Latest tool-manager analysis result, updated whenever ToolManagerSdkAnalyser publishes.
+    // Null on small IDEs (where the analyser service is not registered) and before the first
+    // analysis completes on rich IDEs.
+    @Volatile
+    private var latestTmAnalysis: ToolManagerAnalysisResult? = null
 
     // Track last notified status to avoid spamming duplicate notifications
     @Volatile
@@ -216,6 +214,19 @@ class ElixirEditorBasedSdkWidget(
             notificationScanRequests.tryEmit(Unit)
         }
 
+        // Subscribe to tool-manager analysis results.  When the analyser publishes new results
+        // (after a scan completes or module SDKs change), cache them and trigger a notification
+        // scan so notifyIfNeeded() uses the latest TM data.
+        // On small IDEs the analyser service is absent; getInstanceIfRegistered returns null,
+        // so latestTmAnalysis stays null and notifyIfNeeded() skips all TM-specific logic.
+        ToolManagerSdkAnalyser.getInstanceIfRegistered(project)?.subscribeWithLatest(
+            parentDisposable = this,
+            onAnalysisCompleted = { result ->
+                latestTmAnalysis = result
+                notificationScanRequests.tryEmit(Unit)
+            }
+        )
+
         val notificationScanJob = scope.launch {
             notificationScanRequests
                 .debounce(500.milliseconds)  // slightly longer than widget debounce since notifications are less urgent
@@ -227,31 +238,15 @@ class ElixirEditorBasedSdkWidget(
                 .collect {
                     val modelData = readAction { collectNotificationScanModelData() }
                     val ioData = withContext(Dispatchers.IO) { collectNotificationScanIoData(modelData) }
+                    val tmAnalysis = latestTmAnalysis
 
-                    val (tmIssues, sdkVersionTables) = checker.detectMismatchIssues(
-                        moduleCheckData = modelData.moduleCheckData,
-                        toolManagerResultsByRoot = ioData.toolManagerResultsByRoot,
-                        elixirVersionBySdk = ioData.elixirVersionBySdk,
-                        erlangReleaseByHomePath = ioData.erlangReleaseByHomePath,
-                        elixirVersionByInstallPath = ioData.elixirVersionByInstallPath,
-                    )
-                    // Build per-module tool manager assignments: module name → the ToolManagerVersions that are
-                    // resolved for that module's own content root.  Covers all modules with an
-                    // installed elixir entry, regardless of whether they already have an SDK.
-                    val tmAssignments = checker.buildAssignments(
-                        moduleCheckData = modelData.moduleCheckData,
-                        toolManagerResultsByRoot = ioData.toolManagerResultsByRoot,
-                    )
                     notifyIfNeeded(
-                        moduleSdkIssues = modelData.moduleSdkIssues + tmIssues,
+                        moduleSdkIssues = modelData.moduleSdkIssues + (tmAnalysis?.tmIssues ?: emptyList()),
                         folderMarkIssues = modelData.folderMarkIssues,
-                        tmAssignments = tmAssignments,
+                        tmAnalysis = tmAnalysis,
                         projectSdkSnapshot = modelData.projectSdkSnapshot,
                         classpathIssues = ioData.classpathIssues,
-                        elixirVersionByInstallPath = ioData.elixirVersionByInstallPath,
                         projectSdkOtpMismatch = ioData.projectSdkOtpMismatch,
-                        sdkVersionTables = sdkVersionTables,
-                        toolManagerErrors = ioData.toolManagerErrors,
                     )
                 }
         }
@@ -432,31 +427,23 @@ class ElixirEditorBasedSdkWidget(
     private data class NotificationScanModelData(
         val moduleSdkIssues: List<ModuleSdkIssue>,
         val folderMarkIssues: List<FolderMarkIssue>,
-        val moduleCheckData: List<ToolManagerSdkChecker.ModuleCheckData>,
         val projectSdkSnapshot: ProjectSdkSnapshot,
     )
 
     private data class NotificationScanIoData(
-        val toolManagerResultsByRoot: Map<Path, ToolManagerResult?>,
-        val elixirVersionBySdk: Map<Sdk, String?>,
-        val erlangReleaseByHomePath: Map<String, org.elixir_lang.sdk.erlang.Release?>,
         val projectSdkOtpMismatch: Pair<String, String>?,
-        val elixirVersionByInstallPath: Map<String, String?>,
         val classpathIssues: List<String>,
-        val toolManagerErrors: List<ToolManagerResult.Error>,
     )
 
     @RequiresReadLock
     private fun collectNotificationScanModelData(): NotificationScanModelData {
         val moduleSdkIssues = detectModuleSdkIssues()
         val folderMarkIssues = ProjectModuleSetupValidator.detectFolderMarkIssues(project)
-        val moduleCheckData = checker.collectModuleCheckData()
         val projectSdkSnapshot = collectProjectSdkSnapshot()
 
         return NotificationScanModelData(
             moduleSdkIssues = moduleSdkIssues,
             folderMarkIssues = folderMarkIssues,
-            moduleCheckData = moduleCheckData,
             projectSdkSnapshot = projectSdkSnapshot,
         )
     }
@@ -477,54 +464,33 @@ class ElixirEditorBasedSdkWidget(
     }
 
     private fun collectNotificationScanIoData(modelData: NotificationScanModelData): NotificationScanIoData {
-        val contentRoots = modelData.moduleCheckData.mapNotNull { it.contentRoot }.distinct()
-        LOG.trace("collectNotificationScanIoData: ${contentRoots.size} content root(s): $contentRoots")
-
-        val toolManagerResultsByRoot = checker.resolveVersions(contentRoots)
-        val toolManagerErrors = checker.collectErrors(toolManagerResultsByRoot)
-        val elixirVersionByInstallPath = checker.collectElixirVersionByInstallPath(toolManagerResultsByRoot)
-        val erlangReleaseByHomePath = checker.collectErlangReleaseByHomePath(modelData.moduleCheckData)
-
-        val elixirVersionBySdk = modelData.moduleCheckData
-            .mapNotNull { it.elixirSdk }
-            .distinct()
-            .associateWith { sdk ->
-                Type.canonicalVersion(sdk).also { v ->
-                    LOG.trace("collectNotificationScanIoData: canonicalVersion('${sdk.name}') = $v")
-                }
-            }
-
-        val projectSdkOtpMismatch = modelData.projectSdkSnapshot.elixirSdk?.let { detectOtpMismatch(it) }
-
+        val snapshot = modelData.projectSdkSnapshot
+        val projectSdkOtpMismatch = snapshot.elixirSdk?.let { detectOtpMismatch(it) }
         return NotificationScanIoData(
-            toolManagerResultsByRoot = toolManagerResultsByRoot,
-            elixirVersionBySdk = elixirVersionBySdk,
-            erlangReleaseByHomePath = erlangReleaseByHomePath,
             projectSdkOtpMismatch = projectSdkOtpMismatch,
-            elixirVersionByInstallPath = elixirVersionByInstallPath,
-            classpathIssues = detectClasspathIssues(modelData.projectSdkSnapshot),
-            toolManagerErrors = toolManagerErrors,
+            classpathIssues = detectClasspathIssues(snapshot),
         )
     }
 
     private fun notifyIfNeeded(
         moduleSdkIssues: List<ModuleSdkIssue>,
         folderMarkIssues: List<FolderMarkIssue>,
-        /** Per-module tool-manager assignments: module name → ToolManagerVersions for that module's content root. */
-        tmAssignments: Map<String, ToolManagerVersions> = emptyMap(),
+        /** Tool-manager analysis result from [ToolManagerSdkAnalyser], or null if unavailable. */
+        tmAnalysis: ToolManagerAnalysisResult? = null,
         projectSdkSnapshot: ProjectSdkSnapshot,
         classpathIssues: List<String>,
-        elixirVersionByInstallPath: Map<String, String?> = emptyMap(),
         /** Pre-computed OTP mismatch for the project's primary Elixir SDK, or `null` when there
          *  is no mismatch, when detection failed, or when the user suppressed warnings. */
         projectSdkOtpMismatch: Pair<String, String>? = null,
-        sdkVersionTables: Map<String, SdkVersionTable> = emptyMap(),
-        /** Tool manager errors that prevented version resolution. */
-        toolManagerErrors: List<ToolManagerResult.Error> = emptyList(),
     ) {
         val elixirSdk = projectSdkSnapshot.elixirSdk
         val erlangSdk = projectSdkSnapshot.erlangSdk
         val elixirVersion = projectSdkSnapshot.elixirVersion ?: "Unknown"
+
+        val tmAssignments = tmAnalysis?.tmAssignments ?: emptyMap()
+        val sdkVersionTables = tmAnalysis?.sdkVersionTables ?: emptyMap()
+        val toolManagerErrors = tmAnalysis?.toolManagerErrors ?: emptyList()
+        val elixirVersionByInstallPath = tmAnalysis?.elixirVersionByInstallPath ?: emptyMap()
 
         val sdkStatus: SdkStatus = when {
             moduleSdkIssues.isNotEmpty() ->
@@ -612,7 +578,8 @@ class ElixirEditorBasedSdkWidget(
                         notification.expire()
                         lastNotifiedIssueKey = null
                         activeNotification = null
-                        checker.configureSdks(relevantAssignments)
+                        project.getServiceIfCreated(ToolManagerSdkCheckerService::class.java)
+                            ?.configureSdks(relevantAssignments)
                     }
                 })
             }
@@ -641,7 +608,8 @@ class ElixirEditorBasedSdkWidget(
             notification.addAction(object : AnAction("Configure from $toolName") {
                 override fun actionPerformed(e: AnActionEvent) {
                     notification.expire()
-                    checker.configureSdks(tmAssignments)
+                    project.getServiceIfCreated(ToolManagerSdkCheckerService::class.java)
+                        ?.configureSdks(tmAssignments)
                 }
             })
         }

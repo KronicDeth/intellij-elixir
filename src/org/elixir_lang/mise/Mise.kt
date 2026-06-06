@@ -12,6 +12,7 @@ import com.intellij.util.concurrency.annotations.RequiresBackgroundThread
 import org.elixir_lang.sdk.wsl.wslCompat
 import org.jetbrains.annotations.VisibleForTesting
 import java.nio.file.Path
+import java.nio.file.Paths
 
 private val LOG = logger<Mise>()
 
@@ -65,6 +66,11 @@ private data class RawMiseEntry(
 
 private data class RawMiseSource(
     val type: String?,
+    val path: String?,
+)
+
+/** Raw Gson model for one entry from `mise config ls --json`. */
+private data class RawMiseConfigEntry(
     val path: String?,
 )
 
@@ -135,6 +141,58 @@ object Mise {
     }
 
     /**
+     * Invokes `mise config ls --json` in [workDir] and returns the list of config file paths
+     * that mise considers active for that directory.
+     *
+     * These are the files that, when modified, should trigger a re-scan.  The list typically
+     * includes both project-local files (`mise.toml`, `.tool-versions`) and user-global files
+     * (`~/.config/mise/config.toml`, `~/.tool-versions`).
+     *
+     * Returns `null` if mise is unavailable, times out, or the command fails.
+     *
+     * **Threading**: Must not be called on the EDT or under a read lock.
+     */
+    @RequiresBackgroundThread
+    fun configFiles(workDir: Path): List<Path>? {
+        ThreadingAssertions.assertBackgroundThread()
+        check(!ApplicationManager.getApplication().holdsReadLock()) {
+            "Mise.configFiles() must not be called under a read lock"
+        }
+        LOG.trace("configFiles: invoked for workDir=$workDir")
+        return try {
+            val commandLine = GeneralCommandLine("mise", "config", "ls", "--json")
+                .withWorkDirectory(workDir.toFile())
+            val handler = CapturingProcessHandler(commandLine)
+            val output = handler.runProcess(TIMEOUT_MS)
+            if (output.exitCode != 0) {
+                LOG.debug("mise config ls --json exited with ${output.exitCode} in $workDir")
+                return null
+            }
+            val gson = GsonBuilder().create()
+            val type = object : TypeToken<List<RawMiseConfigEntry>>() {}.type
+            @Suppress("UNCHECKED_CAST")
+            val entries = gson.fromJson(output.stdout, type) as? List<RawMiseConfigEntry>
+                ?: return null
+            val workDirString = workDir.toString()
+            entries.mapNotNull { entry ->
+                entry.path?.let { p ->
+                    // mise outputs Linux absolute paths (e.g. /home/user/.config/mise/config.toml)
+                    // when running inside WSL.  Convert to a Windows UNC path using the workDir as
+                    // context before handing the result to Paths.get(), because Paths.get("/...")
+                    // on Windows produces a drive-relative WindowsPath, not a Linux path.
+                    // maybeConvertLinuxPathToWindowsUncFromContext is a no-op on native Linux /
+                    // plain Windows, so this is safe everywhere.
+                    Paths.get(wslCompat.maybeConvertLinuxPathToWindowsUncFromContext(workDirString, p))
+                }
+            }
+                .also { LOG.trace("configFiles: found ${it.size} config file(s) for $workDir") }
+        } catch (e: Exception) {
+            LOG.debug("mise config ls --json failed in $workDir: ${e.message}")
+            null
+        }
+    }
+
+    /**
      * Detects a `mise trust` error in [stderr].
      *
      * When mise encounters an untrusted config it prints two lines to stderr:
@@ -186,15 +244,18 @@ object Mise {
 
     private fun RawMiseEntry.toMiseToolEntry(workDir: Path): MiseToolEntry? {
         val v = version ?: return null
+        val workDirString = workDir.toString()
         val ip = install_path?.let {
-            wslCompat.maybeConvertLinuxPathToWindowsUncFromContext(workDir.toString(), it)
+            wslCompat.maybeConvertLinuxPathToWindowsUncFromContext(workDirString, it)
         } ?: return null
         return MiseToolEntry(
             version = v,
             requestedVersion = requested_version ?: v,
             installPath = ip,
             sourceType = source?.type,
-            sourcePath = source?.path,
+            sourcePath = source?.path?.let {
+                wslCompat.maybeConvertLinuxPathToWindowsUncFromContext(workDirString, it)
+            },
             installed = installed ?: false,
             active = active ?: false,
         )

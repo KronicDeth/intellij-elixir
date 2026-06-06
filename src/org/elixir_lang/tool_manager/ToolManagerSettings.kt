@@ -1,31 +1,43 @@
 package org.elixir_lang.tool_manager
 
 import com.intellij.openapi.components.PersistentStateComponent
-import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
+import com.intellij.util.messages.Topic
+
+/** Listener notified whenever a tool manager is enabled or disabled. */
+fun interface ToolManagerSettingsListener {
+    fun toolManagerSettingsChanged()
+}
 
 /**
  * Project-level settings controlling which tool managers are active.
  *
  * Persisted in `.idea/elixir.xml` under the key `ElixirToolManagerSettings`.
  *
- * **Default behaviour**: all registered tool managers are enabled (opt-out model).
- * An empty [State.disabledManagers] set means "check everything", which preserves
- * the behaviour users had before this setting existed.
+ * Registered only on rich IDEs (via `rich-platform-plugin.xml`) because the SDK
+ * configuration performed by tool managers relies on Java-module APIs.  No `@Service`
+ * annotation is present so the platform does not auto-register this class for all IDEs.
+ *
+ * **Default behaviour**: all tool managers are **disabled** (opt-in model).
+ * A tool manager must be explicitly enabled by the user before it is consulted
+ * during the SDK notification scan.  This ensures that experimental managers
+ * (such as mise) do not run without user consent.
+ *
+ * An empty [State.enabledManagers] set therefore means "no tool managers are active".
  */
-@Service(Service.Level.PROJECT)
+@Suppress("LightServiceMigrationCode")
 @State(
     name = "ElixirToolManagerSettings",
     storages = [Storage("elixir.xml")]
 )
-class ToolManagerSettings : PersistentStateComponent<ToolManagerSettings.State> {
+internal class ToolManagerSettings : PersistentStateComponent<ToolManagerSettings.State> {
 
     /** XML-serialisable state.  Fields must be `var` for IntelliJ's reflection-based serialiser. */
     class State {
-        var disabledManagers: MutableSet<String> = mutableSetOf()
+        var enabledManagers: MutableSet<String> = mutableSetOf()
     }
 
     private var myState = State()
@@ -36,16 +48,22 @@ class ToolManagerSettings : PersistentStateComponent<ToolManagerSettings.State> 
         myState = state
     }
 
-    /** Returns `true` when [manager] should be consulted during the notification scan. */
+    /** Returns `true` when [manager] has been explicitly enabled by the user. */
     fun isEnabled(manager: ElixirToolManager): Boolean =
-        manager.name !in myState.disabledManagers
+        manager.name in myState.enabledManagers
 
     fun setEnabled(manager: ElixirToolManager, enabled: Boolean) {
-        if (enabled) myState.disabledManagers.remove(manager.name)
-        else myState.disabledManagers.add(manager.name)
+        if (enabled) myState.enabledManagers.add(manager.name)
+        else myState.enabledManagers.remove(manager.name)
     }
 
     companion object {
+        @JvmField
+        val SETTINGS_CHANGED_TOPIC: Topic<ToolManagerSettingsListener> = Topic.create(
+            "ToolManagerSettings.changed",
+            ToolManagerSettingsListener::class.java
+        )
+
         fun getInstance(project: Project): ToolManagerSettings = project.service()
     }
 }
