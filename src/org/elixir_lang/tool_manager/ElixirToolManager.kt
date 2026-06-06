@@ -6,9 +6,12 @@ import java.nio.file.Path
  * A tool manager that can resolve installed Elixir/Erlang versions for a project directory.
  *
  * Implementations (mise, asdf, …) must:
- * - Return `null` from [resolveVersions] whenever the tool manager is not active for the given
- *   directory (not installed, no config file, subprocess failure, etc.).  This is the normal
- *   "not applicable" signal - callers do not distinguish "not installed" from "no config file".
+ * - Return `null` from [resolveVersions] when the manager is not applicable for the given
+ *   directory (not installed, no config file, transient subprocess failure, etc.).
+ * - Return [ToolManagerResult.Error] when the manager is applicable but encountered an
+ *   actionable error.  The implementation is responsible for providing a human-readable
+ *   [ToolManagerResult.Error.description] that explains the problem and how to fix it.
+ * - Return [ToolManagerResult.Success] when versions were successfully resolved.
  * - Be stateless with respect to the project; all context is provided through [resolveVersions].
  *
  * [name] is the **stable persistence key** written to `elixir.xml` via [ToolManagerSettings].
@@ -28,6 +31,8 @@ interface ElixirToolManager {
      * may spawn subprocesses or perform file I/O. Call only from [kotlinx.coroutines.Dispatchers.IO].
      *
      * Returns `null` if this tool manager is not applicable for [contentRoot].
+     * Returns [ToolManagerResult.Error] when applicable but an actionable error occurred.
+     * Returns [ToolManagerResult.Success] when versions are successfully resolved.
      */
-    fun resolveVersions(contentRoot: Path): ToolManagerVersions?
+    fun resolveVersions(contentRoot: Path): ToolManagerResult?
 }

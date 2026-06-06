@@ -23,9 +23,6 @@ import com.intellij.openapi.ui.popup.ListPopup
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.openapi.vfs.VirtualFileManager
-import com.intellij.openapi.vfs.newvfs.BulkFileListener
-import com.intellij.openapi.vfs.newvfs.events.VFileEvent
 import com.intellij.openapi.wm.StatusBarWidget
 import com.intellij.openapi.wm.impl.status.EditorBasedStatusBarPopup
 import com.intellij.ui.ColorUtil
@@ -56,6 +53,7 @@ import org.elixir_lang.sdk.wsl.wslCompat
 import org.elixir_lang.tool_manager.allBuiltInToolManagers
 import org.elixir_lang.tool_manager.ModuleSdkIssue
 import org.elixir_lang.tool_manager.SdkVersionTable
+import org.elixir_lang.tool_manager.ToolManagerResult
 import org.elixir_lang.tool_manager.ToolManagerSettings
 import org.elixir_lang.tool_manager.ToolManagerSdkChecker
 import org.elixir_lang.tool_manager.ToolManagerVersions
@@ -233,7 +231,7 @@ class ElixirEditorBasedSdkWidget(
 
                     val (tmIssues, sdkVersionTables) = checker.detectMismatchIssues(
                         moduleCheckData = modelData.moduleCheckData,
-                        toolManagerVersionsByRoot = ioData.toolManagerVersionsByRoot,
+                        toolManagerResultsByRoot = ioData.toolManagerResultsByRoot,
                         elixirVersionBySdk = ioData.elixirVersionBySdk,
                         erlangReleaseByHomePath = ioData.erlangReleaseByHomePath,
                         elixirVersionByInstallPath = ioData.elixirVersionByInstallPath,
@@ -243,7 +241,7 @@ class ElixirEditorBasedSdkWidget(
                     // installed elixir entry, regardless of whether they already have an SDK.
                     val tmAssignments = checker.buildAssignments(
                         moduleCheckData = modelData.moduleCheckData,
-                        toolManagerVersionsByRoot = ioData.toolManagerVersionsByRoot,
+                        toolManagerResultsByRoot = ioData.toolManagerResultsByRoot,
                     )
                     notifyIfNeeded(
                         moduleSdkIssues = modelData.moduleSdkIssues + tmIssues,
@@ -254,6 +252,7 @@ class ElixirEditorBasedSdkWidget(
                         elixirVersionByInstallPath = ioData.elixirVersionByInstallPath,
                         projectSdkOtpMismatch = ioData.projectSdkOtpMismatch,
                         sdkVersionTables = sdkVersionTables,
+                        toolManagerErrors = ioData.toolManagerErrors,
                     )
                 }
         }
@@ -439,12 +438,13 @@ class ElixirEditorBasedSdkWidget(
     )
 
     private data class NotificationScanIoData(
-        val toolManagerVersionsByRoot: Map<Path, ToolManagerVersions?>,
+        val toolManagerResultsByRoot: Map<Path, ToolManagerResult?>,
         val elixirVersionBySdk: Map<Sdk, String?>,
         val erlangReleaseByHomePath: Map<String, org.elixir_lang.sdk.erlang.Release?>,
         val projectSdkOtpMismatch: Pair<String, String>?,
         val elixirVersionByInstallPath: Map<String, String?>,
         val classpathIssues: List<String>,
+        val toolManagerErrors: List<ToolManagerResult.Error>,
     )
 
     @RequiresReadLock
@@ -481,8 +481,9 @@ class ElixirEditorBasedSdkWidget(
         val contentRoots = modelData.moduleCheckData.mapNotNull { it.contentRoot }.distinct()
         LOG.trace("collectNotificationScanIoData: ${contentRoots.size} content root(s): $contentRoots")
 
-        val toolManagerVersionsByRoot = checker.resolveVersions(contentRoots)
-        val elixirVersionByInstallPath = checker.collectElixirVersionByInstallPath(toolManagerVersionsByRoot)
+        val toolManagerResultsByRoot = checker.resolveVersions(contentRoots)
+        val toolManagerErrors = checker.collectErrors(toolManagerResultsByRoot)
+        val elixirVersionByInstallPath = checker.collectElixirVersionByInstallPath(toolManagerResultsByRoot)
         val erlangReleaseByHomePath = checker.collectErlangReleaseByHomePath(modelData.moduleCheckData)
 
         val elixirVersionBySdk = modelData.moduleCheckData
@@ -497,12 +498,13 @@ class ElixirEditorBasedSdkWidget(
         val projectSdkOtpMismatch = modelData.projectSdkSnapshot.elixirSdk?.let { detectOtpMismatch(it) }
 
         return NotificationScanIoData(
-            toolManagerVersionsByRoot = toolManagerVersionsByRoot,
+            toolManagerResultsByRoot = toolManagerResultsByRoot,
             elixirVersionBySdk = elixirVersionBySdk,
             erlangReleaseByHomePath = erlangReleaseByHomePath,
             projectSdkOtpMismatch = projectSdkOtpMismatch,
             elixirVersionByInstallPath = elixirVersionByInstallPath,
             classpathIssues = detectClasspathIssues(modelData.projectSdkSnapshot),
+            toolManagerErrors = toolManagerErrors,
         )
     }
 
@@ -518,6 +520,8 @@ class ElixirEditorBasedSdkWidget(
          *  is no mismatch, when detection failed, or when the user suppressed warnings. */
         projectSdkOtpMismatch: Pair<String, String>? = null,
         sdkVersionTables: Map<String, SdkVersionTable> = emptyMap(),
+        /** Tool manager errors that prevented version resolution. */
+        toolManagerErrors: List<ToolManagerResult.Error> = emptyList(),
     ) {
         val elixirSdk = projectSdkSnapshot.elixirSdk
         val erlangSdk = projectSdkSnapshot.erlangSdk
@@ -536,6 +540,9 @@ class ElixirEditorBasedSdkWidget(
                 SdkStatus.NotConfiguredToolManagerAvailable(firstVersions, canonicalVersion)
             }
 
+            // No SDK and no tool-manager assignments.  If tool manager errors are present they
+            // likely prevented version resolution - treat as NotConfigured; the error descriptions
+            // are appended to the notification message below.
             elixirSdk == null ->
                 SdkStatus.NotConfigured
 
@@ -576,7 +583,17 @@ class ElixirEditorBasedSdkWidget(
 
         val (title, message, type) = buildNotificationContent(sdkStatus) ?: return
 
-        val notification = object : com.intellij.notification.Notification("Elixir SDK", title, message, type),
+        // Append tool-manager error descriptions when they prevented version resolution.
+        // Each concrete ElixirToolManager implementation provides a human-readable description
+        // and fix hint; the widget renders them verbatim without needing to know the error type.
+        val fullMessage = if (toolManagerErrors.isNotEmpty()) {
+            val errorLines = toolManagerErrors.joinToString("<br>") { "&#8226; [${it.toolManagerName}] ${it.description}" }
+            "$message<br><br><b>Tool manager errors:</b><br>$errorLines"
+        } else {
+            message
+        }
+
+        val notification = object : com.intellij.notification.Notification("Elixir SDK", title, fullMessage, type),
             NotificationFullContent {}
 
         // "Configure from <tool manager>" - for module SDK mismatches with a tool manager assignment.

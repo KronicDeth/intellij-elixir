@@ -1,14 +1,19 @@
 package org.elixir_lang.tool_manager.mise
 
 import org.elixir_lang.mise.Mise
+import org.elixir_lang.mise.MiseResult
 import org.elixir_lang.tool_manager.ElixirToolManager
-import org.elixir_lang.tool_manager.ToolManagerVersions
+import org.elixir_lang.tool_manager.ToolManagerResult
 import java.nio.file.Path
 
 /**
  * [ElixirToolManager] implementation backed by [mise](https://mise.jdx.dev/).
  *
- * Delegates to [Mise.resolveVersions] and wraps the result in [MiseToolManagerVersions].
+ * Delegates to [Mise.resolveVersions] and maps the result to [ToolManagerResult]:
+ * - `null`                        → `null`        (mise unavailable for this root)
+ * - [MiseResult.UntrustedConfig]  → [ToolManagerResult.Error]
+ * - [MiseResult.Success]          → [ToolManagerResult.Success]
+ *
  * All threading constraints of [Mise.resolveVersions] apply here - must not be called on
  * the EDT or under a read lock.
  */
@@ -16,8 +21,18 @@ class MiseToolManager : ElixirToolManager {
     override val name: String = NAME
     override val displayName: String = "mise"
 
-    override fun resolveVersions(contentRoot: Path): ToolManagerVersions? =
-        Mise.resolveVersions(contentRoot)?.let { MiseToolManagerVersions(it) }
+    override fun resolveVersions(contentRoot: Path): ToolManagerResult? =
+        when (val result = Mise.resolveVersions(contentRoot)) {
+            null -> null
+            is MiseResult.UntrustedConfig ->
+                ToolManagerResult.Error(
+                    toolManagerName = NAME,
+                    description = "Config file '${result.configFilePath}' is not trusted. " +
+                        "Run <code>mise trust</code> in the project directory, then reload.",
+                )
+            is MiseResult.Success ->
+                ToolManagerResult.Success(MiseToolManagerVersions(result.versions))
+        }
 
     companion object {
         /** Stable persistence key - do not rename after first release. */
