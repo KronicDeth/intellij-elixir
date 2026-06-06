@@ -37,6 +37,20 @@ data class MiseVersions(
 )
 
 /**
+ * The result of a [Mise.resolveVersions] call.
+ *
+ * `null` from [Mise.resolveVersions] means mise is not on PATH or a transient failure occurred.
+ * A non-null result is one of:
+ * - [Success]          - mise ran successfully and returned version data.
+ * - [UntrustedConfig]  - mise exited non-zero because a config file in the project directory has
+ *   not been trusted yet.  The user must run `mise trust` in the directory to fix this.
+ */
+sealed interface MiseResult {
+    data class Success(val versions: MiseVersions) : MiseResult
+    data class UntrustedConfig(val configFilePath: String) : MiseResult
+}
+
+/**
  * Raw Gson model matching the snake_case JSON output of `mise ls --json`.
  * Converted to [MiseToolEntry] after parsing.
  */
@@ -70,8 +84,9 @@ object Mise {
     /**
      * Invokes `mise ls --current --json` in [workDir] and parses the result.
      *
-     * Returns `null` if mise is not on PATH, returns a non-zero exit code, times out, or
-     * produces output that cannot be parsed. Callers should treat `null` as "mise unavailable".
+     * Returns `null` if mise is not on PATH, times out, or fails in a way that is not
+     * otherwise classified.  Returns [MiseResult.UntrustedConfig] if mise exits non-zero because
+     * a config file has not been trusted.  Returns [MiseResult.Success] on a clean run.
      *
      * **Threading**: Must not be called on the EDT or under a read lock. This method spawns
      * a subprocess and blocks for up to [Mise.TIMEOUT_MS]ms. Callers must ensure they are running
@@ -79,7 +94,7 @@ object Mise {
      * after releasing any read lock).
      */
     @RequiresBackgroundThread
-    fun resolveVersions(workDir: Path): MiseVersions? {
+    fun resolveVersions(workDir: Path): MiseResult? {
         // `assertBackgroundThread()` only checks EDT, NOT holdsReadLock - both guards are needed.
         ThreadingAssertions.assertBackgroundThread()
         check(!ApplicationManager.getApplication().holdsReadLock()) {
@@ -96,6 +111,14 @@ object Mise {
 
             LOG.trace("resolveVersions: exit=${output.exitCode}, stdout.length=${output.stdout.length}, stderr.length=${output.stderr.length}")
             if (output.exitCode != 0) {
+                val trustError = parseTrustError(output.stderr)
+                if (trustError != null) {
+                    LOG.warn(
+                        "mise config not trusted in $workDir: '${trustError.configFilePath}'. " +
+                                "Run `mise trust` in the project directory to allow mise to read it."
+                    )
+                    return trustError
+                }
                 LOG.debug("mise ls --current --json exited with ${output.exitCode} in $workDir: ${output.stderr.take(200)}")
                 return null
             }
@@ -103,12 +126,28 @@ object Mise {
             LOG.trace("resolveVersions: stdout=${output.stdout.take(500)}")
             val result = parseOutput(output.stdout, workDir)
             LOG.trace("resolveVersions: parsed result=$result")
-            result
+            result?.let { MiseResult.Success(it) }
         } catch (e: Exception) {
             LOG.debug("mise ls --current --json failed in $workDir: ${e.message}")
             LOG.trace("resolveVersions: exception class=${e::class.simpleName} message=${e.message}")
             null
         }
+    }
+
+    /**
+     * Detects a `mise trust` error in [stderr].
+     *
+     * When mise encounters an untrusted config it prints two lines to stderr:
+     * ```
+     * mise ERROR error parsing config file: <path>
+     * mise ERROR Config files in <path> are not trusted.
+     * ```
+     *
+     * We match the second line to extract the untrusted config path.
+     */
+    private fun parseTrustError(stderr: String): MiseResult.UntrustedConfig? {
+        val match = Regex("""Config files in (.+) are not trusted\.""").find(stderr) ?: return null
+        return MiseResult.UntrustedConfig(match.groupValues[1].trim())
     }
 
     /**

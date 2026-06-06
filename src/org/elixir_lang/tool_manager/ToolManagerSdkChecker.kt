@@ -100,12 +100,16 @@ class ToolManagerSdkChecker(
     // -------------------------------------------------------------------------
 
     /**
-     * Queries all enabled tool managers for each path in [contentRoots], returning the first non-null
-     * result per content root (priority order matches [toolManagers]).
+     * Queries all enabled tool managers for each path in [contentRoots].
+     *
+     * Returns the first non-null [ToolManagerResult] per content root in priority order.
+     * A [ToolManagerResult.Error] result is returned as-is (not skipped) so that
+     * callers can surface the error to the user rather than silently treating the manager
+     * as absent.
      *
      * Must NOT be called on the EDT or under a read lock - tool managers may spawn subprocesses.
      */
-    fun resolveVersions(contentRoots: List<Path>): Map<Path, ToolManagerVersions?> {
+    fun resolveVersions(contentRoots: List<Path>): Map<Path, ToolManagerResult?> {
         val enabledManagers = toolManagers.filter { settings.isEnabled(it) }
         return contentRoots.associateWith { contentRoot ->
             enabledManagers.firstNotNullOfOrNull { manager ->
@@ -117,6 +121,19 @@ class ToolManagerSdkChecker(
         }
     }
 
+    /**
+     * Extracts all [ToolManagerResult.Error] entries from [toolManagerResultsByRoot].
+     *
+     * Called from the widget's notification scan so the widget can append tool-manager error
+     * descriptions to the active notification rather than silently suppressing them.
+     */
+    fun collectErrors(
+        toolManagerResultsByRoot: Map<Path, ToolManagerResult?>,
+    ): List<ToolManagerResult.Error> =
+        toolManagerResultsByRoot.values
+            .filterIsInstance<ToolManagerResult.Error>()
+            .distinctBy { it.description }
+
     // -------------------------------------------------------------------------
     // Phase 3 - pure analysis (no platform access needed)
     // -------------------------------------------------------------------------
@@ -124,13 +141,11 @@ class ToolManagerSdkChecker(
     /**
      * Detects version mismatches between configured SDKs and tool-manager-resolved versions.
      *
-     * For each module that has tool-manager data, this builds an [SdkVersionTable] containing
-     * both matching and mismatching rows (so the notification table shows the full picture).
-     * A [ModuleSdkIssue] is also emitted for each mismatch (used for notification deduplication
-     * and the issue key).
+     * Only [ToolManagerResult.Success] entries in [toolManagerResultsByRoot] are examined;
+     * [ToolManagerResult.Error] entries are skipped (they carry no version data).
      *
      * @param moduleCheckData              Collected in Phase 1.
-     * @param toolManagerVersionsByRoot    Collected in Phase 2.
+     * @param toolManagerResultsByRoot     Collected in Phase 2.
      * @param elixirVersionBySdk           Canonical Elixir version (from `elixir.app`) per SDK.
      * @param erlangReleaseByHomePath      Full OTP [Release] per Erlang SDK home path.
      * @param elixirVersionByInstallPath   Canonical Elixir version per tool-manager install path.
@@ -139,7 +154,7 @@ class ToolManagerSdkChecker(
      */
     fun detectMismatchIssues(
         moduleCheckData: List<ModuleCheckData>,
-        toolManagerVersionsByRoot: Map<Path, ToolManagerVersions?>,
+        toolManagerResultsByRoot: Map<Path, ToolManagerResult?>,
         elixirVersionBySdk: Map<Sdk, String?>,
         erlangReleaseByHomePath: Map<String, Release?>,
         elixirVersionByInstallPath: Map<String, String?>,
@@ -152,8 +167,8 @@ class ToolManagerSdkChecker(
                 LOG.trace("detectMismatchIssues: '${data.moduleName}' skipped - no content root")
                 continue
             }
-            val tmVersions = toolManagerVersionsByRoot[contentRoot] ?: run {
-                LOG.trace("detectMismatchIssues: '${data.moduleName}' skipped - no tool manager result")
+            val tmVersions = (toolManagerResultsByRoot[contentRoot] as? ToolManagerResult.Success)?.versions ?: run {
+                LOG.trace("detectMismatchIssues: '${data.moduleName}' skipped - no successful tool manager result")
                 continue
             }
 
@@ -215,16 +230,19 @@ class ToolManagerSdkChecker(
      * Builds the map of module name → [ToolManagerVersions] for every Elixir module whose
      * content root has an *installed* tool-manager Elixir version.
      *
+     * Only [ToolManagerResult.Success] entries are considered; [ToolManagerResult.Error] entries
+     * are ignored here (the widget surfaces them through a separate notification path).
+     *
      * Used to populate the "Configure from <tool manager>" action in notifications.
      */
     fun buildAssignments(
         moduleCheckData: List<ModuleCheckData>,
-        toolManagerVersionsByRoot: Map<Path, ToolManagerVersions?>,
+        toolManagerResultsByRoot: Map<Path, ToolManagerResult?>,
     ): Map<String, ToolManagerVersions> {
         val result = LinkedHashMap<String, ToolManagerVersions>()
         for (data in moduleCheckData) {
             val contentRoot = data.contentRoot ?: continue
-            val versions = toolManagerVersionsByRoot[contentRoot] ?: continue
+            val versions = (toolManagerResultsByRoot[contentRoot] as? ToolManagerResult.Success)?.versions ?: continue
             if (versions.elixir?.installed == true) {
                 result[data.moduleName] = versions
             }
@@ -238,16 +256,16 @@ class ToolManagerSdkChecker(
 
     /**
      * Resolves the canonical Elixir version string (from `lib/elixir/ebin/elixir.app`) for every
-     * unique install path referenced by [toolManagerVersionsByRoot].
+     * unique install path referenced by successful results in [toolManagerResultsByRoot].
      *
      * Must be called on a background thread outside any read lock.
      */
     fun collectElixirVersionByInstallPath(
-        toolManagerVersionsByRoot: Map<Path, ToolManagerVersions?>,
+        toolManagerResultsByRoot: Map<Path, ToolManagerResult?>,
     ): Map<String, String?> {
-        return toolManagerVersionsByRoot.values
-            .filterNotNull()
-            .mapNotNull { it.elixir?.installPath }
+        return toolManagerResultsByRoot.values
+            .filterIsInstance<ToolManagerResult.Success>()
+            .mapNotNull { it.versions.elixir?.installPath }
             .distinct()
             .associateWith { installPath ->
                 ElixirVersionDetector.elixirVersion(installPath, null).also { v ->
