@@ -1,0 +1,67 @@
+package org.elixir_lang.tool_manager
+
+import com.intellij.openapi.options.Configurable
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.DialogPanel
+import com.intellij.ui.dsl.builder.bindSelected
+import com.intellij.ui.dsl.builder.panel
+import javax.swing.JComponent
+
+/**
+ * Project-level settings page for Tool Managers (under Settings → Elixir → Tool Managers).
+ *
+ * Only registered on rich IDEs (via `rich-platform-plugin.xml`), because the SDK
+ * configuration performed by tool managers relies on Java-module APIs unavailable on
+ * small IDEs.
+ *
+ * Renders one checkbox per registered tool manager so users can opt in to each experimental
+ * manager individually.  The list is driven by [allBuiltInToolManagers] so new managers
+ * registered there automatically appear here without any additional wiring.
+ */
+internal class ToolManagerConfigurable(private val project: Project) : Configurable {
+
+    private var panel: DialogPanel? = null
+    private val settings: ToolManagerSettings get() = ToolManagerSettings.getInstance(project)
+
+    override fun getDisplayName(): String = "Tool Managers"
+
+    override fun createComponent(): JComponent {
+        panel = panel {
+            group("Experimental Tool Manager Integrations") {
+                for (manager in allBuiltInToolManagers) {
+                    row {
+                        checkBox(manager.displayName)
+                            .comment(
+                                "When enabled, ${manager.displayName} is queried for Elixir/Erlang " +
+                                    "version information and the status-bar widget will compare it " +
+                                    "against the configured SDK."
+                            )
+                            .bindSelected(
+                                getter = { settings.isEnabled(manager) },
+                                setter = { settings.setEnabled(manager, it) }
+                            )
+                    }
+                }
+            }
+        }
+        return panel!!
+    }
+
+    override fun isModified(): Boolean = panel?.isModified() ?: false
+
+    override fun apply() {
+        panel?.apply()
+        // Notify listeners (e.g. ToolManagerSdkCheckerStartupActivity) so the status-bar widget
+        // visibility is refreshed and any pending SDK configuration scan is triggered.
+        project.messageBus.syncPublisher(ToolManagerSettings.SETTINGS_CHANGED_TOPIC)
+            .toolManagerSettingsChanged()
+    }
+
+    override fun reset() {
+        panel?.reset()
+    }
+
+    override fun disposeUIResources() {
+        panel = null
+    }
+}

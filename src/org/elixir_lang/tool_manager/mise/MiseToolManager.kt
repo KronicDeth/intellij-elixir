@@ -3,6 +3,7 @@ package org.elixir_lang.tool_manager.mise
 import org.elixir_lang.mise.Mise
 import org.elixir_lang.mise.MiseResult
 import org.elixir_lang.tool_manager.ElixirToolManager
+import org.elixir_lang.tool_manager.ToolManagerRefreshTrigger
 import org.elixir_lang.tool_manager.ToolManagerResult
 import java.nio.file.Path
 
@@ -33,6 +34,12 @@ class MiseToolManager : ElixirToolManager {
             is MiseResult.Success ->
                 ToolManagerResult.Success(MiseToolManagerVersions(result.versions))
         }
+
+    /**
+     * Returns [MiseRefreshTrigger], which watches mise config files for changes and triggers
+     * a re-scan whenever a config file is modified, deleted, or a new one is created.
+     */
+    override fun createRefreshTrigger(): ToolManagerRefreshTrigger = MiseRefreshTrigger
 
     companion object {
         /** Stable persistence key - do not rename after first release. */

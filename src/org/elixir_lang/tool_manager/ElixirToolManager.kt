@@ -35,4 +35,17 @@ interface ElixirToolManager {
      * Returns [ToolManagerResult.Success] when versions are successfully resolved.
      */
     fun resolveVersions(contentRoot: Path): ToolManagerResult?
+
+    /**
+     * Returns a [ToolManagerRefreshTrigger] that can detect when this tool manager's
+     * configuration has changed and a re-scan should occur, or `null` if this manager
+     * does not support automatic change detection.
+     *
+     * Called once per scan cycle to obtain a fresh trigger (so dynamically discovered watch
+     * targets stay up to date).  The default implementation returns `null`.
+     *
+     * The returned trigger's [ToolManagerRefreshTrigger.install] method is called on a
+     * background IO thread immediately after the scan completes.
+     */
+    fun createRefreshTrigger(): ToolManagerRefreshTrigger? = null
 }
