@@ -1,21 +1,19 @@
 package org.elixir_lang
 
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.components.service
 import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.util.PsiTreeUtil
-import com.intellij.testFramework.PlatformTestUtil
 import com.intellij.testFramework.PsiTestUtil
-import kotlinx.coroutines.runBlocking
+import com.intellij.util.concurrency.annotations.RequiresEdt
 import org.elixir_lang.mix.Dep
 import org.elixir_lang.mix.sync.MixDepsSyncService
+import org.elixir_lang.mix.sync.MixSyncTestHelpers.drainDirectly
 import org.elixir_lang.mix.sync.SyncRequest
 import org.elixir_lang.mix.sync.scopedDepLibraryName
 import org.elixir_lang.psi.ElixirTuple
-import java.util.concurrent.atomic.AtomicBoolean
 
 class DepsWatcherTest : PlatformTestCase() {
     private val depName = "my_dep"
@@ -38,6 +36,7 @@ class DepsWatcherTest : PlatformTestCase() {
         }
     }
 
+    @RequiresEdt
     fun testSyncLibrariesRemovesInjectedStaleClassRootForSingleDep() {
         val depRoot = myFixture.tempDirFixture.findOrCreateDir("deps/$depName")
         myFixture.tempDirFixture.findOrCreateDir("deps/$depName/lib")
@@ -94,6 +93,7 @@ class DepsWatcherTest : PlatformTestCase() {
         )
     }
 
+    @RequiresEdt
     fun testSyncLibrariesRemovesInjectedStaleClassRootsForMultipleDeps() {
         val firstDepRoot = myFixture.tempDirFixture.findOrCreateDir("deps/$depName")
         val secondDepRoot = myFixture.tempDirFixture.findOrCreateDir("deps/$secondDepName")
@@ -372,31 +372,4 @@ class DepsWatcherTest : PlatformTestCase() {
             libraries.forEach { libraryTable.removeLibrary(it) }
         }
     }
-
-    private fun <T> runSuspendOnPooledThread(block: suspend () -> T): T {
-        var result: T? = null
-        var error: Throwable? = null
-        val done = AtomicBoolean(false)
-        ApplicationManager.getApplication().executeOnPooledThread {
-            runBlocking {
-                try {
-                    @Suppress("UNCHECKED_CAST")
-                    result = block()
-                } catch (e: Throwable) {
-                    error = e
-                }
-            }
-            done.set(true)
-        }
-        val deadline = System.currentTimeMillis() + 10_000L
-        while (!done.get()) {
-            assertTrue("runSuspendOnPooledThread timed out after 10 s", System.currentTimeMillis() < deadline)
-            PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
-        }
-        error?.let { throw AssertionError("Suspended block failed: ${it.message}", it) }
-        @Suppress("UNCHECKED_CAST")
-        return result as T
-    }
-
-    private fun drainDirectly(service: MixDepsSyncService) = runSuspendOnPooledThread { service.drain() }
 }
