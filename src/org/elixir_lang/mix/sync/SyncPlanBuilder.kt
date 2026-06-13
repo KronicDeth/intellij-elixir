@@ -44,6 +44,7 @@ internal data class CoalescedRequests(
     val syncRoots: List<SyncRequest.SyncRoot>,
     val depsRoots: List<SyncRequest.DepsRoot>,
     val depRoots: List<SyncRequest.DepRoot>,
+    val consolidatedRoots: List<SyncRequest.Consolidated>,
     val syncModuleNames: Set<String>,
 )
 
@@ -122,6 +123,13 @@ private fun resolvePathShapedRequest(
         is SyncRequest.MixFile ->
             resolveMixFileRequest(project, request.mixFile)
 
+        is SyncRequest.Consolidated ->
+            if (isContentRootCandidate(request.contentRootCandidate, contentRootUrls)) {
+                request
+            } else {
+                null
+            }
+
         SyncRequest.All,
         is SyncRequest.SyncRoot,
         is SyncRequest.SyncModule ->
@@ -185,6 +193,11 @@ internal fun coalesceRequests(requests: List<SyncRequest>): CoalescedRequests {
     val syncModuleNames = requests.filterIsInstance<SyncRequest.SyncModule>()
         .mapTo(LinkedHashSet()) { it.moduleName }
 
+    // Consolidated requests are superseded by hasAll (which already triggers consolidated sync).
+    val consolidatedRoots = if (hasAll) emptyList() else {
+        requests.filterIsInstance<SyncRequest.Consolidated>()
+    }
+
     return CoalescedRequests(
         deleteAlls = deleteAlls,
         deleteOnes = deleteOnes,
@@ -192,6 +205,7 @@ internal fun coalesceRequests(requests: List<SyncRequest>): CoalescedRequests {
         syncRoots = syncRoots,
         depsRoots = depsRoots,
         depRoots = depRoots,
+        consolidatedRoots = consolidatedRoots,
         syncModuleNames = syncModuleNames,
     )
 }
@@ -283,11 +297,14 @@ internal suspend fun buildSyncPlan(project: Project, requests: CoalescedRequests
     val externalLibraryPlans = modulePlans.flatMap { it.externalLibraryPlans }
     val libraryPlans = deduplicateLibraryPlans(requestedLibraryPlans + externalLibraryPlans)
 
+    val consolidatedPlans = buildConsolidatedLibraryPlans(project, requests)
+
     return SyncPlan(
         deleteAlls = requests.deleteAlls.map { DeleteAllPlan(it.depsUrl) },
         deleteOnes = requests.deleteOnes.map { DeleteOnePlan(it.depName, it.contentRootUrl) },
         libraryPlans = libraryPlans,
         modulePlans = modulePlans,
+        consolidatedPlans = consolidatedPlans,
     )
 }
 
@@ -298,6 +315,72 @@ private suspend fun allDepRoots(project: Project): List<VirtualFile> =
             .contentRoots
             .flatMap { contentRoot -> contentRoot.findChild("deps")?.children?.toList() ?: emptyList() }
     }
+
+/**
+ * Builds [ConsolidatedLibraryPlan]s for the affected content roots.
+ *
+ * Scoping rules:
+ * - [CoalescedRequests.hasAll] → scan all content roots
+ * - [CoalescedRequests.syncRoots] / [CoalescedRequests.depsRoots] / [CoalescedRequests.depRoots] → affected roots only
+ * - [CoalescedRequests.consolidatedRoots] → specified content roots only
+ * - [CoalescedRequests.syncModuleNames] → content roots of named modules
+ * - Delete-only requests → empty list (deletion is handled by [buildWritePlan])
+ */
+private suspend fun buildConsolidatedLibraryPlans(
+    project: Project,
+    requests: CoalescedRequests,
+): List<ConsolidatedLibraryPlan> {
+    val hasPositiveSync = requests.hasAll ||
+        requests.syncRoots.isNotEmpty() ||
+        requests.depsRoots.isNotEmpty() ||
+        requests.depRoots.isNotEmpty() ||
+        requests.consolidatedRoots.isNotEmpty() ||
+        requests.syncModuleNames.isNotEmpty()
+
+    if (!hasPositiveSync) return emptyList()
+
+    return readAction {
+        val allContentRoots = ProjectRootManager.getInstance(project).contentRoots
+
+        val contentRoots: List<VirtualFile> = when {
+            requests.hasAll -> allContentRoots.toList()
+            else -> {
+                val fromSyncRoots = requests.syncRoots.mapNotNull { syncRoot ->
+                    allContentRoots.firstOrNull { it.url == syncRoot.contentRootUrl }
+                }
+                val fromDepsRoots = requests.depsRoots.mapNotNull { it.depsRoot.parent?.takeIf { p -> p.isValid } }
+                val fromDepRoots = requests.depRoots.mapNotNull { it.depRoot.parent?.parent?.takeIf { p -> p.isValid } }
+                val fromConsolidated = requests.consolidatedRoots.map { it.contentRootCandidate }.filter { it.isValid }
+                val fromModules = requests.syncModuleNames.flatMap { moduleName ->
+                    ModuleManager.getInstance(project).findModuleByName(moduleName)
+                        ?.takeIf { !it.isDisposed }
+                        ?.let { ModuleRootManager.getInstance(it).contentRoots.toList() }
+                        .orEmpty()
+                }
+                (fromSyncRoots + fromDepsRoots + fromDepRoots + fromConsolidated + fromModules)
+                    .distinctBy { it.url }
+            }
+        }
+
+        contentRoots.mapNotNull { contentRoot ->
+            ProgressManager.checkCanceled()
+            val build = contentRoot.findChild("_build") ?: return@mapNotNull null
+            if (!build.isValid || !build.isDirectory) return@mapNotNull null
+
+            val consolidatedDirs = build.children
+                .filter { it.isDirectory }
+                .flatMap { env -> env.children.filter { it.isDirectory && it.name == "consolidated" } }
+
+            val ownerModuleName = ModuleUtil.findModuleForFile(contentRoot, project)?.name
+
+            ConsolidatedLibraryPlan(
+                contentRootUrl = contentRoot.url,
+                classRootUrls = consolidatedDirs.map { it.url },
+                ownerModuleName = ownerModuleName,
+            )
+        }
+    }
+}
 
 /**
  * Walks up the directory tree from [contentRoot] to find the nearest ancestor that contains
@@ -583,15 +666,22 @@ internal fun buildLibraryRootsPlansInCurrentContext(project: Project, deps: Coll
                     ProgressManager.checkCanceled()
                     for (environmentChild in environment.children.filter { it.isDirectory }) {
                         ProgressManager.checkCanceled()
-                        when (environmentChild.name) {
-                            "consolidated" -> classRoots += environmentChild
-                            "lib" -> environmentChild.findChild(depName)?.let { depEnvLib ->
+                        // Consolidated roots are NOT added to per-dep libraries;
+                        // they belong in a separate shared library managed by
+                        // syncConsolidatedLibrary().
+                        if (environmentChild.name == "lib") {
+                            environmentChild.findChild(depName)?.let { depEnvLib ->
                                 depEnvLib.findChild("ebin")?.let { ebin ->
                                     if (ebin.isDirectory) {
                                         ModuleUtil.findModuleForFile(depEnvLib, project)?.let { module ->
                                             excludeFolders += ExcludeFolderPlan(module.name, depEnvLib.url)
                                         }
-                                        classRoots += ebin
+                                        // Resolve symlinks via VFS before registering: Erlang deps
+                                        // have _build/{env}/lib/{dep}/ebin → deps/{dep}/ebin, so
+                                        // without canonicalization the same physical directory is
+                                        // added once per build environment.
+                                        val canonicalEbin = ebin.canonicalFile ?: ebin
+                                        classRoots += canonicalEbin
                                     }
                                 }
                             }

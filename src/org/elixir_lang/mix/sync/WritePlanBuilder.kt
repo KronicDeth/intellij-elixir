@@ -13,6 +13,7 @@ import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar
 import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.util.concurrency.ThreadingAssertions
 import com.intellij.util.concurrency.annotations.RequiresReadLock
+import org.elixir_lang.mix.library.CONSOLIDATED_LIBRARY_SUFFIX
 import org.elixir_lang.mix.library.Kind
 
 /**
@@ -124,7 +125,7 @@ private fun buildWritePlanInCurrentContext(project: Project, syncPlan: SyncPlan)
             put(
                 name,
                 LibSnap(
-                    isKind = (lib as? LibraryEx)?.getKind() == Kind,
+                    isKind = (lib as? LibraryEx)?.kind == Kind,
                     classUrls = lib.getUrls(OrderRootType.CLASSES).toSet(),
                     sourceUrls = lib.getUrls(OrderRootType.SOURCES).toSet(),
                 )
@@ -155,6 +156,13 @@ private fun buildWritePlanInCurrentContext(project: Project, syncPlan: SyncPlan)
             if (matchesScoped || matchesSources) {
                 librariesToRemove += name
             }
+        }
+
+        // Also remove the consolidated library that belongs to the same project root.
+        val projectRootName = contentRootUrl.trimEnd('/').substringAfterLast('/')
+        val consolidatedLibraryName = "$projectRootName $CONSOLIDATED_LIBRARY_SUFFIX"
+        if (libSnap.containsKey(consolidatedLibraryName)) {
+            librariesToRemove += consolidatedLibraryName
         }
     }
 
@@ -245,6 +253,53 @@ private fun buildWritePlanInCurrentContext(project: Project, syncPlan: SyncPlan)
     }
 
     // -----------------------------------------------------------------------
+    // Step 2b - Compute consolidated library write ops (diff-based)
+    //
+    // Consolidated libraries are diffed exactly like per-dep libraries: compare desired
+    // class root URLs against the current snapshot and only emit a write op when something
+    // actually changed. An empty classRootUrls list means the library should not exist.
+    // -----------------------------------------------------------------------
+    for (plan in syncPlan.consolidatedPlans) {
+        ProgressManager.checkCanceled()
+        val consolidatedLibName = plan.libraryName
+        val existing = libSnap[consolidatedLibName]?.takeIf { consolidatedLibName !in librariesToRemoveSet }
+        val desiredClass = plan.classRootUrls.toSet()
+
+        if (desiredClass.isEmpty()) {
+            // No consolidated dirs exist - schedule removal if library exists and not already scheduled.
+            if (existing != null && consolidatedLibName !in librariesToRemoveSet) {
+                librariesToRemove += consolidatedLibName
+            }
+            continue
+        }
+
+        if (existing != null) {
+            val addClass = (desiredClass - existing.classUrls).toList()
+            val removeClass = (existing.classUrls - desiredClass).toList()
+            if (addClass.isNotEmpty() || removeClass.isNotEmpty()) {
+                libraryWriteOps += LibraryWriteOp(
+                    libraryName = consolidatedLibName,
+                    createWithKind = false,
+                    addClassUrls = addClass,
+                    removeClassUrls = removeClass,
+                    addSourceUrls = emptyList(),
+                    removeSourceUrls = emptyList(),
+                )
+            }
+            // No diff → no write op
+        } else {
+            libraryWriteOps += LibraryWriteOp(
+                libraryName = consolidatedLibName,
+                createWithKind = true,
+                addClassUrls = plan.classRootUrls,
+                removeClassUrls = emptyList(),
+                addSourceUrls = emptyList(),
+                removeSourceUrls = emptyList(),
+            )
+        }
+    }
+
+    // -----------------------------------------------------------------------
     // Step 3 - Compute placeholderLibraries (missingLibraryDeps)
     //
     // A library is a "placeholder" if it is required by a module plan's libraryDeps but:
@@ -293,11 +348,16 @@ private fun buildWritePlanInCurrentContext(project: Project, syncPlan: SyncPlan)
 
     val moduleManager = ModuleManager.getInstance(project)
     val moduleNames = (syncPlan.modulePlans.map { it.moduleName } +
-        syncPlan.libraryPlans.flatMap { it.excludeFolders }.map { it.moduleName })
+        syncPlan.libraryPlans.flatMap { it.excludeFolders }.map { it.moduleName } +
+        syncPlan.consolidatedPlans.mapNotNull { it.ownerModuleName })
         .toCollection(LinkedHashSet())
     val modulePlansByName = syncPlan.modulePlans.associateBy { it.moduleName }
     val excludeFoldersByModule = syncPlan.libraryPlans.flatMap { it.excludeFolders }
         .groupBy { it.moduleName }
+    // Map: owner module name → consolidated library names that should be wired as dependencies.
+    val consolidatedLibsByModule: Map<String, List<String>> = syncPlan.consolidatedPlans
+        .filter { it.ownerModuleName != null && it.classRootUrls.isNotEmpty() }
+        .groupBy({ it.ownerModuleName!! }, { it.libraryName })
 
     val moduleWriteOps = mutableListOf<ModuleWriteOp>()
 
@@ -346,6 +406,17 @@ private fun buildWritePlanInCurrentContext(project: Project, syncPlan: SyncPlan)
                 } else {
                     addInvalidLibraryDeps += libName
                 }
+            }
+        }
+
+        // Wire consolidated library dependencies for this module (from ConsolidatedLibraryPlan).
+        for (consolidatedLibName in consolidatedLibsByModule[moduleName].orEmpty()) {
+            ProgressManager.checkCanceled()
+            if (consolidatedLibName in existingLibraryDeps) continue
+            if (consolidatedLibName in futureLibraries) {
+                addLibraryDeps += consolidatedLibName
+            } else {
+                addInvalidLibraryDeps += consolidatedLibName
             }
         }
 

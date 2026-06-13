@@ -11,13 +11,16 @@ import com.intellij.openapi.vfs.VirtualFile
 import org.elixir_lang.sdk.erlang_dependent.ErlangSdkResult
 import org.elixir_lang.sdk.erlang_dependent.MissingErlangSdkReason
 import org.elixir_lang.sdk.elixir.SdkSettingsOpener
+import org.jetbrains.annotations.TestOnly
 import java.util.Collections
 import java.util.WeakHashMap
 
 object Notifier {
+    private data class ActiveMixDeps(val rootUrl: String, val notification: Notification)
+
     const val MIX_DEPS_OUTDATED_TITLE: String = "Mix deps outdated"
     private const val MIX_DEPS_GROUP_ID: String = "Elixir Mix Deps"
-    private val mixDepsNotifications: MutableMap<Project, Notification> =
+    private val mixDepsNotifications: MutableMap<Project, ActiveMixDeps> =
         Collections.synchronizedMap(WeakHashMap())
     private val missingErlangSdkNotifications: MutableMap<Project, Notification> =
         Collections.synchronizedMap(WeakHashMap())
@@ -126,11 +129,20 @@ object Notifier {
 
     // Mix Dependencies notification methods
     fun mixDepsOutdated(project: Project, root: VirtualFile) {
-        if (mixDepsNotifications.containsKey(project)) {
-            return
-        }
+        val oldNotification = synchronized(mixDepsNotifications) {
+            val existing = mixDepsNotifications[project] ?: return@synchronized null
 
-        val notification = NotificationGroupManager
+            if (existing.rootUrl == root.url) {
+                return
+            }
+
+            mixDepsNotifications.remove(project)
+            existing.notification
+        }
+        oldNotification?.expire()
+
+        lateinit var notification: Notification
+        notification = NotificationGroupManager
             .getInstance()
             .getNotificationGroup(MIX_DEPS_GROUP_ID)
             .createNotification(
@@ -140,8 +152,16 @@ object Notifier {
             )
             .addAction(org.elixir_lang.notification.mix_deps.InstallAction(root))
             .addAction(org.elixir_lang.notification.mix_deps.ShowStatusAction(root))
-            .whenExpired { mixDepsNotifications.remove(project) }
-        mixDepsNotifications[project] = notification
+            .whenExpired {
+                synchronized(mixDepsNotifications) {
+                    if (mixDepsNotifications[project]?.notification === notification) {
+                        mixDepsNotifications.remove(project)
+                    }
+                }
+            }
+        synchronized(mixDepsNotifications) {
+            mixDepsNotifications[project] = ActiveMixDeps(root.url, notification)
+        }
         notification.notify(project)
     }
 
@@ -158,8 +178,27 @@ object Notifier {
     }
 
     fun clearMixDepsOutdated(project: Project) {
-        mixDepsNotifications.remove(project)?.expire()
+        val notification = synchronized(mixDepsNotifications) {
+            mixDepsNotifications.remove(project)?.notification
+        }
+        notification?.expire()
     }
+
+    /**
+     * Returns `true` when a "Mix deps outdated" notification is currently active (shown and not
+     * yet expired) for [project].
+     *
+     * Exposes the private [mixDepsNotifications] map as a read-only boolean so tests can assert
+     * notification state without reflection.
+     */
+    @TestOnly
+    fun hasActiveMixDepsOutdatedNotification(project: Project): Boolean =
+        mixDepsNotifications.containsKey(project)
+
+    /** Test seam: root URL currently bound to the active "Mix deps outdated" notification. */
+    @TestOnly
+    fun activeMixDepsOutdatedRootUrl(project: Project): String? =
+        mixDepsNotifications[project]?.rootUrl
 
     fun mixDepsInstallSuccess(project: Project, moduleName: String) {
         NotificationGroupManager

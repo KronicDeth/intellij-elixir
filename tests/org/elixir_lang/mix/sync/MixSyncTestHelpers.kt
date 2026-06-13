@@ -5,6 +5,7 @@ import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar
 import com.intellij.testFramework.PlatformTestUtil
+import com.intellij.util.concurrency.annotations.RequiresEdt
 import kotlinx.coroutines.runBlocking
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -48,7 +49,7 @@ internal object MixSyncTestHelpers {
             }
             PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
         }
-        error?.let { throw AssertionError("Suspended block failed: ${it.message}", it) }
+        error?.let { throw it }
         @Suppress("UNCHECKED_CAST")
         return result as T
     }
@@ -68,6 +69,7 @@ internal object MixSyncTestHelpers {
      * here: in tests every library in the project table was created by the test itself, so all
      * of them must be removed unconditionally.
      */
+    @RequiresEdt
     fun removeAllLibraries(project: Project) {
         val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
         val toRemove = libraryTable.libraries.toList()

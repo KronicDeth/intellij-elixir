@@ -1,7 +1,6 @@
 package org.elixir_lang.mix.sync
 
 import com.google.common.annotations.VisibleForTesting
-import com.intellij.openapi.application.edtWriteAction
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.module.Module
@@ -13,6 +12,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import org.elixir_lang.mix.library.CONSOLIDATED_LIBRARY_SUFFIX
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -33,7 +33,7 @@ import kotlin.time.Duration.Companion.milliseconds
  * - Deletes are executed before syncs so that a delete followed immediately by a re-sync does not
  *   re-populate libraries that were intentionally removed.
  *
- * Write mutations use [edtWriteAction]: all model mutations dispatch to EDT + write-lock, which
+ * Write mutations use `edtWriteAction`: all model mutations dispatch to EDT + write-lock, which
  * avoids `invokeAndWait`-based deadlocks from coroutine context.
  *
  * Observability:
@@ -181,6 +181,7 @@ class MixDepsSyncService(private val project: Project, cs: CoroutineScope) {
                     "syncModules=${coalescedRequests.syncModuleNames.size}, " +
                     "libraryPlans=${syncPlan.libraryPlans.size}, " +
                     "modulePlans=${syncPlan.modulePlans.size}, " +
+                    "consolidatedPlans=${syncPlan.consolidatedPlans.size}, " +
                     "librariesChanged=${applyStats.librariesChanged}, " +
                     "modulesChanged=${applyStats.modulesChanged})"
             )
@@ -283,10 +284,30 @@ internal data class SyncPlan(
     val deleteOnes: List<DeleteOnePlan> = emptyList(),
     val libraryPlans: List<LibraryRootsPlan> = emptyList(),
     val modulePlans: List<ModuleDepsPlan> = emptyList(),
+    val consolidatedPlans: List<ConsolidatedLibraryPlan> = emptyList(),
 ) {
     val isEmpty: Boolean
         get() = deleteAlls.isEmpty() &&
             deleteOnes.isEmpty() &&
             libraryPlans.isEmpty() &&
-            modulePlans.isEmpty()
+            modulePlans.isEmpty() &&
+            consolidatedPlans.isEmpty()
+}
+
+/**
+ * Desired state for a consolidated protocol library at one content root.
+ *
+ * Built during the read phase by scanning `_build/{env}/consolidated/` directories.
+ * Diffed in `buildWritePlan` against the existing library table state.
+ */
+internal data class ConsolidatedLibraryPlan(
+    /** The content root URL that owns this `_build` directory. */
+    val contentRootUrl: String,
+    /** Desired class root URLs (the `_build/{env}/consolidated/` directories). */
+    val classRootUrls: List<String>,
+    /** The module name of the owner module (for wiring the library as a module dependency). */
+    val ownerModuleName: String?,
+) {
+    val libraryName: String
+        get() = "${contentRootUrl.trimEnd('/').substringAfterLast('/')} $CONSOLIDATED_LIBRARY_SUFFIX"
 }

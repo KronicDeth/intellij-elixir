@@ -1,21 +1,20 @@
 package org.elixir_lang
 
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.components.service
 import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.util.PsiTreeUtil
-import com.intellij.testFramework.PlatformTestUtil
 import com.intellij.testFramework.PsiTestUtil
-import kotlinx.coroutines.runBlocking
+import com.intellij.util.concurrency.annotations.RequiresEdt
 import org.elixir_lang.mix.Dep
+import org.elixir_lang.mix.library.CONSOLIDATED_LIBRARY_SUFFIX
 import org.elixir_lang.mix.sync.MixDepsSyncService
+import org.elixir_lang.mix.sync.MixSyncTestHelpers.drainDirectly
 import org.elixir_lang.mix.sync.SyncRequest
 import org.elixir_lang.mix.sync.scopedDepLibraryName
 import org.elixir_lang.psi.ElixirTuple
-import java.util.concurrent.atomic.AtomicBoolean
 
 class DepsWatcherTest : PlatformTestCase() {
     private val depName = "my_dep"
@@ -33,11 +32,13 @@ class DepsWatcherTest : PlatformTestCase() {
     override fun tearDown() {
         try {
             removeLibrariesIfPresent(depName, secondDepName)
+            removeConsolidatedLibraries()
         } finally {
             super.tearDown()
         }
     }
 
+    @RequiresEdt
     fun testSyncLibrariesRemovesInjectedStaleClassRootForSingleDep() {
         val depRoot = myFixture.tempDirFixture.findOrCreateDir("deps/$depName")
         myFixture.tempDirFixture.findOrCreateDir("deps/$depName/lib")
@@ -55,7 +56,11 @@ class DepsWatcherTest : PlatformTestCase() {
 
         val firstSyncClassRootUrls = classRootUrls(libName)
         assertTrue(
-            "Expected dev consolidated root after first sync",
+            "Expected dev ebin class root after first sync",
+            firstSyncClassRootUrls.any { it.contains("/_build/dev/lib/$depName/ebin") }
+        )
+        assertFalse(
+            "Consolidated root must not be added to the per-dep library",
             firstSyncClassRootUrls.any { it.contains("/_build/dev/consolidated") }
         )
 
@@ -89,11 +94,16 @@ class DepsWatcherTest : PlatformTestCase() {
             secondSyncClassRootUrls.any { it.contains("/stale_classes/$depName") }
         )
         assertTrue(
-            "Expected dev consolidated root after re-sync",
+            "Expected dev ebin class root after re-sync",
+            secondSyncClassRootUrls.any { it.contains("/_build/dev/lib/$depName/ebin") }
+        )
+        assertFalse(
+            "Consolidated root must not be added to the per-dep library after re-sync",
             secondSyncClassRootUrls.any { it.contains("/_build/dev/consolidated") }
         )
     }
 
+    @RequiresEdt
     fun testSyncLibrariesRemovesInjectedStaleClassRootsForMultipleDeps() {
         val firstDepRoot = myFixture.tempDirFixture.findOrCreateDir("deps/$depName")
         val secondDepRoot = myFixture.tempDirFixture.findOrCreateDir("deps/$secondDepName")
@@ -117,11 +127,19 @@ class DepsWatcherTest : PlatformTestCase() {
         drainDirectly(service)
 
         assertTrue(
-            "First dep should include dev consolidated root after first sync",
-            classRootUrls(firstLibName).any { it.contains("/_build/dev/consolidated") }
+            "First dep should include its dev ebin class root after first sync",
+            classRootUrls(firstLibName).any { it.contains("/_build/dev/lib/$depName/ebin") }
         )
         assertTrue(
-            "Second dep should include dev consolidated root after first sync",
+            "Second dep should include its dev ebin class root after first sync",
+            classRootUrls(secondLibName).any { it.contains("/_build/dev/lib/$secondDepName/ebin") }
+        )
+        assertFalse(
+            "First dep library must not include the shared consolidated root",
+            classRootUrls(firstLibName).any { it.contains("/_build/dev/consolidated") }
+        )
+        assertFalse(
+            "Second dep library must not include the shared consolidated root",
             classRootUrls(secondLibName).any { it.contains("/_build/dev/consolidated") }
         )
 
@@ -167,11 +185,19 @@ class DepsWatcherTest : PlatformTestCase() {
             classRootUrls(secondLibName).any { it.contains("/stale_classes/$secondDepName") }
         )
         assertTrue(
-            "First dep should still include dev consolidated root after re-sync",
-            classRootUrls(firstLibName).any { it.contains("/_build/dev/consolidated") }
+            "First dep should still include its dev ebin class root after re-sync",
+            classRootUrls(firstLibName).any { it.contains("/_build/dev/lib/$depName/ebin") }
         )
         assertTrue(
-            "Second dep should still include dev consolidated root after re-sync",
+            "Second dep should still include its dev ebin class root after re-sync",
+            classRootUrls(secondLibName).any { it.contains("/_build/dev/lib/$secondDepName/ebin") }
+        )
+        assertFalse(
+            "First dep library must not include the shared consolidated root after re-sync",
+            classRootUrls(firstLibName).any { it.contains("/_build/dev/consolidated") }
+        )
+        assertFalse(
+            "Second dep library must not include the shared consolidated root after re-sync",
             classRootUrls(secondLibName).any { it.contains("/_build/dev/consolidated") }
         )
     }
@@ -325,6 +351,119 @@ class DepsWatcherTest : PlatformTestCase() {
         assertEquals("Expected path call value to keep fallback deps path", "deps/$depName", dep!!.path)
     }
 
+    @RequiresEdt
+    fun testSyncConsolidatedLibraryCreatesSeparateSharedLibrary() {
+        myFixture.tempDirFixture.findOrCreateDir("deps/$depName/lib")
+        myFixture.tempDirFixture.findOrCreateDir("_build/dev/consolidated")
+        myFixture.tempDirFixture.findOrCreateDir("_build/test/consolidated")
+        myFixture.tempDirFixture.findOrCreateDir("_build/dev/lib/$depName/ebin")
+
+        val service = project.service<MixDepsSyncService>()
+        val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
+
+        // Trigger a full sync that includes consolidated library creation.
+        service.clearPendingForTesting()
+        service.enqueue(SyncRequest.All)
+        drainDirectly(service)
+
+        val tempDirVf = myFixture.tempDirFixture.findOrCreateDir("")
+        val consolidatedLibraryName = "${tempDirVf.name} $CONSOLIDATED_LIBRARY_SUFFIX"
+        val consolidatedLibrary = libraryTable.getLibraryByName(consolidatedLibraryName)
+        assertNotNull("Expected consolidated library '$consolidatedLibraryName' to exist", consolidatedLibrary)
+
+        val consolidatedClassRoots = consolidatedLibrary!!.getUrls(OrderRootType.CLASSES).toList()
+        assertTrue(
+            "Consolidated library should include the dev consolidated root",
+            consolidatedClassRoots.any { it.contains("/_build/dev/consolidated") }
+        )
+        assertTrue(
+            "Consolidated library should include the test consolidated root",
+            consolidatedClassRoots.any { it.contains("/_build/test/consolidated") }
+        )
+        assertFalse(
+            "Consolidated library must not include per-dep ebin roots",
+            consolidatedClassRoots.any { it.contains("/ebin") }
+        )
+    }
+
+    @RequiresEdt
+    fun testDeleteAllLibrariesRemovesConsolidatedLibrary() {
+        myFixture.tempDirFixture.findOrCreateDir("deps/$depName/lib")
+        myFixture.tempDirFixture.findOrCreateDir("_build/dev/consolidated")
+        myFixture.tempDirFixture.findOrCreateDir("_build/dev/lib/$depName/ebin")
+
+        val service = project.service<MixDepsSyncService>()
+        val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
+
+        // Seed libraries via a full sync (creates both dep library and consolidated library).
+        service.clearPendingForTesting()
+        service.enqueue(SyncRequest.All)
+        drainDirectly(service)
+
+        val tempDirVf = myFixture.tempDirFixture.findOrCreateDir("")
+        val consolidatedLibraryName = "${tempDirVf.name} $CONSOLIDATED_LIBRARY_SUFFIX"
+        assertNotNull(
+            "Expected consolidated library to exist before deleting all deps libraries",
+            libraryTable.getLibraryByName(consolidatedLibraryName)
+        )
+
+        // Delete all deps libraries via drain.
+        val depsDir = myFixture.tempDirFixture.findOrCreateDir("deps")
+        val contentRootUrl = depsDir.parent?.url
+        service.clearPendingForTesting()
+        service.enqueue(SyncRequest.DeleteAll(depsDir.url, contentRootUrl))
+        drainDirectly(service)
+
+        assertNull(
+            "Consolidated library should be removed when all dep libraries are deleted",
+            libraryTable.getLibraryByName(consolidatedLibraryName)
+        )
+    }
+
+    @RequiresEdt
+    fun testDeleteAllLibrariesRemovesConsolidatedLibraryWithoutDepLibraries() {
+        myFixture.tempDirFixture.findOrCreateDir("deps")
+        myFixture.tempDirFixture.findOrCreateDir("_build/dev/consolidated")
+
+        val service = project.service<MixDepsSyncService>()
+        val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
+
+        // Create ONLY the consolidated library (no dep libraries) via a full sync.
+        // Since deps/ is empty, no per-dep libraries are created - only consolidated.
+        service.clearPendingForTesting()
+        service.enqueue(SyncRequest.All)
+        drainDirectly(service)
+
+        val tempDirVf = myFixture.tempDirFixture.findOrCreateDir("")
+        val consolidatedLibraryName = "${tempDirVf.name} $CONSOLIDATED_LIBRARY_SUFFIX"
+        assertNotNull(
+            "Expected consolidated library to exist before deleting all deps libraries",
+            libraryTable.getLibraryByName(consolidatedLibraryName)
+        )
+
+        // Verify no dep libraries exist (only consolidated).
+        val depLibraries = libraryTable.libraries.filter { lib ->
+            val name = lib.name ?: return@filter false
+            name != consolidatedLibraryName && !name.endsWith(CONSOLIDATED_LIBRARY_SUFFIX)
+        }
+        assertTrue(
+            "Expected no dep libraries to exist (only the consolidated library)",
+            depLibraries.isEmpty()
+        )
+
+        // Delete all deps libraries via drain - should still remove consolidated library.
+        val depsDir = myFixture.tempDirFixture.findOrCreateDir("deps")
+        val contentRootUrl = depsDir.parent?.url
+        service.clearPendingForTesting()
+        service.enqueue(SyncRequest.DeleteAll(depsDir.url, contentRootUrl))
+        drainDirectly(service)
+
+        assertNull(
+            "Consolidated library should be removed even when there are no per-dep libraries",
+            libraryTable.getLibraryByName(consolidatedLibraryName)
+        )
+    }
+
     // ------------------------------------------------------------------
     // Helpers
     // ------------------------------------------------------------------
@@ -373,30 +512,18 @@ class DepsWatcherTest : PlatformTestCase() {
         }
     }
 
-    private fun <T> runSuspendOnPooledThread(block: suspend () -> T): T {
-        var result: T? = null
-        var error: Throwable? = null
-        val done = AtomicBoolean(false)
-        ApplicationManager.getApplication().executeOnPooledThread {
-            runBlocking {
-                try {
-                    @Suppress("UNCHECKED_CAST")
-                    result = block()
-                } catch (e: Throwable) {
-                    error = e
-                }
-            }
-            done.set(true)
+    private fun removeConsolidatedLibraries() {
+        val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
+        val consolidatedLibraries = libraryTable.libraries.filter {
+            it.name?.endsWith(CONSOLIDATED_LIBRARY_SUFFIX) == true
         }
-        val deadline = System.currentTimeMillis() + 10_000L
-        while (!done.get()) {
-            assertTrue("runSuspendOnPooledThread timed out after 10 s", System.currentTimeMillis() < deadline)
-            PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
-        }
-        error?.let { throw AssertionError("Suspended block failed: ${it.message}", it) }
-        @Suppress("UNCHECKED_CAST")
-        return result as T
-    }
 
-    private fun drainDirectly(service: MixDepsSyncService) = runSuspendOnPooledThread { service.drain() }
+        if (consolidatedLibraries.isEmpty()) {
+            return
+        }
+
+        WriteAction.run<Throwable> {
+            consolidatedLibraries.forEach { libraryTable.removeLibrary(it) }
+        }
+    }
 }
