@@ -69,7 +69,7 @@ class Editor(private val sdkModel: SdkModel, private val history: History, priva
 
     override fun getHelpTopic(): String? = null
 
-    override fun createComponent(): JComponent? {
+    override fun createComponent(): JComponent {
         return mainPanel
     }
 
@@ -84,7 +84,7 @@ class Editor(private val sdkModel: SdkModel, private val history: History, priva
                 pathEditor(orderRootType)?.let { pathEditor ->
                     pathEditor.setAddBaseDir(sdk.homeDirectory)
                     tabbedPane.addTab(pathEditor.displayName, pathEditor.createComponent())
-                    sdkPathEditorByOrderRootType.put(orderRootType, pathEditor)
+                    sdkPathEditorByOrderRootType[orderRootType] = pathEditor
                 }
             }
 
@@ -229,7 +229,7 @@ class Editor(private val sdkModel: SdkModel, private val history: History, priva
         homeComponent.apply {
             setText(absolutePath)
             textField.foreground =
-                if (absolutePath != null && !absolutePath.isEmpty()) {
+                if (!absolutePath.isNullOrEmpty()) {
                     val homeDir = File(absolutePath)
                     val homeMustBeDirectory = (sdk.sdkType as SdkType).homeChooserDescriptor.isChooseFolders
 
@@ -318,7 +318,7 @@ class Editor(private val sdkModel: SdkModel, private val history: History, priva
 
             if (component == null) {
                 component = configurable.createComponent()
-                componentByAdditionalDataConfigurable.put(configurable, component)
+                componentByAdditionalDataConfigurable[configurable] = component
             }
 
             if (component != null) {
@@ -333,7 +333,7 @@ class Editor(private val sdkModel: SdkModel, private val history: History, priva
 
         if (configurables == null) {
             configurables = Lists.newArrayList()
-            additionalDataConfigurableListBySdkType.put(sdkType, configurables)
+            additionalDataConfigurableListBySdkType[sdkType] = configurables
 
             sdkType.createAdditionalDataConfigurable(sdkModel, editedSdkModificator)?.let {
                 configurables.add(it)
@@ -382,7 +382,7 @@ class Editor(private val sdkModel: SdkModel, private val history: History, priva
 
         override fun getRoots(rootType: OrderRootType): Array<VirtualFile> =
             sdkPathEditorByOrderRootType[rootType]?.roots
-                ?: throw IllegalStateException("no editor for root type " + rootType)
+                ?: throw IllegalStateException("no editor for root type $rootType")
 
         override fun addRoot(root: VirtualFile, rootType: OrderRootType) =
             sdkPathEditorByOrderRootType[rootType]!!.addPaths(root)
@@ -402,6 +402,6 @@ class Editor(private val sdkModel: SdkModel, private val history: History, priva
 
     companion object {
         private val LOG = Logger.getInstance(Editor::class.java)
-        private val SDK_TAB = "sdkTab"
+        private const val SDK_TAB = "sdkTab"
     }
 }
