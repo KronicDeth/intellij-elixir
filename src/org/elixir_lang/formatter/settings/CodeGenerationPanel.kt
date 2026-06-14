@@ -62,7 +62,7 @@ class CodeGenerationPanel(settings: CodeStyleSettings) : CodeStyleAbstractPanel(
         myCommenterForm.reset(settings)
     }
 
-    override fun getPanel(): JComponent? {
+    override fun getPanel(): JComponent {
         if (myPanel == null) {
             val contentPanel = getPanelInner()
             myPanel = JBScrollPane(contentPanel)
@@ -72,7 +72,7 @@ class CodeGenerationPanel(settings: CodeStyleSettings) : CodeStyleAbstractPanel(
 
     override fun createHighlighter(colors: EditorColorsScheme): EditorHighlighter {
         val fileType: FileType = getFileType()
-        return FileTypeEditorHighlighterProviders.INSTANCE.forFileType(fileType)
+        return FileTypeEditorHighlighterProviders.getInstance().forFileType(fileType)
             .getEditorHighlighter(null, fileType, null, colors)
     }
 
