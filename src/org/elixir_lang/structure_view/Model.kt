@@ -1,18 +1,17 @@
 package org.elixir_lang.structure_view
 
-import org.elixir_lang.psi.CallDefinitionClause.isFunction
-import org.elixir_lang.psi.CallDefinitionClause.isMacro
-import com.intellij.ide.structureView.TextEditorBasedStructureViewModel
 import com.intellij.ide.structureView.StructureViewModel.ElementInfoProvider
-import com.intellij.ide.util.treeView.smartTree.NodeProvider
 import com.intellij.ide.structureView.StructureViewTreeElement
+import com.intellij.ide.structureView.TextEditorBasedStructureViewModel
+import com.intellij.ide.util.treeView.smartTree.NodeProvider
 import com.intellij.ide.util.treeView.smartTree.Sorter
 import com.intellij.openapi.editor.Editor
 import com.intellij.psi.PsiElement
-import org.elixir_lang.structure_view.element.structure.FieldWithDefaultValue
-import org.elixir_lang.structure_view.node_provider.Used
 import com.intellij.psi.ResolveState
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.psi.*
+import org.elixir_lang.psi.CallDefinitionClause.isFunction
+import org.elixir_lang.psi.CallDefinitionClause.isMacro
 import org.elixir_lang.psi.Exception
 import org.elixir_lang.psi.Use
 import org.elixir_lang.psi.call.Call
@@ -20,7 +19,9 @@ import org.elixir_lang.psi.ex_unit.Case
 import org.elixir_lang.structure_view.element.*
 import org.elixir_lang.structure_view.element.modular.Unknown
 import org.elixir_lang.structure_view.element.structure.Field
+import org.elixir_lang.structure_view.element.structure.FieldWithDefaultValue
 import org.elixir_lang.structure_view.element.structure.Structure
+import org.elixir_lang.structure_view.node_provider.Used
 import org.elixir_lang.structure_view.sorter.Time
 import org.elixir_lang.structure_view.sorter.Visibility
 import java.util.*
@@ -74,6 +75,7 @@ class Model(elixirFile: ElixirFile, editor: Editor?) : TextEditorBasedStructureV
     companion object {
         private val NODE_PROVIDERS: Collection<NodeProvider<*>> = Arrays.asList<NodeProvider<*>>(Used())
 
+        @RequiresReadLock
         fun isSuitable(call: Call?): Boolean {
             // everything in {@link Module#childCallTreeElements}
             return isFunction(call!!) ||

@@ -2,7 +2,7 @@ package org.elixir_lang.structure_view.element.call_definition_by_name_arity
 
 import com.intellij.ide.util.treeView.smartTree.TreeElement
 import com.intellij.psi.ResolveState
-import org.elixir_lang.ArityRange
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.Name
 import org.elixir_lang.NameArity
 import org.elixir_lang.psi.ArityInterval
@@ -10,7 +10,6 @@ import org.elixir_lang.psi.call.Call
 import org.elixir_lang.structure_view.element.CallDefinition
 import org.elixir_lang.structure_view.element.Timed
 import org.elixir_lang.structure_view.element.modular.Modular
-import java.util.*
 
 /**
  * A [CallDefinitionByNameArity] that inserts the [org.elixir_lang.structure_view.element.CallDefinition] it
@@ -22,6 +21,7 @@ open class TreeElementList(
         protected val modular: Modular,
         private val time: Timed.Time
 ) : HashMap<NameArity, CallDefinition>(size), CallDefinitionByNameArity {
+    @RequiresReadLock
     fun addClausesToCallDefinition(call: Call) {
         org.elixir_lang.psi.CallDefinitionClause.nameArityInterval(call, ResolveState.initial())
                 ?.let { (name, arityInterval) ->

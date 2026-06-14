@@ -8,6 +8,7 @@ import com.intellij.execution.process.CapturingProcessHandler
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.util.concurrency.ThreadingAssertions
+import com.intellij.util.concurrency.annotations.RequiresBackgroundThread
 import org.jetbrains.annotations.VisibleForTesting
 import java.nio.file.Path
 
@@ -66,16 +67,17 @@ object Mise {
     private const val TIMEOUT_MS = 10_000
 
     /**
-     * Invokes `mise ls --local --json` in [workDir] and parses the result.
+     * Invokes `mise ls --local --json` in `workDir` and parses the result.
      *
      * Returns `null` if mise is not on PATH, returns a non-zero exit code, times out, or
      * produces output that cannot be parsed. Callers should treat `null` as "mise unavailable".
      *
      * **Threading**: Must not be called on the EDT or under a read lock. This method spawns
-     * a subprocess and blocks for up to [TIMEOUT_MS]ms. Callers must ensure they are running
+     * a subprocess and blocks for up to [Mise.TIMEOUT_MS]ms. Callers must ensure they are running
      * on a background thread outside of any read lock (e.g. inside `withContext(Dispatchers.IO)`
      * after releasing any read lock).
      */
+    @RequiresBackgroundThread
     fun resolveVersions(workDir: Path): MiseVersions? {
         // `assertBackgroundThread()` only checks EDT, NOT holdsReadLock - both guards are needed.
         ThreadingAssertions.assertBackgroundThread()
@@ -106,7 +108,7 @@ object Mise {
      *
      * Takes the first entry for each tool key where `installed == true && active == true`.
      *
-     * `internal` for testing - use [resolveVersions] in production code.
+     * `internal` for testing - use [Mise.resolveVersions] in production code.
      */
     @VisibleForTesting
     internal fun parseOutput(json: String): MiseVersions? {

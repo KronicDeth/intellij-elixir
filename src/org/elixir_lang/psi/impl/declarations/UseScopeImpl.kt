@@ -1,10 +1,12 @@
 package org.elixir_lang.psi.impl.declarations
 
+import com.intellij.openapi.progress.ProgressManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiWhiteSpace
 import com.intellij.psi.search.LocalSearchScope
 import com.intellij.psi.search.SearchScope
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
@@ -22,7 +24,6 @@ import org.elixir_lang.reference.Callable.Companion.variableUseScope
 import org.elixir_lang.reference.ModuleAttribute.Companion.isNonReferencing
 import org.elixir_lang.structure_view.element.Delegation
 import org.jetbrains.annotations.Contract
-import java.util.*
 
 fun PsiElement.selfAndFollowingSiblingsSearchScope(): LocalSearchScope {
     val selfAndFollowingSiblingList = ArrayList<PsiElement>()
@@ -72,6 +73,7 @@ object UseScopeImpl {
      * @return the search scope instance.
      * @see {@link com.intellij.psi.search.PsiSearchHelper.getUseScope
      */
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun get(unqualifiedNoArgumentsCall: UnqualifiedNoArgumentsCall<*>): SearchScope {
@@ -84,6 +86,7 @@ object UseScopeImpl {
             var ancestor = unqualifiedNoArgumentsCall.parent
 
             while (true) {
+                ProgressManager.checkCanceled()
                 if (ancestor is Call) {
                     val ancestorCall = ancestor
 
@@ -104,9 +107,9 @@ object UseScopeImpl {
                     break
                 } else if (ancestor is PsiFile) {
                     Logger.error(
-                            UnqualifiedNoArgumentsCall::class.java,
-                            "Use scope for parameter not found before reaching file scope",
-                            unqualifiedNoArgumentsCall
+                        UnqualifiedNoArgumentsCall::class.java,
+                        "Use scope for parameter not found before reaching file scope",
+                        unqualifiedNoArgumentsCall
                     )
                     break
                 }
@@ -125,6 +128,7 @@ object UseScopeImpl {
         return useScope
     }
 
+    @RequiresReadLock
     @JvmStatic
     fun selector(element: PsiElement): UseScopeSelector {
         var useScopeSelector = UseScopeSelector.PARENT

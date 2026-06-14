@@ -1,19 +1,17 @@
 package org.elixir_lang.structure_view.element.modular
 
 import com.intellij.navigation.ItemPresentation
-import com.intellij.psi.ElementDescriptionLocation
 import com.intellij.psi.PsiElement
-import com.intellij.usageView.UsageViewTypeLocation
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.navigation.item_presentation.Implementation
 import org.elixir_lang.navigation.item_presentation.Parent
-import org.elixir_lang.psi.*
-import org.elixir_lang.psi.Implementation.forNameCollection
 import org.elixir_lang.psi.Implementation.protocolName
+import org.elixir_lang.psi.NamedElement
+import org.elixir_lang.psi.QuotableKeywordList
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function
 import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.keywordValue
-import org.elixir_lang.structure_view.element.CallDefinitionClause.Companion.enclosingModular
 
 class Implementation : Module {
     /**
@@ -106,5 +104,6 @@ class Implementation : Module {
     /**
      * Unlike [.protocolName], will return "?" when the protocol name can't be derived from the call.
      */
+    @RequiresReadLock
     fun protocolName(): String = protocolName(navigationItem) ?: "?"
 }

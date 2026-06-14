@@ -1,6 +1,7 @@
 package org.elixir_lang.navigation
 
 import com.intellij.navigation.ChooseByNameRegistry
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.PlatformTestCase
 import org.elixir_lang.psi.CallDefinitionClause.enclosingModularMacroCall
 import org.elixir_lang.psi.call.Call
@@ -50,6 +51,7 @@ class GotoSymbolContributorTest : PlatformTestCase() {
         assertEquals("decode_auth_type", callDefinitionClause.name)
     }
 
+    @RequiresReadLock
     fun testIssue705BeforeCompile() {
         myFixture.configureByFile("issue_705__before_compile__.ex")
         val elementAtCaret = myFixture.file.findElementAt(myFixture.caretOffset)
@@ -63,6 +65,7 @@ class GotoSymbolContributorTest : PlatformTestCase() {
         assertNotNull(modular)
     }
 
+    @RequiresReadLock
     fun testIssue705TypeFunctions() {
         myFixture.configureByFile("issue_705_type_functions.ex")
         val elementAtCaret = myFixture.file.findElementAt(myFixture.caretOffset)
@@ -76,6 +79,7 @@ class GotoSymbolContributorTest : PlatformTestCase() {
         assertNotNull(modular)
     }
 
+    @RequiresReadLock
     fun testIssue1141() {
         myFixture.configureByFile("issue_1141.ex")
         val elementAtCaret = myFixture.file.findElementAt(myFixture.caretOffset)
@@ -89,6 +93,7 @@ class GotoSymbolContributorTest : PlatformTestCase() {
         assertNotNull(modular)
     }
 
+    @RequiresReadLock
     fun testIssue1228() {
         myFixture.configureByFile("issue_1228.ex")
         val elementAtCaret = myFixture.file.findElementAt(myFixture.caretOffset)

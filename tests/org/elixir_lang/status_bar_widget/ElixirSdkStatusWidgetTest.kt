@@ -11,6 +11,8 @@ import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl
 import com.intellij.openapi.roots.ModuleRootModificationUtil
 import com.intellij.openapi.roots.ProjectRootManager
+import com.intellij.util.concurrency.annotations.RequiresEdt
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
@@ -157,6 +159,7 @@ class ElixirSdkStatusWidgetTest : PlatformTestCase() {
     // Scenario 1: Project SDK = Java, module SDK = Elixir
     // -------------------------------------------------------------------------
 
+    @RequiresReadLock
     fun testModuleElixirSdkFoundWhenProjectSdkIsJava() {
         val elixirSdk = createAndRegisterElixirSdk("Elixir Mock")
         val javaSdk = createJavaSdk()
@@ -191,6 +194,7 @@ class ElixirSdkStatusWidgetTest : PlatformTestCase() {
     // Scenario 2: Project SDK = null, module SDK = Elixir
     // -------------------------------------------------------------------------
 
+    @RequiresReadLock
     fun testModuleElixirSdkFoundWhenProjectSdkIsNull() {
         val elixirSdk = createAndRegisterElixirSdk("Elixir Mock")
 
@@ -242,6 +246,7 @@ class ElixirSdkStatusWidgetTest : PlatformTestCase() {
     // Scenario 6: Small IDE - stale Facet SDK, SDKs exist → dangling issue
     // -------------------------------------------------------------------------
 
+    @RequiresEdt
     fun testDanglingFacetSdkReportedWhenElixirSdkExistsButFacetReferenceIsStale() {
         val staleSdk = createAndRegisterElixirSdk("Elixir 1.17")
         setFacetSdk(staleSdk)
@@ -286,6 +291,7 @@ class ElixirSdkStatusWidgetTest : PlatformTestCase() {
     // Scenario 8: Small IDE - stale Facet SDK, NO Elixir SDKs in table → no dangling
     // -------------------------------------------------------------------------
 
+    @RequiresEdt
     fun testNoDanglingWhenNoElixirSdksExistInTable() {
         val sdk = createAndRegisterElixirSdk("Elixir 1.17")
         setFacetSdk(sdk)

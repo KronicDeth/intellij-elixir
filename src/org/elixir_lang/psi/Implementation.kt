@@ -94,6 +94,7 @@ object Implementation {
     fun forNameElement(call: Call): PsiElement? =
         call.finalArguments()?.lastOrNull()?.let { it as? QuotableKeywordList }?.keywordValue(Function.FOR)
 
+    @RequiresReadLock
     fun processProtocols(defimpl: Call, consumer: Processor<in PsiElement>) {
         protocolName(defimpl)?.let { protocolName ->
             val project = defimpl.project

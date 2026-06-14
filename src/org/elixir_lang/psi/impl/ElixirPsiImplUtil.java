@@ -8,10 +8,10 @@ import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.util.Key;
 import com.intellij.psi.*;
 import com.intellij.psi.scope.PsiScopeProcessor;
-import com.intellij.util.concurrency.annotations.RequiresReadLock;
 import com.intellij.psi.search.SearchScope;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
+import com.intellij.util.concurrency.annotations.RequiresReadLock;
 import kotlin.NotImplementedError;
 import kotlin.jvm.functions.Function1;
 import org.elixir_lang.psi.*;
@@ -165,11 +165,13 @@ public class ElixirPsiImplUtil {
         return new String(bytes, StandardCharsets.UTF_8);
     }
 
+    @RequiresReadLock
     @Nullable
     public static String canonicalName(@NotNull StubBased stubBased) {
         return CanonicallyNamedImpl.INSTANCE.canonicalName(stubBased);
     }
 
+    @RequiresReadLock
     @NotNull
     public static Set<String> canonicalNameSet(@NotNull StubBased stubBased) {
         return CanonicallyNamedImpl.INSTANCE.canonicalNameSet(stubBased);
@@ -267,6 +269,7 @@ public class ElixirPsiImplUtil {
         return elixirHeredoc.getNode().getFirstChildNode().getText().equals("'''");
     }
 
+    @RequiresReadLock
     public static boolean isExported(@NotNull final UnqualifiedNoParenthesesCall unqualifiedNoParenthesesCall) {
         return CallDefinitionClause.isPublicFunction(unqualifiedNoParenthesesCall) ||
                 CallDefinitionClause.isPublicMacro(unqualifiedNoParenthesesCall);
@@ -607,6 +610,7 @@ public class ElixirPsiImplUtil {
         return CallImpl.primaryArity(call);
     }
 
+    @RequiresReadLock
     public static boolean processDeclarations(@NotNull final ElixirUnmatchedAtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall,
                                               @NotNull PsiScopeProcessor processor,
                                               @NotNull ResolveState state,
@@ -615,6 +619,7 @@ public class ElixirPsiImplUtil {
         return ProcessDeclarationsImpl.processDeclarations(atUnqualifiedNoParenthesesCall, processor, state, lastParent, place);
     }
 
+    @RequiresReadLock
     public static boolean processDeclarations(@NotNull final Call call,
                                               @NotNull PsiScopeProcessor processor,
                                               @NotNull ResolveState state,
@@ -807,12 +812,14 @@ public class ElixirPsiImplUtil {
         return ElixirHeredocLinePrefixImplKt.excessWhitespace(heredocLinePrefix, fragmentType, prefixLength);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     public static int exportedArity(@NotNull final UnqualifiedNoParenthesesCall unqualifiedNoParenthesesCall,
                                     @NotNull ResolveState state) {
         return UnqualifiedNoParenthesesCallImplKt.exportedArity(unqualifiedNoParenthesesCall, state);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @Nullable
     public static String exportedName(@NotNull final UnqualifiedNoParenthesesCall unqualifiedNoParenthesesCall) {
@@ -960,21 +967,25 @@ public class ElixirPsiImplUtil {
         return QuotableKeywordPairImpl.getKeywordValue(noParenthesesKeywordPair);
     }
 
+    @RequiresReadLock
     @NotNull
     public static String getName(@NotNull ElixirAlias alias) {
         return PsiNamedElementImpl.getName(alias);
     }
 
+    @RequiresReadLock
     @NotNull
     public static String getName(@NotNull QualifiedAlias qualifiedAlias) {
         return PsiNamedElementImpl.getName(qualifiedAlias);
     }
 
+    @RequiresReadLock
     @Nullable
     public static String getName(@NotNull ElixirAtom atom) {
         return PsiNamedElementImpl.getName(atom);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @Nullable
     public static String getName(@NotNull NamedElement namedElement) {
@@ -997,6 +1008,7 @@ public class ElixirPsiImplUtil {
         return PsiNameIdentifierOwnerImpl.getNameIdentifier(variable);
     }
 
+    @RequiresReadLock
     @Nullable
     public static PsiElement getNameIdentifier(@NotNull org.elixir_lang.psi.call.Named named) {
         if (named instanceof NonNumeric nonNumeric) {
@@ -1010,6 +1022,7 @@ public class ElixirPsiImplUtil {
         return PsiNameIdentifierOwnerImpl.getNameIdentifier(qualifiableAlias);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static ItemPresentation getPresentation(@NotNull final Call call) {
@@ -1032,6 +1045,7 @@ public class ElixirPsiImplUtil {
         return PresentationImpl.getPresentation(qualifiableAlias);
     }
 
+    @RequiresReadLock
     public static @Nullable String implementedProtocolName(@NotNull final Call call) {
         String protocolName;
 
@@ -1683,6 +1697,7 @@ public class ElixirPsiImplUtil {
         return PsiNamedElementImpl.setName(variable, newName);
     }
 
+    @RequiresReadLock
     @NotNull
     public static PsiElement setName(@NotNull final org.elixir_lang.psi.call.Named named,
                                      @NotNull final String newName) {

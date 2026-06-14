@@ -1,10 +1,12 @@
 package org.elixir_lang.mix
 
 import com.intellij.openapi.util.io.FileUtil
+import com.intellij.util.concurrency.annotations.RequiresBackgroundThread
 import com.intellij.util.execution.ParametersListUtil
 import org.elixir_lang.PlatformTestCase
 
 class InstallMixDependenciesRunConfigurationTest : PlatformTestCase() {
+    @RequiresBackgroundThread
     fun testCreatesInstallRunConfiguration() {
         val projectDir = myFixture.tempDirFixture.findOrCreateDir("mix_install")
         myFixture.tempDirFixture.createFile("mix_install/mix.exs", "defmodule MixInstall.MixProject do\nend\n")
@@ -20,6 +22,7 @@ class InstallMixDependenciesRunConfigurationTest : PlatformTestCase() {
         assertNotNull(configuration.configurationModule.module)
     }
 
+    @RequiresBackgroundThread
     fun testCreatesMixDepsStatusRunConfiguration() {
         val projectDir = myFixture.tempDirFixture.findOrCreateDir("mix_status")
         myFixture.tempDirFixture.createFile("mix_status/mix.exs", "defmodule MixStatus.MixProject do\nend\n")

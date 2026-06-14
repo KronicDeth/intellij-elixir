@@ -2,10 +2,10 @@ package org.elixir_lang.psi
 
 import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveState
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.Arity
 import org.elixir_lang.ArityRange
 import org.elixir_lang.NameArityRange
-import org.elixir_lang.ecto.Query
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.call.finalArguments
@@ -21,6 +21,7 @@ open class NameArityRangeWalker(name: String, arityRange: ArityRange) {
     fun hasArity(call: Call) =
             call.resolvedFinalArity() in nameArityRange.arityRange
 
+    @RequiresReadLock
     fun walk(call: Call, state: ResolveState, keepProcessing: (element: PsiElement, state: ResolveState) -> Boolean): Boolean =
             call.finalArguments()?.let { arguments ->
                 val resolvedFinalArity = call.resolvedFinalArity()

@@ -4,6 +4,7 @@ import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.progress.EmptyProgressIndicator
 import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar
+import com.intellij.util.concurrency.annotations.RequiresEdt
 import org.elixir_lang.mix.library.CONSOLIDATED_LIBRARY_SUFFIX
 
 class DepsWatcherTest : PlatformTestCase() {
@@ -12,13 +13,14 @@ class DepsWatcherTest : PlatformTestCase() {
 
     override fun tearDown() {
         try {
-            removeLibrariesIfPresent(depName, secondDepName)
+            removeLibrariesIfPresent()
             removeConsolidatedLibraries()
         } finally {
             super.tearDown()
         }
     }
 
+    @RequiresEdt
     fun testSyncLibrariesRemovesInjectedStaleClassRootForSingleDep() {
         val depRoot = myFixture.tempDirFixture.findOrCreateDir("deps/$depName")
         myFixture.tempDirFixture.findOrCreateDir("deps/$depName/lib")
@@ -80,6 +82,7 @@ class DepsWatcherTest : PlatformTestCase() {
         )
     }
 
+    @RequiresEdt
     fun testSyncLibrariesRemovesInjectedStaleClassRootsForMultipleDeps() {
         val firstDepRoot = myFixture.tempDirFixture.findOrCreateDir("deps/$depName")
         val secondDepRoot = myFixture.tempDirFixture.findOrCreateDir("deps/$secondDepName")
@@ -178,6 +181,7 @@ class DepsWatcherTest : PlatformTestCase() {
         )
     }
 
+    @RequiresEdt
     fun testSyncLibrariesIsIdempotentForMultipleDepsWhenFilesystemIsUnchanged() {
         val firstDepRoot = myFixture.tempDirFixture.findOrCreateDir("deps/$depName")
         val secondDepRoot = myFixture.tempDirFixture.findOrCreateDir("deps/$secondDepName")
@@ -231,6 +235,7 @@ class DepsWatcherTest : PlatformTestCase() {
         }
     }
 
+    @RequiresEdt
     fun testSyncConsolidatedLibraryCreatesSeparateSharedLibrary() {
         myFixture.tempDirFixture.findOrCreateDir("deps/$depName/lib")
         myFixture.tempDirFixture.findOrCreateDir("_build/dev/consolidated")
@@ -262,6 +267,7 @@ class DepsWatcherTest : PlatformTestCase() {
         )
     }
 
+    @RequiresEdt
     fun testDeleteAllLibrariesRemovesConsolidatedLibraryWithoutDepLibraries() {
         val depsRoot = myFixture.tempDirFixture.findOrCreateDir("deps")
         myFixture.tempDirFixture.findOrCreateDir("_build/dev/consolidated")
@@ -303,9 +309,9 @@ class DepsWatcherTest : PlatformTestCase() {
         return library!!.getUrls(OrderRootType.SOURCES).toList()
     }
 
-    private fun removeLibrariesIfPresent(vararg libraryNames: String) {
+    private fun removeLibrariesIfPresent() {
         val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
-        val libraries = libraryNames.mapNotNull { libraryTable.getLibraryByName(it) }
+        val libraries = listOf(depName, secondDepName).mapNotNull { libraryTable.getLibraryByName(it) }
 
         if (libraries.isEmpty()) {
             return

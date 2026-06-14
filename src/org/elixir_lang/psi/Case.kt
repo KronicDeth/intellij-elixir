@@ -2,6 +2,7 @@ package org.elixir_lang.psi
 
 import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveState
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function.CASE
 import org.elixir_lang.psi.call.name.Function.QUOTE
@@ -36,6 +37,7 @@ object Case {
         }
     }
 
+    @RequiresReadLock
     fun treeWalkUpFromLastChildCall(lastChildCall: Call, state: ResolveState, keepProcessing: (PsiElement, ResolveState) -> Boolean): Boolean {
         val resolveModuleName = lastChildCall.resolvedModuleName()
         val functionName = lastChildCall.functionName()
