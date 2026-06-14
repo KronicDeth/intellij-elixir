@@ -823,7 +823,7 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @Nullable
     public static String exportedName(@NotNull final UnqualifiedNoParenthesesCall unqualifiedNoParenthesesCall) {
-        return UnqualifiedNoParenthesesCallImplKt.exportedName(unqualifiedNoParenthesesCall);
+        return UnqualifiedNoParenthesesCallImplKt.cachedExportedName(unqualifiedNoParenthesesCall);
     }
 
     @Contract(pure = true)
@@ -1060,7 +1060,7 @@ public class ElixirPsiImplUtil {
 
     @Nullable
     public static PsiReference getReference(@NotNull AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
-        return AtUnqualifiedNoParenthesesCallImplKt.getReference(atUnqualifiedNoParenthesesCall);
+        return AtUnqualifiedNoParenthesesCallImplKt.cachedReference(atUnqualifiedNoParenthesesCall);
     }
 
     @Nullable
@@ -1074,7 +1074,7 @@ public class ElixirPsiImplUtil {
         if (call instanceof NonNumeric nonNumeric) {
             return NonNumericImplKt.getReference(nonNumeric);
         }
-        return CallImplKt.getReference(call);
+        return CallImplKt.cachedReference(call);
     }
 
     @Nullable
@@ -1089,18 +1089,18 @@ public class ElixirPsiImplUtil {
 
     @Nullable
     public static PsiPolyVariantReference getReference(@NotNull QualifiableAlias qualifiableAlias) {
-        return QualifiableAliasImplKt.getReference(qualifiableAlias);
+        return QualifiableAliasImplKt.cachedReference(qualifiableAlias);
     }
 
     @Contract(pure = true)
     @Nullable
     public static PsiReference getReference(@NotNull final ElixirAtIdentifier atIdentifier) {
-        return ElixirAtIdentifierImplKt.getReference(atIdentifier);
+        return ElixirAtIdentifierImplKt.cachedReference(atIdentifier);
     }
 
     @Nullable
     public static PsiReference getReference(@NotNull final AtOperation atNonNumericOperation) {
-        return AtNonNumericOperationImplKt.getReference(atNonNumericOperation);
+        return AtNonNumericOperationImplKt.cachedReference(atNonNumericOperation);
     }
 
     @RequiresReadLock
@@ -1151,7 +1151,7 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quoteAsAtom(@NotNull final ElixirLine line) {
-        return AtomableImplKt.quoteAsAtom(line);
+        return AtomableImplKt.quoteLineAsAtom(line);
     }
 
     @Contract(pure = true)

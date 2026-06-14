@@ -52,7 +52,7 @@ fun QualifiableAlias.computeReference(): PsiPolyVariantReference? =
             }
     }
 
-fun QualifiableAlias.getReference(): PsiPolyVariantReference? =
+fun QualifiableAlias.cachedReference(): PsiPolyVariantReference? =
     CachedValuesManager.getCachedValue(this) {
         CachedValueProvider.Result.create(computeReference(), this)
     }

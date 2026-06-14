@@ -19,7 +19,7 @@ fun UnqualifiedNoParenthesesCall<*>.exportedArity(state: ResolveState): Int =
 
 @RequiresReadLock
 @Contract(pure = true)
-fun UnqualifiedNoParenthesesCall<*>.exportedName(): String? =
+fun UnqualifiedNoParenthesesCall<*>.cachedExportedName(): String? =
     if (isExported(this)) {
         CallDefinitionClause.nameArityInterval(this, ResolveState.initial())?.name
     } else {
