@@ -315,7 +315,7 @@ class Callable : Annotator, DumbAware {
         fun put(referrerTextAttributeKeys: Array<TextAttributesKey>?): CallHighlight {
             val updatedReferrerTextAttributeKeys = bestReferrerTextAttributeKeys(referrerTextAttributeKeys)
 
-            return if (updatedReferrerTextAttributeKeys == this.referrerTextAttributeKeys) {
+            return if (updatedReferrerTextAttributeKeys contentEquals this.referrerTextAttributeKeys) {
                 this
             } else {
                 CallHighlight(
