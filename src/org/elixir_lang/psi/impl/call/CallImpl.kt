@@ -155,7 +155,7 @@ fun Call.finalArguments(): Array<PsiElement>? = try {
     null
 }
 
-fun Call.getReference(): PsiReference? =
+fun Call.cachedReference(): PsiReference? =
     CachedValuesManager.getCachedValue(this) {
         CachedValueProvider.Result.create(computeReference(), this)
     }
@@ -163,18 +163,18 @@ fun Call.getReference(): PsiReference? =
 /**
  * The value of the keyword argument with the given keywordKeyText.
  *
- * @param this@keywordArgument call to seach for the keyword argument.
+ * @receiver the call to search for the keyword argument.
  * @param keywordKeyText the text of the key, such as `"do"`
- * @return the keyword value `PsiElement` if `call` has [ElixirPsiImplUtil.keywordArguments]
- * and there is a [] for `keywordKeyText`.
+ * @return the keyword value `PsiElement` if `call` has [keywordArguments]
+ * and there is a value for `keywordKeyText`.
  */
 @RequiresReadLock
 fun Call.keywordArgument(keywordKeyText: String): PsiElement? = keywordArguments()?.keywordValue(keywordKeyText)
 
 /**
  * The keyword arguments for `call`.
- * @param this@keywordArguments call to search for keyword arguments.
- * @return the final element of the [ElixirPsiImplUtil.finalArguments] of `` if they are a
+ * @receiver the call to search for keyword arguments.
+ * @return the final element of the [finalArguments] if they are a
  * [QuotableKeywordList]; otherwise, `null`.
  */
 @RequiresReadLock
@@ -831,8 +831,8 @@ object CallImpl {
     /**
      * Whether the `arrow` is a pipe operation.
      *
-     * @param this@isPipe the parent (or futher ancestor of a [Call] that may be piped.
-     * @return `` true if `arrow` is using the `"|>"` operator token.
+     * @receiver the parent (or further ancestor) of a [Call] that may be piped.
+     * @return `true` if `arrow` is using the `"|>"` operator token.
      */
     private fun Arrow.isPipe(): Boolean =
         operator().node.getChildren(ARROW_OPERATOR_TOKEN_SET).let { arrowOperatorChildren ->
@@ -842,8 +842,8 @@ object CallImpl {
     /**
      * Whether the `callAncestor` is a pipe operation.
      *
-     * @param this@isPipe the parent (or further ancestor) of a [Call] that may be piped
-     * @return `` true if `callAncestor` is an [Arrow] using the `"|>"` operator token.
+     * @receiver the parent (or further ancestor) of a [Call] that may be piped
+     * @return `true` if `callAncestor` is an [Arrow] using the `"|>"` operator token.
      */
     private fun PsiElement.isPipe(): Boolean = (this as? Arrow)?.isPipe() ?: false
 }
