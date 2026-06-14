@@ -1,6 +1,5 @@
 package org.elixir_lang.leex.reference.resolver
 
-import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.roots.impl.LibraryScopeCache
 import com.intellij.psi.*
 import com.intellij.psi.impl.source.resolve.ResolveCache
@@ -906,13 +905,7 @@ object Assign : ResolveCache.PolyVariantResolver<ReferenceAssign> {
 
         // MUST use `originalFile` to get the PsiFile with a VirtualFile for decompiled elements
         return element.containingFile.originalFile.virtualFile?.let { elementVirtualFile ->
-            val orderEntries =
-                ProjectRootManager
-                    .getInstance(project)
-                    .fileIndex
-                    .getOrderEntriesForFile(elementVirtualFile)
-
-            LibraryScopeCache.getInstance(project).getLibraryScope(orderEntries)
+            LibraryScopeCache.getInstance(project).getLibraryScope(elementVirtualFile)
         } ?: GlobalSearchScope.allScope(project)
     }
 
