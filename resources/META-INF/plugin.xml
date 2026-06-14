@@ -139,7 +139,7 @@
 
         <!-- for liveTemplates -->
         <defaultLiveTemplates file="liveTemplates/Elixir"/>
-        <liveTemplateContext implementation="org.elixir_lang.templates.ElixirContextType" contextId="ELIXIR"/>
+        <liveTemplateContext implementation="org.elixir_lang.templates.ElixirContextType" contextId="ELIXIR_CODE"/>
         <!-- end liveTemplates -->
 
         <additionalTextAttributes file="colorSchemes/ElixirDarcula.xml" scheme="Darcula"/>
