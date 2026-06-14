@@ -6,6 +6,8 @@ import com.intellij.execution.process.CapturingProcessHandler
 import com.intellij.openapi.application.ApplicationInfo
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.util.Function
+import com.intellij.util.concurrency.ThreadingAssertions
+import com.intellij.util.concurrency.annotations.RequiresBackgroundThread
 import com.intellij.util.containers.ContainerUtil
 import org.elixir_lang.run.WslAwareCommandLine
 import java.io.File
@@ -48,6 +50,7 @@ object ProcessOutput {
         return transformed
     }
 
+    @RequiresBackgroundThread
     fun <T> transformStdoutLine(
         lineTransformer: Function<String?, T>,
         timeout: Int,
@@ -70,6 +73,7 @@ object ProcessOutput {
 
     @JvmStatic
     @Throws(ExecutionException::class)
+    @RequiresBackgroundThread
     fun getProcessOutput(
         timeout: Int,
         workDir: String?,
@@ -89,11 +93,13 @@ object ProcessOutput {
     }
 
     @JvmOverloads
+    @RequiresBackgroundThread
     @Throws(ExecutionException::class)
     fun execute(
         cmd: GeneralCommandLine,
         timeout: Int = STANDARD_TIMEOUT
     ): com.intellij.execution.process.ProcessOutput {
+        ThreadingAssertions.assertBackgroundThread()
         val processHandler = CapturingProcessHandler(cmd)
         return if (timeout < 0) processHandler.runProcess() else processHandler.runProcess(timeout)
     }

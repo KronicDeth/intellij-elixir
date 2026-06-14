@@ -1,10 +1,12 @@
 package org.elixir_lang.psi
 
+import com.intellij.openapi.progress.ProgressManager
 import com.intellij.psi.ElementDescriptionLocation
 import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveState
 import com.intellij.psi.util.isAncestor
 import com.intellij.usageView.UsageViewTypeLocation
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function.USE
 import org.elixir_lang.psi.call.name.Module.KERNEL
@@ -21,6 +23,7 @@ object Use {
      * macro called by `useCall` while `keepProcessing` returns `true`.  Stops the first time `keepProcessing`
      * returns `false`.
      */
+    @RequiresReadLock
     fun treeWalkUp(
         useCall: Call,
         resolveState: ResolveState,
@@ -34,6 +37,7 @@ object Use {
 
             outer@ for (modular in modulars(useCall)) {
                 for (definer in Using.definers(modular)) {
+                    ProgressManager.checkCanceled()
                     val childResolveState = useCallResolveState.putVisitedElement(definer)
 
                     accumulatedKeepProcessing = Using.treeWalkUp(
@@ -68,15 +72,16 @@ object Use {
      */
     @JvmStatic
     fun `is`(call: Call): Boolean =
-        call.isCalling(KERNEL, USE, 1) || call.isCalling(KERNEL, USE, 2);
+        call.isCalling(KERNEL, USE, 1) || call.isCalling(KERNEL, USE, 2)
 
     /**
      * The modular that is used by `useCall`.
      *
-     * @param useCall a [Call] where [is] is `true`.
+     * @param useCall a [Call] where [Use.is] is `true`.
      * @return `defmodule`, `defimpl`, or `defprotocol` used by `useCall`.  It can be `null` if Alias passed to
      *    `useCall` cannot be resolved.
      */
+    @RequiresReadLock
     fun modulars(useCall: Call): Set<PsiElement> =
         useCall
             .finalArguments()

@@ -6,7 +6,11 @@ import com.intellij.openapi.module.ModuleType
 import com.intellij.openapi.roots.ContentEntry
 import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import kotlin.collections.List
+import kotlin.collections.emptyList
+import kotlin.collections.isNotEmpty
+import kotlin.collections.mapNotNull
 
 private const val ELIXIR_MODULE_TYPE_ID = "ELIXIR_MODULE"
 
@@ -21,6 +25,7 @@ fun Module.isElixirModule(): Boolean {
     return isElixirModuleType || hasElixirFacet
 }
 
+@RequiresReadLock
 fun Module.mixContentRoots(): List<MixContentRoot> {
     if (!isElixirModule()) return emptyList()
 
@@ -31,4 +36,5 @@ fun Module.mixContentRoots(): List<MixContentRoot> {
     }
 }
 
+@RequiresReadLock
 fun Module.isElixirMixModule(): Boolean = mixContentRoots().isNotEmpty()

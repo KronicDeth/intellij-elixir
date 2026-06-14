@@ -5,6 +5,7 @@ import com.intellij.execution.lineMarker.RunLineMarkerContributor
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.impl.source.tree.LeafPsiElement
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import com.intellij.util.system.OS
 import org.elixir_lang.exunit.configuration.SUFFIX
 import org.elixir_lang.exunit.configuration.lineNumber
@@ -16,7 +17,7 @@ import org.elixir_lang.psi.operation.Match
 /**
  * Provides the gutter "run" icons for tests.
  */
-class ExUnitLineMarkerProvider : RunLineMarkerContributor() {
+internal class ExUnitLineMarkerProvider : RunLineMarkerContributor() {
 
     override fun getInfo(element: PsiElement): Info? {
 
@@ -66,6 +67,7 @@ class ExUnitLineMarkerProvider : RunLineMarkerContributor() {
     }
 }
 
+@RequiresReadLock
 fun isUnderTestSources(clazz: PsiElement): Boolean {
     val psiFile = clazz.containingFile
     val vFile = psiFile.virtualFile ?: return false

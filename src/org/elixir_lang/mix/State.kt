@@ -11,12 +11,14 @@ import com.intellij.execution.runners.ProgramRunner
 import com.intellij.execution.ui.ConsoleView
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.projectRoots.Sdk
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.console.ElixirConsoleUtil
 import org.elixir_lang.notification.setup_sdk.Notifier
 import org.elixir_lang.run.ElixirProcessHandler
 import org.elixir_lang.run.WslSafeCommandLineState
 import org.elixir_lang.sdk.elixir.ElixirSdkLookup.mostSpecificSdk
 
+@RequiresReadLock
 fun ensureMostSpecificSdk(module: Module): Sdk = mostSpecificSdk(module) ?: throw MissingSdk(module)
 
 /**

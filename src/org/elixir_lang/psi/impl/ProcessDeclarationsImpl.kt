@@ -5,6 +5,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveState
 import com.intellij.psi.scope.PsiScopeProcessor
 import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
@@ -54,6 +55,7 @@ object ProcessDeclarationsImpl {
         return keepProcessing
     }
 
+    @RequiresReadLock
     @JvmStatic
     fun processDeclarations(
         atUnqualifiedNoParenthesesCall: AtUnqualifiedNoParenthesesCall<*>,
@@ -130,6 +132,7 @@ object ProcessDeclarationsImpl {
     /**
      * `def(macro)?p?`, `for`, or `with` can declare variables
      */
+    @RequiresReadLock
     @JvmStatic
     fun processDeclarations(
         call: Call,

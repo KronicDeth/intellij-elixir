@@ -3,6 +3,7 @@ package org.elixir_lang.psi
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiPolyVariantReference
 import com.intellij.psi.ResolveState
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.beam.psi.impl.CallDefinitionImpl
 import org.elixir_lang.beam.psi.impl.ModuleImpl
 import org.elixir_lang.psi.CallDefinitionClause.nameArityInterval
@@ -180,6 +181,7 @@ object Using {
         }
     }
 
+    @RequiresReadLock
     fun definers(modular: PsiElement): Sequence<PsiElement> =
         when (modular) {
             is Call -> definers(modular)
@@ -187,6 +189,7 @@ object Using {
             else -> emptySequence()
         }
 
+    @RequiresReadLock
     fun definers(modularCall: Call): Sequence<Call> =
         modularCall
             .macroChildCallSequence()

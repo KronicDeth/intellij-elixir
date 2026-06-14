@@ -13,7 +13,7 @@ import org.elixir_lang.util.ElixirProjectDisposable
 
 private val LOG = logger<ElixirSdkStatusWidgetStartupActivity>()
 
-class ElixirSdkStatusWidgetStartupActivity : ProjectActivity, DumbAware {
+internal class ElixirSdkStatusWidgetStartupActivity : ProjectActivity, DumbAware {
     override suspend fun execute(project: Project) {
         LOG.debug("Executing startup activity for project: ${project.name}")
 

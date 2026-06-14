@@ -6,6 +6,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiPolyVariantReferenceBase
 import com.intellij.psi.ResolveResult
 import com.intellij.psi.impl.source.resolve.ResolveCache
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.call.finalArguments
@@ -25,6 +26,7 @@ class Type(typeSpec: AtUnqualifiedNoParenthesesCall<*>, type: Call) : PsiPolyVar
     }
 
     companion object {
+        @RequiresReadLock
         tailrec fun typeHead(typeSpec: PsiElement): Call? =
                 when (typeSpec) {
                     is AtUnqualifiedNoParenthesesCall<*> -> {

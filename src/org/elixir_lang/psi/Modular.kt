@@ -1,7 +1,9 @@
 package org.elixir_lang.psi
 
+import com.intellij.openapi.progress.ProgressManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveState
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.Name
 import org.elixir_lang.beam.psi.impl.ModuleImpl
 import org.elixir_lang.psi.call.Call
@@ -10,10 +12,12 @@ import org.elixir_lang.psi.impl.call.macroChildCalls
 import org.elixir_lang.util.AccumulatorContinue
 
 object Modular {
+    @RequiresReadLock
     @JvmStatic
     fun callDefinitionClauseCallSequence(modular: Call): Sequence<Call> =
         modular.macroChildCallSequence().filter { CallDefinitionClause.`is`(it) }
 
+    @RequiresReadLock
     fun callDefinitionClauseCallWhile(
         modular: PsiElement,
         resolveState: ResolveState,
@@ -25,6 +29,7 @@ object Modular {
             else -> true
         }
 
+    @RequiresReadLock
     fun callDefinitionClauseCallWhile(
         modular: Call,
         resolveState: ResolveState,
@@ -34,6 +39,7 @@ object Modular {
         var keepProcessing = true
 
         for (childCall in childCalls) {
+            ProgressManager.checkCanceled()
             if (!resolveState.hasBeenVisited(childCall) && CallDefinitionClause.`is`(childCall)) {
                 val childResolveState = resolveState.putVisitedElement(childCall)
 
@@ -48,6 +54,7 @@ object Modular {
         return keepProcessing
     }
 
+    @RequiresReadLock
     @JvmStatic
     inline fun <R> callDefinitionClauseCallFoldWhile(
         modular: Call,
@@ -58,6 +65,7 @@ object Modular {
         var accumulatorContinue = AccumulatorContinue(initial, true)
 
         for (childChild in childCalls) {
+            ProgressManager.checkCanceled()
             if (CallDefinitionClause.`is`(childChild)) {
                 accumulatorContinue = foldWhile(childChild, accumulatorContinue.accumulator)
 
@@ -70,6 +78,7 @@ object Modular {
         return accumulatorContinue
     }
 
+    @RequiresReadLock
     inline fun <R> callDefinitionClauseCallFoldWhile(
         modular: PsiElement,
         functionName: Name,
@@ -82,6 +91,7 @@ object Modular {
             else -> AccumulatorContinue(initial, true)
         }
 
+    @RequiresReadLock
     inline fun <R> callDefinitionClauseCallFoldWhile(
         modular: Call,
         functionName: Name,

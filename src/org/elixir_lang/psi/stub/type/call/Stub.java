@@ -2,6 +2,7 @@ package org.elixir_lang.psi.stub.type.call;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.stubs.StubOutputStream;
+import com.intellij.util.concurrency.annotations.RequiresReadLock;
 import org.elixir_lang.module.PutAttribute;
 import org.elixir_lang.module.RegisterAttribute;
 import org.elixir_lang.psi.*;
@@ -28,6 +29,7 @@ public abstract class Stub<Stub extends org.elixir_lang.psi.stub.call.Stub<Psi>,
         super(debugName);
     }
 
+    @RequiresReadLock
     public static boolean isModular(Call call) {
         return Implementation.is(call) || Module.is(call) || Protocol.is(call);
     }

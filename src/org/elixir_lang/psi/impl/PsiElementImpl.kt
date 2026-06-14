@@ -13,6 +13,7 @@ import com.intellij.psi.impl.source.tree.LeafPsiElement
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.findParentInFile
 import com.intellij.psi.util.siblings
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function.ALIAS
@@ -24,7 +25,6 @@ import org.elixir_lang.psi.operation.Pipe
 import org.elixir_lang.psi.scope.WhileIn.whileIn
 import org.elixir_lang.util.AccumulatorContinue
 import org.elixir_lang.util.foldWhile
-import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.jetbrains.annotations.Contract
 
 @RequiresReadLock
@@ -210,6 +210,7 @@ fun PsiElement.macroChildCallList(): MutableList<Call> {
  * @return [Call] for the `defmodule`, `defimpl`, or `defprotocol` that defines
  * `maybeAlias` after it is resolved through any `alias`es or `use`.
  */
+@RequiresReadLock
 @Contract(pure = true)
 fun PsiElement.maybeModularNameToModulars(
     maxScope: PsiElement,

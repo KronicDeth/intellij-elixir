@@ -1,6 +1,7 @@
 package org.elixir_lang.psi.impl
 
 import com.intellij.psi.PsiElement
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.Name
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.module.PutAttribute
@@ -8,7 +9,6 @@ import org.elixir_lang.module.RegisterAttribute
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function.UNQUOTE
-import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.jetbrains.annotations.Contract
 
 object PsiNamedElementImpl {
@@ -101,6 +101,7 @@ object PsiNamedElementImpl {
         TODO("Rename not implemented")
     }
 
+    @RequiresReadLock
     @JvmStatic
     fun setName(
         named: org.elixir_lang.psi.call.Named,
