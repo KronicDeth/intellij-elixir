@@ -6,6 +6,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.util.system.OS
+import org.jetbrains.annotations.VisibleForTesting
 import java.nio.file.Paths
 import kotlin.io.path.absolutePathString
 
@@ -76,28 +77,52 @@ interface WslCompatService {
      * @param path the path to canonicalize
      * @return the canonicalized path,
      */
-    fun canonicalizePath(path: String, currentOs: OS = OS.CURRENT): String {
-        val maybeConvertedPath = when {
-            currentOs != OS.Windows -> path
-
-            currentOs.isAtLeast(11, 0) ->
-                path.replacePrefix(LEGACY_WSL_PREFIX, MODERN_WSL_PREFIX)
-
-            else -> path.replacePrefix(MODERN_WSL_PREFIX, LEGACY_WSL_PREFIX)
+    fun canonicalizePath(path: String): String {
+        val maybeConvertedPath = path.canonicalizeWslPrefix()
+        return try {
+            toRealPath(maybeConvertedPath)
+        } catch (_: Exception) {
+            maybeConvertedPath
         }
-        // Resolve symlinks
-        return Paths.get(maybeConvertedPath).toRealPath().absolutePathString()
     }
+
+    @VisibleForTesting
+    fun toRealPath(myPath: String) = Paths.get(myPath).toRealPath().absolutePathString()
 
     /**
      * Nullable version of [canonicalizePath]
      */
-    fun canonicalizePathNullable(path: String?, currentOs: OS = OS.CURRENT): String? {
+    fun canonicalizePathNullable(path: String?): String? {
         if (path == null) {
             return path
         }
-        return canonicalizePath(path, currentOs)
+        return canonicalizePath(path)
     }
+
+    /**
+     * Decides how a WSL UNC prefix should be normalized for [currentOs], returning the
+     * `(fromPrefix, toPrefix)` pair to apply, or `null` when no conversion should happen
+     * (i.e. not on Windows).
+     *
+     * This is the single ambient-OS decision point, kept separate from the pure string
+     * rewrite in [canonicalizeWslPrefix] so the rewrite is testable without an OS dependency
+     * and this policy can be overridden deterministically in tests.
+     *
+     * - Windows 11+ normalizes the legacy `\\wsl$\` prefix to the modern `\\wsl.localhost\`.
+     * - Older Windows normalizes the modern prefix to the legacy one.
+     */
+    fun wslPrefixConversion(currentOs: OS = OS.CURRENT): Pair<String, String>? = when {
+        currentOs != OS.Windows -> null
+        currentOs.isAtLeast(11, 0) -> LEGACY_WSL_PREFIX to MODERN_WSL_PREFIX
+        else -> MODERN_WSL_PREFIX to LEGACY_WSL_PREFIX
+    }
+
+    /**
+     * Applies the [wslPrefixConversion] decision for the current OS to this path, leaving it
+     * unchanged when no conversion applies.
+     */
+    fun String.canonicalizeWslPrefix(): String =
+            wslPrefixConversion()?.let { (from, to) -> replacePrefix(from, to) } ?: this
 
     fun String.replacePrefix(prefix: String, replacement: String) = if (startsWith(prefix, true))
         replacement + substring(prefix.length)
@@ -111,7 +136,9 @@ interface WslCompatService {
         if (first.isNullOrBlank() || second.isNullOrBlank()) {
             false
         } else {
-            FileUtil.pathsEqual(canonicalizePath(first), canonicalizePath(second))
+                val canonicalizedFirst = canonicalizePath(first)
+                val canonicalizedSecond = canonicalizePath(second)
+                FileUtil.pathsEqual(canonicalizedFirst, canonicalizedSecond)
         }
 
     /**

@@ -6,6 +6,8 @@ import com.intellij.testFramework.registerOrReplaceServiceInstance
 import org.elixir_lang.PlatformTestCase
 import org.elixir_lang.sdk.wsl.MockWslCompatService
 import org.elixir_lang.sdk.wsl.WslCompatService
+import org.mockito.ArgumentMatchers.anyString
+import org.mockito.Mockito.*
 import java.io.File
 import java.nio.file.Files
 
@@ -117,6 +119,24 @@ class TypeNamingTest : PlatformTestCase() {
         assertEquals("Should contain exactly one 'Elixir'; was: $name", 1, name.split("Elixir").size - 1)
     }
 
+    fun testSuggestSdkName_doesNotThrowWhenCanonicalizeFails() {
+        val throwingService = spy(MockWslCompatService())
+        doThrow(IllegalStateException("boom"))
+            .`when`(throwingService)
+            .toRealPath(anyString())
+
+        ApplicationManager.getApplication().registerOrReplaceServiceInstance(
+            WslCompatService::class.java,
+            throwingService,
+            testRootDisposable,
+        )
+
+        val name = elixirType.suggestSdkName(null, "/not/a/real/elixir/install")
+
+        assertTrue("Name should still be produced even if canonicalization fails; was: $name", name.contains("Elixir"))
+        verify(throwingService, atLeastOnce()).toRealPath(anyString())
+    }
+
     // ---------------------------------------------------------------
     // getVersionString
     // ---------------------------------------------------------------
@@ -140,6 +160,46 @@ class TypeNamingTest : PlatformTestCase() {
         // Even the fallback path must contain "Elixir" for display correctness
         val version = elixirType.getVersionString("/Users/josh/.local/share/mise/installs/elixir/1.15.7")
         assertTrue("Version string should contain 'Elixir'; was: $version", version.contains("Elixir"))
+    }
+
+    fun testGetVersionString_doesNotThrowWhenCanonicalizeFails() {
+        val throwingService = spy(MockWslCompatService())
+        doThrow(IllegalStateException("boom"))
+            .`when`(throwingService)
+            .toRealPath(anyString())
+
+        ApplicationManager.getApplication().registerOrReplaceServiceInstance(
+            WslCompatService::class.java,
+            throwingService,
+            testRootDisposable,
+        )
+
+        val version = elixirType.getVersionString("/not/a/real/path/elixir")
+
+        assertTrue("Version string should still be produced when canonicalization fails; was: $version", version.contains("Elixir"))
+        verify(throwingService, atLeastOnce()).toRealPath(anyString())
+    }
+
+    fun testGetVersionString_withRealAppFile_doesNotThrowWhenCanonicalizeFails() {
+        val sdkHome = createElixirSdkHome("1.15.7")
+        VfsRootAccess.allowRootAccess(testRootDisposable, sdkHome)
+
+        val throwingService = spy(MockWslCompatService())
+        doThrow(IllegalStateException("boom"))
+            .`when`(throwingService)
+            .toRealPath(anyString())
+
+        ApplicationManager.getApplication().registerOrReplaceServiceInstance(
+            WslCompatService::class.java,
+            throwingService,
+            testRootDisposable,
+        )
+
+        val version = elixirType.getVersionString(sdkHome)
+
+        assertTrue("Version string should still be produced when canonicalization fails; was: $version", version.contains("Elixir"))
+        assertTrue("Version string should still contain parsed version when canonicalization fails; was: $version", version.contains("1.15.7"))
+        verify(throwingService, atLeastOnce()).toRealPath(anyString())
     }
 
     // ---------------------------------------------------------------
