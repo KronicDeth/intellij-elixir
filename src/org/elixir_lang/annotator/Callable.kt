@@ -27,7 +27,7 @@ import java.util.*
 /**
  * Annotates callables.
  */
-class Callable : Annotator, DumbAware {
+internal class Callable : Annotator, DumbAware {
     /**
      * Annotates the specified PSI element.
      * It is guaranteed to be executed in non-reentrant fashion.
@@ -220,7 +220,7 @@ class Callable : Annotator, DumbAware {
                 }
         }
 
-    private fun callHighlight(resolved: CallDefinitionImpl<*>, previousCallHighlight: CallHighlight?): CallHighlight? {
+    private fun callHighlight(resolved: CallDefinitionImpl<*>, previousCallHighlight: CallHighlight?): CallHighlight {
         val referrerTextAttributesKeys = when (resolved.time) {
             Timed.Time.COMPILE -> referrerTextAttributesKeys(
                 resolved,
@@ -349,7 +349,7 @@ class Callable : Annotator, DumbAware {
             }
 
         companion object {
-            internal fun nullablePut(
+            fun nullablePut(
                 callHighlight: CallHighlight?,
                 referrerTextAttributeKeys: Array<TextAttributesKey>?
             ): CallHighlight =
