@@ -5,6 +5,9 @@ import com.intellij.codeInsight.lookup.LookupElementPresentation;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.psi.PsiElement;
+import com.intellij.ui.RowIcon;
+import org.elixir_lang.Icons;
+import org.elixir_lang.call.Visibility;
 import org.elixir_lang.psi.call.Call;
 import org.jetbrains.annotations.NotNull;
 
@@ -98,7 +101,7 @@ public class CallDefinitionClause extends com.intellij.codeInsight.lookup.Lookup
                 "### toString()\n" +
                 "\n" +
                 "```\n" +
-                object.toString() + "\n" +
+                object + "\n" +
                 "```\n" +
                 "\n" +
                 "### getClass().getName()\n" +
@@ -113,7 +116,28 @@ public class CallDefinitionClause extends com.intellij.codeInsight.lookup.Lookup
     private void renderPsiElement(@NotNull PsiElement psiElement, @NotNull LookupElementPresentation presentation) {
         if (psiElement instanceof Call) {
             renderCall((Call) psiElement, presentation);
+        } else if (psiElement instanceof org.elixir_lang.beam.psi.impl.CallDefinitionImpl) {
+            renderCallDefinitionImpl(
+                    (org.elixir_lang.beam.psi.impl.CallDefinitionImpl<?>) psiElement,
+                    presentation
+            );
         }
+    }
+
+    private void renderCallDefinitionImpl(
+            @NotNull org.elixir_lang.beam.psi.impl.CallDefinitionImpl<?> callDefinition,
+            @NotNull LookupElementPresentation presentation) {
+        int arity = callDefinition.getNameArityInterval().getArityInterval().getMinimum();
+        presentation.appendTailText("/" + arity, true);
+
+        // Mirror the source render path's icon (navigation.item_presentation.CallDefinitionHead):
+        // a RowIcon of [time (function/macro), visibility, call-definition-clause].  Only exported
+        // (public) definitions are offered in completion, so visibility is PUBLIC.
+        RowIcon icon = new RowIcon(3);
+        icon.setIcon(Icons.Time.from(callDefinition.getTime()), 0);
+        icon.setIcon(Icons.Visibility.from(Visibility.PUBLIC), 1);
+        icon.setIcon(Icons.CALL_DEFINITION_CLAUSE, 2);
+        presentation.setIcon(icon);
     }
 
     private void renderStructureView(@NotNull org.elixir_lang.structure_view.element.CallDefinitionClause structureView,
