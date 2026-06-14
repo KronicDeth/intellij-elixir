@@ -869,7 +869,7 @@ class ModuleAttribute : Annotator, DumbAware {
             message = "Float literals are not allowed in types: use float() instead"
         }
 
-        highlightTypeError(decimalFloat, message!!, annotationHolder)
+        highlightTypeError(decimalFloat, message, annotationHolder)
     }
 
     private fun highlightTypesAndTypeParameterUsages(
