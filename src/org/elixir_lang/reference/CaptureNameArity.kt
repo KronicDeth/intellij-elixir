@@ -1,7 +1,6 @@
 package org.elixir_lang.reference
 
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
@@ -35,10 +34,8 @@ class CaptureNameArity(element: NonNumeric, val nameElement: Call, val arity: Ar
             incompleteCode: Boolean
     ): Array<ResolveResult> {
         ApplicationManager.getApplication().assertReadAccessAllowed()
-        return ReadAction.compute<Array<ResolveResult>, Throwable> {
-            ResolveCache
-                .getInstance(project)
-                .resolveWithCaching(captureNameArity, Resolver, false, incompleteCode)
-        }
+        return ResolveCache
+            .getInstance(project)
+            .resolveWithCaching(captureNameArity, Resolver, false, incompleteCode)
     }
 }
