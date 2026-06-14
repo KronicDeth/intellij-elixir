@@ -244,6 +244,11 @@ class Editor(private val sdkModel: SdkModel, private val history: History, priva
         }
     }
 
+    /**
+     * See https://youtrack.jetbrains.com/issue/IJPL-243914 for reason why we can't move on from
+     * deprecated call.
+     */
+    @Suppress("DEPRECATION")
     private fun doSelectHomePath() {
         val sdkType = sdk.sdkType as SdkType
         SdkConfigurationUtil.selectSdkHome(sdkType) { path -> doSetHomePath(path, sdkType) }
