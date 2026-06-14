@@ -17,7 +17,7 @@ import org.mockito.Mockito
 class MockWslCompatService(
     private val distributionOverride: ((String?) -> WSLDistribution?)? = null,
     private val conversionOverride: ((WSLDistribution, String?) -> String?)? = null,
-    private val canonicalWslPrefixOverride: String? = null,
+    private val prefixConversionOverride: Pair<String, String>? = LEGACY_WSL_PREFIX to MODERN_WSL_PREFIX,
 ) : WslCompatService {
     override val log = Logger.getInstance(MockWslCompatService::class.java)
 
@@ -143,25 +143,11 @@ class MockWslCompatService(
         return null
     }
 
-    // Only performs prefix normalization (\\wsl$\ ↔ \\wsl.localhost\) without calling toRealPath(),
-    // since test paths don't exist on the filesystem.
-    override fun canonicalizePath(path: String, currentOs: OS): String {
-        val forcedPrefix = canonicalWslPrefixOverride
-        if (forcedPrefix != null) {
-            return when {
-                forcedPrefix == MODERN_WSL_PREFIX -> path.replacePrefix(LEGACY_WSL_PREFIX, MODERN_WSL_PREFIX)
-                forcedPrefix == LEGACY_WSL_PREFIX -> path.replacePrefix(MODERN_WSL_PREFIX, LEGACY_WSL_PREFIX)
-                else -> path
-            }
-        }
-
-        return when {
-            currentOs != OS.Windows -> path
-
-            currentOs.isAtLeast(11, 0) ->
-                path.replacePrefix(LEGACY_WSL_PREFIX, MODERN_WSL_PREFIX)
-
-            else -> path.replacePrefix(MODERN_WSL_PREFIX, LEGACY_WSL_PREFIX)
-        }
-    }
+    /**
+     * Returns [prefixConversionOverride] (default: legacy→modern) instead of consulting the host OS,
+     * so tests are deterministic across the CI matrix (Windows 11, older Windows, and Linux runners).
+     * Only the OS-version policy is stubbed; the real prefix rewrite in [canonicalizeWslPrefix] still runs.
+     * Pass `prefixConversionOverride = null` to simulate the "no conversion" (non-Windows) case.
+     */
+    override fun wslPrefixConversion(currentOs: OS): Pair<String, String>? = prefixConversionOverride
 }
