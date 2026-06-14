@@ -32,7 +32,7 @@ class FileEditor(
     override fun getBackgroundHighlighter(): BackgroundEditorHighlighter? = null
     override fun getComponent(): JComponent {
         val descriptor = PrevNextActionsDescriptor(IdeActions.ACTION_NEXT_EDITOR_TAB, IdeActions.ACTION_PREVIOUS_EDITOR_TAB)
-        rootTabbedPane = TabbedPaneWrapper.AsJBTabs(project, SwingConstants.TOP, descriptor, this)
+        rootTabbedPane = TabbedPaneWrapper.createJbTabs(project, SwingConstants.TOP, descriptor, this)
 
         Cache.from(virtualFile)?.let { cache ->
             cache.chunkCollection().forEach { chunk ->
