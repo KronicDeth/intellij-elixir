@@ -33,6 +33,8 @@ class Runner : GenericProgramRunner<RunnerSettings>() {
     override fun doExecute(state: RunProfileState, environment: ExecutionEnvironment): RunContentDescriptor =
             XDebuggerManager
                     .getInstance(environment.project)
+                    // Keep startSession() for 253 compatibility; XDebugSessionBuilder is not
+                    // available across our supported baseline yet.
                     .startSession(
                             environment,
                             object : XDebugProcessStarter() {
