@@ -41,13 +41,22 @@ class Variants : CallDefinitionClause() {
     }
 
     override fun execute(element: CallDefinitionImpl<*>, state: ResolveState): Boolean {
-        val entranceCallDefinitionClause = state.get(ENTRANCE_CALL_DEFINITION_CLAUSE)
-
-        if ((entranceCallDefinitionClause == null || !element.isEquivalentTo(entranceCallDefinitionClause)) && element is Named) {
-            addCallDefinitionClauseToLookupElementByPsiElement(element)
+        // BEAM-decompiled call definitions are never the entrance clause (which is always source),
+        // so the entrance guard from executeOnCallDefinitionClause does not apply here.
+        if (element.isExported()) {
+            addCallDefinitionToLookupElementByPsiElement(element)
         }
 
         return true
+    }
+
+    private fun addCallDefinitionToLookupElementByPsiElement(element: CallDefinitionImpl<*>) {
+        val name = element.exportedName()
+
+        lookupElementByPsiElementName.computeIfAbsent(element to name) { (el, n) ->
+            LookupElementBuilder.createWithSmartPointer(n, el)
+                .withRenderer(org.elixir_lang.code_insight.lookup.element_renderer.CallDefinitionClause(n))
+        }
     }
 
     private fun addCallDefinitionClauseToLookupElementByPsiElement(named: Named) {
