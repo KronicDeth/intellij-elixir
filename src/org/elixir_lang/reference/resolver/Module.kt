@@ -116,11 +116,10 @@ object Module : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Modul
 
                 entranceVirtualFile?.let {
                     // ... we prefer sources compared to decompiled, so use LibraryScope to get the Library source too.
-                    val orderEntries = projectFileIndex.getOrderEntriesForFile(entranceVirtualFile)
                     val libraryScope =
                         LibraryScopeCache
                             .getInstance(project)
-                            .getLibraryScope(orderEntries)
+                            .getLibraryScope(entranceVirtualFile)
 
                     moduleWithDependenciesAndLibrariesScope.uniteWith(libraryScope)
                 } ?: moduleWithDependenciesAndLibrariesScope
