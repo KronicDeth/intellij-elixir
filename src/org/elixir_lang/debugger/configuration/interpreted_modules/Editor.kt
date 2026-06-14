@@ -204,7 +204,7 @@ class Editor<T : Debuggable<*>> : SettingsEditor<T>() {
     }
 
     private fun focus() {
-        IdeFocusManager.getGlobalInstance().doWhenFocusSettlesDown {
+        SwingUtilities.invokeLater {
             IdeFocusManager.getGlobalInstance().requestFocus(inheritedModuleFilterTable, true)
         }
     }
