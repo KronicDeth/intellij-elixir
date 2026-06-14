@@ -1,6 +1,5 @@
 package org.elixir_lang.psi.impl
 
-import com.intellij.openapi.application.runReadAction
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.openapi.progress.ProgressManager
@@ -29,11 +28,9 @@ import org.jetbrains.annotations.Contract
 
 @RequiresReadLock
 fun PsiElement.ancestorSequence() = generateSequence(this) { it.parent }
-fun PsiElement.document(): Document? = containingFile.viewProvider.let { viewProvider ->
-    runReadAction {
-        viewProvider.document
-    }
-}
+
+@RequiresReadLock
+fun PsiElement.document(): Document? = containingFile.viewProvider.document
 
 @RequiresReadLock
 tailrec fun PsiElement.selfOrEnclosingMacroCall(): Call? =

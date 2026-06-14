@@ -1369,6 +1369,7 @@ public class ElixirPsiImplUtil {
         return QuotableImpl.quote(unqualifiedNoParenthesesCall);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final UnqualifiedNoArgumentsCall unqualifiedNoArgumentsCall) {
