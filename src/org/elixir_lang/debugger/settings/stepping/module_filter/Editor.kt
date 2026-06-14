@@ -14,6 +14,7 @@ import java.awt.BorderLayout
 import java.awt.Dimension
 import javax.swing.JPanel
 import javax.swing.JTable
+import javax.swing.SwingUtilities
 import org.elixir_lang.debugger.settings.stepping.module_filter.editor.table.cell_renderer.ModuleFilter as ModuleFilterCellRenderer
 
 class Editor: JPanel(BorderLayout()), ComponentWithEmptyText {
@@ -87,7 +88,7 @@ class Editor: JPanel(BorderLayout()), ComponentWithEmptyText {
     }
 
     private fun focus() {
-        IdeFocusManager.getGlobalInstance().doWhenFocusSettlesDown {
+        SwingUtilities.invokeLater {
             IdeFocusManager.getGlobalInstance().requestFocus(table, true)
         }
     }
