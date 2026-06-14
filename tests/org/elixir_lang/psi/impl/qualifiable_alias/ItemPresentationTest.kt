@@ -33,7 +33,7 @@ class ItemPresentationTest : PlatformTestCase() {
         // getPresentableText() must terminate (not infinite-loop) and return the alias presentation
         val presentation = elixirAlias.presentation
         assertNotNull("Expected a non-null ItemPresentation for ElixirAlias", presentation)
-        val presentableText = presentation!!.presentableText
+        val presentableText = presentation.presentableText
         assertEquals("alias Prefix", presentableText)
     }
 

@@ -72,7 +72,7 @@ class Handler : RenameHandler {
 
     // See `com.intellij.refactoring.rename.inplace.VariableInplaceRenameHandler.doRename`
     private fun invoke(editor: Editor, element: PsiElement, dataContext: DataContext) {
-        val renamer = createRenamer(element, editor!!)
+        val renamer = createRenamer(element, editor)
         val startedRename = renamer.performInplaceRename()
 
         if (!startedRename) {

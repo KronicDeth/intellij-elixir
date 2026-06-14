@@ -336,11 +336,11 @@ class Editor(private val sdkModel: SdkModel, private val history: History, priva
             additionalDataConfigurableListBySdkType.put(sdkType, configurables)
 
             sdkType.createAdditionalDataConfigurable(sdkModel, editedSdkModificator)?.let {
-                configurables!!.add(it)
+                configurables.add(it)
             }
         }
 
-        return configurables!!
+        return configurables
     }
 
     override fun navigateTo(place: Place?, requestFocus: Boolean): ActionCallback {
