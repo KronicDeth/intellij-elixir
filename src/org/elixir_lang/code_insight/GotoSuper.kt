@@ -1,8 +1,7 @@
 package org.elixir_lang.code_insight
 
 import com.intellij.codeInsight.CodeInsightActionHandler
-import com.intellij.codeInsight.daemon.impl.PsiElementListNavigator
-import com.intellij.ide.util.DefaultPsiElementCellRenderer
+import com.intellij.codeInsight.navigation.PsiTargetNavigator
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile
@@ -22,7 +21,7 @@ import org.elixir_lang.psi.impl.call.macroChildCallList
 import org.elixir_lang.psi.stub.index.ModularName
 
 
-class GotoSuper : CodeInsightActionHandler {
+internal class GotoSuper : CodeInsightActionHandler {
     override fun startInWriteAction(): Boolean = false
 
     override fun invoke(project: Project, editor: Editor, file: PsiFile) {
@@ -83,13 +82,10 @@ class GotoSuper : CodeInsightActionHandler {
                     .toList()
                     .toTypedArray()
 
-            PsiElementListNavigator.openTargets(
-                    editor,
-                    targets,
-                    "Choose Protocol Function",
-                    "Protocol Functions of ${call.functionName()}/${call.resolvedFinalArity()}",
-                    DefaultPsiElementCellRenderer()
-            )
+            PsiTargetNavigator(targets)
+                    .title("Choose Protocol Function")
+                    .tabTitle("Protocol Functions of ${call.functionName()}/${call.resolvedFinalArity()}")
+                    .navigate(editor, "Choose Protocol Function")
         }
     }
 }
