@@ -28,6 +28,9 @@ import org.jetbrains.annotations.Nullable;
       return stack.size();
   }
 
+  public void clearStack() {
+      stack.clear();
+  }
   private void startQuote(CharSequence quotePromoterCharSequence) {
     String quotePromoter = quotePromoterCharSequence.toString();
     stack.push(quotePromoter, yystate());
@@ -647,7 +650,7 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
 %state DECIMAL_FRACTION
 %state DECIMAL_WHOLE_NUMBER
 %state DOT_OPERATION
-%state ESCAPE_IN_LITERAL_GROUP
+%state ESCAPE_IN_LITERAL
 %state ESCAPE_SEQUENCE
 %state EXTENDED_HEXADECIMAL_ESCAPE_SEQUENCE
 %state GROUP
@@ -1099,13 +1102,13 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
   .                                                 { handleInLastState(); }
 }
 
-<ESCAPE_IN_LITERAL_GROUP> {
+<ESCAPE_IN_LITERAL> {
   {EOL} {
-          yybegin(GROUP);
+          popAndBegin();
           return ElixirTypes.EOL;
         }
   .     {
-          yybegin(GROUP);
+          popAndBegin();
           return ElixirTypes.FRAGMENT;
         }
 }
@@ -1157,6 +1160,32 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
                            return ElixirTypes.FRAGMENT;
                           }
                         }
+  // See https://github.com/elixir-lang/elixir/pull/4341
+  // \""" (or \''') is special in ALL heredocs and sigil lines (interpolating and non-interpolating
+  // alike): the backslash escapes the closing delimiter sequence so it doesn't end the group/
+  // heredoc, and the backslash itself is NOT part of the content.
+  // Placed in the shared block so GROUP and GROUP_HEREDOC_LINE_BODY can never diverge on this rule.
+  // ESCAPE_SEQUENCE already handles {GROUP_HEREDOC_TERMINATOR} → HEREDOC_TERMINATOR (see that
+  // state's rules), and the parser grammar ESCAPE HEREDOC_TERMINATOR → ESCAPED_HEREDOC_TERMINATOR
+  // already exists, so no further changes are needed beyond this rule.
+  {ESCAPE}{GROUP_HEREDOC_TERMINATOR} {
+                                       CharSequence heredocTerminator = yytext().subSequence(1, yytext().length());
+                                       yypushback(heredocTerminator.length());
+
+                                       if (isTerminator(heredocTerminator) || isInterpolating()) {
+                                         // \""" in """ heredoc - delimiter-escape (both interpolating and non-interpolating)
+                                         // \''' in """ heredoc (interpolating) - \ is a normal escape character; ESCAPE_SEQUENCE
+                                         //   handles {GROUP_HEREDOC_TERMINATOR} by pushing back all-but-first and returning
+                                         //   ESCAPED_CHARACTER_TOKEN, so \' + '' is correct.
+                                         pushAndBegin(ESCAPE_SEQUENCE);
+                                         return ElixirTypes.ESCAPE;
+                                       } else {
+                                         // \''' in """ heredoc (non-interpolating): \ is a literal fragment;
+                                         // ESCAPE_IN_LITERAL handles the pushed-back chars and returns to this state.
+                                         pushAndBegin(ESCAPE_IN_LITERAL);
+                                         return ElixirTypes.FRAGMENT;
+                                       }
+                                     }
 }
 
 // Rules in GROUP, but not GROUP_HEREDOC_LINE_BODY
@@ -1169,21 +1198,21 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
 
                                /* even literal groups have escape sequences because escaping the terminator is still
                                   allowed */
-                               if (isTerminator(groupTerminator) || isInterpolating()) {
-                                 // matches interpolating behavior from `{ESCAPE}` rule below
-                                 pushAndBegin(ESCAPE_SEQUENCE);
-                                 return ElixirTypes.ESCAPE;
-                               } else {
-                                 // matches non-interpolating behavior from `{ESCAPE}` rule below
-                                 yybegin(ESCAPE_IN_LITERAL_GROUP);
-                                 return ElixirTypes.FRAGMENT;
-                               }
+                                if (isTerminator(groupTerminator) || isInterpolating()) {
+                                  // matches interpolating behavior from `{ESCAPE}` rule below
+                                  pushAndBegin(ESCAPE_SEQUENCE);
+                                  return ElixirTypes.ESCAPE;
+                                } else {
+                                  // matches non-interpolating behavior from `{ESCAPE}` rule below
+                                  pushAndBegin(ESCAPE_IN_LITERAL);
+                                  return ElixirTypes.FRAGMENT;
+                                }
                              }
   {ESCAPE} / {EOL}           {
                                if (isInterpolating()) {
                                  pushAndBegin(ESCAPE_SEQUENCE);
                                } else {
-                                 yybegin(ESCAPE_IN_LITERAL_GROUP);
+                                 pushAndBegin(ESCAPE_IN_LITERAL);
                                }
 
                                return ElixirTypes.ESCAPE;
@@ -1193,7 +1222,7 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
                                  pushAndBegin(ESCAPE_SEQUENCE);
                                  return ElixirTypes.ESCAPE;
                                } else {
-                                 yybegin(ESCAPE_IN_LITERAL_GROUP);
+                                 pushAndBegin(ESCAPE_IN_LITERAL);
                                  return ElixirTypes.FRAGMENT;
                                }
                              }
@@ -1232,13 +1261,25 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
 // Rules in GROUP_HEREDOC_LINE_BODY, but not GROUP
 <GROUP_HEREDOC_LINE_BODY> {
   // See https://github.com/elixir-lang/elixir/pull/4341
+  // \<newline> is special in ALL heredocs (interpolating and non-interpolating alike):
+  // Elixir's tokenizer (elixir_interpolation.erl extract/8) processes \<newline> via
+  // extract_nl() regardless of the Interpol flag, so the structure is syntactically
+  // distinct from plain content. The GROUP state also always returns ESCAPE for
+  // \<newline> in non-interpolating mode (going to ESCAPE_IN_LITERAL), so we
+  // mirror that here and always produce ESCAPE + EOL → ESCAPED_EOL in the PSI tree.
   {ESCAPE} / {EOL} {
                      yybegin(GROUP_HEREDOC_LINE_ESCAPED_EOL);
                      return ElixirTypes.ESCAPE;
                    }
+  // For non-interpolating sigils, a backslash is a literal character; stay in this state so
+  // the next character is handled by the normal GROUP_HEREDOC_LINE_BODY rules.
   {ESCAPE}         {
-                     pushAndBegin(ESCAPE_SEQUENCE);
-                     return ElixirTypes.ESCAPE;
+                     if (isInterpolating()) {
+                       pushAndBegin(ESCAPE_SEQUENCE);
+                       return ElixirTypes.ESCAPE;
+                     } else {
+                       return ElixirTypes.FRAGMENT;
+                     }
                    }
   {EOL}            {
                      yybegin(GROUP_HEREDOC_LINE_START);
