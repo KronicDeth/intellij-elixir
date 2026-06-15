@@ -50,8 +50,7 @@ internal class WslCompatServiceImpl : WslCompatService {
             // Delegate to native IntelliJ API
             val wslPath = WslPath.parseWindowsUncPath(windowsUncPath)
             wslPath?.linuxPath
-        } catch (e: Exception) {
-            log.debug("Error converting Windows UNC path to Linux path: $windowsUncPath", e)
+        } catch (_: Exception) {
             null
         }
     }

@@ -3,6 +3,8 @@ package org.elixir_lang.psi
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiPolyVariantReference
 import com.intellij.psi.ResolveState
+import com.intellij.psi.search.GlobalSearchScope
+import com.intellij.psi.stubs.StubIndex
 import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.beam.psi.impl.CallDefinitionImpl
 import org.elixir_lang.beam.psi.impl.ModuleImpl
@@ -15,6 +17,7 @@ import org.elixir_lang.psi.impl.call.macroChildCallSequence
 import org.elixir_lang.psi.impl.call.stabBodyChildExpressions
 import org.elixir_lang.psi.impl.maybeModularNameToModulars
 import org.elixir_lang.psi.impl.stripAccessExpression
+import org.elixir_lang.psi.stub.index.ModularName
 import org.elixir_lang.structure_view.element.Timed
 import org.elixir_lang.util.AccumulatorContinue
 
@@ -201,6 +204,61 @@ object Using {
             .asSequence()
             .filter { isDefiner(it) }
 
+    /**
+     * Returns true if [modular] is `ExUnit.CaseTemplate` itself or a module that (directly or
+     * transitively) uses `ExUnit.CaseTemplate`.
+     *
+     * This is needed because `ExUnit.CaseTemplate.__using__/1` generates a `defmacro __using__`
+     * inside the target module at *compile time*.  That generated macro never appears in the
+     * module's source `.ex` file, so [definers] returns an empty sequence for such modules and the
+     * scope walker gives up without importing `describe`, `test`, etc.  Detecting the CaseTemplate
+     * pattern lets [Use.treeWalkUp] substitute `ExUnit.Case.__using__/1` directly instead.
+     *
+     * Cycle-safety is provided by [resolveState]'s visited-element set.
+     */
+    @RequiresReadLock
+    fun isCaseTemplate(modular: PsiElement, resolveState: ResolveState): Boolean {
+        if (resolveState.hasBeenVisited(modular)) return false
+        return when (modular) {
+            is ModuleImpl<*> -> modular.name == EXUNIT_CASE_TEMPLATE
+            is Call -> {
+                val updatedState = resolveState.putVisitedElement(modular)
+                modular.name == EXUNIT_CASE_TEMPLATE ||
+                modular.macroChildCallSequence()
+                    .filter { Use.`is`(it) }
+                    .any { useCall ->
+                        Use.modulars(useCall).any { inner ->
+                            isCaseTemplate(inner, updatedState)
+                        }
+                    }
+            }
+            else -> false
+        }
+    }
+
+    /**
+     * Locates the `__using__/1` definers of `ExUnit.Case` via the stub index.
+     *
+     * Used as a substitute in [Use.treeWalkUp] when the target module is a CaseTemplate: because the
+     * generated `__using__` is not in the source PSI and the `unquote(__MODULE__).__proxy__` call inside
+     * it cannot be statically resolved, we skip the opaque generated layer and go straight to
+     * `ExUnit.Case.__using__/1`, which is what every CaseTemplate chain ultimately delegates to.
+     */
+    @RequiresReadLock
+    fun exUnitCaseDefiners(context: PsiElement): Sequence<PsiElement> =
+        StubIndex
+            .getElements(
+                ModularName.KEY,
+                EXUNIT_CASE,
+                context.project,
+                GlobalSearchScope.allScope(context.project),
+                NamedElement::class.java
+            )
+            .asSequence()
+            .flatMap { definers(it) }
+
+    private const val EXUNIT_CASE = "ExUnit.Case"
+    private const val EXUNIT_CASE_TEMPLATE = "ExUnit.CaseTemplate"
     private const val ARITY = 1
     private const val USING = "__using__"
 

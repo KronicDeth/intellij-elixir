@@ -4,7 +4,6 @@ import com.intellij.openapi.project.DumbService
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiNamedElement
 import com.intellij.psi.ResolveState
-import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
 import com.intellij.psi.util.PsiTreeUtil
 import org.elixir_lang.Module.concat
@@ -20,6 +19,7 @@ import org.elixir_lang.psi.scope.VisitedElementSetResolveResult
 import org.elixir_lang.psi.scope.maxScope
 import org.elixir_lang.psi.stub.index.ModularName
 import org.elixir_lang.reference.module.UnaliasedName
+import org.elixir_lang.reference.resolver.narrowedScope
 
 class MultiResolve internal constructor(private val name: String, private val incompleteCode: Boolean) : Module() {
     /**
@@ -106,13 +106,15 @@ class MultiResolve internal constructor(private val name: String, private val in
         if (!DumbService.isDumb(project)) {
             var found = false
 
+            val searchScope = narrowedScope(match, project)
+
             StubIndex
                     .getInstance()
                     .processElements(
                             ModularName.KEY,
                             unaliasedName,
                             project,
-                            GlobalSearchScope.allScope(project),
+                            searchScope,
                             NamedElement::class.java) {
                 resolveResultOrderedSet.add(it, unaliasedName, true, visitedElementSet)
                 found = true
