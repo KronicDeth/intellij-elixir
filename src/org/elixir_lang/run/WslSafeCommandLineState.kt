@@ -5,7 +5,9 @@ import com.intellij.execution.configurations.CommandLineState
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.process.ProcessHandler
 import com.intellij.execution.runners.ExecutionEnvironment
+import com.intellij.openapi.application.ReadAction
 import com.intellij.platform.ide.progress.runWithModalProgressBlocking
+import java.util.concurrent.Callable
 
 abstract class WslSafeCommandLineState<T>(
     environment: ExecutionEnvironment,
@@ -16,9 +18,13 @@ abstract class WslSafeCommandLineState<T>(
 
     @Throws(ExecutionException::class)
     override fun startProcess(): ProcessHandler {
+        // configuration.commandLine() -> Mix/Elixir/IEx.commandLine() -> CliArguments.argsOrThrow()
+        // -> requireErlangSdkOrNotifyAndThrow() -> findErlangSdkByHomePath() which asserts a read
+        // lock. startProcess() is called by the execution infrastructure without a read lock, so
+        // we must acquire one here.
         val commandLine =
             try {
-                configuration.commandLine()
+                ReadAction.nonBlocking(Callable { configuration.commandLine() }).executeSynchronously()
             } catch (e: ExecutionException) {
                 handleExecutionException(e)
                 throw e

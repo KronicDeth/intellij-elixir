@@ -3,6 +3,7 @@ package org.elixir_lang
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.Sdk
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.cli.CliArguments
 import org.elixir_lang.jps.shared.cli.CliArgs
 import org.elixir_lang.jps.shared.cli.CliTool
@@ -13,6 +14,7 @@ object Elixir {
     /**
      * Keep in-sync with [org.elixir_lang.jps.Builder.elixirCommandLine]
      */
+    @RequiresReadLock
     fun commandLine(
         environment: Map<String, String>,
         workingDirectory: String?,
