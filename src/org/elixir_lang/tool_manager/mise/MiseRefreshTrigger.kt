@@ -14,6 +14,7 @@ import com.intellij.openapi.vfs.newvfs.events.VFileDeleteEvent
 import com.intellij.openapi.vfs.newvfs.events.VFileEvent
 import org.elixir_lang.mise.Mise
 import org.elixir_lang.tool_manager.ToolManagerRefreshTrigger
+import org.jetbrains.annotations.VisibleForTesting
 import java.nio.file.Path
 
 private val LOG = logger<MiseRefreshTrigger>()
@@ -112,7 +113,8 @@ object MiseRefreshTrigger : ToolManagerRefreshTrigger {
         return lifetime
     }
 
-    private fun shouldTrigger(
+    @VisibleForTesting
+    internal fun shouldTrigger(
         event: VFileEvent,
         exactPaths: Set<String>,
         contentRootStrings: Set<String>,
