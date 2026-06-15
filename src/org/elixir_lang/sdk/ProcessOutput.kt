@@ -12,7 +12,7 @@ import com.intellij.util.containers.ContainerUtil
 import org.elixir_lang.run.WslAwareCommandLine
 import java.io.File
 import java.nio.charset.StandardCharsets
-import java.util.Locale
+import java.util.*
 
 /**
  * Created by zyuyou on 2015/5/27.

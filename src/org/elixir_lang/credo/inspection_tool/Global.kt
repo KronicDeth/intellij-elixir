@@ -8,7 +8,10 @@ import com.intellij.execution.util.ExecUtil
 import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.ModalityState
+import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.progress.ProgressIndicator
@@ -23,11 +26,12 @@ import org.elixir_lang.credo.Action
 import org.elixir_lang.isElixirMixModule
 import org.elixir_lang.jps.shared.ParametersList
 import org.elixir_lang.mix.Project
-import org.elixir_lang.notification.setup_sdk.Notifier
-import org.elixir_lang.sdk.elixir.ElixirSdkLookup.mostSpecificSdk
+import org.elixir_lang.notification.setup_sdk.sdkOrNotify
+import org.elixir_lang.sdk.elixir.ElixirSdkLookup
 import java.nio.charset.StandardCharsets
 import java.nio.file.InvalidPathException
 import java.nio.file.Paths
+import java.util.concurrent.Callable
 
 // Phase 2 location parsing: try the most specific location shape first to avoid path/line ambiguity.
 // lib/level_web/ui/empty_state.ex:1:11: R: Modules should have a @moduledoc tag.
@@ -92,7 +96,7 @@ internal fun parseFlycheckFinding(line: String): FlycheckFinding? {
 
 private val LOG = logger<Global>()
 
-class Global : GlobalInspectionTool() {
+internal class Global : GlobalInspectionTool() {
     private data class CredoRunOutcome(
         val findingCount: Int,
         val failureSummary: String? = null,
@@ -111,6 +115,17 @@ class Global : GlobalInspectionTool() {
         globalContext: GlobalInspectionContext,
         problemDescriptionsProcessor: ProblemDescriptionsProcessor,
     ) {
+        // Save all modified documents before launching mix credo so the external process
+        // sees the current file contents.  Same reasoning as dialyzer/inspection/Global.kt:
+        // runInspection runs on a background thread (isReadActionNeeded = false);
+        // saveAllDocuments() requires EDT; invokeAndWait is the correct bridge for
+        // non-suspend blocking code.  ModalityState.nonModal() ensures the save is not
+        // deferred by an open dialog.
+        ApplicationManager.getApplication().invokeAndWait(
+            { FileDocumentManager.getInstance().saveAllDocuments() },
+            ModalityState.nonModal()
+        )
+
         val project = scope.project
         val scopedModules = ApplicationManager.getApplication().runReadAction<List<Module>> {
             ModuleManager.getInstance(project).modules.filter { scope.containsModule(it) && it.isElixirMixModule() }
@@ -214,17 +229,11 @@ class Global : GlobalInspectionTool() {
         module: Module,
         workingDirectory: String,
     ): CredoRunOutcome {
-        val elixirSdk = mostSpecificSdk(module)
+        val elixirSdk = ReadAction.nonBlocking(Callable {
+            ElixirSdkLookup.resolveWithErlang(module).sdkOrNotify(module)
+        }).executeSynchronously()
+            ?: return CredoRunOutcome(findingCount = 0) // notification already fired by sdkOrNotify
         val project = module.project
-
-        if (elixirSdk == null) {
-            Notifier.error(
-                module,
-                "Missing module Elixir SDK",
-                "There is no configured Elixir SDK for the module ${module.name} or its project ${project.name}, so credo cannot be run"
-            )
-            return CredoRunOutcome(findingCount = 0, failureSummary = "Missing Elixir SDK for module ${module.name}")
-        }
 
         val service = org.elixir_lang.credo.Service.getInstance(project)
         val environment = service.environmentVariableData.envs
