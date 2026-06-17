@@ -261,7 +261,8 @@ object Mise {
      *
      * We match the second line to extract the untrusted config path.
      */
-    private fun parseTrustError(stderr: String): MiseResult.UntrustedConfig? {
+    @VisibleForTesting
+    internal fun parseTrustError(stderr: String): MiseResult.UntrustedConfig? {
         val match = Regex("""Config files in (.+) are not trusted\.""").find(stderr) ?: return null
         return MiseResult.UntrustedConfig(match.groupValues[1].trim())
     }
