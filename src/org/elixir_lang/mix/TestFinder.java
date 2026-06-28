@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 
-public class TestFinder implements com.intellij.testIntegration.TestFinder {
+public final class TestFinder implements com.intellij.testIntegration.TestFinder {
     private static final String TEST_SUFFIX = "Test";
 
     @NotNull
@@ -32,9 +32,7 @@ public class TestFinder implements com.intellij.testIntegration.TestFinder {
         Call sourceElement = sourceElement(element);
         Collection<PsiElement> correspondingCollection = new ArrayList<>();
 
-        if (sourceElement instanceof StubBased) {
-            @SuppressWarnings("rawtypes")
-            StubBased sourceStubBased = (StubBased) sourceElement;
+        if (sourceElement instanceof @SuppressWarnings("rawtypes")StubBased sourceStubBased) {
             Set<String> canonicalNameSet = sourceStubBased.canonicalNameSet();
 
             if (!canonicalNameSet.isEmpty()) {
@@ -54,9 +52,7 @@ public class TestFinder implements com.intellij.testIntegration.TestFinder {
                         );
 
                         for (NamedElement correspondingElement : correspondingElements) {
-                            if (correspondingElement instanceof Call) {
-                                Call correspondingCall = (Call) correspondingElement;
-
+                            if (correspondingElement instanceof Call correspondingCall) {
                                 if (correspondingCallCondition.value(correspondingCall)) {
                                     correspondingCollection.add(correspondingCall);
                                 }
@@ -159,9 +155,7 @@ public class TestFinder implements com.intellij.testIntegration.TestFinder {
         Call sourceElement = sourceElement(element);
         boolean isTest = false;
 
-        if (sourceElement instanceof StubBased) {
-            @SuppressWarnings("rawtypes")
-            StubBased sourceStubBased = (StubBased) sourceElement;
+        if (sourceElement instanceof StubBased sourceStubBased) {
             Set<String> canonicalNameSet = sourceStubBased.canonicalNameSet();
 
             if (!canonicalNameSet.isEmpty()) {
