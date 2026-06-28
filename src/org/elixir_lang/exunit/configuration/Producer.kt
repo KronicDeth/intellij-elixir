@@ -9,14 +9,14 @@ import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.util.Ref
 import com.intellij.psi.*
 import org.elixir_lang.exunit.Configuration
-import org.elixir_lang.file.containsFileWithSuffix
 import org.elixir_lang.mix.Project
+import org.elixir_lang.mix.Test
 import org.elixir_lang.psi.ElixirFile
 import org.elixir_lang.sdk.elixir.Type
 import org.elixir_lang.sdk.elixir.ElixirSdkLookup.mostSpecificSdk
 import java.io.File
 
-class MixExUnitRunConfigurationProducer :
+internal class MixExUnitRunConfigurationProducer :
     LazyRunConfigurationProducer<Configuration>() {
     override fun getConfigurationFactory(): ConfigurationFactory = Factory
 
@@ -36,7 +36,6 @@ class MixExUnitRunConfigurationProducer :
         } == true
 }
 
-const val SUFFIX = "_test.exs"
 private const val UNKNOWN_LINE = -1
 
 private fun configurationName(
@@ -83,8 +82,9 @@ private fun isConfigurationFromContextImpl(configuration: Configuration, psiElem
             contextConfiguration.workingDirectory == configuration.workingDirectory
 }
 
-fun lineNumber(psiElement: PsiElement): Int {
-    val containingFile = psiElement.containingFile
+fun lineNumber(psiElement: PsiElement): Int = lineNumber(psiElement, psiElement.containingFile)
+
+fun lineNumber(psiElement: PsiElement, containingFile: PsiFile): Int {
     val documentLineNumber = PsiDocumentManager
         .getInstance(containingFile.project)
         .getDocument(containingFile)
@@ -137,7 +137,7 @@ private fun setupConfigurationFromContextImpl(
 
             if ((sdkTypeId == null || sdkTypeId == Type.instance) &&
                 ProjectRootsUtil.isInTestSource(psiElement.virtualFile, psiElement.project) &&
-                containsFileWithSuffix(psiElement, SUFFIX)
+                Test.containsTestFile(psiElement)
             ) {
                 val basePath = psiElement.getProject().basePath
                 val workingDirectory = workingDirectory(psiElement, basePath)
@@ -152,7 +152,7 @@ private fun setupConfigurationFromContextImpl(
             }
         }
         is ElixirFile -> {
-            if (psiElement.virtualFile?.path?.endsWith(SUFFIX) == true) {
+            if (Test.isTestFile(psiElement)) {
                 val basePath = psiElement.project.basePath
                 val workingDirectory = workingDirectory(psiElement, basePath)
                 val lineNumber = lineNumber(psiElement)
@@ -169,7 +169,7 @@ private fun setupConfigurationFromContextImpl(
         else -> {
             val containingFile = psiElement.containingFile
 
-            if (containingFile is ElixirFile && containingFile.virtualFile?.path?.endsWith(SUFFIX) == true) {
+            if (containingFile is ElixirFile && Test.isTestFile(containingFile)) {
                 val basePath = psiElement.project.basePath
                 val workingDirectory = workingDirectory(psiElement, basePath)
                 val lineNumber = lineNumber(psiElement)

@@ -10,7 +10,7 @@ import com.intellij.openapi.progress.ProgressManager
  * Default implementation of WslCompatService using the IntelliJ Platform WSL API.
  * Delegates to native IntelliJ APIs where possible to avoid redundancy.
  */
-class WslCompatServiceImpl : WslCompatService {
+internal class WslCompatServiceImpl : WslCompatService {
     override val log = Logger.getInstance(WslCompatServiceImpl::class.java)
 
     override fun isWslUncPath(path: String?): Boolean {
@@ -47,7 +47,8 @@ class WslCompatServiceImpl : WslCompatService {
         }
 
         return try {
-            // Delegate to native IntelliJ API
+            // Delegate to native IntelliJ API, this just returns null if
+            // running on a non-Windows system.
             val wslPath = WslPath.parseWindowsUncPath(windowsUncPath)
             wslPath?.linuxPath
         } catch (e: Exception) {
