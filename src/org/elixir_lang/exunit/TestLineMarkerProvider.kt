@@ -12,6 +12,7 @@ import org.elixir_lang.mix.TestFinder
 import org.elixir_lang.psi.ElixirFile
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.operation.Match
+import org.elixir_lang.sdk.wsl.wslCompat
 
 /**
  * Provides the gutter "run" icons for tests.
@@ -55,14 +56,19 @@ class ExUnitLineMarkerProvider : RunLineMarkerContributor() {
         } ?: return null
 
         val number = lineNumber(element)
-        var url = "file://${element.containingFile.virtualFile.path}:${number}"
-        if (OS.CURRENT == OS.Windows) {
-            // In Elixir, the drive letter is lowercase for some reason.
-            val location = "file://".length
-            url = url.replaceRange(location, location + 1, url[location].lowercaseChar().toString())
-        }
+        val url = "file://${fileUrlAsExUnitSeesIt(element)}:${number}"
         val state = TestStateStorage.getInstance(element.project)?.getState(url)
         return withExecutorActions(getTestStateIcon(state, isClass))
+    }
+
+    private fun fileUrlAsExUnitSeesIt(element: PsiElement): String = if (OS.CURRENT == OS.Windows) {
+        // In Elixir, the drive letter is lowercase for some reason.
+        val fixedDriveLetter = element.containingFile.virtualFile.path.replaceFirstChar { it.lowercase() }
+        // On WSL, ExUnit reports the POSIX path, but IDEA references the file by the UNC path. We convert it to posix if
+        // it is UNC, otherwise return unchanged.
+        wslCompat.maybeParseWindowsUncPath(fixedDriveLetter)
+    } else {
+        element.containingFile.virtualFile.path
     }
 }
 
