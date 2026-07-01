@@ -1,13 +1,14 @@
 package org.elixir_lang.reference.resolver
 
 import com.intellij.codeInsight.daemon.SyntheticPsiFileSupport
-import com.intellij.openapi.application.runReadActionBlocking
+import com.intellij.openapi.application.ReadAction
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiFileFactory
 import com.intellij.psi.search.GlobalSearchScope
 import org.elixir_lang.ElixirLanguage
 import org.elixir_lang.PlatformTestCase
+import java.util.concurrent.Callable
 
 class ScopeUtilTest : PlatformTestCase() {
 
@@ -22,7 +23,9 @@ class ScopeUtilTest : PlatformTestCase() {
         val psiFile = myFixture.configureByText("foo.ex", source)
         val realVirtualFile = psiFile.virtualFile
 
-        val scope = runReadActionBlocking { narrowedScope(elementIn(psiFile), project) }
+        val scope = ReadAction.nonBlocking(Callable {
+            narrowedScope(elementIn(psiFile), project)
+        }).executeSynchronously()
 
         assertNotSame(GlobalSearchScope.allScope(project), scope)
         assertTrue("Module scope should contain the module's own file", scope.contains(realVirtualFile))
@@ -53,7 +56,9 @@ class ScopeUtilTest : PlatformTestCase() {
         assertFalse("Precondition: backing file is not a real local file", backingFile.isInLocalFileSystem)
         SyntheticPsiFileSupport.markFileWithUrl(backingFile, realVirtualFile.url)
 
-        val scope = runReadActionBlocking { narrowedScope(elementIn(outsiderFile), project) }
+        val scope = ReadAction.nonBlocking(Callable {
+            narrowedScope(elementIn(outsiderFile), project)
+        }).executeSynchronously()
 
         assertNotSame(
             "Should narrow to the recovered module instead of allScope",
@@ -68,7 +73,9 @@ class ScopeUtilTest : PlatformTestCase() {
         val syntheticFile = PsiFileFactory.getInstance(project)
             .createFileFromText("foo.ex", ElixirLanguage, source, false, false)
 
-        val scope = runReadActionBlocking { narrowedScope(elementIn(syntheticFile), project) }
+        val scope = ReadAction.nonBlocking(Callable {
+            narrowedScope(elementIn(syntheticFile), project)
+        }).executeSynchronously()
 
         assertSame(GlobalSearchScope.allScope(project), scope)
     }
