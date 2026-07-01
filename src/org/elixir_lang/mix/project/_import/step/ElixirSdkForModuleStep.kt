@@ -79,7 +79,7 @@ class ElixirSdkForModuleStep(private val wizardContext: WizardContext) : ModuleW
     private val projectForSdkModel: Project = if (project.isDefault) {
         // Construct a project file path from the import directory.
         // The .idea/misc.xml path is used because getEelDescriptor() calls Path.of(filePath).getEelDescriptor(),
-        // which only needs the path prefix to determine the environment (e.g., //wsl$/ItronUbuntu/... for WSL).
+        // which only needs the path prefix to determine the environment (e.g., //wsl$/Ubuntu/... for WSL).
         val projectPath = wizardContext.projectFileDirectory.let { "$it/.idea/misc.xml" }
         NonDefaultProjectWrapper(project, projectPath)
     } else {

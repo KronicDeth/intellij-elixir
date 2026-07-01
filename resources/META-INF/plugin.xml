@@ -44,6 +44,10 @@
         <sdkType implementation="org.elixir_lang.sdk.elixir.Type"/>
         <sdkType implementation="org.elixir_lang.sdk.erlang.Type"/>
 
+        <!-- External Libraries: rename SDK "ebin"/"lib" roots to their OTP app name and show .ex source -->
+        <projectViewNodeDecorator implementation="org.elixir_lang.sdk.ElixirSdkLibraryNodeDecorator"/>
+        <treeStructureProvider implementation="org.elixir_lang.sdk.ElixirSdkLibraryTreeStructureProvider"/>
+
 
         <editorNotificationProvider implementation="org.elixir_lang.notification.setup_sdk.Provider"/>
         <notificationGroup displayType="BALLOON" id="Elixir"/>

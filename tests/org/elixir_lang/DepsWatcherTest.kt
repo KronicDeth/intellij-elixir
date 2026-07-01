@@ -4,6 +4,7 @@ import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.progress.EmptyProgressIndicator
 import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar
+import org.elixir_lang.mix.library.CONSOLIDATED_LIBRARY_SUFFIX
 
 class DepsWatcherTest : PlatformTestCase() {
     private val depName = "my_dep"
@@ -12,6 +13,7 @@ class DepsWatcherTest : PlatformTestCase() {
     override fun tearDown() {
         try {
             removeLibrariesIfPresent(depName, secondDepName)
+            removeConsolidatedLibraries()
         } finally {
             super.tearDown()
         }
@@ -34,7 +36,11 @@ class DepsWatcherTest : PlatformTestCase() {
 
         val firstSyncClassRootUrls = classRootUrls(depName)
         assertTrue(
-            "Expected dev consolidated root after first sync",
+            "Expected dev ebin class root after first sync",
+            firstSyncClassRootUrls.any { it.contains("/_build/dev/lib/$depName/ebin") }
+        )
+        assertFalse(
+            "Consolidated root must not be added to the per-dep library",
             firstSyncClassRootUrls.any { it.contains("/_build/dev/consolidated") }
         )
 
@@ -65,7 +71,11 @@ class DepsWatcherTest : PlatformTestCase() {
             secondSyncClassRootUrls.any { it.contains("/stale_classes/$depName") }
         )
         assertTrue(
-            "Expected dev consolidated root after re-sync",
+            "Expected dev ebin class root after re-sync",
+            secondSyncClassRootUrls.any { it.contains("/_build/dev/lib/$depName/ebin") }
+        )
+        assertFalse(
+            "Consolidated root must not be added to the per-dep library after re-sync",
             secondSyncClassRootUrls.any { it.contains("/_build/dev/consolidated") }
         )
     }
@@ -90,11 +100,19 @@ class DepsWatcherTest : PlatformTestCase() {
         }
 
         assertTrue(
-            "First dep should include dev consolidated root after first sync",
-            classRootUrls(depName).any { it.contains("/_build/dev/consolidated") }
+            "First dep should include its dev ebin class root after first sync",
+            classRootUrls(depName).any { it.contains("/_build/dev/lib/$depName/ebin") }
         )
         assertTrue(
-            "Second dep should include dev consolidated root after first sync",
+            "Second dep should include its dev ebin class root after first sync",
+            classRootUrls(secondDepName).any { it.contains("/_build/dev/lib/$secondDepName/ebin") }
+        )
+        assertFalse(
+            "First dep library must not include the shared consolidated root",
+            classRootUrls(depName).any { it.contains("/_build/dev/consolidated") }
+        )
+        assertFalse(
+            "Second dep library must not include the shared consolidated root",
             classRootUrls(secondDepName).any { it.contains("/_build/dev/consolidated") }
         )
 
@@ -143,11 +161,19 @@ class DepsWatcherTest : PlatformTestCase() {
             secondDepSecondSyncClassRootUrls.any { it.contains("/stale_classes/$secondDepName") }
         )
         assertTrue(
-            "First dep should still include dev consolidated root after re-sync",
-            firstDepSecondSyncClassRootUrls.any { it.contains("/_build/dev/consolidated") }
+            "First dep should still include its dev ebin class root after re-sync",
+            firstDepSecondSyncClassRootUrls.any { it.contains("/_build/dev/lib/$depName/ebin") }
         )
         assertTrue(
-            "Second dep should still include dev consolidated root after re-sync",
+            "Second dep should still include its dev ebin class root after re-sync",
+            secondDepSecondSyncClassRootUrls.any { it.contains("/_build/dev/lib/$secondDepName/ebin") }
+        )
+        assertFalse(
+            "First dep library must not include the shared consolidated root after re-sync",
+            firstDepSecondSyncClassRootUrls.any { it.contains("/_build/dev/consolidated") }
+        )
+        assertFalse(
+            "Second dep library must not include the shared consolidated root after re-sync",
             secondDepSecondSyncClassRootUrls.any { it.contains("/_build/dev/consolidated") }
         )
     }
@@ -205,6 +231,64 @@ class DepsWatcherTest : PlatformTestCase() {
         }
     }
 
+    fun testSyncConsolidatedLibraryCreatesSeparateSharedLibrary() {
+        myFixture.tempDirFixture.findOrCreateDir("deps/$depName/lib")
+        myFixture.tempDirFixture.findOrCreateDir("_build/dev/consolidated")
+        myFixture.tempDirFixture.findOrCreateDir("_build/test/consolidated")
+        myFixture.tempDirFixture.findOrCreateDir("_build/dev/lib/$depName/ebin")
+        val buildRoot = myFixture.tempDirFixture.findOrCreateDir("_build")
+
+        val watcher = DepsWatcher(project)
+        val indicator = EmptyProgressIndicator()
+
+        WriteAction.run<Throwable> {
+            watcher.syncConsolidatedLibrary(buildRoot, indicator)
+        }
+
+        val consolidatedLibraryName = "${buildRoot.parent!!.name} $CONSOLIDATED_LIBRARY_SUFFIX"
+        val consolidatedClassRoots = classRootUrls(consolidatedLibraryName)
+
+        assertTrue(
+            "Consolidated library should include the dev consolidated root",
+            consolidatedClassRoots.any { it.contains("/_build/dev/consolidated") }
+        )
+        assertTrue(
+            "Consolidated library should include the test consolidated root",
+            consolidatedClassRoots.any { it.contains("/_build/test/consolidated") }
+        )
+        assertFalse(
+            "Consolidated library must not include per-dep ebin roots",
+            consolidatedClassRoots.any { it.contains("/ebin") }
+        )
+    }
+
+    fun testDeleteAllLibrariesRemovesConsolidatedLibraryWithoutDepLibraries() {
+        val depsRoot = myFixture.tempDirFixture.findOrCreateDir("deps")
+        myFixture.tempDirFixture.findOrCreateDir("_build/dev/consolidated")
+        val buildRoot = myFixture.tempDirFixture.findOrCreateDir("_build")
+
+        val watcher = DepsWatcher(project)
+        val indicator = EmptyProgressIndicator()
+        val consolidatedLibraryName = "${buildRoot.parent!!.name} $CONSOLIDATED_LIBRARY_SUFFIX"
+
+        WriteAction.run<Throwable> {
+            watcher.syncConsolidatedLibrary(buildRoot, indicator)
+        }
+        assertNotNull(
+            "Expected consolidated library to exist before deleting all deps libraries",
+            LibraryTablesRegistrar.getInstance().getLibraryTable(project).getLibraryByName(consolidatedLibraryName)
+        )
+
+        val deleteAllLibraries = DepsWatcher::class.java.getDeclaredMethod("deleteAllLibraries", String::class.java)
+        deleteAllLibraries.isAccessible = true
+        deleteAllLibraries.invoke(watcher, depsRoot.url)
+
+        assertNull(
+            "Consolidated library should be removed even when there are no per-dep libraries",
+            LibraryTablesRegistrar.getInstance().getLibraryTable(project).getLibraryByName(consolidatedLibraryName)
+        )
+    }
+
     private fun classRootUrls(libraryName: String): kotlin.collections.List<String> {
         val library = LibraryTablesRegistrar.getInstance().getLibraryTable(project).getLibraryByName(libraryName)
         assertNotNull("Expected library '$libraryName' to exist", library)
@@ -229,6 +313,21 @@ class DepsWatcherTest : PlatformTestCase() {
 
         WriteAction.run<Throwable> {
             libraries.forEach { libraryTable.removeLibrary(it) }
+        }
+    }
+
+    private fun removeConsolidatedLibraries() {
+        val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
+        val consolidatedLibraries = libraryTable.libraries.filter {
+            it.name?.endsWith(CONSOLIDATED_LIBRARY_SUFFIX) == true
+        }
+
+        if (consolidatedLibraries.isEmpty()) {
+            return
+        }
+
+        WriteAction.run<Throwable> {
+            consolidatedLibraries.forEach { libraryTable.removeLibrary(it) }
         }
     }
 
