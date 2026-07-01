@@ -45,15 +45,15 @@
    2. Check "Create separate module per source set"
    3. Ensure Gradle JVM is **AT LEAST** Java 21+.
    Your import settings should look something like this:<br/>
-   ![Gradle settings](/screenshots/contributing/gradle_settings.png?raw=true "Gradle settings")
+   ![Gradle settings](screenshots/contributing/gradle_settings.png?raw=true "Gradle settings")
    4. Click Finish
 7. When the "Gradle Project Data to Import" dialog pops up
    1. Leave "Elixir (root module), ":jps-builder", and "jps-shared" checked.<br/>
-   ![Select modules](/screenshots/contributing/select_modules.png?raw=true "Select modules")
+   ![Select modules](screenshots/contributing/select_modules.png?raw=true "Select modules")
    2. Click OK
 8. When the "Import Gradle Projects" dialog pops up
    1. Leave "intellij-elixir" checked.  You can remove the old main module:<br/>
-     ![Remove module](/screenshots/contributing/remove_module.png?raw=true "Remove module")
+     ![Remove module](screenshots/contributing/remove_module.png?raw=true "Remove module")
 9. Install [Kotlin Plugin](https://plugins.jetbrains.com/plugin/6954-kotlin)
 
 ### Building and running
@@ -122,7 +122,7 @@ The build system automatically detects your platform:
 **kerl build fails on Linux as of May 2026**
 
 If you see this:
-```sh
+```text
 beam/dist.c:5678:15: error: two or more data types in declaration specifiers
  5678 |         Eterm bool = ((monitor_oflags & ERTS_ML_FLG_SPAWN_MONITOR)
                        ^~~~
@@ -286,11 +286,33 @@ After regenerating parser code:
 
 **`//noinspection BnfResolve` for JFlex tokens:** GrammarKit warns `Unresolved rule reference` for tokens that are defined by JFlex (e.g. `pin = DO`), not by BNF rules. These are false positives - suppress them with a comment on the line above:
 ```bnf
-//noinspection BnfResolve
 pin = DO
 ```
 
 **`gen/` inspection suppression:** The build script marks `gen/` as generated sources via `idea.module.generatedSourceDirs` so that IntelliJ suppresses inspections (e.g. unused imports) on GrammarKit-generated code. There is no GrammarKit configuration to control which imports the generator emits.
+
+### JFlex Lexer Regeneration
+
+The Elixir lexer `src/org/elixir_lang/ElixirFlexLexer.java` is generated from `src/org/elixir_lang/Elixir.flex` using [JFlex](https://jflex.de/). If you modify `Elixir.flex` (e.g. adding a new state, changing a rule, or fixing escape handling), you must regenerate the lexer.
+
+#### Prerequisites
+- Install the **GrammarKit** plugin in IntelliJ IDEA (it bundles JFlex). Settings → Plugins → search "Grammar-Kit".
+
+#### Regenerating the Lexer
+
+1. Open `src/org/elixir_lang/Elixir.flex` in the editor.
+2. Right-click inside the file → **Run JFlex Generator**.
+3. The generator overwrites `gen/org/elixir_lang/ElixirFlexLexer.java` in place.
+   The first time you run it (or on a fresh checkout) it may prompt you to select an output
+   folder - point it at the repository root so it discovers `gen/` automatically.
+
+`gen/` is declared as `generatedSourceDirs` in `build.gradle.kts`, so the IDE warns you if you try to manually edit it and suppresses inspections on it automatically.
+
+#### ⚠️ No Manual Post-Regeneration Step Required
+
+The stack is cleared automatically. `ElixirFlexLexerAdapter.start()` calls the generated
+`clearStack()` method before each lex, so no hand-patching of the generated file is required
+after regeneration.
 
 ### Color Schemes
 
