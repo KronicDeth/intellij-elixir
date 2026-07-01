@@ -223,7 +223,7 @@ The Elixir parser and PSI element classes in `gen/` are generated from `src/org/
 The GrammarKit generator writes files with CRLF line endings, but the repository uses LF. After regenerating, convert line endings from Git Bash:
 
 ```bash
-cd /c/Users/steve/IdeaProjects/intellij-elixir/intellij-elixir
+cd ~/IdeaProjects/intellij-elixir/intellij-elixir
 find gen -type f | xargs dos2unix.exe
 ```
 

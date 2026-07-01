@@ -860,9 +860,9 @@ class ElixirEditorBasedSdkWidget(
     private fun configureSdkFromMise(project: Project, miseAssignments: Map<String, MiseVersions>) {
         runWithModalProgressBlocking(ModalTaskOwner.project(project), "Configuring Elixir SDK from mise") {
             // Collect content roots so Linux install paths returned by WSL-side mise
-            // (e.g. /home/steve/.local/share/mise/installs/erlang/23.3.4.20) can be
+            // (e.g. /home/user/.local/share/mise/installs/erlang/23.3.4.20) can be
             // converted to the Windows UNC form that SdkRegistrar and WslCompatService expect
-            // (e.g. \\wsl.localhost\ItronUbuntu\home\steve\.local\share\mise\installs\erlang\23.3.4.20).
+            // (e.g. \\wsl.localhost\Ubuntu\home\user\.local\share\mise\installs\erlang\23.3.4.20).
             val contentRootByModule: Map<String, Path?> = readAction {
                 miseAssignments.keys.associateWith { name ->
                     ModuleManager.getInstance(project).findModuleByName(name)
@@ -923,12 +923,12 @@ class ElixirEditorBasedSdkWidget(
     }
 
     /**
-     * Converts a Linux absolute path (e.g. `/home/steve/.local/share/mise/installs/elixir/1.11.3`)
+     * Converts a Linux absolute path (e.g. `/home/user/.local/share/mise/installs/elixir/1.11.3`)
      * to the Windows UNC form expected by [SdkRegistrar] and `wslCompat`
-     * (e.g. `\\wsl.localhost\ItronUbuntu\home\steve\.local\share\mise\installs\elixir\1.11.3`).
+     * (e.g. `\\wsl.localhost\Ubuntu\home\user\.local\share\mise\installs\elixir\1.11.3`).
      *
      * The WSL distribution is inferred from [contentRoot], which must be a Windows UNC path for
-     * a WSL filesystem (e.g. `\\wsl.localhost\ItronUbuntu\home\steve\workspace\intelliconnect`).
+     * a WSL filesystem (e.g. `\\wsl.localhost\Ubuntu\home\user\workspace\intelliconnect`).
      *
      * Returns [installPath] unchanged when:
      * - it is not a Linux absolute path (does not start with `/`),
