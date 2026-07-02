@@ -1,8 +1,8 @@
 package org.elixir_lang.mix.watcher
 
-import com.intellij.openapi.application.runReadAction
+import com.intellij.openapi.application.readAction
 import com.intellij.openapi.progress.ProgressIndicator
-import com.intellij.openapi.project.Project
+import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiFile
@@ -21,8 +21,15 @@ class Resolution(
     val depToRootVirtualFile: Map<Dep, VirtualFile?>
 ) {
     companion object {
-        fun resolution(
-            project: Project,
+        /**
+         * Resolves the transitive dep-set for all given [rootVirtualFiles].
+         *
+         * Uses [readAction] (WARA) for PSI access so the EDT is never blocked waiting for a read
+         * lock. If a write action preempts a read, the lambda is transparently retried. On retry,
+         * the [CachedValue] keyed on each `mix.exs` `PsiFile` avoids reparsing files that haven't
+         * changed since the previous attempt, keeping restarts cheap.
+         */
+        suspend fun resolution(
             psiManager: PsiManager,
             progressIndicator: ProgressIndicator,
             vararg rootVirtualFiles: VirtualFile
@@ -33,6 +40,7 @@ class Resolution(
             val depToRootVirtualFile = mutableMapOf<Dep, VirtualFile?>()
 
             while (rootVirtualFileQueue.isNotEmpty() && !progressIndicator.isCanceled) {
+                ProgressManager.checkCanceled()
                 val rootVirtualFile = rootVirtualFileQueue.remove()
 
                 if (!rootVirtualFileToDepSet.containsKey(rootVirtualFile)) {
@@ -42,12 +50,13 @@ class Resolution(
                         if (progressIndicator.isCanceled) {
                             break
                         }
+                        ProgressManager.checkCanceled()
 
                         /* Don't need to check module dep because it will already be in `rootVirtualFiles` AND
                            Module deps handle transitivity while Library deps don't */
                         if (dep.type == Dep.Type.LIBRARY) {
                             if (!depToRootVirtualFile.contains(dep)) {
-                                val depRootVirtualFile = dep.virtualFile(project)
+                                val depRootVirtualFile = dep.virtualFile(rootVirtualFile)
 
                                 depToRootVirtualFile[dep] = depRootVirtualFile
 
@@ -68,7 +77,7 @@ class Resolution(
             return Resolution(rootVirtualFileToDepSet, depToRootVirtualFile)
         }
 
-        private fun rootVirtualFileToDepSet(
+        private suspend fun rootVirtualFileToDepSet(
             psiManager: PsiManager,
             progressIndicator: ProgressIndicator,
             rootVirtualFile: VirtualFile
@@ -85,16 +94,19 @@ class Resolution(
             }
         }
 
-        private fun packageVirtualFileToDepSet(
+        private suspend fun packageVirtualFileToDepSet(
             psiManager: PsiManager,
             progressIndicator: ProgressIndicator,
             packageManager: PackageManager,
             packageVirtualFile: VirtualFile
         ): Set<Dep> {
-            val packagePsiFile = runReadAction {
+            // WARA: acquires the read lock without blocking the EDT. If a write action preempts,
+            // readAction restarts the lambda. IncorrectOperationException can occur when the
+            // VirtualFile is no longer valid (e.g., deleted while we waited for the lock).
+            val packagePsiFile = readAction {
                 try {
                     psiManager.findFile(packageVirtualFile)
-                } catch (error: IncorrectOperationException) {
+                } catch (@Suppress("unused") error: IncorrectOperationException) {
                     null
                 }
             }
@@ -108,11 +120,23 @@ class Resolution(
             }
         }
 
-        private fun packagePsiFileToDepSet(
+        /**
+         * Reads the dep-set from [packagePsiFile] under a WARA read lock.
+         *
+         * The result is cached via [CachedValueProvider] keyed on [packagePsiFile]'s modification
+         * tracker. If a write action cancels the WARA and modifies a *different* file, the cached
+         * value for this file remains valid - on restart the cache hit returns the previous result
+         * without reparsing. This is correct: only a modification to [packagePsiFile] itself would
+         * invalidate the cache and trigger a fresh parse.
+         *
+         * The [org.elixir_lang.package_manager.DepGatherer] is constructed freshly per WARA attempt (via [PackageManager.depGatherer])
+         * so partial results from a cancelled attempt are never reused.
+         */
+        private suspend fun packagePsiFileToDepSet(
             packageManager: PackageManager,
             packagePsiFile: PsiFile
         ): Set<Dep> =
-            runReadAction {
+            readAction {
                 getCachedValue(packagePsiFile, DEP_SET) {
                     packageManager
                         .depGatherer()

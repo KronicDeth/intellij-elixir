@@ -140,7 +140,7 @@ class ElixirEditorBasedSdkWidget(
      * avoid redundant work during bulk rootsChanged events.
      *
      * Primary trigger: `mix deps.get` → VFS detects new files under `deps/` and `_build/` →
-     * [org.elixir_lang.DepsWatcher] syncs libraries → each per-dep `libraryModifiableModel.commit()` and
+     * Mix dep sync updates libraries → each per-dep `libraryModifiableModel.commit()` and
      * `ModuleRootManager.modifiableModel.commit()` fires a separate rootsChanged event.
      * A Phoenix project with 30 deps can easily generate 60–90+ events in quick succession.
      */
@@ -736,6 +736,7 @@ class ElixirEditorBasedSdkWidget(
         val classpathIssues: List<String>,
     )
 
+    @RequiresReadLock
     private fun collectNotificationScanModelData(): NotificationScanModelData {
         val moduleSdkIssues = detectModuleSdkIssues()
         val folderMarkIssues = ProjectModuleSetupValidator.detectFolderMarkIssues(project)
@@ -750,6 +751,7 @@ class ElixirEditorBasedSdkWidget(
         )
     }
 
+    @RequiresReadLock
     private fun collectProjectSdkSnapshot(): ProjectSdkSnapshot {
         val elixirSdk = findModuleLevelElixirSdk()
         val elixirVersion = elixirSdk?.versionString?.let {

@@ -63,10 +63,16 @@ internal class ElixirSdkLibraryTreeStructureProvider : TreeStructureProvider, Du
                 when (val entry = node.value?.orderEntry) {
                     is JdkOrderEntry ->
                         if (entry.isElixirOrErlangSdk()) SdkLibraryNode(node, settings) else node
-                    is LibraryOrderEntry ->
-                        if (entry.libraryName?.endsWith(CONSOLIDATED_LIBRARY_SUFFIX) == true)
-                            ConsolidatedLibraryNode(node, settings)
-                        else node
+                    is LibraryOrderEntry -> {
+                        val libName = entry.libraryName
+                        when {
+                            libName?.endsWith(CONSOLIDATED_LIBRARY_SUFFIX) == true ->
+                                ConsolidatedLibraryNode(node, settings)
+                            libName != null && " [file:///" in libName ->
+                                ScopedDepLibraryNode(node, settings)
+                            else -> node
+                        }
+                    }
                     else -> node
                 }
             }
@@ -182,4 +188,27 @@ private class ConsolidatedLibraryNode(
     settings: ViewSettings,
 ) : NamedLibraryElementNode(wrapped.project!!, wrapped.value!!, settings) {
     override fun getWeight(): Int = -1
+}
+
+/**
+ * Wraps a scoped dep [NamedLibraryElementNode] whose name contains a `[file:///...]` suffix,
+ * overriding [update] to display the dep name without the verbose URL and instead show the
+ * content root directory as a grey location string.
+ *
+ * Example: `"phoenix [file:///project/apps/my_app]"` → displays as `phoenix` with `(my_app)` in grey.
+ */
+private class ScopedDepLibraryNode(
+    wrapped: NamedLibraryElementNode,
+    settings: ViewSettings,
+) : NamedLibraryElementNode(wrapped.project!!, wrapped.value!!, settings) {
+    override fun update(presentation: PresentationData) {
+        super.update(presentation)
+        val name = presentation.presentableText ?: return
+        val bracketIdx = name.indexOf(" [file:///")
+        if (bracketIdx < 0) return
+        presentation.presentableText = name.substring(0, bracketIdx)
+        // Show only the final path segment of the content root URL as the location hint
+        val url = name.substring(bracketIdx + 2, name.length - 1)
+        presentation.locationString = url.trimEnd('/').substringAfterLast('/')
+    }
 }

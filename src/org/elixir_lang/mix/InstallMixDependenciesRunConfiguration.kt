@@ -6,7 +6,10 @@ import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.util.concurrency.ThreadingAssertions
 import com.intellij.util.concurrency.annotations.RequiresBackgroundThread
+import com.intellij.util.concurrency.annotations.RequiresReadLock
+import org.elixir_lang.isElixirModule
 import org.elixir_lang.mix.configuration.Factory
 
 internal const val INSTALL_MIX_DEPS_NAME: String = "Install deps and compile"
@@ -23,13 +26,16 @@ internal val COMPLETION_MESSAGE_CLI =
 internal val INSTALL_MIX_DEPS_ARGS =
     (listOf("do") + INSTALL_HEX_CLI + COMMA + INSTALL_REBAR_CLI + COMMA + DEPS_GET_CLI + COMMA + DEPS_COMPILE_CLI + COMMA + COMPLETION_MESSAGE_CLI).toMutableList()
 
+@RequiresReadLock
 @RequiresBackgroundThread
 internal fun createInstallMixDependenciesRunConfiguration(
     project: Project,
     projectRoot: VirtualFile
 ): RunnerAndConfigurationSettings? {
+    ThreadingAssertions.assertReadAccess()
+    ThreadingAssertions.assertBackgroundThread()
     val module = ModuleUtilCore.findModuleForFile(projectRoot, project)
-        ?: ModuleManager.getInstance(project).modules.firstOrNull()
+        ?: ModuleManager.getInstance(project).modules.firstOrNull { it.isElixirModule() }
         ?: return null
 
     val runManager = RunManager.getInstance(project)
@@ -43,13 +49,16 @@ internal fun createInstallMixDependenciesRunConfiguration(
     return settings
 }
 
+@RequiresReadLock
 @RequiresBackgroundThread
 internal fun createMixDepsStatusRunConfiguration(
     project: Project,
     projectRoot: VirtualFile
 ): RunnerAndConfigurationSettings? {
+    ThreadingAssertions.assertReadAccess()
+    ThreadingAssertions.assertBackgroundThread()
     val module = ModuleUtilCore.findModuleForFile(projectRoot, project)
-        ?: ModuleManager.getInstance(project).modules.firstOrNull()
+        ?: ModuleManager.getInstance(project).modules.firstOrNull { it.isElixirModule() }
         ?: return null
 
     val runManager = RunManager.getInstance(project)

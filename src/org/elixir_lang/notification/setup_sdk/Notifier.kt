@@ -7,16 +7,20 @@ import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.vfs.VirtualFile
 import org.elixir_lang.sdk.erlang_dependent.ErlangSdkResult
 import org.elixir_lang.sdk.erlang_dependent.MissingErlangSdkReason
 import org.elixir_lang.sdk.elixir.SdkSettingsOpener
+import org.jetbrains.annotations.TestOnly
 import java.util.Collections
 import java.util.WeakHashMap
 
 object Notifier {
+    private data class ActiveMixDeps(val rootUrl: String, val notification: Notification)
+
     const val MIX_DEPS_OUTDATED_TITLE: String = "Mix deps outdated"
     private const val MIX_DEPS_GROUP_ID: String = "Elixir Mix Deps"
-    private val mixDepsNotifications: MutableMap<Project, Notification> =
+    private val mixDepsNotifications: MutableMap<Project, ActiveMixDeps> =
         Collections.synchronizedMap(WeakHashMap())
     private val missingErlangSdkNotifications: MutableMap<Project, Notification> =
         Collections.synchronizedMap(WeakHashMap())
@@ -124,32 +128,49 @@ object Notifier {
     }
 
     // Mix Dependencies notification methods
-    fun mixDepsOutdated(project: Project) {
-        if (mixDepsNotifications.containsKey(project)) {
-            return
-        }
+    fun mixDepsOutdated(project: Project, root: VirtualFile) {
+        val oldNotification = synchronized(mixDepsNotifications) {
+            val existing = mixDepsNotifications[project] ?: return@synchronized null
 
-        val notification = NotificationGroupManager
+            if (existing.rootUrl == root.url) {
+                return
+            }
+
+            mixDepsNotifications.remove(project)
+            existing.notification
+        }
+        oldNotification?.expire()
+
+        lateinit var notification: Notification
+        notification = NotificationGroupManager
             .getInstance()
             .getNotificationGroup(MIX_DEPS_GROUP_ID)
             .createNotification(
-                MIX_DEPS_OUTDATED_TITLE,
+                "$MIX_DEPS_OUTDATED_TITLE (${root.name})",
                 "Mix deps reported missing, outdated, or uncompiled deps",
                 NotificationType.WARNING
             )
-            .addAction(org.elixir_lang.notification.mix_deps.InstallAction())
-            .addAction(org.elixir_lang.notification.mix_deps.ShowStatusAction())
-            .whenExpired { mixDepsNotifications.remove(project) }
-        mixDepsNotifications[project] = notification
+            .addAction(org.elixir_lang.notification.mix_deps.InstallAction(root))
+            .addAction(org.elixir_lang.notification.mix_deps.ShowStatusAction(root))
+            .whenExpired {
+                synchronized(mixDepsNotifications) {
+                    if (mixDepsNotifications[project]?.notification === notification) {
+                        mixDepsNotifications.remove(project)
+                    }
+                }
+            }
+        synchronized(mixDepsNotifications) {
+            mixDepsNotifications[project] = ActiveMixDeps(root.url, notification)
+        }
         notification.notify(project)
     }
 
-    fun mixDepsCheckFailed(project: Project, message: String) {
+    fun mixDepsCheckFailed(project: Project, moduleName: String, message: String) {
         NotificationGroupManager
             .getInstance()
             .getNotificationGroup("Elixir")
             .createNotification(
-                "Mix deps check failed",
+                "Mix deps check failed ($moduleName)",
                 message,
                 NotificationType.INFORMATION
             )
@@ -157,51 +178,70 @@ object Notifier {
     }
 
     fun clearMixDepsOutdated(project: Project) {
-        mixDepsNotifications.remove(project)?.expire()
+        val notification = synchronized(mixDepsNotifications) {
+            mixDepsNotifications.remove(project)?.notification
+        }
+        notification?.expire()
     }
 
-    fun mixDepsInstallSuccess(project: Project) {
+    /**
+     * Returns `true` when a "Mix deps outdated" notification is currently active (shown and not
+     * yet expired) for [project].
+     *
+     * Exposes the private [mixDepsNotifications] map as a read-only boolean so tests can assert
+     * notification state without reflection.
+     */
+    @TestOnly
+    fun hasActiveMixDepsOutdatedNotification(project: Project): Boolean =
+        mixDepsNotifications.containsKey(project)
+
+    /** Test seam: root URL currently bound to the active "Mix deps outdated" notification. */
+    @TestOnly
+    fun activeMixDepsOutdatedRootUrl(project: Project): String? =
+        mixDepsNotifications[project]?.rootUrl
+
+    fun mixDepsInstallSuccess(project: Project, moduleName: String) {
         NotificationGroupManager
             .getInstance()
             .getNotificationGroup("Elixir")
             .createNotification(
-                "Mix deps installed",
+                "Mix deps installed ($moduleName)",
                 "Successfully installed hex, rebar, fetched deps, and compiled",
                 NotificationType.INFORMATION
             )
             .notify(project)
     }
 
-    fun mixDepsInstallError(project: Project, errorMessage: String) {
+    fun mixDepsInstallError(project: Project, moduleName: String, errorMessage: String) {
         NotificationGroupManager
             .getInstance()
             .getNotificationGroup("Elixir")
             .createNotification(
-                "Mix deps installation failed",
+                "Mix deps installation failed ($moduleName)",
                 "Failed during local.hex, local.rebar, deps.get, or compilation. See Run Window for details: $errorMessage",
                 NotificationType.ERROR
             )
             .notify(project)
     }
 
-    fun mixDepsNoSdk(project: Project) {
+    fun mixDepsNoSdk(project: Project, moduleName: String) {
         NotificationGroupManager
             .getInstance()
             .getNotificationGroup("Elixir")
             .createNotification(
-                "No Elixir SDK found",
+                "No Elixir SDK found ($moduleName)",
                 "Please configure an Elixir SDK for this project before installing deps",
                 NotificationType.ERROR
             )
             .notify(project)
     }
 
-    fun mixDepsError(project: Project, errorMessage: String) {
+    fun mixDepsError(project: Project, moduleName: String, errorMessage: String) {
         NotificationGroupManager
             .getInstance()
             .getNotificationGroup("Elixir")
             .createNotification(
-                "Mix deps error",
+                "Mix deps error ($moduleName)",
                 errorMessage,
                 NotificationType.ERROR
             )
