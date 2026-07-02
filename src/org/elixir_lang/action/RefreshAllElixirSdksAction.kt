@@ -8,6 +8,7 @@ import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.platform.ide.progress.ModalTaskOwner
 import com.intellij.platform.ide.progress.runWithModalProgressBlocking
 import org.elixir_lang.notification.setup_sdk.Notifier
+import org.elixir_lang.sdk.elixir.ElixirSdkValidation
 import org.elixir_lang.status_bar_widget.ElixirSdkRefreshListener
 import org.elixir_lang.sdk.elixir.Type as ElixirSdkType
 import org.elixir_lang.sdk.erlang.Type as ErlangSdkType
@@ -40,6 +41,8 @@ class RefreshAllElixirSdksAction : AnAction() {
 
         var refreshedElixirCount = 0
         var refreshedErlangCount = 0
+        // Collect OTP mismatches found during refresh (sdk name → mismatch description)
+        val otpMismatches = mutableListOf<String>()
 
         runWithModalProgressBlocking(
             ModalTaskOwner.project(project), "Refreshing All SDK Paths"
@@ -67,6 +70,15 @@ class RefreshAllElixirSdksAction : AnAction() {
                     continue
                 }
             }
+
+            // Check OTP mismatches for each Elixir SDK after refresh (informational).
+            // ElixirSdkValidation.detectOtpMismatch handles the suppress flag internally.
+            for (elixirSdk in allElixirSdks) {
+                val mismatch = ElixirSdkValidation.detectOtpMismatch(elixirSdk) ?: continue
+                otpMismatches.add(
+                    "'${elixirSdk.name}' compiled for OTP ${mismatch.first} but paired with OTP ${mismatch.second}"
+                )
+            }
         }
 
         // Notify listeners that SDKs have been refreshed (updates status widget)
@@ -76,6 +88,15 @@ class RefreshAllElixirSdksAction : AnAction() {
 
         // Show success notification with counts
         Notifier.sdkRefreshSuccess(project, refreshedElixirCount, totalElixirSdks, refreshedErlangCount, totalErlangSdks)
+
+        // Show separate OTP mismatch notification if any were found
+        if (otpMismatches.isNotEmpty()) {
+            val mismatchMessage = buildString {
+                append("OTP version mismatches detected. Configure in Project Structure to fix:\n")
+                otpMismatches.forEach { append("  • $it\n") }
+            }
+            Notifier.sdkRefreshWarning(project, mismatchMessage)
+        }
     }
 
     private fun refreshSingleElixirSdk(sdk: Sdk, sdkType: ElixirSdkType) {

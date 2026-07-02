@@ -2,63 +2,168 @@ package org.elixir_lang.sdk.elixir
 
 import com.intellij.facet.FacetManager
 import com.intellij.openapi.module.Module
+import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.module.ModuleUtilCore
+import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.roots.ProjectRootManager
+import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiElement
 import com.intellij.util.concurrency.ThreadingAssertions
+import com.intellij.util.concurrency.annotations.RequiresBackgroundThread
 import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.Facet
+import org.elixir_lang.sdk.erlang_dependent.ErlangSdkResolver
+import org.elixir_lang.sdk.erlang_dependent.ErlangSdkResult
+
+/**
+ * The result of resolving an Elixir SDK for a module, project, or PSI element.
+ *
+ * [Ready] carries the Elixir [Sdk] (and, when resolved via [ElixirSdkLookup.resolveWithErlang],
+ * a verified Erlang dependency). [MissingElixirSdk] means no Elixir SDK is configured at all.
+ * [MissingErlangSdk] means an Elixir SDK was found but its Erlang dependency is absent or broken;
+ * the `detail` property carries the typed reason for rich user-facing messages.
+ *
+ * Use the [sdk] extension property to extract the [Sdk] or null without a `when` expression.
+ * Use `sdkOrNotify` (from `org.elixir_lang.notification.setup_sdk`) to fire the appropriate
+ * setup-SDK notification and return the SDK or null in one call.
+ */
+sealed class ElixirSdkResolution {
+    data class Ready(val sdk: Sdk) : ElixirSdkResolution()
+    data object MissingElixirSdk : ElixirSdkResolution()
+    data class MissingErlangSdk(val detail: ErlangSdkResult.Missing) : ElixirSdkResolution()
+}
+
+/** Returns the [Sdk] if this is [ElixirSdkResolution.Ready], otherwise null. */
+val ElixirSdkResolution.sdk: Sdk? get() = (this as? ElixirSdkResolution.Ready)?.sdk
 
 /**
  * Resolves the most specific Elixir SDK for a given [Module], [Project], or [PsiElement].
  *
  * All overloads require a read lock ([RequiresReadLock]). Callers that are not already inside
- * a platform-provided read action (e.g. formatting service callbacks) must acquire one
+ * a platform-provided read action (e.g. background inspection threads) must acquire one
  * explicitly via [com.intellij.openapi.application.ReadAction.nonBlocking].
  *
  * Resolution order for [Module]: Facet SDK → module SDK → project SDK.
+ *
+ * Use [resolveWithErlang] when the caller needs to verify the Erlang dependency as well.
  */
 object ElixirSdkLookup {
     private val LOG = com.intellij.openapi.diagnostic.logger<ElixirSdkLookup>()
 
     @RequiresReadLock
-    fun mostSpecificSdk(module: Module): Sdk? {
+    fun mostSpecificSdk(module: Module): Sdk? = resolve(module).sdk
+
+    @RequiresReadLock
+    fun mostSpecificSdk(psiElement: PsiElement): Sdk? = resolve(psiElement).sdk
+
+    @RequiresReadLock
+    fun mostSpecificSdk(project: Project): Sdk? = resolve(project).sdk
+
+    /** Resolves to [ElixirSdkResolution.Ready] or [ElixirSdkResolution.MissingElixirSdk]. */
+    @RequiresReadLock
+    fun resolve(module: Module): ElixirSdkResolution {
         ThreadingAssertions.assertReadAccess()
         val facetSdk = FacetManager.getInstance(module).getFacetByType(Facet.ID)?.sdk
         if (facetSdk != null) {
-            LOG.trace("ElixirSdkLookup.mostSpecificSdk(module='${module.name}'): resolved from Facet → '${facetSdk.name}'")
-            return facetSdk
+            LOG.trace("ElixirSdkLookup.resolve(module='${module.name}'): resolved from Facet → '${facetSdk.name}'")
+            return ElixirSdkResolution.Ready(facetSdk)
         }
 
         val modSdk = moduleSdk(module)
         if (modSdk != null) {
-            LOG.trace("ElixirSdkLookup.mostSpecificSdk(module='${module.name}'): resolved from ModuleRootManager → '${modSdk.name}'")
-            return modSdk
+            LOG.trace("ElixirSdkLookup.resolve(module='${module.name}'): resolved from ModuleRootManager → '${modSdk.name}'")
+            return ElixirSdkResolution.Ready(modSdk)
         }
 
-        val projSdk = mostSpecificSdk(module.project)
-        LOG.trace("ElixirSdkLookup.mostSpecificSdk(module='${module.name}'): fell through to project SDK → '${projSdk?.name}'")
-        return projSdk
+        val projResolution = resolve(module.project)
+        LOG.trace("ElixirSdkLookup.resolve(module='${module.name}'): fell through to project SDK → '${projResolution.sdk?.name}'")
+        return projResolution
     }
 
+    /** Resolves to [ElixirSdkResolution.Ready] or [ElixirSdkResolution.MissingElixirSdk]. */
     @RequiresReadLock
-    fun mostSpecificSdk(psiElement: PsiElement): Sdk? {
+    fun resolve(psiElement: PsiElement): ElixirSdkResolution {
         ThreadingAssertions.assertReadAccess()
         val project = psiElement.project
-        if (project.isDisposed) return null
+        if (project.isDisposed) return ElixirSdkResolution.MissingElixirSdk
 
         val module = ModuleUtilCore.findModuleForPsiElement(psiElement)
-
-        return if (module != null) mostSpecificSdk(module) else mostSpecificSdk(project)
+        return if (module != null) resolve(module) else resolve(project)
     }
 
+    /** Resolves to [ElixirSdkResolution.Ready] or [ElixirSdkResolution.MissingElixirSdk]. */
     @RequiresReadLock
-    fun mostSpecificSdk(project: Project): Sdk? {
+    fun resolve(project: Project): ElixirSdkResolution {
         ThreadingAssertions.assertReadAccess()
-        return projectSdk(project)
+        val sdk = projectSdk(project)
+        return if (sdk != null) ElixirSdkResolution.Ready(sdk) else ElixirSdkResolution.MissingElixirSdk
+    }
+
+    /**
+     * Resolves the Elixir SDK for [module] and verifies its Erlang dependency.
+     *
+     * Returns [ElixirSdkResolution.Ready], [ElixirSdkResolution.MissingElixirSdk], or
+     * [ElixirSdkResolution.MissingErlangSdk]. Use the [sdk] extension property or
+     * `sdkOrNotify` (from `org.elixir_lang.notification.setup_sdk`) on the result.
+     */
+    @RequiresReadLock
+    fun resolveWithErlang(module: Module): ElixirSdkResolution {
+        ThreadingAssertions.assertReadAccess()
+        val elixirSdk = resolve(module).sdk ?: return ElixirSdkResolution.MissingElixirSdk
+        return when (val result = ErlangSdkResolver.getInstance().resolveErlangSdkResult(elixirSdk)) {
+            is ErlangSdkResult.Success -> ElixirSdkResolution.Ready(elixirSdk)
+            is ErlangSdkResult.Missing -> ElixirSdkResolution.MissingErlangSdk(result)
+        }
+    }
+
+    /**
+     * Resolves the Elixir SDK for [psiElement] and verifies its Erlang dependency.
+     */
+    @RequiresReadLock
+    fun resolveWithErlang(psiElement: PsiElement): ElixirSdkResolution {
+        ThreadingAssertions.assertReadAccess()
+        val elixirSdk = resolve(psiElement).sdk ?: return ElixirSdkResolution.MissingElixirSdk
+        return when (val result = ErlangSdkResolver.getInstance().resolveErlangSdkResult(elixirSdk)) {
+            is ErlangSdkResult.Success -> ElixirSdkResolution.Ready(elixirSdk)
+            is ErlangSdkResult.Missing -> ElixirSdkResolution.MissingErlangSdk(result)
+        }
+    }
+
+    /**
+     * Resolves the Elixir SDK for the module that owns [root], falling back to the first module
+     * in the project when no module directly owns the file.
+     *
+     * Returns null when no module exists or no Elixir SDK is configured.
+     */
+    @RequiresReadLock
+    @RequiresBackgroundThread
+    fun resolve(project: Project, root: VirtualFile): Sdk? {
+        ThreadingAssertions.assertReadAccess()
+        ThreadingAssertions.assertBackgroundThread()
+        val module = ModuleUtilCore.findModuleForFile(root, project)
+            ?: ModuleManager.getInstance(project).modules.firstOrNull()
+            ?: return null
+        return resolve(module).sdk
+    }
+
+    /**
+     * Collects all distinct active Elixir SDKs across all modules in the project.
+     *
+     * Useful for SDK refresh actions and "does any Elixir SDK exist?" guards.
+     */
+    @RequiresReadLock
+    fun resolveAll(project: Project): Set<Sdk> {
+        ThreadingAssertions.assertReadAccess()
+        val sdks = mutableSetOf<Sdk>()
+        for (module in ModuleManager.getInstance(project).modules) {
+            ProgressManager.checkCanceled()
+            val sdk = resolve(module).sdk
+            if (sdk != null) sdks.add(sdk)
+        }
+        return sdks
     }
 
     private fun moduleSdk(module: Module): Sdk? {
@@ -73,9 +178,9 @@ object ElixirSdkLookup {
     private fun projectSdk(project: Project): Sdk? = sdk(ProjectRootManager.getInstance(project).projectSdk)
 
     private fun sdk(sdk: Sdk?): Sdk? =
-        if (sdk != null && sdk.sdkType === Type.instance) {
-            sdk
-        } else {
-            null
-        }
+        if (sdk != null && sdk.sdkType === Type.instance) sdk else null
 }
+
+@RequiresReadLock
+@RequiresBackgroundThread
+fun findElixirSdkForRoot(project: Project, root: VirtualFile): Sdk? = ElixirSdkLookup.resolve(project, root)

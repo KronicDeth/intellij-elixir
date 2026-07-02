@@ -5,11 +5,12 @@ import com.intellij.openapi.projectRoots.ProjectJdkTable
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl
 import com.intellij.openapi.roots.OrderRootType
+import com.intellij.testFramework.common.runAll
 import org.elixir_lang.PlatformTestCase
 import org.elixir_lang.sdk.erlang.Type as ErlangSdkType
 
 /**
- * Tests for Type.hasErlangClasspathInElixirSdk method.
+ * Tests for [ElixirSdkValidation.hasErlangClasspathInElixirSdk].
  *
  * This tests the validation logic that checks whether Erlang SDK classpath
  * entries are properly added to an Elixir SDK's classpath.
@@ -19,20 +20,19 @@ class TypeClasspathTest : PlatformTestCase() {
     private var elixirSdk: Sdk? = null
     private var erlangSdk: Sdk? = null
 
-    override fun tearDown() {
-        try {
-            // Clean up SDKs
-            val jdkTable = ProjectJdkTable.getInstance()
+    override fun tearDown() = runAll(
+        {
             WriteAction.run<Throwable> {
-                elixirSdk?.let { jdkTable.removeJdk(it) }
-                erlangSdk?.let { jdkTable.removeJdk(it) }
+                elixirSdk?.let { ProjectJdkTable.getInstance().removeJdk(it) }
+                erlangSdk?.let { ProjectJdkTable.getInstance().removeJdk(it) }
             }
-        } finally {
+        },
+        {
             elixirSdk = null
             erlangSdk = null
-            super.tearDown()
-        }
-    }
+        },
+        { super.tearDown() },
+    )
 
     fun testHasErlangClasspathInElixirSdk_returnsFalseWhenErlangHomePathIsNull() {
         // Create mock SDKs without home paths
@@ -43,7 +43,7 @@ class TypeClasspathTest : PlatformTestCase() {
         erlangSdk = ProjectJdkImpl("Test Erlang SDK", erlangSdkType)
 
         // Erlang SDK has no home path set, should return false
-        val result = Type.hasErlangClasspathInElixirSdk(elixirSdk!!, erlangSdk!!)
+        val result = ElixirSdkValidation.hasErlangClasspathInElixirSdk(elixirSdk!!, erlangSdk!!)
         assertFalse("Should return false when Erlang SDK has no home path", result)
     }
 
@@ -71,11 +71,11 @@ class TypeClasspathTest : PlatformTestCase() {
         }
 
         // Elixir SDK has no classpath entries from Erlang
-        val result = Type.hasErlangClasspathInElixirSdk(elixirSdk!!, erlangSdk!!)
+        val result = ElixirSdkValidation.hasErlangClasspathInElixirSdk(elixirSdk!!, erlangSdk!!)
         assertFalse("Should return false when Elixir SDK has no Erlang classpath entries", result)
     }
 
-    fun testHasErlangClasspathInElixirSdk_returnsTrueWhenErlangPathsPresent() {
+    fun testHasErlangClasspathInElixirSdk_returnsFalseWhenRootIsNotUnderErlangHome() {
         // Create SDKs where Elixir SDK contains paths from Erlang SDK home
         val elixirSdkType = Type.instance
         val erlangSdkType = ErlangSdkType()
@@ -108,17 +108,8 @@ class TypeClasspathTest : PlatformTestCase() {
 
         // The temp dir path won't start with erlangHomePath, so this should be false
         // This tests the negative case with real VirtualFiles
-        val result = Type.hasErlangClasspathInElixirSdk(elixirSdk!!, erlangSdk!!)
+        val result = ElixirSdkValidation.hasErlangClasspathInElixirSdk(elixirSdk!!, erlangSdk!!)
         assertFalse("Temp directory path doesn't start with fake erlang home", result)
     }
 
-    fun testHasErlangClasspathInElixirSdkMethodExists() {
-        // Verify the method exists and is callable
-        val method = Type.Companion::class.java.getMethod(
-            "hasErlangClasspathInElixirSdk",
-            Sdk::class.java,
-            Sdk::class.java
-        )
-        assertNotNull("Method hasErlangClasspathInElixirSdk should exist", method)
-    }
 }

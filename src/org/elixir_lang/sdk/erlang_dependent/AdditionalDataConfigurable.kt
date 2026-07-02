@@ -1,7 +1,6 @@
 package org.elixir_lang.sdk.erlang_dependent
 
 import com.intellij.icons.AllIcons
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.diagnostic.trace
 import com.intellij.openapi.options.ConfigurationException
@@ -13,15 +12,22 @@ import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.ui.ComboBox
 import com.intellij.openapi.util.Comparing
 import com.intellij.ui.SimpleListCellRenderer
+import com.intellij.ui.components.JBCheckBox
 import com.intellij.util.ui.JBUI
 import org.elixir_lang.debug
 import org.elixir_lang.sdk.elixir.ElixirErlangClasspath.addNewCodePathsFromInternErlangSdk
 import org.elixir_lang.sdk.elixir.ElixirErlangClasspath.removeCodePathsFromInternalErlangSdk
-import org.elixir_lang.sdk.elixir.Type.Companion.hasErlangClasspathInRoots
+import org.elixir_lang.sdk.elixir.ElixirSdkMutation
+import org.elixir_lang.sdk.elixir.ElixirSdkPathConfigurator
+import org.elixir_lang.sdk.elixir.ElixirSdkValidation
+import org.elixir_lang.sdk.elixir.ElixirSdkValidation.hasErlangClasspathInRoots
+import org.elixir_lang.util.WriteActions
+import org.elixir_lang.util.runWithEdtGuard
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
 import java.awt.event.ItemEvent
 import javax.swing.*
+import org.elixir_lang.sdk.elixir.Type as ElixirSdkType
 
 class AdditionalDataConfigurable(
     private val sdkModel: SdkModel,
@@ -33,6 +39,13 @@ class AdditionalDataConfigurable(
     private val classpathWarningLabel = JLabel("Erlang classpath entries missing from Elixir SDK").apply {
         icon = AllIcons.General.Warning
         isVisible = false
+    }
+    private val otpMismatchWarningLabel = JLabel("").apply {
+        icon = AllIcons.General.Warning
+        isVisible = false
+    }
+    private val suppressOtpMismatchWarningCheckBox = JBCheckBox("Suppress OTP version mismatch warning").apply {
+        isSelected = false
     }
     private val saveHintLabel =
         JLabel("After changing the Erlang SDK, save settings and reopen this dialog to see updates").apply {
@@ -165,6 +178,34 @@ class AdditionalDataConfigurable(
                 0,
             ),
         )
+        wholePanel.add(
+            otpMismatchWarningLabel,
+            GridBagConstraints(
+                0,
+                GridBagConstraints.RELATIVE,
+                2, 1, 1.0, 0.0,
+                GridBagConstraints.WEST,
+                GridBagConstraints.HORIZONTAL,
+                JBUI.insetsTop(8),
+                0, 0,
+            ),
+        )
+        wholePanel.add(
+            suppressOtpMismatchWarningCheckBox,
+            GridBagConstraints(
+                0,
+                GridBagConstraints.RELATIVE,
+                2, 1, 1.0, 0.0,
+                GridBagConstraints.WEST,
+                GridBagConstraints.HORIZONTAL,
+                JBUI.insetsTop(4),
+                0, 0,
+            ),
+        )
+        suppressOtpMismatchWarningCheckBox.addItemListener {
+            modified = true
+            updateOtpMismatchWarning()
+        }
         internalErlangSdksComboBox.setRenderer(
             object : SimpleListCellRenderer<Sdk>() {
                 override fun customize(
@@ -208,12 +249,14 @@ class AdditionalDataConfigurable(
                     // Show hint to save and reopen
                     saveHintLabel.isVisible = true
                     updateWarningLabel()
+                    updateOtpMismatchWarning()
                 }
             }
         }
 
         modified = true
         updateWarningLabel()
+        updateOtpMismatchWarning()
 
         return wholePanel
     }
@@ -243,45 +286,42 @@ class AdditionalDataConfigurable(
         val selectedErlangSdk = internalErlangSdksComboBox.selectedItem as? Sdk ?: return false
         val additionalData = sdk.sdkAdditionalData as? SdkAdditionalData ?: return true
 
-        return additionalData.getErlangSdkName() != selectedErlangSdk.name
+        return (additionalData.getErlangSdkName() != selectedErlangSdk.name) ||
+                (additionalData.isSuppressOtpMismatchWarning() != suppressOtpMismatchWarningCheckBox.isSelected)
     }
 
     @Throws(ConfigurationException::class)
     override fun apply() {
         val myElixirSdk = elixirSdk ?: return
-        val selectedErlangSdk = internalErlangSdksComboBox.selectedItem as? Sdk
-        val existingAdditionalData = myElixirSdk.sdkAdditionalData as? SdkAdditionalData
-        val needsUpdate = existingAdditionalData?.getErlangSdkName() != selectedErlangSdk?.name
+        val erlangSdkChanged = erlangSdkChanged(myElixirSdk)
 
-        if (needsUpdate) {
-            writeInternalErlangSdk(selectedErlangSdk)
-            myElixirSdk.putUserData(Type.ERLANG_SDK_KEY, selectedErlangSdk)
-            if (LOG.isTraceEnabled) {
-                LOG.trace("[${myElixirSdk.name}] Reconfiguring SDK paths after Erlang SDK update")
-            }
-            (myElixirSdk.sdkType as? org.elixir_lang.sdk.elixir.Type)?.setupSdkPaths(myElixirSdk)
-        }
+        writeInternalErlangSdk(myElixirSdk)
+        if (erlangSdkChanged) reconfigureSdkPaths(myElixirSdk)
+
         modified = false
     }
 
-    private fun writeInternalErlangSdk(erlangSdk: Sdk?) {
-        val myElixirSdk = elixirSdk ?: return
-        LOG.trace { "[${myElixirSdk.name}] Persisting Erlang SDK dependency: ${erlangSdk?.name ?: "null"}" }
-        val sdkAdditionData =
-            SdkAdditionalData(
-                erlangSdk,
-                myElixirSdk,
-            )
+    private fun erlangSdkChanged(myElixirSdk: Sdk): Boolean {
+        val selectedErlangSdk = internalErlangSdksComboBox.selectedItem as? Sdk
+        val existingAdditionalData = myElixirSdk.sdkAdditionalData as? SdkAdditionalData
+        return existingAdditionalData?.getErlangSdkName() != selectedErlangSdk?.name
+    }
 
-        // We must get a fresh modificator from the Elixir SDK itself, not use the constructor parameter. The
-        // sdkModificator passed to the constructor is a UI-only wrapper (EditedSdkModificator from Editor.kt or
-        // com.intellij.openapi.projectRoots.ui.SdkEditor.EditedSdkModificator) that is designed for managing classpath
-        // roots in the UI. It throws UnsupportedOperationException on setSdkAdditionalData() and has an empty
-        // commitChanges() implementation. To actually persist additional data, we need a real modificator from the SDK.
-        val mySdkModificator = myElixirSdk.sdkModificator
-        mySdkModificator.sdkAdditionalData = sdkAdditionData
-        ApplicationManager.getApplication().runWriteAction {
-            mySdkModificator.commitChanges()
+    private fun reconfigureSdkPaths(myElixirSdk: Sdk) {
+        LOG.trace { "[${myElixirSdk.name}] Reconfiguring SDK paths after Erlang SDK update" }
+        ElixirSdkPathConfigurator.configure(myElixirSdk)
+    }
+
+    private fun writeInternalErlangSdk(myElixirSdk: Sdk) {
+        val erlangSdk = internalErlangSdksComboBox.selectedItem as? Sdk
+        LOG.trace { "[${myElixirSdk.name}] Persisting Erlang SDK dependency: ${erlangSdk?.name ?: "null"}" }
+
+        WriteActions.runWriteAction {
+            ElixirSdkMutation.applyDependencySelection(
+                elixirSdk = myElixirSdk,
+                erlangSdk = erlangSdk,
+                suppressOtpMismatchWarning = suppressOtpMismatchWarningCheckBox.isSelected,
+            )
         }
     }
 
@@ -301,22 +341,17 @@ class AdditionalDataConfigurable(
         }
 
         // Try to get the Erlang SDK from additional data, using sdkModel for lookup
-        val erlangSdk = when (val additionalData = sdk.sdkAdditionalData) {
-            is SdkAdditionalData -> {
-                LOG.debug("[$sdkName] Has SdkAdditionalData, looking up Erlang SDK (erlangSdkName=${additionalData.getErlangSdkName()})")
-                additionalData.getErlangSdk(sdkModel)
-            }
-
-            null -> {
-                LOG.debug("[$sdkName] sdkAdditionalData is null, auto-discovering Erlang SDK from model")
-                findFirstErlangSdkInModel()
-            }
-
-            else -> {
-                LOG.debug("[$sdkName] sdkAdditionalData is ${additionalData::class.java.simpleName}, auto-discovering Erlang SDK from model")
-                findFirstErlangSdkInModel()
-            }
+        val additionalData = sdk.sdkAdditionalData as? SdkAdditionalData
+        val erlangSdk = if (additionalData != null) {
+            LOG.debug("[$sdkName] Has SdkAdditionalData, looking up Erlang SDK (erlangSdkName=${additionalData.getErlangSdkName()})")
+            additionalData.getErlangSdk(sdkModel)
+        } else {
+            LOG.debug("[$sdkName] sdkAdditionalData is null or non-SdkAdditionalData type, auto-discovering Erlang SDK from model")
+            findFirstErlangSdkInModel()
         }
+
+        // Restore the suppress checkbox state from persisted additional data
+        suppressOtpMismatchWarningCheckBox.isSelected = additionalData?.isSuppressOtpMismatchWarning() ?: false
 
         if (erlangSdk != null) {
             LOG.debug("[$sdkName] Looking for Erlang SDK '${erlangSdk.name}' in combo box")
@@ -348,6 +383,7 @@ class AdditionalDataConfigurable(
         modified = false
         saveHintLabel.isVisible = false
         updateWarningLabel()
+        updateOtpMismatchWarning()
     }
 
     /**
@@ -389,7 +425,7 @@ class AdditionalDataConfigurable(
         val sdks = sdkModel.sdks
 
         for (currentSdk in sdks) {
-            if (currentSdk.sdkType is org.elixir_lang.sdk.elixir.Type) {
+            if (currentSdk.sdkType is ElixirSdkType) {
                 val sdkAdditionalData = currentSdk.sdkAdditionalData as? SdkAdditionalData
                 if (sdkAdditionalData == null) {
                     LOG.debug("[updateErlangSdkList] Skipping ${currentSdk.name}: no SdkAdditionalData")
@@ -404,6 +440,39 @@ class AdditionalDataConfigurable(
             }
         }
         updateJdkList()
+    }
+
+    /**
+     * Computes whether the currently selected Erlang SDK's OTP major matches the OTP major that
+     * the Elixir SDK was compiled against, and updates [otpMismatchWarningLabel] accordingly.
+     *
+     * Delegates to [ElixirSdkValidation.detectOtpMismatch] which encapsulates the detection logic
+     * (cache check → BEAM file read → `OTP_VERSION` read). Uses [runWithEdtGuard] so the
+     * filesystem reads do not block the EDT.
+     *
+     * Informational only - never prevents applying settings.
+     * Hidden when the suppress checkbox is checked.
+     */
+    private fun updateOtpMismatchWarning() {
+        val myElixirSdk = elixirSdk
+        val selectedErlangSdk = internalErlangSdksComboBox.selectedItem as? Sdk
+
+        if (myElixirSdk == null || selectedErlangSdk == null || suppressOtpMismatchWarningCheckBox.isSelected) {
+            otpMismatchWarningLabel.isVisible = false
+            return
+        }
+
+        val mismatch = runWithEdtGuard("Detecting OTP version compatibility...") {
+            ElixirSdkValidation.detectOtpMismatch(myElixirSdk, selectedErlangSdk)
+        }
+
+        if (mismatch != null) {
+            otpMismatchWarningLabel.text =
+                    "Elixir SDK was compiled for OTP ${mismatch.first} but is paired with OTP ${mismatch.second}"
+            otpMismatchWarningLabel.isVisible = true
+        } else {
+            otpMismatchWarningLabel.isVisible = false
+        }
     }
 
     private fun updateWarningLabel() {

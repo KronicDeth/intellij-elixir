@@ -3,12 +3,15 @@ package org.elixir_lang.action
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.platform.ide.progress.ModalTaskOwner
 import com.intellij.platform.ide.progress.runWithModalProgressBlocking
 import org.elixir_lang.notification.setup_sdk.Notifier
 import org.elixir_lang.sdk.SdkRegistrar
 import org.elixir_lang.sdk.erlang.Type as ErlangSdkType
 import java.io.File
+
+private val LOG = logger<AddDevelopmentSdksAction>()
 
 /**
  * Development-only action that adds Elixir and Erlang SDKs from system properties.
@@ -66,6 +69,7 @@ class AddDevelopmentSdksAction : AnAction() {
                 }
             }
         } catch (ex: Exception) {
+            LOG.warn("Failed to refresh SDK paths (AddDevelopmentSdksAction)", ex)
             Notifier.sdkRefreshError(project, ex.message ?: "Unknown error creating SDKs")
         }
     }

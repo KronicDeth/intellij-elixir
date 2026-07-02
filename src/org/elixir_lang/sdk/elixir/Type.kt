@@ -7,13 +7,9 @@ import com.intellij.openapi.fileChooser.FileChooserDescriptor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.projectRoots.*
-import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.util.InvalidDataException
 import com.intellij.openapi.util.WriteExternalException
-import com.intellij.openapi.util.io.FileUtil
-import com.intellij.openapi.vfs.LocalFileSystem
-import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.toNioPathOrNull
 import com.intellij.util.concurrency.annotations.RequiresBackgroundThread
@@ -411,13 +407,8 @@ ELIXIR_SDK_HOME
                 if (additionalData.getErlangSdkName() != previousName) continue
 
                 LOG.info("Updating Elixir SDK '${elixirSdk.name}' reference from '$previousName' to '$newName'")
-
-                val modificator = elixirSdk.sdkModificator
-                val newAdditionalData = SdkAdditionalData(renamedErlangSdk, elixirSdk)
-                modificator.sdkAdditionalData = newAdditionalData
-
                 ApplicationManager.getApplication().runWriteAction {
-                    modificator.commitChanges()
+                    ElixirSdkMutation.applyDependencySelection(elixirSdk, renamedErlangSdk)
                 }
             }
         }
@@ -438,27 +429,5 @@ ELIXIR_SDK_HOME
         @JvmStatic
         val instance: Type
             get() = findInstance(Type::class.java)
-
-
-        /**
-         * Checks if the Elixir SDK's classpath contains entries from the Erlang SDK.
-         * This can be false when JetBrains settings persistence fails to save the SDK configuration.
-         *
-         * @return true if Erlang classpath entries are present in the Elixir SDK, false if missing
-         */
-        @JvmStatic
-        fun hasErlangClasspathInElixirSdk(elixirSdk: Sdk, erlangSdk: Sdk): Boolean {
-            val classRoots = elixirSdk.rootProvider.getFiles(OrderRootType.CLASSES)
-            return hasErlangClasspathInRoots(classRoots, erlangSdk)
-        }
-
-        @JvmStatic
-        fun hasErlangClasspathInRoots(classRoots: Array<VirtualFile>, erlangSdk: Sdk): Boolean {
-            val erlangHomePath = erlangSdk.homePath ?: return false
-            val erlangHomePathVf = LocalFileSystem.getInstance()
-                .refreshAndFindFileByPath(FileUtil.toSystemIndependentName(erlangHomePath))
-                ?: return false
-            return classRoots.any { root -> VfsUtilCore.isAncestor(erlangHomePathVf, root, true) }
-        }
     }
 }
