@@ -50,7 +50,7 @@ jobs:
     steps:
       - name: Checkout
         id: checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           ref: ${{ inputs.ref || github.ref }}
 
@@ -140,7 +140,7 @@ jobs:
 
       - name: Upload Test Reports (on failure or when requested)
         id: upload-test-reports
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: ${{ always() && (failure() || inputs.upload-reports) }}
         with:
           name: test-reports-${{ matrix.os }}-${{ matrix.idea-version }}
@@ -159,7 +159,7 @@ jobs:
     steps:
       - name: Checkout
         id: checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           ref: ${{ inputs.ref || github.ref }}
 
@@ -213,7 +213,7 @@ jobs:
 
       - name: Upload Verify Reports
         id: upload-verify-reports
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: ${{ always() && inputs.upload-reports }}
         with:
           name: verify-plugin-reports
@@ -224,7 +224,7 @@ jobs:
 
       - name: Upload Plugin Artifact
         id: upload-plugin
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: plugin-artifact
           path: build/distributions/*.zip

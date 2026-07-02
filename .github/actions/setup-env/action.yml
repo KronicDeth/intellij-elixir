@@ -51,7 +51,7 @@ runs:
 
     - name: Restore JetBrains Runtime cache
       id: cache-jbr
-      uses: actions/cache/restore@v5
+      uses: actions/cache/restore@v6
       with:
         path: ${{ runner.tool_cache }}/Java_JetBrains_*
         key: jbr-${{ runner.os }}-${{ runner.arch }}-21
@@ -72,7 +72,7 @@ runs:
     - name: Save JetBrains Runtime cache
       id: cache-jbr-save
       if: always() && steps.cache-jbr.outputs.cache-hit != 'true' && steps.setup-java.outcome == 'success'
-      uses: actions/cache/save@v5
+      uses: actions/cache/save@v6
       with:
         path: ${{ runner.tool_cache }}/Java_JetBrains_*
         key: jbr-${{ runner.os }}-${{ runner.arch }}-${{ steps.setup-java.outputs.version }}
@@ -102,7 +102,7 @@ runs:
 
     - name: Setup Gradle
       id: setup-gradle
-      uses: gradle/actions/setup-gradle@v5
+      uses: gradle/actions/setup-gradle@v6
       with:
         cache-disabled: true
         add-job-summary-as-pr-comment: 'on-failure'
@@ -114,7 +114,7 @@ runs:
     - name: Restore Elixir cache
       id: cache-elixir-restore
       if: ${{ inputs.setup-elixir == 'true' }}
-      uses: actions/cache/restore@v5
+      uses: actions/cache/restore@v6
       with:
         path: |
           cache/elixir-${{ inputs.elixir-version }}-intellij_elixir-2.1.0/_build
@@ -142,7 +142,7 @@ runs:
     - name: Save Elixir cache
       id: cache-elixir-save
       if: always() && steps.cache-elixir-restore.outputs.cache-hit != 'true' && inputs.setup-elixir == 'true' && steps.setup-elixir.outcome == 'success'
-      uses: actions/cache/save@v5
+      uses: actions/cache/save@v6
       with:
         path: |
           cache/elixir-${{ inputs.elixir-version }}-intellij_elixir-2.1.0
