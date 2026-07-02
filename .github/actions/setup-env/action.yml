@@ -126,9 +126,7 @@ runs:
     - name: Setup Elixir
       id: setup-elixir
       if: ${{ inputs.setup-elixir == 'true' }}
-      # Needed until https://github.com/erlef/setup-beam/pull/461 is merged/released or
-      # https://github.com/actions/runner-images/issues/14004 is resolved.
-      uses: sh41/setup-beam@fix-windows-2025
+      uses: erlef/setup-beam@v1
       with:
         otp-version: ${{ inputs.otp-version }}
         elixir-version: ${{ inputs.elixir-version }}

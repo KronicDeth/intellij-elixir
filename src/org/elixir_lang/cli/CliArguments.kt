@@ -4,6 +4,7 @@ import com.intellij.execution.ExecutionException
 import com.intellij.execution.wsl.WslPath
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.Sdk
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import com.intellij.util.system.OS
 import org.elixir_lang.jps.shared.cli.CliArgs
 import org.elixir_lang.jps.shared.cli.CliTool
@@ -32,6 +33,7 @@ object CliArguments {
         )
     }
 
+    @RequiresReadLock
     fun argsOrThrow(
         elixirSdk: Sdk,
         tool: CliTool,

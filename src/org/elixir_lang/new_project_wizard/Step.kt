@@ -41,6 +41,8 @@ import org.elixir_lang.sdk.elixir.Type
 import org.elixir_lang.sdk.erlang_dependent.ErlangSdkResolver
 import java.io.IOException
 import java.nio.file.Paths
+import com.intellij.openapi.application.ReadAction
+import java.util.concurrent.Callable
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 
@@ -146,7 +148,11 @@ class Step(parent: NewProjectWizardStep) : AbstractNewProjectWizardStep(parent),
             }
             erlangSdkForSetup = null  // Clear after use; Step is wizard-scoped so no leak, but signals intent
 
-            val commandLine = Mix.commandLine(emptyMap(), workingDirectory, sdk, project = project)
+            // Mix.commandLine() -> argsOrThrow() -> requireErlangSdkOrNotifyAndThrow()
+            // -> findErlangSdkByHomePath() asserts a read lock; acquire one here.
+            val commandLine = ReadAction.nonBlocking(Callable {
+                Mix.commandLine(emptyMap(), workingDirectory, sdk, project = project)
+            }).executeSynchronously()
             commandLine.addParameters("new", projectDirectory)
 
             if (mixNewApp.isNotBlank()) {
