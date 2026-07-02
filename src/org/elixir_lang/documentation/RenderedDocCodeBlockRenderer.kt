@@ -7,6 +7,7 @@ import com.intellij.openapi.diagnostic.ControlFlowException
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.editor.richcopy.HtmlSyntaxInfoUtil
 import com.intellij.openapi.project.Project
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.ElixirLanguage
 
 /**
@@ -20,6 +21,7 @@ import org.elixir_lang.ElixirLanguage
  * The try/catch fallback is intentional: `HtmlCodeSnippetBuilder` is `@Experimental` and
  * may change between platform versions; the fallback ensures graceful degradation.
  */
+@Suppress("UnstableApiUsage")
 internal object RenderedDocCodeBlockRenderer {
     private val logger = Logger.getInstance(RenderedDocCodeBlockRenderer::class.java)
 
@@ -32,6 +34,7 @@ internal object RenderedDocCodeBlockRenderer {
      * @param rawCode the raw code content extracted from the markdown AST
      * @return HTML string wrapped in `<pre><code>...</code></pre>` with inline styling
      */
+    @RequiresReadLock
     fun render(project: Project, language: Language, rawCode: String): String {
         if (!DocumentationSettings.isHighlightingOfCodeBlocksEnabled() || language != ElixirLanguage) {
             return QuickDocHighlightingHelper.getStyledCodeBlock(project, language, rawCode)

@@ -4,6 +4,7 @@ import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.projectRoots.ProjectJdkTable
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl
+import com.intellij.util.concurrency.annotations.RequiresEdt
 import org.elixir_lang.PlatformTestCase
 import org.elixir_lang.sdk.SdkHomeKey
 import org.elixir_lang.sdk.SdkHomePaths
@@ -26,6 +27,7 @@ class TypeErlangAutoLinkTest : PlatformTestCase() {
         }
     }
 
+    @RequiresEdt
     fun testFindRegisteredErlangSdk_returnsRegisteredSdk() {
         val erlangSdk = ProjectJdkImpl("Test Erlang SDK", ErlangSdkType()).apply {
             WriteAction.run<Throwable> {
@@ -46,6 +48,7 @@ class TypeErlangAutoLinkTest : PlatformTestCase() {
         assertEquals("Test Erlang SDK", result!!.name)
     }
 
+    @RequiresEdt
     fun testFindRegisteredErlangSdk_returnsNullWhenNoneRegistered() {
         // Remove any existing Erlang SDKs
         val table = ProjectJdkTable.getInstance()
@@ -58,6 +61,7 @@ class TypeErlangAutoLinkTest : PlatformTestCase() {
         assertNull("Should return null when no Erlang SDK is registered", result)
     }
 
+    @RequiresEdt
     fun testFindRegisteredErlangSdk_returnsFirstWithHomePath() {
         // Verify it returns an SDK when one exists with a homePath set
         val sdkWithHome = ProjectJdkImpl("Erlang With Home", ErlangSdkType()).apply {
@@ -100,6 +104,7 @@ class TypeErlangAutoLinkTest : PlatformTestCase() {
         assertNull("Should return null when Elixir SDK has no homePath", result)
     }
 
+    @RequiresEdt
     fun testFindRegisteredErlangSdk_ignoresNonErlangSdks() {
         // Register an Elixir SDK (not Erlang) -- should not be returned
         val elixirSdk = ProjectJdkImpl("Test Elixir SDK", Type.instance).apply {

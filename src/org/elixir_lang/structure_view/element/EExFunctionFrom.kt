@@ -4,6 +4,7 @@ import com.intellij.ide.structureView.StructureViewTreeElement
 import com.intellij.ide.util.treeView.smartTree.TreeElement
 import com.intellij.navigation.ItemPresentation
 import com.intellij.navigation.NavigationItem
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.call.Visibility
 import org.elixir_lang.navigation.item_presentation.NameArity
 import org.elixir_lang.navigation.item_presentation.Parent
@@ -82,6 +83,7 @@ class EExFunctionFrom(val modular: Modular, val call: Call) : StructureViewTreeE
 
 
     companion object {
+        @RequiresReadLock
         fun fromCall(call: Call): EExFunctionFrom? =
             enclosingModular(call)?.let { modular ->
                 EExFunctionFrom(modular, call)

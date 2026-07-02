@@ -12,7 +12,7 @@ import org.elixir_lang.settings.ElixirExperimentalSettings
 
 private val LOG = logger<ElixirSdkStatusWidgetFactory>()
 
-class ElixirSdkStatusWidgetFactory : StatusBarWidgetFactory {
+internal class ElixirSdkStatusWidgetFactory : StatusBarWidgetFactory {
     override fun getId(): String = ElixirEditorBasedSdkWidget.ID
 
     override fun getDisplayName(): String = "Elixir SDK Status"

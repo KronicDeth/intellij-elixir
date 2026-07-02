@@ -44,9 +44,10 @@ class ModuleImpl<T : ModuleStub<*>?>(private val stub: T) : ModuleElementImpl(),
      *
      * @return the parent of the element, or null if the element has no parent.
      */
-    override fun getParent(): PsiElement = stub!!.getParentStub().psi
+    override fun getParent(): PsiElement = stub!!.parentStub.psi
 
-    override fun getElementType(): IStubElementType<*, *> = stub!!.getStubType()
+    @Deprecated("Deprecated in platform - use getIElementType()", replaceWith = ReplaceWith("getIElementType()"))
+    override fun getElementType(): IStubElementType<*, *> = stub!!.elementType as IStubElementType<*, *>
 
     override fun getStub(): T = stub
 

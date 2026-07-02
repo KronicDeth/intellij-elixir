@@ -14,6 +14,7 @@ import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileVisitor
+import com.intellij.util.concurrency.annotations.RequiresEdt
 import org.elixir_lang.DepsWatcher
 import org.elixir_lang.mix.project.CANONICAL_FOLDER_MARKS
 import org.elixir_lang.mix.project.FolderMark
@@ -110,6 +111,7 @@ object Project {
         return result
     }
 
+    @RequiresEdt
     fun createModulesForOtpApps(
         project: Project,
         otpApps: List<OtpApp>,

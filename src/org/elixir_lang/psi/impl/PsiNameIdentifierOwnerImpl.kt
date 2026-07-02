@@ -1,6 +1,7 @@
 package org.elixir_lang.psi.impl
 
 import com.intellij.psi.PsiElement
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.module.PutAttribute
 import org.elixir_lang.module.RegisterAttribute
 import org.elixir_lang.psi.*
@@ -47,6 +48,7 @@ object PsiNameIdentifierOwnerImpl {
     @JvmStatic
     fun getNameIdentifier(variable: ElixirVariable): PsiElement = variable
 
+    @RequiresReadLock
     @JvmStatic
     fun getNameIdentifier(named: org.elixir_lang.psi.call.Named): PsiElement? =
             when {

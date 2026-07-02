@@ -1,5 +1,6 @@
 package org.elixir_lang.psi.impl
 
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.PlatformTestCase
 
 class GetModuleNameTest : PlatformTestCase() {
@@ -27,6 +28,7 @@ class GetModuleNameTest : PlatformTestCase() {
         assertEquals("Foo.Bar", elementAtCaret!!.getModuleName())
     }
 
+    @RequiresReadLock
     fun testDefmoduleCallItself() {
         myFixture.configureByFile("defmodule_call.ex")
         val elementAtCaret = myFixture.file.findElementAt(myFixture.caretOffset)

@@ -2,10 +2,10 @@ package org.elixir_lang.structure_view.element;
 
 import com.intellij.ide.util.treeView.smartTree.TreeElement;
 import com.intellij.navigation.ItemPresentation;
-import com.intellij.openapi.util.Pair;
 import com.intellij.psi.ElementDescriptionLocation;
 import com.intellij.psi.PsiElement;
 import com.intellij.usageView.UsageViewTypeLocation;
+import com.intellij.util.concurrency.annotations.RequiresReadLock;
 import org.elixir_lang.navigation.item_presentation.Parent;
 import org.elixir_lang.psi.ElixirAccessExpression;
 import org.elixir_lang.psi.ElixirList;
@@ -23,8 +23,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.elixir_lang.psi.call.name.Function.DEFEXCEPTION;
-import static org.elixir_lang.psi.call.name.Module.KERNEL;
 import static org.elixir_lang.psi.impl.PsiElementImplKt.stripAccessExpression;
 import static org.elixir_lang.psi.impl.call.CallImplKt.finalArguments;
 
@@ -95,6 +93,7 @@ public class Exception extends Element<Call> {
      * @return Maps the element for the key in the struct to the element in the default value.  When the list form of
      *   fields without default values is used, the Map value element is {@code  null}.
      */
+    @RequiresReadLock
     @NotNull
     public Map<PsiElement, PsiElement> defaultValueElementByKeyElement() {
         PsiElement[] finalArguments = finalArguments(navigationItem);

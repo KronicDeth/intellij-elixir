@@ -5,6 +5,7 @@ import com.intellij.navigation.ItemPresentation
 import com.intellij.psi.ElementDescriptionLocation
 import com.intellij.psi.PsiElement
 import com.intellij.usageView.UsageViewTypeLocation
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.navigation.item_presentation.Delegation
 import org.elixir_lang.navigation.item_presentation.Parent
 import org.elixir_lang.psi.ElixirAccessExpression
@@ -27,6 +28,7 @@ class Delegation(private val modular: Modular, call: Call) : Element<Call?>(call
      *
      * @return defaults to `false` and when keyword argument is not parsable as boolean.
      */
+    @RequiresReadLock
     fun appendFirst(): Boolean =
         navigationItem!!.keywordArgument("append_first")?.let { keywordValue ->
             keywordValue.text == "true"
@@ -39,6 +41,7 @@ class Delegation(private val modular: Modular, call: Call) : Element<Call?>(call
      */
     fun `as`(): String? = keywordArgumentText("as")
 
+    @RequiresReadLock
     fun callDefinitionHeadCallList(): List<Call> = callDefinitionHeadCallList(navigationItem!!)
 
     fun definition(callDefinition: CallDefinition) = childList.add(callDefinition)
@@ -88,6 +91,7 @@ class Delegation(private val modular: Modular, call: Call) : Element<Call?>(call
         navigationItem!!.keywordArgument(keywordValueText)?.text
 
     companion object {
+        @RequiresReadLock
         @JvmStatic
         fun callDefinitionHeadCallList(defdelegateCall: Call): List<Call> {
             var callDefinitionHeadCallList: List<Call>? = null
@@ -123,11 +127,13 @@ class Delegation(private val modular: Modular, call: Call) : Element<Call?>(call
         @JvmStatic
         fun `is`(call: Call): Boolean = call.isCalling(Module.KERNEL, Function.DEFDELEGATE, 2)
 
+        @RequiresReadLock
         fun fromCall(call: Call): org.elixir_lang.structure_view.element.Delegation? =
             enclosingModular(call)?.let { modular ->
                 Delegation(modular, call)
             }
 
+        @RequiresReadLock
         fun nameIdentifier(call: Call): PsiElement? =
             call.finalArguments()?.get(0)?.let { it as? Call }?.functionNameElement()
     }

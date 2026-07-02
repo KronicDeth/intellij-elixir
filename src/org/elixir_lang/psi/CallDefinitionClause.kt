@@ -51,6 +51,7 @@ object CallDefinitionClause {
      * @param location where the description will be used
      * @return
      */
+    @RequiresReadLock
     fun elementDescription(call: Call, location: ElementDescriptionLocation): String? =
             when {
                 isFunction(call) -> functionElementDescription(call, location)

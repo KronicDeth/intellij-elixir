@@ -10,6 +10,7 @@ import com.intellij.openapi.application.readAction
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.module.ModuleUtilCore
+import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.ProjectJdkTable
 import com.intellij.openapi.projectRoots.Sdk
@@ -30,6 +31,7 @@ import com.intellij.platform.ide.progress.runWithModalProgressBlocking
 import com.intellij.ui.EditorNotifications
 import com.intellij.util.concurrency.ThreadingAssertions
 import com.intellij.util.concurrency.annotations.RequiresBackgroundThread
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import com.intellij.util.messages.MessageBusConnection
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
@@ -610,8 +612,10 @@ class ElixirEditorBasedSdkWidget(
      * that actually drives code insight - rather than the project-level one. The mismatch between them
      * is reported separately by [detectModuleSdkIssues].
      */
+    @RequiresReadLock
     internal fun findModuleLevelElixirSdk(): Sdk? {
         for (module in ModuleManager.getInstance(project).modules) {
+            ProgressManager.checkCanceled()
             if (!module.isElixirModule()) continue
             val moduleSdk = ElixirSdkLookup.mostSpecificSdk(module)
             if (moduleSdk != null) return moduleSdk
@@ -628,6 +632,7 @@ class ElixirEditorBasedSdkWidget(
      * [ModuleRootManager] which requires read access; the caller must either hold a read lock
      * or call this inside a `readAction { }` block.
      */
+    @RequiresReadLock
     @RequiresBackgroundThread
     internal fun detectModuleSdkIssues(): List<ModuleSdkIssue> {
         ThreadingAssertions.assertBackgroundThread()
@@ -635,6 +640,7 @@ class ElixirEditorBasedSdkWidget(
         val projectSdk = ProjectRootManager.getInstance(project).projectSdk
 
         for (module in ModuleManager.getInstance(project).modules) {
+            ProgressManager.checkCanceled()
             if (!module.isElixirModule()) continue
 
             val rootManager = ModuleRootManager.getInstance(module)
@@ -642,6 +648,7 @@ class ElixirEditorBasedSdkWidget(
             // --- Rich IDE path: detect dangling/mismatch JdkOrderEntry ---
             var hasJdkEntry = false
             for (entry in rootManager.orderEntries) {
+                ProgressManager.checkCanceled()
                 if (entry !is JdkOrderEntry) continue
 
                 val jdkName = entry.jdkName ?: continue

@@ -19,6 +19,8 @@ class State(environment: ExecutionEnvironment, configuration: Configuration) :
         val project = configuration.project
 
         val processHandler = startProcess()
+        // Keep direct TerminalExecutionConsole constructor for 253 compatibility;
+        // TerminalExecutionConsoleBuilder is not available across our supported baseline yet.
         val console = TerminalExecutionConsole(project, processHandler)
         ElixirConsoleUtil.attachFilters(project, console)
         processHandler.startNotify()

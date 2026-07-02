@@ -1,20 +1,24 @@
 package org.elixir_lang.psi
 
-import org.elixir_lang.psi.impl.ProcessDeclarationsImpl
 import com.intellij.extapi.psi.PsiFileBase
 import com.intellij.openapi.fileTypes.FileType
-import com.intellij.psi.*
-import org.elixir_lang.ElixirLanguage
-import org.elixir_lang.ElixirFileType
+import com.intellij.openapi.progress.ProgressManager
+import com.intellij.psi.FileViewProvider
+import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiFile
+import com.intellij.psi.ResolveState
 import com.intellij.psi.scope.PsiScopeProcessor
-import org.elixir_lang.psi.call.StubBased
 import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.util.concurrency.annotations.RequiresReadLock
+import org.elixir_lang.ElixirFileType
+import org.elixir_lang.ElixirLanguage
 import org.elixir_lang.psi.call.Call
+import org.elixir_lang.psi.call.StubBased
 import org.elixir_lang.psi.call.qualification.Qualified
+import org.elixir_lang.psi.impl.ProcessDeclarationsImpl
 import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.call.stabBodyChildExpressions
 import org.elixir_lang.psi.impl.childExpressions
-import java.util.ArrayList
 
 class ElixirFile(viewProvider: FileViewProvider) : PsiFileBase(viewProvider, ElixirLanguage) {
     override fun getFileType(): FileType = ElixirFileType.INSTANCE
@@ -112,6 +116,7 @@ class ElixirFile(viewProvider: FileViewProvider) : PsiFileBase(viewProvider, Eli
     /**
      * @return modulars owned (declared) by this element.
      */
+    @RequiresReadLock
     fun modulars(): Array<StubBased<*>> {
         val stubBaseds = PsiTreeUtil.getChildrenOfType(
                 this,
@@ -120,6 +125,7 @@ class ElixirFile(viewProvider: FileViewProvider) : PsiFileBase(viewProvider, Eli
         val modularList: MutableList<StubBased<*>> = ArrayList()
         if (stubBaseds != null) {
             for (stubBased in stubBaseds) {
+                ProgressManager.checkCanceled()
                 if (Implementation.`is`(stubBased) || Module.`is`(stubBased) || Protocol.`is`(stubBased)) {
                     modularList.add(stubBased)
                 }

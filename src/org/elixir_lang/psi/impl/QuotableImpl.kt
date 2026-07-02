@@ -4,11 +4,11 @@ package org.elixir_lang.psi.impl
 
 import com.ericsson.otp.erlang.*
 import com.intellij.lang.ASTNode
-import com.intellij.openapi.application.runReadAction
 import com.intellij.psi.*
 import com.intellij.psi.impl.source.tree.Factory
 import com.intellij.psi.tree.IElementType
 import com.intellij.psi.tree.TokenSet
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.ElixirLanguage
 import org.elixir_lang.Macro
 import org.elixir_lang.mix.project.computeReadAction
@@ -947,6 +947,7 @@ object QuotableImpl {
         )
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun quote(unqualifiedNoArgumentsCall: UnqualifiedNoArgumentsCall<*>): OtpErlangObject {
@@ -954,9 +955,7 @@ object QuotableImpl {
         val quoted: OtpErlangObject
         val identifier = unqualifiedNoArgumentsCall.identifier
 
-        val identifierText = runReadAction {
-            identifier.text
-        }
+        val identifierText = identifier.text
         val callMetadata = metadata(identifier)
 
         // if a variable has a `do` block is no longer a variable because the do block acts as keyword arguments.

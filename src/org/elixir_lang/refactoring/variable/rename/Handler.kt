@@ -3,6 +3,7 @@ package org.elixir_lang.refactoring.variable.rename
 import com.intellij.codeInsight.TargetElementUtil.adjustOffset
 import com.intellij.ide.DataManager
 import com.intellij.openapi.actionSystem.CommonDataKeys
+import java.awt.KeyboardFocusManager
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
@@ -25,7 +26,7 @@ import org.elixir_lang.reference.Callable
  * element.
  */
 // Can't subclass `VariableInplaceRenameHandler` because it declares `isAvailableOnDataContext` as `final`
-class Handler : RenameHandler {
+internal class Handler : RenameHandler {
     // called during rename action update. should not perform any user interactions
     override fun isAvailableOnDataContext(dataContext: DataContext): Boolean {
         val editor = CommonDataKeys.EDITOR.getData(dataContext)
@@ -64,18 +65,21 @@ class Handler : RenameHandler {
      *                    (it is recommended to pass DataManager.getDataContext() instead of null)
      */
     override fun invoke(project: Project, elements: Array<out PsiElement>, dataContext: DataContext?) {
-        val nonNullDataContext = dataContext ?: DataManager.getInstance().dataContext
+        val nonNullDataContext = dataContext
+            ?: DataManager.getInstance().getDataContext(
+                KeyboardFocusManager.getCurrentKeyboardFocusManager().focusOwner ?: return
+            )
 
         invoke(nonNullDataContext.let(CommonDataKeys.EDITOR::getData), elements, nonNullDataContext)
     }
 
-    private fun createRenamer(elementToRename: PsiElement, editor: Editor?): VariableInplaceRenamer? =
+    private fun createRenamer(elementToRename: PsiElement, editor: Editor?): VariableInplaceRenamer =
         Inplace(elementToRename as PsiNamedElement, editor)
 
     // See `com.intellij.refactoring.rename.inplace.VariableInplaceRenameHandler.doRename`
     private fun invoke(editor: Editor?, element: PsiElement, dataContext: DataContext) {
         val renamer = createRenamer(element, editor)
-        val startedRename = renamer?.performInplaceRename() ?: false
+        val startedRename = renamer.performInplaceRename()
 
         if (!startedRename) {
             performDialogRename(element, editor, dataContext)

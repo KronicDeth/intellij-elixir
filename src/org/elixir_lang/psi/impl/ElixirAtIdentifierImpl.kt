@@ -23,7 +23,7 @@ private fun ElixirAtIdentifier.computeReference(): PsiReference? =
  * @see [IntelliJ Platform SDK DevGuide | Find Usages](http://www.jetbrains.org/intellij/sdk/docs/reference_guide/custom_language_support/find_usages.html?search=PsiNameIdentifierOwner)
  */
 @Contract(pure = true)
-fun ElixirAtIdentifier.getReference(): PsiReference? =
+fun ElixirAtIdentifier.cachedReference(): PsiReference? =
         getCachedValue(this) {
             CachedValueProvider.Result.create(computeReference(), this)
         }

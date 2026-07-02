@@ -18,6 +18,9 @@ import com.intellij.facet.FacetType
 import com.intellij.facet.impl.FacetUtil
 import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.roots.ModuleRootModificationUtil
+import com.intellij.openapi.application.ReadAction
+import com.intellij.util.concurrency.annotations.RequiresEdt
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.Facet
 import org.elixir_lang.PlatformTestCase
 import org.elixir_lang.facet.Type
@@ -144,6 +147,7 @@ class ReconfigureModuleSetupActionTest : PlatformTestCase() {
      * When a module has `lib/` and `test/` on disk but no source/exclude marks, the action
      * should additively apply all canonical marks for the directories that exist.
      */
+    @RequiresReadLock
     fun testAddsMissingSourceAndExcludeMarks() {
         addMixContentEntry(
             "unconfigured_app",
@@ -190,6 +194,7 @@ class ReconfigureModuleSetupActionTest : PlatformTestCase() {
      * When a module is already fully configured, the action should be idempotent -
      * no duplicate marks should be added.
      */
+    @RequiresReadLock
     fun testIdempotentWhenAlreadyConfigured() {
         addMixContentEntry(
             "configured_app",
@@ -230,6 +235,7 @@ class ReconfigureModuleSetupActionTest : PlatformTestCase() {
      * The action should preserve user-customized source roots that are not part of the
      * canonical set (e.g. a custom `scripts/` Sources root).
      */
+    @RequiresReadLock
     fun testPreservesCustomSourceRoots() {
         addMixContentEntry(
             "custom_roots_app",
@@ -254,6 +260,7 @@ class ReconfigureModuleSetupActionTest : PlatformTestCase() {
     /**
      * When `lib/` is incorrectly marked as Test Sources, the action should fix it to Sources.
      */
+    @RequiresReadLock
     fun testFixesIncorrectSourceMark() {
         addMixContentEntry(
             "wrong_mark_app",
@@ -277,6 +284,7 @@ class ReconfigureModuleSetupActionTest : PlatformTestCase() {
     /**
      * Canonical marks are added by URL even when directories are not present on disk yet.
      */
+    @RequiresReadLock
     fun testAddsMarksForNonExistentDirectories() {
         // Only create lib/ and test/, NOT spec/, .elixir_ls/, etc.
         addMixContentEntry(
@@ -298,6 +306,7 @@ class ReconfigureModuleSetupActionTest : PlatformTestCase() {
     /**
      * Non-Mix modules (no `mix.exs`) should be completely ignored by the action.
      */
+    @RequiresReadLock
     fun testNonMixModuleIsSkipped() {
         val appRoot = myFixture.tempDirFixture.findOrCreateDir("non_mix_app")
         myFixture.tempDirFixture.findOrCreateDir("non_mix_app/lib")
@@ -323,6 +332,7 @@ class ReconfigureModuleSetupActionTest : PlatformTestCase() {
      * Strict filtering: even if a content root is a Mix app, it should be ignored when the module is not
      * identified as Elixir (no ELIXIR_MODULE type and no Elixir facet).
      */
+    @RequiresReadLock
     fun testMixModuleWithoutElixirIdentityIsSkipped() {
         removeElixirFacetIfPresent()
 
@@ -343,6 +353,7 @@ class ReconfigureModuleSetupActionTest : PlatformTestCase() {
     /**
      * web/ is a canonical source root and is added even when absent.
      */
+    @RequiresReadLock
     fun testWebDirectoryMarkedUnconditionally() {
         addMixContentEntry(
             "phoenix_old_app",
@@ -369,6 +380,7 @@ class ReconfigureModuleSetupActionTest : PlatformTestCase() {
      * touch the module SDK.  Before Step 1, `fixModuleSdk()` would call `model.inheritSdk()`
      * unconditionally, replacing the Elixir module SDK with the Java project SDK.
      */
+    @RequiresEdt
     fun testReconfigureWithNonElixirProjectSdkDoesNotTouchModuleSdk() {
         val javaHome = System.getProperty("java.home") ?: "/usr/lib/jvm/java"
         val javaSdk = SimpleJavaSdkType().createJdk("Java Mock", javaHome)
@@ -391,7 +403,9 @@ class ReconfigureModuleSetupActionTest : PlatformTestCase() {
         runAction()
 
         // The module SDK should still be the Elixir SDK, not the Java project SDK
-        val moduleSdkAfter = ModuleRootManager.getInstance(module).sdk
+        val moduleSdkAfter = ReadAction.nonBlocking(java.util.concurrent.Callable {
+            ModuleRootManager.getInstance(module).sdk
+        }).executeSynchronously()
         assertEquals(
             "Module SDK must not be replaced with Java project SDK when project SDK is non-Elixir",
             elixirSdk,

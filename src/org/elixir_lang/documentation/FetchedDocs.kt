@@ -4,6 +4,7 @@ import com.ericsson.otp.erlang.OtpErlangBinary
 import com.ericsson.otp.erlang.OtpErlangObject
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.psi.PsiElement
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.beam.chunk.beam_documentation.docs.documented.Doc
 import org.elixir_lang.beam.chunk.beam_documentation.docs.documented.MarkdownByLanguage
 import org.elixir_lang.beam.term.inspect
@@ -121,6 +122,7 @@ private fun List<AtUnqualifiedNoParenthesesCall<*>>?.moduleAttributeValueTextLis
 
 private fun AtUnqualifiedNoParenthesesCall<*>.moduleAttributeValueText(): String? = this.moduleAttributeValue()?.text
 
+@RequiresReadLock
 fun AtUnqualifiedNoParenthesesCall<*>.moduleAttributeValue(): PsiElement? = this
     .finalArguments()
     ?.singleOrNull()

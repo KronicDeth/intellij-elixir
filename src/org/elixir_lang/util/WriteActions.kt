@@ -10,6 +10,10 @@ import com.intellij.openapi.application.WriteAction
  * deadlocks. For long or cancellable work, keep the heavy portion off the EDT and only wrap the minimal write step.
  */
 object WriteActions {
+    // The ThreadingConcurrency inspection flags WriteAction.run as @RequiresEdt, but this utility
+    // explicitly branches on isDispatchThread / isWriteAccessAllowed before calling it, and falls
+    // back to invokeAndWait when off-EDT. The inspection cannot see inside the if-branches.
+    @Suppress("ThreadingConcurrency")
     fun runWriteAction(action: () -> Unit) {
         val application = ApplicationManager.getApplication()
 

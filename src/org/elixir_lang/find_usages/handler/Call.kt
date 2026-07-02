@@ -5,6 +5,7 @@ import com.intellij.openapi.application.ex.ApplicationInfoEx
 import com.intellij.openapi.util.BuildNumber
 import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveState
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.find_usages.toPsiElementList
 import org.elixir_lang.psi.ArityInterval
 import org.elixir_lang.psi.CallDefinitionClause
@@ -67,6 +68,7 @@ class Call(call: Call) : FindUsagesHandler(call) {
 }
 
 private data class CallNameArityInterval(val call: Call, val name: String, val arityInterval: ArityInterval) {
+    @RequiresReadLock
     fun toEnclosingCallEnclosedCallNameArityRange(): EnclosingCallEnclosedCallNameArityInterval? =
             enclosingModularMacroCall(call)?.let { enclosingCall ->
                 EnclosingCallEnclosedCallNameArityInterval(enclosingCall, this.call, this.name, this.arityInterval)
@@ -79,6 +81,7 @@ private data class EnclosingCallEnclosedCallNameArityInterval(
         val name: String,
         val arityInterval: ArityInterval
 ) {
+    @RequiresReadLock
     fun toSecondaryElements(): Iterable<Call> =
         Modular.callDefinitionClauseCallSequence(enclosingCall)
                 .map { it to nameArityInterval(it, ResolveState.initial()) }

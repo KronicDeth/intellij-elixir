@@ -17,6 +17,5 @@ private fun AtOperation.computeReference(): PsiReference? =
             null
         }
 
-fun AtOperation.getReference(): PsiReference? =
+fun AtOperation.cachedReference(): PsiReference? =
         getCachedValue(this) { CachedValueProvider.Result.create(computeReference(), this) }
-

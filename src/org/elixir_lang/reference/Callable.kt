@@ -13,6 +13,7 @@ import com.intellij.usageView.UsageViewLongNameLocation
 import com.intellij.usageView.UsageViewShortNameLocation
 import com.intellij.usageView.UsageViewTypeLocation
 import com.intellij.util.IncorrectOperationException
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.annotator.Parameter
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.*
@@ -253,6 +254,7 @@ class Callable : PsiReferenceBase<Call>, PsiPolyVariantReference {
                 }
             } ?: false
 
+        @RequiresReadLock
         @JvmStatic
         @Contract(pure = true)
         fun isDefiner(call: Call): Boolean =
@@ -376,6 +378,7 @@ class Callable : PsiReferenceBase<Call>, PsiPolyVariantReference {
                 }
             }
 
+        @RequiresReadLock
         fun parameterElementDescription(call: Call, location: ElementDescriptionLocation): String? =
             if (location === UsageViewLongNameLocation.INSTANCE || location === UsageViewShortNameLocation.INSTANCE) {
                 call.name

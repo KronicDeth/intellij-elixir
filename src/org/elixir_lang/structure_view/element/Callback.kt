@@ -6,6 +6,7 @@ import com.intellij.psi.ElementDescriptionLocation
 import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveState
 import com.intellij.usageView.UsageViewTypeLocation
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.call.Visibility
 import org.elixir_lang.navigation.item_presentation.NameArity
 import org.elixir_lang.navigation.item_presentation.Parent
@@ -15,6 +16,7 @@ import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil
 import org.elixir_lang.psi.operation.Type
 import org.elixir_lang.structure_view.element.CallDefinitionClause.Companion.enclosingModular
+import org.elixir_lang.structure_view.element.Timed.Time
 import org.elixir_lang.structure_view.element.modular.Modular
 import org.jetbrains.annotations.Contract
 
@@ -110,6 +112,7 @@ class Callback(private val modular: Modular, navigationItem: Call) :
                 moduleAttributeName == "@callback" || moduleAttributeName == "@macrocallback"
             } ?: false
 
+        @RequiresReadLock
         fun fromCall(call: Call): Callback? =
             enclosingModular(call)?.let { modular ->
                 Callback(modular, call)

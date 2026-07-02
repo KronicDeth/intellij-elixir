@@ -16,7 +16,6 @@ import org.elixir_lang.psi.CallDefinitionClause.`is`
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function
 import org.elixir_lang.psi.call.name.Function.UNQUOTE_SPLICING
-import org.elixir_lang.psi.call.name.Module
 import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.impl.identifierName
 import org.elixir_lang.psi.impl.stripAccessExpression
@@ -30,7 +29,7 @@ import org.elixir_lang.structure_view.element.CallDefinitionHead.Companion.strip
 /**
  * Annotates module attributes.
  */
-class ModuleAttribute : Annotator, DumbAware {
+internal class ModuleAttribute : Annotator, DumbAware {
     /*
      * Public Instance Methods
      */
@@ -210,8 +209,7 @@ class ModuleAttribute : Annotator, DumbAware {
             when (grandChild) {
                 /* Match is invalid.  It will be marked by MatchOperatorInsteadOfTypeOperator inspection as an error */
                 is Match, is Type -> {
-                    val infix = grandChild as Infix
-                    val leftOperand: PsiElement? = infix.leftOperand()?.stripAccessExpression()
+                    val leftOperand: PsiElement? = grandChild.leftOperand()?.stripAccessExpression()
                     var typeParameterNameSet: Set<String?> = emptySet<String>()
 
                     if (leftOperand is Call) {
@@ -230,7 +228,7 @@ class ModuleAttribute : Annotator, DumbAware {
                         cannotHighlightTypes(leftOperand)
                     }
 
-                    val rightOperand: PsiElement? = infix.rightOperand()
+                    val rightOperand: PsiElement? = grandChild.rightOperand()
 
                     if (rightOperand != null) {
                         highlightTypesAndTypeParameterUsages(
@@ -252,8 +250,7 @@ class ModuleAttribute : Annotator, DumbAware {
                             highlightTypesAndTypeTypeParameterDeclarations(
                                 secondaryArguments,
                                 typeParameterNameSet,
-                                annotationHolder,
-                                ElixirSyntaxHighlighter.TYPE
+                                annotationHolder
                             )
                         } ?: return
                     } else {
@@ -299,7 +296,6 @@ class ModuleAttribute : Annotator, DumbAware {
                             functionNameElement.textRange,
                             ElixirSyntaxHighlighter.TYPE
                         )
-                        Unit
                     }
                 }
 
@@ -320,7 +316,6 @@ class ModuleAttribute : Annotator, DumbAware {
                             functionNameElement.textRange,
                             ElixirSyntaxHighlighter.TYPE
                         )
-                        Unit
                     }
 
                     highlightTypesAndTypeParameterUsages(
@@ -354,7 +349,7 @@ class ModuleAttribute : Annotator, DumbAware {
         annotationHolder: AnnotationHolder,
     ): Set<String?> {
         val arguments: Array<PsiElement>? = if (Unquote.`is`(call)) {
-            call.secondaryArguments() as Array<PsiElement>?
+            call.secondaryArguments()?.filterNotNull()?.toTypedArray()
         } else {
             call.primaryArguments()
         }
@@ -508,14 +503,13 @@ class ModuleAttribute : Annotator, DumbAware {
         psiElements: List<PsiElement>,
         typeParameterNameSet: Set<String?>,
         annotationHolder: AnnotationHolder,
-        typeTextAttributesKey: TextAttributesKey,
     ) {
         for (psiElement in psiElements) {
             highlightTypesAndTypeTypeParameterDeclarations(
                 psiElement,
                 typeParameterNameSet,
                 annotationHolder,
-                typeTextAttributesKey
+                ElixirSyntaxHighlighter.TYPE
             )
         }
     }
@@ -545,7 +539,6 @@ class ModuleAttribute : Annotator, DumbAware {
                             functionNameElement.textRange,
                             leftMostFunctionNameTextAttributesKey
                         )
-                        Unit
                     }
 
                     leftOperand.primaryArguments()?.let { primaryArguments ->
@@ -651,7 +644,6 @@ class ModuleAttribute : Annotator, DumbAware {
                 it.textRange,
                 leftMostFunctionNameTextAttributesKey
             )
-            Unit
         }
 
         call.primaryArguments()?.let {
@@ -712,7 +704,6 @@ class ModuleAttribute : Annotator, DumbAware {
         type.leftOperand()?.let {
             if (typeParameterNameSet.contains(it.text)) {
                 Highlighter.highlight(annotationHolder, it.textRange, ElixirSyntaxHighlighter.TYPE_PARAMETER)
-                Unit
             } else {
                 highlightTypesAndTypeParameterUsages(
                     it,
@@ -869,7 +860,7 @@ class ModuleAttribute : Annotator, DumbAware {
             message = "Float literals are not allowed in types: use float() instead"
         }
 
-        highlightTypeError(decimalFloat, message!!, annotationHolder)
+        highlightTypeError(decimalFloat, message, annotationHolder)
     }
 
     private fun highlightTypesAndTypeParameterUsages(
@@ -1333,7 +1324,7 @@ class ModuleAttribute : Annotator, DumbAware {
         annotationHolder: AnnotationHolder,
         typeTextAttributesKey: TextAttributesKey,
     ) {
-        if (!unqualifiedParenthesesCall.isCalling(Module.KERNEL, Function.UNQUOTE, 1)) {
+        if (!unqualifiedParenthesesCall.isCalling(KERNEL, Function.UNQUOTE, 1)) {
             val functionNameElement = unqualifiedParenthesesCall.functionNameElement()
 
             if (functionNameElement != null) {
