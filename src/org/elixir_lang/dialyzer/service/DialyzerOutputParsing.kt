@@ -29,7 +29,7 @@ private fun parseStdErr(stderr: String): List<DialyzerWarn> {
     }
     return entries.map { e: List<String> ->
         val (file, line) = getFileAndLine(e[0])
-        val message = e.drop(1).joinToString(System.lineSeparator())
+        val message = e.drop(1).joinToString("\n")
         DialyzerWarn(file, line, message)
     }
 }
