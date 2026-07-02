@@ -10,6 +10,7 @@ kotlin = "2.4.0"
 intellij-platform = "2.17.0"
 gradle-download = "5.7.0"
 test-logger = "4.0.0"
+versions = "0.54.0"
 
 # Dependency Versions
 commons-io = "2.22.0"
@@ -38,4 +39,5 @@ intellij-platform = { id = "org.jetbrains.intellij.platform", version.ref = "int
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 download = { id = "de.undercouch.download", version.ref = "gradle-download" }
 test-logger = { id = "com.adarshr.test-logger", version.ref = "test-logger" }
+versions = { id = "com.github.ben-manes.versions", version.ref = "versions" }
 qodana = { id = "org.jetbrains.qodana", version.ref = "qodana" }

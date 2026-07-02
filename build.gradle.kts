@@ -18,7 +18,10 @@
 
 import com.adarshr.gradle.testlogger.TestLoggerExtension
 import com.adarshr.gradle.testlogger.theme.ThemeType
+import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import de.undercouch.gradle.tasks.download.Download
+import org.gradle.api.artifacts.Configuration
+import org.gradle.api.specs.Spec
 import deps.registerResolveExternalDependenciesTasksForAllProjects
 import elixir.ElixirService
 import org.jetbrains.intellij.platform.gradle.Constants
@@ -49,6 +52,7 @@ plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.download)
     alias(libs.plugins.test.logger)
+    alias(libs.plugins.versions)
     id("java")
     id("idea")
 }
@@ -117,6 +121,32 @@ val versionSuffix: String = when {
 version = "$basePluginVersion$versionSuffix"
 
 logger.lifecycle("[elixir-build] platform=$actualPlatformVersion version=$version channel=$publishChannel dynamicEap=$useDynamicEapVersion skipSearchableOptions=$skipSearchableOptions quoterExe=$quoterExe quoterTmpPath=${quoterTmpPath.asFile.absolutePath}")
+
+//// --- Dependency Updates Configuration ---
+//// Run with: ./gradlew dependencyUpdates --no-parallel
+//// The --no-parallel flag is required by the plugin in Gradle 9+ (see plugin README known issues).
+tasks.withType<DependencyUpdatesTask> {
+    gradleReleaseChannel = "current"
+
+    filterConfigurations = Spec<Configuration> {
+        !(
+                it.name.startsWith("intellij") ||
+                        it.name.startsWith("jetbrainsRuntime") ||
+                        it.name.startsWith("marketplace") ||
+                        it.name.startsWith("compose")
+                )
+    }
+
+
+    // Only report stable → stable upgrades; reject pre-releases (RC, Beta, Alpha, SNAPSHOT, M1, etc.)
+    rejectVersionIf {
+        val stableKeyword = listOf("RELEASE", "FINAL", "GA").any { kw ->
+            candidate.version.uppercase().contains(kw)
+        }
+        val isStable = stableKeyword || "^[0-9,.v-]+(-r)?$".toRegex().matches(candidate.version)
+        isStable.not()
+    }
+}
 
 // --- Global Project Configuration ---
 allprojects {
