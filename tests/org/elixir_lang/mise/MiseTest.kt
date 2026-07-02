@@ -190,4 +190,82 @@ class MiseTest : PlatformTestCase() {
         assertNull(result!!.elixir!!.sourceType)
         assertNull(result.elixir.sourcePath)
     }
+
+    // -------------------------------------------------------------------------
+    // parseTrustError
+    // -------------------------------------------------------------------------
+
+    fun testParseTrustError_documentedTwoLineStderr_extractsPath() {
+        // Mirrors the exact two-line output produced by mise when a config file is untrusted.
+        val stderr = """
+            mise ERROR error parsing config file: /home/user/proj/mise.toml
+            mise ERROR Config files in /home/user/proj/mise.toml are not trusted.
+        """.trimIndent()
+        val result = Mise.parseTrustError(stderr)
+        assertNotNull(result)
+        assertEquals("/home/user/proj/mise.toml", result!!.configFilePath)
+    }
+
+    fun testParseTrustError_singleMatchingLine_extractsPath() {
+        val stderr = "mise ERROR Config files in /my/project are not trusted."
+        val result = Mise.parseTrustError(stderr)
+        assertNotNull(result)
+        assertEquals("/my/project", result!!.configFilePath)
+    }
+
+    fun testParseTrustError_unrelatedStderr_returnsNull() {
+        assertNull(Mise.parseTrustError("mise ERROR command not found: elixir"))
+    }
+
+    fun testParseTrustError_emptyString_returnsNull() {
+        assertNull(Mise.parseTrustError(""))
+    }
+
+    fun testParseTrustError_pathWithSpaces_trimmedCorrectly() {
+        // Surrounding whitespace inside the captured group is trimmed via .trim().
+        val stderr = "mise ERROR Config files in   /home/user/my project/mise.toml   are not trusted."
+        val result = Mise.parseTrustError(stderr)
+        assertNotNull(result)
+        assertEquals("/home/user/my project/mise.toml", result!!.configFilePath)
+    }
+
+    fun testParseTrustError_patternEmbeddedInLongerStderr_stillMatched() {
+        // .find() scans the whole string; warnings/noise before and after must not prevent matching.
+        val stderr = """
+            mise WARN  some other warning
+            mise ERROR Config files in /proj/.mise.toml are not trusted.
+            mise INFO  continuing...
+        """.trimIndent()
+        val result = Mise.parseTrustError(stderr)
+        assertNotNull(result)
+        assertEquals("/proj/.mise.toml", result!!.configFilePath)
+    }
+
+    // -------------------------------------------------------------------------
+    // parseDoctorStateDir
+    // -------------------------------------------------------------------------
+
+    fun testParseDoctorStateDir_typicalJson_extractsStatePath() {
+        val json = """{"dirs":{"state":"/home/user/.local/state/mise","data":"/home/user/.local/share/mise"}}"""
+        val result = Mise.parseDoctorStateDir(json, "/home/user/project")
+        assertNotNull(result)
+        // Normalise to forward slashes so the assertion holds on both Windows and Linux.
+        assertEquals("/home/user/.local/state/mise", com.intellij.openapi.util.io.FileUtil.toSystemIndependentName(result!!.toString()))
+    }
+
+    fun testParseDoctorStateDir_missingDirs_returnsNull() {
+        assertNull(Mise.parseDoctorStateDir("""{"tools":{}}""", "/home/user/project"))
+    }
+
+    fun testParseDoctorStateDir_missingState_returnsNull() {
+        assertNull(Mise.parseDoctorStateDir("""{"dirs":{}}""", "/home/user/project"))
+    }
+
+    fun testParseDoctorStateDir_emptyObject_returnsNull() {
+        assertNull(Mise.parseDoctorStateDir("{}", "/home/user/project"))
+    }
+
+    fun testParseDoctorStateDir_malformedJson_returnsNull() {
+        assertNull(Mise.parseDoctorStateDir("not json at all {{{", "/home/user/project"))
+    }
 }

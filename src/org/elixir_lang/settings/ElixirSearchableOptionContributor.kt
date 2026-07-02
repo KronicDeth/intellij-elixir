@@ -6,7 +6,7 @@ import com.intellij.ide.ui.search.SearchableOptionProcessor
 /**
  * Keeps Elixir settings discoverable in search without requiring Elixir-prefixed labels.
  */
-class ElixirSearchableOptionContributor : SearchableOptionContributor() {
+internal class ElixirSearchableOptionContributor : SearchableOptionContributor() {
     override fun processOptions(processor: SearchableOptionProcessor) {
         addAliases(
             processor = processor,
@@ -54,6 +54,14 @@ class ElixirSearchableOptionContributor : SearchableOptionContributor() {
             configurableDisplayName = "Internal Erlang SDKs",
             hit = "Internal Erlang SDKs",
             text = "elixir erlang sdk otp"
+        )
+
+        addAliases(
+            processor = processor,
+            configurableId = "language.elixir.tool_managers",
+            configurableDisplayName = "Tool Managers",
+            hit = "Tool Managers",
+            text = "elixir tool manager mise asdf sdk version automatic configure experimental"
         )
     }
 

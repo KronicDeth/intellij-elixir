@@ -51,6 +51,7 @@
 
         <editorNotificationProvider implementation="org.elixir_lang.notification.setup_sdk.Provider"/>
         <notificationGroup displayType="BALLOON" id="Elixir"/>
+        <notificationGroup displayType="STICKY_BALLOON" id="Elixir SDK"/>
         <notificationGroup displayType="STICKY_BALLOON" id="Elixir Mix Deps"/>
 
         <!-- Distillery -->
