@@ -100,8 +100,11 @@ class FileEditor(
                 JBScrollPane(Table(org.elixir_lang.beam.chunk.literals.Model(cache.literals)))
             Chunk.TypeID.LOCT.toString() ->
                 JBScrollPane(Table(org.elixir_lang.beam.chunk.call_definitions.Model(cache.locals)))
-            Chunk.TypeID.STRT.toString() ->
-                JBScrollPane(Table(org.elixir_lang.beam.chunk.strings.Model(cache.strings)))
+            Chunk.TypeID.STRT.toString() -> {
+                val table = Table(org.elixir_lang.beam.chunk.strings.Model(cache.strings, cache.code))
+                table.emptyText.text = "String pool is empty"
+                JBScrollPane(table)
+            }
             else ->
                 JBScrollPane(JPanel())
         }
