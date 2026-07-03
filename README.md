@@ -18,7 +18,7 @@ Table of Contents[![Backers on Open Collective](https://opencollective.com/intel
             * [Sources](#sources)
             * [Paths](#paths)
              * [Dependencies](#dependencies)
-          * [SDK Status Widget (Experimental)](#sdk-status-widget-experimental)
+          * [SDK Status Widget(#sdk-status-widget)
           * [New Elixir File](#new-elixir-file)
             * [Empty module](#empty-module)
             * [Elixir Application](#elixir-application)
@@ -517,23 +517,23 @@ Module paths list the output directories when compiling code in the module.  The
 
 ![Module Settings > Dependencies](/screenshots/project_settings/module/Dependencies.png?raw=true "Module Dependencies")
 
-Module dependencies include the SDK and the module's own sources.  Mix dependencies from `deps/` are automatically detected and registered as IDE Libraries by the background `DepsWatcher`:
+Module dependencies include the SDK and the module's own sources.  Mix dependencies from `deps/` are automatically detected and registered as IDE Libraries by processes that run in the background and monitor file changes:
 
 * **Trigger**: File system events in `deps/` and `_build/` (after `mix deps.get`, `mix compile` or folder deletions).
 * **What it creates**: For each dependency, an IDE Library with source roots from `deps/APP/lib` and class roots from `_build/ENV/lib/APP/ebin`.
 * **Result**: Dependencies appear under "External Libraries" in the Project tool window, providing Go-to-Declaration, completion, and Find Usages into dependency source code.
 * **Troubleshooting**: If libraries don't appear after `mix deps.get`, try running `mix compile` to generate `_build/` output, then wait a few seconds for the file watcher to pick up changes. You can also use **Tools → Elixir → Install Mix Dependencies**.
 
-### SDK Status Widget (Experimental)
+### SDK Status Widget
 
-The status bar can display an **Elixir SDK status widget** in the bottom-right corner of the IDE. It shows the current SDK version and warns about configuration problems.
+The status bar can display an **Elixir SDK status widget** in the bottom-right corner of the IDE. It shows the current SDK version and warns about configuration problems. It will only display when you have an Elixir file open in the editor.
 
 **Enabling the widget:**
 
 1. Open **Settings** (Ctrl+Alt+S / ⌘,)
-2. Navigate to **Languages & Frameworks → Elixir → Experimental Settings**
+2. Navigate to **Languages & Frameworks → Elixir**
 3. Check **"Enable Status Bar Widget showing if the Elixir SDK is correctly configured"**
-4. Click **OK** -- the widget appears in the status bar immediately
+4. Click **OK** -- the widget appears in the status bar when you have Elixir files open.
 
 **Widget states:**
 
@@ -541,6 +541,7 @@ The status bar can display an **Elixir SDK status widget** in the bottom-right c
 |---------|---------|
 | `Elixir: 1.17.3` | SDK configured correctly |
 | `Elixir: 1.17.3 !` | Classpath issues (missing ebin paths or Erlang SDK classpath entries) |
+| `Elixir: 1.17.3 ⚠ OTP` | Elixir SDK was compiled against a different OTP major than the paired Erlang SDK |
 | `Elixir: 1.17.3 ⚙` | Folder marks are suboptimal (e.g., `test/` not marked as Test Sources) |
 | `Elixir: SDK Error` | Module `.iml` files reference an SDK that no longer exists |
 | `Elixir: Issues` | SDK is invalid or missing its Erlang SDK dependency |
@@ -549,6 +550,7 @@ The status bar can display an **Elixir SDK status widget** in the bottom-right c
 **Click the widget** to open a popup with quick actions:
 
 * **Configure Elixir SDKs...** -- open Project Structure to add or edit SDKs
+* **Detected Elixir SDKs** -- if no SDK is configured and a tool manager (e.g. mise) detects valid installations, they are listed here. Click one to register it as the project SDK.
 * **Refresh Elixir SDKs** -- re-scan SDK home paths and update classpath entries
 * **Install Mix Dependencies** -- run `mix deps.get` for the project
 * **Reconfigure Elixir Module Setup** -- re-apply canonical folder marks (`lib/` → Sources, `test/` → Test Sources, `deps/` → Excluded, etc.) and fix dangling module SDK references
@@ -557,6 +559,7 @@ The status bar can display an **Elixir SDK status widget** in the bottom-right c
 
 * **"Reconfigure Now"** -- one-click fix for folder mark warnings and module SDK errors
 * **"Open Project Structure"** -- navigate to SDK/module settings
+* **"Don't Warn for This SDK"** -- suppress OTP mismatch warnings for a specific SDK
 
 Notifications auto-expire when the issue is resolved (e.g., after running "Reconfigure Now"). Rapid project structure changes (such as importing multiple modules) are debounced to avoid notification spam.
 
@@ -4274,7 +4277,7 @@ Qualified functions and macro calls will complete using those functions and macr
 
 ##### Unqualified
 
-Function and macro calls that are unqualified are completed from the index of all function and macro definitions, both public and private. (The index contains only those Elixir functions and macro defined in parsable source, such as those in the project or its dependencies.  Erlang functions and Elixir functions only in compiled `.beam` files, such as the standard library will not complete.)  Private function and macros are shown, so you can choose them and then make the chosen function or macro public if it is a remote call.
+Function and macro calls that are unqualified are completed from the index of all function and macro definitions, both public and private. The index includes functions defined in parsable Elixir source (project and dependencies) as well as exported functions from compiled `.beam` files (including the standard library and Erlang modules, shown with `/arity` tail text). Private functions and macros are shown, so you can choose them and then make the chosen function or macro public if it is a remote call.
 
 #### Module Attributes
 
