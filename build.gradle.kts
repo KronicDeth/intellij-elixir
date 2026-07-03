@@ -18,7 +18,10 @@
 
 import com.adarshr.gradle.testlogger.TestLoggerExtension
 import com.adarshr.gradle.testlogger.theme.ThemeType
+import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import de.undercouch.gradle.tasks.download.Download
+import org.gradle.api.artifacts.Configuration
+import org.gradle.api.specs.Spec
 import deps.registerResolveExternalDependenciesTasksForAllProjects
 import elixir.ElixirService
 import org.jetbrains.intellij.platform.gradle.Constants
@@ -49,6 +52,7 @@ plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.download)
     alias(libs.plugins.test.logger)
+    alias(libs.plugins.versions)
     id("java")
     id("idea")
 }
@@ -67,8 +71,8 @@ val libCommonsIo = libs.commons.io
 val libMockitoCore = libs.mockito.core
 
 // --- Configuration Properties ---
-val elixirVersion: String by project
-val quoterVersion: String by project
+val elixirVersion = project.property("elixirVersion") as String
+val quoterVersion = project.property("quoterVersion") as String
 
 // Publish channel: "default" for release, "canary" for pre-release
 val publishChannel: String = providers.gradleProperty("publishChannels").getOrElse("canary")
@@ -118,63 +122,92 @@ version = "$basePluginVersion$versionSuffix"
 
 logger.lifecycle("[elixir-build] platform=$actualPlatformVersion version=$version channel=$publishChannel dynamicEap=$useDynamicEapVersion skipSearchableOptions=$skipSearchableOptions quoterExe=$quoterExe quoterTmpPath=${quoterTmpPath.asFile.absolutePath}")
 
+//// --- Dependency Updates Configuration ---
+//// Run with: ./gradlew dependencyUpdates --no-parallel
+//// The --no-parallel flag is required by the plugin in Gradle 9+ (see plugin README known issues).
+tasks.withType<DependencyUpdatesTask> {
+    gradleReleaseChannel = "current"
+
+    filterConfigurations = Spec<Configuration> {
+        !(
+                it.name.startsWith("intellij") ||
+                        it.name.startsWith("jetbrainsRuntime") ||
+                        it.name.startsWith("marketplace") ||
+                        it.name.startsWith("compose")
+                )
+    }
+
+
+    // Only report stable → stable upgrades; reject pre-releases (RC, Beta, Alpha, SNAPSHOT, M1, etc.)
+    rejectVersionIf {
+        val stableKeyword = listOf("RELEASE", "FINAL", "GA").any { kw ->
+            candidate.version.uppercase().contains(kw)
+        }
+        val isStable = stableKeyword || "^[0-9,.v-]+(-r)?$".toRegex().matches(candidate.version)
+        isStable.not()
+    }
+}
+
 // --- Global Project Configuration ---
 allprojects {
-    apply(plugin = "java")
-    apply(plugin = "com.adarshr.test-logger")
-
     repositories {
         mavenCentral()
     }
 
-    dependencies {
-        testImplementation(libJunit)
-        testImplementation(libOpentest4j)
+    pluginManager.withPlugin("java") {
+        dependencies {
+            "testImplementation"(libJunit)
+            "testImplementation"(libOpentest4j)
+        }
+
+        configure<JavaPluginExtension> {
+            sourceCompatibility = JavaVersion.valueOf("VERSION_$javaVersionStr")
+            targetCompatibility = JavaVersion.valueOf("VERSION_$javaVersionStr")
+        }
+
+        tasks.withType<JavaCompile> { options.encoding = "UTF-8" }
+
+        tasks.withType<Test>().configureEach {
+            inputs.dir(rootProject.layout.projectDirectory.dir("testData"))
+                .withPropertyName("testData")
+                .withPathSensitivity(PathSensitivity.RELATIVE)
+        }
     }
 
-    configure<JavaPluginExtension> {
-        sourceCompatibility = JavaVersion.valueOf("VERSION_$javaVersionStr")
-        targetCompatibility = JavaVersion.valueOf("VERSION_$javaVersionStr")
-    }
-
-    tasks.withType<JavaCompile> { options.encoding = "UTF-8" }
-
-    configure<TestLoggerExtension> {
-        theme = ThemeType.MOCHA
-        showExceptions = true
-        showStackTraces = true
-        showFullStackTraces = false
-        slowThreshold = 2000
-        showSummary = true
-        showStandardStreams = false
-        showFailedStandardStreams = true
-    }
-
-    tasks.withType<Test>().configureEach {
-        inputs.dir(rootProject.layout.projectDirectory.dir("testData"))
-            .withPropertyName("testData")
-            .withPathSensitivity(PathSensitivity.RELATIVE)
+    pluginManager.withPlugin("com.adarshr.test-logger") {
+        configure<TestLoggerExtension> {
+            theme = ThemeType.MOCHA
+            showExceptions = true
+            showStackTraces = true
+            showFullStackTraces = false
+            slowThreshold = 2000
+            showSummary = true
+            showStandardStreams = false
+            showFailedStandardStreams = true
+        }
     }
 }
 
 // --- Subprojects (JPS) ---
 subprojects {
-    apply(plugin = "org.jetbrains.intellij.platform.base")
+    pluginManager.withPlugin("org.jetbrains.intellij.platform.base") {
+        repositories {
+            intellijPlatform { defaultRepositories() }
+        }
 
-    repositories {
-        intellijPlatform { defaultRepositories() }
-    }
-
-    dependencies {
-        intellijPlatform {
-            create(providers.gradleProperty("platformType"), providers.provider { actualPlatformVersion })
+        dependencies {
+            intellijPlatform {
+                create(providers.gradleProperty("platformType"), providers.provider { actualPlatformVersion })
+            }
         }
     }
 
-    sourceSets {
-        main {
-            java.srcDirs("src")
-            resources.srcDirs("resources")
+    pluginManager.withPlugin("java") {
+        sourceSets {
+            main {
+                java.srcDirs("src")
+                resources.srcDirs("resources")
+            }
         }
     }
 }
@@ -211,11 +244,11 @@ idea {
     }
 }
 
-val testUIImplementation: Configuration by configurations.getting {
+val testUIImplementation = configurations.getByName("testUIImplementation") {
     extendsFrom(configurations.testImplementation.get())
 }
 
-val testUIRuntimeOnly: Configuration by configurations.getting {
+val testUIRuntimeOnly = configurations.getByName("testUIRuntimeOnly") {
     extendsFrom(configurations.testRuntimeOnly.get())
 }
 
@@ -295,7 +328,7 @@ intellijPlatform {
         externalPrefixes.add("org.jetbrains.jps")
     }
     sourceSets {
-        val testUI: SourceSet by project.sourceSets
+        val testUI = project.sourceSets.getByName("testUI")
         add(testUI)
     }
 }
@@ -304,7 +337,7 @@ intellijPlatform {
 val verifierReportsDir: File = layout.buildDirectory.dir("reports/pluginVerifier").get().asFile
 val projectDirFile: File = projectDir
 
-val openVerificationReports by tasks.registering {
+val openVerificationReports = tasks.register("openVerificationReports") {
     description = "Opens plugin verification markdown reports in the IDE"
     group = "verification"
 
@@ -398,7 +431,9 @@ dependencies {
     implementation(files("lib/OtpErlang.jar"))
     implementation(libCommonsIo)
 
+    @Suppress("AvoidDuplicateDependencies")
     testImplementation(libMockitoCore)
+    @Suppress("AvoidDuplicateDependencies")
     mockitoAgent(libMockitoCore) { isTransitive = false }
 
     // UI Test dependencies
@@ -481,10 +516,9 @@ tasks.withType<RunIdeTask>().configureEach {
 // `gradlew runRubyMine -PplatformVersionRubyMine=2025.2` to override a specific platform version at runtime,
 // which is useful for testing against multiple IDE versions without changing the build script.
 val platformVersionPrefix = "platformVersion"
-val runIdePlatformsList: List<String> = project.properties.keys
-    .filter { it.startsWith(platformVersionPrefix) && it.length > platformVersionPrefix.length }
+val runIdePlatformsList: List<String> = providers.gradlePropertiesPrefixedBy(platformVersionPrefix).get().keys
     .map { it.removePrefix(platformVersionPrefix) }
-    .filter { !it.endsWith("EAP") }
+    .filter { it.isNotEmpty() && !it.endsWith("EAP") }
     .sorted()
 
 // Reduces having to download the IDEs when testing.
@@ -499,7 +533,7 @@ runIdePlatformsList.forEach { platform ->
         }
     })
 
-    if (enableEAP && project.hasProperty("platformVersion${platform}EAP")) {
+    if (enableEAP && providers.gradleProperty("platformVersion${platform}EAP").isPresent) {
         // If EAP is enabled in gradle.properties, and useDynamicEapVersion is enabled,
         // use the major version with "-EAP-SNAPSHOT" suffix.
         // Otherwise, use the specified EAP version.
@@ -526,7 +560,7 @@ runIdePlatformsList.forEach { platform ->
 
 // --- External Tools (Elixir & Quoter) ---
 val expectedElixirVersion = elixirVersion
-val prepareElixirSdk by tasks.registering(PrepareElixirSdkTask::class) {
+val prepareElixirSdk = tasks.register<PrepareElixirSdkTask>("prepareElixirSdk") {
     description = "Downloads and builds Elixir from source if needed"
     group = "verification"
     elixirVersion.set(expectedElixirVersion)
@@ -535,19 +569,22 @@ val prepareElixirSdk by tasks.registering(PrepareElixirSdkTask::class) {
     markerFile.set(elixirPath.file(".installed"))
 }
 
-val getElixir by tasks.registering {
+val getElixir = tasks.register("getElixir") {
+    description = "Prepares the Elixir SDK"
     dependsOn(prepareElixirSdk)
 }
 
 
-val getQuoter by tasks.registering(Download::class) {
+val getQuoter = tasks.register<Download>("getQuoter") {
+    description = "Downloads the Quoter tool"
     src("https://github.com/KronicDeth/intellij_elixir/archive/v${quoterVersion}.zip")
     dest(cachePath.file("intellij_elixir-${quoterVersion}.zip"))
     overwrite(false)
 }
 
 
-val unzipQuoter by tasks.registering(Copy::class) {
+val unzipQuoter = tasks.register<Copy>("unzipQuoter") {
+    description = "Unzips the Quoter tool"
     dependsOn(getQuoter)
 
     // 1. Target the final destination directly
@@ -564,7 +601,8 @@ val unzipQuoter by tasks.registering(Copy::class) {
     }
 }
 
-val getQuoterDeps by tasks.registering(GetQuoterDepsTask::class) {
+val getQuoterDeps = tasks.register<GetQuoterDepsTask>("getQuoterDeps") {
+    description = "Prepares the Quoter dependencies"
     dependsOn(unzipQuoter, prepareElixirSdk)
     workingDir(quoterUnzippedPath)
 
@@ -581,7 +619,8 @@ val getQuoterDeps by tasks.registering(GetQuoterDepsTask::class) {
         .withPathSensitivity(PathSensitivity.RELATIVE)
 }
 
-val releaseQuoter by tasks.registering(ReleaseQuoterTask::class) {
+val releaseQuoter = tasks.register<ReleaseQuoterTask>("releaseQuoter") {
+    description = "Builds the Quoter tool"
     dependsOn(getQuoterDeps)
     workingDir(quoterUnzippedPath)
 
@@ -620,7 +659,8 @@ val quoterService = gradle.sharedServices.registerIfAbsent("quoter", QuoterServi
     }
 }
 
-val startQuoter by tasks.registering(StartQuoterTask::class) {
+val startQuoter = tasks.register<StartQuoterTask>("startQuoter") {
+    description = "Starts the Quoter tool"
     dependsOn(releaseQuoter)
 }
 
@@ -658,7 +698,7 @@ tasks.named<Zip>("buildPlugin") {
 
 val sdkPropertiesFile = layout.buildDirectory.file("elixir-erlang-sdks.properties")
 
-val resolveElixirErlangSdks by tasks.registering(ResolveElixirErlangSdksTask::class) {
+val resolveElixirErlangSdks = tasks.register<ResolveElixirErlangSdksTask>("resolveElixirErlangSdks") {
     description = "Resolves Erlang and Elixir SDKs for testing"
     group = "verification"
     projectDir.set(layout.projectDirectory)
