@@ -1,5 +1,64 @@
 # Changelog
 
+## Unreleased
+
+### Enhancements
+* [#3856](https://github.com/KronicDeth/intellij-elixir/pull/3856) - [@sh41](https://github.com/sh41)
+  * **Mise users: the plugin now watches your mise config files and re-detects SDKs automatically.** New opt-in per-project settings page (Settings → Elixir → Tool Managers) controls which tool managers are active. Running `mise trust` or editing `.mise.toml` triggers a re-scan without restarting the IDE. Errors like "untrusted config" are now shown in notifications instead of silently ignored.
+  * **SDK setup on project open is more reliable.** The initial SDK notification scan now waits for the IDE's internal project model to finish loading, preventing a race where newly registered SDKs could disappear moments after being added.
+* [#3846](https://github.com/KronicDeth/intellij-elixir/pull/3846) - [@sh41](https://github.com/sh41)
+  * **You'll now be warned if your Elixir SDK was compiled against a different OTP version than your configured Erlang SDK.** Warnings appear in Project Structure (Additional Data panel), the status bar widget balloon, and the "Refresh All Elixir SDK Paths" summary. You can suppress the warning per-SDK if the mismatch is intentional.
+* [#3845](https://github.com/KronicDeth/intellij-elixir/pull/3845) - [@sh41](https://github.com/sh41)
+  * **SDK version detection is faster and works without a working Elixir installation.** The plugin now reads the version directly from the `elixir.app` file instead of running `elixir --short-version`. SDK names show the OTP major version (e.g. `mise Elixir 1.15.7-otp-26`). Mise detection now honours `.tool-versions` and parent-directory configs via `mise ls --current`.
+* [#3851](https://github.com/KronicDeth/intellij-elixir/pull/3851) - [@sh41](https://github.com/sh41)
+  * **The External Libraries tree is easier to navigate.** SDK library roots now show their OTP app name (e.g. "phoenix" instead of a raw path), and `.ex` source files appear alongside `.beam` files.
+* [#3861](https://github.com/KronicDeth/intellij-elixir/pull/3861) - [@sh41](https://github.com/sh41)
+  * **Run/Debug gutter icons now work in WSL-hosted projects.** Icons indicating test status also propagate from individual `test`/`describe` blocks up to the enclosing `describe` and `defmodule`, so you can see the status of the entire group from the gutter. The plugin reads simple `test_load_filters`/`test_paths` from `mix.exs` for correct test file detection.
+* [#3858](https://github.com/KronicDeth/intellij-elixir/pull/3858) - [@sh41](https://github.com/sh41)
+  * **Autocomplete now includes functions from BEAM-only (Erlang) dependencies.** Decompiled exported functions appear in unqualified completion with `/arity` tail text and a proper icon.
+  * **BEAM viewer improvement (View → Tool Windows → BEAM Viewer):** the StrT (string table) tab now shows individual strings with their lengths and auto-sizes columns.
+* [#3852](https://github.com/KronicDeth/intellij-elixir/pull/3852) - [@sh41](https://github.com/sh41)
+  * **Fewer "unknown AST node" warnings when decompiling OTP 26+ BEAM files.** Map comprehension nodes (`m_generate`, `mc`) introduced in OTP 26 are now decompiled correctly.
+
+### Bug Fixes
+* [#3849](https://github.com/KronicDeth/intellij-elixir/pull/3849) - [@sh41](https://github.com/sh41)
+  * **Ctrl-click on `div`, `rem`, `is_nil` etc. now navigates to Elixir source instead of landing on a `.beam` file.** The resolver now sorts source results before decompiled ones.
+  * **`describe`/`test` blocks resolve correctly when using `ExUnit.CaseTemplate`.** Previously these showed `?` icons in the structure view and wouldn't navigate. Now the plugin follows `use MyApp.ConnCase` chains to find the underlying `ExUnit.Case` macros.
+  * **Go-to-Declaration is less noisy in multi-module projects.** Resolver scope narrowed from the entire project to the current module's dependencies, reducing false matches from unrelated modules and/or SDKs.
+  * **Navigation works from VCS diff views.** Synthetic files (e.g. the diff editor) now resolve to their real on-disk counterparts.
+* [#3850](https://github.com/KronicDeth/intellij-elixir/pull/3850) - [@sh41](https://github.com/sh41)
+  * **Go-to-Declaration on the `String` module (and other modules with `\u{…}` in their docs) now works.** Previously the lexer mishandled Unicode escape sequences inside `~S"""…"""` heredocs, corrupting the parse tree for the rest of the file and causing navigation to fall through to `.beam`.
+* [#3839](https://github.com/KronicDeth/intellij-elixir/pull/3839) - [@sh41](https://github.com/sh41)
+  * **IDE no longer freezes when dependencies change.** The dependency sync system has been rewritten from a legacy thread-based watcher to a coroutine pipeline. Changing `mix.lock` now re-scans only the affected project root instead of all roots. Notifications show which module is affected.
+* [#3848](https://github.com/KronicDeth/intellij-elixir/pull/3848) - [@sh41](https://github.com/sh41)
+  * **Dialyzer and Credo inspections now analyse the latest code.** Open documents are saved before the inspection runs, so on-disk state matches what you see in the editor.
+  * **Umbrella sub-app path dependencies are now classified correctly** during mix sync (previously could appear under the wrong module).
+  * **Debugger no longer risks a threading crash** when gathering SDK paths at session start.
+* [#3855](https://github.com/KronicDeth/intellij-elixir/pull/3855) - [@sh41](https://github.com/sh41)
+  * **Run configurations are more stable on 2025.3+.** Internal threading contracts are now enforced on the code paths that build Mix/Elixir/IEx command lines, preventing potential crashes when launching run configs.
+
+### Threading / Platform Hygiene
+
+*No user-visible behaviour changes. These improve long-term stability and IDE responsiveness.*
+
+* [#3858](https://github.com/KronicDeth/intellij-elixir/pull/3858) - [@sh41](https://github.com/sh41)
+  * `@RequiresReadLock` / `@RequiresBackgroundThread` annotations added across PSI, structure view, navigation, SDK, mix, and utility layers.
+  * `ProgressManager.checkCanceled()` added in large-set iteration loops (improves cancellation responsiveness during long operations).
+  * Numerous deprecated-API replacements for forward compatibility with future IDE versions.
+  * Shadowed extension functions renamed to avoid GrammarKit member conflicts.
+
+### Build / CI
+
+*No user-visible changes. These affect contributors and CI infrastructure only.*
+
+* [#3855](https://github.com/KronicDeth/intellij-elixir/pull/3855) - [@sh41](https://github.com/sh41)
+  * GitHub Actions now summarizes the first ≤10 failed tests in the job summary.
+  * Reverted to upstream `setup-beam` action (win25 runner issues resolved upstream).
+* [#3850](https://github.com/KronicDeth/intellij-elixir/pull/3850), [#3845](https://github.com/KronicDeth/intellij-elixir/pull/3845) - [@sh41](https://github.com/sh41)
+  * CONTRIBUTING.md: corrected JFlex regeneration instructions; `ElixirFlexLexer.java` moved from `src/` to `gen/`; documented 253 API constraints for debugger and terminal console.
+* [#3863](https://github.com/KronicDeth/intellij-elixir/pull/3863) - [@sh41](https://github.com/sh41)
+  * Plugin artifact uploaded unpacked so downloading from GitHub Actions produces a ready-to-install zip without double-wrapping.
+
 ## v23.9.0
 
 ### Enhancements
