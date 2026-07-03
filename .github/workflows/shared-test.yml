@@ -224,8 +224,15 @@ jobs:
 
       - name: Upload Plugin Artifact
         id: upload-plugin
+        run: |
+          zip_file=$(ls build/distributions/*.zip | head -1)
+          artifact_name=$(basename "$zip_file" .zip)
+          echo "artifact-name=$artifact_name" >> "$GITHUB_OUTPUT"
+          unzip -o "$zip_file" -d build/distributions/unpacked
+
+      - name: Upload Plugin Artifact (contents)
         uses: actions/upload-artifact@v7
         with:
-          name: plugin-artifact
-          path: build/distributions/*.zip
+          name: ${{ steps.upload-plugin.outputs.artifact-name }}
+          path: build/distributions/unpacked/
           retention-days: 1
