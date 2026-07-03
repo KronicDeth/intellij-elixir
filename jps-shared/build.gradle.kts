@@ -1,5 +1,7 @@
 plugins {
     kotlin("jvm")
+    alias(libs.plugins.test.logger)
+    id("org.jetbrains.intellij.platform.base")
 }
 base {
     archivesName.set("${rootProject.name}.${project.name}")

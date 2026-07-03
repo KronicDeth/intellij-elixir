@@ -1,5 +1,11 @@
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 
+plugins {
+    id("java")
+    alias(libs.plugins.test.logger)
+    id("org.jetbrains.intellij.platform.base")
+}
+
 base {
     archivesName.set("${rootProject.name}.${project.name}")
 }
@@ -23,8 +29,8 @@ tasks.withType<JavaCompile>().configureEach {
 tasks.test {
     dependsOn(":getElixir")
 
-    val elixirPath: String by project
-    val elixirVersion: String by project
+    val elixirPath = project.property("elixirPath") as String
+    val elixirVersion = project.property("elixirVersion") as String
     useJUnit()
     jvmArgs(
         "--add-opens=java.base/java.lang=ALL-UNNAMED",
