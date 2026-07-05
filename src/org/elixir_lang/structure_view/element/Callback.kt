@@ -5,6 +5,7 @@ import com.intellij.navigation.ItemPresentation
 import com.intellij.psi.ElementDescriptionLocation
 import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveState
+import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.usageView.UsageViewTypeLocation
 import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.call.Visibility
@@ -75,11 +76,11 @@ class Callback(private val modular: Modular, navigationItem: Call) :
      * @return [Time.COMPILE] for compile time (`defmacro`, `defmacrop`);
      * [Time.RUN] for run time `def`, `defp`)
      */
-    override fun time(): Timed.Time =
+    override fun time(): Time =
         ElixirPsiImplUtil.moduleAttributeName(navigationItem).let { moduleAttributeName ->
             when (moduleAttributeName) {
-                "@callback" -> Timed.Time.RUN
-                "@macrocallback" -> Timed.Time.COMPILE
+                "@callback" -> Time.RUN
+                "@macrocallback" -> Time.COMPILE
                 else -> TODO("Unknown callback $moduleAttributeName")
             }
         }
@@ -111,6 +112,23 @@ class Callback(private val modular: Modular, navigationItem: Call) :
 
                 moduleAttributeName == "@callback" || moduleAttributeName == "@macrocallback"
             } ?: false
+
+        /**
+         * `true` if [element] is (within) the name/head of an enclosing `@callback`/`@macrocallback`,
+         * e.g. `foo` or `foo()` in `@callback foo() :: ...`.
+         *
+         * Used so the Symbol model (the `Callback` symbol) owns Find Usages / navigation for callback
+         * names instead of the legacy `PsiReference`-based find-usages, which otherwise contributes a
+         * redundant second target.
+         */
+        @Contract(pure = true)
+        fun isHead(element: PsiElement): Boolean {
+            val attribute = PsiTreeUtil.getParentOfType(element, AtUnqualifiedNoParenthesesCall::class.java, false)
+                ?: return false
+            if (!`is`(attribute)) return false
+            val head = headCall(attribute) ?: return false
+            return PsiTreeUtil.isAncestor(head, element, false) || PsiTreeUtil.isAncestor(element, head, false)
+        }
 
         @RequiresReadLock
         fun fromCall(call: Call): Callback? =

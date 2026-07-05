@@ -44,7 +44,7 @@ private val IDENTIFIER_TOKEN_SET = TokenSet.create(
     UNARY_OPERATOR
 )
 
-class Provider : com.intellij.lang.findUsages.FindUsagesProvider {
+internal class Provider : com.intellij.lang.findUsages.FindUsagesProvider {
     /**
      * Gets the word scanner for building a word index for the specified language.
      * Note that the implementation MUST be thread-safe, otherwise you should return a new instance of your scanner
@@ -52,7 +52,7 @@ class Provider : com.intellij.lang.findUsages.FindUsagesProvider {
      *
      * @return the word scanner implementation.
      */
-    override fun getWordsScanner(): WordsScanner? =
+    override fun getWordsScanner(): WordsScanner =
         DefaultWordsScanner(
             ElixirLexer(),
             IDENTIFIER_TOKEN_SET,
@@ -73,7 +73,10 @@ class Provider : com.intellij.lang.findUsages.FindUsagesProvider {
             is Call ->
                 // Don't find usage for the `name` in `@name`.  `AtNonNumericOperation` above will instead
                 // be used for all of `@name.
-                !psiElement.isModuleAttributeNameElement()
+                !psiElement.isModuleAttributeNameElement() &&
+                        // `@callback`/`@macrocallback` names are owned by the Symbol model (the `Callback`
+                        // symbol + `ElixirSymbolUsageSearcher`); don't also offer a redundant legacy target.
+                        !org.elixir_lang.structure_view.element.Callback.isHead(psiElement)
             is QualifiableAlias -> psiElement.isOutermostQualifiableAlias()
             else -> false
         }
@@ -97,6 +100,7 @@ class Provider : com.intellij.lang.findUsages.FindUsagesProvider {
      * @return the help topic ID, or null if no help is available.
      */
     override fun getHelpId(psiElement: PsiElement): String? =
+        @Suppress("UnstableApiUsage")
         when (psiElement) {
             is AtUnqualifiedNoParenthesesCall<*> ->
                 com.intellij.lang.HelpID.FIND_OTHER_USAGES
@@ -134,7 +138,7 @@ class Provider : com.intellij.lang.findUsages.FindUsagesProvider {
     override fun getType(element: PsiElement): String =
         try {
             ElementDescriptionUtil.getElementDescription(element, UsageViewTypeLocation.INSTANCE)
-        } catch (e: StackOverflowError) {
+        } catch (_: StackOverflowError) {
             Logger.error(Provider::class.java, "StackOverflow getting type for Find Usage", element)
 
             "unknown_elixir_type"
