@@ -75,6 +75,9 @@ internal class Provider : com.intellij.lang.findUsages.FindUsagesProvider {
                 // Don't find usage for the `name` in `@name`.  `AtNonNumericOperation` above will instead
                 // be used for all of `@name.
                 !psiElement.isModuleAttributeNameElement() &&
+                        // Function declaration heads are owned by the Symbol model (`FunctionSymbol`,
+                        // `ProtocolFunction`, `Callback`); don't offer a parallel legacy Find Usages target.
+                        !CallDefinitionClause.isHead(psiElement) &&
                         // `@callback`/`@macrocallback` names are owned by the Symbol model (the `Callback`
                         // symbol + `ElixirSymbolUsageSearcher`); don't also offer a redundant legacy target.
                         !Callback.isHead(psiElement) &&

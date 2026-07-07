@@ -1,13 +1,26 @@
 package org.elixir_lang.reference.mfa_tuple
 
+import com.intellij.find.usages.api.PsiUsage
+import com.intellij.find.usages.api.UsageOptions
+import com.intellij.find.usages.impl.AllSearchOptions
+import com.intellij.find.usages.impl.buildQuery
+import com.intellij.find.usages.impl.searchTargets
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.ReadAction
+import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiNamedElement
 import com.intellij.psi.PsiReferenceService
+import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.PsiTreeUtil
 import org.elixir_lang.PlatformTestCase
+import org.elixir_lang.psi.CallDefinitionClause
 import org.elixir_lang.psi.ElixirAtom
+import org.elixir_lang.psi.call.Call
 import org.elixir_lang.reference.MfaFunctionReference
 import org.elixir_lang.reference.Module
+import java.util.concurrent.Callable
 
+@Suppress("UnstableApiUsage")
 class MfaTupleReferenceTest : PlatformTestCase() {
     fun testFunctionResolvesIntegerArity() {
         val reference = mfaFunctionReferenceAtCaret("basic_mfa.ex")
@@ -186,7 +199,7 @@ class MfaTupleReferenceTest : PlatformTestCase() {
     }
 
     /**
-     * `{:ok, :error, [reason]}` is a common Elixir tagged-value tuple, not an MFA tuple.
+     * `{:ok, :error, \[reason]}` is a common Elixir tagged-value tuple, not an MFA tuple.
      * However, with Erlang-style support (unquoted atom at element[0]), the provider accepts
      * `:ok` as a potential Erlang module name.  Since `:ok` resolves to no module, the
      * reference is soft and returns empty results - no false error highlighting.
@@ -213,14 +226,20 @@ class MfaTupleReferenceTest : PlatformTestCase() {
         assertTrue(resolveResults.first().isValidResult)
         val functionDefinition = resolveResults.first().element!!
 
-        // Find all usages of that function definition
-        val usages = myFixture.findUsages(functionDefinition)
+        // Find usages through SearchTarget routing (Symbol API path).
+        val usages = findUsages(functionDefinition)
 
         // The MFA tuple atom should be among them
-        val usageElements = usages.map { it.element }
+        val usageElements = usages.mapNotNull { usage -> usage.file.findElementAt(usage.range.startOffset) }
+        val hasMfaTupleAtomUsage = usages.any { usage ->
+            if (usage.file.name != "find_usages.ex") return@any false
+            val start = usage.range.startOffset
+            if (start <= 0) return@any false
+            usage.file.text.getOrNull(start - 1) == ':'
+        }
         assertTrue(
-            "Expected MFA tuple reference in Find Usages results, got: ${usageElements.map { it?.text }}",
-            usageElements.any { it != null && it.text == ":map" && it.containingFile?.name == "find_usages.ex" }
+            "Expected MFA tuple reference in Find Usages results, got: ${usageElements.map { it.text }}",
+            hasMfaTupleAtomUsage
         )
     }
 
@@ -239,5 +258,27 @@ class MfaTupleReferenceTest : PlatformTestCase() {
         return PsiReferenceService.getService().getReferences(atom, PsiReferenceService.Hints.NO_HINTS)
             .filterIsInstance<MfaFunctionReference>()
             .singleOrNull()
+    }
+
+    private fun findUsages(element: PsiElement): List<PsiUsage> {
+        val file = element.containingFile
+        val offset = (element as? Call)
+            ?.takeIf { CallDefinitionClause.`is`(it) }
+            ?.let { CallDefinitionClause.nameIdentifier(it)?.textRange?.startOffset }
+            ?: element.textRange.startOffset
+        val allOptions = AllSearchOptions(
+            UsageOptions.createOptions(GlobalSearchScope.allScope(project)),
+            textSearch = false
+        )
+
+        return ApplicationManager.getApplication().executeOnPooledThread(Callable<List<PsiUsage>> {
+            ReadAction.nonBlocking(Callable<List<PsiUsage>> {
+                val targets = searchTargets(file, offset)
+                assertTrue("Expected at least one search target at offset $offset", targets.isNotEmpty())
+                targets
+                    .flatMap { buildQuery(project, it, allOptions).findAll() }
+                    .filterIsInstance<PsiUsage>()
+            }).executeSynchronously()
+        }).get()
     }
 }

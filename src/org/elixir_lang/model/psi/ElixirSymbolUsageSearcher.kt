@@ -9,24 +9,27 @@ import com.intellij.model.search.LeafOccurrence
 import com.intellij.model.search.LeafOccurrenceMapper
 import com.intellij.model.search.SearchContext
 import com.intellij.model.search.SearchService
-import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
+import com.intellij.psi.PsiReferenceService
 import com.intellij.psi.ResolveState
 import com.intellij.psi.search.SearchScope
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.usages.impl.rules.UsageType
 import com.intellij.util.Query
 import com.intellij.util.concurrency.annotations.RequiresReadLock
+import com.intellij.openapi.progress.ProcessCanceledException
 import org.elixir_lang.model.psi.callback.BehaviourMembership
 import org.elixir_lang.model.psi.callback.Callback
 import org.elixir_lang.model.psi.function.FunctionSymbol
 import org.elixir_lang.model.psi.protocol.ProtocolFunction
 import org.elixir_lang.psi.CallDefinitionClause
+import org.elixir_lang.psi.ElixirAtom
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.reference.Callable
+import org.elixir_lang.reference.MfaFunctionReference
 
 /**
  * Shared [UsageSearcher] for Elixir [ElixirSymbolWithUsages] targets. Registered once over
@@ -270,6 +273,8 @@ internal class ElixirSymbolUsageSearcher : UsageSearcher {
             val symbol = symbolPointer.dereference() ?: return emptyList()
             val (_, leaf, _) = occurrence
 
+            mfaTupleUsage(leaf, symbol)?.let { return listOf(it) }
+
             val call = leaf.enclosingCalls().firstOrNull() ?: return emptyList()
             // Skip definition heads/clauses - they are declarations, not call sites.
             if (CallDefinitionClause.isHead(call) || CallDefinitionClause.`is`(call)) return emptyList()
@@ -299,6 +304,31 @@ internal class ElixirSymbolUsageSearcher : UsageSearcher {
                     declaration = false,
                     usageType = CALL
                 )
+            )
+        }
+
+        @RequiresReadLock
+        private fun mfaTupleUsage(leaf: PsiElement, symbol: FunctionSymbol): PsiUsage? {
+            val atom = PsiTreeUtil.getParentOfType(leaf, ElixirAtom::class.java, false) ?: return null
+            val references = PsiReferenceService.getService()
+                .getReferences(atom, PsiReferenceService.Hints.NO_HINTS)
+                .filterIsInstance<MfaFunctionReference>()
+            if (references.isEmpty()) return null
+
+            val matches = references.any { reference ->
+                reference.multiResolve(false)
+                    .filter { it.isValidResult }
+                    .mapNotNull { it.element as? Call }
+                    .flatMap { FunctionSymbol.fromClause(it) }
+                    .any { it == symbol }
+            }
+            if (!matches) return null
+
+            return ElixirPsiUsage.create(
+                leaf,
+                TextRange(0, leaf.textLength),
+                declaration = false,
+                usageType = CALL
             )
         }
     }
