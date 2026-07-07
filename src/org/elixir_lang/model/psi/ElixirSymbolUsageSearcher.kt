@@ -9,21 +9,23 @@ import com.intellij.model.search.LeafOccurrence
 import com.intellij.model.search.LeafOccurrenceMapper
 import com.intellij.model.search.SearchContext
 import com.intellij.model.search.SearchService
+import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.TextRange
-import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiFile
-import com.intellij.psi.PsiReferenceService
-import com.intellij.psi.ResolveState
+import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.psi.*
+import com.intellij.psi.search.FileTypeIndex
+import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.search.SearchScope
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.usages.impl.rules.UsageType
 import com.intellij.util.Query
 import com.intellij.util.concurrency.annotations.RequiresReadLock
-import com.intellij.openapi.progress.ProcessCanceledException
+import org.elixir_lang.ElixirFileType
 import org.elixir_lang.model.psi.callback.BehaviourMembership
 import org.elixir_lang.model.psi.callback.Callback
 import org.elixir_lang.model.psi.function.FunctionSymbol
+import org.elixir_lang.model.psi.module.ModuleSymbol
 import org.elixir_lang.model.psi.protocol.ProtocolFunction
 import org.elixir_lang.psi.CallDefinitionClause
 import org.elixir_lang.psi.ElixirAtom
@@ -65,6 +67,8 @@ internal class ElixirSymbolUsageSearcher : UsageSearcher {
         } else if (target is FunctionSymbol) {
             queries += functionDeclarationFamilyQuery(parameters.project, target, parameters.searchScope)
             queries += functionCallSiteQuery(parameters.project, target, parameters.searchScope)
+        } else if (target is ModuleSymbol) {
+            queries += moduleUsageQuery(parameters.project, target, parameters.searchScope)
         }
         return queries
     }
@@ -202,12 +206,46 @@ internal class ElixirSymbolUsageSearcher : UsageSearcher {
         symbol: FunctionSymbol,
         searchScope: SearchScope
     ): Query<out PsiUsage> =
-        SearchService.getInstance()
-            .searchWord(project, symbol.name)
-            .caseSensitive(true)
-            .inContexts(SearchContext.inCode())
-            .inScope(searchScope)
-            .buildQuery(FunctionCallSiteMapper(symbol.createPointer()))
+            SearchService.getInstance()
+                .searchWord(project, symbol.name)
+                .caseSensitive(true)
+                .inContexts(SearchContext.inCode())
+                .inScope(searchScope)
+                .buildQuery(FunctionCallSiteMapper(symbol.createPointer()))
+
+    private fun moduleUsageQuery(
+        project: Project,
+        symbol: ModuleSymbol,
+        searchScope: SearchScope
+    ): Query<out PsiUsage> {
+        val candidateFiles = moduleUsageFiles(project, searchScope)
+        val moduleNamePattern = Regex("""(?m)\b(?:alias|use|import)\s+(${Regex.escape(symbol.moduleName)})\b""")
+        val usages = candidateFiles
+            .mapNotNull { file -> PsiManager.getInstance(project).findFile(file) }
+            .flatMap { file ->
+                moduleNamePattern.findAll(file.text).map { match ->
+                    val start = match.groups[1]!!.range.first
+                    val endExclusive = match.groups[1]!!.range.last + 1
+                    ElixirPsiUsage.create(
+                        file,
+                        TextRange(start, endExclusive),
+                        declaration = false,
+                        usageType = MODULE_REFERENCE
+                    )
+                }.toList()
+            }
+
+        return ElixirDirectUsagesQuery(usages)
+    }
+
+    private fun moduleUsageFiles(project: Project, searchScope: SearchScope): Collection<VirtualFile> {
+        val allElixirFiles = FileTypeIndex.getFiles(ElixirFileType.INSTANCE, GlobalSearchScope.allScope(project))
+        if (searchScope is GlobalSearchScope) {
+            return allElixirFiles.filter { searchScope.contains(it) }
+        }
+
+        return allElixirFiles
+    }
 
     /**
      * Finds additional declaration clauses for the same logical function family
@@ -218,12 +256,12 @@ internal class ElixirSymbolUsageSearcher : UsageSearcher {
         symbol: FunctionSymbol,
         searchScope: SearchScope
     ): Query<out PsiUsage> =
-        SearchService.getInstance()
-            .searchWord(project, symbol.name)
-            .caseSensitive(true)
-            .inContexts(SearchContext.inCode())
-            .inScope(searchScope)
-            .buildQuery(FunctionDeclarationFamilyMapper(symbol.createPointer()))
+            SearchService.getInstance()
+                .searchWord(project, symbol.name)
+                .caseSensitive(true)
+                .inContexts(SearchContext.inCode())
+                .inScope(searchScope)
+                .buildQuery(FunctionDeclarationFamilyMapper(symbol.createPointer()))
 
     /**
      * Maps each occurrence of a function name to a matching declaration clause in the same
@@ -337,6 +375,8 @@ internal class ElixirSymbolUsageSearcher : UsageSearcher {
 private val IMPLEMENTATION = UsageType { "Implementation" }
 
 private val CALL = UsageType { "Function call" }
+
+private val MODULE_REFERENCE = UsageType { "Module reference" }
 
 private const val USING = "__using__"
 

@@ -1,12 +1,9 @@
 package org.elixir_lang.psi.impl
 
-import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiNamedElement
-import com.intellij.psi.PsiPolyVariantReference
-import com.intellij.psi.PsiReference
-import com.intellij.psi.ResolveResult
+import com.intellij.psi.*
 import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager
+import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.util.isAncestor
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.*
@@ -21,7 +18,9 @@ import org.elixir_lang.reference.Module
 import org.jetbrains.annotations.Contract
 
 fun QualifiableAlias.computeReference(): PsiPolyVariantReference? =
-    when (val parent = this.parent) {
+    if (isDefmoduleDeclarationName(this)) {
+        null
+    } else when (val parent = this.parent) {
         is QualifiableAlias ->
             // If the `parent` goes beyond this element then this element is the outermost Qualifiable alias that is still
             // ends in this element, so it represents the fully-qualified name.
@@ -51,6 +50,16 @@ fun QualifiableAlias.computeReference(): PsiPolyVariantReference? =
                 null
             }
     }
+
+private fun isDefmoduleDeclarationName(alias: QualifiableAlias): Boolean {
+    val moduleCall = generateSequence(alias as PsiElement) { it.parent }
+        .filterIsInstance<Call>()
+        .firstOrNull { org.elixir_lang.psi.Module.`is`(it) }
+        ?: return false
+    val firstPrimaryArgument = moduleCall.primaryArguments()?.firstOrNull() ?: return false
+
+    return PsiTreeUtil.isAncestor(firstPrimaryArgument, alias, false)
+}
 
 fun QualifiableAlias.cachedReference(): PsiPolyVariantReference? =
     CachedValuesManager.getCachedValue(this) {
