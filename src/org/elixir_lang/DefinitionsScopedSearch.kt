@@ -17,7 +17,7 @@ import org.elixir_lang.psi.impl.call.macroChildCallList
 import org.elixir_lang.psi.impl.maybeModularNameToModulars
 import org.elixir_lang.psi.outerMostQualifiableAlias
 
-class DefinitionsScopedSearch :
+internal class DefinitionsScopedSearch :
     QueryExecutorBase<PsiElement, DefinitionsScopedSearch.SearchParameters>(/* requireReadAction = */ true) {
     override fun processQuery(
         queryParameters: DefinitionsScopedSearch.SearchParameters,
@@ -45,7 +45,22 @@ class DefinitionsScopedSearch :
         }
     }
 
-    private fun processQuery(call: Call, consumer: Processor<in PsiElement>) {
+    private fun processQuery(callArgument: Call, consumer: Processor<in PsiElement>) {
+        // "Go To Implementation" (Ctrl+Alt+B) resolves its source through the element-name path, which
+        // lands on the *name-call head* of the clause (e.g. `perform()` inside `def perform()`), not on
+        // the enclosing `CallDefinitionClause`. Since protocol-function names are owned by the Symbol
+        // model, they carry no self-resolving reference to fall back on, so normalize the head call up to
+        // its enclosing def clause before dispatching.
+        val call =
+            if (!Protocol.`is`(callArgument) && !CallDefinitionClause.`is`(callArgument) && Protocol.isHead(callArgument)) {
+                generateSequence(callArgument.parent) { it.parent }
+                    .filterIsInstance<Call>()
+                    .firstOrNull { CallDefinitionClause.`is`(it) }
+                    ?: callArgument
+            } else {
+                callArgument
+            }
+
         if (Protocol.`is`(call)) {
             Protocol.processImplementations(call, consumer)
         } else if (CallDefinitionClause.`is`(call)) {

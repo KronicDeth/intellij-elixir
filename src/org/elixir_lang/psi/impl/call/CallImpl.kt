@@ -42,7 +42,9 @@ import org.elixir_lang.psi.operation.not_in.Normalized as NotInNormalized
 fun Call.computeReference(): PsiReference? =
     /* if the call is just the identifier for a module attribute reference, then don't return a Callable reference,
            and instead let {@link #getReference(AtNonNumericOperation) handle it */
-    if (!this.isModuleAttributeNameElement() &&
+    if (Protocol.isHead(this)) {
+        null
+    } else if (!this.isModuleAttributeNameElement() &&
         // if a bitstring segment option then the option is a pseudo-function
         !isBitStreamSegmentOption(this) &&
         !this.isSlashInCaptureNameSlashArity() &&

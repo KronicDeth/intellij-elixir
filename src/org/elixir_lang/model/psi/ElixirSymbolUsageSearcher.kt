@@ -21,6 +21,7 @@ import com.intellij.util.Query
 import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.model.psi.callback.BehaviourMembership
 import org.elixir_lang.model.psi.callback.Callback
+import org.elixir_lang.model.psi.protocol.ProtocolFunction
 import org.elixir_lang.psi.CallDefinitionClause
 import org.elixir_lang.psi.call.Call
 
@@ -31,10 +32,13 @@ import org.elixir_lang.psi.call.Call
  * - Every searchable symbol contributes its self-declaration usage.
  * - A [Callback] additionally contributes each implementing `def`/`defmacro` clause of matching
  *   name/arity/kind, where the enclosing module implements the behaviour (see [BehaviourMembership]).
+ * - A [ProtocolFunction] additionally contributes each **call site** that dispatches to it
+ *   (`Protocol.function(args)` of matching name/arity). Implementations are intentionally *not*
+ *   usages - they are reached via "Go To Implementation" (`Ctrl+Alt+B`) / the gutter marker.
  *
  * Candidates are found by a name-anchored text search (efficient, only visits files containing the
- * name); behaviour membership is resolved via [BehaviourMembership] (shared with the reverse
- * `def` → `@callback` reference so both directions agree).
+ * name); behaviour membership is resolved via [BehaviourMembership]; call-site dispatch is resolved
+ * via [Call.isCalling].
  */
 @Suppress("UnstableApiUsage")
 internal class ElixirSymbolUsageSearcher : UsageSearcher {
@@ -47,17 +51,35 @@ internal class ElixirSymbolUsageSearcher : UsageSearcher {
 
         if (target is Callback) {
             queries += implementationQuery(parameters.project, target, parameters.searchScope)
+        } else if (target is ProtocolFunction) {
+            queries += protocolCallSiteQuery(parameters.project, target, parameters.searchScope)
         }
         return queries
     }
 
-    private fun implementationQuery(project: Project, callback: Callback, searchScope: SearchScope): Query<out PsiUsage> =
-        SearchService.getInstance()
-            .searchWord(project, callback.name)
-            .caseSensitive(true) // Elixir function/macro names are case-sensitive
-            .inContexts(SearchContext.inCode())
-            .inScope(searchScope)
-            .buildQuery(ImplementationMapper(callback.createPointer()))
+    private fun implementationQuery(
+        project: Project,
+        callback: Callback,
+        searchScope: SearchScope
+    ): Query<out PsiUsage> =
+            SearchService.getInstance()
+                .searchWord(project, callback.name)
+                .caseSensitive(true) // Elixir function/macro names are case-sensitive
+                .inContexts(SearchContext.inCode())
+                .inScope(searchScope)
+                .buildQuery(ImplementationMapper(callback.createPointer()))
+
+    private fun protocolCallSiteQuery(
+        project: Project,
+        pf: ProtocolFunction,
+        searchScope: SearchScope
+    ): Query<out PsiUsage> =
+            SearchService.getInstance()
+                .searchWord(project, pf.name)
+                .caseSensitive(true)
+                .inContexts(SearchContext.inCode())
+                .inScope(searchScope)
+                .buildQuery(ProtocolCallSiteMapper(pf.createPointer()))
 
     /**
      * Maps each occurrence of the callback name to an implementing definition clause, if any.
@@ -78,30 +100,37 @@ internal class ElixirSymbolUsageSearcher : UsageSearcher {
             val nameIdentifier = CallDefinitionClause.nameIdentifier(defClause) ?: return emptyList()
             if (!PsiTreeUtil.isAncestor(nameIdentifier, leaf, false)) return emptyList()
 
-            val nameArity = CallDefinitionClause.nameArityInterval(defClause, ResolveState.initial()) ?: return emptyList()
+            val nameArity =
+                    CallDefinitionClause.nameArityInterval(defClause, ResolveState.initial()) ?: return emptyList()
             if (nameArity.name != callback.name || callback.arity !in nameArity.arityInterval) return emptyList()
 
             // `@callback` is implemented by `def`, `@macrocallback` by `defmacro`.
             val kindMatches =
-                if (callback.macro) CallDefinitionClause.isMacro(defClause) else CallDefinitionClause.isFunction(defClause)
+                    if (callback.macro) CallDefinitionClause.isMacro(defClause) else CallDefinitionClause.isFunction(
+                        defClause
+                    )
             if (!kindMatches) return emptyList()
 
             val implements =
-                when (val usingDefiner = defClause.enclosingUsingDefiner()) {
-                    // Default implementation: a `def` inside a `__using__` quote whose module is the
-                    // behaviour itself, or which injects `@behaviour B`.
-                    is Call -> {
-                        val definingModule = CallDefinitionClause.enclosingModularMacroCall(usingDefiner)
-                        definingModule != null &&
-                                (BehaviourMembership.moduleName(definingModule) == callback.moduleName ||
-                                        callback.moduleName in BehaviourMembership.namesInjectedByDefiner(usingDefiner, definingModule))
+                    when (val usingDefiner = defClause.enclosingUsingDefiner()) {
+                        // Default implementation: a `def` inside a `__using__` quote whose module is the
+                        // behaviour itself, or which injects `@behaviour B`.
+                        is Call -> {
+                            val definingModule = CallDefinitionClause.enclosingModularMacroCall(usingDefiner)
+                            definingModule != null &&
+                                    (BehaviourMembership.moduleName(definingModule) == callback.moduleName ||
+                                            callback.moduleName in BehaviourMembership.namesInjectedByDefiner(
+                                        usingDefiner,
+                                        definingModule
+                                    ))
+                        }
+                        // Concrete implementation: a `def` directly in a module that declares the behaviour.
+                        else -> {
+                            val modular =
+                                    CallDefinitionClause.enclosingModularMacroCall(defClause) ?: return emptyList()
+                            BehaviourMembership.implements(modular, callback.moduleName)
+                        }
                     }
-                    // Concrete implementation: a `def` directly in a module that declares the behaviour.
-                    else -> {
-                        val modular = CallDefinitionClause.enclosingModularMacroCall(defClause) ?: return emptyList()
-                        BehaviourMembership.implements(modular, callback.moduleName)
-                    }
-                }
             if (!implements) return emptyList()
 
             return listOf(
@@ -115,19 +144,57 @@ internal class ElixirSymbolUsageSearcher : UsageSearcher {
         }
     }
 
+    /**
+     * Maps each occurrence of a protocol function name to a **call site** that dispatches to it, if any.
+     * A call site is a qualified call `Protocol.function(args)` (of matching name/arity) whose resolved
+     * module is the protocol. The search framework invokes [mapOccurrence] under a read action.
+     */
+    private class ProtocolCallSiteMapper(
+        private val protocolFunctionPointer: Pointer<out ProtocolFunction>
+    ) : LeafOccurrenceMapper<PsiUsage> {
+        @RequiresReadLock
+        override fun mapOccurrence(occurrence: LeafOccurrence): Collection<PsiUsage> {
+            val protocolFunction = protocolFunctionPointer.dereference() ?: return emptyList()
+            val (_, leaf, _) = occurrence
+
+            // Nearest enclosing call. A call site is an invocation, not a definition clause.
+            val call = leaf.enclosingCalls().firstOrNull() ?: return emptyList()
+            if (CallDefinitionClause.`is`(call)) return emptyList()
+
+            // The occurrence must be the call's own function name, not one of its arguments.
+            val nameElement = call.functionNameElement() ?: return emptyList()
+            if (!PsiTreeUtil.isAncestor(nameElement, leaf, false)) return emptyList()
+
+            // The call must dispatch to this protocol function: `<protocolName>.<name>/<arity>`.
+            if (!call.isCalling(protocolFunction.protocolName, protocolFunction.name, protocolFunction.arity)) {
+                return emptyList()
+            }
+
+            return listOf(
+                ElixirPsiUsage.create(
+                    nameElement,
+                    TextRange(0, nameElement.textLength),
+                    declaration = false,
+                    usageType = CALL
+                )
+            )
+        }
+    }
 }
 
 private val IMPLEMENTATION = UsageType { "Implementation" }
 
+private val CALL = UsageType { "Function call" }
+
 private const val USING = "__using__"
 
 private fun PsiElement.enclosingCalls(): Sequence<Call> =
-    generateSequence(parent) { it.parent }.takeWhile { it !is PsiFile }.filterIsInstance<Call>()
+        generateSequence(parent) { it.parent }.takeWhile { it !is PsiFile }.filterIsInstance<Call>()
 
 /** Nearest enclosing `defmacro __using__/1` clause, or `null`. */
 @RequiresReadLock
 private fun Call.enclosingUsingDefiner(): Call? =
-    enclosingCalls().firstOrNull { call ->
-        CallDefinitionClause.`is`(call) &&
-                CallDefinitionClause.nameArityInterval(call, ResolveState.initial())?.name == USING
-    }
+        enclosingCalls().firstOrNull { call ->
+            CallDefinitionClause.`is`(call) &&
+                    CallDefinitionClause.nameArityInterval(call, ResolveState.initial())?.name == USING
+        }

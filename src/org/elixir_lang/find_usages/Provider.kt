@@ -18,6 +18,7 @@ import org.elixir_lang.psi.*
 import org.elixir_lang.psi.ElixirTypes.*
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.isOutermostQualifiableAlias
+import org.elixir_lang.structure_view.element.Callback
 
 private val IDENTIFIER_TOKEN_SET = TokenSet.create(
     ALIAS_TOKEN,
@@ -76,7 +77,11 @@ internal class Provider : com.intellij.lang.findUsages.FindUsagesProvider {
                 !psiElement.isModuleAttributeNameElement() &&
                         // `@callback`/`@macrocallback` names are owned by the Symbol model (the `Callback`
                         // symbol + `ElixirSymbolUsageSearcher`); don't also offer a redundant legacy target.
-                        !org.elixir_lang.structure_view.element.Callback.isHead(psiElement)
+                        !Callback.isHead(psiElement) &&
+                        // A protocol function name (`def`/`defmacro` inside a `defprotocol`) is owned by the
+                        // Symbol model (the `ProtocolFunction` symbol + `ElixirSymbolUsageSearcher`); don't also
+                        // offer a redundant legacy target.
+                        !Protocol.isHead(psiElement)
             is QualifiableAlias -> psiElement.isOutermostQualifiableAlias()
             else -> false
         }
