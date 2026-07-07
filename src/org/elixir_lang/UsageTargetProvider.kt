@@ -8,8 +8,8 @@ import com.intellij.psi.PsiFile
 import com.intellij.usages.UsageTarget
 import org.elixir_lang.beam.psi.impl.ModuleImpl
 import org.elixir_lang.psi.AtOperation
+import org.elixir_lang.psi.CallDefinitionClause
 import org.elixir_lang.psi.ElixirFile
-import org.elixir_lang.psi.Protocol
 import org.elixir_lang.psi.QualifiableAlias
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.structure_view.element.Callback
@@ -30,15 +30,9 @@ internal class UsageTargetProvider : com.intellij.usages.UsageTargetProvider {
     override fun getTargets(psiElement: PsiElement): Array<UsageTarget>? =
             when {
                 psiElement.containingFile !is ElixirFile -> null
-                Callback.isHead(psiElement) -> {
-                    // `@callback`/`@macrocallback` names are owned by the Symbol model (the `Callback` symbol);
-                    // don't contribute a redundant legacy usage target beside the symbol's `name/arity` target.
-                    null
-                }
-
-                Protocol.isHead(psiElement) -> {
-                    // Protocol function names are owned by the Symbol model (the `ProtocolFunction` symbol);
-                    // don't contribute a redundant legacy usage target.
+                Callback.isHead(psiElement) || CallDefinitionClause.isHead(psiElement) -> {
+                    // Call-definition clause heads (including `@callback`/`@macrocallback` and protocol function
+                    // declarations) are owned by the Symbol model; don't contribute a redundant legacy usage target.
                     null
                 }
 

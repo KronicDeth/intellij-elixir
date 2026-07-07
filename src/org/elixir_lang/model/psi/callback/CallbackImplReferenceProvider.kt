@@ -16,11 +16,10 @@ import org.elixir_lang.psi.call.Call
  * Attaches a [CallbackImplReference] to an implementing `def`/`defmacro` clause's name, so
  * "Go To Declaration" navigates to the `@callback` it implements.
  *
- * Fast-exits for anything that is not a call-definition clause, leaving all other navigation
- * unchanged. Resolution is lazy: the reference is returned unconditionally for call-def clauses and
- * the platform calls [CallbackImplReference.resolveReference] only when it needs to offer navigation
- * (Ctrl+Click, Go To Declaration). An empty resolution simply produces no navigation target - there
- * are no phantom unresolved references.
+ * Only creates a reference when the enclosing module is known to implement at least one behaviour
+ * (`@behaviour Foo` or `use Foo`). A non-null reference that resolves to nothing would shadow the
+ * `FunctionSymbol` declaration via `referencedData ?: declaredData`, breaking Ctrl+Click / Find
+ * Usages on ordinary functions.
  *
  * [getSearchRequests] returns nothing on purpose: callback → implementations (reverse Find Usages) is
  * served by [org.elixir_lang.model.psi.ElixirSymbolUsageSearcher]'s direct query, so these references
@@ -36,7 +35,10 @@ internal class CallbackImplReferenceProvider : PsiSymbolReferenceProvider {
         // create a non-null-but-empty `referencedData` that shadows the `ProtocolFunction` declaration
         // in the platform's `targetSymbols` (`referencedData ?: declaredData`), breaking Find Usages.
         val enclosingModular = CallDefinitionClause.enclosingModularMacroCall(element)
-        if (enclosingModular != null && Protocol.`is`(enclosingModular)) return emptyList()
+        if (enclosingModular == null || Protocol.`is`(enclosingModular)) return emptyList()
+        // A non-null reference that resolves to nothing would shadow the `FunctionSymbol` declaration.
+        // Only create the reference for defs in modules that actually implement a behaviour.
+        if (BehaviourMembership.namesImplementedBy(enclosingModular).isEmpty()) return emptyList()
         val nameIdentifier = CallDefinitionClause.nameIdentifier(element) ?: return emptyList()
         val rangeInElement = nameIdentifier.textRange.shiftLeft(element.textRange.startOffset)
         return listOf(CallbackImplReference(element, rangeInElement))

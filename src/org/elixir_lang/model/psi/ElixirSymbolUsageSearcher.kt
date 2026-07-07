@@ -9,6 +9,7 @@ import com.intellij.model.search.LeafOccurrence
 import com.intellij.model.search.LeafOccurrenceMapper
 import com.intellij.model.search.SearchContext
 import com.intellij.model.search.SearchService
+import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
@@ -21,9 +22,11 @@ import com.intellij.util.Query
 import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.model.psi.callback.BehaviourMembership
 import org.elixir_lang.model.psi.callback.Callback
+import org.elixir_lang.model.psi.function.FunctionSymbol
 import org.elixir_lang.model.psi.protocol.ProtocolFunction
 import org.elixir_lang.psi.CallDefinitionClause
 import org.elixir_lang.psi.call.Call
+import org.elixir_lang.reference.Callable
 
 /**
  * Shared [UsageSearcher] for Elixir [ElixirSymbolWithUsages] targets. Registered once over
@@ -35,6 +38,9 @@ import org.elixir_lang.psi.call.Call
  * - A [ProtocolFunction] additionally contributes each **call site** that dispatches to it
  *   (`Protocol.function(args)` of matching name/arity). Implementations are intentionally *not*
  *   usages - they are reached via "Go To Implementation" (`Ctrl+Alt+B`) / the gutter marker.
+ * - A [FunctionSymbol] additionally contributes each **call site** that dispatches to it.
+ *   Qualified calls (`Module.function(args)`) are matched via [Call.isCalling]; unqualified calls
+ *   require scope resolution and are resolved by delegating to the legacy [Callable] walker.
  *
  * Candidates are found by a name-anchored text search (efficient, only visits files containing the
  * name); behaviour membership is resolved via [BehaviourMembership]; call-site dispatch is resolved
@@ -53,6 +59,9 @@ internal class ElixirSymbolUsageSearcher : UsageSearcher {
             queries += implementationQuery(parameters.project, target, parameters.searchScope)
         } else if (target is ProtocolFunction) {
             queries += protocolCallSiteQuery(parameters.project, target, parameters.searchScope)
+        } else if (target is FunctionSymbol) {
+            queries += functionDeclarationFamilyQuery(parameters.project, target, parameters.searchScope)
+            queries += functionCallSiteQuery(parameters.project, target, parameters.searchScope)
         }
         return queries
     }
@@ -180,6 +189,119 @@ internal class ElixirSymbolUsageSearcher : UsageSearcher {
             )
         }
     }
+
+    /**
+     * Builds a word-index query that finds every source token whose text matches the function name,
+     * then hands each occurrence to [FunctionCallSiteMapper].
+     */
+    private fun functionCallSiteQuery(
+        project: Project,
+        symbol: FunctionSymbol,
+        searchScope: SearchScope
+    ): Query<out PsiUsage> =
+        SearchService.getInstance()
+            .searchWord(project, symbol.name)
+            .caseSensitive(true)
+            .inContexts(SearchContext.inCode())
+            .inScope(searchScope)
+            .buildQuery(FunctionCallSiteMapper(symbol.createPointer()))
+
+    /**
+     * Finds additional declaration clauses for the same logical function family
+     * (`module.name/arity`) as [symbol].
+     */
+    private fun functionDeclarationFamilyQuery(
+        project: Project,
+        symbol: FunctionSymbol,
+        searchScope: SearchScope
+    ): Query<out PsiUsage> =
+        SearchService.getInstance()
+            .searchWord(project, symbol.name)
+            .caseSensitive(true)
+            .inContexts(SearchContext.inCode())
+            .inScope(searchScope)
+            .buildQuery(FunctionDeclarationFamilyMapper(symbol.createPointer()))
+
+    /**
+     * Maps each occurrence of a function name to a matching declaration clause in the same
+     * logical function family (`module.name/arity`).
+     */
+    private class FunctionDeclarationFamilyMapper(
+        private val symbolPointer: Pointer<out FunctionSymbol>
+    ) : LeafOccurrenceMapper<PsiUsage> {
+        @RequiresReadLock
+        override fun mapOccurrence(occurrence: LeafOccurrence): Collection<PsiUsage> {
+            val symbol = symbolPointer.dereference() ?: return emptyList()
+            val (_, leaf, _) = occurrence
+
+            val defClause = leaf.enclosingCalls().firstOrNull { CallDefinitionClause.`is`(it) } ?: return emptyList()
+            val nameIdentifier = CallDefinitionClause.nameIdentifier(defClause) ?: return emptyList()
+            if (!PsiTreeUtil.isAncestor(nameIdentifier, leaf, false)) return emptyList()
+            if (!defClause.matchesFunctionFamily(symbol)) return emptyList()
+
+            // Direct usage query already contributes the symbol's own declaration.
+            if (defClause.containingFile.virtualFile == symbol.file.virtualFile &&
+                nameIdentifier.textRange == symbol.range
+            ) {
+                return emptyList()
+            }
+
+            return listOf(
+                ElixirPsiUsage.create(
+                    nameIdentifier,
+                    TextRange(0, nameIdentifier.textLength),
+                    declaration = true
+                )
+            )
+        }
+    }
+
+    /**
+     * Maps each occurrence of a function name to a **call site** for the given [FunctionSymbol].
+     *
+     * Qualified calls (`Module.function(args)`) are matched by name/arity without scope resolution.
+     * Unqualified calls are resolved via the legacy [Callable] scope-walker.
+     */
+    private class FunctionCallSiteMapper(
+        private val symbolPointer: Pointer<out FunctionSymbol>
+    ) : LeafOccurrenceMapper<PsiUsage> {
+        @RequiresReadLock
+        override fun mapOccurrence(occurrence: LeafOccurrence): Collection<PsiUsage> {
+            val symbol = symbolPointer.dereference() ?: return emptyList()
+            val (_, leaf, _) = occurrence
+
+            val call = leaf.enclosingCalls().firstOrNull() ?: return emptyList()
+            // Skip definition heads/clauses - they are declarations, not call sites.
+            if (CallDefinitionClause.isHead(call) || CallDefinitionClause.`is`(call)) return emptyList()
+
+            val nameElement = call.functionNameElement() ?: return emptyList()
+            if (!PsiTreeUtil.isAncestor(nameElement, leaf, false)) return emptyList()
+
+            // Fast path: qualified call (`ModuleName.functionName/arity`).
+            val matched = if (call.isCalling(symbol.moduleName, symbol.name, symbol.arity)) {
+                true
+            } else {
+                // Unqualified call: resolve via legacy scope-walker and check against this symbol.
+                val resolved = Callable(call).multiResolve(false)
+                    .filter { it.isValidResult }
+                    .mapNotNull { it.element as? Call }
+                    .filter { CallDefinitionClause.`is`(it) }
+                    .flatMap { FunctionSymbol.fromClause(it) }
+                resolved.any { it == symbol }
+            }
+
+            if (!matched) return emptyList()
+
+            return listOf(
+                ElixirPsiUsage.create(
+                    nameElement,
+                    TextRange(0, nameElement.textLength),
+                    declaration = false,
+                    usageType = CALL
+                )
+            )
+        }
+    }
 }
 
 private val IMPLEMENTATION = UsageType { "Implementation" }
@@ -190,6 +312,21 @@ private const val USING = "__using__"
 
 private fun PsiElement.enclosingCalls(): Sequence<Call> =
         generateSequence(parent) { it.parent }.takeWhile { it !is PsiFile }.filterIsInstance<Call>()
+
+@RequiresReadLock
+private fun Call.matchesFunctionFamily(symbol: FunctionSymbol): Boolean {
+    val enclosingModular = CallDefinitionClause.enclosingModularMacroCall(this) ?: return false
+    val moduleName = runCatching { org.elixir_lang.psi.Module.name(enclosingModular) }
+        .getOrElse { if (it is ProcessCanceledException) throw it else null }
+        ?: return false
+    if (moduleName != symbol.moduleName) return false
+
+    val nameArity = CallDefinitionClause.nameArityInterval(this, ResolveState.initial()) ?: return false
+    if (nameArity.name != symbol.name || symbol.arity !in nameArity.arityInterval) return false
+
+    val clauseIsMacro = CallDefinitionClause.isMacro(this)
+    return clauseIsMacro == symbol.macro
+}
 
 /** Nearest enclosing `defmacro __using__/1` clause, or `null`. */
 @RequiresReadLock

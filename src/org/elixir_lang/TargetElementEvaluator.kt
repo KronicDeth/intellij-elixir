@@ -5,10 +5,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReference
 import com.intellij.psi.ResolveResult
 import com.intellij.util.ThreeState
-import org.elixir_lang.psi.AtOperation
-import org.elixir_lang.psi.Protocol
-import org.elixir_lang.psi.QualifiedNoArgumentsCall
-import org.elixir_lang.psi.UnqualifiedNoArgumentsCall
+import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.operation.Multiplication
 import org.elixir_lang.psi.operation.capture.NonNumeric
@@ -19,10 +16,13 @@ import org.elixir_lang.structure_view.element.Callback
 
 internal class TargetElementEvaluator : TargetElementEvaluatorEx2() {
     override fun isAcceptableNamedParent(parent: PsiElement): Boolean = when {
-        Callback.isHead(parent) -> {
-            // `@callback`/`@macrocallback` names are owned by the Symbol model (the `Callback` symbol).
-            // Don't expose them as a legacy named element, which the platform would otherwise offer as a
-            // redundant Find Usages / Go To target beside the symbol's `name/arity` target.
+        Callback.isHead(parent) || (CallDefinitionClause.isHead(parent) && !Protocol.isHead(parent)) -> {
+            // `@callback`/`@macrocallback` names and regular (non-protocol) call-definition clause heads are
+            // owned by the Symbol model. Don't expose them as a legacy named element, which the platform
+            // would otherwise offer as a redundant Find Usages / Go To target beside the symbol's
+            // `name/arity` target.
+            // Protocol function `def` heads are kept on the legacy path because
+            // `DefinitionsScopedSearch` (Go To Implementation) resolves source via legacy flags.
             false
         }
 
@@ -62,17 +62,10 @@ internal class TargetElementEvaluator : TargetElementEvaluatorEx2() {
         referenceOrReferencedElement: PsiElement?
     ): ThreeState =
             when {
-                referenceOrReferencedElement != null && Callback.isHead(referenceOrReferencedElement) -> {
-                    // A `@callback`/`@macrocallback` name resolves (via a reference) to itself; the Symbol model
-                    // owns it, so don't accept it as a legacy *referenced* Find Usages / Go To target either
-                    // (`isAcceptableNamedParent` above already closes the named-element path). Together these leave
-                    // the `Callback` symbol as the sole target - no redundant chooser entry.
-                    ThreeState.NO
-                }
-
-                referenceOrReferencedElement != null && Protocol.isHead(referenceOrReferencedElement) -> {
-                    // A protocol function name resolves to itself; the Symbol model owns it, so don't accept it as a
-                    // legacy *referenced* Find Usages / Go To target.
+                referenceOrReferencedElement != null && (Callback.isHead(referenceOrReferencedElement) || CallDefinitionClause.isHead(referenceOrReferencedElement)) -> {
+                    // Names in call-definition clause heads (including `@callback`/`@macrocallback` and protocol
+                    // function declarations) are owned by the Symbol model. Don't accept them as legacy
+                    // *referenced* Find Usages / Go To targets - leave the Symbol as the sole target.
                     ThreeState.NO
                 }
 
@@ -93,21 +86,10 @@ internal class TargetElementEvaluator : TargetElementEvaluatorEx2() {
                 else -> {
                     val resolved = reference.resolve()
                     when {
-                        resolved != null && Callback.isHead(resolved) -> {
-                            // `@callback`/`@macrocallback` names are owned by the Symbol model. The Find Usages
-                            // action's `targetVariants` gathers a legacy `PsiTargetVariant` straight from
-                            // `getTargetCandidates(reference)` (bypassing `isAcceptableReferencedElement`), so the
-                            // callback's own `Type` self-reference (`perform()` -> the `@callback` head) would
-                            // otherwise add a redundant target beside the symbol's `name/arity` target - an
-                            // ambiguity popup. `TargetElementUtil.getTargetCandidates` only skips its default
-                            // `multiResolve` fallback when the evaluator returns a NON-null collection, so return an
-                            // empty (non-null) list for a callback-head self-reference; defer everything else.
-                            mutableListOf()
-                        }
-
-                        resolved != null && Protocol.isHead(resolved) -> {
-                            // Protocol function names are owned by the Symbol model; return empty list to prevent
-                            // redundant target for self-references.
+                        resolved != null && (Callback.isHead(resolved) || CallDefinitionClause.isHead(resolved)) -> {
+                            // Call-definition clause heads (including `@callback`/`@macrocallback` and protocol
+                            // function declarations) are owned by the Symbol model; return empty list to prevent
+                            // redundant legacy target beside the symbol's target - avoids the ambiguity popup.
                             mutableListOf()
                         }
 
