@@ -262,6 +262,9 @@
 
         <stubIndex implementation="org.elixir_lang.psi.stub.index.ImplementedProtocolName"/>
         <definitionsScopedSearch implementation="org.elixir_lang.DefinitionsScopedSearch"/>
+        <!-- Concise row rendering for the Go To Implementation / Go To Target popups. -->
+        <gotoTargetPresentationProvider
+                implementation="org.elixir_lang.navigation.ElixirGotoTargetPresentationProvider"/>
         <codeInsight.lineMarkerProvider language="Elixir"
                                         implementationClass="org.elixir_lang.code_insight.line_marker_provider.Protocol"/>
 

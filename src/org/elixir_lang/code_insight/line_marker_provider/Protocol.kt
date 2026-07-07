@@ -16,6 +16,7 @@ import com.intellij.psi.ResolveState
 import com.intellij.psi.SmartPsiElementPointer
 import org.elixir_lang.Icons
 import org.elixir_lang.beam.psi.impl.ModuleImpl
+import org.elixir_lang.navigation.ElixirImplementationCellRenderer
 import org.elixir_lang.psi.CallDefinitionClause
 import org.elixir_lang.psi.CallDefinitionClause.enclosingModularMacroCall
 import org.elixir_lang.psi.Protocol
@@ -25,7 +26,7 @@ import java.awt.event.MouseEvent
 import java.util.*
 import javax.swing.Icon
 
-class Protocol : LineMarkerProvider {
+internal class Protocol : LineMarkerProvider {
     override fun getLineMarkerInfo(element: PsiElement): LineMarkerInfo<*>? {
         // LineMarkerProvider contract: only return info for leaf elements
         if (element.firstChild != null) return null
@@ -126,6 +127,12 @@ class Protocol : LineMarkerProvider {
             DEFAULT_PSI_CONVERTOR,
             PSI_GOTO_RELATED_ITEM_PROVIDER
         ) {
+        init {
+            // Render each implementing clause the same way as the Go To Implementation (Ctrl+Alt+B) popup
+            // instead of the default location-string rows, which are too wide to be usable.
+            setCellRenderer { ElixirImplementationCellRenderer() }
+        }
+
         override fun createGutterIconRenderer(
             pointers: NotNullLazyValue<out MutableList<SmartPsiElementPointer<*>>>,
             renderer: Computable<out PsiElementListCellRenderer<*>>,
