@@ -1,12 +1,10 @@
 package org.elixir_lang.reference.callable
 
 import com.intellij.openapi.util.Disposer
-import org.elixir_lang.psi.ElixirIdentifier
-import com.intellij.psi.PsiPolyVariantReference
 import com.intellij.psi.NavigatablePsiElement
+import com.intellij.psi.PsiPolyVariantReference
 import org.elixir_lang.PlatformTestCase
-import org.junit.Assert
-import java.lang.Exception
+import org.elixir_lang.psi.ElixirIdentifier
 
 class IntramoduleTest : PlatformTestCase() {
     fun testAmbiguousBackReference() {
@@ -71,26 +69,15 @@ class IntramoduleTest : PlatformTestCase() {
 
     fun testFunctionNameMultipleSameArity() {
         myFixture.configureByFiles("function_name_multiple_same_arity.ex")
-        val parenthesesCall = myFixture
+        val declarationHead = myFixture
                 .file
                 .findElementAt(myFixture.caretOffset)!!
                 .parent
                 .parent
                 .parent
-        assertInstanceOf(parenthesesCall.firstChild, ElixirIdentifier::class.java)
-
-        val reference = parenthesesCall.reference
-        assertNotNull("`referenced` has no reference", reference)
-        assertInstanceOf(reference, PsiPolyVariantReference::class.java)
-        val polyVariantReference = reference as PsiPolyVariantReference?
-
-        val resolveResults = polyVariantReference!!.multiResolve(false)
-        Assert.assertNotEquals("Resolved to both clauses instead of selected clause", 2, resolveResults.size.toLong())
-        assertEquals("Resolves to self", 1, resolveResults.size)
-
-        val resolved = reference.resolve()
-        assertNotNull("Reference not resolved", resolved)
-        assertEquals("def referenced(true) do\n  end", resolved!!.text)
+        assertInstanceOf(declarationHead.firstChild, ElixirIdentifier::class.java)
+        // Under the Symbol API, a call-definition head is a declaration site, not a reference.
+        assertNull("Call definition head should not expose a legacy reference", declarationHead.reference)
     }
 
     fun testParenthesesRecursiveReference() {

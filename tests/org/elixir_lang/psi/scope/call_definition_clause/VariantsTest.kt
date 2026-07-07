@@ -1,7 +1,6 @@
 package org.elixir_lang.psi.scope.call_definition_clause
 
 import com.intellij.codeInsight.completion.CompletionType
-import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.codeInsight.lookup.LookupElementPresentation
 import org.elixir_lang.PlatformTestCase
@@ -18,24 +17,12 @@ class VariantsTest : PlatformTestCase() {
 
     fun testIssue462() {
         myFixture.configureByFiles("self_completion.ex")
-        val head = myFixture
-            .file
-            .findElementAt(myFixture.caretOffset - 1)!!
-            .parent
-            .parent
-        assertInstanceOf(head, Call::class.java)
-        val reference = head.reference
-        assertNotNull("Call definition head does not have a reference", reference)
-        val variants = reference!!.variants
-        var count = 0
-        for (variant in variants) {
-            if (variant is LookupElement) {
-                if (variant.lookupString == "the_function_currently_being_defined") {
-                    count += 1
-                }
-            }
-        }
-        assertEquals("There is at least one entry for the function currently being defined in variants", 0, count)
+        myFixture.complete(CompletionType.BASIC)
+        val variants = myFixture.lookupElementStrings.orEmpty()
+        assertFalse(
+            "Function currently being defined should not appear in completion variants",
+            variants.contains("the_function_currently_being_defined")
+        )
     }
 
     fun testIssue2073() {
