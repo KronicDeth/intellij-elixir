@@ -1,24 +1,39 @@
 package org.elixir_lang
 
+import com.intellij.find.usages.api.PsiUsage
+import com.intellij.find.usages.api.UsageOptions
+import com.intellij.find.usages.impl.AllSearchOptions
+import com.intellij.find.usages.impl.buildQuery
+import com.intellij.find.usages.impl.searchTargets
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.application.ex.ApplicationInfoEx
 import com.intellij.openapi.util.Version
 import com.intellij.psi.PsiPolyVariantReference
+import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.usages.UsageInfo2UsageAdapter
 import org.elixir_lang.find_usages.handler.AlreadyResolved
+import java.util.concurrent.Callable
 
+@Suppress("UnstableApiUsage")
 class FindUsagesTest : PlatformTestCase() {
     override fun getTestDataPath(): String {
         return "testData/org/elixir_lang/find_usages"
     }
 
     fun testFunctionRecursiveDeclaration() {
-        val usages = myFixture.testFindUsages("function_recursive_declaration.ex", "kernel.ex")
-                .map { UsageInfo2UsageAdapter(it) }
+        if (AlreadyResolved.alreadyResolved) {
+            val offsets = functionSymbolUsageOffsetsAtCaret("function_recursive_declaration.ex", "kernel.ex")
+            assertEquals(3, offsets.size)
+            assertContainsElements(offsets, listOf(63, 93))
+            return
+        }
+        val usageInfos = myFixture.testFindUsages("function_recursive_declaration.ex", "kernel.ex").toList()
 
-        assertEquals(3, usages.size)
-        assertContainsElements(usages.map { it.element!!.textOffset }, listOf(63, 93))
+        assertEquals(3, usageInfos.size)
+        assertContainsElements(usageInfos.map { it.element!!.textOffset }, listOf(63, 93))
 
-        val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
+        val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usageInfos)
 
         assertEquals(
             """<root> (3)
@@ -40,13 +55,18 @@ class FindUsagesTest : PlatformTestCase() {
     }
 
     fun testFunctionRecursiveUsage() {
-        val usages = myFixture.testFindUsages("function_recursive_usage.ex", "kernel.ex")
-            .map { UsageInfo2UsageAdapter(it) }
+        if (AlreadyResolved.alreadyResolved) {
+            val offsets = functionSymbolUsageOffsetsAtCaret("function_recursive_usage.ex", "kernel.ex")
+            assertEquals(3, offsets.size)
+            assertContainsElements(offsets, listOf(63, 93))
+            return
+        }
+        val usageInfos = myFixture.testFindUsages("function_recursive_usage.ex", "kernel.ex").toList()
 
-        assertEquals(3, usages.size)
-        assertContainsElements(usages.map { it.element!!.textOffset }, listOf(63, 93))
+        assertEquals(3, usageInfos.size)
+        assertContainsElements(usageInfos.map { it.element!!.textOffset }, listOf(63, 93))
 
-        val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
+        val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usageInfos)
 
         assertEquals(
             """<root> (3)
@@ -68,13 +88,18 @@ class FindUsagesTest : PlatformTestCase() {
     }
 
     fun testFunctionSingleClauseUnused() {
-        val usages = myFixture.testFindUsages("function_single_clause_unused.ex", "kernel.ex")
-            .map { UsageInfo2UsageAdapter(it) }
+        if (AlreadyResolved.alreadyResolved) {
+            val offsets = functionSymbolUsageOffsetsAtCaret("function_single_clause_unused.ex", "kernel.ex")
+            assertEquals(1, offsets.size)
+            assertContainsElements(offsets, listOf(26))
+            return
+        }
+        val usageInfos = myFixture.testFindUsages("function_single_clause_unused.ex", "kernel.ex").toList()
 
-        assertEquals(1, usages.size)
-        assertContainsElements(usages.map { it.element!!.textOffset }, listOf(26))
+        assertEquals(1, usageInfos.size)
+        assertContainsElements(usageInfos.map { it.element!!.textOffset }, listOf(26))
 
-        val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
+        val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usageInfos)
 
         assertEquals(
             """<root> (1)
@@ -90,13 +115,18 @@ class FindUsagesTest : PlatformTestCase() {
     }
 
     fun testFunctionMultipleClausesUnused() {
-        val usages = myFixture.testFindUsages("function_multiple_clauses_unused.ex", "kernel.ex")
-            .map { UsageInfo2UsageAdapter(it) }
+        if (AlreadyResolved.alreadyResolved) {
+            val offsets = functionSymbolUsageOffsetsAtCaret("function_multiple_clauses_unused.ex", "kernel.ex")
+            assertEquals(2, offsets.size)
+            assertContainsElements(offsets, listOf(26))
+            return
+        }
+        val usageInfos = myFixture.testFindUsages("function_multiple_clauses_unused.ex", "kernel.ex").toList()
 
-        assertEquals(2, usages.size)
-        assertContainsElements(usages.map { it.element!!.textOffset }, listOf(26))
+        assertEquals(2, usageInfos.size)
+        assertContainsElements(usageInfos.map { it.element!!.textOffset }, listOf(26))
 
-        val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
+        val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usageInfos)
 
         assertEquals(
             """<root> (2)
@@ -113,16 +143,26 @@ class FindUsagesTest : PlatformTestCase() {
     }
 
     fun testFunctionMultipleModulesDeclaration() {
-        val usages = myFixture.testFindUsages(
+        if (AlreadyResolved.alreadyResolved) {
+            val offsets = functionSymbolUsageOffsetsAtCaret(
+                "function_multiple_modules_declaration_target.ex",
+                "function_multiple_modules_declaration_usage.ex",
+                "kernel.ex"
+            )
+            assertEquals(2, offsets.size)
+            assertContainsElements(offsets, listOf(31, 50))
+            return
+        }
+        val usageInfos = myFixture.testFindUsages(
             "function_multiple_modules_declaration_target.ex",
             "function_multiple_modules_declaration_usage.ex",
             "kernel.ex"
-        ).map { UsageInfo2UsageAdapter(it) }
+        ).toList()
 
-        assertEquals(2, usages.size)
-        assertContainsElements(usages.map { it.element!!.textOffset }, listOf(31, 50))
+        assertEquals(2, usageInfos.size)
+        assertContainsElements(usageInfos.map { it.element!!.textOffset }, listOf(31, 50))
 
-        val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
+        val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usageInfos)
 
         assertEquals(
             """<root> (2)
@@ -143,16 +183,26 @@ class FindUsagesTest : PlatformTestCase() {
     }
 
     fun testFunctionMultipleModulesUsage() {
-        val usages = myFixture.testFindUsages(
+        if (AlreadyResolved.alreadyResolved) {
+            val offsets = functionSymbolUsageOffsetsAtCaret(
+                "function_multiple_modules_usage_target.ex",
+                "function_multiple_modules_usage_declaration.ex",
+                "kernel.ex"
+            )
+            assertEquals(2, offsets.size)
+            assertContainsElements(offsets, listOf(31, 50))
+            return
+        }
+        val usageInfos = myFixture.testFindUsages(
             "function_multiple_modules_usage_target.ex",
             "function_multiple_modules_usage_declaration.ex",
             "kernel.ex"
-        ).map { UsageInfo2UsageAdapter(it) }
+        ).toList()
 
-        assertEquals(2, usages.size)
-        assertContainsElements(usages.map { it.element!!.textOffset }, listOf(31, 50))
+        assertEquals(2, usageInfos.size)
+        assertContainsElements(usageInfos.map { it.element!!.textOffset }, listOf(31, 50))
 
-        val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
+        val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usageInfos)
 
         assertEquals(
             """<root> (2)
@@ -173,16 +223,26 @@ class FindUsagesTest : PlatformTestCase() {
     }
 
     fun testFunctionImportDeclaration() {
-        val usages = myFixture.testFindUsages(
+        if (AlreadyResolved.alreadyResolved) {
+            val offsets = functionSymbolUsageOffsetsAtCaret(
+                "function_import_declaration_target.ex",
+                "function_import_declaration_usage.ex",
+                "kernel.ex"
+            )
+            assertEquals(2, offsets.size)
+            assertContainsElements(offsets, listOf(31, 60))
+            return
+        }
+        val usageInfos = myFixture.testFindUsages(
             "function_import_declaration_target.ex",
             "function_import_declaration_usage.ex",
             "kernel.ex"
-        ).map { UsageInfo2UsageAdapter(it) }
+        ).toList()
 
-        assertEquals(2, usages.size)
-        assertContainsElements(usages.map { it.element!!.textOffset }, listOf(31, 60))
+        assertEquals(2, usageInfos.size)
+        assertContainsElements(usageInfos.map { it.element!!.textOffset }, listOf(31, 60))
 
-        val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usages.map { it.usageInfo })
+        val usageViewTreeTextRepresentation = myFixture.getUsageViewTreeTextRepresentation(usageInfos)
 
         assertEquals(
             """<root> (2)
@@ -203,27 +263,21 @@ class FindUsagesTest : PlatformTestCase() {
     }
 
     fun testFunctionImportUsage() {
-        val usageInfos = if (AlreadyResolved.alreadyResolved) {
-            myFixture.configureByFiles(
+        if (AlreadyResolved.alreadyResolved) {
+            val offsets = functionSymbolUsageOffsetsAtCaret(
                 "function_import_usage_target.ex",
                 "function_import_usage_declaration.ex",
                 "kernel.ex"
             )
-
-            val reference = myFixture.getReferenceAtCaretPositionWithAssertion() as PsiPolyVariantReference
-            assertNotNull(reference)
-
-            val resolved = reference.multiResolve(false)
-            assertEquals(2, resolved.size)
-
-            myFixture.findUsages(resolved[0].element!!)
-        } else {
-            myFixture.testFindUsages(
-                "function_import_usage_target.ex",
-                "function_import_usage_declaration.ex",
-                "kernel.ex"
-            )
+            assertEquals(2, offsets.size)
+            assertContainsElements(offsets, listOf(31, 60))
+            return
         }
+        val usageInfos = myFixture.testFindUsages(
+            "function_import_usage_target.ex",
+            "function_import_usage_declaration.ex",
+            "kernel.ex"
+        ).toList()
 
         assertEquals(2, usageInfos.size)
         assertContainsElements(usageInfos.map { it.element!!.textOffset }, listOf(31, 60))
@@ -623,8 +677,13 @@ class FindUsagesTest : PlatformTestCase() {
     }
 
     fun testIssue2374() {
-        val usages =
-            myFixture.testFindUsages("issue_2374.ex", "kernel.ex").map { UsageInfo2UsageAdapter(it) }
+        if (AlreadyResolved.alreadyResolved) {
+            val offsets = functionSymbolUsageOffsetsAtCaret("issue_2374.ex", "kernel.ex")
+            assertEquals(3, offsets.size)
+            assertContainsElements(offsets, listOf(23, 53, 53))
+            return
+        }
+        val usages = myFixture.testFindUsages("issue_2374.ex", "kernel.ex").map { UsageInfo2UsageAdapter(it) }
 
         assertEquals(3, usages.size)
 
@@ -659,5 +718,27 @@ class FindUsagesTest : PlatformTestCase() {
             "Usages"
         }
         return usagesString
+    }
+
+    private fun functionSymbolUsageOffsetsAtCaret(vararg fileNames: String): kotlin.collections.List<Int> {
+        myFixture.configureByFiles(*fileNames)
+        val file = myFixture.file
+        val offset = myFixture.caretOffset
+        val allOptions = AllSearchOptions(
+            UsageOptions.createOptions(GlobalSearchScope.allScope(project)),
+            textSearch = false
+        )
+        return ApplicationManager.getApplication().executeOnPooledThread(Callable {
+            ReadAction.nonBlocking(Callable {
+                val targets = searchTargets(file, offset)
+                if (targets.isEmpty()) {
+                    emptyList()
+                } else {
+                    buildQuery(project, targets.single(), allOptions).findAll()
+                        .filterIsInstance<PsiUsage>()
+                        .map { it.range.startOffset }
+                }
+            }).executeSynchronously()
+        }).get()
     }
 }
