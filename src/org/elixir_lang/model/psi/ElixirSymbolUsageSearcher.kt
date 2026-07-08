@@ -12,16 +12,12 @@ import com.intellij.model.search.SearchService
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.TextRange
-import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.*
-import com.intellij.psi.search.FileTypeIndex
-import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.search.SearchScope
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.usages.impl.rules.UsageType
 import com.intellij.util.Query
 import com.intellij.util.concurrency.annotations.RequiresReadLock
-import org.elixir_lang.ElixirFileType
 import org.elixir_lang.model.psi.callback.BehaviourMembership
 import org.elixir_lang.model.psi.callback.Callback
 import org.elixir_lang.model.psi.function.FunctionSymbol
@@ -29,7 +25,14 @@ import org.elixir_lang.model.psi.module.ModuleSymbol
 import org.elixir_lang.model.psi.protocol.ProtocolFunction
 import org.elixir_lang.psi.CallDefinitionClause
 import org.elixir_lang.psi.ElixirAtom
+import org.elixir_lang.psi.QualifiableAlias
 import org.elixir_lang.psi.call.Call
+import org.elixir_lang.psi.call.name.Function.ALIAS
+import org.elixir_lang.psi.call.name.Function.IMPORT
+import org.elixir_lang.psi.call.name.Function.USE
+import org.elixir_lang.psi.call.name.Module.KERNEL
+import org.elixir_lang.psi.impl.call.finalArguments
+import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.reference.Callable
 import org.elixir_lang.reference.MfaFunctionReference
 
@@ -213,38 +216,89 @@ internal class ElixirSymbolUsageSearcher : UsageSearcher {
                 .inScope(searchScope)
                 .buildQuery(FunctionCallSiteMapper(symbol.createPointer()))
 
+    /**
+     * Finds every reference to this module using the word index (efficient) and then resolves
+     * each occurrence via the existing PSI reference infrastructure. This handles all forms:
+     * - `alias MyApp.Module` / `use MyApp.Module` / `import MyApp.Module`
+     * - `alias MyApp.{Module, AnotherModule}` (multi-alias)
+     * - Bare references in code: `Supervisor.init(\[MyApp.Module])`
+     * - Aliased short-name references: `Module.function()` where `alias MyApp.Module` is in scope
+     */
     private fun moduleUsageQuery(
         project: Project,
         symbol: ModuleSymbol,
         searchScope: SearchScope
-    ): Query<out PsiUsage> {
-        val candidateFiles = moduleUsageFiles(project, searchScope)
-        val moduleNamePattern = Regex("""(?m)\b(?:alias|use|import)\s+(${Regex.escape(symbol.moduleName)})\b""")
-        val usages = candidateFiles
-            .mapNotNull { file -> PsiManager.getInstance(project).findFile(file) }
-            .flatMap { file ->
-                moduleNamePattern.findAll(file.text).map { match ->
-                    val start = match.groups[1]!!.range.first
-                    val endExclusive = match.groups[1]!!.range.last + 1
-                    ElixirPsiUsage.create(
-                        file,
-                        TextRange(start, endExclusive),
-                        declaration = false,
-                        usageType = MODULE_REFERENCE
-                    )
-                }.toList()
+    ): Query<out PsiUsage> =
+        SearchService.getInstance()
+            .searchWord(project, symbol.searchText)
+            .caseSensitive(true)
+            .inContexts(SearchContext.inCode())
+            .inScope(searchScope)
+            .buildQuery(ModuleUsageMapper(symbol.createPointer()))
+
+    private class ModuleUsageMapper(
+        private val symbolPointer: Pointer<out ModuleSymbol>
+    ) : LeafOccurrenceMapper<PsiUsage> {
+        @RequiresReadLock
+        override fun mapOccurrence(occurrence: LeafOccurrence): Collection<PsiUsage> {
+            val symbol = symbolPointer.dereference() ?: return emptyList()
+            val (_, leaf, _) = occurrence
+
+            // Walk up to the outermost QualifiableAlias containing this leaf.
+            val alias = generateSequence(leaf) { it.parent }
+                .filterIsInstance<QualifiableAlias>()
+                .lastOrNull()
+                ?: return emptyList()
+
+            // Skip defmodule declaration names - null reference by convention.
+            // The declaration is already contributed by ElixirDirectUsageQuery.
+            if (alias.reference == null) return emptyList()
+
+            // Primary: pure structural match via fullyQualifiedName(). Works for:
+            //   alias MyApp.Module, use MyApp.Module, MyApp.{Module, Other}, MyApp.Module in code
+            val fqn = alias.fullyQualifiedName().removeElixirPrefix()
+            if (fqn == symbol.moduleName) {
+                return listOf(
+                    ElixirPsiUsage.create(alias, TextRange(0, alias.textLength), declaration = false, usageType = MODULE_REFERENCE)
+                )
             }
 
-        return ElixirDirectUsagesQuery(usages)
-    }
+            // Secondary: bare short-name reference where the FQN is just the last segment.
+            // e.g. `Module` in code where `alias MyApp.Module` is in lexical scope.
+            // `alias MyApp.Module` is simultaneously a usage of `MyApp.Module` AND a declaration
+            // of `Module` in the enclosing scope - bare `Module` references that declaration
+            // transitively. Check structurally: is there an alias/use/import of symbol.moduleName
+            // in the enclosing defmodule? No index or scope resolution required.
+            if (fqn == symbol.searchText && hasEnclosingModuleAlias(alias, symbol.moduleName)) {
+                return listOf(
+                    ElixirPsiUsage.create(alias, TextRange(0, alias.textLength), declaration = false, usageType = MODULE_REFERENCE)
+                )
+            }
 
-    private fun moduleUsageFiles(project: Project, searchScope: SearchScope): Collection<VirtualFile> {
-        val allElixirFiles = FileTypeIndex.getFiles(ElixirFileType.INSTANCE, GlobalSearchScope.allScope(project))
-        if (searchScope is GlobalSearchScope) {
-            return allElixirFiles.filter { searchScope.contains(it) }
+            return emptyList()
         }
 
-        return allElixirFiles
+        private fun hasEnclosingModuleAlias(element: PsiElement, targetFqn: String): Boolean {
+            val enclosingModule = generateSequence(element) { it.parent }
+                .filterIsInstance<Call>()
+                .firstOrNull { org.elixir_lang.psi.Module.`is`(it) }
+                ?: return false
+
+            return PsiTreeUtil.findChildrenOfType(enclosingModule, Call::class.java).any { call ->
+                (call.isCalling(KERNEL, ALIAS) ||
+                    call.isCalling(KERNEL, USE) ||
+                    call.isCalling(KERNEL, IMPORT)) &&
+                    call.finalArguments()
+                        ?.firstOrNull()
+                        ?.stripAccessExpression()
+                        ?.let { it as? QualifiableAlias }
+                        ?.fullyQualifiedName()
+                        ?.removeElixirPrefix() == targetFqn
+            }
+        }
+
+        private fun String.removeElixirPrefix(): String =
+            if (startsWith("Elixir.")) removePrefix("Elixir.") else this
     }
 
     /**

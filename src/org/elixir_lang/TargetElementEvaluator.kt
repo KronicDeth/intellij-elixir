@@ -4,6 +4,7 @@ import com.intellij.codeInsight.TargetElementEvaluatorEx2
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReference
 import com.intellij.psi.ResolveResult
+import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.ThreeState
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
@@ -47,7 +48,11 @@ internal class TargetElementEvaluator : TargetElementEvaluatorEx2() {
         }
 
         parent is Call -> {
-            if (parent.hasMapFieldOptionalityName() && parent.ancestorTypeSpec() != null) {
+            if (org.elixir_lang.psi.Module.`is`(parent)) {
+                // `defmodule` declaration heads are owned by the Symbol model (ModuleSymbol declaration provider).
+                // Prevent legacy named-element targeting, which produces Ctrl-hover underline but no actionable target.
+                false
+            } else if (parent.hasMapFieldOptionalityName() && parent.ancestorTypeSpec() != null) {
                 false
             } else {
                 super.isAcceptableNamedParent(parent)
@@ -62,10 +67,18 @@ internal class TargetElementEvaluator : TargetElementEvaluatorEx2() {
         referenceOrReferencedElement: PsiElement?
     ): ThreeState =
             when {
-                referenceOrReferencedElement != null && (Callback.isHead(referenceOrReferencedElement) || CallDefinitionClause.isHead(referenceOrReferencedElement)) -> {
+                referenceOrReferencedElement != null && (Callback.isHead(referenceOrReferencedElement) || CallDefinitionClause.isHead(
+                    referenceOrReferencedElement
+                )) -> {
                     // Names in call-definition clause heads (including `@callback`/`@macrocallback` and protocol
                     // function declarations) are owned by the Symbol model. Don't accept them as legacy
                     // *referenced* Find Usages / Go To targets - leave the Symbol as the sole target.
+                    ThreeState.NO
+                }
+
+                referenceOrReferencedElement is Call && org.elixir_lang.psi.Module.`is`(referenceOrReferencedElement) -> {
+                    // `defmodule` declarations are Symbol-owned. Legacy referenced-element acceptance
+                    // can steal Ctrl-click handling from Symbol targets and result in no-op navigation.
                     ThreeState.NO
                 }
 
@@ -82,18 +95,38 @@ internal class TargetElementEvaluator : TargetElementEvaluatorEx2() {
                         .mapNotNull(ResolveResult::getElement)
                         .toMutableList()
                 }
-
+                // `defmodule` calls are declaration heads owned by ModuleSymbol. If a legacy PsiReference
+                // is present on the call (for example, resolving `defmodule` to Kernel), suppress it so
+                // Ctrl+Click stays on declaration-owned Symbol behavior.
                 else -> {
-                    val resolved = reference.resolve()
-                    when {
-                        resolved != null && (Callback.isHead(resolved) || CallDefinitionClause.isHead(resolved)) -> {
-                            // Call-definition clause heads (including `@callback`/`@macrocallback` and protocol
-                            // function declarations) are owned by the Symbol model; return empty list to prevent
-                            // redundant legacy target beside the symbol's target - avoids the ambiguity popup.
-                            mutableListOf()
-                        }
+                    val referenceElement = reference.element
+                    // Suppress legacy references on `defmodule` heads (Symbol-owned): covers both the whole
+                    // Call element and the `defmodule` keyword leaf (functionNameElement), which otherwise
+                    // resolves to Kernel.defmodule in .beam and causes spurious navigation.
+                    val enclosingModuleCall = generateSequence(referenceElement) { it.parent }
+                        .filterIsInstance<Call>()
+                        .firstOrNull { org.elixir_lang.psi.Module.`is`(it) }
+                    val isOnDefmoduleHead = enclosingModuleCall != null &&
+                            (referenceElement == enclosingModuleCall ||
+                                    PsiTreeUtil.isAncestor(
+                                        enclosingModuleCall.functionNameElement(),
+                                        referenceElement,
+                                        false
+                                    ))
+                    if (isOnDefmoduleHead) {
+                        mutableListOf()
+                    } else {
+                        val resolved = reference.resolve()
+                        when {
+                            resolved != null && (Callback.isHead(resolved) || CallDefinitionClause.isHead(resolved)) -> {
+                                // Call-definition clause heads (including `@callback`/`@macrocallback` and protocol
+                                // function declarations) are owned by the Symbol model; return empty list to prevent
+                                // redundant legacy target beside the symbol's target - avoids the ambiguity popup.
+                                mutableListOf()
+                            }
 
-                        else -> super.getTargetCandidates(reference)
+                            else -> super.getTargetCandidates(reference)
+                        }
                     }
                 }
             }

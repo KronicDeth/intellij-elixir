@@ -20,7 +20,17 @@ internal class ModuleSymbolDeclarationProvider : PsiSymbolDeclarationProvider {
             ?: return emptyList()
 
         val nameElement = ModuleSymbol.moduleNameElement(moduleCall) ?: return emptyList()
-        if (!PsiTreeUtil.isAncestor(nameElement, element, false)) return emptyList()
+        // Fire when: (a) caret is on a descendant of the module name alias, OR
+        // (b) the platform passes the declaring Call itself with an offset within the module name.
+        val isInNameElement = when {
+            PsiTreeUtil.isAncestor(nameElement, element, false) -> true
+            element == moduleCall -> {
+                val offsetInFile = element.textRange.startOffset + offsetInElement
+                nameElement.textRange.containsOffset(offsetInFile)
+            }
+            else -> false
+        }
+        if (!isInNameElement) return emptyList()
 
         val symbol = ModuleSymbol.fromModular(moduleCall) ?: return emptyList()
         val rangeInDeclaringElement = nameElement.textRange.shiftLeft(moduleCall.textRange.startOffset)

@@ -1,88 +1,88 @@
 package org.elixir_lang.model.psi.module
 
-import com.intellij.codeInsight.navigation.actions.GotoDeclarationOrUsageHandler2
-import com.intellij.find.usages.api.PsiUsage
-import com.intellij.find.usages.api.UsageOptions
-import com.intellij.find.usages.impl.AllSearchOptions
-import com.intellij.find.usages.impl.buildQuery
-import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.application.ReadAction
-import com.intellij.psi.search.GlobalSearchScope
 import org.elixir_lang.PlatformTestCase
-import org.elixir_lang.psi.Module
-import org.elixir_lang.psi.QualifiableAlias
-import org.elixir_lang.psi.call.Call
-import java.util.concurrent.Callable
+import org.elixir_lang.code_insight.assertNoNavigationAtCaret
+import org.elixir_lang.code_insight.assertShowUsagesChosenAtCaret
+import org.elixir_lang.code_insight.nonDeclarationUsageCountAtCaret
 
+/**
+ * Behavior-level tests for module Find/Show Usages.
+ *
+ * Each test describes what the user experiences: which caret position routes to Show Usages
+ * and how many references appear in the popup for a given source layout.
+ *
+ * The pipeline is real caret → [com.intellij.find.usages.impl.searchTargets] → [com.intellij.find.usages.impl.buildQuery] → [com.intellij.find.usages.api.PsiUsage]s, identical to
+ * what the Find Usages action invokes. No implementation classes (declaration providers,
+ * usage mappers, symbol constructors) are called directly.
+ */
 class ModuleFindUsagesTest : PlatformTestCase() {
     override fun getTestDataPath(): String = "testData/org/elixir_lang/model/psi/module"
 
-    fun testAliasUseImportSitesAreFound() {
-        val (total, references) = moduleUsageCounts("usages_alias_use_import.ex")
+    // ── Ctrl-click routing ──────────────────────────────────────────────────────────────────────
 
-        assertEquals(4, total)
-        assertEquals(3, references)
-    }
-
-    fun testCtrlClickOnDefmoduleChoosesShowUsages() {
+    fun testCtrlClickOnUnqualifiedModuleDeclarationShowsUsages() {
         myFixture.configureByFiles("usages_alias_use_import.ex")
-        assertEquals(
-            GotoDeclarationOrUsageHandler2.GTDUOutcome.SU,
-            GotoDeclarationOrUsageHandler2.testGTDUOutcomeInNonBlockingReadAction(
-                myFixture.editor, myFixture.file, myFixture.caretOffset
-            )
-        )
+        myFixture.assertShowUsagesChosenAtCaret()
     }
 
-    @Suppress("UnstableApiUsage")
-    private fun moduleUsageCounts(vararg files: String): Pair<Int, Int> {
+    fun testCtrlClickOnQualifiedModuleLastSegmentShowsUsages() {
+        myFixture.configureByFiles("usages_qualified_alias_last_segment.ex")
+        myFixture.assertShowUsagesChosenAtCaret()
+    }
+
+    fun testCtrlClickOnQualifiedModuleQualifierShowsUsages() {
+        myFixture.configureByFiles("usages_qualified_alias_use_import.ex")
+        myFixture.assertShowUsagesChosenAtCaret()
+    }
+
+    fun testCtrlClickOnDefmoduleKeywordDoesNothing() {
+        myFixture.configureByFiles("usages_defmodule_keyword.ex")
+        myFixture.assertNoNavigationAtCaret()
+    }
+
+    // ── Find Usages popup content ───────────────────────────────────────────────────────────────
+
+    /** `alias Target`, `use Target`, `import Target` all appear as usages of `defmodule Target`. */
+    fun testFindUsagesOnUnqualifiedModuleFindsAliasUseImportSites() {
+        assertEquals(3, nonDeclarationUsageCount("usages_alias_use_import.ex"))
+    }
+
+    /** Caret on the last segment of a qualified name still finds all reference sites. */
+    fun testFindUsagesFromQualifiedModuleLastSegmentFindsReferences() {
+        assertEquals(3, nonDeclarationUsageCount("usages_qualified_alias_last_segment.ex"))
+    }
+
+    /** Caret on the qualifier segment of a qualified name still finds all reference sites. */
+    fun testFindUsagesFromQualifiedModuleQualifierFindsReferences() {
+        assertEquals(3, nonDeclarationUsageCount("usages_qualified_alias_use_import.ex"))
+    }
+
+    /** `alias MyApp.{Module, AnotherModule}` multi-alias syntax counts as a usage. */
+    fun testFindUsagesFindsMultiAliasSite() {
+        assertEquals(1, nonDeclarationUsageCount("usages_multi_alias.ex"))
+    }
+
+    /** `MyApp.Module` appearing as a value in general code (e.g. a list literal) counts as a usage. */
+    fun testFindUsagesFindsGeneralCodeReference() {
+        assertEquals(1, nonDeclarationUsageCount("usages_general_reference.ex"))
+    }
+
+    /**
+     * A bare `Module` reference where `alias MyApp.Module` is in lexical scope counts as a usage
+     * of `MyApp.Module`. Both the alias site and the bare code reference appear in Find Usages.
+     */
+    fun testFindUsagesFindsAliasedShortNameUsageInCode() {
+        assertEquals(2, nonDeclarationUsageCount("usages_aliased_short_name.ex"))
+    }
+
+    // ── Helpers ─────────────────────────────────────────────────────────────────────────────────
+
+    /**
+     * Configures [files], resolves the search target at the caret (the same entry point the Find
+     * Usages action uses), runs the query, and returns the count of non-declaration usages.
+     */
+    private fun nonDeclarationUsageCount(vararg files: String): Int {
         myFixture.configureByFiles(*files)
-        val moduleSymbol = moduleSymbolAtCaret()
-        val allOptions = AllSearchOptions(
-            UsageOptions.createOptions(GlobalSearchScope.allScope(project)),
-            textSearch = false
-        )
-
-        return ApplicationManager.getApplication().executeOnPooledThread(Callable<Pair<Int, Int>> {
-            ReadAction.nonBlocking(Callable<Pair<Int, Int>> {
-                val usages = buildQuery(project, moduleSymbol, allOptions).findAll().filterIsInstance<PsiUsage>()
-                usages.size to usages.count { usage -> isModuleReferenceUsage(usage) }
-            }).executeSynchronously()
-        }).get()
-    }
-
-    private fun moduleSymbolAtCaret(): ModuleSymbol {
-        val element = myFixture.file.findElementAt(myFixture.caretOffset)
-        assertNotNull("Element at caret should exist", element)
-        val callChain = generateSequence(element!!) { it.parent }
-            .filterIsInstance<Call>()
-            .toList()
-        val moduleCall = callChain.firstOrNull { Module.`is`(it) }
-        assertNotNull(
-            "Expected caret to be inside a defmodule declaration; calls at caret were: ${
-                callChain.map { "${it.functionName()}:${it.text.take(40)}" }
-            }",
-            moduleCall
-        )
-
-        return ModuleSymbol.fromModular(moduleCall!!) ?: error(
-            "Expected module symbol at caret for call `${moduleCall.text}`"
-        )
-    }
-
-    @Suppress("UnstableApiUsage")
-    private fun isModuleReferenceUsage(usage: PsiUsage): Boolean {
-        if (usage.declaration) return false
-        val element = usage.file.findElementAt(usage.range.startOffset) ?: return false
-        val alias = generateSequence(element) { it.parent }
-            .filterIsInstance<QualifiableAlias>()
-            .firstOrNull()
-            ?: return false
-        val enclosingCall = generateSequence(alias as com.intellij.psi.PsiElement) { it.parent }
-            .filterIsInstance<Call>()
-            .firstOrNull()
-            ?: return false
-
-        return !Module.`is`(enclosingCall)
+        return myFixture.nonDeclarationUsageCountAtCaret(project)
     }
 }

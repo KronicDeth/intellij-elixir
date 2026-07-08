@@ -79,7 +79,7 @@ class ModuleSymbol(
             val stripped = firstArgument.stripAccessExpression()
 
             return when (stripped) {
-                is QualifiableAlias -> stripped.nameIdentifier ?: stripped
+                is QualifiableAlias -> stripped
                 is Call -> stripped.functionNameElement() ?: stripped
                 else -> stripped
             }
