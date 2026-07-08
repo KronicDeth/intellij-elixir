@@ -1,0 +1,38 @@
+package org.elixir_lang.model.psi.module_attribute
+
+import com.intellij.model.Symbol
+import com.intellij.model.psi.PsiSymbolReference
+import com.intellij.openapi.util.TextRange
+import com.intellij.psi.PsiElement
+import com.intellij.util.concurrency.annotations.RequiresReadLock
+import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
+import org.elixir_lang.psi.call.Call
+import org.elixir_lang.psi.scope.module_attribute.MultiResolve
+
+@Suppress("UnstableApiUsage")
+class ModuleAttributeReference(
+    private val call: Call,
+    private val rangeInElement: TextRange
+) : PsiSymbolReference {
+    override fun getElement(): PsiElement = call
+
+    override fun getRangeInElement(): TextRange = rangeInElement
+
+    @RequiresReadLock
+    override fun resolveReference(): Collection<Symbol> =
+        resolveSymbols(call)
+
+    companion object {
+        @RequiresReadLock
+        fun resolveSymbols(call: Call): List<ModuleAttributeSymbol> {
+            val name = call.functionName() ?: return emptyList()
+            val value = "@$name"
+            val declaration = MultiResolve.resolveResultOrderedSet(value, call)
+                .toList()
+                .firstOrNull { it.isValidResult }
+                ?.element as? AtUnqualifiedNoParenthesesCall<*>
+                ?: return emptyList()
+            return ModuleAttributeSymbol.fromDeclaration(declaration)?.let { listOf(it) } ?: emptyList()
+        }
+    }
+}

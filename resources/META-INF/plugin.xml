@@ -275,6 +275,13 @@
                                      hostLanguage="Elixir"
                                      implementationClass="org.elixir_lang.model.psi.type.TypeReferenceProvider"
                                      targetClass="org.elixir_lang.model.psi.type.TypeSymbol"/>
+        <!-- Symbol-API: module attribute declarations/references (`@name`). -->
+        <psi.declarationProvider
+                implementation="org.elixir_lang.model.psi.module_attribute.ModuleAttributeDeclarationProvider"/>
+        <psi.symbolReferenceProvider hostElementClass="org.elixir_lang.psi.call.Call"
+                                     hostLanguage="Elixir"
+                                     implementationClass="org.elixir_lang.model.psi.module_attribute.ModuleAttributeReferenceProvider"
+                                     targetClass="org.elixir_lang.model.psi.module_attribute.ModuleAttributeSymbol"/>
         <!-- Symbol-API: local variables and parameters. -->
         <psi.declarationProvider
                 implementation="org.elixir_lang.model.psi.variable.VariableSymbolDeclarationProvider"/>

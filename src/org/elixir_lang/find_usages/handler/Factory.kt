@@ -8,13 +8,16 @@ import org.elixir_lang.ElixirLanguage
 internal class Factory : com.intellij.find.findUsages.FindUsagesHandlerFactory() {
     override fun createFindUsagesHandler(element: PsiElement, forHighlightUsages: Boolean): FindUsagesHandler =
             when (element) {
-                is org.elixir_lang.psi.AtOperation -> AtNonNumericOperation(element)
                 is org.elixir_lang.beam.psi.impl.ModuleImpl<*> -> ModuleImpl(element)
                 is org.elixir_lang.psi.QualifiableAlias -> QualifiableAlias(element)
                 else -> throw IllegalArgumentException("Cannot create FindUsageHandler for ${element.javaClass.canonicalName}")
             }
 
     override fun canFindUsages(element: PsiElement): Boolean =
-            element !is org.elixir_lang.psi.call.Call &&
+            when (element) {
+                is org.elixir_lang.beam.psi.impl.ModuleImpl<*>,
+                is org.elixir_lang.psi.QualifiableAlias ->
                     LanguageFindUsages.INSTANCE.forLanguage(ElixirLanguage).canFindUsagesFor(element)
+                else -> false
+            }
 }

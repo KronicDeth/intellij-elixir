@@ -14,11 +14,12 @@ import org.elixir_lang.ElixirLexer
 import org.elixir_lang.ElixirParserDefinition
 import org.elixir_lang.beam.psi.impl.ModuleImpl
 import org.elixir_lang.errorreport.Logger
+import org.elixir_lang.model.psi.module_attribute.ModuleAttributeSymbol
+import org.elixir_lang.model.psi.variable.VariableSymbol
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.ElixirTypes.*
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.isOutermostQualifiableAlias
-import org.elixir_lang.model.psi.variable.VariableSymbol
 import org.elixir_lang.structure_view.element.Callback
 import org.elixir_lang.structure_view.element.Type as TypeElement
 
@@ -72,11 +73,11 @@ internal class Provider : com.intellij.lang.findUsages.FindUsagesProvider {
      */
     override fun canFindUsagesFor(psiElement: PsiElement): Boolean =
         when (psiElement) {
-            is AtOperation, is ModuleImpl<*> -> true
+            is ModuleImpl<*> -> true
             is Call ->
-                // Don't find usage for the `name` in `@name`.  `AtNonNumericOperation` above will instead
-                // be used for all of `@name.
+                // Symbol-API owns module attribute names (`@name`) and declarations.
                 !psiElement.isModuleAttributeNameElement() &&
+                        !ModuleAttributeSymbol.isHead(psiElement) &&
                         // Function declaration heads are owned by the Symbol model (`FunctionSymbol`,
                         // `ProtocolFunction`, `Callback`); don't offer a parallel legacy Find Usages target.
                         !CallDefinitionClause.isHead(psiElement) &&

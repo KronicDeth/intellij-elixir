@@ -9,10 +9,11 @@ import com.intellij.model.search.SearchRequest
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile
 import com.intellij.util.concurrency.annotations.RequiresReadLock
+import org.elixir_lang.model.psi.variable.VariableSymbol
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
 import org.elixir_lang.psi.CallDefinitionClause
 import org.elixir_lang.psi.call.Call
-import org.elixir_lang.model.psi.variable.VariableSymbol
+import org.elixir_lang.psi.isModuleAttributeNameElement
 import org.elixir_lang.reference.Callable
 
 /**
@@ -37,6 +38,7 @@ internal class FunctionCallReferenceProvider : PsiSymbolReferenceProvider {
         hints: PsiSymbolReferenceHints
     ): Collection<PsiSymbolReference> {
         if (element !is Call) return emptyList()
+        if (element.isModuleAttributeNameElement()) return emptyList()
         // Module attribute elements themselves (`@callback`, `@spec`, …) are not call sites.
         if (element is AtUnqualifiedNoParenthesesCall<*>) return emptyList()
         // A call nested inside a module attribute (e.g. `perform()` in `@callback perform()`,

@@ -5,37 +5,40 @@ import com.intellij.find.usages.api.Usage
 import com.intellij.find.usages.api.UsageSearchParameters
 import com.intellij.find.usages.api.UsageSearcher
 import com.intellij.model.Pointer
+import com.intellij.model.psi.PsiSymbolReferenceService
 import com.intellij.model.search.LeafOccurrence
 import com.intellij.model.search.LeafOccurrenceMapper
 import com.intellij.model.search.SearchContext
 import com.intellij.model.search.SearchService
+import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.progress.ProcessCanceledException
+import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.TextRange
-import com.intellij.psi.*
-import com.intellij.model.psi.PsiSymbolReferenceService
-import com.intellij.openapi.progress.ProgressManager
+import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiFile
+import com.intellij.psi.PsiReferenceService
+import com.intellij.psi.ResolveState
 import com.intellij.psi.search.SearchScope
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.usages.impl.rules.UsageType
+import com.intellij.util.AbstractQuery
+import com.intellij.util.Processor
 import com.intellij.util.Query
 import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.model.psi.callback.BehaviourMembership
 import org.elixir_lang.model.psi.callback.Callback
 import org.elixir_lang.model.psi.function.FunctionSymbol
 import org.elixir_lang.model.psi.module.ModuleSymbol
+import org.elixir_lang.model.psi.module_attribute.ModuleAttributeReference
+import org.elixir_lang.model.psi.module_attribute.ModuleAttributeSymbol
 import org.elixir_lang.model.psi.protocol.ProtocolFunction
 import org.elixir_lang.model.psi.type.TypeReference
 import org.elixir_lang.model.psi.type.TypeSymbol
 import org.elixir_lang.model.psi.variable.VariableSymbol
-import org.elixir_lang.psi.CallDefinitionClause
-import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
-import org.elixir_lang.psi.ElixirAtom
-import org.elixir_lang.psi.QualifiableAlias
+import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
-import org.elixir_lang.psi.call.name.Function.ALIAS
-import org.elixir_lang.psi.call.name.Function.IMPORT
-import org.elixir_lang.psi.call.name.Function.USE
+import org.elixir_lang.psi.call.name.Function.*
 import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.moduleAttributeName
 import org.elixir_lang.psi.impl.call.finalArguments
@@ -44,6 +47,7 @@ import org.elixir_lang.psi.scope.ancestorTypeSpec
 import org.elixir_lang.reference.Callable
 import org.elixir_lang.reference.MfaFunctionReference
 import org.elixir_lang.structure_view.element.CallDefinitionSpecification
+import java.util.concurrent.Callable as JCallable
 
 /**
  * Shared [UsageSearcher] for Elixir [ElixirSymbolWithUsages] targets. Registered once over
@@ -72,19 +76,36 @@ internal class ElixirSymbolUsageSearcher : UsageSearcher {
         val queries = mutableListOf<Query<out Usage>>()
         queries += ElixirDirectUsageQuery(ElixirPsiUsage.create(target.file, target.range, declaration = true))
 
-        if (target is Callback) {
-            queries += implementationQuery(parameters.project, target, parameters.searchScope)
-        } else if (target is ProtocolFunction) {
-            queries += protocolCallSiteQuery(parameters.project, target, parameters.searchScope)
-        } else if (target is FunctionSymbol) {
-            queries += functionDeclarationFamilyQuery(parameters.project, target, parameters.searchScope)
-            queries += functionCallSiteQuery(parameters.project, target, parameters.searchScope)
-        } else if (target is ModuleSymbol) {
-            queries += moduleUsageQuery(parameters.project, target, parameters.searchScope)
-        } else if (target is TypeSymbol) {
-            queries += typeUsageQuery(parameters.project, target, parameters.searchScope)
-        } else if (target is VariableSymbol) {
-            queries += variableUsageQuery(parameters.project, target, parameters.searchScope)
+        when (target) {
+            is Callback -> {
+                queries += implementationQuery(parameters.project, target, parameters.searchScope)
+            }
+
+            is ProtocolFunction -> {
+                queries += protocolCallSiteQuery(parameters.project, target, parameters.searchScope)
+            }
+
+            is FunctionSymbol -> {
+                queries += functionDeclarationFamilyQuery(parameters.project, target, parameters.searchScope)
+                queries += functionCallSiteQuery(parameters.project, target, parameters.searchScope)
+            }
+
+            is ModuleSymbol -> {
+                queries += moduleUsageQuery(parameters.project, target, parameters.searchScope)
+            }
+
+            is TypeSymbol -> {
+                queries += typeUsageQuery(parameters.project, target, parameters.searchScope)
+            }
+
+            is ModuleAttributeSymbol -> {
+                queries += moduleAttributeReadUsageQuery(parameters.project, target, parameters.searchScope)
+                queries += moduleAttributeWriteUsageQuery(target, parameters.searchScope)
+            }
+
+            is VariableSymbol -> {
+                queries += variableUsageQuery(parameters.project, target, parameters.searchScope)
+            }
         }
         return queries
     }
@@ -253,6 +274,23 @@ internal class ElixirSymbolUsageSearcher : UsageSearcher {
             .inScope(symbol.maximalSearchScope?.intersectWith(searchScope) ?: searchScope)
             .buildQuery(VariableUsageMapper(symbol.createPointer()))
 
+    private fun moduleAttributeReadUsageQuery(
+        project: Project,
+        symbol: ModuleAttributeSymbol,
+        searchScope: SearchScope
+    ): Query<out PsiUsage> =
+        SearchService.getInstance()
+            .searchWord(project, symbol.searchText)
+            .caseSensitive(true)
+            .inContexts(SearchContext.inCode())
+            .inScope(symbol.maximalSearchScope?.intersectWith(searchScope) ?: searchScope)
+            .buildQuery(ModuleAttributeReadUsageMapper(symbol.createPointer()))
+
+    private fun moduleAttributeWriteUsageQuery(
+        symbol: ModuleAttributeSymbol,
+        @Suppress("UNUSED_PARAMETER") searchScope: SearchScope
+    ): Query<out PsiUsage> = ModuleAttributeWriteUsageQuery(symbol.createPointer())
+
     /**
      * Finds every reference to this module using the word index (efficient) and then resolves
      * each occurrence via the existing PSI reference infrastructure. This handles all forms:
@@ -318,7 +356,7 @@ internal class ElixirSymbolUsageSearcher : UsageSearcher {
         private fun hasEnclosingModuleAlias(element: PsiElement, targetFqn: String): Boolean {
             val enclosingModule = generateSequence(element) { it.parent }
                 .filterIsInstance<Call>()
-                .firstOrNull { org.elixir_lang.psi.Module.`is`(it) }
+                .firstOrNull { Module.`is`(it) }
                 ?: return false
 
             return PsiTreeUtil.findChildrenOfType(enclosingModule, Call::class.java).any { call ->
@@ -566,6 +604,82 @@ internal class ElixirSymbolUsageSearcher : UsageSearcher {
             return declarationOnLeft && candidateOnRight
         }
     }
+
+    private class ModuleAttributeReadUsageMapper(
+        private val symbolPointer: Pointer<out ModuleAttributeSymbol>
+    ) : LeafOccurrenceMapper<PsiUsage> {
+        @RequiresReadLock
+        override fun mapOccurrence(occurrence: LeafOccurrence): Collection<PsiUsage> {
+            val symbol = symbolPointer.dereference() ?: return emptyList()
+            val (_, leaf, _) = occurrence
+
+            for (candidate in generateSequence(leaf) { it.parent }.takeWhile { it !is PsiFile }) {
+                ProgressManager.checkCanceled()
+                if (candidate !is Call) continue
+                if (!candidate.isModuleAttributeNameElement()) continue
+                if (candidate.functionName() != symbol.name) continue
+                val nameElement = candidate.functionNameElement() ?: continue
+                if (!PsiTreeUtil.isAncestor(nameElement, leaf, false)) continue
+                if (ModuleAttributeReference.resolveSymbols(candidate).none { it == symbol }) continue
+                return listOf(
+                    ElixirPsiUsage.create(
+                        nameElement,
+                        TextRange(0, nameElement.textLength),
+                        declaration = false,
+                        usageType = MODULE_ATTRIBUTE_READ
+                    )
+                )
+            }
+
+            return emptyList()
+        }
+    }
+
+    private class ModuleAttributeWriteUsageQuery(
+        private val symbolPointer: Pointer<out ModuleAttributeSymbol>
+    ) : AbstractQuery<PsiUsage>() {
+        override fun processResults(consumer: Processor<in PsiUsage>): Boolean =
+            ReadAction.nonBlocking(JCallable<Boolean> {
+                val symbol = symbolPointer.dereference() ?: return@JCallable true
+                val declaration = generateSequence(symbol.file.findElementAt(symbol.range.startOffset)) { it.parent }
+                    .filterIsInstance<AtUnqualifiedNoParenthesesCall<*>>()
+                    .firstOrNull { it.atIdentifier.textRange == symbol.range }
+                    ?: return@JCallable true
+                val seen = mutableSetOf<TextRange>(declaration.atIdentifier.textRange)
+
+                var sibling: PsiElement? = declaration
+                while (sibling != null) {
+                    ProgressManager.checkCanceled()
+                    val declarationCandidate = sibling as? AtUnqualifiedNoParenthesesCall<*>
+                    if (declarationCandidate != null) {
+                        ProgressManager.checkCanceled()
+                        val candidateSymbol = ModuleAttributeSymbol.fromDeclaration(declarationCandidate)
+                        if (candidateSymbol != null) {
+                            if (candidateSymbol.name != symbol.name || candidateSymbol.moduleName != symbol.moduleName) {
+                                sibling = sibling.nextSibling
+                                continue
+                            }
+                            if (!seen.add(declarationCandidate.atIdentifier.textRange)) {
+                                sibling = sibling.nextSibling
+                                continue
+                            }
+
+                            val usage = ElixirPsiUsage.create(
+                                declarationCandidate.atIdentifier,
+                                TextRange(0, declarationCandidate.atIdentifier.textLength),
+                                declaration = false,
+                                usageType = MODULE_ATTRIBUTE_WRITE
+                            )
+                            if (!consumer.process(usage)) return@JCallable false
+                        }
+                    }
+
+                    sibling = sibling.nextSibling
+                }
+
+                true
+            }).executeSynchronously()
+    }
 }
 
 private val IMPLEMENTATION = UsageType { "Implementation" }
@@ -575,6 +689,10 @@ private val CALL = UsageType { "Function call" }
 private val MODULE_REFERENCE = UsageType { "Module reference" }
 
 private val SPECIFICATION = UsageType { "Specification" }
+
+private val MODULE_ATTRIBUTE_READ = UsageType { "Module attribute read" }
+
+private val MODULE_ATTRIBUTE_WRITE = UsageType { "Module attribute accumulate or override" }
 
 private val VALUE_READ = UsageType { "Value read" }
 
@@ -588,7 +706,7 @@ private fun PsiElement.enclosingCalls(): Sequence<Call> =
 @RequiresReadLock
 private fun Call.matchesFunctionFamily(symbol: FunctionSymbol): Boolean {
     val enclosingModular = CallDefinitionClause.enclosingModularMacroCall(this) ?: return false
-    val moduleName = runCatching { org.elixir_lang.psi.Module.name(enclosingModular) }
+    val moduleName = runCatching { Module.name(enclosingModular) }
         .getOrElse { if (it is ProcessCanceledException) throw it else null }
         ?: return false
     if (moduleName != symbol.moduleName) return false
