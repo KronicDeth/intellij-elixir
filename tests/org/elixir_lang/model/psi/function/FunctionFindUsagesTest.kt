@@ -1,18 +1,11 @@
 package org.elixir_lang.model.psi.function
 
-import com.intellij.codeInsight.navigation.actions.GotoDeclarationOrUsageHandler2
 import com.intellij.find.usages.api.PsiUsage
-import com.intellij.find.usages.api.UsageOptions
-import com.intellij.find.usages.impl.AllSearchOptions
-import com.intellij.find.usages.impl.buildQuery
-import com.intellij.find.usages.impl.searchTargets
-import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.application.ReadAction
-import com.intellij.psi.search.GlobalSearchScope
 import org.elixir_lang.PlatformTestCase
+import org.elixir_lang.code_insight.assertShowUsagesChosenAtCaret
+import org.elixir_lang.code_insight.singleTargetPsiUsagesAtCaret
 import org.elixir_lang.psi.CallDefinitionClause
 import org.elixir_lang.psi.call.Call
-import java.util.concurrent.Callable
 
 /**
  * Behavior-level tests for forward Find/Show Usages: invoking Find Usages on a `def` lists the
@@ -33,6 +26,38 @@ class FunctionFindUsagesTest : PlatformTestCase() {
         assertTrue(
             "Expected the qualified call site `UsagesQualified.perform(value)` among the function's usages",
             callSiteUsageCount("usages_qualified.ex") >= 1
+        )
+    }
+
+    fun testApplyCallSiteIsFound() {
+        assertTrue(
+            "Expected the `apply(ApplyTarget, :reverse, [...])` call site among the function's usages",
+            callSiteUsageCount("usages_apply.ex") >= 1
+        )
+    }
+
+    @Suppress("UnstableApiUsage")
+    fun testApplyCallSiteIsCountedOnce() {
+        val usages = psiUsages("usages_apply.ex")
+            .filterNot { it.declaration }
+            .filter { it.file.name == "usages_apply.ex" }
+            .filter { usage ->
+                val line = usage.file.text.substring(0, usage.range.startOffset).count { it == '\n' } + 1
+                line == 7
+            }
+
+        assertEquals(
+            "Expected exactly one usage on the apply MFA atom line",
+            1,
+            usages.size
+        )
+    }
+
+    fun testErlangQualifiedCallSiteIsNotCountedYet() {
+        assertEquals(
+            "The Erlang-style qualified call site `:erlang.sqrt(value)` is still an uncovered gap",
+            0,
+            callSiteUsageCount("usages_erlang_qualified.ex")
         )
     }
 
@@ -62,12 +87,7 @@ class FunctionFindUsagesTest : PlatformTestCase() {
      */
     fun testCtrlClickOnFunctionDefChoosesShowUsages() {
         myFixture.configureByFiles("ctrl_click_def.ex")
-        assertEquals(
-            GotoDeclarationOrUsageHandler2.GTDUOutcome.SU,
-            GotoDeclarationOrUsageHandler2.testGTDUOutcomeInNonBlockingReadAction(
-                myFixture.editor, myFixture.file, myFixture.caretOffset
-            )
-        )
+        myFixture.assertShowUsagesChosenAtCaret()
     }
 
     /**
@@ -86,26 +106,8 @@ class FunctionFindUsagesTest : PlatformTestCase() {
     @Suppress("UnstableApiUsage")
     private fun psiUsages(vararg files: String): List<PsiUsage> {
         myFixture.configureByFiles(*files)
-        assertEquals(
-            GotoDeclarationOrUsageHandler2.GTDUOutcome.SU,
-            GotoDeclarationOrUsageHandler2.testGTDUOutcomeInNonBlockingReadAction(
-                myFixture.editor, myFixture.file, myFixture.caretOffset
-            )
-        )
-
-        val file = myFixture.file
-        val offset = myFixture.caretOffset
-        val allOptions = AllSearchOptions(
-            UsageOptions.createOptions(GlobalSearchScope.allScope(project)),
-            textSearch = false
-        )
-
-        return ApplicationManager.getApplication().executeOnPooledThread(Callable {
-            ReadAction.nonBlocking(Callable {
-                val target = searchTargets(file, offset).single()
-                buildQuery(project, target, allOptions).findAll().filterIsInstance<PsiUsage>()
-            }).executeSynchronously()
-        }).get()
+        myFixture.assertShowUsagesChosenAtCaret()
+        return myFixture.singleTargetPsiUsagesAtCaret(project)
     }
 
     @Suppress("UnstableApiUsage")

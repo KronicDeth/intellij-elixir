@@ -90,4 +90,14 @@ class FunctionGotoDeclarationTest : PlatformTestCase() {
             presentationTexts.size
         )
     }
+
+    fun testCtrlClickOnErlangQualifiedCallDoesNothingYet() {
+        myFixture.configureByFiles("goto_declaration_erlang_qualified_call.ex")
+        assertEquals(
+            null,
+            GotoDeclarationOrUsageHandler2.testGTDUOutcomeInNonBlockingReadAction(
+                myFixture.editor, myFixture.file, myFixture.caretOffset
+            )
+        )
+    }
 }
