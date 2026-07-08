@@ -2,6 +2,7 @@ package org.elixir_lang.psi.impl
 
 import com.intellij.extapi.psi.ASTWrapperPsiElement
 import com.intellij.lang.ASTNode
+import com.intellij.model.psi.PsiExternalReferenceHost
 import com.intellij.psi.HintedReferenceHost
 import com.intellij.psi.PsiReference
 import com.intellij.psi.PsiReferenceService
@@ -12,13 +13,14 @@ import com.intellij.psi.impl.source.resolve.reference.ReferenceProvidersRegistry
  *
  * Implements [HintedReferenceHost] so that `PsiReferenceService.getReferences()` queries
  * both intrinsic references (from `getReference()`) and contributed references
- * (from `PsiReferenceContributor` registrations, e.g. `MfaTupleReferenceContributor`).
+ * (from `PsiSymbolReferenceProvider` registrations, e.g. `AtomReferenceProvider`).
  *
  * Without this, the platform's `PsiReferenceServiceImpl.doGetReferences()` only calls
  * `element.getReferences()` (which returns only intrinsic references) for elements that
  * do not implement `ContributedReferenceHost` or `HintedReferenceHost`.
  */
-abstract class ElixirAtomMixin(node: ASTNode) : ASTWrapperPsiElement(node), HintedReferenceHost {
+@Suppress("UnstableApiUsage")
+abstract class ElixirAtomMixin(node: ASTNode) : ASTWrapperPsiElement(node), HintedReferenceHost, PsiExternalReferenceHost {
     override fun getReferences(hints: PsiReferenceService.Hints): Array<PsiReference> {
         val intrinsic = reference
         val contributed = ReferenceProvidersRegistry.getReferencesFromProviders(this, hints)

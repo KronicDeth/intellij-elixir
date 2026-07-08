@@ -1,15 +1,19 @@
 package org.elixir_lang.psi.impl
 
-import com.intellij.psi.PsiElementResolveResult
-import com.intellij.psi.PsiNamedElement
-import com.intellij.psi.PsiPolyVariantReference
-import com.intellij.psi.PsiReference
+import com.intellij.psi.*
 import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager.getCachedValue
-import org.elixir_lang.psi.ElixirAtom
+import org.elixir_lang.model.psi.atom.AtomReference
+import org.elixir_lang.model.psi.atom.GeneralAtomReference
+import org.elixir_lang.model.psi.atom.contentTextRange
+import org.elixir_lang.model.psi.atom.mfaReferenceContext
+import org.elixir_lang.psi.*
 
 
-private fun ElixirAtom.computeReference(): PsiReference = org.elixir_lang.reference.Atom(this)
+private fun ElixirAtom.computeReference(): PsiReference =
+    mfaReferenceContext()?.let { context ->
+        AtomReference(this, context.moduleElement, contentTextRange(this), context.arity)
+    } ?: GeneralAtomReference(this)
 
 fun getReference(atom: ElixirAtom): PsiReference? =
         getCachedValue(atom) { CachedValueProvider.Result.create(atom.computeReference(), atom) }

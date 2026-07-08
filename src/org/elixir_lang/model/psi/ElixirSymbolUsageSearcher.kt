@@ -17,7 +17,6 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
-import com.intellij.psi.PsiReferenceService
 import com.intellij.psi.ResolveState
 import com.intellij.psi.search.SearchScope
 import com.intellij.psi.util.PsiTreeUtil
@@ -26,6 +25,8 @@ import com.intellij.util.AbstractQuery
 import com.intellij.util.Processor
 import com.intellij.util.Query
 import com.intellij.util.concurrency.annotations.RequiresReadLock
+import org.elixir_lang.model.psi.atom.AtomReference
+import org.elixir_lang.model.psi.atom.AtomSymbol
 import org.elixir_lang.model.psi.callback.BehaviourMembership
 import org.elixir_lang.model.psi.callback.Callback
 import org.elixir_lang.model.psi.function.FunctionSymbol
@@ -45,7 +46,6 @@ import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.psi.scope.ancestorTypeSpec
 import org.elixir_lang.reference.Callable
-import org.elixir_lang.reference.MfaFunctionReference
 import org.elixir_lang.structure_view.element.CallDefinitionSpecification
 import java.util.concurrent.Callable as JCallable
 
@@ -88,6 +88,12 @@ internal class ElixirSymbolUsageSearcher : UsageSearcher {
             is FunctionSymbol -> {
                 queries += functionDeclarationFamilyQuery(parameters.project, target, parameters.searchScope)
                 queries += functionCallSiteQuery(parameters.project, target, parameters.searchScope)
+            }
+
+            is AtomSymbol -> {
+                queries += atomUsageQuery(parameters.project, target.name, parameters.searchScope) { atomSymbol ->
+                    atomSymbol == target
+                }
             }
 
             is ModuleSymbol -> {
@@ -249,6 +255,19 @@ internal class ElixirSymbolUsageSearcher : UsageSearcher {
                 .inContexts(SearchContext.inCode())
                 .inScope(searchScope)
                 .buildQuery(FunctionCallSiteMapper(symbol.createPointer()))
+
+    private fun atomUsageQuery(
+        project: Project,
+        atomText: String,
+        searchScope: SearchScope,
+        atomMatches: (AtomSymbol) -> Boolean
+    ): Query<out PsiUsage> =
+            SearchService.getInstance()
+                .searchWord(project, atomText)
+                .caseSensitive(true)
+                .inContexts(SearchContext.inCode())
+                .inScope(searchScope)
+                .buildQuery(AtomUsageMapper(atomMatches))
 
     private fun typeUsageQuery(
         project: Project,
@@ -440,7 +459,7 @@ internal class ElixirSymbolUsageSearcher : UsageSearcher {
             val symbol = symbolPointer.dereference() ?: return emptyList()
             val (_, leaf, _) = occurrence
 
-            mfaTupleUsage(leaf, symbol)?.let { return listOf(it) }
+            atomUsage(leaf, symbol)?.let { return listOf(it) }
 
             val call = leaf.enclosingCalls().firstOrNull() ?: return emptyList()
             // Skip definition heads/clauses - they are declarations, not call sites.
@@ -496,19 +515,22 @@ internal class ElixirSymbolUsageSearcher : UsageSearcher {
         }
 
         @RequiresReadLock
-        private fun mfaTupleUsage(leaf: PsiElement, symbol: FunctionSymbol): PsiUsage? {
+        private fun atomUsage(leaf: PsiElement, symbol: FunctionSymbol): PsiUsage? {
             val atom = PsiTreeUtil.getParentOfType(leaf, ElixirAtom::class.java, false) ?: return null
-            val references = PsiReferenceService.getService()
-                .getReferences(atom, PsiReferenceService.Hints.NO_HINTS)
-                .filterIsInstance<MfaFunctionReference>()
+            val references = PsiSymbolReferenceService.getService()
+                .getReferences(atom)
+                .filterIsInstance<AtomReference>()
             if (references.isEmpty()) return null
 
             val matches = references.any { reference ->
-                reference.multiResolve(false)
-                    .filter { it.isValidResult }
-                    .mapNotNull { it.element as? Call }
-                    .flatMap { FunctionSymbol.fromClause(it) }
-                    .any { it == symbol }
+                reference.resolveReference()
+                    .filterIsInstance<AtomSymbol>()
+                    .any {
+                        it.moduleName == symbol.moduleName &&
+                            it.name == symbol.name &&
+                            it.arity == symbol.arity &&
+                            it.macro == symbol.macro
+                    }
             }
             if (!matches) return null
 
@@ -517,6 +539,36 @@ internal class ElixirSymbolUsageSearcher : UsageSearcher {
                 TextRange(0, leaf.textLength),
                 declaration = false,
                 usageType = CALL
+            )
+        }
+    }
+
+    private class AtomUsageMapper(
+        private val atomMatches: (AtomSymbol) -> Boolean
+    ) : LeafOccurrenceMapper<PsiUsage> {
+        @RequiresReadLock
+        override fun mapOccurrence(occurrence: LeafOccurrence): Collection<PsiUsage> {
+            val (_, leaf, _) = occurrence
+            val atom = PsiTreeUtil.getParentOfType(leaf, ElixirAtom::class.java, false) ?: return emptyList()
+            val references = PsiSymbolReferenceService.getService()
+                .getReferences(atom)
+                .filterIsInstance<AtomReference>()
+            if (references.isEmpty()) return emptyList()
+
+            val matches = references.any { reference ->
+                reference.resolveReference()
+                    .filterIsInstance<AtomSymbol>()
+                    .any(atomMatches)
+            }
+            if (!matches) return emptyList()
+
+            return listOf(
+                ElixirPsiUsage.create(
+                    leaf,
+                    TextRange(0, leaf.textLength),
+                    declaration = false,
+                    usageType = CALL
+                )
             )
         }
     }
