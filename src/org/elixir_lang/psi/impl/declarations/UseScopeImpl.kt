@@ -9,6 +9,7 @@ import com.intellij.psi.search.SearchScope
 import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.*
+import org.elixir_lang.psi.ModuleAttribute.isNonReferencing
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function.*
 import org.elixir_lang.psi.call.name.Module.KERNEL
@@ -21,7 +22,6 @@ import org.elixir_lang.reference.Callable.Companion.isParameter
 import org.elixir_lang.reference.Callable.Companion.isParameterWithDefault
 import org.elixir_lang.reference.Callable.Companion.isVariable
 import org.elixir_lang.reference.Callable.Companion.variableUseScope
-import org.elixir_lang.reference.ModuleAttribute.Companion.isNonReferencing
 import org.elixir_lang.structure_view.element.Delegation
 import org.jetbrains.annotations.Contract
 

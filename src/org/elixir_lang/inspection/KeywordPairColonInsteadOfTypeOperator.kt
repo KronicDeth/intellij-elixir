@@ -6,12 +6,12 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor
 import org.elixir_lang.local_quick_fix.ConvertKeywordPairToTypeOperation
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
+import org.elixir_lang.psi.ModuleAttribute.isTypeName
 import org.elixir_lang.psi.QuotableKeywordList
 import org.elixir_lang.psi.impl.identifierName
-import org.elixir_lang.reference.ModuleAttribute.Companion.isTypeName
 import org.jetbrains.annotations.Nls
 
-class KeywordPairColonInsteadOfTypeOperator : LocalInspectionTool() {
+internal class KeywordPairColonInsteadOfTypeOperator : LocalInspectionTool() {
     override fun checkFile(file: PsiFile,
                            manager: InspectionManager,
                            isOnTheFly: Boolean): Array<ProblemDescriptor> {

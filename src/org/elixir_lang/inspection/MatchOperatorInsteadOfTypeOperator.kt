@@ -7,14 +7,14 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor
 import org.elixir_lang.local_quick_fix.ConvertMatchToTypeOperation
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
+import org.elixir_lang.psi.ModuleAttribute.isTypeName
 import org.elixir_lang.psi.impl.identifierName
 import org.elixir_lang.psi.impl.operatorTokenNode
 import org.elixir_lang.psi.operation.Infix
 import org.elixir_lang.psi.operation.Match
-import org.elixir_lang.reference.ModuleAttribute.Companion.isTypeName
 import org.jetbrains.annotations.Nls
 
-class MatchOperatorInsteadOfTypeOperator : LocalInspectionTool() {
+internal class MatchOperatorInsteadOfTypeOperator : LocalInspectionTool() {
     override fun checkFile(file: PsiFile,
                            manager: InspectionManager,
                            isOnTheFly: Boolean): Array<ProblemDescriptor> {

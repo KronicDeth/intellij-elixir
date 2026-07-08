@@ -10,13 +10,13 @@ import org.elixir_lang.ElixirSyntaxHighlighter
 import org.elixir_lang.ElixirSyntaxHighlighter.Companion.SIGIL
 import org.elixir_lang.ElixirSyntaxHighlighter.Companion.SIGIL_BY_NAME
 import org.elixir_lang.psi.*
+import org.elixir_lang.psi.ModuleAttribute.isDocumentationName
 import org.elixir_lang.psi.impl.identifierName
-import org.elixir_lang.reference.ModuleAttribute.Companion.isDocumentationName
 
 /**
  * Annotates quotes and sigils
  */
-class Textual : Annotator, DumbAware {
+internal class Textual : Annotator, DumbAware {
     /**
      * Annotates the specified PSI element.
      * It is guaranteed to be executed in non-reentrant fashion.

@@ -1060,7 +1060,7 @@ public class ElixirPsiImplUtil {
 
     @Nullable
     public static PsiReference getReference(@NotNull AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
-        return AtUnqualifiedNoParenthesesCallImplKt.cachedReference(atUnqualifiedNoParenthesesCall);
+        return null;
     }
 
     @Nullable
@@ -1096,7 +1096,7 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @Nullable
     public static PsiReference getReference(@NotNull final ElixirAtIdentifier atIdentifier) {
-        return ElixirAtIdentifierImplKt.cachedReference(atIdentifier);
+        return null;
     }
 
     @Nullable

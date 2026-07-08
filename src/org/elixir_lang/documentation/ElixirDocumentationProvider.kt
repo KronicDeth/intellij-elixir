@@ -5,6 +5,7 @@ import com.ericsson.otp.erlang.OtpErlangObject
 import com.intellij.lang.documentation.DocumentationMarkup
 import com.intellij.lang.documentation.DocumentationProvider
 import com.intellij.lang.parser.GeneratedParserUtilBase.DummyBlock
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.TextRange
@@ -16,16 +17,15 @@ import org.elixir_lang.beam.chunk.beam_documentation.docs.documented.MarkdownByL
 import org.elixir_lang.beam.chunk.beam_documentation.docs.documented.None
 import org.elixir_lang.beam.psi.BeamFileImpl
 import org.elixir_lang.beam.psi.impl.CallDefinitionImpl
-import com.intellij.openapi.diagnostic.logger
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.CallDefinitionClause.enclosingModularMacroCall
+import org.elixir_lang.psi.ModuleAttribute.isDocumentationName
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.call.macroChildCallSequence
 import org.elixir_lang.psi.impl.childExpressions
 import org.elixir_lang.psi.impl.identifierName
 import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.psi.stub.type.call.Stub.isModular
-import org.elixir_lang.reference.ModuleAttribute.Companion.isDocumentationName
 import org.elixir_lang.reference.Resolver
 import org.elixir_lang.structure_view.element.Callback
 import org.intellij.markdown.html.HtmlGenerator
@@ -37,7 +37,7 @@ import com.intellij.psi.DummyBlockType.DummyBlock as ExperimentalPsiDummyBlock
 
 private val LOG = logger<ElixirDocumentationProvider>()
 
-class ElixirDocumentationProvider : DocumentationProvider {
+internal class ElixirDocumentationProvider : DocumentationProvider {
     override fun generateDoc(element: PsiElement, originalElement: PsiElement?): String? =
         fetchDocs(element)?.let { formatDocs(element.project, it) }
 
