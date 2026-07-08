@@ -6,6 +6,7 @@ import com.intellij.psi.PsiReference
 import com.intellij.psi.ResolveResult
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.ThreeState
+import org.elixir_lang.model.psi.variable.VariableSymbol
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.operation.Multiplication
@@ -18,7 +19,7 @@ import org.elixir_lang.structure_view.element.Type as TypeElement
 
 internal class TargetElementEvaluator : TargetElementEvaluatorEx2() {
     override fun isAcceptableNamedParent(parent: PsiElement): Boolean = when {
-        Callback.isHead(parent) || TypeElement.isHead(parent) || (CallDefinitionClause.isHead(parent) && !Protocol.isHead(parent)) -> {
+        Callback.isHead(parent) || TypeElement.isHead(parent) || VariableSymbol.isHead(parent) || (CallDefinitionClause.isHead(parent) && !Protocol.isHead(parent)) -> {
             // `@callback`/`@macrocallback` names and regular (non-protocol) call-definition clause heads are
             // owned by the Symbol model. Don't expose them as a legacy named element, which the platform
             // would otherwise offer as a redundant Find Usages / Go To target beside the symbol's
@@ -68,7 +69,7 @@ internal class TargetElementEvaluator : TargetElementEvaluatorEx2() {
         referenceOrReferencedElement: PsiElement?
     ): ThreeState =
             when {
-                referenceOrReferencedElement != null && (Callback.isHead(referenceOrReferencedElement) || TypeElement.isHead(referenceOrReferencedElement) || CallDefinitionClause.isHead(
+                referenceOrReferencedElement != null && (Callback.isHead(referenceOrReferencedElement) || TypeElement.isHead(referenceOrReferencedElement) || VariableSymbol.isHead(referenceOrReferencedElement) || CallDefinitionClause.isHead(
                     referenceOrReferencedElement
                 )) -> {
                     // Names in call-definition clause heads (including `@callback`/`@macrocallback` and protocol
@@ -119,7 +120,7 @@ internal class TargetElementEvaluator : TargetElementEvaluatorEx2() {
                     } else {
                         val resolved = reference.resolve()
                         when {
-                            resolved != null && (Callback.isHead(resolved) || TypeElement.isHead(resolved) || CallDefinitionClause.isHead(resolved)) -> {
+                            resolved != null && (Callback.isHead(resolved) || TypeElement.isHead(resolved) || VariableSymbol.isHead(resolved) || CallDefinitionClause.isHead(resolved)) -> {
                                 // Call-definition clause heads (including `@callback`/`@macrocallback` and protocol
                                 // function declarations) are owned by the Symbol model; return empty list to prevent
                                 // redundant legacy target beside the symbol's target - avoids the ambiguity popup.

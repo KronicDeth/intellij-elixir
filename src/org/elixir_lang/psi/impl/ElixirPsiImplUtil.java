@@ -1084,7 +1084,8 @@ public class ElixirPsiImplUtil {
 
     @Nullable
     public static PsiReference getReference(@NotNull ElixirIdentifier identifier) {
-        return ElixirIdentifierImplKt.getReference(identifier);
+        // migrated to Symbol API
+        return null;
     }
 
     @Nullable

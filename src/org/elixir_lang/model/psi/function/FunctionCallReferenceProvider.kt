@@ -12,6 +12,7 @@ import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
 import org.elixir_lang.psi.CallDefinitionClause
 import org.elixir_lang.psi.call.Call
+import org.elixir_lang.model.psi.variable.VariableSymbol
 import org.elixir_lang.reference.Callable
 
 /**
@@ -50,6 +51,8 @@ internal class FunctionCallReferenceProvider : PsiSymbolReferenceProvider {
         // The head call inside a definition clause (e.g. `foo(args)` in `def foo(args)`) is
         // part of the declaration anchor - a reference here would shadow the FunctionSymbol.
         if (CallDefinitionClause.isHead(element)) return emptyList()
+        // Local variable/parameter identifiers are owned by VariableSymbol.
+        if (VariableSymbol.classify(element) != null) return emptyList()
         val nameElement = element.functionNameElement() ?: return emptyList()
         val rangeInElement = nameElement.textRange.shiftLeft(element.textRange.startOffset)
         return listOf(FunctionCallReference(element, rangeInElement))

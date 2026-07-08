@@ -14,6 +14,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.*
 import com.intellij.model.psi.PsiSymbolReferenceService
+import com.intellij.openapi.progress.ProgressManager
 import com.intellij.psi.search.SearchScope
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.usages.impl.rules.UsageType
@@ -26,6 +27,7 @@ import org.elixir_lang.model.psi.module.ModuleSymbol
 import org.elixir_lang.model.psi.protocol.ProtocolFunction
 import org.elixir_lang.model.psi.type.TypeReference
 import org.elixir_lang.model.psi.type.TypeSymbol
+import org.elixir_lang.model.psi.variable.VariableSymbol
 import org.elixir_lang.psi.CallDefinitionClause
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
 import org.elixir_lang.psi.ElixirAtom
@@ -81,6 +83,8 @@ internal class ElixirSymbolUsageSearcher : UsageSearcher {
             queries += moduleUsageQuery(parameters.project, target, parameters.searchScope)
         } else if (target is TypeSymbol) {
             queries += typeUsageQuery(parameters.project, target, parameters.searchScope)
+        } else if (target is VariableSymbol) {
+            queries += variableUsageQuery(parameters.project, target, parameters.searchScope)
         }
         return queries
     }
@@ -236,6 +240,18 @@ internal class ElixirSymbolUsageSearcher : UsageSearcher {
             .inContexts(SearchContext.inCode())
             .inScope(searchScope)
             .buildQuery(TypeUsageMapper(symbol.createPointer()))
+
+    private fun variableUsageQuery(
+        project: Project,
+        symbol: VariableSymbol,
+        searchScope: SearchScope
+    ): Query<out PsiUsage> =
+        SearchService.getInstance()
+            .searchWord(project, symbol.searchText)
+            .caseSensitive(true)
+            .inContexts(SearchContext.inCode())
+            .inScope(symbol.maximalSearchScope?.intersectWith(searchScope) ?: searchScope)
+            .buildQuery(VariableUsageMapper(symbol.createPointer()))
 
     /**
      * Finds every reference to this module using the word index (efficient) and then resolves
@@ -496,6 +512,60 @@ internal class ElixirSymbolUsageSearcher : UsageSearcher {
             )
         }
     }
+
+    private class VariableUsageMapper(
+        private val symbolPointer: Pointer<out VariableSymbol>
+    ) : LeafOccurrenceMapper<PsiUsage> {
+        @RequiresReadLock
+        override fun mapOccurrence(occurrence: LeafOccurrence): Collection<PsiUsage> {
+            val symbol = symbolPointer.dereference() ?: return emptyList()
+            val (_, leaf, _) = occurrence
+            for (candidate in generateSequence(leaf) { it.parent }.takeWhile { it !is PsiFile }) {
+                ProgressManager.checkCanceled()
+                if (VariableSymbol.variableName(candidate) != symbol.name) continue
+                val nameElement = VariableSymbol.nameIdentifierElement(candidate) ?: continue
+                if (!PsiTreeUtil.isAncestor(nameElement, leaf, false)) continue
+                if (nameElement.containingFile.virtualFile == symbol.file.virtualFile &&
+                    nameElement.textRange == symbol.range
+                ) {
+                    continue
+                }
+                if (isSameMatchRightOperandReadOfDeclaration(symbol, candidate)) continue
+                return listOf(
+                    ElixirPsiUsage.create(
+                        nameElement,
+                        TextRange(0, nameElement.textLength),
+                        declaration = false,
+                        usageType = if (VariableSymbol.isDeclaration(candidate)) VALUE_WRITE else VALUE_READ
+                    )
+                )
+            }
+            return emptyList()
+        }
+
+        @RequiresReadLock
+        private fun isSameMatchRightOperandReadOfDeclaration(symbol: VariableSymbol, candidate: PsiElement): Boolean {
+            val declarationElement = generateSequence(symbol.file.findElementAt(symbol.range.startOffset)) { it.parent }
+                .firstOrNull { element ->
+                    VariableSymbol.nameIdentifierElement(element)?.textRange == symbol.range
+                } ?: return false
+            val declarationMatch = generateSequence(declarationElement) { it.parent }
+                .filterIsInstance<org.elixir_lang.psi.operation.Match>()
+                .firstOrNull()
+                ?: return false
+            val candidateInSameMatch = PsiTreeUtil.isAncestor(declarationMatch, candidate, false)
+            if (!candidateInSameMatch) return false
+
+            val declarationOnLeft = declarationMatch.leftOperand()?.let { left ->
+                PsiTreeUtil.isAncestor(left, declarationElement, false)
+            } == true
+            val candidateOnRight = declarationMatch.rightOperand()?.let { right ->
+                PsiTreeUtil.isAncestor(right, candidate, false)
+            } == true
+
+            return declarationOnLeft && candidateOnRight
+        }
+    }
 }
 
 private val IMPLEMENTATION = UsageType { "Implementation" }
@@ -505,6 +575,10 @@ private val CALL = UsageType { "Function call" }
 private val MODULE_REFERENCE = UsageType { "Module reference" }
 
 private val SPECIFICATION = UsageType { "Specification" }
+
+private val VALUE_READ = UsageType { "Value read" }
+
+private val VALUE_WRITE = UsageType { "Value write" }
 
 private const val USING = "__using__"
 
