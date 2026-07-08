@@ -19,6 +19,7 @@ import org.elixir_lang.psi.ElixirTypes.*
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.isOutermostQualifiableAlias
 import org.elixir_lang.structure_view.element.Callback
+import org.elixir_lang.structure_view.element.Type as TypeElement
 
 private val IDENTIFIER_TOKEN_SET = TokenSet.create(
     ALIAS_TOKEN,
@@ -78,6 +79,7 @@ internal class Provider : com.intellij.lang.findUsages.FindUsagesProvider {
                         // Function declaration heads are owned by the Symbol model (`FunctionSymbol`,
                         // `ProtocolFunction`, `Callback`); don't offer a parallel legacy Find Usages target.
                         !CallDefinitionClause.isHead(psiElement) &&
+                        !TypeElement.isHead(psiElement) &&
                         // `@callback`/`@macrocallback` names are owned by the Symbol model (the `Callback`
                         // symbol + `ElixirSymbolUsageSearcher`); don't also offer a redundant legacy target.
                         !Callback.isHead(psiElement) &&

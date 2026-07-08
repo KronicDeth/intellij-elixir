@@ -5,6 +5,7 @@ import com.intellij.navigation.ItemPresentation
 import com.intellij.psi.ElementDescriptionLocation
 import com.intellij.psi.PsiElement
 import com.intellij.usageView.UsageViewTypeLocation
+import com.intellij.psi.util.PsiTreeUtil
 import org.elixir_lang.call.Visibility
 import org.elixir_lang.navigation.item_presentation.Parent
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
@@ -50,7 +51,7 @@ class Type(
      * @return [Visibility.PUBLIC] for `@type` and `@opaque`; [Visibility.PRIVATE] for
      * `@typep`
      */
-    override fun visibility(): Visibility? = visibility
+    override fun visibility(): Visibility = visibility
 
     companion object {
         fun elementDescription(location: ElementDescriptionLocation): String? =
@@ -79,6 +80,16 @@ class Type(
             moduleAttributeName == "@opaque" || moduleAttributeName == "@type" || moduleAttributeName == "@typep"
         } else {
             false
+        }
+
+        fun isHead(element: PsiElement): Boolean {
+            val attribute = PsiTreeUtil.getParentOfType(element, AtUnqualifiedNoParenthesesCall::class.java, false)
+                ?: return false
+            if (!`is`(attribute)) return false
+            val spec = specification(attribute) ?: return false
+            val head = specificationType(spec) ?: return false
+
+            return PsiTreeUtil.isAncestor(head, element, false) || PsiTreeUtil.isAncestor(element, head, false)
         }
 
         private fun isOpaque(moduleAttributeName: String): Boolean = moduleAttributeName == "@opaque"

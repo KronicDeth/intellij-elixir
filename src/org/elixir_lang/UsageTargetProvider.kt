@@ -13,6 +13,7 @@ import org.elixir_lang.psi.ElixirFile
 import org.elixir_lang.psi.QualifiableAlias
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.structure_view.element.Callback
+import org.elixir_lang.structure_view.element.Type as TypeElement
 
 internal class UsageTargetProvider : com.intellij.usages.UsageTargetProvider {
     override fun getTargets(editor: Editor, file: PsiFile): Array<UsageTarget>? = if (file is ElixirFile) {
@@ -30,7 +31,7 @@ internal class UsageTargetProvider : com.intellij.usages.UsageTargetProvider {
     override fun getTargets(psiElement: PsiElement): Array<UsageTarget>? =
             when {
                 psiElement.containingFile !is ElixirFile -> null
-                Callback.isHead(psiElement) || CallDefinitionClause.isHead(psiElement) -> {
+                Callback.isHead(psiElement) || TypeElement.isHead(psiElement) || CallDefinitionClause.isHead(psiElement) -> {
                     // Call-definition clause heads (including `@callback`/`@macrocallback` and protocol function
                     // declarations) are owned by the Symbol model; don't contribute a redundant legacy usage target.
                     null

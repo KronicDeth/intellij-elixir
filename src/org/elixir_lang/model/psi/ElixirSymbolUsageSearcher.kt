@@ -13,6 +13,7 @@ import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.*
+import com.intellij.model.psi.PsiSymbolReferenceService
 import com.intellij.psi.search.SearchScope
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.usages.impl.rules.UsageType
@@ -23,7 +24,10 @@ import org.elixir_lang.model.psi.callback.Callback
 import org.elixir_lang.model.psi.function.FunctionSymbol
 import org.elixir_lang.model.psi.module.ModuleSymbol
 import org.elixir_lang.model.psi.protocol.ProtocolFunction
+import org.elixir_lang.model.psi.type.TypeReference
+import org.elixir_lang.model.psi.type.TypeSymbol
 import org.elixir_lang.psi.CallDefinitionClause
+import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
 import org.elixir_lang.psi.ElixirAtom
 import org.elixir_lang.psi.QualifiableAlias
 import org.elixir_lang.psi.call.Call
@@ -31,10 +35,13 @@ import org.elixir_lang.psi.call.name.Function.ALIAS
 import org.elixir_lang.psi.call.name.Function.IMPORT
 import org.elixir_lang.psi.call.name.Function.USE
 import org.elixir_lang.psi.call.name.Module.KERNEL
+import org.elixir_lang.psi.impl.ElixirPsiImplUtil.moduleAttributeName
 import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.stripAccessExpression
+import org.elixir_lang.psi.scope.ancestorTypeSpec
 import org.elixir_lang.reference.Callable
 import org.elixir_lang.reference.MfaFunctionReference
+import org.elixir_lang.structure_view.element.CallDefinitionSpecification
 
 /**
  * Shared [UsageSearcher] for Elixir [ElixirSymbolWithUsages] targets. Registered once over
@@ -72,6 +79,8 @@ internal class ElixirSymbolUsageSearcher : UsageSearcher {
             queries += functionCallSiteQuery(parameters.project, target, parameters.searchScope)
         } else if (target is ModuleSymbol) {
             queries += moduleUsageQuery(parameters.project, target, parameters.searchScope)
+        } else if (target is TypeSymbol) {
+            queries += typeUsageQuery(parameters.project, target, parameters.searchScope)
         }
         return queries
     }
@@ -215,6 +224,18 @@ internal class ElixirSymbolUsageSearcher : UsageSearcher {
                 .inContexts(SearchContext.inCode())
                 .inScope(searchScope)
                 .buildQuery(FunctionCallSiteMapper(symbol.createPointer()))
+
+    private fun typeUsageQuery(
+        project: Project,
+        symbol: TypeSymbol,
+        searchScope: SearchScope
+    ): Query<out PsiUsage> =
+        SearchService.getInstance()
+            .searchWord(project, symbol.searchText)
+            .caseSensitive(true)
+            .inContexts(SearchContext.inCode())
+            .inScope(searchScope)
+            .buildQuery(TypeUsageMapper(symbol.createPointer()))
 
     /**
      * Finds every reference to this module using the word index (efficient) and then resolves
@@ -374,6 +395,8 @@ internal class ElixirSymbolUsageSearcher : UsageSearcher {
             val nameElement = call.functionNameElement() ?: return emptyList()
             if (!PsiTreeUtil.isAncestor(nameElement, leaf, false)) return emptyList()
 
+            specUsage(call, symbol)?.let { return listOf(it) }
+
             // Fast path: qualified call (`ModuleName.functionName/arity`).
             val matched = if (call.isCalling(symbol.moduleName, symbol.name, symbol.arity)) {
                 true
@@ -396,6 +419,25 @@ internal class ElixirSymbolUsageSearcher : UsageSearcher {
                     declaration = false,
                     usageType = CALL
                 )
+            )
+        }
+
+        @RequiresReadLock
+        private fun specUsage(call: Call, symbol: FunctionSymbol): PsiUsage? {
+            call.enclosingSpecAttributeIfHead() ?: return null
+            val matches = PsiSymbolReferenceService.getService()
+                .getReferences(call)
+                .flatMap { it.resolveReference() }
+                .filterIsInstance<FunctionSymbol>()
+                .any { it == symbol }
+            if (!matches) return null
+
+            val nameElement = call.functionNameElement() ?: return null
+            return ElixirPsiUsage.create(
+                nameElement,
+                TextRange(0, nameElement.textLength),
+                declaration = false,
+                usageType = SPECIFICATION
             )
         }
 
@@ -424,6 +466,36 @@ internal class ElixirSymbolUsageSearcher : UsageSearcher {
             )
         }
     }
+
+    private class TypeUsageMapper(
+        private val symbolPointer: Pointer<out TypeSymbol>
+    ) : LeafOccurrenceMapper<PsiUsage> {
+        @RequiresReadLock
+        override fun mapOccurrence(occurrence: LeafOccurrence): Collection<PsiUsage> {
+            val symbol = symbolPointer.dereference() ?: return emptyList()
+            val (_, leaf, _) = occurrence
+            val call = leaf.enclosingCalls().firstOrNull() ?: return emptyList()
+            // Type usages are only valid inside type/spec syntax, never in executable code
+            // (for example, variable bindings in function heads).
+            if (call.ancestorTypeSpec() == null) return emptyList()
+            val nameElement = call.functionNameElement() ?: return emptyList()
+            if (!PsiTreeUtil.isAncestor(nameElement, leaf, false)) return emptyList()
+            if (call.enclosingTypeDeclarationIfHead() != null) return emptyList()
+            if (call.enclosingSpecAttributeIfHead() != null) return emptyList()
+
+            val resolved = TypeReference.resolveSymbols(call)
+            if (resolved.none { it == symbol }) return emptyList()
+
+            return listOf(
+                ElixirPsiUsage.create(
+                    nameElement,
+                    TextRange(0, nameElement.textLength),
+                    declaration = false,
+                    usageType = SPECIFICATION
+                )
+            )
+        }
+    }
 }
 
 private val IMPLEMENTATION = UsageType { "Implementation" }
@@ -431,6 +503,8 @@ private val IMPLEMENTATION = UsageType { "Implementation" }
 private val CALL = UsageType { "Function call" }
 
 private val MODULE_REFERENCE = UsageType { "Module reference" }
+
+private val SPECIFICATION = UsageType { "Specification" }
 
 private const val USING = "__using__"
 
@@ -459,3 +533,26 @@ private fun Call.enclosingUsingDefiner(): Call? =
             CallDefinitionClause.`is`(call) &&
                     CallDefinitionClause.nameArityInterval(call, ResolveState.initial())?.name == USING
         }
+
+@RequiresReadLock
+private fun Call.enclosingSpecAttributeIfHead(): AtUnqualifiedNoParenthesesCall<*>? {
+    val moduleAttribute = generateSequence(parent) { it.parent }
+        .filterIsInstance<AtUnqualifiedNoParenthesesCall<*>>()
+        .firstOrNull()
+        ?: return null
+    if (moduleAttributeName(moduleAttribute) != "@spec") return null
+    val specification = CallDefinitionSpecification.specification(moduleAttribute) ?: return null
+    val specHead = CallDefinitionSpecification.specificationType(specification) ?: return null
+    return if (specHead.isEquivalentTo(this)) moduleAttribute else null
+}
+
+@RequiresReadLock
+private fun Call.enclosingTypeDeclarationIfHead(): AtUnqualifiedNoParenthesesCall<*>? {
+    val moduleAttribute = generateSequence(parent) { it.parent }
+        .filterIsInstance<AtUnqualifiedNoParenthesesCall<*>>()
+        .firstOrNull { org.elixir_lang.structure_view.element.Type.`is`(it) }
+        ?: return null
+    val specification = CallDefinitionSpecification.specification(moduleAttribute) ?: return null
+    val typeHead = CallDefinitionSpecification.specificationType(specification) ?: return null
+    return if (typeHead.isEquivalentTo(this)) moduleAttribute else null
+}

@@ -42,6 +42,19 @@ class FunctionFindUsagesTest : PlatformTestCase() {
         assertEquals(1, callSiteCount)
     }
 
+    @Suppress("UnstableApiUsage")
+    fun testSpecUsageIsLabeledAsSpecificationNotFunctionCall() {
+        val usages = psiUsages("usages_specification.ex")
+            .filterNot { it.declaration }
+
+        val specificationUsages = usages.filter { it.usageType?.toString() == "Specification" }
+        assertTrue("Expected at least one @spec usage grouped as Specification", specificationUsages.isNotEmpty())
+        assertTrue(
+            "Expected a regular executable call site usage as well",
+            usages.any { it.usageType?.toString() == "Function call" }
+        )
+    }
+
     /**
      * Ctrl-Click on a function definition - a declaration / SearchTarget - the
      * "Go To Declaration or Usages" handler (`GotoDeclarationOrUsageHandler2`) should choose
@@ -65,8 +78,13 @@ class FunctionFindUsagesTest : PlatformTestCase() {
         return functionUsageCounts(*files).second
     }
 
-    @Suppress("UnstableApiUsage")
     private fun functionUsageCounts(vararg files: String): Pair<Int, Int> {
+        val usages = psiUsages(*files)
+        return usages.size to callSiteCount(usages)
+    }
+
+    @Suppress("UnstableApiUsage")
+    private fun psiUsages(vararg files: String): List<PsiUsage> {
         myFixture.configureByFiles(*files)
         assertEquals(
             GotoDeclarationOrUsageHandler2.GTDUOutcome.SU,
@@ -82,11 +100,10 @@ class FunctionFindUsagesTest : PlatformTestCase() {
             textSearch = false
         )
 
-        return ApplicationManager.getApplication().executeOnPooledThread(Callable<Pair<Int, Int>> {
-            ReadAction.nonBlocking(Callable<Pair<Int, Int>> {
+        return ApplicationManager.getApplication().executeOnPooledThread(Callable {
+            ReadAction.nonBlocking(Callable {
                 val target = searchTargets(file, offset).single()
-                val psiUsages = buildQuery(project, target, allOptions).findAll().filterIsInstance<PsiUsage>()
-                psiUsages.size to callSiteCount(psiUsages)
+                buildQuery(project, target, allOptions).findAll().filterIsInstance<PsiUsage>()
             }).executeSynchronously()
         }).get()
     }
