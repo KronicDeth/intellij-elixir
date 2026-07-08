@@ -1,18 +1,10 @@
 package org.elixir_lang
 
-import com.intellij.find.usages.api.PsiUsage
-import com.intellij.find.usages.api.UsageOptions
-import com.intellij.find.usages.impl.AllSearchOptions
-import com.intellij.find.usages.impl.buildQuery
-import com.intellij.find.usages.impl.searchTargets
-import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.application.ex.ApplicationInfoEx
 import com.intellij.openapi.util.Version
-import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.usages.UsageInfo2UsageAdapter
+import org.elixir_lang.code_insight.psiUsagesAtCaret
 import org.elixir_lang.find_usages.handler.AlreadyResolved
-import java.util.concurrent.Callable
 
 @Suppress("UnstableApiUsage")
 class FindUsagesTest : PlatformTestCase() {
@@ -223,19 +215,15 @@ class FindUsagesTest : PlatformTestCase() {
     }
 
     fun testModuleAttributeDeclaration() {
-        val usages = myFixture.testFindUsages("module_attribute_declaration.ex", "kernel.ex")
-            .map { UsageInfo2UsageAdapter(it) }
-
-        assertEquals(2, usages.size)
-        assertContainsElements(usages.map { it.element!!.textOffset }, listOf(31, 69))
+        val offsets = usageOffsetsAtCaret("module_attribute_declaration.ex", "kernel.ex")
+        assertEquals(2, offsets.size)
+        assertContainsElements(offsets, listOf(32, 70))
     }
 
     fun testModuleAttributeUsage() {
-        val usages = myFixture.testFindUsages("module_attribute_usage.ex", "kernel.ex")
-            .map { UsageInfo2UsageAdapter(it) }
-
-        assertEquals(2, usages.size)
-        assertContainsElements(usages.map { it.element!!.textOffset }, listOf(31, 69))
+        val offsets = usageOffsetsAtCaret("module_attribute_usage.ex", "kernel.ex")
+        assertEquals(2, offsets.size)
+        assertContainsElements(offsets, listOf(32, 70))
     }
 
     fun testIssue2374() {
@@ -288,23 +276,6 @@ class FindUsagesTest : PlatformTestCase() {
 
     private fun usageOffsetsAtCaret(vararg fileNames: String): kotlin.collections.List<Int> {
         myFixture.configureByFiles(*fileNames)
-        val file = myFixture.file
-        val offset = myFixture.caretOffset
-        val allOptions = AllSearchOptions(
-            UsageOptions.createOptions(GlobalSearchScope.allScope(project)),
-            textSearch = false
-        )
-        return ApplicationManager.getApplication().executeOnPooledThread(Callable {
-            ReadAction.nonBlocking(Callable {
-                val targets = searchTargets(file, offset)
-                if (targets.isEmpty()) {
-                    emptyList()
-                } else {
-                    buildQuery(project, targets.single(), allOptions).findAll()
-                        .filterIsInstance<PsiUsage>()
-                        .map { it.range.startOffset }
-                }
-            }).executeSynchronously()
-        }).get()
+        return myFixture.psiUsagesAtCaret(project).map { it.range.startOffset }
     }
 }
