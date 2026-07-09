@@ -10,7 +10,9 @@ import com.intellij.platform.backend.navigation.NavigationTarget
 import com.intellij.platform.backend.presentation.TargetPresentation
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
+import com.intellij.psi.SmartPointerManager
 import com.intellij.psi.search.SearchScope
+import com.intellij.refactoring.rename.api.RenameTarget
 import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.model.psi.ElixirSymbolWithUsages
 import org.elixir_lang.psi.Module
@@ -28,11 +30,31 @@ class ModuleSymbol(
     override val file: PsiFile,
     override val range: TextRange,
     val moduleName: String
-) : ElixirSymbolWithUsages, NavigationTarget, SearchTarget {
+) : ElixirSymbolWithUsages, NavigationTarget, SearchTarget, RenameTarget {
     override val searchText: String get() = moduleName.substringAfterLast('.')
+    override val targetName: String get() = moduleName
 
     override fun createPointer(): Pointer<out ModuleSymbol> {
         val moduleName = this.moduleName
+        // Anchor to the enclosing `defmodule` call (a stable ancestor) rather than to the
+        // name-identifier element or a bare file range: an in-place (Shift+F6) rename fully replaces
+        // the identifier's text, which swaps out the identifier leaf (collapsing a pointer anchored to
+        // it) and collapses a plain range marker to an empty range - either way the subsequent
+        // programmatic commit edits the wrong range and applies nothing. The `defmodule` call survives
+        // the identifier replacement, so its name-element range is recomputed correctly on restore.
+        val modular = generateSequence(file.findElementAt(range.startOffset)) { it.parent }
+            .filterIsInstance<Call>()
+            .firstOrNull { Module.`is`(it) && moduleNameElement(it)?.textRange == range }
+        if (modular != null) {
+            val modularPointer = SmartPointerManager.getInstance(file.project)
+                .createSmartPsiElementPointer(modular, file)
+            return Pointer {
+                val restoredModular = modularPointer.dereference() ?: return@Pointer null
+                val restoredRange = moduleNameElement(restoredModular)?.textRange
+                    ?: return@Pointer null
+                ModuleSymbol(restoredModular.containingFile, restoredRange, moduleName)
+            }
+        }
         return Pointer.fileRangePointer(file, range) { restoredFile, restoredRange ->
             ModuleSymbol(restoredFile, restoredRange, moduleName)
         }

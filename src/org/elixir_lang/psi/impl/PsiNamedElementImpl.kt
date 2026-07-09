@@ -1,6 +1,8 @@
 package org.elixir_lang.psi.impl
 
 import com.intellij.psi.PsiElement
+import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.util.IncorrectOperationException
 import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.Name
 import org.elixir_lang.errorreport.Logger
@@ -107,7 +109,15 @@ object PsiNamedElementImpl {
         named: org.elixir_lang.psi.call.Named,
         newName: String
     ): PsiElement {
-        if (CallDefinitionClause.`is`(named)) {
+        if (Module.`is`(named)) {
+            val moduleNameElement = org.elixir_lang.model.psi.module.ModuleSymbol.moduleNameElement(named)
+                ?: throw IncorrectOperationException("Cannot rename module declaration without a module name element")
+            val replacementAlias = PsiTreeUtil.findChildOfType(
+                ElementFactory.createFile(named.project, newName),
+                QualifiableAlias::class.java
+            ) ?: throw IncorrectOperationException("Unable to parse module alias name: $newName")
+            moduleNameElement.replace(replacementAlias)
+        } else if (CallDefinitionClause.`is`(named)) {
             CallDefinitionClause.head(named)?.let { it as? org.elixir_lang.psi.call.Named }?.setName(newName)
         } else {
             val functionNameElement = named.functionNameElement()

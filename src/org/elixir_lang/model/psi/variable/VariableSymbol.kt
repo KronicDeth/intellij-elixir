@@ -11,8 +11,10 @@ import com.intellij.platform.backend.presentation.TargetPresentation
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiNameIdentifierOwner
+import com.intellij.psi.SmartPointerManager
 import com.intellij.psi.search.SearchScope
 import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.refactoring.rename.api.RenameTarget
 import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.model.psi.ElixirSymbolWithUsages
 import org.elixir_lang.psi.ElixirVariable
@@ -30,7 +32,7 @@ class VariableSymbol(
     override val range: TextRange,
     val name: String,
     val kind: Kind
-) : ElixirSymbolWithUsages, NavigationTarget, SearchTarget {
+) : ElixirSymbolWithUsages, NavigationTarget, SearchTarget, RenameTarget {
     enum class Kind {
         PARAMETER,
         VARIABLE,
@@ -38,10 +40,34 @@ class VariableSymbol(
     }
 
     override val searchText: String get() = name
+    override val targetName: String get() = name
 
     override fun createPointer(): Pointer<out VariableSymbol> {
         val name = this.name
         val kind = this.kind
+        // Anchor to the enclosing call-definition clause (the `def`/`defp`/... a large, structurally
+        // stable ancestor) and recompute the occurrence by its offset within that clause. A variable's
+        // own name element is essentially the identifier leaf, and a plain file-range marker collapses:
+        // an in-place (Shift+F6) rename replaces the whole identifier, which invalidates a pointer
+        // anchored to that leaf/marker. The programmatic commit then reverts the live edit and
+        // re-dereferences the target pointer; if it is null the whole rename is dropped (a no-op). The
+        // enclosing clause survives the identifier replacement, so the occurrence range is recomputed
+        // from the (restored) clause on dereference.
+        val clause = generateSequence(file.findElementAt(range.startOffset)) { it.parent }
+            .filterIsInstance<Call>()
+            .firstOrNull { CallDefinitionClause.`is`(it) }
+        if (clause != null && clause.textRange.contains(range)) {
+            val clausePointer = SmartPointerManager.getInstance(file.project)
+                .createSmartPsiElementPointer(clause, file)
+            val relativeStart = range.startOffset - clause.textRange.startOffset
+            val length = range.length
+            return Pointer {
+                val restoredClause = clausePointer.dereference() ?: return@Pointer null
+                val start = restoredClause.textRange.startOffset + relativeStart
+                if (start + length > restoredClause.textRange.endOffset) return@Pointer null
+                VariableSymbol(restoredClause.containingFile, TextRange(start, start + length), name, kind)
+            }
+        }
         return Pointer.fileRangePointer(file, range) { restoredFile, restoredRange ->
             VariableSymbol(restoredFile, restoredRange, name, kind)
         }

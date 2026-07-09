@@ -230,6 +230,8 @@
                 implementation="org.elixir_lang.model.psi.callback.CallbackSymbolDeclarationProvider"/>
         <searcher forClass="com.intellij.find.usages.api.UsageSearchParameters"
                   implementationClass="org.elixir_lang.model.psi.ElixirSymbolUsageSearcher"/>
+        <searcher forClass="com.intellij.refactoring.rename.api.RenameUsageSearchParameters"
+                  implementationClass="org.elixir_lang.model.psi.ElixirRenameUsageSearcher"/>
         <!-- Reverse navigation: implementing `def`/`defmacro` name → the `@callback` it implements. -->
         <psi.symbolReferenceProvider hostElementClass="org.elixir_lang.psi.call.Call"
                                      hostLanguage="Elixir"
@@ -369,6 +371,11 @@
         <spellchecker.support implementationClass="org.elixir_lang.spell_checking.Strategy" language="Elixir"/>
         <spellchecker.bundledDictionaryProvider
                 implementation="org.elixir_lang.spell_checking.BundledDictionaryProvider"/>
+
+        <!-- Rename wiring: keep platform default handler/processor; no custom rename handler or processor EPs.
+             Elixir rename is Symbol-API only; veto the legacy PsiElementRenameHandler so it never competes
+             with the Symbol renamer (which would otherwise raise the "What would you like to do?" chooser). -->
+        <vetoRenameCondition implementation="org.elixir_lang.refactoring.ElixirVetoRenameCondition"/>
 
         <!-- module attribute refactoring -->
         <renameHandler implementation="org.elixir_lang.refactoring.module_attribute.rename.Handler"/>

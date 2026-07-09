@@ -11,8 +11,10 @@ import com.intellij.platform.backend.navigation.NavigationTarget
 import com.intellij.platform.backend.presentation.TargetPresentation
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
+import com.intellij.psi.SmartPointerManager
 import com.intellij.psi.search.SearchScope
 import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.refactoring.rename.api.RenameTarget
 import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.model.psi.ElixirSymbolWithUsages
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
@@ -22,6 +24,7 @@ import org.elixir_lang.psi.ModuleAttribute
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.declarations.UseScopeImpl
 import org.elixir_lang.psi.impl.identifierName
+import org.elixir_lang.psi.impl.identifierTextRange
 import java.util.*
 
 @Suppress("UnstableApiUsage")
@@ -30,12 +33,31 @@ class ModuleAttributeSymbol(
     override val range: TextRange,
     val moduleName: String,
     val name: String
-) : ElixirSymbolWithUsages, NavigationTarget, SearchTarget {
+) : ElixirSymbolWithUsages, NavigationTarget, SearchTarget, RenameTarget {
     override val searchText: String get() = name
+    override val targetName: String get() = name
 
     override fun createPointer(): Pointer<out ModuleAttributeSymbol> {
         val moduleName = this.moduleName
         val name = this.name
+        // Anchor to the declaring PSI element rather than a bare file range: an in-place (Shift+F6)
+        // rename fully replaces the identifier's text, which collapses a plain range marker to an
+        // empty range and corrupts the subsequent programmatic commit. A smart element pointer
+        // re-anchors by PSI structure, so the identifier range is recomputed correctly on restore.
+        val declaration = declaration()
+        if (declaration != null) {
+            val declarationPointer =
+                SmartPointerManager.getInstance(file.project).createSmartPsiElementPointer(declaration, file)
+            return Pointer {
+                val restoredDeclaration = declarationPointer.dereference() ?: return@Pointer null
+                ModuleAttributeSymbol(
+                    restoredDeclaration.containingFile,
+                    restoredDeclaration.atIdentifier.identifierTextRange(),
+                    moduleName,
+                    name
+                )
+            }
+        }
         return Pointer.fileRangePointer(file, range) { restoredFile, restoredRange ->
             ModuleAttributeSymbol(restoredFile, restoredRange, moduleName, name)
         }

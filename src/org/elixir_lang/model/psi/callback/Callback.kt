@@ -11,7 +11,9 @@ import com.intellij.platform.backend.navigation.NavigationTarget
 import com.intellij.platform.backend.presentation.TargetPresentation
 import com.intellij.psi.PsiFile
 import com.intellij.psi.ResolveState
+import com.intellij.psi.SmartPointerManager
 import com.intellij.psi.search.SearchScope
+import com.intellij.refactoring.rename.api.RenameTarget
 import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.model.psi.ElixirSymbolWithUsages
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
@@ -36,9 +38,10 @@ class Callback(
     val name: String,
     val arity: Int,
     val macro: Boolean
-) : ElixirSymbolWithUsages, NavigationTarget, SearchTarget {
+) : ElixirSymbolWithUsages, NavigationTarget, SearchTarget, RenameTarget {
 
     override val searchText: String get() = name
+    override val targetName: String get() = name
 
     // Satisfies both SearchTarget.createPointer and NavigationTarget.createPointer (Pointer is covariant).
     override fun createPointer(): Pointer<out Callback> {
@@ -46,6 +49,25 @@ class Callback(
         val name = this.name
         val arity = this.arity
         val macro = this.macro
+        // Anchor to the enclosing `@callback`/`@macrocallback` module attribute (a stable ancestor)
+        // rather than to the name-identifier element or a bare file range: an in-place (Shift+F6)
+        // rename fully replaces the identifier's text, which swaps out the identifier leaf (collapsing
+        // a pointer anchored to it) and collapses a plain range marker to an empty range - either way
+        // the subsequent programmatic commit edits the wrong range and applies nothing. The attribute
+        // survives the identifier replacement, so its name-identifier range is recomputed on restore.
+        val attribute = generateSequence(file.findElementAt(range.startOffset)) { it.parent }
+            .filterIsInstance<AtUnqualifiedNoParenthesesCall<*>>()
+            .firstOrNull { CallbackElement.`is`(it) && CallbackElement.nameIdentifier(it)?.textRange == range }
+        if (attribute != null) {
+            val attributePointer = SmartPointerManager.getInstance(file.project)
+                .createSmartPsiElementPointer(attribute, file)
+            return Pointer {
+                val restoredAttribute = attributePointer.dereference() ?: return@Pointer null
+                val restoredRange = CallbackElement.nameIdentifier(restoredAttribute)?.textRange
+                    ?: return@Pointer null
+                Callback(restoredAttribute.containingFile, restoredRange, moduleName, name, arity, macro)
+            }
+        }
         return Pointer.fileRangePointer(file, range) { restoredFile, restoredRange ->
             Callback(restoredFile, restoredRange, moduleName, name, arity, macro)
         }

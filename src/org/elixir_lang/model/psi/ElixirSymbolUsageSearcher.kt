@@ -29,6 +29,7 @@ import org.elixir_lang.model.psi.atom.AtomReference
 import org.elixir_lang.model.psi.atom.AtomSymbol
 import org.elixir_lang.model.psi.callback.BehaviourMembership
 import org.elixir_lang.model.psi.callback.Callback
+import org.elixir_lang.model.psi.function.FunctionArityKeywordPairReference
 import org.elixir_lang.model.psi.function.FunctionSymbol
 import org.elixir_lang.model.psi.module.ModuleSymbol
 import org.elixir_lang.model.psi.module_attribute.ModuleAttributeReference
@@ -42,6 +43,7 @@ import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function.*
 import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.moduleAttributeName
+import org.elixir_lang.psi.impl.identifierTextRange
 import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.psi.scope.ancestorTypeSpec
@@ -57,8 +59,9 @@ import java.util.concurrent.Callable as JCallable
  * - A [Callback] additionally contributes each implementing `def`/`defmacro` clause of matching
  *   name/arity/kind, where the enclosing module implements the behaviour (see [BehaviourMembership]).
  * - A [ProtocolFunction] additionally contributes each **call site** that dispatches to it
- *   (`Protocol.function(args)` of matching name/arity). Implementations are intentionally *not*
- *   usages - they are reached via "Go To Implementation" (`Ctrl+Alt+B`) / the gutter marker.
+ *   (`Protocol.function(args)` of matching name/arity) and each implementing `def`/`defmacro`
+ *   clause inside a `defimpl` of the same protocol (so rename keeps every implementation in sync;
+ *   for Find Usages the implementations are also reachable via "Go To Implementation").
  * - A [FunctionSymbol] additionally contributes each **call site** that dispatches to it.
  *   Qualified calls (`Module.function(args)`) are matched via [Call.isCalling]; unqualified calls
  *   require scope resolution and are resolved by delegating to the legacy [Callable] walker.
@@ -83,6 +86,7 @@ internal class ElixirSymbolUsageSearcher : UsageSearcher {
 
             is ProtocolFunction -> {
                 queries += protocolCallSiteQuery(parameters.project, target, parameters.searchScope)
+                queries += protocolImplementationQuery(parameters.project, target, parameters.searchScope)
             }
 
             is FunctionSymbol -> {
@@ -140,6 +144,18 @@ internal class ElixirSymbolUsageSearcher : UsageSearcher {
                 .inScope(searchScope)
                 .buildQuery(ProtocolCallSiteMapper(pf.createPointer()))
 
+    private fun protocolImplementationQuery(
+        project: Project,
+        pf: ProtocolFunction,
+        searchScope: SearchScope
+    ): Query<out PsiUsage> =
+            SearchService.getInstance()
+                .searchWord(project, pf.name)
+                .caseSensitive(true)
+                .inContexts(SearchContext.inCode())
+                .inScope(searchScope)
+                .buildQuery(ProtocolImplementationMapper(pf.createPointer()))
+
     /**
      * Maps each occurrence of the callback name to an implementing definition clause, if any.
      * The search framework invokes [mapOccurrence] under a read action.
@@ -151,6 +167,10 @@ internal class ElixirSymbolUsageSearcher : UsageSearcher {
         override fun mapOccurrence(occurrence: LeafOccurrence): Collection<PsiUsage> {
             val callback = callbackPointer.dereference() ?: return emptyList()
             val (_, leaf, _) = occurrence
+
+            // A `defoverridable name: arity` entry that names this callback (resolved through the
+            // behaviour in scope) - keeps the overridable entry renaming with the callback.
+            defoverridableKeyUsage(leaf, callback)?.let { return listOf(it) }
 
             // Nearest enclosing call-definition clause (def/defp/defmacro/...).
             val defClause = leaf.enclosingCalls().firstOrNull { CallDefinitionClause.`is`(it) } ?: return emptyList()
@@ -201,6 +221,36 @@ internal class ElixirSymbolUsageSearcher : UsageSearcher {
                 )
             )
         }
+
+        /**
+         * If [leaf] is inside the key of a `defoverridable name: arity` entry that resolves to
+         * [callback], the keyword-key occurrence, else `null`. Resolution reuses the shared
+         * [FunctionArityKeywordPairReference] attached to the `defoverridable` host so behaviour-scope
+         * logic stays in one place.
+         */
+        @RequiresReadLock
+        private fun defoverridableKeyUsage(leaf: PsiElement, callback: Callback): PsiUsage? {
+            val occurrence = FunctionArityKeywordPair.at(leaf) ?: return null
+            if (occurrence.host != FunctionArityKeywordPair.Host.DEFOVERRIDABLE) return null
+            if (occurrence.name != callback.name || occurrence.arity != callback.arity) return null
+
+            val matches = PsiSymbolReferenceService.getService()
+                .getReferences(occurrence.hostCall)
+                .filterIsInstance<FunctionArityKeywordPairReference>()
+                .filter { it.absoluteRange.containsOffset(leaf.textRange.startOffset) }
+                .flatMap { it.resolveReference() }
+                .filterIsInstance<Callback>()
+                .any { it == callback }
+            if (!matches) return null
+
+            val key = occurrence.pair.keywordKey
+            return ElixirPsiUsage.create(
+                key,
+                TextRange(0, key.textLength),
+                declaration = false,
+                usageType = IMPLEMENTATION
+            )
+        }
     }
 
     /**
@@ -235,6 +285,56 @@ internal class ElixirSymbolUsageSearcher : UsageSearcher {
                     TextRange(0, nameElement.textLength),
                     declaration = false,
                     usageType = CALL
+                )
+            )
+        }
+    }
+
+    /**
+     * Maps each occurrence of a protocol function name to an implementing `def`/`defmacro` clause
+     * inside a `defimpl` of the same protocol, if any. Unlike Find Usages (where implementations are
+     * reached via "Go To Implementation"), rename MUST update every `defimpl` clause so the protocol
+     * member and all its concrete implementations stay in sync. The search framework invokes
+     * [mapOccurrence] under a read action.
+     */
+    private class ProtocolImplementationMapper(
+        private val protocolFunctionPointer: Pointer<out ProtocolFunction>
+    ) : LeafOccurrenceMapper<PsiUsage> {
+        @RequiresReadLock
+        override fun mapOccurrence(occurrence: LeafOccurrence): Collection<PsiUsage> {
+            val protocolFunction = protocolFunctionPointer.dereference() ?: return emptyList()
+            val (_, leaf, _) = occurrence
+
+            // Nearest enclosing call-definition clause (def/defmacro).
+            val defClause = leaf.enclosingCalls().firstOrNull { CallDefinitionClause.`is`(it) } ?: return emptyList()
+
+            // The occurrence must be the clause's own name, not a call in its body.
+            val nameIdentifier = CallDefinitionClause.nameIdentifier(defClause) ?: return emptyList()
+            if (!PsiTreeUtil.isAncestor(nameIdentifier, leaf, false)) return emptyList()
+
+            val nameArity =
+                    CallDefinitionClause.nameArityInterval(defClause, ResolveState.initial()) ?: return emptyList()
+            if (nameArity.name != protocolFunction.name || protocolFunction.arity !in nameArity.arityInterval) {
+                return emptyList()
+            }
+
+            // `def` implements a function protocol member; `defmacro` a macro member.
+            val kindMatches =
+                    if (protocolFunction.macro) CallDefinitionClause.isMacro(defClause)
+                    else CallDefinitionClause.isFunction(defClause)
+            if (!kindMatches) return emptyList()
+
+            // The clause must live directly inside a `defimpl` for this protocol.
+            val defimpl = CallDefinitionClause.enclosingModularMacroCall(defClause) ?: return emptyList()
+            if (!Implementation.`is`(defimpl)) return emptyList()
+            if (Implementation.protocolName(defimpl) != protocolFunction.protocolName) return emptyList()
+
+            return listOf(
+                ElixirPsiUsage.create(
+                    nameIdentifier,
+                    TextRange(0, nameIdentifier.textLength),
+                    declaration = false,
+                    usageType = IMPLEMENTATION
                 )
             )
         }
@@ -461,6 +561,8 @@ internal class ElixirSymbolUsageSearcher : UsageSearcher {
 
             atomUsage(leaf, symbol)?.let { return listOf(it) }
 
+            keywordKeyUsage(leaf, symbol)?.let { return listOf(it) }
+
             val call = leaf.enclosingCalls().firstOrNull() ?: return emptyList()
             // Skip definition heads/clauses - they are declarations, not call sites.
             if (CallDefinitionClause.isHead(call) || CallDefinitionClause.`is`(call)) return emptyList()
@@ -511,6 +613,31 @@ internal class ElixirSymbolUsageSearcher : UsageSearcher {
                 TextRange(0, nameElement.textLength),
                 declaration = false,
                 usageType = SPECIFICATION
+            )
+        }
+
+        @RequiresReadLock
+        private fun keywordKeyUsage(leaf: PsiElement, symbol: FunctionSymbol): PsiUsage? {
+            val occurrence = FunctionArityKeywordPair.at(leaf) ?: return null
+            // `defoverridable` keys resolve to a Callback, handled via the Callback search path.
+            if (occurrence.host == FunctionArityKeywordPair.Host.DEFOVERRIDABLE) return null
+            if (occurrence.name != symbol.name || occurrence.arity != symbol.arity) return null
+
+            val matches = PsiSymbolReferenceService.getService()
+                .getReferences(occurrence.hostCall)
+                .filterIsInstance<FunctionArityKeywordPairReference>()
+                .filter { it.absoluteRange.containsOffset(leaf.textRange.startOffset) }
+                .flatMap { it.resolveReference() }
+                .filterIsInstance<FunctionSymbol>()
+                .any { it == symbol }
+            if (!matches) return null
+
+            val key = occurrence.pair.keywordKey
+            return ElixirPsiUsage.create(
+                key,
+                TextRange(0, key.textLength),
+                declaration = false,
+                usageType = CALL
             )
         }
 
@@ -695,7 +822,7 @@ internal class ElixirSymbolUsageSearcher : UsageSearcher {
                 val symbol = symbolPointer.dereference() ?: return@JCallable true
                 val declaration = generateSequence(symbol.file.findElementAt(symbol.range.startOffset)) { it.parent }
                     .filterIsInstance<AtUnqualifiedNoParenthesesCall<*>>()
-                    .firstOrNull { it.atIdentifier.textRange == symbol.range }
+                    .firstOrNull { it.atIdentifier.identifierTextRange() == symbol.range }
                     ?: return@JCallable true
                 val seen = mutableSetOf<TextRange>(declaration.atIdentifier.textRange)
 
@@ -716,9 +843,10 @@ internal class ElixirSymbolUsageSearcher : UsageSearcher {
                                 continue
                             }
 
+                            val atIdentifier = declarationCandidate.atIdentifier
                             val usage = ElixirPsiUsage.create(
-                                declarationCandidate.atIdentifier,
-                                TextRange(0, declarationCandidate.atIdentifier.textLength),
+                                atIdentifier,
+                                atIdentifier.identifierTextRange().shiftLeft(atIdentifier.textRange.startOffset),
                                 declaration = false,
                                 usageType = MODULE_ATTRIBUTE_WRITE
                             )

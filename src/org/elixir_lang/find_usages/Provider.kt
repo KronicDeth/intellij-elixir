@@ -13,7 +13,6 @@ import com.intellij.usageView.UsageViewTypeLocation
 import org.elixir_lang.ElixirLexer
 import org.elixir_lang.ElixirParserDefinition
 import org.elixir_lang.beam.psi.impl.ModuleImpl
-import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.model.psi.module_attribute.ModuleAttributeSymbol
 import org.elixir_lang.model.psi.variable.VariableSymbol
 import org.elixir_lang.psi.*
@@ -152,8 +151,6 @@ internal class Provider : com.intellij.lang.findUsages.FindUsagesProvider {
         try {
             ElementDescriptionUtil.getElementDescription(element, UsageViewTypeLocation.INSTANCE)
         } catch (_: StackOverflowError) {
-            Logger.error(Provider::class.java, "StackOverflow getting type for Find Usage", element)
-
             "unknown_elixir_type"
         }
 }

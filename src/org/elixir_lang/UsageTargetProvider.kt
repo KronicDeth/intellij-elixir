@@ -2,6 +2,7 @@ package org.elixir_lang
 
 import com.intellij.codeInsight.TargetElementUtil.adjustOffset
 import com.intellij.find.findUsages.PsiElement2UsageTargetAdapter
+import com.intellij.model.psi.PsiSymbolReferenceService
 import com.intellij.openapi.editor.Editor
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
@@ -29,12 +30,17 @@ internal class UsageTargetProvider : com.intellij.usages.UsageTargetProvider {
         null
     }
 
+    @Suppress("UnstableApiUsage")
     override fun getTargets(psiElement: PsiElement): Array<UsageTarget>? =
             when {
                 psiElement.containingFile !is ElixirFile -> null
                 Callback.isHead(psiElement) || TypeElement.isHead(psiElement) || ModuleAttributeSymbol.isHead(psiElement) || VariableSymbol.isHead(psiElement) || CallDefinitionClause.isHead(psiElement) -> {
                     // Call-definition clause heads (including `@callback`/`@macrocallback` and protocol function
                     // declarations) are owned by the Symbol model; don't contribute a redundant legacy usage target.
+                    null
+                }
+                PsiSymbolReferenceService.getService().getReferences(psiElement).isNotEmpty() -> {
+                    // If Symbol references exist, don't also contribute a legacy usage target.
                     null
                 }
 

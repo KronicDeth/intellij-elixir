@@ -10,7 +10,9 @@ import com.intellij.platform.backend.navigation.NavigationRequest
 import com.intellij.platform.backend.navigation.NavigationTarget
 import com.intellij.platform.backend.presentation.TargetPresentation
 import com.intellij.psi.PsiFile
+import com.intellij.psi.SmartPointerManager
 import com.intellij.psi.search.SearchScope
+import com.intellij.refactoring.rename.api.RenameTarget
 import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.model.psi.ElixirSymbolWithUsages
 import org.elixir_lang.psi.CallDefinitionClause
@@ -26,13 +28,33 @@ class TypeSymbol(
     val moduleName: String,
     val name: String,
     val arity: Int
-) : ElixirSymbolWithUsages, NavigationTarget, SearchTarget {
+) : ElixirSymbolWithUsages, NavigationTarget, SearchTarget, RenameTarget {
     override val searchText: String get() = name
+    override val targetName: String get() = name
 
     override fun createPointer(): Pointer<out TypeSymbol> {
         val moduleName = this.moduleName
         val name = this.name
         val arity = this.arity
+        // Anchor to the enclosing `@type`/`@typep`/`@opaque` module attribute (a stable ancestor)
+        // rather than to the name-identifier element or a bare file range: an in-place (Shift+F6)
+        // rename fully replaces the identifier's text, which swaps out the identifier leaf (collapsing
+        // a pointer anchored to it) and collapses a plain range marker to an empty range - either way
+        // the subsequent programmatic commit edits the wrong range and applies nothing. The attribute
+        // survives the identifier replacement, so its name-identifier range is recomputed on restore.
+        val attribute = generateSequence(file.findElementAt(range.startOffset)) { it.parent }
+            .filterIsInstance<org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall<*>>()
+            .firstOrNull { TypeElement.`is`(it) && TypeElement.nameIdentifier(it)?.textRange == range }
+        if (attribute != null) {
+            val attributePointer = SmartPointerManager.getInstance(file.project)
+                .createSmartPsiElementPointer(attribute, file)
+            return Pointer {
+                val restoredAttribute = attributePointer.dereference() ?: return@Pointer null
+                val restoredRange = TypeElement.nameIdentifier(restoredAttribute)?.textRange
+                    ?: return@Pointer null
+                TypeSymbol(restoredAttribute.containingFile, restoredRange, moduleName, name, arity)
+            }
+        }
         return Pointer.fileRangePointer(file, range) { restoredFile, restoredRange ->
             TypeSymbol(restoredFile, restoredRange, moduleName, name, arity)
         }
