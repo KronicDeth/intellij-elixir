@@ -210,7 +210,7 @@ class ElementDescriptionProvider : com.intellij.psi.ElementDescriptionProvider {
             Implementation.`is`(call) -> Implementation.elementDescription(location)
             Import.`is`(call) -> Import.elementDescription(call, location)
             org.elixir_lang.psi.Module.`is`(call) -> Module.elementDescription(call, location)
-            Overridable.`is`(call) -> Overridable.elementDescription(call, location)
+            Overridable.`is`(call) -> Overridable.elementDescription(location)
             Protocol.`is`(call) -> Module.elementDescription(call, location)
             QuoteMacro.`is`(call) -> org.elixir_lang.structure_view.element.Quote.elementDescription(call, location)
             Structure.`is`(call) -> Structure.elementDescription(call, location)

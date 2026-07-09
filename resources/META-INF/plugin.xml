@@ -262,6 +262,12 @@
                                      hostLanguage="Elixir"
                                      implementationClass="org.elixir_lang.model.psi.function.FunctionCallReferenceProvider"
                                      targetClass="org.elixir_lang.model.psi.function.FunctionSymbol"/>
+        <!-- `name: arity` keyword-pair key (`import :only`/`:except`, `@compile :inline`, `@dialyzer`,
+             `defoverridable`) -> the function/macro (or `@callback` for `defoverridable`) it names. -->
+        <psi.symbolReferenceProvider hostElementClass="org.elixir_lang.psi.call.Call"
+                                     hostLanguage="Elixir"
+                                     implementationClass="org.elixir_lang.model.psi.function.FunctionArityKeywordPairReferenceProvider"
+                                     targetClass="org.elixir_lang.model.psi.function.FunctionSymbol"/>
 
         <!-- Symbol-API: module declarations/references (`defmodule`, `alias`, `use`, `import`, qualifiers). -->
         <psi.declarationProvider
