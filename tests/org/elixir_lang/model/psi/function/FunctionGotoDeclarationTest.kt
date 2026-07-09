@@ -1,12 +1,13 @@
 package org.elixir_lang.model.psi.function
 
-import com.intellij.codeInsight.navigation.actions.GotoDeclarationOrUsageHandler2
 import com.intellij.ide.impl.HeadlessDataManager
 import com.intellij.model.psi.PsiSymbolReferenceService
-import com.intellij.openapi.actionSystem.IdeActions
 import org.elixir_lang.PlatformTestCase
+import org.elixir_lang.code_insight.assertGotoDeclarationChosenAtCaret
+import org.elixir_lang.code_insight.assertGotoDeclarationLandsIn
+import org.elixir_lang.code_insight.assertNoNavigationAtCaret
+import org.elixir_lang.code_insight.enclosingCallAtCaret
 import org.elixir_lang.psi.CallDefinitionClause
-import org.elixir_lang.psi.call.Call
 
 /**
  * Behavior-level tests for reverse navigation: "Go To Declaration" on a call site navigates to
@@ -27,40 +28,22 @@ class FunctionGotoDeclarationTest : PlatformTestCase() {
     /** Ctrl-Click on a call site - an element with a symbol reference - should choose Go To Declaration. */
     fun testCtrlClickOnCallSiteChoosesGotoDeclaration() {
         myFixture.configureByFiles("goto_declaration.ex")
-        assertEquals(
-            GotoDeclarationOrUsageHandler2.GTDUOutcome.GTD,
-            GotoDeclarationOrUsageHandler2.testGTDUOutcomeInNonBlockingReadAction(
-                myFixture.editor, myFixture.file, myFixture.caretOffset
-            )
-        )
+        myFixture.assertGotoDeclarationChosenAtCaret()
     }
 
     /** The Go To Declaration action moves the caret onto the `def` name in the same module. */
     fun testGoToDeclarationNavigatesToFunctionDef() {
         myFixture.configureByFiles("goto_declaration.ex")
-        myFixture.performEditorAction(IdeActions.ACTION_GOTO_DECLARATION)
-
-        val target = myFixture.file.findElementAt(myFixture.caretOffset)
-        assertNotNull("Go To Declaration should navigate somewhere", target)
-        assertEquals("perform", target!!.text)
-
-        val enclosingClause = generateSequence(target) { it.parent }
-            .filterIsInstance<Call>()
-            .firstOrNull { CallDefinitionClause.`is`(it) }
-        assertNotNull("Expected the caret to land inside a def clause", enclosingClause)
+        myFixture.assertGotoDeclarationLandsIn("perform", "a def clause") { CallDefinitionClause.`is`(it) }
     }
 
     /** The reference at the call site must resolve to at least one [FunctionSymbol]. */
     fun testCallSiteReferenceResolvesToFunctionSymbol() {
         myFixture.configureByFiles("goto_declaration.ex")
-        val element = myFixture.file.findElementAt(myFixture.caretOffset)
-        assertNotNull("Element at caret should exist", element)
+        val callElement = myFixture.enclosingCallAtCaret { !CallDefinitionClause.`is`(it) }
+        assertNotNull("Call site element at caret should exist", callElement)
 
-        val callElement = generateSequence(element!!) { it.parent }
-            .filterIsInstance<Call>()
-            .first { !CallDefinitionClause.`is`(it) }
-
-        val references = PsiSymbolReferenceService.getService().getReferences(callElement)
+        val references = PsiSymbolReferenceService.getService().getReferences(callElement!!)
         assertTrue("Call site should have at least one symbol reference", references.isNotEmpty())
 
         val resolved = references.flatMap { it.resolveReference() }
@@ -69,14 +52,10 @@ class FunctionGotoDeclarationTest : PlatformTestCase() {
 
     fun testMultiClauseTargetsHaveDistinctPresentation() {
         myFixture.configureByFiles("choose_declaration_multi_clause.ex")
-        val element = myFixture.file.findElementAt(myFixture.caretOffset)
-        assertNotNull("Element at caret should exist", element)
+        val callElement = myFixture.enclosingCallAtCaret { !CallDefinitionClause.`is`(it) }
+        assertNotNull("Call site element at caret should exist", callElement)
 
-        val callElement = generateSequence(element!!) { it.parent }
-            .filterIsInstance<Call>()
-            .first { !CallDefinitionClause.`is`(it) }
-
-        val references = PsiSymbolReferenceService.getService().getReferences(callElement)
+        val references = PsiSymbolReferenceService.getService().getReferences(callElement!!)
         val symbols = references
             .flatMap { it.resolveReference() }
             .filterIsInstance<FunctionSymbol>()
@@ -91,13 +70,18 @@ class FunctionGotoDeclarationTest : PlatformTestCase() {
         )
     }
 
+    fun testGoToDeclarationNavigatesToPrivateFunctionDef() {
+        myFixture.configureByFiles("goto_declaration_private.ex")
+        myFixture.assertGotoDeclarationLandsIn("perform", "a defp clause") { CallDefinitionClause.`is`(it) }
+    }
+
+    fun testGoToDeclarationNavigatesToMacroDef() {
+        myFixture.configureByFiles("goto_declaration_macro.ex")
+        myFixture.assertGotoDeclarationLandsIn("perform", "a defmacro clause") { CallDefinitionClause.`is`(it) }
+    }
+
     fun testCtrlClickOnErlangQualifiedCallDoesNothingYet() {
         myFixture.configureByFiles("goto_declaration_erlang_qualified_call.ex")
-        assertEquals(
-            null,
-            GotoDeclarationOrUsageHandler2.testGTDUOutcomeInNonBlockingReadAction(
-                myFixture.editor, myFixture.file, myFixture.caretOffset
-            )
-        )
+        myFixture.assertNoNavigationAtCaret()
     }
 }
