@@ -1,5 +1,5 @@
 defmodule Unused do
-  def unused do
+  def run do
     unu<caret>sed = 1
   end
 end

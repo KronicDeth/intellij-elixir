@@ -1,28 +1,22 @@
 package org.elixir_lang.model.psi.protocol
 
-import com.intellij.codeInsight.navigation.actions.GotoDeclarationOrUsageHandler2
-import com.intellij.find.usages.api.PsiUsage
-import com.intellij.find.usages.api.UsageOptions
-import com.intellij.find.usages.impl.AllSearchOptions
-import com.intellij.find.usages.impl.buildQuery
-import com.intellij.find.usages.impl.searchTargets
-import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.application.ReadAction
-import com.intellij.psi.search.GlobalSearchScope
 import org.elixir_lang.PlatformTestCase
+import org.elixir_lang.code_insight.assertShowUsagesChosenAtCaret
+import org.elixir_lang.code_insight.singleTargetPsiUsagesAtCaret
 import org.elixir_lang.psi.CallDefinitionClause
 import org.elixir_lang.psi.call.Call
-import java.util.concurrent.Callable
 
 /**
  * Behavior-level tests for forward Find/Show Usages: invoking Find Usages on a `defprotocol def` lists the
- * **call sites** that dispatch to it (`Protocol.function(args)`). Implementations are deliberately excluded -
- * they are reached via "Go To Implementation" (`Ctrl+Alt+B`) / the gutter marker, mirroring how Java surfaces
- * overriding methods.
+ * **call sites** that dispatch to it (`Protocol.function(args)`) as well as its `defimpl` implementations
+ * (the latter so rename keeps every implementation in sync, consistent with how `@callback` usages include
+ * their implementations). Implementations are additionally reachable via "Go To Implementation"
+ * (`Ctrl+Alt+B`) / the gutter marker. The helper below counts only call sites (implementation `def` clauses
+ * are filtered out via [CallDefinitionClause]).
  *
  * These drive the SAME production search pipeline the Find Usages action uses - the `SearchTarget`
- * resolved at the caret (via [searchTargets], i.e. our `ProtocolFunction` symbol) fed through [buildQuery]
- * (which runs `ElixirSymbolUsageSearcher` and yields the very [PsiUsage]s the tool window would display). We deliberately do NOT go through
+ * resolved at the caret (via [com.intellij.find.usages.impl.searchTargets], i.e. our `ProtocolFunction` symbol) fed through [com.intellij.find.usages.impl.buildQuery]
+ * (which runs `ElixirSymbolUsageSearcher` and yields the very [com.intellij.find.usages.api.PsiUsage]s the tool window would display). We deliberately do NOT go through
  * `CodeInsightTestFixture.testFindUsagesUsingAction`: that wrapper fires the async, EDT-/modality-bound
  * `FindUsagesAction` and then polls for a `UsageView`, which is unreliable headless (the view is never
  * surfaced even though target arbitration is correct - verified separately: exactly one `SEARCH_TARGET`
@@ -55,12 +49,7 @@ class ProtocolFunctionFindUsagesTest : PlatformTestCase() {
      */
     fun testCtrlClickOnProtocolFunctionChoosesShowUsages() {
         myFixture.configureByFiles("usages_use_injected.ex")
-        assertEquals(
-            GotoDeclarationOrUsageHandler2.GTDUOutcome.SU,
-            GotoDeclarationOrUsageHandler2.testGTDUOutcomeInNonBlockingReadAction(
-                myFixture.editor, myFixture.file, myFixture.caretOffset
-            )
-        )
+        myFixture.assertShowUsagesChosenAtCaret()
     }
 
     fun testCallToDifferentModuleIsNotListed() {
@@ -75,44 +64,23 @@ class ProtocolFunctionFindUsagesTest : PlatformTestCase() {
      * Runs Find Usages on the `defprotocol def` at the caret in [files] and counts non-declaration usages
      * located on a **call site** - the function name of a `Call` that is not a call-definition clause
      * (`def`/`defmacro`). The protocol function's own self-declaration usage is excluded via
-     * [PsiUsage.declaration]. We resolve each usage by its `(file, range)` - the searcher models a
-     * [PsiUsage] as file + absolute range (so its `.element` is the file, not the call name), matching how
+     * [com.intellij.find.usages.api.PsiUsage.declaration]. We resolve each usage by its `(file, range)` - the searcher models a
+     * [com.intellij.find.usages.api.PsiUsage] as file + absolute range (so its `.element` is the file, not the call name), matching how
      * the tool window navigates.
      */
     @Suppress("UnstableApiUsage")
     private fun callSiteUsageCount(vararg files: String): Int {
         myFixture.configureByFiles(*files)
-        val file = myFixture.file
-        val offset = myFixture.caretOffset
-        val allOptions = AllSearchOptions(
-            UsageOptions.createOptions(GlobalSearchScope.allScope(project)),
-            textSearch = false
-        )
-        // Run on a background thread under a read action: the symbol search executes a name-anchored
-        // word/index search (`SearchService.searchWord`), which the platform runs off the EDT - driving
-        // it there mirrors the real Find Usages action and, unlike a direct EDT `findAll()`, actually
-        // visits the indexed files.
-        return ApplicationManager.getApplication().executeOnPooledThread(Callable<Int> {
-            ReadAction.nonBlocking(Callable<Int> {
-                val targets = searchTargets(file, offset)
-                if (targets.isEmpty()) {
-                    0
-                } else {
-                    val target = targets.single()
-                    buildQuery(project, target, allOptions).findAll()
-                        .filterIsInstance<PsiUsage>()
-                        .filterNot { it.declaration }
-                        .count { usage ->
-                            val element = usage.file.findElementAt(usage.range.startOffset)
-                            val enclosingCall = element?.let {
-                                generateSequence(it) { e -> e.parent }
-                                    .filterIsInstance<Call>()
-                                    .firstOrNull()
-                            }
-                            enclosingCall != null && !CallDefinitionClause.`is`(enclosingCall)
-                        }
+        return myFixture.singleTargetPsiUsagesAtCaret(project)
+            .filterNot { it.declaration }
+            .count { usage ->
+                val element = usage.file.findElementAt(usage.range.startOffset)
+                val enclosingCall = element?.let {
+                    generateSequence(it) { e -> e.parent }
+                        .filterIsInstance<Call>()
+                        .firstOrNull()
                 }
-            }).executeSynchronously()
-        }).get()
+                enclosingCall != null && !CallDefinitionClause.`is`(enclosingCall)
+            }
     }
 }
