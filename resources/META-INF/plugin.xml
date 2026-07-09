@@ -376,16 +376,8 @@
              Elixir rename is Symbol-API only; veto the legacy PsiElementRenameHandler so it never competes
              with the Symbol renamer (which would otherwise raise the "What would you like to do?" chooser). -->
         <vetoRenameCondition implementation="org.elixir_lang.refactoring.ElixirVetoRenameCondition"/>
-
-        <!-- module attribute refactoring -->
-        <renameHandler implementation="org.elixir_lang.refactoring.module_attribute.rename.Handler"/>
         <renameInputValidator implementation="org.elixir_lang.refactoring.module_attribute.rename.InputValidator"/>
-        <renamePsiElementProcessor implementation="org.elixir_lang.refactoring.module_attribute.rename.Processor"/>
-
-        <!-- variable refactoring -->
-        <renameHandler implementation="org.elixir_lang.refactoring.variable.rename.Handler"/>
         <renameInputValidator implementation="org.elixir_lang.refactoring.variable.rename.InputValidator"/>
-        <renamePsiElementProcessor implementation="org.elixir_lang.refactoring.variable.rename.Processor"/>
 
         <stubIndex implementation="org.elixir_lang.psi.stub.index.AllName"/>
         <typedHandler implementation="org.elixir_lang.TypedHandler"/>
