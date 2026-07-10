@@ -89,6 +89,30 @@ class InPlaceRenameTest : InPlaceSymbolRenameTestCase() {
         myFixture.checkResultByFile("macro.ex", "macro_after.ex", false)
     }
 
+    /**
+     * Renaming from the function **declaration** must also update a `&map_it/0` capture usage, so the
+     * capture site becomes `&map_rename_it/0` (and not, e.g., a doubled or empty name).
+     */
+    fun testCaptureUsageRenamedFromDeclaration() {
+        myFixture.configureByFiles("capture.ex")
+
+        inPlaceRenameAtCaret("map_rename_it")
+
+        myFixture.checkResultByFile("capture.ex", "capture_after.ex", false)
+    }
+
+    /**
+     * Renaming from the `&map_it/0` **capture site** must update both the capture and the function
+     * declaration, replacing only the name (not the whole `&name/arity` capture).
+     */
+    fun testCaptureUsageRenamedFromCaptureSite() {
+        myFixture.configureByFiles("capture_usage.ex")
+
+        inPlaceRenameAtCaret("map_rename_it")
+
+        myFixture.checkResultByFile("capture_usage.ex", "capture_usage_after.ex", false)
+    }
+
     fun testGuardInPlaceRename() {
         myFixture.configureByFiles("guard.ex")
 
