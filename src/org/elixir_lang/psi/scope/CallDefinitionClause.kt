@@ -324,16 +324,19 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
         }
 
     /**
-     * Returns all [NamedElement]s for [moduleName] within [scope], with source [Call]s ordered before
-     * decompiled [ModuleImpl]s. This ensures the scope walker visits source definitions first so that
-     * [keepProcessing] stops the walk before beam stubs are ever reached when source is available.
+     * Returns the [NamedElement]s for [moduleName] within [scope] to walk, preferring source [Call]s
+     * over decompiled [ModuleImpl] beam stubs: when the module is available as source, the beam stubs
+     * are dropped entirely so a module present in both forms is not visited twice.
      *
-     * [StubIndex.processElements] returns elements in an unspecified order; without this ordering a
-     * [ModuleImpl] arriving first would add a valid result, set [keepProcessing] to false, and
-     * short-circuit the loop before the corresponding source [Call] (e.g. `kernel.ex`) was visited.
+     * Dropping the beam stubs matters for Variants-style completion, where [keepProcessing] is always
+     * `true`, so a source [Call] and its [ModuleImpl] beam counterpart would otherwise both be visited
+     * and offer every definition twice (e.g. each `Kernel.SpecialForms` macro). For resolution, where
+     * [keepProcessing] stops after the first result, the surviving source [Call]s are still ordered
+     * first so the walk short-circuits on source before any beam stub (which are now only present when
+     * no source exists) is reached.
      */
-    private fun sourceFirstNamedElements(project: Project, scope: GlobalSearchScope, moduleName: String): List<NamedElement> =
-        buildList {
+    private fun sourceFirstNamedElements(project: Project, scope: GlobalSearchScope, moduleName: String): List<NamedElement> {
+        val namedElements = buildList {
             StubIndex.getInstance().processElements(
                 org.elixir_lang.psi.stub.index.ModularName.KEY,
                 moduleName,
@@ -341,7 +344,14 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
                 scope,
                 NamedElement::class.java
             ) { add(it); true }
-        }.sortedWith(compareBy { it is ModuleImpl<*> })
+        }
+
+        return if (namedElements.any { it is Call }) {
+            namedElements.filter { it is Call }
+        } else {
+            namedElements
+        }
+    }
 
     companion object {
         val MODULAR_CANONICAL_NAME = Key<String>("MODULAR_CANONICAL_NAME")
