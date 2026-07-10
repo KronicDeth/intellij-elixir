@@ -72,6 +72,23 @@ fun CodeInsightTestFixture.completionStringsAtCaret(): List<String>? {
 }
 
 /**
+ * Drives completion at the caret for the **single-candidate** case: with a non-empty prefix a lone
+ * match auto-inserts instead of opening the popup. Asserts no multi-candidate popup was shown (i.e.
+ * [complete] returned `null`) and returns the resulting document text, so callers can assert what the
+ * sole completion inserted.
+ *
+ * Complements [completionStringsAtCaret], which covers the multi-candidate popup case (it also returns
+ * `null` on auto-insert, but discards the inserted text this helper exposes).
+ */
+fun CodeInsightTestFixture.completeSoleCandidateAtCaret(): String {
+    assertNull(
+        "Expected a single auto-inserted completion, but a multi-candidate popup was shown",
+        complete(CompletionType.BASIC)
+    )
+    return file.text
+}
+
+/**
  * The [PsiUsage]s the Find Usages tool window would display for the search target resolved at the
  * caret (including the declaration usage; empty when the caret resolves to no unambiguous target).
  *

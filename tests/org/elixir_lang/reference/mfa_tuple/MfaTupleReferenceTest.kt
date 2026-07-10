@@ -1,5 +1,6 @@
 package org.elixir_lang.reference.mfa_tuple
 
+import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.find.usages.api.PsiUsage
 import com.intellij.find.usages.api.UsageOptions
 import com.intellij.find.usages.impl.AllSearchOptions
@@ -58,10 +59,11 @@ class MfaTupleReferenceTest : PlatformTestCase() {
         assertEquals("process", (resolved as? PsiNamedElement)?.name)
     }
 
-    fun testGetVariantsReturnsEmpty() {
+    fun testGetVariantsOffersModuleFunctions() {
         val reference = atomReferenceAtCaret("basic_mfa.ex")
 
-        assertEmpty(reference.variants.toList())
+        val variantStrings = reference.variants.map { (it as LookupElement).lookupString }
+        assertContainsElements(variantStrings, "map")
     }
 
     fun testBareAtomUsesGeneralReferenceWithLegacyVariants() {
@@ -82,12 +84,13 @@ class MfaTupleReferenceTest : PlatformTestCase() {
         )
     }
 
-    fun testMfaAtomUsesMfaReferenceWithEmptyVariants() {
+    fun testMfaAtomUsesMfaReferenceWithModuleFunctionVariants() {
         myFixture.configureByFile("basic_mfa.ex")
         val reference = myFixture.getReferenceAtCaretPositionWithAssertion()
 
         assertInstanceOf(reference, AtomReference::class.java)
-        assertEmpty(reference.variants.toList())
+        val variantStrings = reference.variants.map { (it as LookupElement).lookupString }
+        assertContainsElements(variantStrings, "map")
     }
 
     fun testFunctionResolvesArgsListArity() {

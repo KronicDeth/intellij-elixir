@@ -7,6 +7,7 @@ import com.intellij.openapi.util.TextRange
 import com.intellij.psi.*
 import com.intellij.psi.impl.source.resolve.ResolveCache
 import com.intellij.util.concurrency.annotations.RequiresReadLock
+import org.elixir_lang.code_insight.completion.callDefinitionClauseLookupElements
 import org.elixir_lang.psi.CallDefinitionClause
 import org.elixir_lang.psi.ElixirAtom
 import org.elixir_lang.psi.call.Call
@@ -30,7 +31,15 @@ class AtomReference(
     private val functionName: String?
         get() = myElement.node.lastChildNode?.text
 
-    override fun getVariants(): Array<Any> = emptyArray()
+    override fun getVariants(): Array<Any> {
+        val modulars = moduleElement.maybeModularNameToModulars(
+            maxScope = myElement.containingFile,
+            useCall = null,
+            incompleteCode = true
+        )
+
+        return callDefinitionClauseLookupElements(modulars, appendParentheses = false).toTypedArray()
+    }
 
     override fun getAbsoluteRange(): TextRange =
         rangeInElement.shiftRight(myElement.textRange.startOffset)
