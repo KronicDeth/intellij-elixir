@@ -49,12 +49,7 @@ class VariableReference(
             val matchFallback = pinMatchRightSideSymbols(element, name)
             if (matchFallback.isNotEmpty()) return matchFallback
 
-            val call = (element as? Call)
-                ?: generateSequence(element) { it.parent }.filterIsInstance<Call>().firstOrNull()
-            val legacyResolved = call?.reference?.resolve()
-            return legacyResolved?.let { resolved ->
-                VariableSymbol.fromDeclaration(resolved)?.let { listOf(it) } ?: emptyList()
-            } ?: emptyList()
+            return emptyList()
         }
 
         @RequiresReadLock
