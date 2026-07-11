@@ -1,0 +1,27 @@
+<html lang="en">
+<body>
+<p>Reports type names in type specifications that cannot be resolved to any type definition in scope.</p>
+<!-- tooltip end -->
+<p>In Elixir, a type name used in a <code>@type</code>, <code>@typep</code>, <code>@opaque</code>,
+<code>@spec</code>, <code>@callback</code>, or <code>@macrocallback</code> must resolve to a type that
+is defined, imported from another module, or provided as a built-in. When the type cannot be resolved,
+the specification is misleading and tools such as Dialyzer will not behave as intended.</p>
+<p>This inspection flags the type name (for example, <code>missing</code> in
+<code>@spec convert(Other.missing()) :: :ok</code>) when it does not resolve to a type definition. For
+qualified names, the message includes the qualifier (e.g. <code>Type 'Other.missing/0' is not defined</code>);
+for unqualified names it reports the bare name and arity (e.g. <code>Type 'nope/0' is not defined</code>).</p>
+<p>The following are recognised and never flagged:</p>
+<ul>
+    <li>Built-in types such as <code>integer()</code>, <code>term()</code>, and <code>atom()</code>.</li>
+    <li>Type variables declared in a <code>@type</code> head, for example <code>a</code> and <code>b</code>
+        in <code>@type pair(a, b) :: {a, b}</code>.</li>
+    <li>Type variables bound by a <code>when</code> guard, for example <code>a</code> in
+        <code>@spec identity(a) :: a when a: term()</code>.</li>
+</ul>
+<p>Qualified type names whose qualifier module itself cannot be resolved are not flagged here; the
+unresolved module is reported by the <em>Unresolvable module qualifier</em> inspection instead.</p>
+<p>This inspection only runs on files under Source or Test Source roots (e.g. <code>lib/</code>,
+<code>test/</code>). Files in unmarked directories like <code>config/</code>, and Elixir fragments
+injected into documentation, are not inspected.</p>
+</body>
+</html>
