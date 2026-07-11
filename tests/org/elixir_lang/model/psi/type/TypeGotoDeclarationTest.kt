@@ -6,6 +6,7 @@ import org.elixir_lang.PlatformTestCase
 import org.elixir_lang.code_insight.assertGotoDeclarationChosenAtCaret
 import org.elixir_lang.code_insight.assertGotoDeclarationLandsIn
 import org.elixir_lang.code_insight.enclosingCallAtCaret
+import org.elixir_lang.code_insight.gotoDeclarationDestination
 import org.elixir_lang.structure_view.element.Type as TypeElement
 
 @Suppress("UnstableApiUsage")
@@ -40,5 +41,36 @@ class TypeGotoDeclarationTest : PlatformTestCase() {
 
         val resolved = references.flatMap { it.resolveReference() }
         assertTrue("Reference should resolve to at least one TypeSymbol", resolved.any { it is TypeSymbol })
+    }
+
+    fun testCtrlClickOnTypeVariableUsageChoosesGotoDeclaration() {
+        myFixture.configureByFiles("type_variable_usage.ex")
+        myFixture.assertGotoDeclarationChosenAtCaret()
+    }
+
+    fun testGoToDeclarationNavigatesToTypeVariableDeclaration() {
+        myFixture.configureByFiles("type_variable_usage.ex")
+        myFixture.assertGotoDeclarationLandsIn(
+            "a",
+            "the type variable's head declaration"
+        ) { it.text == "box(a)" }
+    }
+
+    fun testCtrlClickOnSpecTypeVariableUsageChoosesGotoDeclaration() {
+        myFixture.configureByFiles("type_variable_spec_when.ex")
+        myFixture.assertGotoDeclarationChosenAtCaret()
+    }
+
+    fun testSpecTypeVariableUsageResolvesToWhenBinding() {
+        myFixture.configureByFiles("type_variable_spec_when.ex")
+        val target = myFixture.gotoDeclarationDestination()
+        assertNotNull("Go To Declaration should navigate to the `when` binding", target)
+        assertEquals("a", target!!.text)
+
+        val whenOffset = myFixture.file.text.indexOf("when")
+        assertTrue(
+            "Should land on the `when` binding, not the parameter usage",
+            target.textRange.startOffset > whenOffset
+        )
     }
 }

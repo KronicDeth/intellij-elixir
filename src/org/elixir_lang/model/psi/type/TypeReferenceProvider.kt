@@ -26,6 +26,7 @@ internal class TypeReferenceProvider : PsiSymbolReferenceProvider {
         if (element is AtUnqualifiedNoParenthesesCall<*>) return emptyList()
         if (element.ancestorTypeSpec() == null) return emptyList()
         if (isTypespecHeadFunction(element) || isTypeDeclarationHead(element) || isSpecHeadFunction(element)) return emptyList()
+        if (TypeVariableSymbol.isDeclaration(element)) return emptyList()
 
         val nameElement = element.functionNameElement() ?: return emptyList()
         val rangeInElement = nameElement.textRange.shiftLeft(element.textRange.startOffset)

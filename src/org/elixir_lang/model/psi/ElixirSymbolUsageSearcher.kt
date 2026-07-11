@@ -37,6 +37,7 @@ import org.elixir_lang.model.psi.module_attribute.ModuleAttributeSymbol
 import org.elixir_lang.model.psi.protocol.ProtocolFunction
 import org.elixir_lang.model.psi.type.TypeReference
 import org.elixir_lang.model.psi.type.TypeSymbol
+import org.elixir_lang.model.psi.type.TypeVariableSymbol
 import org.elixir_lang.model.psi.variable.VariableSymbol
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
@@ -106,6 +107,10 @@ internal class ElixirSymbolUsageSearcher : UsageSearcher {
 
             is TypeSymbol -> {
                 queries += typeUsageQuery(parameters.project, target, parameters.searchScope)
+            }
+
+            is TypeVariableSymbol -> {
+                queries += typeVariableUsageQuery(parameters.project, target, parameters.searchScope)
             }
 
             is ModuleAttributeSymbol -> {
@@ -381,12 +386,23 @@ internal class ElixirSymbolUsageSearcher : UsageSearcher {
             .inScope(searchScope)
             .buildQuery(TypeUsageMapper(symbol.createPointer()))
 
+    private fun typeVariableUsageQuery(
+        project: Project,
+        symbol: TypeVariableSymbol,
+        searchScope: SearchScope
+    ): Query<out PsiUsage> =
+        SearchService.getInstance()
+            .searchWord(project, symbol.searchText)
+            .caseSensitive(true)
+            .inContexts(SearchContext.inCode())
+            .inScope(symbol.maximalSearchScope?.intersectWith(searchScope) ?: searchScope)
+            .buildQuery(TypeVariableUsageMapper(symbol.createPointer()))
+
     private fun variableUsageQuery(
         project: Project,
         symbol: VariableSymbol,
         searchScope: SearchScope
-    ): Query<out PsiUsage> =
-        SearchService.getInstance()
+    ): Query<out PsiUsage> =        SearchService.getInstance()
             .searchWord(project, symbol.searchText)
             .caseSensitive(true)
             .inContexts(SearchContext.inCode())
@@ -718,6 +734,45 @@ internal class ElixirSymbolUsageSearcher : UsageSearcher {
 
             val resolved = TypeReference.resolveSymbols(call)
             if (resolved.none { it == symbol }) return emptyList()
+
+            return listOf(
+                ElixirPsiUsage.create(
+                    nameElement,
+                    TextRange(0, nameElement.textLength),
+                    declaration = false,
+                    usageType = SPECIFICATION
+                )
+            )
+        }
+    }
+
+    private class TypeVariableUsageMapper(
+        private val symbolPointer: Pointer<out TypeVariableSymbol>
+    ) : LeafOccurrenceMapper<PsiUsage> {
+        @RequiresReadLock
+        override fun mapOccurrence(occurrence: LeafOccurrence): Collection<PsiUsage> {
+            val symbol = symbolPointer.dereference() ?: return emptyList()
+            val (_, leaf, _) = occurrence
+            // The search scope is the single enclosing `@type`/`@spec` attribute, so any same-named
+            // occurrence here is either this variable's declaration or one of its usages.
+            val call = generateSequence(leaf) { it.parent }
+                .takeWhile { it !is PsiFile }
+                .filterIsInstance<Call>()
+                .firstOrNull { candidate ->
+                    val nameElement = candidate.functionNameElement()
+                    nameElement != null &&
+                        PsiTreeUtil.isAncestor(nameElement, leaf, false) &&
+                        candidate.functionName() == symbol.name
+                }
+                ?: return emptyList()
+            val nameElement = call.functionNameElement() ?: return emptyList()
+            // Skip the declaration's own occurrence; it is contributed separately as declaration = true.
+            if (nameElement.containingFile.virtualFile == symbol.file.virtualFile &&
+                nameElement.textRange == symbol.range
+            ) {
+                return emptyList()
+            }
+            if (TypeReference.resolveTypeVariableSymbols(call).none { it == symbol }) return emptyList()
 
             return listOf(
                 ElixirPsiUsage.create(

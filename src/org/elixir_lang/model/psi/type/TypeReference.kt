@@ -27,8 +27,11 @@ class TypeReference(
     override fun getRangeInElement(): TextRange = rangeInElement
 
     @RequiresReadLock
-    override fun resolveReference(): Collection<Symbol> =
-        resolveSymbols(call)
+    override fun resolveReference(): Collection<Symbol> {
+        val typeSymbols = resolveSymbols(call)
+
+        return if (typeSymbols.isNotEmpty()) typeSymbols else resolveTypeVariableSymbols(call)
+    }
 
     companion object {
         @RequiresReadLock
@@ -44,6 +47,24 @@ class TypeReference(
                 .mapNotNull { it.element as? Call }
                 .filter { TypeElement.`is`(it) }
                 .flatMap { TypeSymbol.fromTypeAttribute(it) }
+                .distinct()
+        }
+
+        /**
+         * Resolves an unqualified type name to the type variable(s) that declare it - a head parameter of an
+         * enclosing `@type`/`@typep`/`@opaque` (e.g. `a` in `@type box(a) :: {:box, a}`) or a `@spec ... when`
+         * binding. Qualified names can never be type variables, so they resolve to nothing here. Only consulted
+         * when [resolveSymbols] finds no `@type` definition, so real types always win.
+         */
+        @RequiresReadLock
+        fun resolveTypeVariableSymbols(call: Call): List<TypeVariableSymbol> {
+            if (call is Qualified) return emptyList()
+            val name = call.functionName() ?: return emptyList()
+
+            return MultiResolve.resolveResults(name, call.resolvedFinalArity(), false, call)
+                .filter(ResolveResult::isValidResult)
+                .mapNotNull { it.element }
+                .mapNotNull { TypeVariableSymbol.fromDeclaration(it) }
                 .distinct()
         }
 
