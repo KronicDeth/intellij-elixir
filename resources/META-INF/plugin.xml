@@ -385,6 +385,9 @@
         <localInspection displayName="Unresolvable module qualifier" enabledByDefault="true" groupName="Elixir"
                          implementationClass="org.elixir_lang.inspection.UnresolvableModuleQualifier"
                          language="Elixir" level="ERROR" shortName="UnresolvableModuleQualifier"/>
+        <localInspection displayName="Type variable used once" enabledByDefault="true" groupName="Elixir"
+                         implementationClass="org.elixir_lang.inspection.TypeVariableUsedOnce"
+                         language="Elixir" level="ERROR" shortName="TypeVariableUsedOnce"/>
         <spellchecker.support implementationClass="org.elixir_lang.spell_checking.Strategy" language="Elixir"/>
         <spellchecker.bundledDictionaryProvider
                 implementation="org.elixir_lang.spell_checking.BundledDictionaryProvider"/>
