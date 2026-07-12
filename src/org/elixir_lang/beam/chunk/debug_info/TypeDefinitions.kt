@@ -6,8 +6,8 @@ import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.AbstractCodeCo
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.attribute.Type
 import org.elixir_lang.beam.psi.stubs.ModuleStub
 import org.elixir_lang.beam.type.VisibilityNameArity
+import org.elixir_lang.model.psi.type.TypeBuiltins.BUILTIN_ARITY_BY_NAME
 import org.elixir_lang.psi.Protocol
-import org.elixir_lang.reference.resolver.Type.BUILTIN_ARITY_BY_NAME
 import org.elixir_lang.type.Visibility
 import java.util.*
 

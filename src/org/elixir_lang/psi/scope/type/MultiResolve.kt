@@ -16,7 +16,6 @@ import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.psi.operation.*
 import org.elixir_lang.psi.scope.ResolveResultOrderedSet
 import org.elixir_lang.psi.scope.WhileIn.whileIn
-import org.elixir_lang.reference.Type.Companion.typeHead
 
 class MultiResolve
 private constructor(private val name: String,
@@ -188,5 +187,29 @@ private constructor(private val name: String,
 
             return multiResolve.resolveResults()
         }
+
+        private tailrec fun typeHead(typeSpec: PsiElement): Call? =
+            when (typeSpec) {
+                is AtUnqualifiedNoParenthesesCall<*> -> {
+                    val finalArgument = typeSpec.finalArguments()?.singleOrNull()
+
+                    if (finalArgument != null) {
+                        typeHead(finalArgument)
+                    } else {
+                        null
+                    }
+                }
+                is Type -> typeSpec.leftOperand() as? Call
+                is When -> {
+                    val leftOperand = typeSpec.leftOperand()
+
+                    if (leftOperand != null) {
+                        typeHead(leftOperand)
+                    } else {
+                        null
+                    }
+                }
+                else -> null
+            }
     }
 }

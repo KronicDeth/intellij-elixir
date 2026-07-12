@@ -145,7 +145,10 @@ private fun Call.computeCallableReference(): PsiReference? =
             if (this.isTypeSpecPseudoFunction()) {
                 null
             } else {
-                org.elixir_lang.reference.Type(ancestorTypeSpec, this)
+                // Type-spec references (`@type`/`@spec` usage sites) are owned by Symbol API providers:
+                // - TypeReferenceProvider for type names
+                // - SpecFunctionReferenceProvider for @spec function heads
+                null
             }
         } else {
             Callable(this)
