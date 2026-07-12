@@ -9,6 +9,7 @@ import com.intellij.psi.ResolveResult
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
 import com.intellij.util.concurrency.annotations.RequiresReadLock
+import org.elixir_lang.beam.psi.impl.TypeDefinitionImpl
 import org.elixir_lang.psi.NamedElement
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.qualification.Qualified
@@ -48,6 +49,26 @@ class TypeReference(
                 .filter { TypeElement.`is`(it) }
                 .flatMap { TypeSymbol.fromTypeAttribute(it) }
                 .distinct()
+        }
+
+        /**
+         * Whether [call] resolves to any type definition. Unlike [resolveSymbols], this also counts decompiled BEAM
+         * types (`TypeDefinitionImpl`, e.g. `:queue.queue/0` from the Erlang stdlib), which [resolveSymbols] drops
+         * because it can only build [TypeSymbol]s from source `@type` [Call]s.
+         */
+        @RequiresReadLock
+        fun resolvesToType(call: Call): Boolean {
+            val resolved = if (call is Qualified) resolveQualified(call) else resolveUnqualified(call)
+
+            return resolved
+                .filter(ResolveResult::isValidResult)
+                .any { result ->
+                    when (val element = result.element) {
+                        is Call -> TypeElement.`is`(element)
+                        is TypeDefinitionImpl<*> -> true
+                        else -> false
+                    }
+                }
         }
 
         /**

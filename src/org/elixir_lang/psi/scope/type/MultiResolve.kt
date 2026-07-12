@@ -16,6 +16,7 @@ import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.psi.operation.*
 import org.elixir_lang.psi.scope.ResolveResultOrderedSet
 import org.elixir_lang.psi.scope.WhileIn.whileIn
+import org.elixir_lang.structure_view.element.Type as TypeElement
 
 class MultiResolve
 private constructor(private val name: String,
@@ -26,9 +27,16 @@ private constructor(private val name: String,
                     ?.let { executeOnTypeHead(definition, it, state) }
                     ?: true
 
-    private fun executeOnTypeHead(definition: Call, typeHead: Call, state: ResolveState): Boolean =
-            executeOnTypeHeadArguments(typeHead, state)
-                    && executeOnTypeHeadName(definition, typeHead, state)
+    private fun executeOnTypeHead(definition: Call, typeHead: Call, state: ResolveState): Boolean {
+        // Only `@type`/`@typep`/`@opaque` heads declare type variables. In `@spec`/`@callback`/`@macrocallback`
+        // heads the arguments are type usages (references to real types or `when`-bound variables), so processing
+        // them as declarations would wrongly self-resolve a bare name like `config` in `@spec check(config, opts)`
+        // and short-circuit resolution before reaching the actual `@type config` or `when` binding.
+        val argumentsKeepProcessing =
+            if (TypeElement.`is`(definition)) executeOnTypeHeadArguments(typeHead, state) else true
+
+        return argumentsKeepProcessing && executeOnTypeHeadName(definition, typeHead, state)
+    }
 
     private fun executeOnTypeHeadArguments(typeHead: Call, state: ResolveState): Boolean =
             typeHead.finalArguments()?.let { executeOnTypeHeadArguments(it, state) }
