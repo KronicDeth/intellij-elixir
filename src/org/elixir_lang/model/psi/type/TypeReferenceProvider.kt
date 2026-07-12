@@ -18,6 +18,7 @@ import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.psi.operation.Operation
 import org.elixir_lang.psi.operation.Type as TypeOperation
 import org.elixir_lang.psi.scope.ancestorTypeSpec
+import org.elixir_lang.psi.scope.isTypeSpecPseudoFunction
 import org.elixir_lang.structure_view.element.CallDefinitionSpecification
 import org.elixir_lang.structure_view.element.Type as TypeElement
 
@@ -47,6 +48,9 @@ internal fun isTypeNameUsage(call: Call): Boolean {
     if (isTypespecHeadFunction(call) || isTypeDeclarationHead(call) || isSpecHeadFunction(call)) return false
     if (isNamedTypeLabel(call)) return false
     if (isQualifierOfQualifiedType(call)) return false
+    // `required(...)`/`optional(...)` map-field markers, `...` list repetition, and `var` no-type-restriction
+    // are typespec syntax, not references to a named type, so they never resolve and must not be treated as usages.
+    if (call.isTypeSpecPseudoFunction()) return false
     if (TypeVariableSymbol.isDeclaration(call)) return false
     return true
 }

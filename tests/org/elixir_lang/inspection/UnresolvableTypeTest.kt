@@ -65,6 +65,15 @@ class UnresolvableTypeTest : PlatformTestCase() {
         myFixture.checkHighlighting()
     }
 
+    /**
+     * A named spec argument whose label happens to match the type it annotates, e.g. `my_id :: my_id()`, must still
+     * resolve the `my_id()` on the right to the `@type my_id`. The label on the left must not shadow the type.
+     */
+    fun testSpecNamedArgLabelSameNameAsTypeNotFlagged() {
+        myFixture.configureByFiles("spec_named_arg_label_same_name_as_type_not_flagged.ex")
+        myFixture.checkHighlighting()
+    }
+
     fun testSelfQualifiedTypeNotFlagged() {
         myFixture.configureByFiles("self_qualified_type_not_flagged.ex")
         myFixture.checkHighlighting()
@@ -72,6 +81,15 @@ class UnresolvableTypeTest : PlatformTestCase() {
 
     fun testSpecHeadTypeReferenceNotFlagged() {
         myFixture.configureByFiles("spec_head_type_reference_not_flagged.ex")
+        myFixture.checkHighlighting()
+    }
+
+    /**
+     * `required(...)` and `optional(...)` are map-field optionality markers in a map type, not type usages
+     * (they wrap the key type of a `%{... => ...}` association), so they must not be flagged as undefined types.
+     */
+    fun testMapFieldOptionalityNotFlagged() {
+        myFixture.configureByFiles("map_field_optionality_not_flagged.ex")
         myFixture.checkHighlighting()
     }
 

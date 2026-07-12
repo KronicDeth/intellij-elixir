@@ -76,8 +76,13 @@ private constructor(private val name: String,
         }
     }
 
-    override fun executeOnParameter(parameter: PsiElement, state: ResolveState): Boolean =
-            when (parameter) {
+    override fun executeOnParameter(parameter: PsiElement, state: ResolveState): Boolean {
+        // The left side of a `name :: type` annotation (e.g. the `my_id` in `@spec do_it(my_id :: my_id())`) is a
+        // label for the type on its right, not a type-variable declaration. Registering it would shadow a real
+        // `@type`/`@spec ... when` binding of the same name and short-circuit resolution, so skip it here.
+        if (parameter.isNamedTypeLabelOperand()) return true
+
+        return when (parameter) {
                 is ElixirAccessExpression -> executeOnParameter(parameter.stripAccessExpression(), state)
                 is ElixirParentheticalStab ->
                     parameter.stab?.stabOperationList?.singleOrNull()
@@ -164,6 +169,17 @@ private constructor(private val name: String,
                     true
                 }
             }
+    }
+
+    /**
+     * Whether this element is the left-hand label of a `name :: type` annotation (e.g. `my_id` in `my_id :: my_id()`).
+     * Such a label names the type on its right rather than declaring a type variable, so it must not be registered as
+     * a resolvable declaration.
+     */
+    private fun PsiElement.isNamedTypeLabelOperand(): Boolean {
+        val typeOperation = PsiTreeUtil.getParentOfType(this, Type::class.java) ?: return false
+        return typeOperation.leftOperand()?.stripAccessExpression() === this
+    }
 
     private fun executeOnParameter(parameter: PsiElement, name: String?, state: ResolveState): Boolean =
             if (this.arity == 0 && name != null && name.startsWith(this.name)) {
