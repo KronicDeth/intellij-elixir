@@ -135,8 +135,12 @@ class FunctionSymbol(
             val nameArity = CallDefinitionClause.nameArityInterval(clause, ResolveState.initial()) ?: return emptyList()
             val nameId = CallDefinitionClause.nameIdentifier(clause) ?: return emptyList()
             val macro = CallDefinitionClause.isMacro(clause)
+            // For a decompiled beam function, this clause lives in an in-memory mirror file built from the `.beam`'s
+            // decompiled text; its `originalFile` is the navigable compiled file whose virtual file opens the
+            // decompiled editor at these offsets. For a source function `originalFile` is the file itself (no-op).
+            val declarationFile = clause.containingFile.originalFile
             return nameArity.arityInterval.closed().map { arity ->
-                FunctionSymbol(clause.containingFile, nameId.textRange, moduleName, nameArity.name, arity, macro)
+                FunctionSymbol(declarationFile, nameId.textRange, moduleName, nameArity.name, arity, macro)
             }
         }
     }

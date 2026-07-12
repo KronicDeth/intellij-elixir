@@ -9,7 +9,7 @@ import com.intellij.psi.util.PsiTreeUtil
 import org.elixir_lang.code_insight.assertGotoDeclarationChosenAtCaret
 import org.elixir_lang.code_insight.assertNoNavigationAtCaret
 import org.elixir_lang.code_insight.completionStringsAtCaret
-import org.elixir_lang.code_insight.gotoDeclarationDestination
+import org.elixir_lang.code_insight.gotoDeclarationDestinationAtCaret
 import org.elixir_lang.code_insight.nonDeclarationUsageCountAtCaret
 import org.elixir_lang.intellij_elixir.refactoring.InPlaceSymbolRenameTestCase
 import org.elixir_lang.psi.SigilHeredocLiteral
@@ -416,24 +416,18 @@ class RegexSigilInjectionTest : InPlaceSymbolRenameTestCase() {
     }
 
     private fun assertGotoDeclarationAtCaret() {
-        val usageOffset = myFixture.caretOffset
-
         // Ctrl+Click chooses "go to declaration" (a single unambiguous target), not "show usages".
         myFixture.assertGotoDeclarationChosenAtCaret()
 
         // Perform the real navigation and assert WHERE it landed: the payload_type *declaration*
         // (the first occurrence in the file), not merely that some target existed.
-        val destination = myFixture.gotoDeclarationDestination()
+        val destination = myFixture.gotoDeclarationDestinationAtCaret()
         assertNotNull("Go To Declaration produced no destination element", destination)
         assertEquals("payload_type", destination!!.text)
         assertEquals(
             "Go To Declaration must land on the payload_type declaration",
             myFixture.file.text.indexOf("payload_type"),
             destination.textRange.startOffset
-        )
-        assertTrue(
-            "The declaration must precede the interpolated usage the caret started on",
-            myFixture.caretOffset < usageOffset
         )
     }
 

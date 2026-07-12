@@ -15,9 +15,11 @@ import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.TextRange
+import com.intellij.psi.PsiCompiledFile
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.ResolveState
+import com.intellij.psi.search.LocalSearchScope
 import com.intellij.psi.search.SearchScope
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.usages.impl.rules.UsageType
@@ -80,46 +82,98 @@ internal class ElixirSymbolUsageSearcher : UsageSearcher {
         val queries = mutableListOf<Query<out Usage>>()
         queries += ElixirDirectUsageQuery(ElixirPsiUsage.create(target.file, target.range, declaration = true))
 
+        queries += usageQueries(parameters.project, target, parameters.searchScope)
+
+        // A symbol declared inside a decompiled file (e.g. a `.beam`) has usages that live in the SAME
+        // decompiled file - for a BEAM type, every `@spec`/`@type` reference to it, plus the right-hand
+        // side of its own `@type`. Those are invisible to the queries above: Find Usages is driven by
+        // SearchService.searchWord over a GlobalSearchScope, which only visits word-indexed files, and a
+        // `.beam` file's indexed content is its binary bytes - the decompiled text is never scanned. Re-run
+        // the same per-symbol queries against a LocalSearchScope over the decompiled mirror: a
+        // LocalSearchScope makes searchWord scan the given PSI text directly (no index), so the in-memory
+        // mirror's occurrences are found. The global pass above cannot see these, so there is no overlap.
+        //
+        // `target.file` can arrive in either of two shapes: the navigable compiled file itself (e.g. when
+        // the target is built directly from the caret), or - crucially, in the real Find Usages pipeline,
+        // which dereferences the target through its `Pointer` on a background thread - the in-memory mirror
+        // `ElixirFile`, because `TypeSymbol.createPointer()` restores `file` from the mirror element's
+        // `containingFile`. A mirror is recognised by its `originalFile` being the compiled file. Handle both.
+        val declarationFile = target.file
+        val compiledFile: PsiCompiledFile? = when {
+            declarationFile is PsiCompiledFile -> declarationFile
+            declarationFile.originalFile is PsiCompiledFile -> declarationFile.originalFile as PsiCompiledFile
+            else -> null
+        }
+        if (compiledFile != null) {
+            // The decompiled mirror to scan (the same cached instance whether `target.file` arrived as the
+            // compiled file or as the mirror restored through the pointer - `getMirror()` caches it).
+            val mirror = compiledFile.decompiledPsiFile
+            // The per-symbol mappers anchor each usage to the mirror element's `containingFile` - the
+            // in-memory mirror `ElixirFile`, which has no editor document/VirtualFile. The usage view cannot
+            // map such usages to real lines, so they all collapse onto a single line. Re-anchor them to the
+            // navigable compiled BEAM file (the mirror's `originalFile`): the mirror text is byte-for-byte the
+            // decompiled editor's document text, so the absolute offsets are identical and now resolve to the
+            // correct decompiled-editor lines - exactly like the declaration usage and Go To Declaration.
+            usageQueries(parameters.project, target, LocalSearchScope(mirror)).mapTo(queries) { query ->
+                query.mapping { usage: Usage ->
+                    if (usage is ElixirPsiUsage && usage.file !== compiledFile) {
+                        ElixirPsiUsage(compiledFile, usage.range, usage.declaration, usage.usageType)
+                    } else {
+                        usage
+                    }
+                }
+            }
+        }
+
+        return queries
+    }
+
+    private fun usageQueries(
+        project: Project,
+        target: ElixirSymbolWithUsages,
+        searchScope: SearchScope
+    ): List<Query<out Usage>> {
+        val queries = mutableListOf<Query<out Usage>>()
         when (target) {
             is Callback -> {
-                queries += implementationQuery(parameters.project, target, parameters.searchScope)
+                queries += implementationQuery(project, target, searchScope)
             }
 
             is ProtocolFunction -> {
-                queries += protocolCallSiteQuery(parameters.project, target, parameters.searchScope)
-                queries += protocolImplementationQuery(parameters.project, target, parameters.searchScope)
+                queries += protocolCallSiteQuery(project, target, searchScope)
+                queries += protocolImplementationQuery(project, target, searchScope)
             }
 
             is FunctionSymbol -> {
-                queries += functionDeclarationFamilyQuery(parameters.project, target, parameters.searchScope)
-                queries += functionCallSiteQuery(parameters.project, target, parameters.searchScope)
+                queries += functionDeclarationFamilyQuery(project, target, searchScope)
+                queries += functionCallSiteQuery(project, target, searchScope)
             }
 
             is AtomSymbol -> {
-                queries += atomUsageQuery(parameters.project, target.name, parameters.searchScope) { atomSymbol ->
+                queries += atomUsageQuery(project, target.name, searchScope) { atomSymbol ->
                     atomSymbol == target
                 }
             }
 
             is ModuleSymbol -> {
-                queries += moduleUsageQuery(parameters.project, target, parameters.searchScope)
+                queries += moduleUsageQuery(project, target, searchScope)
             }
 
             is TypeSymbol -> {
-                queries += typeUsageQuery(parameters.project, target, parameters.searchScope)
+                queries += typeUsageQuery(project, target, searchScope)
             }
 
             is TypeVariableSymbol -> {
-                queries += typeVariableUsageQuery(parameters.project, target, parameters.searchScope)
+                queries += typeVariableUsageQuery(project, target, searchScope)
             }
 
             is ModuleAttributeSymbol -> {
-                queries += moduleAttributeReadUsageQuery(parameters.project, target, parameters.searchScope)
-                queries += moduleAttributeWriteUsageQuery(target, parameters.searchScope)
+                queries += moduleAttributeReadUsageQuery(project, target, searchScope)
+                queries += moduleAttributeWriteUsageQuery(target, searchScope)
             }
 
             is VariableSymbol -> {
-                queries += variableUsageQuery(parameters.project, target, parameters.searchScope)
+                queries += variableUsageQuery(project, target, searchScope)
             }
         }
         return queries

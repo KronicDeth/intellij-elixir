@@ -5,7 +5,7 @@ import com.intellij.model.psi.PsiSymbolReferenceService
 import org.elixir_lang.PlatformTestCase
 import org.elixir_lang.code_insight.assertGotoDeclarationChosenAtCaret
 import org.elixir_lang.code_insight.enclosingCallAtCaret
-import org.elixir_lang.code_insight.gotoDeclarationDestination
+import org.elixir_lang.code_insight.gotoDeclarationDestinationAtCaret
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
 import org.elixir_lang.psi.CallDefinitionClause
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil
@@ -32,7 +32,7 @@ class CallbackImplGotoDeclarationTest : PlatformTestCase() {
     fun testGoToDeclarationNavigatesToCallback() {
         myFixture.configureByFiles("goto_use_injected.ex", "kernel.ex")
 
-        val target = myFixture.gotoDeclarationDestination()
+        val target = myFixture.gotoDeclarationDestinationAtCaret()
 
         assertNotNull("Go To Declaration should navigate somewhere", target)
         assertEquals("perform", target!!.text)

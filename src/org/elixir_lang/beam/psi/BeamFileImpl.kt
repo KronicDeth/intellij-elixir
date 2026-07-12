@@ -63,6 +63,18 @@ class BeamFileImpl private constructor(
     override fun getDecompiledPsiFile(): PsiFile = mirror as PsiFile
 
     /**
+     * Returns the mirror previously built by [getMirror] without triggering decompilation.
+     *
+     * The highlighting daemon ([com.intellij.codeInsight.daemon.impl.DaemonCodeAnalyzerImpl.queuePassesCreation] via
+     * [com.intellij.codeInsight.daemon.impl.TextEditorBackgroundHighlighter.getCachedFileToHighlight]) submits a
+     * `PsiCompiledFile` for semantic highlighting by swapping it for this cached mirror. If this returned the
+     * inherited default of `null`, the daemon would bail out of scheduling passes on every attempt and no annotator
+     * (semantic) highlighting would ever run over the decompiled `.beam` text, even though [getMirror] had built a
+     * full AST. Mirrors [com.intellij.psi.impl.compiled.ClsFileImpl.getCachedMirror].
+     */
+    override fun getCachedMirror(): PsiFile? = mirrorFileElement?.psi as PsiFile?
+
+    /**
      * Returns the virtual file corresponding to the PSI file.
      *
      * @return the virtual file, or null if the file exists only in memory.
@@ -339,11 +351,22 @@ class BeamFileImpl private constructor(
     override fun getOriginalFile(): PsiFile = this
 
     /**
-     * Returns the file type for the file.
+     * The PSI file type. This is deliberately the **non-binary** [org.elixir_lang.ElixirFileType], NOT the
+     * binary [org.elixir_lang.beam.FileType] used by the VFS to drive decompilation.
      *
-     * @return [org.elixir_lang.beam.FileType.INSTANCE]
+     * The distinction matters for the Find Usages tool window. `UsageInfo2UsageAdapter` computes a usage's
+     * displayed line and navigation offset from `PsiDocumentManager.getDocument(usage.file)`, but it
+     * short-circuits to line `-1` / offset `0` whenever `usage.file.getFileType().isBinary()` is true. Because
+     * `BeamFileImpl` is a physical file whose decompiled document is fully reachable (via
+     * `FileDocumentManager.getCachedDocument(virtualFile)`), reporting a non-binary PSI file type lets the
+     * usage view map every within-`.beam` usage to its true decompiled line instead of collapsing them all onto
+     * line 1. The VFS-level type (and thus the `filetype.decompiler`/read-only binary handling) is unaffected:
+     * decompiler wiring keys off [VirtualFile.getFileType], and the beam editor keys off it in
+     * [org.elixir_lang.beam.file_editor.Provider].
+     *
+     * @return [org.elixir_lang.ElixirFileType.INSTANCE]
      */
-    override fun getFileType(): FileType = org.elixir_lang.beam.FileType.INSTANCE
+    override fun getFileType(): FileType = org.elixir_lang.ElixirFileType.INSTANCE
 
     /**
      * This file.

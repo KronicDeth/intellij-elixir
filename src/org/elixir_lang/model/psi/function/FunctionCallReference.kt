@@ -5,6 +5,7 @@ import com.intellij.model.psi.PsiSymbolReference
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.util.concurrency.annotations.RequiresReadLock
+import org.elixir_lang.beam.psi.impl.CallDefinitionImpl
 import org.elixir_lang.model.psi.protocol.ProtocolFunction
 import org.elixir_lang.psi.CallDefinitionClause
 import org.elixir_lang.psi.call.Call
@@ -45,7 +46,16 @@ class FunctionCallReference(
         val callArity = call.resolvedFinalArity()
         val clauses = Callable(call).multiResolve(false)
             .filter { it.isValidResult }
-            .mapNotNull { result -> result.element as? Call }
+            .mapNotNull { result ->
+                when (val element = result.element) {
+                    // A source `def`/`defmacro` clause is already a `Call`, while a decompiled beam function exposes
+                    // the equivalent clause as its navigation element (the `.beam` mirror), so both flow through the
+                    // same `FunctionSymbol.fromClause` pipeline and compare equal by module/name/arity/macro.
+                    is Call -> element
+                    is CallDefinitionImpl<*> -> element.navigationElement as? Call
+                    else -> null
+                }
+            }
             .filter { CallDefinitionClause.`is`(it) }
 
         // Only navigate to the clause(s) whose arity matches this specific call site.

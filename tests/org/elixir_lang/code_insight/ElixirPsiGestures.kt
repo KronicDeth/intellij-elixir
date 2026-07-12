@@ -34,7 +34,7 @@ fun CodeInsightTestFixture.assertGotoDeclarationLandsIn(
     enclosingDescription: String,
     enclosingPredicate: (Call) -> Boolean
 ): Call {
-    val target = gotoDeclarationDestination()
+    val target = gotoDeclarationDestinationAtCaret()
     assertNotNull("Go To Declaration should navigate somewhere", target)
     assertEquals(expectedText, target!!.text)
     val enclosingCall = target.enclosingCall(enclosingPredicate)

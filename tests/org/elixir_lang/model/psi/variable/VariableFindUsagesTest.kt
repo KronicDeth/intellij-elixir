@@ -4,7 +4,7 @@ import com.intellij.ide.impl.HeadlessDataManager
 import org.elixir_lang.PlatformTestCase
 import org.elixir_lang.code_insight.assertGotoDeclarationChosenAtCaret
 import org.elixir_lang.code_insight.assertShowUsagesChosenAtCaret
-import org.elixir_lang.code_insight.gotoDeclarationDestination
+import org.elixir_lang.code_insight.gotoDeclarationDestinationAtCaret
 import org.elixir_lang.code_insight.nonDeclarationUsageCountAtCaret
 import org.elixir_lang.code_insight.searchTargetCountAtCaret
 
@@ -78,7 +78,7 @@ class VariableFindUsagesTest : PlatformTestCase() {
 
     fun testGoToDeclarationFromVariableUsageNavigatesToDeclaration() {
         myFixture.configureByFiles("goto_declaration_variable_usage.ex")
-        val target = myFixture.gotoDeclarationDestination()
+        val target = myFixture.gotoDeclarationDestinationAtCaret()
         assertNotNull("Go To Declaration should navigate to variable declaration", target)
         assertEquals("variable", target!!.text)
     }

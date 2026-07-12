@@ -6,8 +6,7 @@ import org.elixir_lang.PlatformTestCase
 import org.elixir_lang.code_insight.assertGotoDeclarationChosenAtCaret
 import org.elixir_lang.code_insight.assertGotoDeclarationLandsIn
 import org.elixir_lang.code_insight.enclosingCallAtCaret
-import org.elixir_lang.code_insight.gotoDeclarationDestination
-import org.elixir_lang.code_insight.gotoDeclarationTargetElement
+import org.elixir_lang.code_insight.gotoDeclarationDestinationAtCaret
 import org.elixir_lang.structure_view.element.Type as TypeElement
 
 @Suppress("UnstableApiUsage")
@@ -51,7 +50,7 @@ class TypeGotoDeclarationTest : PlatformTestCase() {
 
     fun testGoToDeclarationNavigatesToRemoteSourceType() {
         myFixture.configureByFiles("remote_source_type.ex", "remote_source_other.ex")
-        val target = myFixture.gotoDeclarationTargetElement(project)
+        val target = myFixture.gotoDeclarationDestinationAtCaret()
         assertNotNull("Go To Declaration should navigate to RemoteSourceOther's @type", target)
         assertEquals("existing", target!!.text)
         assertEquals("remote_source_other.ex", target.containingFile.name)
@@ -81,7 +80,7 @@ class TypeGotoDeclarationTest : PlatformTestCase() {
 
     fun testSpecTypeVariableUsageResolvesToWhenBinding() {
         myFixture.configureByFiles("type_variable_spec_when.ex")
-        val target = myFixture.gotoDeclarationDestination()
+        val target = myFixture.gotoDeclarationDestinationAtCaret()
         assertNotNull("Go To Declaration should navigate to the `when` binding", target)
         assertEquals("a", target!!.text)
 

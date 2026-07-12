@@ -5,7 +5,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
 import org.elixir_lang.PlatformTestCase
 import org.elixir_lang.code_insight.assertGotoDeclarationChosenAtCaret
-import org.elixir_lang.code_insight.gotoDeclarationDestination
+import org.elixir_lang.code_insight.gotoDeclarationDestinationAtCaret
 import org.elixir_lang.psi.call.Call
 
 /**
@@ -136,8 +136,6 @@ class GenServerDispatchTest : PlatformTestCase() {
      * loose "somewhere after" offset comparison.
      */
     private fun assertRequestNavigatesToHandler(handlerName: String, request: String) {
-        val usageOffset = myFixture.caretOffset
-
         // Independently locate the exact call-definition clause that handles this request.
         val expectedClause = expectedHandlerClause(handlerName, request)
 
@@ -145,14 +143,13 @@ class GenServerDispatchTest : PlatformTestCase() {
             "Ctrl+Click on the GenServer request should go to the $handlerName clause"
         )
 
-        val destination = myFixture.gotoDeclarationDestination()
+        val destination = myFixture.gotoDeclarationDestinationAtCaret()
         assertNotNull("Go To Declaration produced no destination element", destination)
         assertTrue(
             "Go To Declaration must land inside the $handlerName($request, ...) clause, " +
                 "landed on: '${destination?.text}'",
             PsiTreeUtil.isAncestor(expectedClause, destination!!, false)
         )
-        assertTrue("Go To Declaration must move the caret to the handler", myFixture.caretOffset != usageOffset)
     }
 
     /**
