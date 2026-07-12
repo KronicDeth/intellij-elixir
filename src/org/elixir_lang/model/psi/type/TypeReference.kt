@@ -31,10 +31,18 @@ class TypeReference(
     override fun resolveReference(): Collection<Symbol> {
         val typeSymbols = resolveSymbols(call)
 
-        return if (typeSymbols.isNotEmpty()) typeSymbols else resolveTypeVariableSymbols(call)
+        return typeSymbols.ifEmpty { resolveTypeVariableSymbols(call) }
     }
 
     companion object {
+        /**
+         * Resolves [call] to the [TypeSymbol]s of the `@type`/`@typep`/`@opaque` definition(s) it names. Both source
+         * definitions and decompiled BEAM definitions (`:queue.queue/0` from the Erlang stdlib, or a built-in like
+         * `integer/0` faked onto `:erlang`) are covered: a source definition is already a `@type` [Call], while a
+         * decompiled [TypeDefinitionImpl] exposes the equivalent `@type` [Call] as its
+         * [navigationElement][com.intellij.psi.PsiElement.getNavigationElement] (the decompiled `.beam` mirror), so
+         * both flow through the same [TypeSymbol.fromTypeAttribute] pipeline and compare equal by module/name/arity.
+         */
         @RequiresReadLock
         fun resolveSymbols(call: Call): List<TypeSymbol> {
             val resolved = if (call is Qualified) {
@@ -44,17 +52,26 @@ class TypeReference(
             }
 
             return resolved
+                .asSequence()
                 .filter(ResolveResult::isValidResult)
-                .mapNotNull { it.element as? Call }
+                .mapNotNull { result ->
+                    when (val element = result.element) {
+                        is Call -> element
+                        is TypeDefinitionImpl<*> -> element.navigationElement as? Call
+                        else -> null
+                    }
+                }
                 .filter { TypeElement.`is`(it) }
                 .flatMap { TypeSymbol.fromTypeAttribute(it) }
                 .distinct()
+                .toList()
         }
 
         /**
-         * Whether [call] resolves to any type definition. Unlike [resolveSymbols], this also counts decompiled BEAM
-         * types (`TypeDefinitionImpl`, e.g. `:queue.queue/0` from the Erlang stdlib), which [resolveSymbols] drops
-         * because it can only build [TypeSymbol]s from source `@type` [Call]s.
+         * Whether [call] resolves to any type definition, used by the unresolvable-type inspection to decide whether
+         * a name is a real type. More lenient than [resolveSymbols]: it counts a decompiled [TypeDefinitionImpl] as a
+         * type on its own, without requiring the decompiled `.beam` mirror to expose a usable `@type` [Call], so the
+         * inspection never false-flags a genuinely defined BEAM type even if its mirror cannot be rendered.
          */
         @RequiresReadLock
         fun resolvesToType(call: Call): Boolean {

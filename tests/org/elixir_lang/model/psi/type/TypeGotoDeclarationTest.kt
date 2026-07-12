@@ -7,6 +7,7 @@ import org.elixir_lang.code_insight.assertGotoDeclarationChosenAtCaret
 import org.elixir_lang.code_insight.assertGotoDeclarationLandsIn
 import org.elixir_lang.code_insight.enclosingCallAtCaret
 import org.elixir_lang.code_insight.gotoDeclarationDestination
+import org.elixir_lang.code_insight.gotoDeclarationTargetElement
 import org.elixir_lang.structure_view.element.Type as TypeElement
 
 @Suppress("UnstableApiUsage")
@@ -41,6 +42,23 @@ class TypeGotoDeclarationTest : PlatformTestCase() {
 
         val resolved = references.flatMap { it.resolveReference() }
         assertTrue("Reference should resolve to at least one TypeSymbol", resolved.any { it is TypeSymbol })
+    }
+
+    fun testCtrlClickOnRemoteSourceTypeChoosesGotoDeclaration() {
+        myFixture.configureByFiles("remote_source_type.ex", "remote_source_other.ex")
+        myFixture.assertGotoDeclarationChosenAtCaret()
+    }
+
+    fun testGoToDeclarationNavigatesToRemoteSourceType() {
+        myFixture.configureByFiles("remote_source_type.ex", "remote_source_other.ex")
+        val target = myFixture.gotoDeclarationTargetElement(project)
+        assertNotNull("Go To Declaration should navigate to RemoteSourceOther's @type", target)
+        assertEquals("existing", target!!.text)
+        assertEquals("remote_source_other.ex", target.containingFile.name)
+        val enclosing = generateSequence(target) { it.parent }
+            .filterIsInstance<org.elixir_lang.psi.call.Call>()
+            .firstOrNull { TypeElement.`is`(it) }
+        assertNotNull("Should land inside a @type/@typep/@opaque declaration", enclosing)
     }
 
     fun testCtrlClickOnTypeVariableUsageChoosesGotoDeclaration() {

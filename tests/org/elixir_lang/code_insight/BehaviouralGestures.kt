@@ -14,7 +14,10 @@ import com.intellij.find.usages.impl.searchTargets
 import com.intellij.openapi.actionSystem.IdeActions
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ReadAction
+import com.intellij.openapi.editor.Document
+import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
+import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
@@ -60,6 +63,34 @@ fun CodeInsightTestFixture.assertNoNavigationAtCaret(message: String? = null) {
 fun CodeInsightTestFixture.gotoDeclarationDestination(): PsiElement? {
     performEditorAction(IdeActions.ACTION_GOTO_DECLARATION)
     return file.findElementAt(caretOffset)
+}
+
+/**
+ * Performs the real Go To Declaration action and returns the PSI element the caret lands on in whichever
+ * editor navigation actually switched to - so, unlike [gotoDeclarationDestination], it follows navigation that
+ * lands in another source file or a decompiled `.beam` rather than only inspecting the originally configured file.
+ *
+ * The action and the resulting editor read run on the EDT (via `Application.invokeAndWait`); resolving that
+ * editor's document back to a [com.intellij.psi.PsiFile] runs off the EDT under a read action, mirroring
+ * [psiUsagesAtCaret], because the platform marks that resolution as background work.
+ */
+fun CodeInsightTestFixture.gotoDeclarationTargetElement(project: Project): PsiElement? {
+    val application = ApplicationManager.getApplication()
+    var document: Document? = null
+    var offset = -1
+    application.invokeAndWait {
+        performEditorAction(IdeActions.ACTION_GOTO_DECLARATION)
+        FileEditorManager.getInstance(project).selectedTextEditor?.let { editor ->
+            document = editor.document
+            offset = editor.caretModel.offset
+        }
+    }
+    val navigatedDocument = document ?: return null
+    return application.executeOnPooledThread(Callable {
+        ReadAction.nonBlocking(Callable {
+            PsiDocumentManager.getInstance(project).getPsiFile(navigatedDocument)?.findElementAt(offset)
+        }).executeSynchronously()
+    }).get()
 }
 
 /**

@@ -100,7 +100,13 @@ class TypeSymbol(
                 .getOrElse { if (it is ProcessCanceledException) throw it else null }
                 ?: return emptyList()
 
-            return listOf(TypeSymbol(typeAttribute.containingFile, nameId.textRange, moduleName, name, arity))
+            // For a decompiled BEAM type, this `@type` Call lives in an in-memory mirror file built from the
+            // `.beam`'s decompiled text; its `originalFile` is the navigable compiled file whose virtual file opens
+            // the decompiled editor at the very offsets used here (mirror text == decompiled document text). For a
+            // source type `originalFile` is the file itself, so this is a no-op there.
+            val declarationFile = typeAttributeCall.containingFile.originalFile
+
+            return listOf(TypeSymbol(declarationFile, nameId.textRange, moduleName, name, arity))
         }
     }
 }
