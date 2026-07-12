@@ -25,11 +25,11 @@ import com.intellij.util.IncorrectOperationException
 import org.elixir_lang.ElixirLanguage
 import org.elixir_lang.beam.Beam
 import org.elixir_lang.beam.Beam.Companion.from
-import org.elixir_lang.beam.Decompiler
 import org.elixir_lang.beam.MacroNameArity
 import org.elixir_lang.beam.chunk.Atoms
 import org.elixir_lang.beam.chunk.CallDefinitions
 import org.elixir_lang.beam.chunk.debug_info.TypeDefinitions
+import org.elixir_lang.beam.defmoduleArgument
 import org.elixir_lang.beam.psi.impl.*
 import org.elixir_lang.beam.psi.stubs.CallDefinitionStub
 import org.elixir_lang.beam.psi.stubs.ModuleStub
@@ -143,7 +143,7 @@ class BeamFileImpl private constructor(
                         ?.atoms()
                         ?.moduleName()
                         ?: virtualFile.nameWithoutExtension
-                val name = Decompiler.defmoduleArgument(moduleName)
+                val name = defmoduleArgument(moduleName)
                 LOGGER.warn("Building minimal stub tree for ${virtualFile.presentableUrl} (module $name)")
                 ModuleStubImpl<ModuleImpl<*>>(rootStub, name)
                 StubTree(rootStub)
@@ -454,7 +454,7 @@ class BeamFileImpl private constructor(
                 atoms
                     .moduleName()
                     ?.let { moduleName ->
-                        val name = Decompiler.defmoduleArgument(moduleName)
+                        val name = defmoduleArgument(moduleName)
                         val parentStub = ElixirFileStubImpl()
                         val moduleStub: ModuleStub<*> = ModuleStubImpl<ModuleImpl<*>>(parentStub, name)
                         buildCallDefinitions(moduleStub, beam, atoms)
