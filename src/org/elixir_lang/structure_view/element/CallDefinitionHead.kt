@@ -10,6 +10,7 @@ import org.elixir_lang.call.Visibility
 import org.elixir_lang.navigation.item_presentation.NameArity
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
+import org.elixir_lang.psi.call.name.Function.UNQUOTE
 import org.elixir_lang.psi.impl.PsiNamedElementImpl.unquoteName
 import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.psi.operation.Normalized.operatorIndex
@@ -102,7 +103,15 @@ class CallDefinitionHead(val callDefinition: CallDefinition, private val visibil
 
                     if (functionName != null) {
                         val name = unquoteName(stripped, functionName)
-                        val arityInterval = stripped.resolvedFinalArityInterval()
+                        // For an `unquote(:name)` head the primary argument list supplies the name, not the
+                        // parameters, so the parameters (if any) come solely from the secondary argument list.
+                        // A bare `unquote(:name)` head therefore has arity 0 rather than the arity 1 that counting
+                        // the name atom would produce.
+                        val arityInterval = if (functionName == UNQUOTE) {
+                            ArityInterval.fromArguments(stripped.secondaryArguments()?.map { it!! }?.toTypedArray())
+                        } else {
+                            stripped.resolvedFinalArityInterval()
+                        }
 
                         NameArityInterval(name, arityInterval).adjusted(state)
                     } else {
