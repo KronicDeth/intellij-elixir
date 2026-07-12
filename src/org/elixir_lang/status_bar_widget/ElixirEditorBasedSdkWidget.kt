@@ -208,7 +208,7 @@ class ElixirEditorBasedSdkWidget(
         // purpose.
         @Suppress("UnstableApiUsage", "DEPRECATION")
         scope.launch {
-            suspendCancellableCoroutine<Unit> { cont ->
+            suspendCancellableCoroutine { cont ->
                 JpsProjectLoadingManager.getInstance(project).jpsProjectLoaded {
                     cont.resumeWith(Result.success(Unit))
                 }
@@ -475,9 +475,12 @@ class ElixirEditorBasedSdkWidget(
         )
     }
 
-    private fun collectNotificationScanIoData(modelData: NotificationScanModelData): NotificationScanIoData {
+    private suspend fun collectNotificationScanIoData(modelData: NotificationScanModelData): NotificationScanIoData {
         val snapshot = modelData.projectSdkSnapshot
-        val projectSdkOtpMismatch = snapshot.elixirSdk?.let { detectOtpMismatch(it) }
+        // detectOtpMismatch(sdk) is @RequiresReadLock: it reads sdkAdditionalData (suppression flag + paired
+        // Erlang SDK) from the model. This runs on Dispatchers.IO, which holds no read lock, so wrap the call in
+        // a read action. The single-arg overload is used deliberately to keep honouring isSuppressOtpMismatchWarning.
+        val projectSdkOtpMismatch = snapshot.elixirSdk?.let { elixirSdk -> readAction { detectOtpMismatch(elixirSdk) } }
         return NotificationScanIoData(
             projectSdkOtpMismatch = projectSdkOtpMismatch,
             classpathIssues = detectClasspathIssues(snapshot),
@@ -830,6 +833,7 @@ class ElixirEditorBasedSdkWidget(
      * [ModuleRootManager] which requires read access; the caller must either hold a read lock
      * or call this inside a `readAction { }` block.
      */
+    @RequiresReadLock
     @RequiresBackgroundThread
     internal fun detectModuleSdkIssues(): List<ModuleSdkIssue> {
         ThreadingAssertions.assertBackgroundThread()
