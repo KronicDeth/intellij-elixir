@@ -21,7 +21,7 @@ defmodule :ssh_options do
 
   @typep authentication_daemon_options :: (:ssh_file.system_dir_daemon_option() | {:auth_method_kb_interactive_data, prompt_texts()} | {:user_passwords, [{userName :: charlist(), pwd :: charlist()}]} | {:pk_check_user, boolean()} | {:password, charlist()} | {:pwdfun, (pwdfun_2() | pwdfun_4())})
 
-  @typep callbacks_daemon_options :: ({:failfun, (user :: charlist(), peerAddress :: :inet.ip_address(), reason :: term() -> _)} | {:connectfun, (user :: charlist(), peerAddress :: :inet.ip_address(), method :: charlist() -> _)})
+  @typep callbacks_daemon_options :: ({:failfun, (user :: charlist(), peerAddress :: :inet.ip_address(), reason :: term() -> any())} | {:connectfun, (user :: charlist(), peerAddress :: :inet.ip_address(), method :: charlist() -> any())})
 
   @typep cipher_alg :: (:"3des-cbc" | :"AEAD_AES_128_GCM" | :"AEAD_AES_256_GCM" | :"aes128-cbc" | :"aes128-ctr" | :"aes128-gcm@openssh.com" | :"aes192-ctr" | :"aes192-cbc" | :"aes256-cbc" | :"aes256-ctr" | :"aes256-gcm@openssh.com" | :"chacha20-poly1305@openssh.com")
 
@@ -49,7 +49,7 @@ defmodule :ssh_options do
 
   @typep disconnectfun_common_option :: {:disconnectfun, (reason :: term() -> (:void | any()))}
 
-  @typep double_algs :: ([({:client2server, [algType]} | {:server2client, [algType]})] | [algType])
+  @typep double_algs(algType) :: ([({:client2server, [algType]} | {:server2client, [algType]})] | [algType])
 
   @typep error :: {:error, {:eoptions, any()}}
 

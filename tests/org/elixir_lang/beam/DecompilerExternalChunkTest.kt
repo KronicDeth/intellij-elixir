@@ -35,6 +35,10 @@ import java.nio.charset.StandardCharsets
  * OTP27_embedded_docs/       -- OTP 27 with docs embedded in .beam files
  *   stdlib/
  *     ebin/                  (no doc/chunks/ directory)
+ *
+ * OTP29_embedded_docs/       -- OTP 29 with docs embedded in .beam files;
+ *   stdlib/                     exercises abstract-code type rendering
+ *     ebin/                     (parametrized types, -opaque, dynamic())
  * ```
  *
  * Beam files and chunk files are copied from real OTP installations
@@ -51,31 +55,78 @@ class DecompilerExternalChunkTest : PlatformTestCase() {
     // --- OTP 23: external chunks (application/erlang+html format) ---
 
     fun testOTP23Base64WithExternalChunks() {
-        assertDecompiledWithAppLayout("OTP23_external_chunks", "stdlib", "base64")
+        assertDecompiledWithAppLayout("OTP23_external_chunks", "base64")
     }
 
     fun testOTP23QueueWithExternalChunks() {
-        assertDecompiledWithAppLayout("OTP23_external_chunks", "stdlib", "queue")
+        assertDecompiledWithAppLayout("OTP23_external_chunks", "queue")
     }
 
     // --- OTP 26: external chunks (application/erlang+html format, newer OTP) ---
 
     fun testOTP26Base64WithExternalChunks() {
-        assertDecompiledWithAppLayout("OTP26_external_chunks", "stdlib", "base64")
+        assertDecompiledWithAppLayout("OTP26_external_chunks", "base64")
     }
 
     fun testOTP26QueueWithExternalChunks() {
-        assertDecompiledWithAppLayout("OTP26_external_chunks", "stdlib", "queue")
+        assertDecompiledWithAppLayout("OTP26_external_chunks", "queue")
     }
 
     // --- OTP 27: embedded docs (docs chunk inside .beam file) ---
 
     fun testOTP27Base64WithEmbeddedDocs() {
-        assertDecompiledWithAppLayout("OTP27_embedded_docs", "stdlib", "base64")
+        assertDecompiledWithAppLayout("OTP27_embedded_docs", "base64")
     }
 
     fun testOTP27QueueWithEmbeddedDocs() {
-        assertDecompiledWithAppLayout("OTP27_embedded_docs", "stdlib", "queue")
+        assertDecompiledWithAppLayout("OTP27_embedded_docs", "queue")
+    }
+
+    // --- OTP 29: embedded docs (exercises abstract-code type rendering:
+    //     parametrized types, `-opaque`, and the `dynamic()` builtin) ---
+
+    fun testOTP29Base64WithEmbeddedDocs() {
+        assertDecompiledWithAppLayout("OTP29_embedded_docs", "base64")
+    }
+
+    fun testOTP29QueueWithEmbeddedDocs() {
+        assertDecompiledWithAppLayout("OTP29_embedded_docs", "queue")
+    }
+
+    fun testOTP29ArrayWithEmbeddedDocs() {
+        assertDecompiledWithAppLayout("OTP29_embedded_docs", "array")
+    }
+
+    fun testOTP29DictWithEmbeddedDocs() {
+        assertDecompiledWithAppLayout("OTP29_embedded_docs", "dict")
+    }
+
+    fun testOTP29GbSetsWithEmbeddedDocs() {
+        assertDecompiledWithAppLayout("OTP29_embedded_docs", "gb_sets")
+    }
+
+    fun testOTP29GbTreesWithEmbeddedDocs() {
+        assertDecompiledWithAppLayout("OTP29_embedded_docs", "gb_trees")
+    }
+
+    fun testOTP29MapsWithEmbeddedDocs() {
+        assertDecompiledWithAppLayout("OTP29_embedded_docs", "maps")
+    }
+
+    fun testOTP29OrddictWithEmbeddedDocs() {
+        assertDecompiledWithAppLayout("OTP29_embedded_docs", "orddict")
+    }
+
+    fun testOTP29OrdsetsWithEmbeddedDocs() {
+        assertDecompiledWithAppLayout("OTP29_embedded_docs", "ordsets")
+    }
+
+    fun testOTP29SetsWithEmbeddedDocs() {
+        assertDecompiledWithAppLayout("OTP29_embedded_docs", "sets")
+    }
+
+    fun testOTP29JsonWithEmbeddedDocs() {
+        assertDecompiledWithAppLayout("OTP29_embedded_docs", "json")
     }
 
     override fun getTestDataPath(): String =
@@ -89,9 +140,9 @@ class DecompilerExternalChunkTest : PlatformTestCase() {
      * [org.elixir_lang.beam.chunk.beam_documentation.Documentation.fromExternalChunk]
      * can navigate from `<app>/ebin/<module>.beam` to `<app>/doc/chunks/<module>.chunk`.
      */
-    private fun assertDecompiledWithAppLayout(otpDir: String, app: String, moduleName: String) {
+    private fun assertDecompiledWithAppLayout(otpDir: String, moduleName: String) {
         val testDataPath = getTestDataPath()
-        val ebinDir = "$testDataPath/$otpDir/$app/ebin"
+        val ebinDir = "$testDataPath/$otpDir/stdlib/ebin"
         val beamPath = "$ebinDir/$moduleName.beam"
         val goldenPath = "$ebinDir/$moduleName.ex"
 

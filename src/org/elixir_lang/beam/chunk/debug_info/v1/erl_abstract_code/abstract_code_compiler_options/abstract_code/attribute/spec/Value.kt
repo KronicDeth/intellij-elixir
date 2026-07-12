@@ -2,12 +2,11 @@ package org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code
 
 import com.ericsson.otp.erlang.*
 import org.elixir_lang.Macro.ifTupleTo
-import org.elixir_lang.beam.Decompiler
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode
-import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.MacroString
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.attribute.spec.value.Definition
 import org.elixir_lang.beam.decompiler.Default
 import org.elixir_lang.beam.decompiler.MacroNameArity
+import org.elixir_lang.beam.decompiler.decompiler
 import org.elixir_lang.code.Identifier.inspectAsFunction
 import org.elixir_lang.psi.call.name.Function.DEF
 import java.math.BigInteger
@@ -51,7 +50,7 @@ object Value {
     private fun toStrings(value: OtpErlangTuple) =
             toMacroNameArity(value)
                     ?.let { macroNameArity ->
-                        val decompiler = Decompiler.decompiler("erlang", macroNameArity.toNameArity()) ?: Default.INSTANCE
+                        val decompiler = decompiler("erlang", macroNameArity.toNameArity()) ?: Default.INSTANCE
 
                         toDefinitions(value)
                                 ?.let { definitionsToStrings(it, decompiler, macroNameArity) }

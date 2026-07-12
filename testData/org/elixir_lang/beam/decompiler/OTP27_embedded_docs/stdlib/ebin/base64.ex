@@ -5,17 +5,19 @@ defmodule :base64 do
   [RFC 2045](https://www.ietf.org/rfc/rfc2045.txt).
   """
 
-  # Types
+  # Private Types
 
   @typedoc ~S"""
   Base 64 Encoding alphabet, see
   [RFC 4648](https://datatracker.ietf.org/doc/html/rfc4648).
   """
-  @type base64_alphabet()
+  @typep base64_alphabet :: (?A..?Z | ?a..?z | ?0..?9 | ?+ | ?/ | ?- | ?_ | ?=)
+
   @typedoc ~S"""
   Base 64 encoded binary.
   """
-  @type base64_binary()
+  @typep base64_binary :: binary()
+
   @typedoc ~S"""
   Selector for the Base 64 Encoding alphabet used for [encoding](`encode/2`) and
   [decoding](`decode/2`). See
@@ -23,15 +25,18 @@ defmodule :base64 do
   [4](https://datatracker.ietf.org/doc/html/rfc4648#section-4) and
   [5](https://datatracker.ietf.org/doc/html/rfc4648#section-5).
   """
-  @type base64_mode()
+  @typep base64_mode :: (:standard | :urlsafe)
+
   @typedoc ~S"""
   Base 64 encoded string.
   """
-  @type base64_string()
+  @typep base64_string :: [base64_alphabet()]
+
   @typedoc ~S"""
   Arbitrary sequences of octets.
   """
-  @type byte_string()
+  @typep byte_string :: [byte()]
+
   @typedoc ~S"""
   Customizes the behaviour of the decode functions.
 
@@ -59,7 +64,8 @@ defmodule :base64 do
   - **`false`** - Accepts an encoded string with missing `=` padding characters at
     the end.
   """
-  @type decode_options()
+  @typep decode_options :: %{optional(:padding) => boolean(), optional(:mode) => base64_mode()}
+
   @typedoc ~S"""
   Customizes the behaviour of the decode functions.
 
@@ -82,7 +88,7 @@ defmodule :base64 do
 
   - **`false`** - Skips appending `=` padding characters to the encoded string.
   """
-  @type encode_options()
+  @typep encode_options :: %{optional(:padding) => boolean(), optional(:mode) => base64_mode()}
 
   # Functions
 

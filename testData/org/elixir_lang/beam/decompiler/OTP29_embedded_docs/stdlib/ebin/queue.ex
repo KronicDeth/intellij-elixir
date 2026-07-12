@@ -68,7 +68,7 @@ defmodule :queue do
   Returns `true` if `Pred(Item)` returns `true` for all items `Item` in `Q`,
   otherwise `false`.
 
-  _Example:_
+  ## Examples
 
   ```erlang
   1> Queue = queue:from_list([1,2,3,4,5]).
@@ -87,7 +87,7 @@ defmodule :queue do
   Returns `true` if `Pred(Item)` returns `true` for at least one item `Item` in
   `Q`, otherwise `false`.
 
-  _Example:_
+  ## Examples
 
   ```erlang
   1> Queue = queue:from_list([1,2,3,4,5]).
@@ -103,14 +103,14 @@ defmodule :queue do
   def any(pred, q), do: :erlang.error(:badarg, [pred, q])
 
   @doc ~S"""
-  Inserts `Item` at the head of queue `Q1`. Returns the new queue `Q2`.
+  Inserts `Item` at the head of queue `Q1` and returns the new queue `Q2`.
 
-  _Example:_
+  ## Examples
 
   ```erlang
-  1> Queue = queue:cons(0, queue:from_list([1,2,3])).
-  {[3,2],[0,1]}
-  2> queue:to_list(Queue).
+  1> Queue1 = queue:from_list([1, 2, 3]).
+  2> Queue2 = queue:cons(0, Queue1).
+  3> queue:to_list(Queue2).
   [0,1,2,3]
   ```
   """
@@ -122,11 +122,14 @@ defmodule :queue do
 
   Fails with reason `empty` if `Q` is empty.
 
-  _Example 1:_
+  ## Examples
 
   ```erlang
-  1> queue:daeh(queue:from_list([1,2,3])).
+  1> Queue = queue:from_list([1, 2, 3]).
+  2> queue:daeh(Queue).
   3
+  3> queue:drop(queue:new()).
+  ** exception error: empty
   ```
   """
   @spec daeh(q :: queue(item)) :: item
@@ -136,7 +139,7 @@ defmodule :queue do
   Returns a copy of `Q1` where the first item matching `Item` is deleted, if there
   is such an item.
 
-  _Example:_
+  ## Examples
 
   ```erlang
   1> Queue = queue:from_list([1,2,3,4,5]).
@@ -170,7 +173,7 @@ defmodule :queue do
   Returns a copy of `Q1` where the last item matching `Item` is deleted, if there
   is such an item.
 
-  _Example:_
+  ## Examples
 
   ```erlang
   1> Queue = queue:from_list([1,2,3,4,3,5]).
@@ -191,13 +194,13 @@ defmodule :queue do
   Returns a copy of `Q1` where the first item for which `Pred` returns `true` is
   deleted, if there is such an item.
 
-  _Example:_
+  ## Examples
 
   ```erlang
-  1> Queue = queue:from_list([100,1,2,3,4,5]).
-  2> Queue1 = queue:delete_with(fun (E) -> E > 0, Queue).
+  1> Queue = queue:from_list([1,2,3,4,5]).
+  2> Queue1 = queue:delete_with(fun (E) -> E rem 2 =:= 0 end, Queue).
   3> queue:to_list(Queue1).
-  [1,2,3,4,5]
+  [1,3,4,5]
   ```
   """
   @spec delete_with(pred, q1) :: q2 when pred: (item -> boolean()), q1: queue(item), q2: queue(item), item: term()
@@ -225,13 +228,13 @@ defmodule :queue do
   Returns a copy of `Q1` where the last item for which `Pred` returns `true` is
   deleted, if there is such an item.
 
-  _Example:_
+  ## Examples
 
   ```erlang
-  1> Queue = queue:from_list([1,2,3,4,5,100]).
-  2> Queue1 = queue:delete_with(fun (E) -> E > 10, Queue).
+  1> Queue = queue:from_list([1,2,3,4,5]).
+  2> Queue1 = queue:delete_with_r(fun (E) -> E rem 2 =:= 0 end, Queue).
   3> queue:to_list(Queue1).
-  [1,2,3,4,5]
+  [1,2,3,5]
   ```
   """
   @spec delete_with_r(pred, q1) :: q2 when pred: (item -> boolean()), q1: queue(item), q2: queue(item), item: term()
@@ -247,15 +250,15 @@ defmodule :queue do
 
   Fails with reason `empty` if `Q1` is empty.
 
-  _Example:_
+  ## Examples
 
   ```erlang
-  1> Queue = queue:from_list([1,2,3,4,5]).
-  {[5,4,3],[1,2]}
-  2> Queue = queue:drop(Queue).
-  {[5,4,3],[2]}
-  3> queue:to_list(Queue1).
+  1> Queue1 = queue:from_list([1,2,3,4,5]).
+  2> Queue2 = queue:drop(Queue1).
+  3> queue:to_list(Queue2).
   [2,3,4,5]
+  4> queue:drop(queue:new()).
+  ** exception error: empty
   ```
   """
   @spec drop(q1 :: queue(item)) :: q2 :: queue(item)
@@ -279,15 +282,15 @@ defmodule :queue do
 
   Fails with reason `empty` if `Q1` is empty.
 
-  _Example:_
+  ## Examples
 
   ```erlang
-  1> Queue = queue:from_list([1,2,3,4,5]).
-  {[5,4,3],[1,2]}
-  2> Queue = queue:drop_r(Queue).
-  {[4,3],[1,2]}
-  3> queue:to_list(Queue1).
+  1> Queue1 = queue:from_list([1,2,3,4,5]).
+  2> Queue2 = queue:drop_r(Queue1).
+  3> queue:to_list(Queue2).
   [1,2,3,4]
+  4> queue:drop(queue:new()).
+  ** exception error: empty
   ```
   """
   @spec drop_r(q1 :: queue(item)) :: q2 :: queue(item)
@@ -314,13 +317,11 @@ defmodule :queue do
   returns `false`, `Item` is not copied. If it returns a list, the list elements
   are inserted instead of `Item` in the result queue.
 
-  _Example 1:_
+  ## Examples
 
   ```erlang
   1> Queue = queue:from_list([1,2,3,4,5]).
-  {[5,4,3],[1,2]}
   2> Queue1 = queue:filter(fun (E) -> E > 2 end, Queue).
-  {[5],[3,4]}
   3> queue:to_list(Queue1).
   [3,4,5]
   ```
@@ -329,13 +330,11 @@ defmodule :queue do
   returning `true`, just as returning `[]` is semantically equivalent to returning
   `false`. But returning a list builds more garbage than returning an atom.
 
-  _Example 2:_
+  ## Examples
 
   ```erlang
   1> Queue = queue:from_list([1,2,3,4,5]).
-  {[5,4,3],[1,2]}
   2> Queue1 = queue:filter(fun (E) -> [E, E+1] end, Queue).
-  {[6,5,5,4,4,3],[1,2,2,3]}
   3> queue:to_list(Queue1).
   [1,2,2,3,3,4,4,5,5,6]
   ```
@@ -364,19 +363,16 @@ defmodule :queue do
   returns `false`, `Item` is not copied. If it returns `{true, NewItem}`, the
   queue element at this position is replaced with `NewItem` in the result queue.
 
-  _Example 1:_
+  ## Examples
 
   ```erlang
   1> Queue = queue:from_list([1,2,3,4,5]).
-  {[5,4,3],[1,2]}
   2> Queue1 = queue:filtermap(fun (E) -> E > 2 end, Queue).
-  {[5],[3,4]}
   3> queue:to_list(Queue1).
   [3,4,5]
-  4> Queue1 = queue:filtermap(fun (E) -> {true, E+100} end, Queue).
-  {"ihg","ef"}
-  5> queue:to_list(Queue1).
-  "efghi
+  4> Queue2 = queue:filtermap(fun (E) -> {true, E - 100} end, Queue).
+  5> queue:to_list(Queue2).
+  [-99,-98,-97,-96,-95]
   ```
   """
   @spec filtermap(fun, q1) :: q2 when fun: (item -> (boolean() | {true, value})), q1: queue(item), q2: queue((item | value)), item: term(), value: term()
@@ -397,17 +393,20 @@ defmodule :queue do
 
   @doc ~S"""
   Calls `Fun(Item, AccIn)` on successive items `Item` of `Queue`, starting with
-  `AccIn == Acc0`. The queue is traversed in queue order, that is, from front to
-  rear. `Fun/2` must return a new accumulator, which is passed to the next call.
-  The function returns the final value of the accumulator. `Acc0` is returned if
-  the queue is empty.
+  `AccIn == Acc0`.
 
-  _Example:_
+  The queue is traversed in queue order, that is, from front to
+  rear. `Fun/2` must return a new accumulator, which is passed to the
+  next call.  The function returns the final value of the
+  accumulator. `Acc0` is returned if the queue is empty.
+
+  ## Examples
 
   ```erlang
-  1> queue:fold(fun(X, Sum) -> X + Sum end, 0, queue:from_list([1,2,3,4,5])).
+  1> Queue = queue:from_list([1,2,3,4,5]).
+  2> queue:fold(fun(X, Sum) -> X + Sum end, 0, Queue).
   15
-  2> queue:fold(fun(X, Prod) -> X * Prod end, 1, queue:from_list([1,2,3,4,5])).
+  3> queue:fold(fun(X, Prod) -> X * Prod end, 1, Queue).
   120
   ```
   """
@@ -422,6 +421,16 @@ defmodule :queue do
   @doc ~S"""
   Returns a queue containing the items in `L` in the same order; the head item of
   the list becomes the front item of the queue.
+
+  ## Examples
+
+  ```erlang
+  1> Queue = queue:from_list([a,b,c,d,e]).
+  2> queue:get(Queue).
+  a
+  3> queue:to_list(Queue).
+  [a,b,c,d,e]
+  ```
   """
   @spec from_list(l :: [item]) :: queue(item)
   def from_list(l) when is_list(l), do: f2r(l)
@@ -433,13 +442,14 @@ defmodule :queue do
 
   Fails with reason `empty` if `Q` is empty.
 
-  _Example 1:_
+  ## Examples
 
   ```erlang
   1> Queue = queue:from_list([1,2,3,4,5]).
-  {[5,4,3],[1,2]}
-  2> 1 == queue:get(Queue).
-  true
+  2> queue:get(Queue).
+  1
+  3> queue:drop(queue:new()).
+  ** exception error: empty
   ```
   """
   @spec get(q :: queue(item)) :: item
@@ -454,13 +464,14 @@ defmodule :queue do
 
   Fails with reason `empty` if `Q` is empty.
 
-  _Example 1:_
+  ## Examples
 
   ```erlang
   1> Queue = queue:from_list([1,2,3,4,5]).
-  {[5,4,3],[1,2]}
-  2> 5 == queue:get_r(Queue).
-  true
+  2> queue:get_r(Queue).
+  5
+  3> queue:drop(queue:new()).
+  ** exception error: empty
   ```
   """
   @spec get_r(q :: queue(item)) :: item
@@ -479,11 +490,14 @@ defmodule :queue do
 
   Fails with reason `empty` if `Q` is empty.
 
-  _Example 1:_
+  ## Examples
 
   ```erlang
-  1> queue:head(queue:from_list([1,2,3])).
+  1> Queue = queue:from_list([1, 2, 3]).
+  2> queue:head(Queue).
   1
+  3> queue:drop(queue:new()).
+  ** exception error: empty
   ```
   """
   @spec head(q :: queue(item)) :: item
@@ -494,15 +508,13 @@ defmodule :queue do
   def head(q), do: :erlang.error(:badarg, [q])
 
   @doc ~S"""
-  Inserts `Item` at the rear of queue `Q1`. Returns the resulting queue `Q2`.
+  Inserts `Item` at the rear of queue `Q1` and returns the resulting queue `Q2`.
 
-  _Example:_
+  ## Examples
 
   ```erlang
   1> Queue = queue:from_list([1,2,3,4,5]).
-  {[5,4,3],[1,2]}
   2> Queue1 = queue:in(100, Queue).
-  {[100,5,4,3],[1,2]}
   3> queue:to_list(Queue1).
   [1,2,3,4,5,100]
   ```
@@ -515,15 +527,13 @@ defmodule :queue do
   def unquote(:in)(x, q), do: :erlang.error(:badarg, [x, q])
 
   @doc ~S"""
-  Inserts `Item` at the front of queue `Q1`. Returns the resulting queue `Q2`.
+  Inserts `Item` at the front of queue `Q1` and returns the resulting queue `Q2`.
 
-  _Example:_
+  ## Examples
 
   ```erlang
   1> Queue = queue:from_list([1,2,3,4,5]).
-  {[5,4,3],[1,2]}
   2> Queue1 = queue:in_r(100, Queue).
-  {[5,4,3],[100,1,2]}
   3> queue:to_list(Queue1).
   [100,1,2,3,4,5]
   ```
@@ -540,20 +550,35 @@ defmodule :queue do
 
   Fails with reason `empty` if `Q1` is empty.
 
-  _Example:_
+  ## Examples
 
   ```erlang
-  1> Queue = queue:init(queue:from_list([1,2,3])).
-  {[2],[1]}
-  2> queue:to_list(Queue).
+  1> Queue1 = queue:from_list([1, 2, 3]).
+  2> Queue2 = queue:init(Queue1).
+  3> queue:to_list(Queue2).
   [1,2]
+  4> queue:drop(queue:new()).
+  ** exception error: empty
   ```
   """
   @spec init(q1 :: queue(item)) :: q2 :: queue(item)
   def init(q), do: drop_r(q)
 
   @doc ~S"""
-  Tests if `Q` is empty and returns `true` if so, otherwise `false`.
+  Returns `true` if `Q` is empty; otherwise, returns `false`.
+
+  ## Examples
+
+  ```erlang
+  1> queue:is_empty(queue:new()).
+  true
+  2> queue:is_empty(queue:from_list([a])).
+  false
+  3> queue:is_empty(42).
+  ** exception error: bad argument
+       in function  queue:is_empty/1
+          called as queue:is_empty(42)
+  ```
   """
   @spec is_empty(q :: queue()) :: boolean()
   def is_empty({[], []}), do: true
@@ -563,10 +588,20 @@ defmodule :queue do
   def is_empty(q), do: :erlang.error(:badarg, [q])
 
   @doc ~S"""
-  Tests if `Term` is a queue and returns `true` if so, otherwise `false`. Note
-  that the test will return `true` for a term coinciding with the representation
-  of a queue, even when not constructed by thus module. See also note on
-  [data types](`e:system:data_types.md#no_user_types`).
+  Returns `true` if `Term` is queue; otherwise, returns `false`.
+
+  Note that the test will return `true` for a term coinciding with the
+  representation of a queue, even when not constructed by this
+  module. See also note on [data types](`e:system:data_types.md#no_user_types`).
+
+  ## Examples
+
+  ```erlang
+  1> queue:is_queue(queue:from_list([1,2,3,4,5])).
+  true
+  2> queue:is_queue(42).
+  false
+  ```
   """
   @spec is_queue(term :: term()) :: boolean()
   def is_queue({r, f}) when is_list(r) and is_list(f), do: true
@@ -577,13 +612,11 @@ defmodule :queue do
   Returns a queue `Q3` that is the result of joining `Q1` and `Q2` with `Q1` in
   front of `Q2`.
 
-  _Example:_
+  ## Examples
 
   ```erlang
   1> Queue1 = queue:from_list([1,3]).
-  {[3],[1]}
   2> Queue2 = queue:from_list([2,4]).
-  {[4],[2]}
   3> queue:to_list(queue:join(Queue1, Queue2)).
   [1,3,2,4]
   ```
@@ -605,8 +638,6 @@ defmodule :queue do
   @doc ~S"""
   Returns a queue `Q2` that is the result of removing the tail item from `Q1`.
 
-  Fails with reason `empty` if `Q1` is empty.
-
   The name [`lait/1`](`lait/1`) is a misspelling - do not use it anymore.
   """
   @spec lait(q1 :: queue(item)) :: q2 :: queue(item)
@@ -617,11 +648,14 @@ defmodule :queue do
 
   Fails with reason `empty` if `Q` is empty.
 
-  _Example:_
+  ## Examples
 
   ```erlang
-  1> queue:last(queue:from_list([1,2,3])).
+  1> Queue = queue:from_list([1, 2, 3]).
+  2> queue:last(Queue).
   3
+  3> queue:drop(queue:new()).
+  ** exception error: empty
   ```
   """
   @spec last(q :: queue(item)) :: item
@@ -629,6 +663,13 @@ defmodule :queue do
 
   @doc ~S"""
   Calculates and returns the length of queue `Q`.
+
+  ## Examples
+
+  ```erlang
+  1> queue:len(queue:from_list([1,2,3])).
+  3
+  ```
   """
   @spec len(q :: queue()) :: non_neg_integer()
   def len({r, f}) when is_list(r) and is_list(f), do: length(r) + length(f)
@@ -640,20 +681,32 @@ defmodule :queue do
 
   Fails with reason `empty` if `Q1` is empty.
 
-  _Example:_
+  ## Examples
 
   ```erlang
-  1> Queue = queue:liat(queue:from_list([1,2,3])).
-  {[2],[1]}
-  2> queue:to_list(Queue).
+  1> Queue1 = queue:from_list([1, 2, 3]).
+  2> Queue2 = queue:liat(Queue1).
+  3> queue:to_list(Queue2).
   [1,2]
+  4> queue:drop(queue:new()).
+  ** exception error: empty
   ```
   """
   @spec liat(q1 :: queue(item)) :: q2 :: queue(item)
   def liat(q), do: drop_r(q)
 
   @doc ~S"""
-  Returns `true` if `Item` matches some element in `Q`, otherwise `false`.
+  Returns `true` if `Item` matches some element in `Q`; otherwise, returns `false`.
+
+  ## Examples
+
+  ```erlang
+  1> Queue = queue:from_list([a,b,c,d,e]).
+  2> queue:member(b, Queue).
+  true
+  3> queue:member(42, Queue).
+  false
+  ```
   """
   @spec member(item, q :: queue(item)) :: boolean()
   def member(x, {r, f}) when is_list(r) and is_list(f), do: :lists.member(x, r) or :lists.member(x, f)
@@ -670,24 +723,35 @@ defmodule :queue do
 
   @doc ~S"""
   Returns an empty queue.
+
+  ## Examples
+
+  ```erlang
+  1> Q = queue:new().
+  2> queue:to_list(Q).
+  []
+  3> queue:is_empty(Q).
+  true
+  ```
   """
   @spec new() :: queue(none())
   def new(), do: {[], []}
 
   @doc ~S"""
-  Removes the item at the front of queue `Q1`. Returns tuple
-  `{{value, Item}, Q2}`, where `Item` is the item removed and `Q2` is the
-  resulting queue. If `Q1` is empty, tuple `{empty, Q1}` is returned.
+  Removes the item at the front of queue `Q1`.
 
-  _Example:_
+  Returns tuple `{{value, Item}, Q2}`, where `Item` is the item removed
+  and `Q2` is the resulting queue. If `Q1` is empty, tuple `{empty, Q1}`
+  is returned.
+
+  ## Examples
 
   ```erlang
   1> Queue = queue:from_list([1,2,3,4,5]).
-  {[5,4,3],[1,2]}
   2> {{value, 1=Item}, Queue1} = queue:out(Queue).
-  {{value,1},{[5,4,3],[2]}}
   3> queue:to_list(Queue1).
   [2,3,4,5]
+  4> {empty, _} = queue:out(queue:new()).
   ```
   """
   @spec out(q1 :: queue(item)) :: ({{:value, item}, q2 :: queue(item)} | {:empty, q1 :: queue(item)})
@@ -707,19 +771,20 @@ defmodule :queue do
   def out(q), do: :erlang.error(:badarg, [q])
 
   @doc ~S"""
-  Removes the item at the rear of queue `Q1`. Returns tuple `{{value, Item}, Q2}`,
-  where `Item` is the item removed and `Q2` is the new queue. If `Q1` is empty,
-  tuple `{empty, Q1}` is returned.
+  Removes the item at the rear of queue `Q1`.
 
-  _Example:_
+  Returns tuple `{{value, Item}, Q2}`, where `Item` is the item removed
+  and `Q2` is the new queue. If `Q1` is empty, tuple `{empty, Q1}` is
+  returned.
+
+  ## Examples
 
   ```erlang
   1> Queue = queue:from_list([1,2,3,4,5]).
-  {[5,4,3],[1,2]}
   2> {{value, 5=Item}, Queue1} = queue:out_r(Queue).
-  {{value,5},{[4,3],[1,2]}}
   3> queue:to_list(Queue1).
   [1,2,3,4]
+  4> {empty, _} = queue:out_r(queue:new()).
   ```
   """
   @spec out_r(q1 :: queue(item)) :: ({{:value, item}, q2 :: queue(item)} | {:empty, q1 :: queue(item)})
@@ -742,15 +807,14 @@ defmodule :queue do
   Returns tuple `{value, Item}`, where `Item` is the front item of `Q`, or `empty`
   if `Q` is empty.
 
-  _Example 1:_
+  ## Examples
 
   ```erlang
   1> queue:peek(queue:new()).
   empty
   2> Queue = queue:from_list([1,2,3,4,5]).
-  {[5,4,3],[1,2]}
   3> queue:peek(Queue).
-  {value, 1}
+  {value,1}
   ```
   """
   @spec peek(q :: queue(item)) :: (:empty | {:value, item})
@@ -768,15 +832,14 @@ defmodule :queue do
   Returns tuple `{value, Item}`, where `Item` is the rear item of `Q`, or `empty`
   if `Q` is empty.
 
-  _Example 1:_
+  ## Examples
 
   ```erlang
   1> queue:peek_r(queue:new()).
   empty
   2> Queue = queue:from_list([1,2,3,4,5]).
-  {[5,4,3],[1,2]}
   3> queue:peek_r(Queue).
-  {value, 5}
+  {value,5}
   ```
   """
   @spec peek_r(q :: queue(item)) :: (:empty | {:value, item})
@@ -792,6 +855,15 @@ defmodule :queue do
 
   @doc ~S"""
   Returns a queue `Q2` containing the items of `Q1` in the reverse order.
+
+  ## Examples
+
+  ```erlang
+  1> Queue = queue:from_list([1,2,3,4,5]).
+  2> QueueRev = queue:reverse(Queue).
+  3> queue:to_list(QueueRev).
+  [5,4,3,2,1]
+  ```
   """
   @spec reverse(q1 :: queue(item)) :: q2 :: queue(item)
   def reverse({r, f}) when is_list(r) and is_list(f), do: {f, r}
@@ -799,14 +871,14 @@ defmodule :queue do
   def reverse(q), do: :erlang.error(:badarg, [q])
 
   @doc ~S"""
-  Inserts `Item` as the tail item of queue `Q1`. Returns the new queue `Q2`.
+  Inserts `Item` as the tail item of queue `Q1` and returns the new queue `Q2`.
 
-  _Example:_
+  ## Examples
 
   ```erlang
-  1> Queue = queue:snoc(queue:from_list([1,2,3]), 4).
-  {[4,3,2],[1]}
-  2> queue:to_list(Queue).
+  1> Queue1 = queue:from_list([1, 2, 3]).
+  2> Queue2 = queue:snoc(Queue1, 4).
+  3> queue:to_list(Queue2).
   [1,2,3,4]
   ```
   """
@@ -814,7 +886,20 @@ defmodule :queue do
   def snoc(q, x), do: apply(__MODULE__, :in, [x, q])
 
   @doc ~S"""
-  Splits `Q1` in two. The `N` front items are put in `Q2` and the rest in `Q3`.
+  Splits `Q1` into two queues.
+
+  The `N` front items are put in `Q2` and the rest in `Q3`.
+
+  ## Examples
+
+  ```erlang
+  1> Queue1 = queue:from_list([1,2,3,4,5]).
+  2> {Queue2, Queue3} = queue:split(2, Queue1).
+  3> queue:to_list(Queue2).
+  [1,2]
+  4> queue:to_list(Queue3).
+  [3,4,5]
+  ```
   """
   @spec split(n :: non_neg_integer(), q1 :: queue(item)) :: {q2 :: queue(item), q3 :: queue(item)}
   def split(0, {r, f} = q) when is_list(r) and is_list(f), do: {{[], []}, q}
@@ -848,6 +933,17 @@ defmodule :queue do
   Returns a queue `Q2` that is the result of removing the head item from `Q1`.
 
   Fails with reason `empty` if `Q1` is empty.
+
+  ## Examples
+
+  ```erlang
+  1> Queue1 = queue:from_list([1,2,3,4,5]).
+  2> Queue2 = queue:tail(Queue1).
+  3> queue:to_list(Queue2).
+  [2,3,4,5]
+  4> queue:drop(queue:new()).
+  ** exception error: empty
+  ```
   """
   @spec tail(q1 :: queue(item)) :: q2 :: queue(item)
   def tail(q), do: drop(q)
@@ -856,13 +952,13 @@ defmodule :queue do
   Returns a list of the items in the queue in the same order; the front item of
   the queue becomes the head of the list.
 
-  _Example:_
+  ## Examples
 
   ```erlang
-  1> Queue = queue:from_list([1,2,3,4,5]).
-  {[5,4,3],[1,2]}
-  2> List == queue:to_list(Queue).
-  true
+  1> List = [1,2,3,4,5].
+  2> Queue = queue:from_list(List).
+  3> queue:to_list(Queue).
+  [1,2,3,4,5]
   ```
   """
   @spec to_list(q :: queue(item)) :: [item]

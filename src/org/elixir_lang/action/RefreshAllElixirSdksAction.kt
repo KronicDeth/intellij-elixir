@@ -3,6 +3,7 @@ package org.elixir_lang.action
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.projectRoots.ProjectJdkTable
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.platform.ide.progress.ModalTaskOwner
@@ -12,6 +13,7 @@ import org.elixir_lang.sdk.elixir.ElixirSdkValidation
 import org.elixir_lang.status_bar_widget.ElixirSdkRefreshListener
 import org.elixir_lang.sdk.elixir.Type as ElixirSdkType
 import org.elixir_lang.sdk.erlang.Type as ErlangSdkType
+import java.util.concurrent.Callable
 
 class RefreshAllElixirSdksAction : AnAction() {
 
@@ -74,7 +76,9 @@ class RefreshAllElixirSdksAction : AnAction() {
             // Check OTP mismatches for each Elixir SDK after refresh (informational).
             // ElixirSdkValidation.detectOtpMismatch handles the suppress flag internally.
             for (elixirSdk in allElixirSdks) {
-                val mismatch = ElixirSdkValidation.detectOtpMismatch(elixirSdk) ?: continue
+                val mismatch = ReadAction
+                    .nonBlocking(Callable { ElixirSdkValidation.detectOtpMismatch(elixirSdk) })
+                    .executeSynchronously() ?: continue
                 otpMismatches.add(
                     "'${elixirSdk.name}' compiled for OTP ${mismatch.first} but paired with OTP ${mismatch.second}"
                 )

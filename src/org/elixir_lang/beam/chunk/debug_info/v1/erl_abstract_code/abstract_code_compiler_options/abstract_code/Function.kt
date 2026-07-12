@@ -1,11 +1,11 @@
 package org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code
 
 import com.ericsson.otp.erlang.*
-import org.elixir_lang.beam.Decompiler
 import org.elixir_lang.beam.MacroNameArity
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.function.Clause
 import org.elixir_lang.beam.decompiler.Default
 import org.elixir_lang.beam.decompiler.Options
+import org.elixir_lang.beam.decompiler.decompiler
 import org.elixir_lang.psi.call.name.Function.DEF
 
 private const val TAG = "function"
@@ -28,7 +28,7 @@ class Function(term: OtpErlangTuple, attributes: Attributes): Node(term) {
 
         MacroNameArity(DEF, nameString, arity)
     }
-    val decompiler by lazy { Decompiler.decompiler("erlang", macroNameArity.toNameArity()) ?: Default.INSTANCE }
+    val decompiler by lazy { decompiler("erlang", macroNameArity.toNameArity()) ?: Default.INSTANCE }
 
     override fun toMacroString(options: Options): String =
             clauses.joinToString("\n\n") { it.toMacroString(options) }

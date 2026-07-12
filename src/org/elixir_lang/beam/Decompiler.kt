@@ -4,7 +4,6 @@ import com.ericsson.otp.erlang.OtpErlangBinary
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.fileTypes.BinaryFileDecompiler
 import com.intellij.openapi.vfs.VirtualFile
-import org.elixir_lang.NameArity
 import org.elixir_lang.beam.Beam.Companion.from
 import org.elixir_lang.beam.MacroNameArity.MACRO_ORDER
 import org.elixir_lang.beam.chunk.Atoms
@@ -19,577 +18,631 @@ import org.elixir_lang.beam.chunk.beam_documentation.docs.documented.None
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.AbstractCodeCompileOptions
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.attribute.Spec
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.attribute.Type
-import org.elixir_lang.beam.decompiler.*
+import org.elixir_lang.beam.decompiler.Default
+import org.elixir_lang.beam.decompiler.Options
+import org.elixir_lang.beam.decompiler.appendNotDecompiledBody
+import org.elixir_lang.beam.decompiler.decompiler
 import org.elixir_lang.beam.term.inspect
 import org.elixir_lang.psi.call.name.Function.*
 import org.elixir_lang.psi.call.name.Module
 import org.elixir_lang.reference.resolver.Type.BUILTIN_ARITY_BY_NAME
 import java.util.*
 
-class Decompiler : BinaryFileDecompiler {
+internal class Decompiler : BinaryFileDecompiler {
     override fun decompile(virtualFile: VirtualFile): CharSequence = decompiled(from(virtualFile), virtualFile)
+}
 
-    companion object {
-        private val logger = Logger.getInstance(Decompiler::class.java)
-        private val HEADER_NAME_BY_MACRO: Map<String, String> = mapOf(
-            DEFMACRO to "Macros",
-            DEFMACROP to "Private Macros",
-            DEF to "Functions",
-            DEFP to "Private Functions"
-        )
-        private val MACRO_NAME_ARITY_DECOMPILER_LIST: List<org.elixir_lang.beam.decompiler.MacroNameArity> = listOf(
-            InfixOperator,
-            PrefixOperator,
-            Unquoted,
-            SignatureOverride,
-            Default.INSTANCE
-        )
+private val logger = Logger.getInstance(Decompiler::class.java)
+private val HEADER_NAME_BY_MACRO: Map<String, String> = mapOf(
+    DEFMACRO to "Macros",
+    DEFMACROP to "Private Macros",
+    DEF to "Functions",
+    DEFP to "Private Functions"
+)
 
-        private const val DECOMPILATION_ERROR = "# Decompilation Error: "
+private const val DECOMPILATION_ERROR = "# Decompilation Error: "
 
-        private fun decompiled(beam: Beam?, virtualFile: VirtualFile): CharSequence {
-            val decompiled = StringBuilder()
+private fun decompiled(beam: Beam?, virtualFile: VirtualFile): CharSequence {
+    val decompiled = StringBuilder()
 
-            return if (beam != null) {
-                val atoms = beam.atoms()
-                if (atoms != null) {
-                    val moduleName = atoms.moduleName()
-                    if (moduleName != null) {
-                        val defmoduleArgument = defmoduleArgument(moduleName)
-                        decompiled
-                            .append("# Source code recreated from a .beam file by IntelliJ Elixir\n")
-                            .append("defmodule ")
-                            .append(defmoduleArgument)
-                            .append(" do\n")
-                        val documentation = beam.documentation()
-                            ?: Documentation.fromExternalChunk(virtualFile)
+    return if (beam != null) {
+        val atoms = beam.atoms()
+        if (atoms != null) {
+            val moduleName = atoms.moduleName()
+            if (moduleName != null) {
+                val defmoduleArgument = defmoduleArgument(moduleName)
+                decompiled
+                    .append("# Source code recreated from a .beam file by IntelliJ Elixir\n")
+                    .append("defmodule ")
+                    .append(defmoduleArgument)
+                    .append(" do\n")
+                val documentation = beam.documentation()
+                    ?: Documentation.fromExternalChunk(virtualFile)
 
-                        if (documentation != null) {
-                            documentation.moduleDocs?.englishDocs?.let { moduleDocs ->
-                                appendDocumentation(decompiled, "moduledoc", moduleDocs)
-                            }
+                if (documentation != null) {
+                    documentation.moduleDocs?.englishDocs?.let { moduleDocs ->
+                        appendDocumentation(decompiled, "moduledoc", moduleDocs)
+                    }
+                }
+
+                val debugInfo = beam.debugInfo()
+
+                appendTypes(decompiled, moduleName, debugInfo, documentation)
+                appendCallDefinitions(decompiled, beam, atoms, debugInfo, documentation)
+                decompiled.append("end\n")
+            } else {
+                decompiled
+                    .append(DECOMPILATION_ERROR)
+                    .append("No module name found in ")
+                    .append(TypeID.ATOM)
+                    .append(" chunk in BEAM")
+            }
+        } else {
+            decompiled
+                .append(DECOMPILATION_ERROR)
+                .append("No ")
+                .append(TypeID.ATOM)
+                .append(" chunk found in BEAM")
+        }
+    } else {
+        decompiled.append(DECOMPILATION_ERROR).append("BEAM format could not be read")
+    }
+}
+
+private fun appendTypes(
+    decompiled: StringBuilder,
+    moduleName: String,
+    debugInfo: DebugInfo?,
+    documentation: Documentation?
+) {
+    // fake built-in types being defined in `erlang`, so that built-in type resolution can point to a single location
+    if (moduleName == "erlang") {
+        decompiled
+            .append('\n')
+            .append("  # Built-in types (not actually declared in :erlang)\n")
+            .append('\n')
+
+        for (name in BUILTIN_ARITY_BY_NAME.keys.sorted()) {
+            for (arity in BUILTIN_ARITY_BY_NAME[name]!!.sorted()) {
+                decompiled.append("  @type ").append(name).append('(')
+
+                if ((name == "maybe_improper_list" ||
+                            name == "nonempty_improper_list" ||
+                            name == "nonempty_maybe_improper_list")
+                    && arity == 2
+                ) {
+                    decompiled.append("element :: term(), tail :: term()")
+                } else if (name == "non_empty_list" && arity == 1) {
+                    decompiled.append("element :: term()")
+                } else {
+                    for (i in 1..arity) {
+                        if (i > 1) {
+                            decompiled.append(", ")
                         }
 
-                        val debugInfo = beam.debugInfo()
-
-                        appendTypes(decompiled, moduleName, debugInfo, documentation)
-                        appendCallDefinitions(decompiled, beam, atoms, debugInfo, documentation)
-                        decompiled.append("end\n")
-                    } else {
-                        decompiled
-                            .append(DECOMPILATION_ERROR)
-                            .append("No module name found in ")
-                            .append(TypeID.ATOM)
-                            .append(" chunk in BEAM")
+                        decompiled.append("type").append(i)
                     }
-                } else {
-                    decompiled
-                        .append(DECOMPILATION_ERROR)
-                        .append("No ")
-                        .append(TypeID.ATOM)
-                        .append(" chunk found in BEAM")
                 }
-            } else {
-                decompiled.append(DECOMPILATION_ERROR).append("BEAM format could not be read")
+
+                decompiled.append(") :: ...\n")
             }
         }
+    }
 
-        private fun appendTypes(
-            decompiled: StringBuilder,
-            moduleName: String,
-            debugInfo: DebugInfo?,
-            documentation: Documentation?
-        ) {
-            // fake built-in types being defined in `erlang`, so that built-in type resolution can point to a single location
-            if (moduleName == "erlang") {
-                decompiled
-                    .append('\n')
-                    .append("  # Built-in types (not actually declared in :erlang)\n")
-                    .append('\n')
+    if (moduleName == "erlang") {
+        // `erlang` keeps its legacy type rendering precedence in addition to the faked built-ins above.
+        documentation?.docs?.typeDocumentedByArityByName()?.let { appendTypes(decompiled, it) }
+            ?: debugInfo?.let { appendTypes(decompiled, it, Options()) }
+    } else {
+        // For Erlang-compiled modules the abstract code is the authoritative source of type definitions:
+        // it carries the real bodies, type parameters (arity) and `-opaque` declarations that the docs
+        // chunk only summarizes.  Render from it, merging any `@typedoc` from the docs chunk.  Beams
+        // without Erlang abstract code (e.g. Elixir-compiled beams) fall back to the docs chunk.
+        val abstractCodeCompileOptions = debugInfo as? AbstractCodeCompileOptions
 
-                for (name in BUILTIN_ARITY_BY_NAME.keys.sorted()) {
-                    for (arity in BUILTIN_ARITY_BY_NAME[name]!!.sorted()) {
-                        decompiled.append("  @type ").append(name).append('(')
-
-                        if ((name == "maybe_improper_list" ||
-                                    name == "nonempty_improper_list" ||
-                                    name == "nonempty_maybe_improper_list")
-                            && arity == 2
-                        ) {
-                            decompiled.append("element :: term(), tail :: term()")
-                        } else if (name == "non_empty_list" && arity == 1) {
-                            decompiled.append("element :: term()")
-                        } else {
-                            for (i in 1..arity) {
-                                if (i > 1) {
-                                    decompiled.append(", ")
-                                }
-
-                                decompiled.append("type").append(i)
-                            }
-                        }
-
-                        decompiled.append(") :: ...\n")
-                    }
-                }
-            }
-
+        if (abstractCodeCompileOptions != null) {
+            appendTypes(decompiled, abstractCodeCompileOptions, documentation, Options())
+        } else {
             documentation?.docs?.typeDocumentedByArityByName()?.let { appendTypes(decompiled, it) }
-                ?: debugInfo?.let { appendTypes(decompiled, it, Options()) }
         }
+    }
+}
 
-        private fun appendTypes(decompiled: StringBuilder, documentedByArityByName: Map<String, Map<Int, Documented>>) {
-            if (documentedByArityByName.isNotEmpty()) {
-                decompiled
-                    .append('\n')
-                    .append("  # Types\n")
-                    .append('\n')
-            }
+private fun appendTypes(decompiled: StringBuilder, documentedByArityByName: Map<String, Map<Int, Documented>>) {
+    if (documentedByArityByName.isNotEmpty()) {
+        decompiled
+            .append('\n')
+            .append("  # Types\n")
+            .append('\n')
+    }
 
-            for ((name, documentedByArity) in documentedByArityByName) {
-                for ((arity, documented) in documentedByArity) {
-                    documented.doc?.let { doc ->
-                        when (doc) {
-                            is None -> Unit
-                            is Hidden -> appendDocumentation(decompiled, "typedoc")
-                            is MarkdownByLanguage -> {
-                                for (formatted in doc.formattedByLanguage.values) {
-                                    appendDocumentation(decompiled, "typedoc", formatted)
-                                }
-                            }
+    for ((name, documentedByArity) in documentedByArityByName) {
+        for ((arity, documented) in documentedByArity) {
+            documented.doc?.let { doc ->
+                when (doc) {
+                    is None -> Unit
+                    is Hidden -> appendDocumentation(decompiled, "typedoc")
+                    is MarkdownByLanguage -> {
+                        for (formatted in doc.formattedByLanguage.values) {
+                            appendDocumentation(decompiled, "typedoc", formatted)
                         }
-                    }
-
-                    val signatures = documented.signatures
-
-                    if (signatures.isNotEmpty()) {
-                        for (signature in signatures) {
-                            val cleaned = signature.replace("\r", "")
-                            val (attr, body) = erlangTypeSignatureToElixir(cleaned)
-                            decompiled.append("  @").append(attr).append(' ').append(body).append('\n')
-                        }
-                    } else {
-                        decompiled.append("  @type ").append(name).append('(')
-
-                        for (i in 1..arity) {
-                            if (i > 1) {
-                                decompiled.append(", ")
-                            }
-
-                            decompiled.append("type").append(i)
-                        }
-
-                        decompiled.append(") :: ...\n")
                     }
                 }
             }
-        }
 
-        private fun appendTypes(decompiled: StringBuilder, debugInfo: DebugInfo, options: Options) {
-            when (debugInfo) {
-                is AbstractCodeCompileOptions -> appendTypes(decompiled, debugInfo, options)
-                else -> Unit
-            }
-        }
+            val signatures = documented.signatures
 
-        private fun appendTypes(
-            decompiled: StringBuilder,
-            abstractCodeCompileOptions: AbstractCodeCompileOptions,
-            decompilerOptions: Options
-        ) {
-            val macroStringAttributesByElixirAttributeName =
-                abstractCodeCompileOptions.attributes.macroStringAttributes.filterIsInstance<Type>()
-                    .groupBy { it.elixirAttributeName }
-
-            appendTypes(decompiled, macroStringAttributesByElixirAttributeName, "type", "Types", decompilerOptions)
-            appendTypes(
-                decompiled,
-                macroStringAttributesByElixirAttributeName,
-                "typep",
-                "Private Types",
-                decompilerOptions
-            )
-        }
-
-        private fun appendTypes(
-            decompiled: StringBuilder,
-            macroStringAttributesByElixirAttributeName: Map<String, List<Type>>,
-            elixirAttributeName: String,
-            title: String,
-            options: Options
-        ) {
-            val macroStringAttributes = macroStringAttributesByElixirAttributeName[elixirAttributeName]
-
-            if (!macroStringAttributes.isNullOrEmpty()) {
-                appendHeader(decompiled, title)
-
-                for (macroStringAttribute in macroStringAttributes.sortedBy { it.name }) {
-                    decompiled
-                        .append('\n')
-                        .append("  ").append(macroStringAttribute.toMacroString(options)).append('\n')
+            if (signatures.isNotEmpty()) {
+                for (signature in signatures) {
+                    val cleaned = signature.replace("\r", "")
+                    val (attr, body) = erlangTypeSignatureToElixir(cleaned)
+                    decompiled.append("  @").append(attr).append(' ').append(body).append('\n')
                 }
+            } else {
+                decompiled.append("  @type ").append(name).append('(')
+
+                for (i in 1..arity) {
+                    if (i > 1) {
+                        decompiled.append(", ")
+                    }
+
+                    decompiled.append("type").append(i)
+                }
+
+                decompiled.append(") :: ...\n")
             }
         }
+    }
+}
 
-        private fun appendCallDefinitions(
-            decompiled: StringBuilder,
-            beam: Beam,
-            atoms: Atoms,
-            debugInfo: DebugInfo?,
-            documentation: Documentation?
-        ) {
-            val macroNameAritySortedSetByMacro = CallDefinitions.macroNameAritySortedSetByMacro(beam, atoms)
-            appendCallDefinitions(decompiled, macroNameAritySortedSetByMacro, debugInfo, documentation)
+private fun appendTypes(decompiled: StringBuilder, debugInfo: DebugInfo, options: Options) {
+    when (debugInfo) {
+        is AbstractCodeCompileOptions -> appendTypes(decompiled, debugInfo, options)
+        else -> Unit
+    }
+}
+
+private fun appendTypes(
+    decompiled: StringBuilder,
+    abstractCodeCompileOptions: AbstractCodeCompileOptions,
+    decompilerOptions: Options
+) {
+    val macroStringAttributesByElixirAttributeName =
+        abstractCodeCompileOptions.attributes.macroStringAttributes.filterIsInstance<Type>()
+            .groupBy { it.elixirAttributeName }
+
+    appendTypes(decompiled, macroStringAttributesByElixirAttributeName, "type", "Types", decompilerOptions)
+    appendTypes(
+        decompiled,
+        macroStringAttributesByElixirAttributeName,
+        "typep",
+        "Private Types",
+        decompilerOptions
+    )
+}
+
+private fun appendTypes(
+    decompiled: StringBuilder,
+    macroStringAttributesByElixirAttributeName: Map<String, List<Type>>,
+    elixirAttributeName: String,
+    title: String,
+    options: Options
+) {
+    val macroStringAttributes = macroStringAttributesByElixirAttributeName[elixirAttributeName]
+
+    if (!macroStringAttributes.isNullOrEmpty()) {
+        appendHeader(decompiled, title)
+
+        for (macroStringAttribute in macroStringAttributes.sortedBy { it.name }) {
+            decompiled
+                .append('\n')
+                .append("  ").append(macroStringAttribute.toMacroString(options)).append('\n')
         }
+    }
+}
 
-        private fun macroToHeaderName(macro: String): String = HEADER_NAME_BY_MACRO[macro]!!
+private fun appendTypes(
+    decompiled: StringBuilder,
+    abstractCodeCompileOptions: AbstractCodeCompileOptions,
+    documentation: Documentation?,
+    decompilerOptions: Options
+) {
+    val typesByElixirAttributeName =
+        abstractCodeCompileOptions.attributes.macroStringAttributes.filterIsInstance<Type>()
+            .groupBy { it.elixirAttributeName }
+    val typeDocumentedByArityByName = documentation?.docs?.typeDocumentedByArityByName() ?: emptyMap()
 
-        private fun appendCallDefinitions(
-            decompiled: StringBuilder,
-            macroNameAritySortedSetByMacro: Map<String, SortedSet<MacroNameArity>>,
-            debugInfo: DebugInfo?,
-            documentation: Documentation?
-        ) {
-            val options = options(macroNameAritySortedSetByMacro)
+    // `@type` and `@opaque` are both public and share the "Types" section; `@typep` is private.
+    appendTypeSection(
+        decompiled,
+        "Types",
+        typesByElixirAttributeName["type"].orEmpty() + typesByElixirAttributeName["opaque"].orEmpty(),
+        typeDocumentedByArityByName,
+        decompilerOptions
+    )
+    appendTypeSection(
+        decompiled,
+        "Private Types",
+        typesByElixirAttributeName["typep"].orEmpty(),
+        typeDocumentedByArityByName,
+        decompilerOptions
+    )
+}
 
-            for (macro in MACRO_ORDER) {
-                val macroNameAritySortedSet = macroNameAritySortedSetByMacro[macro]
+private fun appendTypeSection(
+    decompiled: StringBuilder,
+    title: String,
+    types: List<Type>,
+    typeDocumentedByArityByName: Map<String, Map<Int, Documented>>,
+    options: Options
+) {
+    if (types.isNotEmpty()) {
+        appendHeader(decompiled, title)
 
-                if (macroNameAritySortedSet != null && options.decompileMacro(macro)) {
-                    for ((index, macroNameArity) in macroNameAritySortedSet.withIndex()) {
-                        if (index == 0) {
-                            appendHeader(decompiled, macroToHeaderName(macro))
-                        }
-                        decompiled.append("\n")
+        for (type in types.sortedBy { it.name }) {
+            decompiled.append('\n')
+            appendTypeDoc(decompiled, type, typeDocumentedByArityByName)
+            decompiled.append("  ").append(type.toMacroString(options)).append('\n')
+        }
+    }
+}
 
-                        if (documentation != null) {
-                            documentation.docs?.let { docs ->
-                                docs.deprecated(macroNameArity)?.let { deprecated ->
-                                    when (deprecated) {
-                                        is OtpErlangBinary ->
-                                            decompiled.append("\n  @deprecated \"\"\"\n")
-                                                .append("  ")
-                                                .append(String(deprecated.binaryValue()))
-                                                .append("\n  \"\"\"\n\n")
-                                        else -> {
-                                            logger.error(
-                                                "Don't know how to decompiled @deprecated value (${
-                                                    inspect(
-                                                        deprecated
-                                                    )
-                                                })"
+private fun appendTypeDoc(
+    decompiled: StringBuilder,
+    type: Type,
+    typeDocumentedByArityByName: Map<String, Map<Int, Documented>>
+) {
+    val name = type.name ?: return
+    val documented = typeDocumentedByArityByName[name]?.get(type.arity) ?: return
+
+    documented.doc?.let { doc ->
+        when (doc) {
+            is None -> Unit
+            is Hidden -> appendDocumentation(decompiled, "typedoc")
+            is MarkdownByLanguage ->
+                for (formatted in doc.formattedByLanguage.values) {
+                    appendDocumentation(decompiled, "typedoc", formatted)
+                }
+        }
+    }
+}
+
+private fun appendCallDefinitions(
+    decompiled: StringBuilder,
+    beam: Beam,
+    atoms: Atoms,
+    debugInfo: DebugInfo?,
+    documentation: Documentation?
+) {
+    val macroNameAritySortedSetByMacro = CallDefinitions.macroNameAritySortedSetByMacro(beam, atoms)
+    appendCallDefinitions(decompiled, macroNameAritySortedSetByMacro, debugInfo, documentation)
+}
+
+private fun macroToHeaderName(macro: String): String = HEADER_NAME_BY_MACRO[macro]!!
+
+private fun appendCallDefinitions(
+    decompiled: StringBuilder,
+    macroNameAritySortedSetByMacro: Map<String, SortedSet<MacroNameArity>>,
+    debugInfo: DebugInfo?,
+    documentation: Documentation?
+) {
+    val options = options(macroNameAritySortedSetByMacro)
+
+    for (macro in MACRO_ORDER) {
+        val macroNameAritySortedSet = macroNameAritySortedSetByMacro[macro]
+
+        if (macroNameAritySortedSet != null && options.decompileMacro(macro)) {
+            for ((index, macroNameArity) in macroNameAritySortedSet.withIndex()) {
+                if (index == 0) {
+                    appendHeader(decompiled, macroToHeaderName(macro))
+                }
+                decompiled.append("\n")
+
+                if (documentation != null) {
+                    documentation.docs?.let { docs ->
+                        docs.deprecated(macroNameArity)?.let { deprecated ->
+                            when (deprecated) {
+                                is OtpErlangBinary ->
+                                    decompiled.append("\n  @deprecated \"\"\"\n")
+                                        .append("  ")
+                                        .append(String(deprecated.binaryValue()))
+                                        .append("\n  \"\"\"\n\n")
+                                else -> {
+                                    logger.error(
+                                        "Don't know how to decompiled @deprecated value (${
+                                            inspect(
+                                                deprecated
                                             )
-                                        }
-                                    }
+                                        })"
+                                    )
                                 }
+                            }
+                        }
 
-                                docs.doc(macroNameArity)?.let { doc ->
-                                    when (doc) {
-                                        is None -> Unit
-                                        is Hidden -> appendDocumentation(decompiled, "doc")
-                                        is MarkdownByLanguage -> {
-                                            for (formatted in doc.formattedByLanguage.values) {
-                                                appendDocumentation(decompiled, "doc", formatted)
-                                            }
-                                        }
+                        docs.doc(macroNameArity)?.let { doc ->
+                            when (doc) {
+                                is None -> Unit
+                                is Hidden -> appendDocumentation(decompiled, "doc")
+                                is MarkdownByLanguage -> {
+                                    for (formatted in doc.formattedByLanguage.values) {
+                                        appendDocumentation(decompiled, "doc", formatted)
                                     }
                                 }
                             }
                         }
-                        appendSpec(decompiled, macroNameArity, debugInfo, options)
-                        appendMacroNameArity(decompiled, macroNameArity, debugInfo, documentation, options)
                     }
                 }
+                appendSpec(decompiled, macroNameArity, debugInfo, options)
+                appendMacroNameArity(decompiled, macroNameArity, debugInfo, documentation, options)
             }
         }
+    }
+}
 
-        private const val definitionLimit = 500
+private const val definitionLimit = 500
 
-        private fun options(macroNameAritySortedSet: Map<String, SortedSet<MacroNameArity>>): Options {
-            val defmacroCount = macroNameAritySortedSet[DEFMACRO]?.size ?: 0
-            val defCount = macroNameAritySortedSet[DEF]?.size ?: 0
-            val publicCount = defmacroCount + defCount
+private fun options(macroNameAritySortedSet: Map<String, SortedSet<MacroNameArity>>): Options {
+    val defmacroCount = macroNameAritySortedSet[DEFMACRO]?.size ?: 0
+    val defCount = macroNameAritySortedSet[DEF]?.size ?: 0
+    val publicCount = defmacroCount + defCount
 
-            return if (publicCount > definitionLimit) {
-                Options(decompileBodies = false, decompileMacros = setOf(DEFMACRO, DEF))
+    return if (publicCount > definitionLimit) {
+        Options(decompileBodies = false, decompileMacros = setOf(DEFMACRO, DEF))
+    } else {
+        val defmacropCount = macroNameAritySortedSet[DEFMACROP]?.size ?: 0
+        val defpCount = macroNameAritySortedSet[DEFP]?.size ?: 0
+        val privateCount = defmacropCount + defpCount
+
+        if (publicCount + privateCount > definitionLimit) {
+            Options(decompileBodies = false, decompileMacros = setOf(DEFMACRO, DEF))
+        } else {
+            Options(decompileBodies = true, decompileMacros = setOf(DEFMACRO, DEFMACROP, DEF, DEFP))
+        }
+    }
+}
+
+private fun appendHeader(decompiled: StringBuilder, name: String) {
+    decompiled
+        .append("\n")
+        .append("  # ")
+        .append(name)
+        .append("\n")
+}
+
+private fun appendDocumentation(decompiled: StringBuilder, moduleAttribute: String) {
+    decompiled.append("  @").append(moduleAttribute).append(' ').append("false").append('\n')
+}
+
+private fun appendDocumentation(decompiled: StringBuilder, moduleAttribute: String, text: String) {
+    val sanitizedText = text.replace("\r", "")
+    val safePromoterTerminator = safePromoterTerminator(sanitizedText)
+    val promoterTerminator: String = safePromoterTerminator ?: "\"\"\""
+    decompiled
+        .append("  @")
+        .append(moduleAttribute)
+        // Use ~S sigil to stop interpolation in docs as an interpolation stored in the docs was
+        // escaped in the original source.
+        .append(" ~S")
+        .append(promoterTerminator)
+        .append('\n')
+    appendDocumentationText(decompiled, safePromoterTerminator, sanitizedText)
+    decompiled
+        .append("\n  ")
+        .append(promoterTerminator)
+        .append('\n')
+}
+
+private const val CHARLIST_HEREDOC_PROMOTER_TERMINATOR = "'''"
+private const val STRING_HEREDOC_PROMOTER_TERMINATOR = "\"\"\""
+private fun safePromoterTerminator(text: String): String? {
+    val containsCharlistHeredoc = text.contains(CHARLIST_HEREDOC_PROMOTER_TERMINATOR)
+    val containsStringHeredoc = text.contains(STRING_HEREDOC_PROMOTER_TERMINATOR)
+
+    return if (containsCharlistHeredoc && containsStringHeredoc) {
+        null
+    } else if (containsCharlistHeredoc) {
+        STRING_HEREDOC_PROMOTER_TERMINATOR
+    } else if (containsStringHeredoc) {
+        CHARLIST_HEREDOC_PROMOTER_TERMINATOR
+    } else {
+        // Default to String since it is what actual developers would use most often
+        STRING_HEREDOC_PROMOTER_TERMINATOR
+    }
+}
+
+private fun appendDocumentationText(decompiled: StringBuilder, safePromoterTerminator: String?, text: String) {
+    val lines = text.split("\n").toTypedArray()
+    val lastI = lines.size - 1
+
+    for (i in lines.indices) {
+        val line = lines[i]
+        val stripped: String = line.trimEnd()
+
+        if (stripped.isNotEmpty()) {
+            decompiled.append("  ")
+
+            if (safePromoterTerminator == null) {
+                decompiled.append(stripped.replace(STRING_HEREDOC_PROMOTER_TERMINATOR, "\"\"\""))
             } else {
-                val defmacropCount = macroNameAritySortedSet[DEFMACROP]?.size ?: 0
-                val defpCount = macroNameAritySortedSet[DEFP]?.size ?: 0
-                val privateCount = defmacropCount + defpCount
-
-                if (publicCount + privateCount > definitionLimit) {
-                    Options(decompileBodies = false, decompileMacros = setOf(DEFMACRO, DEF))
-                } else {
-                    Options(decompileBodies = true, decompileMacros = setOf(DEFMACRO, DEFMACROP, DEF, DEFP))
-                }
+                decompiled.append(stripped)
             }
         }
 
-        private fun appendHeader(decompiled: StringBuilder, name: String) {
-            decompiled
-                .append("\n")
-                .append("  # ")
-                .append(name)
-                .append("\n")
+        if (i != lastI) {
+            decompiled.append("\n")
         }
+    }
+}
 
-        private fun appendDocumentation(decompiled: StringBuilder, moduleAttribute: String) {
-            decompiled.append("  @").append(moduleAttribute).append(' ').append("false").append('\n')
+private fun appendSpec(
+    decompiled: StringBuilder,
+    macroNameArity: MacroNameArity,
+    debugInfo: DebugInfo?,
+    options: Options
+) {
+    when (debugInfo) {
+        is AbstractCodeCompileOptions -> appendSpec(decompiled, macroNameArity, debugInfo, options)
+        else -> Unit
+    }
+}
+
+private fun appendSpec(
+    decompiled: StringBuilder,
+    macroNameArity: MacroNameArity,
+    debugInfo: AbstractCodeCompileOptions,
+    options: Options
+) {
+    debugInfo
+        .attributes.macroStringAttributes
+        .find {
+            it is Spec &&
+                    it.name == macroNameArity.name &&
+                    it.arity == macroNameArity.arity.toBigInteger()
         }
-
-        private fun appendDocumentation(decompiled: StringBuilder, moduleAttribute: String, text: String) {
-            val sanitizedText = text.replace("\r", "")
-            val safePromoterTerminator = safePromoterTerminator(sanitizedText)
-            val promoterTerminator: String = safePromoterTerminator ?: "\"\"\""
-            decompiled
-                .append("  @")
-                .append(moduleAttribute)
-                // Use ~S sigil to stop interpolation in docs as an interpolation stored in the docs was
-                // escaped in the original source.
-                .append(" ~S")
-                .append(promoterTerminator)
-                .append('\n')
-            appendDocumentationText(decompiled, safePromoterTerminator, sanitizedText)
-            decompiled
-                .append("\n  ")
-                .append(promoterTerminator)
-                .append('\n')
+        ?.let { spec ->
+            decompiled.append(spec.toMacroString(options).prependIndentToNonBlank()).append('\n')
         }
+}
 
-        private const val CHARLIST_HEREDOC_PROMOTER_TERMINATOR = "'''"
-        private const val STRING_HEREDOC_PROMOTER_TERMINATOR = "\"\"\""
-        private fun safePromoterTerminator(text: String): String? {
-            val containsCharlistHeredoc = text.contains(CHARLIST_HEREDOC_PROMOTER_TERMINATOR)
-            val containsStringHeredoc = text.contains(STRING_HEREDOC_PROMOTER_TERMINATOR)
+private fun appendMacroNameArity(
+    decompiled: StringBuilder,
+    macroNameArity: MacroNameArity,
+    debugInfo: DebugInfo?,
+    documentation: Documentation?,
+    options: Options
+) =
+    appendMacroNameArity(decompiled, macroNameArity, debugInfo, options) ||
+            appendMacroNameArity(decompiled, macroNameArity, documentation)
 
-            return if (containsCharlistHeredoc && containsStringHeredoc) {
-                null
-            } else if (containsCharlistHeredoc) {
-                STRING_HEREDOC_PROMOTER_TERMINATOR
-            } else if (containsStringHeredoc) {
-                CHARLIST_HEREDOC_PROMOTER_TERMINATOR
-            } else {
-                // Default to String since it is what actual developers would use most often
-                STRING_HEREDOC_PROMOTER_TERMINATOR
-            }
-        }
+private fun appendMacroNameArity(
+    decompiled: StringBuilder,
+    macroNameArity: MacroNameArity,
+    debugInfo: DebugInfo?,
+    options: Options
+): Boolean =
+    when (debugInfo) {
+        is AbstractCodeCompileOptions ->
+            appendMacroNameArity(decompiled, macroNameArity, debugInfo, options)
+        is org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.V1 ->
+            appendMacroNameArity(decompiled, macroNameArity, debugInfo, options)
+        else -> false
+    }
 
-        private fun appendDocumentationText(decompiled: StringBuilder, safePromoterTerminator: String?, text: String) {
-            val lines = text.split("\n").toTypedArray()
-            val lastI = lines.size - 1
+private fun appendMacroNameArity(
+    decompiled: StringBuilder,
+    macroNameArity: MacroNameArity,
+    debugInfo: AbstractCodeCompileOptions,
+    options: Options
+): Boolean =
+    when (macroNameArity.macro) {
+        DEF, DEFP -> {
+            val function = debugInfo.functions.byNameArity[macroNameArity.toNameArity()]
 
-            for (i in lines.indices) {
-                val line = lines[i]
-                val stripped: String = line.trimEnd()
+            if (function != null) {
+                var macroString = function.toMacroString(options)
 
-                if (stripped.isNotEmpty()) {
-                    decompiled.append("  ")
-
-                    if (safePromoterTerminator == null) {
-                        decompiled.append(stripped.replace(STRING_HEREDOC_PROMOTER_TERMINATOR, "\"\"\""))
-                    } else {
-                        decompiled.append(stripped)
-                    }
+                // The Erlang abstract code Function always hardcodes macro as DEF because
+                // the AST doesn't distinguish exported/unexported. The Decompiler knows the
+                // correct macro from the export table, so fix it up here.
+                if (macroNameArity.macro == DEFP) {
+                    macroString = macroString.replaceDefWithDefp()
                 }
 
-                if (i != lastI) {
-                    decompiled.append("\n")
-                }
-            }
-        }
-
-        private fun appendSpec(
-            decompiled: StringBuilder,
-            macroNameArity: MacroNameArity,
-            debugInfo: DebugInfo?,
-            options: Options
-        ) {
-            when (debugInfo) {
-                is AbstractCodeCompileOptions -> appendSpec(decompiled, macroNameArity, debugInfo, options)
-                else -> Unit
-            }
-        }
-
-        private fun appendSpec(
-            decompiled: StringBuilder,
-            macroNameArity: MacroNameArity,
-            debugInfo: AbstractCodeCompileOptions,
-            options: Options
-        ) {
-            debugInfo
-                .attributes.macroStringAttributes
-                .find {
-                    it is Spec &&
-                            it.name == macroNameArity.name &&
-                            it.arity == macroNameArity.arity.toBigInteger()
-                }
-                ?.let { spec ->
-                    decompiled.append(spec.toMacroString(options).prependIndentToNonBlank()).append('\n')
-                }
-        }
-
-        private fun appendMacroNameArity(
-            decompiled: StringBuilder,
-            macroNameArity: MacroNameArity,
-            debugInfo: DebugInfo?,
-            documentation: Documentation?,
-            options: Options
-        ) =
-            appendMacroNameArity(decompiled, macroNameArity, debugInfo, options) ||
-                    appendMacroNameArity(decompiled, macroNameArity, documentation)
-
-        private fun appendMacroNameArity(
-            decompiled: StringBuilder,
-            macroNameArity: MacroNameArity,
-            debugInfo: DebugInfo?,
-            options: Options
-        ): Boolean =
-            when (debugInfo) {
-                is AbstractCodeCompileOptions ->
-                    appendMacroNameArity(decompiled, macroNameArity, debugInfo, options)
-                is org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.V1 ->
-                    appendMacroNameArity(decompiled, macroNameArity, debugInfo, options)
-                else -> false
-            }
-
-        private fun appendMacroNameArity(
-            decompiled: StringBuilder,
-            macroNameArity: MacroNameArity,
-            debugInfo: AbstractCodeCompileOptions,
-            options: Options
-        ): Boolean =
-            when (macroNameArity.macro) {
-                DEF, DEFP -> {
-                    val function = debugInfo.functions.byNameArity[macroNameArity.toNameArity()]
-
-                    if (function != null) {
-                        var macroString = function.toMacroString(options)
-
-                        // The Erlang abstract code Function always hardcodes macro as DEF because
-                        // the AST doesn't distinguish exported/unexported. The Decompiler knows the
-                        // correct macro from the export table, so fix it up here.
-                        if (macroNameArity.macro == DEFP) {
-                            macroString = macroString.replaceDefWithDefp()
-                        }
-
-                        decompiled.append(macroString.prependIndentToNonBlank()).append('\n')
-
-                        true
-                    } else {
-                        false
-                    }
-                }
-                else -> false
-            }
-
-        private fun appendMacroNameArity(
-            decompiled: StringBuilder,
-            macroNameArity: MacroNameArity,
-            debugInfo: org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.V1,
-            options: Options
-        ): Boolean =
-            debugInfo.definitions?.get(macroNameArity)?.toMacroString(options)?.let { macroString ->
                 decompiled.append(macroString.prependIndentToNonBlank()).append('\n')
-
-                true
-            } ?: false
-
-        private fun appendMacroNameArity(
-            decompiled: StringBuilder,
-            macroNameArity: MacroNameArity,
-            documentation: Documentation?
-        ): Boolean {
-            val beamLanguage = documentation?.beamLanguage ?: "elixir"
-            val decompiler = decompiler(beamLanguage, macroNameArity.toNameArity())
-
-            return if (decompiler != null) {
-                // The signature while easier for users to read are not proper code for those that need to use unquote, so
-                // only allow signatures for default decompiler
-                if (decompiler === Default.INSTANCE) {
-                    val signatures =
-                        documentation?.takeIf { it.beamLanguage == "elixir" }?.docs?.signatures(macroNameArity)
-
-                    if (signatures != null && signatures.isNotEmpty()) {
-                        for (signature in signatures) {
-                            decompiled.append("  ").append(macroNameArity.macro).append(' ')
-                            decompiled.append(signature.replace("\r", ""))
-                            appendNotDecompiledBody(decompiled)
-                        }
-                    } else {
-                        decompiler.append(decompiled, macroNameArity)
-                    }
-                } else {
-                    decompiler.append(decompiled, macroNameArity)
-                }
 
                 true
             } else {
                 false
             }
         }
-
-        fun decompiler(beamLanguage: String, nameArity: NameArity): org.elixir_lang.beam.decompiler.MacroNameArity? {
-            var accepted: org.elixir_lang.beam.decompiler.MacroNameArity? = null
-
-            for (decompiler in MACRO_NAME_ARITY_DECOMPILER_LIST) {
-                if (decompiler.accept(beamLanguage, nameArity)) {
-                    accepted = decompiler
-                    break
-                }
-            }
-
-            if (accepted == null) {
-                error(nameArity)
-            }
-
-            return accepted
-        }
-
-        private fun error(nameArity: NameArity) {
-            logger.error("No decompiler for MacroNameArity ($nameArity)")
-        }
-
-        fun defmoduleArgument(moduleName: String): String = if (moduleName.startsWith(Module.ELIXIR_PREFIX)) {
-            moduleName.substring(Module.ELIXIR_PREFIX.length)
-        } else {
-            ":" + moduleNameToAtomName(moduleName)
-        }
-
-        private fun moduleNameToAtomName(moduleName: String): String = if (moduleName.contains("-")) {
-            "\"" + moduleName + "\""
-        } else {
-            moduleName
-        }
-
-        /**
-         * Converts an Erlang type signature like `-type ascii_binary() :: binary().` or
-         * `-opaque queue(Item) :: {list(Item), list(Item)}.` into an Elixir attribute
-         * name and body: `("type", "ascii_binary() :: binary()")` or
-         * `("opaque", "queue(Item) :: {list(Item), list(Item)}")`.
-         *
-         * Strips the leading `-type `/`-opaque ` prefix and trailing `.` that are
-         * part of Erlang's syntax but invalid in Elixir `@type`/`@opaque` attributes.
-         */
-        private fun erlangTypeSignatureToElixir(signature: String): Pair<String, String> {
-            var body = signature
-            val attr = when {
-                body.startsWith("-opaque ") -> {
-                    body = body.removePrefix("-opaque ")
-                    "opaque"
-                }
-                body.startsWith("-type ") -> {
-                    body = body.removePrefix("-type ")
-                    "type"
-                }
-                else -> "type"
-            }
-            // Strip trailing Erlang period
-            if (body.endsWith(".")) {
-                body = body.dropLast(1)
-            }
-            return Pair(attr, body)
-        }
+        else -> false
     }
+
+private fun appendMacroNameArity(
+    decompiled: StringBuilder,
+    macroNameArity: MacroNameArity,
+    debugInfo: org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.V1,
+    options: Options
+): Boolean =
+    debugInfo.definitions?.get(macroNameArity)?.toMacroString(options)?.let { macroString ->
+        decompiled.append(macroString.prependIndentToNonBlank()).append('\n')
+
+        true
+    } ?: false
+
+private fun appendMacroNameArity(
+    decompiled: StringBuilder,
+    macroNameArity: MacroNameArity,
+    documentation: Documentation?
+): Boolean {
+    val beamLanguage = documentation?.beamLanguage ?: "elixir"
+    val decompiler = decompiler(beamLanguage, macroNameArity.toNameArity())
+
+    return if (decompiler != null) {
+        // The signature while easier for users to read are not proper code for those that need to use unquote, so
+        // only allow signatures for default decompiler
+        if (decompiler === Default.INSTANCE) {
+            val signatures =
+                documentation?.takeIf { it.beamLanguage == "elixir" }?.docs?.signatures(macroNameArity)
+
+            if (signatures != null && signatures.isNotEmpty()) {
+                for (signature in signatures) {
+                    decompiled.append("  ").append(macroNameArity.macro).append(' ')
+                    decompiled.append(signature.replace("\r", ""))
+                    appendNotDecompiledBody(decompiled)
+                }
+            } else {
+                decompiler.append(decompiled, macroNameArity)
+            }
+        } else {
+            decompiler.append(decompiled, macroNameArity)
+        }
+
+        true
+    } else {
+        false
+    }
+}
+
+fun defmoduleArgument(moduleName: String): String = if (moduleName.startsWith(Module.ELIXIR_PREFIX)) {
+    moduleName.substring(Module.ELIXIR_PREFIX.length)
+} else {
+    ":" + moduleNameToAtomName(moduleName)
+}
+
+private fun moduleNameToAtomName(moduleName: String): String = if (moduleName.contains("-")) {
+    "\"" + moduleName + "\""
+} else {
+    moduleName
+}
+
+/**
+ * Converts an Erlang type signature like `-type ascii_binary() :: binary().` or
+ * `-opaque queue(Item) :: {list(Item), list(Item)}.` into an Elixir attribute
+ * name and body: `("type", "ascii_binary() :: binary()")` or
+ * `("opaque", "queue(Item) :: {list(Item), list(Item)}")`.
+ *
+ * Strips the leading `-type `/`-opaque ` prefix and trailing `.` that are
+ * part of Erlang's syntax but invalid in Elixir `@type`/`@opaque` attributes.
+ */
+private fun erlangTypeSignatureToElixir(signature: String): Pair<String, String> {
+    var body = signature
+    val attr = when {
+        body.startsWith("-opaque ") -> {
+            body = body.removePrefix("-opaque ")
+            "opaque"
+        }
+        body.startsWith("-type ") -> {
+            body = body.removePrefix("-type ")
+            "type"
+        }
+        else -> "type"
+    }
+    // Strip trailing Erlang period
+    if (body.endsWith(".")) {
+        body = body.dropLast(1)
+    }
+    return Pair(attr, body)
 }
 
 fun String.prependIndentToNonBlank(indent: String = "  "): String =

@@ -9,6 +9,8 @@ defmodule :code do
 
   @type module_status :: (:not_loaded | :loaded | :modified | :removed)
 
+  @opaque prepared_code :: {:"$prepared$", [{module(), {binary(), charlist(), any()}}]}
+
   # Private Types
 
   @typep add_path_ret :: (true | {:error, :bad_directory})
@@ -17,7 +19,7 @@ defmodule :code do
 
   @typep loaded_ret_atoms :: (:cover_compiled | :preloaded)
 
-  @typep prep_fun_type :: (module(), :file.filename(), binary() -> ({:ok, _} | {:error, _}))
+  @typep prep_fun_type :: (module(), :file.filename(), binary() -> ({:ok, any()} | {:error, any()}))
 
   # Functions
 
@@ -240,7 +242,7 @@ defmodule :code do
     :ok
   end
 
-  @spec replace_path(name, dir) :: (true | {:error, what}) when name: atom(), dir: :file.filename(), what: (:bad_directory | :bad_name | {:badarg, _})
+  @spec replace_path(name, dir) :: (true | {:error, what}) when name: atom(), dir: :file.filename(), what: (:bad_directory | :bad_name | {:badarg, any()})
   def replace_path(name, dir) when is_atom(name) or is_list(name) and is_atom(dir) or is_list(dir), do: call({:replace_path, name, dir})
 
   @spec root_dir() :: :file.filename()

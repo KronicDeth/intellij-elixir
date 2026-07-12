@@ -20,16 +20,17 @@ import com.intellij.psi.impl.source.tree.TreeElement
 import com.intellij.psi.scope.PsiScopeProcessor
 import com.intellij.psi.search.PsiElementProcessor
 import com.intellij.psi.stubs.*
+import com.intellij.reference.SoftReference
 import com.intellij.util.ArrayUtil
 import com.intellij.util.IncorrectOperationException
 import org.elixir_lang.ElixirLanguage
 import org.elixir_lang.beam.Beam
 import org.elixir_lang.beam.Beam.Companion.from
-import org.elixir_lang.beam.Decompiler
 import org.elixir_lang.beam.MacroNameArity
 import org.elixir_lang.beam.chunk.Atoms
 import org.elixir_lang.beam.chunk.CallDefinitions
 import org.elixir_lang.beam.chunk.debug_info.TypeDefinitions
+import org.elixir_lang.beam.defmoduleArgument
 import org.elixir_lang.beam.psi.impl.*
 import org.elixir_lang.beam.psi.stubs.CallDefinitionStub
 import org.elixir_lang.beam.psi.stubs.ModuleStub
@@ -41,7 +42,6 @@ import org.elixir_lang.type.Visibility
 import org.jetbrains.annotations.NonNls
 import java.io.IOException
 import java.lang.ref.SoftReference as JavaSoftReference
-import com.intellij.reference.SoftReference
 
 // See com.intellij.psi.impl.compiled.ClsFileImpl
 class BeamFileImpl private constructor(
@@ -58,7 +58,7 @@ class BeamFileImpl private constructor(
     private var mirrorFileElement: TreeElement? = null
     private var stub: JavaSoftReference<StubTree>? = null
 
-    constructor(fileViewProvider: FileViewProvider) : this(fileViewProvider, false) {}
+    constructor(fileViewProvider: FileViewProvider) : this(fileViewProvider, false)
 
     override fun getDecompiledPsiFile(): PsiFile = mirror as PsiFile
 
@@ -115,7 +115,7 @@ class BeamFileImpl private constructor(
         val moduleStub = stub as? ModuleStub<*>
             ?: throw IllegalStateException("Expected ModuleStub, got ${stub.javaClass.name}")
         val psi = moduleStub.psi
-        return psi ?: throw IllegalStateException("Expected Module PSI, got ${psi?.javaClass?.name}")
+        return psi ?: throw IllegalStateException("Expected Module PSI, got null ${moduleStub.javaClass.name}")
     }
 
     private fun getStub(): PsiFileStub<*> = stubTree.root
@@ -143,7 +143,7 @@ class BeamFileImpl private constructor(
                         ?.atoms()
                         ?.moduleName()
                         ?: virtualFile.nameWithoutExtension
-                val name = Decompiler.defmoduleArgument(moduleName)
+                val name = defmoduleArgument(moduleName)
                 LOGGER.warn("Building minimal stub tree for ${virtualFile.presentableUrl} (module $name)")
                 ModuleStubImpl<ModuleImpl<*>>(rootStub, name)
                 StubTree(rootStub)
@@ -163,8 +163,7 @@ class BeamFileImpl private constructor(
                         .let {
                             @Suppress("UNCHECKED_CAST")
                             it as PsiFileStubImpl<PsiFile>
-                        }
-                        .setPsi(this)
+                        }.psi = this
 
                     stub = JavaSoftReference(newStubTree)
 
@@ -454,18 +453,18 @@ class BeamFileImpl private constructor(
                 atoms
                     .moduleName()
                     ?.let { moduleName ->
-                        val name = Decompiler.defmoduleArgument(moduleName)
+                        val name = defmoduleArgument(moduleName)
                         val parentStub = ElixirFileStubImpl()
                         val moduleStub: ModuleStub<*> = ModuleStubImpl<ModuleImpl<*>>(parentStub, name)
                         buildCallDefinitions(moduleStub, beam, atoms)
-                        buildTypeDefinitions(moduleStub, atoms)
+                        buildTypeDefinitions(moduleStub, beam, atoms)
 
                         moduleStub
                     }
             }
 
-        private fun buildTypeDefinitions(parentStub: ModuleStub<*>, atoms: Atoms) {
-            TypeDefinitions.visibilityNameAritySortedSetByVisibility(parentStub, atoms)
+        private fun buildTypeDefinitions(parentStub: ModuleStub<*>, beam: Beam, atoms: Atoms) {
+            TypeDefinitions.visibilityNameAritySortedSetByVisibility(parentStub, beam, atoms)
                 .forEach { (_, visibilityNameAritySortedSet) ->
                     visibilityNameAritySortedSet.forEach { visibilityNameArity ->
                         buildTypeDefinition(parentStub, visibilityNameArity)

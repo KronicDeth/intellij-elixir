@@ -3,6 +3,8 @@ defmodule :dialyzer_callgraph do
 
   # Types
 
+  @opaque callgraph :: callgraph()
+
   @type callgraph_edge :: {mfa_or_funlbl(), mfa_or_funlbl()}
 
   @type mfa_or_funlbl :: (label() | mfa())
@@ -145,7 +147,7 @@ defmodule :dialyzer_callgraph do
   @spec is_self_rec(mfa_or_funlbl(), callgraph()) :: boolean()
   def is_self_rec(mfaOrLabel, callgraph(self_rec: selfRecs)), do: ets_lookup_set(mfaOrLabel, selfRecs)
 
-  @spec lookup_call_site(label(), callgraph()) :: (:error | {:ok, [_]})
+  @spec lookup_call_site(label(), callgraph()) :: (:error | {:ok, [any()]})
   def lookup_call_site(label, callgraph(calls: calls)) when is_integer(label), do: ets_lookup_dict(label, calls)
 
   @spec lookup_label(mfa_or_funlbl(), callgraph()) :: (:error | {:ok, integer()})

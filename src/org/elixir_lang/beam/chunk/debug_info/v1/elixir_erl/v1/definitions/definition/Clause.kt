@@ -5,14 +5,13 @@ import com.ericsson.otp.erlang.OtpErlangObject
 import com.ericsson.otp.erlang.OtpErlangTuple
 import org.elixir_lang.Macro
 import org.elixir_lang.Macro.rewriteGuard
-import org.elixir_lang.beam.Decompiler.Companion.decompiler
 import org.elixir_lang.beam.chunk.Keyword
 import org.elixir_lang.beam.chunk.debug_info.logger
 import org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.v1.definitions.Definition
 import org.elixir_lang.beam.decompiler.Options
+import org.elixir_lang.beam.decompiler.decompiler
 import org.elixir_lang.beam.term.inspect
 import org.elixir_lang.toOtpErlangList
-import java.lang.StringBuilder
 
 
 class Clause(
@@ -53,7 +52,7 @@ class Clause(
                     } else {
                         "$prefix do\n${blockMacroToString.prependIndent("  ")}\nend"
                     }
-                } catch (stackOverflowError: StackOverflowError) {
+                } catch (_: StackOverflowError) {
                     "$prefix, do: ..."
                 }
             } else {
@@ -82,19 +81,19 @@ class Clause(
         private fun argumentsToString(arguments: OtpErlangList?): String =
                 arguments?.joinToString(", ") { argument -> Macro.toString(argument) } ?: ""
 
-        const val expectedArity = 4
+        const val EXPECTED_ARITY = 4
 
         private fun from(tuple: OtpErlangTuple, definition: Definition): Clause? {
             val arity = tuple.arity()
 
-            return if (arity == expectedArity) {
+            return if (arity == EXPECTED_ARITY) {
                 // https://github.com/elixir-lang/elixir/blob/8c05bb078d715504a9d34343ad807275909474ed/lib/elixir/lib/exception.ex#L231
                 val (metadata, arguments, guards, block) = tuple
 
                 Clause(definition, metadata, arguments, guards, block)
             } else {
                 logger.error("""
-                             Clause arity (${arity}) is not ${expectedArity}
+                             Clause arity (${arity}) is not $EXPECTED_ARITY
 
                              ## clause
 

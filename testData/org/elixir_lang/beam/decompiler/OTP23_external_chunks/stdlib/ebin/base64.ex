@@ -4,13 +4,14 @@ defmodule :base64 do
   Provides base64 encode and decode, see [RFC 2045](https://www.ietf.org/rfc/rfc2045.txt).
   """
 
-  # Types
+  # Private Types
 
   @typedoc ~S"""
   A `binary()` with ASCII characters in the range 1 to 255.
   """
-  @type ascii_binary() :: term()
-  @type ascii_string() :: term()
+  @typep ascii_binary :: binary()
+
+  @typep ascii_string :: [1..255]
 
   # Functions
 

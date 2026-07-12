@@ -2,12 +2,12 @@ package org.elixir_lang.beam
 
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.vfs.VirtualFile
-import org.elixir_lang.beam.psi.BeamFileImpl.Companion.buildFileStub
 import com.intellij.psi.stubs.BinaryFileStubBuilder
 import com.intellij.psi.stubs.Stub
 import com.intellij.util.indexing.FileContent
+import org.elixir_lang.beam.psi.BeamFileImpl.Companion.buildFileStub
 
-class StubBuilder : BinaryFileStubBuilder {
+internal class StubBuilder : BinaryFileStubBuilder {
     /**
      * @param file a .beam file
      * @return `true` (accepts all files because it is only registered for BEAM file type
@@ -30,6 +30,6 @@ class StubBuilder : BinaryFileStubBuilder {
 
     companion object {
         private val LOGGER = Logger.getInstance(StubBuilder::class.java)
-        private const val STUB_VERSION = 2
+        private const val STUB_VERSION = 3
     }
 }
