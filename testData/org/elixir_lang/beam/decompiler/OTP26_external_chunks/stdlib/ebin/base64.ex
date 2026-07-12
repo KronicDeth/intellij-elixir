@@ -6,32 +6,37 @@ defmodule :base64 do
   Provides base64 encode and decode, see [RFC 2045](https://www.ietf.org/rfc/rfc2045.txt).
   """
 
-  # Types
+  # Private Types
 
   @typedoc ~S"""
   Base 64 Encoding alphabet, see [RFC 4648](https://datatracker.ietf.org/doc/html/rfc4648).
   """
-  @type base64_alphabet() :: term()
+  @typep base64_alphabet :: (?A..?Z | ?a..?z | ?0..?9 | ?+ | ?/ | ?- | ?_ | ?=)
+
   @typedoc ~S"""
   Base 64 encoded binary.
   """
-  @type base64_binary() :: term()
+  @typep base64_binary :: binary()
+
   @typedoc ~S"""
   Selector for the Base 64 Encoding alphabet used for [encoding](stdlib:base64#encode/2) and [decoding](stdlib:base64#decode/2). See [RFC 4648](https://datatracker.ietf.org/doc/html/rfc4648) Sections [4](https://datatracker.ietf.org/doc/html/rfc4648#section-4) and [5](https://datatracker.ietf.org/doc/html/rfc4648#section-5).
   """
-  @type base64_mode() :: term()
+  @typep base64_mode :: (:standard | :urlsafe)
+
   @typedoc ~S"""
   Base 64 encoded string.
   """
-  @type base64_string() :: term()
+  @typep base64_string :: [base64_alphabet()]
+
   @typedoc ~S"""
   Arbitrary sequences of octets.
   """
-  @type byte_string() :: term()
+  @typep byte_string :: [byte()]
+
   @typedoc ~S"""
   Customises the behaviour of the encode and decode functions. Default value if omitted entirely or partially is `#{mode => standard, padding => true}`.
   """
-  @type options() :: term()
+  @typep options :: %{optional(:padding) => boolean(), optional(:mode) => base64_mode()}
 
   # Functions
 

@@ -28,11 +28,12 @@ defmodule :queue do
 
   # Types
 
-  @type queue() :: term()
+  @type queue :: queue(any())
+
   @typedoc ~S"""
   As returned by [`new/0`](stdlib:queue#new/0).
   """
-  @type queue(Arg1) :: term()
+  @opaque queue(item) :: {[item], [item]}
 
   # Functions
 

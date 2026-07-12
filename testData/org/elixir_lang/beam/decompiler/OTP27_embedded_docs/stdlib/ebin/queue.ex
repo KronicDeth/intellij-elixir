@@ -55,11 +55,12 @@ defmodule :queue do
 
   # Types
 
-  @type queue()
+  @type queue :: queue(any())
+
   @typedoc ~S"""
   As returned by `new/0`.
   """
-  @type queue(Item)
+  @opaque queue(item) :: {[item], [item]}
 
   # Functions
 

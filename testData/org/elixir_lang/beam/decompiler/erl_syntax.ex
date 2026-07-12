@@ -15,7 +15,7 @@ defmodule :erl_syntax do
 
   @typep encoding :: (:utf8 | :unicode | :latin1)
 
-  @typep erl_parse :: (:erl_parse.abstract_clause() | :erl_parse.abstract_expr() | :erl_parse.abstract_form() | :erl_parse.abstract_type() | :erl_parse.form_info() | {:bin_element, _, _, _, _})
+  @typep erl_parse :: (:erl_parse.abstract_clause() | :erl_parse.abstract_expr() | :erl_parse.abstract_form() | :erl_parse.abstract_type() | :erl_parse.form_info() | {:bin_element, any(), any(), any(), any()})
 
   @typep guard :: (:none | syntaxTree() | [syntaxTree()] | [[syntaxTree()]])
 

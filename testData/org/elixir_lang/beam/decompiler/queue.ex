@@ -3,7 +3,9 @@ defmodule :queue do
 
   # Types
 
-  @type queue :: queue(_)
+  @type queue :: queue(any())
+
+  @opaque queue(item) :: {[item], [item]}
 
   # Functions
 

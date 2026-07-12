@@ -1,6 +1,7 @@
 package org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code
 
 import com.ericsson.otp.erlang.OtpErlangAtom
+import com.ericsson.otp.erlang.OtpErlangList
 import com.ericsson.otp.erlang.OtpErlangObject
 import com.ericsson.otp.erlang.OtpErlangTuple
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode
@@ -62,4 +63,38 @@ object Type {
 
     private fun toSubtype(type: OtpErlangTuple): OtpErlangObject? = type.elementAt(2)
 }
+
+private const val VAR_TAG = "var"
+private const val ANONYMOUS_VARIABLE_NAME = "_"
+
+/**
+ * Within a type expression the Erlang anonymous type variable `{var, Anno, :_}` means "any type in this
+ * position".  Elixir has no anonymous type variable - a bare `_` in a typespec is a `type _/0 undefined`
+ * compile error - so rewrite each one to the `any()` built-in type node `{type, Anno, any, []}`, which the
+ * existing type renderer emits as `any()`.
+ *
+ * This is only sound for *type* terms: `@type`/`@typep`/`@opaque` bodies and `@spec` types.  It must never be
+ * applied to value/pattern terms (function clauses), where `{var, Anno, :_}` is a legitimate ignore pattern
+ * rendered verbatim as `_`.
+ */
+fun anonymousVariableToAny(term: OtpErlangObject): OtpErlangObject =
+        when (term) {
+            is OtpErlangTuple ->
+                if (isAnonymousVariable(term)) {
+                    anyType(term.elementAt(1))
+                } else {
+                    OtpErlangTuple(Array(term.arity()) { anonymousVariableToAny(term.elementAt(it)) })
+                }
+            is OtpErlangList ->
+                OtpErlangList(Array(term.arity()) { anonymousVariableToAny(term.elementAt(it)) })
+            else -> term
+        }
+
+private fun isAnonymousVariable(term: OtpErlangTuple): Boolean =
+        term.arity() == 3 &&
+                (term.elementAt(0) as? OtpErlangAtom)?.atomValue() == VAR_TAG &&
+                (term.elementAt(2) as? OtpErlangAtom)?.atomValue() == ANONYMOUS_VARIABLE_NAME
+
+private fun anyType(anno: OtpErlangObject): OtpErlangTuple =
+        OtpErlangTuple(arrayOf(OtpErlangAtom("type"), anno, OtpErlangAtom("any"), OtpErlangList()))
 

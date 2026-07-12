@@ -129,9 +129,24 @@ private fun appendTypes(
         }
     }
 
+    if (moduleName == "erlang") {
+        // `erlang` keeps its legacy type rendering precedence in addition to the faked built-ins above.
+        documentation?.docs?.typeDocumentedByArityByName()?.let { appendTypes(decompiled, it) }
+            ?: debugInfo?.let { appendTypes(decompiled, it, Options()) }
+    } else {
+        // For Erlang-compiled modules the abstract code is the authoritative source of type definitions:
+        // it carries the real bodies, type parameters (arity) and `-opaque` declarations that the docs
+        // chunk only summarizes.  Render from it, merging any `@typedoc` from the docs chunk.  Beams
+        // without Erlang abstract code (e.g. Elixir-compiled beams) fall back to the docs chunk.
+        val abstractCodeCompileOptions = debugInfo as? AbstractCodeCompileOptions
+
+        if (abstractCodeCompileOptions != null) {
+            appendTypes(decompiled, abstractCodeCompileOptions, documentation, Options())
+        } else {
             documentation?.docs?.typeDocumentedByArityByName()?.let { appendTypes(decompiled, it) }
-                ?: debugInfo?.let { appendTypes(decompiled, it, Options()) }
         }
+    }
+}
 
 private fun appendTypes(decompiled: StringBuilder, documentedByArityByName: Map<String, Map<Int, Documented>>) {
     if (documentedByArityByName.isNotEmpty()) {
@@ -226,16 +241,82 @@ private fun appendTypes(
     }
 }
 
-        private fun appendCallDefinitions(
-            decompiled: StringBuilder,
-            beam: Beam,
-            atoms: Atoms,
-            debugInfo: DebugInfo?,
-            documentation: Documentation?
-        ) {
-            val macroNameAritySortedSetByMacro = CallDefinitions.macroNameAritySortedSetByMacro(beam, atoms)
-            appendCallDefinitions(decompiled, macroNameAritySortedSetByMacro, debugInfo, documentation)
+private fun appendTypes(
+    decompiled: StringBuilder,
+    abstractCodeCompileOptions: AbstractCodeCompileOptions,
+    documentation: Documentation?,
+    decompilerOptions: Options
+) {
+    val typesByElixirAttributeName =
+        abstractCodeCompileOptions.attributes.macroStringAttributes.filterIsInstance<Type>()
+            .groupBy { it.elixirAttributeName }
+    val typeDocumentedByArityByName = documentation?.docs?.typeDocumentedByArityByName() ?: emptyMap()
+
+    // `@type` and `@opaque` are both public and share the "Types" section; `@typep` is private.
+    appendTypeSection(
+        decompiled,
+        "Types",
+        typesByElixirAttributeName["type"].orEmpty() + typesByElixirAttributeName["opaque"].orEmpty(),
+        typeDocumentedByArityByName,
+        decompilerOptions
+    )
+    appendTypeSection(
+        decompiled,
+        "Private Types",
+        typesByElixirAttributeName["typep"].orEmpty(),
+        typeDocumentedByArityByName,
+        decompilerOptions
+    )
+}
+
+private fun appendTypeSection(
+    decompiled: StringBuilder,
+    title: String,
+    types: List<Type>,
+    typeDocumentedByArityByName: Map<String, Map<Int, Documented>>,
+    options: Options
+) {
+    if (types.isNotEmpty()) {
+        appendHeader(decompiled, title)
+
+        for (type in types.sortedBy { it.name }) {
+            decompiled.append('\n')
+            appendTypeDoc(decompiled, type, typeDocumentedByArityByName)
+            decompiled.append("  ").append(type.toMacroString(options)).append('\n')
         }
+    }
+}
+
+private fun appendTypeDoc(
+    decompiled: StringBuilder,
+    type: Type,
+    typeDocumentedByArityByName: Map<String, Map<Int, Documented>>
+) {
+    val name = type.name ?: return
+    val documented = typeDocumentedByArityByName[name]?.get(type.arity) ?: return
+
+    documented.doc?.let { doc ->
+        when (doc) {
+            is None -> Unit
+            is Hidden -> appendDocumentation(decompiled, "typedoc")
+            is MarkdownByLanguage ->
+                for (formatted in doc.formattedByLanguage.values) {
+                    appendDocumentation(decompiled, "typedoc", formatted)
+                }
+        }
+    }
+}
+
+private fun appendCallDefinitions(
+    decompiled: StringBuilder,
+    beam: Beam,
+    atoms: Atoms,
+    debugInfo: DebugInfo?,
+    documentation: Documentation?
+) {
+    val macroNameAritySortedSetByMacro = CallDefinitions.macroNameAritySortedSetByMacro(beam, atoms)
+    appendCallDefinitions(decompiled, macroNameAritySortedSetByMacro, debugInfo, documentation)
+}
 
 private fun macroToHeaderName(macro: String): String = HEADER_NAME_BY_MACRO[macro]!!
 

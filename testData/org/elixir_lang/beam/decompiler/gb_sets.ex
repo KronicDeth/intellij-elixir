@@ -3,13 +3,17 @@ defmodule :gb_sets do
 
   # Types
 
-  @type iter :: iter(_)
+  @type iter :: iter(any())
 
-  @type set :: set(_)
+  @opaque iter(element) :: [gb_set_node(element)]
+
+  @type set :: set(any())
+
+  @opaque set(element) :: {non_neg_integer(), gb_set_node(element)}
 
   # Private Types
 
-  @typep gb_set_node :: (nil | {element, _, _})
+  @typep gb_set_node(element) :: (nil | {element, any(), any()})
 
   # Functions
 
