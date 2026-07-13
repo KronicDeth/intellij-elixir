@@ -358,6 +358,10 @@
 
         <lang.parserDefinition language="Elixir" implementationClass="org.elixir_lang.ElixirParserDefinition"/>
         <lang.psiStructureViewFactory language="Elixir" implementationClass="org.elixir_lang.structure_view.Factory"/>
+        <!-- Breadcrumbs (path shown at the bottom of the editor) and Sticky Lines (declarations pinned to the top of
+             the editor while scrolling) are both derived from this provider; the platform has no separate sticky-lines
+             extension point. -->
+        <breadcrumbsInfoProvider implementation="org.elixir_lang.breadcrumbs.Provider"/>
         <lang.quoteHandler language="Elixir" implementationClass="org.elixir_lang.QuoteHandler"/>
         <lang.syntaxHighlighterFactory
                 implementationClass="org.elixir_lang.ElixirSyntaxHighlighterFactory"
