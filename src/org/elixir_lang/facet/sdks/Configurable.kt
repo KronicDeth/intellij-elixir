@@ -95,6 +95,9 @@ abstract class Configurable: SearchableConfigurable, com.intellij.openapi.option
             projectSdksModel.isModified || editorByProjectJdkImpl.any { entry -> entry.value.isModified }
 
     override fun reset() {
+        // The shared model is populated once (SdksService.initModel) and kept in sync via the
+        // SdkModel listeners; do NOT reset it here - re-cloning would invalidate the SDK objects
+        // held by other open SDK views (and break removeSdk, whose findSdk matches by identity).
         sdkList.refresh()
     }
 
@@ -182,22 +185,31 @@ abstract class Configurable: SearchableConfigurable, com.intellij.openapi.option
     }
 
     private fun removeSdk() {
-        sdkList.selectedValue?.let {
-            val sdk = projectSdksModel.findSdk(it)!!
-            SdkConfigurationUtil.removeSdk(sdk)
+        val selected = sdkList.selectedValue ?: return
+        removeSelectedSdk(selected)
+    }
 
-            projectSdksModel.removeSdk(sdk)
-            projectSdksModel.removeSdk(it)
-
-            editorByProjectJdkImpl[it]?.let {
-                sdkPanel.getValue(sdkPanel.key, false).let {
-                    sdkPanel.remove(it)
-                }
-            }
-            editorByProjectJdkImpl.remove(it)
-
-            sdkList.refresh()
+    /**
+     * Removes [selected] (the editable model clone shown in the list). Extracted for testing.
+     *
+     * `findSdk(clone)` returns the original table SDK, or null if the model no longer tracks it -
+     * guard rather than `!!`. `projectSdksModel.removeSdk(clone)` fires `beforeSdkRemove` so the
+     * combo model and module-library cleanup listeners run.
+     */
+    internal fun removeSelectedSdk(selected: ProjectJdkImpl) {
+        projectSdksModel.findSdk(selected)?.let { original ->
+            SdkConfigurationUtil.removeSdk(original)
         }
+        projectSdksModel.removeSdk(selected)
+
+        editorByProjectJdkImpl[selected]?.let {
+            sdkPanel.getValue(sdkPanel.key, false).let { value ->
+                sdkPanel.remove(value)
+            }
+        }
+        editorByProjectJdkImpl.remove(selected)
+
+        sdkList.refresh()
     }
 
     private fun updateSdkPanel(selectedValue: ProjectJdkImpl?) {

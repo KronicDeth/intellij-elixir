@@ -26,7 +26,13 @@ class Model :
         SdksService.getInstance()?.apply {
             getModel().addListener(object : SdkModel.Listener {
                 override fun beforeSdkRemove(sdk: Sdk) {
-                    remove(sdk)
+                    // ProjectSdksModel.removeSdk fires this with the ORIGINAL table SDK (the map key),
+                    // while this model holds the editable clones (the map values), so remove(sdk) by
+                    // identity would miss and leave a "ghost" entry in the chooser. Match by name.
+                    val index = internalList.indexOfFirst { it?.name == sdk.name }
+                    if (index >= 0) {
+                        remove(index)
+                    }
                 }
 
                 override fun sdkAdded(sdk: Sdk) {
