@@ -130,14 +130,30 @@ object ProcessOutput {
      * {@link com.intellij.openapi.updateSettings.UpdateStrategyCustomization} _for example)."_
      *
      */
+    /**
+     * Test-only override for [isSmallIde]. Tests run on the full IntelliJ platform (product code
+     * `IC`/`IU`), so small-IDE-gated behavior cannot otherwise be exercised. When non-null, [isSmallIde]
+     * returns this value. Set it in a test and reset to null in teardown.
+     *
+     * Only the setter is [org.jetbrains.annotations.TestOnly] - the getter is read by the
+     * production [isSmallIde] accessor, so annotating it would be a TestOnly-API-in-production
+     * violation.
+     */
+    @Volatile
+    @set:org.jetbrains.annotations.TestOnly
+    var isSmallIdeOverride: Boolean? = null
+
     @JvmStatic
     val isSmallIde: Boolean
-        get() = try {
-            val productCode = ApplicationInfo.getInstance().build.productCode.uppercase(Locale.US)
-            productCode !in INTELLIJ_IDEA_PRODUCT_CODES
-        } catch (throwable: Throwable) {
-            LOGGER.warn("Unable to detect IDE product; defaulting to small IDE behavior", throwable)
-            true
+        get() {
+            isSmallIdeOverride?.let { return it }
+            return try {
+                val productCode = ApplicationInfo.getInstance().build.productCode.uppercase(Locale.US)
+                productCode !in INTELLIJ_IDEA_PRODUCT_CODES
+            } catch (throwable: Throwable) {
+                LOGGER.warn("Unable to detect IDE product; defaulting to small IDE behavior", throwable)
+                true
+            }
         }
 
     private val INTELLIJ_IDEA_PRODUCT_CODES: Set<String> = setOf("IC", "IU", "IE")
