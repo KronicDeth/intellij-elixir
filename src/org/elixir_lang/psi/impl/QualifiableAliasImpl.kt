@@ -133,7 +133,83 @@ object QualifiableAliasImpl {
     @Contract(pure = true)
     @JvmStatic
     fun fullyQualifiedName(qualifiableAlias: QualifiableAlias): String =
-        prependQualifiers(qualifiableAlias.parent, qualifiableAlias, qualifiableAlias.name ?: "?")
+        prependQualifiers(qualifiableAlias.parent, qualifiableAlias, selfQualifiedName(qualifiableAlias))
+
+    /**
+     * The name of [qualifiableAlias] with its own qualifier expanded.
+     *
+     * [com.intellij.psi.PsiNamedElement.getName] for a [QualifiedAlias] is the raw source text.
+     * That only equals the resolvable module name when the qualifier chain consists purely of
+     * Aliases: a call qualifier such as `__MODULE__` in `__MODULE__.Endpoint` must be resolved to
+     * the enclosing module so the name becomes e.g. `MyModule.Endpoint` - echoing the text would
+     * produce `__MODULE__.Endpoint`, which matches nothing in the module name index.
+     */
+    private fun selfQualifiedName(qualifiableAlias: QualifiableAlias): String {
+        if (qualifiableAlias !is QualifiedAlias) {
+            return qualifiableAlias.name ?: "?"
+        }
+
+        val children = qualifiableAlias.children
+        val operatorIndex = operatorIndex(children)
+        val qualifier = org.elixir_lang.psi.operation.infix.Normalized.leftOperand(children, operatorIndex)
+        val relativeName = org.elixir_lang.psi.operation.infix.Normalized.rightOperand(children, operatorIndex)
+            ?.let { it as? PsiNamedElement }
+            ?.name
+
+        return if (qualifier != null && relativeName != null) {
+            "${qualifierName(qualifier, qualifiableAlias)}.$relativeName"
+        } else {
+            qualifiableAlias.name ?: "?"
+        }
+    }
+
+    /**
+     * The module name contributed by [qualifier], the left operand of a qualified alias or
+     * qualified call: the dotted name for Alias chains (recursing through [selfQualifiedName] so
+     * call qualifiers nested in longer chains like `__MODULE__.Foo.Bar` expand too), or the name
+     * of the modular a call qualifier such as `__MODULE__` resolves to.
+     */
+    private fun qualifierName(qualifier: PsiElement, context: PsiElement): String =
+        when (val strippedQualifier = qualifier.stripAccessExpression()) {
+            is QualifiedAlias -> selfQualifiedName(strippedQualifier)
+            is QualifiableAlias -> strippedQualifier.name ?: "?"
+            is Call -> {
+                val modularSet = strippedQualifier.maybeModularNameToModulars()
+
+                when (modularSet.size) {
+                    0 -> {
+                        Logger.error(
+                            QualifiableAlias::class.java,
+                            "Don't know how to prepend qualifier when call resolves to no modulars",
+                            context
+                        )
+
+                        "?"
+                    }
+
+                    1 -> modularSet.single().name ?: "?"
+                    else -> {
+                        Logger.error(
+                            QualifiableAlias::class.java,
+                            "Don't know how to prepend qualifier when call resolves to more than one modular",
+                            context
+                        )
+
+                        "?"
+                    }
+                }
+            }
+
+            else -> {
+                Logger.error(
+                    QualifiableAlias::class.java,
+                    "Don't know how to prepend qualifier",
+                    context
+                )
+
+                "?"
+            }
+        }
 
     private fun prependQualifiers(ancestor: PsiElement, previousAncestor: PsiElement, accumulator: String): String =
         when (ancestor) {
@@ -178,47 +254,7 @@ object QualifiableAliasImpl {
                         // ancestor was qualifier, so it is only the qualifier's name
                         accumulator
                     } else {
-                        val qualifiedName = when (val strippedQualifier = qualifier.stripAccessExpression()) {
-                            is QualifiableAlias -> strippedQualifier.name
-                            is Call -> {
-                                val modularSet = strippedQualifier.maybeModularNameToModulars()
-
-                                when (modularSet.size) {
-                                    0 -> {
-                                        Logger.error(
-                                            QualifiableAlias::class.java,
-                                            "Don't know how to prepend qualifier when call resolves to no modulars",
-                                            ancestor
-                                        )
-
-                                        "?.${accumulator}"
-                                    }
-
-                                    1 -> "${modularSet.single().name}.${accumulator}"
-                                    else -> {
-                                        Logger.error(
-                                            QualifiableAlias::class.java,
-                                            "Don't know how to prepend qualifier when call resolves to more than one modular",
-                                            ancestor
-                                        )
-
-                                        "?.${accumulator}"
-                                    }
-                                }
-                            }
-
-                            else -> {
-                                Logger.error(
-                                    QualifiableAlias::class.java,
-                                    "Don't know how to prepend qualifier",
-                                    ancestor
-                                )
-
-                                "?.${accumulator}"
-                            }
-                        }
-
-                        "${qualifiedName}.${accumulator}"
+                        "${qualifierName(qualifier, ancestor)}.${accumulator}"
                     }
                 } else {
                     Logger.error(QualifiableAlias::class.java, "Don't know how to prepend qualifier", ancestor)
