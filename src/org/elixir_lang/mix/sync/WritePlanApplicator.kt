@@ -178,6 +178,18 @@ private fun applyModuleWriteOp(
     moduleManager: ModuleManager,
     libraryTable: com.intellij.openapi.roots.libraries.LibraryTable,
 ) {
+    // Stale-entry pruning - remove the invalid project-level entries scheduled by buildWritePlan.
+    // Re-check isValid at apply time: if a concurrent write action created the referenced library
+    // after the read-phase snapshot, the entry is no longer invalid and must be kept.
+    if (op.removeStaleLibraryDeps.isNotEmpty()) {
+        for (entry in modifiableModel.orderEntries.filterIsInstance<LibraryOrderEntry>()) {
+            ProgressManager.checkCanceled()
+            if (!entry.isValid && entry.libraryName in op.removeStaleLibraryDeps) {
+                modifiableModel.removeOrderEntry(entry)
+            }
+        }
+    }
+
     // Revalidate the live model state at apply time to guard against a concurrent write action
     // that added entries between buildWritePlan (readAction) and applyWritePlan (edtWriteAction).
     // Without this check, addModuleOrderEntry / addLibraryEntry / addExcludeFolder would create

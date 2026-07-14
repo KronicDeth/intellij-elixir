@@ -4,10 +4,7 @@ import com.intellij.openapi.application.readAction
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.roots.LibraryOrderEntry
-import com.intellij.openapi.roots.ModuleOrderEntry
-import com.intellij.openapi.roots.ModuleRootManager
-import com.intellij.openapi.roots.OrderRootType
+import com.intellij.openapi.roots.*
 import com.intellij.openapi.roots.impl.libraries.LibraryEx
 import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar
 import com.intellij.openapi.vfs.VfsUtilCore
@@ -34,10 +31,16 @@ internal data class LibraryWriteOp(
 /**
  * Per-module dependency wiring to be applied during [applyWritePlan].
  *
- * Only the additions are recorded here - existing entries are never removed by the sync pipeline.
  * [addModuleDeps] contains module names whose dep-module is currently live; [addInvalidModuleDeps]
  * contains names whose dep-module is absent or disposed at plan-build time.  [addLibraryDeps] and
  * [addInvalidLibraryDeps] follow the same convention for project libraries.
+ *
+ * [removeStaleLibraryDeps] is the single removal case the pipeline performs on existing entries:
+ * INVALID project-level library entries whose root-scoped name embeds a content-root URL that is
+ * no longer a project content root.  Such entries can never become valid again - no sync will
+ * recreate a library scoped to a root that left the project (e.g. after the project moved on disk
+ * or a WSL distro rename changed every file URL) - so they are permanently dead weight.  All other
+ * existing entries are never removed by the sync pipeline.
  */
 internal data class ModuleWriteOp(
     val moduleName: String,
@@ -46,6 +49,7 @@ internal data class ModuleWriteOp(
     val addLibraryDeps: Set<String>,
     val addInvalidLibraryDeps: Set<String>,
     val addExcludeFolderUrls: List<String>,
+    val removeStaleLibraryDeps: Set<String> = emptySet(),
 )
 
 /**
@@ -347,6 +351,10 @@ private fun buildWritePlanInCurrentContext(project: Project, syncPlan: SyncPlan)
         (libSnap.keys - allLibrariesToRemoveSet) + plannedLibraryNames + placeholderLibraries
 
     val moduleManager = ModuleManager.getInstance(project)
+    // Current content-root URLs, used to recognise stale root-scoped library entries: a scoped
+    // name embedding a URL outside this set references a root that left the project.
+    val projectContentRootUrls = ProjectRootManager.getInstance(project).contentRoots
+        .mapTo(HashSet()) { it.url }
     val moduleNames = (syncPlan.modulePlans.map { it.moduleName } +
         syncPlan.libraryPlans.flatMap { it.excludeFolders }.map { it.moduleName } +
         syncPlan.consolidatedPlans.mapNotNull { it.ownerModuleName })
@@ -430,9 +438,24 @@ private fun buildWritePlanInCurrentContext(project: Project, syncPlan: SyncPlan)
             .map { it.folderUrl }
             .filterNot { it in existingExcludeFolderUrls }
 
+        // Stale-entry pruning: an INVALID project-level library entry whose root-scoped name
+        // embeds a content-root URL that is no longer part of the project can never become
+        // valid again - no sync will ever recreate a library scoped to a root that left the
+        // project.  Entries scoped to a CURRENT content root are the deliberate placeholder
+        // wiring for declared-but-unfetched deps and stay untouched, as do entries without
+        // the `name [url]` scoped-name shape (potentially user-created libraries).
+        val removeStaleLibraryDeps = rootManager.orderEntries
+            .filterIsInstance<LibraryOrderEntry>()
+            .filter { !it.isValid && it.libraryLevel == LibraryTablesRegistrar.PROJECT_LEVEL }
+            .mapNotNull { it.libraryName }
+            .filterTo(LinkedHashSet()) { name ->
+                scopedLibraryNameContentRootUrl(name)
+                    ?.let { embeddedUrl -> embeddedUrl !in projectContentRootUrls } == true
+            }
+
         if (addModuleDeps.isNotEmpty() || addInvalidModuleDeps.isNotEmpty() ||
             addLibraryDeps.isNotEmpty() || addInvalidLibraryDeps.isNotEmpty() ||
-            addExcludeFolderUrls.isNotEmpty()
+            addExcludeFolderUrls.isNotEmpty() || removeStaleLibraryDeps.isNotEmpty()
         ) {
             moduleWriteOps += ModuleWriteOp(
                 moduleName = moduleName,
@@ -441,6 +464,7 @@ private fun buildWritePlanInCurrentContext(project: Project, syncPlan: SyncPlan)
                 addLibraryDeps = addLibraryDeps,
                 addInvalidLibraryDeps = addInvalidLibraryDeps,
                 addExcludeFolderUrls = addExcludeFolderUrls,
+                removeStaleLibraryDeps = removeStaleLibraryDeps,
             )
         }
     }
