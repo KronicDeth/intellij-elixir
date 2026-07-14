@@ -45,9 +45,11 @@ import org.elixir_lang.sdk.elixir.ElixirSdkLookup
 import org.elixir_lang.sdk.elixir.ElixirSdkMutation
 import org.elixir_lang.sdk.elixir.ElixirSdkValidation
 import org.elixir_lang.sdk.elixir.ElixirSdkValidation.detectOtpMismatch
+import org.elixir_lang.sdk.elixir.ModuleSdkStatus
 import org.elixir_lang.sdk.elixir.SdkSettingsOpener
 import org.elixir_lang.sdk.elixir.Type
 import org.elixir_lang.sdk.elixir.sdk
+import org.elixir_lang.sdk.elixir.summaryHtml
 import org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData
 import org.elixir_lang.tool_manager.ModuleSdkIssue
 import org.elixir_lang.tool_manager.SdkVersionTable
@@ -147,8 +149,8 @@ class ElixirEditorBasedSdkWidget(
     }
 
     // Latest tool-manager analysis result, updated whenever ToolManagerSdkAnalyser publishes.
-    // Null on small IDEs (where the analyser service is not registered) and before the first
-    // analysis completes on rich IDEs.
+    // Null before the first analysis completes (the analyser service is now registered in every
+    // IDE, so getInstanceIfRegistered is only null if the service somehow failed to load).
     @Volatile
     private var latestTmAnalysis: ToolManagerAnalysisResult? = null
 
@@ -219,8 +221,8 @@ class ElixirEditorBasedSdkWidget(
         // Subscribe to tool-manager analysis results.  When the analyser publishes new results
         // (after a scan completes or module SDKs change), cache them and trigger a notification
         // scan so notifyIfNeeded() uses the latest TM data.
-        // On small IDEs the analyser service is absent; getInstanceIfRegistered returns null,
-        // so latestTmAnalysis stays null and notifyIfNeeded() skips all TM-specific logic.
+        // getInstanceIfRegistered is null-safe in case the service failed to load; then
+        // latestTmAnalysis stays null and notifyIfNeeded() skips all TM-specific logic.
         ToolManagerSdkAnalyser.getInstanceIfRegistered(project)?.subscribeWithLatest(
             parentDisposable = this,
             onAnalysisCompleted = { result ->
@@ -380,50 +382,22 @@ class ElixirEditorBasedSdkWidget(
             count = ModuleManager.getInstance(project).modules.count { it.isElixirModule() }
             cachedElixirModuleCount = count
         }
-        val showModuleName = count > 1
+        val moduleName = if (count > 1) module.name else null
 
-        if (elixirSdk == null) {
-            val state = WidgetState(
-                toolTip = if (showModuleName) "No Elixir SDK configured for module '${module.name}'" else "No Elixir SDK configured",
-                text = "No Elixir SDK",
-                isActionEnabled = true
-            )
-            return state
-        }
+        // Shared classification + tooltip text (see ModuleSdkStatus), also used by the
+        // Settings → Elixir per-module SDK page so the status text lives in one place.
+        val status = ModuleSdkStatus.of(elixirSdk)
+        val toolTip = status.summaryHtml(moduleName)
+        return when (status) {
+            is ModuleSdkStatus.NoSdk ->
+                WidgetState(toolTip, "No Elixir SDK", true)
 
-        if (!isValidSdk(elixirSdk)) {
-            val state = WidgetState(
-                toolTip = if (showModuleName) "Elixir SDK: ${elixirSdk.name} - Invalid SDK (module '${module.name}')" else "Elixir SDK: ${elixirSdk.name} - Invalid SDK",
-                text = "Elixir: SDK Error",
-                isActionEnabled = true
-            )
-            state.icon = AllIcons.General.Error
-            return state
-        }
+            is ModuleSdkStatus.Invalid, is ModuleSdkStatus.MissingErlang ->
+                WidgetState(toolTip, "Elixir: SDK Error", true).apply { icon = AllIcons.General.Error }
 
-        val erlangSdk = getErlangSdk(elixirSdk)
-        if (erlangSdk == null) {
-            val state = WidgetState(
-                toolTip = if (showModuleName) "Elixir SDK: ${elixirSdk.name} - Missing Erlang SDK (module '${module.name}')" else "Elixir SDK: ${elixirSdk.name} - Missing Erlang SDK",
-                text = "Elixir: SDK Error",
-                isActionEnabled = true
-            )
-            state.icon = AllIcons.General.Error
-            return state
+            is ModuleSdkStatus.Ready ->
+                WidgetState(toolTip, status.elixirSdk.name, true).apply { icon = Icons.LANGUAGE }
         }
-
-        val tooltipBase = buildString {
-            append("Elixir: <b>${elixirSdk.name}</b>")
-            append("<br>Erlang: <b>${erlangSdk.name}</b>")
-            if (showModuleName) append("<br>Module: <b>${module.name}</b>")
-        }
-        val state = WidgetState(
-            toolTip = tooltipBase,
-            text = elixirSdk.name,
-            isActionEnabled = true
-        )
-        state.icon = Icons.LANGUAGE
-        return state
     }
 
     // -------------------------------------------------------------------------
@@ -906,13 +880,6 @@ class ElixirEditorBasedSdkWidget(
         if (!ElixirSdkValidation.hasErlangClasspathInElixirSdk(elixirSdk, erlangSdk))
             issues.add("Erlang SDK classpath entries missing - reopen SDK settings to fix")
         return issues
-    }
-
-    private fun isValidSdk(sdk: Sdk?): Boolean {
-        if (sdk == null) return false
-        val sdkType = sdk.sdkType as? Type ?: return false
-        val homePath = sdk.homePath ?: return false
-        return sdkType.isValidSdkHome(homePath)
     }
 
     private fun getErlangSdk(elixirSdk: Sdk): Sdk? =
