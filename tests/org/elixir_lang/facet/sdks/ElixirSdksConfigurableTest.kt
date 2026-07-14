@@ -4,6 +4,7 @@ import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.projectRoots.ProjectJdkTable
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl
+import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar
 import com.intellij.testFramework.common.runAll
 import org.elixir_lang.PlatformTestCase
 import org.elixir_lang.facet.SdksService
@@ -99,6 +100,39 @@ class ElixirSdksConfigurableTest : PlatformTestCase() {
         addElixirSdkToTable("Elixir Test D")
 
         assertTrue("cached model should refresh after external add; got ${listedNames()}", "Elixir Test D" in listedNames())
+    }
+
+    fun testDisposeUIResourcesRemovesSdkModelListener() {
+        val configurable = ElixirSdksConfigurable()
+        configurable.createComponent()
+        configurable.reset()
+
+        val libraryTable = LibraryTablesRegistrar.getInstance().libraryTable
+        try {
+            // While the page is open, its SdkModel listener mirrors model additions into the
+            // application library table (that is its observable side effect).
+            service().getModel().addSdk(ProjectJdkImpl("Elixir Listener A", ElixirSdkType.instance))
+            assertNotNull(
+                "sanity: listener should mirror the SDK into the library table while the page is open",
+                libraryTable.getLibraryByName("Elixir Listener A"),
+            )
+
+            configurable.disposeUIResources()
+
+            // After disposal the listener must be removed from the shared, app-lifetime model -
+            // otherwise one listener accumulates per Settings open.
+            service().getModel().addSdk(ProjectJdkImpl("Elixir Listener B", ElixirSdkType.instance))
+            assertNull(
+                "listener must be removed on disposeUIResources",
+                libraryTable.getLibraryByName("Elixir Listener B"),
+            )
+        } finally {
+            WriteAction.run<Throwable> {
+                listOf("Elixir Listener A", "Elixir Listener B").forEach { name ->
+                    libraryTable.getLibraryByName(name)?.let { libraryTable.removeLibrary(it) }
+                }
+            }
+        }
     }
 
     fun testRemovedSdkDoesNotGhostInChooser() {

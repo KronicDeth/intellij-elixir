@@ -114,6 +114,13 @@ abstract class Configurable: SearchableConfigurable, com.intellij.openapi.option
         }
     }
 
+    /**
+     * The listener added to the shared, application-lifetime [ProjectSdksModel][com.intellij.openapi.roots.ui.configuration.projectRoot.ProjectSdksModel]
+     * in [addListeners]; kept so [disposeUIResources] can remove it. Without removal, one listener
+     * (pinning this Configurable and its Swing tree) accumulates on every Settings open.
+     */
+    private var sdkModelListener: SdkModel.Listener? = null
+
     private fun addListeners() {
         val listener = object : SdkModel.Listener {
             override fun beforeSdkRemove(sdk: Sdk) {
@@ -173,11 +180,18 @@ abstract class Configurable: SearchableConfigurable, com.intellij.openapi.option
             }
         }
         projectSdksModel.addListener(listener)
+        sdkModelListener = listener
         sdkList.selectionModel.addListSelectionListener { event ->
             if (!event.valueIsAdjusting) {
                 updateSdkPanel(sdkList.selectedValue)
             }
         }
+    }
+
+    override fun disposeUIResources() {
+        sdkModelListener?.let { projectSdksModel.removeListener(it) }
+        sdkModelListener = null
+        editorByProjectJdkImpl.clear()
     }
 
     private fun addSdk() {
@@ -223,7 +237,7 @@ abstract class Configurable: SearchableConfigurable, com.intellij.openapi.option
 
 private fun Library.ModifiableModel.addRoots(roots: Array<VirtualFile>) =
         roots.forEach {
-            addRoot(it, com.intellij.openapi.roots.OrderRootType.CLASSES)
+            addRoot(it, OrderRootType.CLASSES)
         }
 
 private fun Library.ModifiableModel.clearRoots() {

@@ -7,6 +7,7 @@ import com.intellij.openapi.ui.DialogPanel
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.dsl.builder.panel
 import org.elixir_lang.facet.sdk.ComboBox
+import org.elixir_lang.facet.sdk.Model
 import org.elixir_lang.sdk.elixir.ModuleSdkStatus
 import org.elixir_lang.sdk.elixir.summaryHtml
 import org.elixir_lang.tool_manager.ToolManagerSdkAnalyser
@@ -74,7 +75,7 @@ abstract class Configurable(val module: Module) : UnnamedConfigurable {
     }
 
     /**
-     * After the tool-manager button configures this module, [ToolManagerSdkChecker.configureSdks] has
+     * After the tool-manager button configures this module, [org.elixir_lang.tool_manager.ToolManagerSdkChecker.configureSdks] has
      * registered the SDK in the JDK table and set this module's Facet SDK directly (bypassing the
      * dialog's model). Surface it in the dropdown by adding it to the model (which fires `sdkAdded`
      * so the combo picks it up) and selecting it. Deliberately avoids `ProjectSdksModel.reset`, which
@@ -117,6 +118,16 @@ abstract class Configurable(val module: Module) : UnnamedConfigurable {
         if (::sdkComboBox.isInitialized) {
             sdkComboBox.selectedItem = initSdk()?.let { projectSdksModel.findSdk(it.name) }
             updateStatusLabel()
+        }
+    }
+
+    override fun disposeUIResources() {
+        // The combo's Model subscribes to the application-lifetime ProjectSdksModel; unsubscribe
+        // so listeners don't accumulate across Settings opens (one Model is created per module per
+        // Settings open). ModuleAwareProjectConfigurable.disposeUIResources() propagates here for
+        // every instantiated per-module configurable.
+        if (::sdkComboBox.isInitialized) {
+            (sdkComboBox.model as? Model)?.detach()
         }
     }
 }

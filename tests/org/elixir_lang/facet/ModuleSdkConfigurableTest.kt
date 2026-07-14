@@ -115,6 +115,29 @@ class ModuleSdkConfigurableTest : PlatformTestCase() {
         )
     }
 
+    fun testDisposeUIResourcesDetachesSdkChooser() {
+        val configurable = moduleConfigurable()
+        val component = configurable.createComponent()
+        val combo = descendants(component).filterIsInstance<JComboBox<*>>().single()
+
+        // Sanity: while the panel is live, the chooser tracks additions to the shared model.
+        val before = combo.itemCount
+        SdksService.getInstance()!!.getModel().addSdk(ProjectJdkImpl("Elixir Detach A", ElixirSdkType.instance))
+        assertEquals(before + 1, combo.itemCount)
+
+        configurable.disposeUIResources()
+
+        // After disposal the chooser's Model must be detached from the shared, app-lifetime
+        // ProjectSdksModel - otherwise one listener (pinning the combo) accumulates per module
+        // per Settings open.
+        SdksService.getInstance()!!.getModel().addSdk(ProjectJdkImpl("Elixir Detach B", ElixirSdkType.instance))
+        assertEquals(
+            "chooser must not receive updates after disposeUIResources",
+            before + 1,
+            combo.itemCount,
+        )
+    }
+
     fun testApplyWritesFacetSdk() {
         val sdk = registerElixirSdk("Elixir Module Test C")
 
