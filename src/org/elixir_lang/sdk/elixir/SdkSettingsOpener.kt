@@ -18,7 +18,7 @@ interface SdkSettingsOpener {
     }
 }
 
-class SettingsSdkSettingsOpener : SdkSettingsOpener {
+internal class SettingsSdkSettingsOpener : SdkSettingsOpener {
     override fun open(event: AnActionEvent) {
         val project = event.project ?: ProjectManager.getInstance().openProjects.firstOrNull()
         ShowSettingsUtil.getInstance().showSettingsDialog(project, org.elixir_lang.facet.sdks.elixir.Configurable::class.java)
@@ -27,7 +27,7 @@ class SettingsSdkSettingsOpener : SdkSettingsOpener {
     override fun targetName(): String = "Settings"
 }
 
-class ProjectStructureSdkSettingsOpener : SdkSettingsOpener {
+internal class ProjectStructureSdkSettingsOpener : SdkSettingsOpener {
     override fun open(event: AnActionEvent) {
         val action = ActionManager.getInstance().getAction("ShowProjectStructureSettings")
         if (action != null) {

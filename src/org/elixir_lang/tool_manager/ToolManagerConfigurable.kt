@@ -10,9 +10,9 @@ import javax.swing.JComponent
 /**
  * Project-level settings page for Tool Managers (under Settings → Elixir → Tool Managers).
  *
- * Only registered on rich IDEs (via `rich-platform-plugin.xml`), because the SDK
- * configuration performed by tool managers relies on Java-module APIs unavailable on
- * small IDEs.
+ * Registered in the base `plugin.xml`, so available in every IDE including small IDEs
+ * (RubyMine, etc.), letting those users opt in to a tool manager. SDK configuration is
+ * small-IDE-safe (see [ToolManagerSdkChecker.configureSdks]).
  *
  * Renders one checkbox per registered tool manager so users can opt in to each experimental
  * manager individually.  The list is driven by [allBuiltInToolManagers] so new managers

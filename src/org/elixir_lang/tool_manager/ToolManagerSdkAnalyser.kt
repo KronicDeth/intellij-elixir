@@ -8,6 +8,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.roots.ModuleRootListener
 import com.intellij.openapi.projectRoots.ProjectJdkTable
+import com.intellij.ui.EditorNotifications
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.cancel
@@ -25,8 +26,9 @@ import kotlin.time.Duration.Companion.milliseconds
 private val LOG = logger<ToolManagerSdkAnalyser>()
 
 /**
- * Project service (rich IDEs only, registered via `rich-platform-plugin.xml`) that analyses
- * raw tool-manager scan results against the currently configured module SDKs.
+ * Project service (registered in the base `plugin.xml`, so available in every IDE including
+ * small IDEs like RubyMine) that analyses raw tool-manager scan results against the currently
+ * configured module SDKs.
  *
  * Responsibilities:
  * - Subscribes to [ToolManagerSdkCheckerService.SCAN_TOPIC] and caches the latest scan results.
@@ -54,6 +56,15 @@ internal class ToolManagerSdkAnalyser(private val project: Project) : Disposable
 
     @Volatile
     private var latestAnalysis: ToolManagerAnalysisResult? = null
+
+    /**
+     * The most recent completed analysis snapshot, or null before the first scan completes.
+     * Safe to read from any thread (the result is immutable). Used by synchronous UI consumers
+     * such as the setup-SDK editor banner ([org.elixir_lang.notification.setup_sdk.Provider]),
+     * which reads it under the platform read lock while building the panel.
+     */
+    val latestAnalysisResult: ToolManagerAnalysisResult?
+        get() = latestAnalysis
 
     private val analysisRequests = MutableSharedFlow<Unit>(
         extraBufferCapacity = 1,
@@ -140,6 +151,12 @@ internal class ToolManagerSdkAnalyser(private val project: Project) : Disposable
                             "${tmIssues.size} issue(s), ${tmAssignments.size} assignment(s)"
                     )
                     project.messageBus.syncPublisher(ANALYSIS_TOPIC).analysisCompleted(result)
+
+                    // Refresh editor banners so the setup-SDK notification (Provider) can offer a
+                    // "Configure from <tool manager>" action once assignments become available.
+                    // The banner is first built before this async scan completes, so it must be
+                    // re-rendered here.
+                    EditorNotifications.getInstance(project).updateAllNotifications()
                 }
         }
     }
@@ -172,7 +189,7 @@ internal class ToolManagerSdkAnalyser(private val project: Project) : Disposable
 
         fun getInstance(project: Project): ToolManagerSdkAnalyser =
             project.getService(ToolManagerSdkAnalyser::class.java)
-                ?: error("ToolManagerSdkAnalyser not registered (not a rich IDE?)")
+                ?: error("ToolManagerSdkAnalyser not registered")
 
         fun getInstanceIfRegistered(project: Project): ToolManagerSdkAnalyser? =
             project.getService(ToolManagerSdkAnalyser::class.java)

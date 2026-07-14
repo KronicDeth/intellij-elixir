@@ -17,9 +17,11 @@ fun interface ToolManagerSettingsListener {
  *
  * Persisted in `.idea/elixir.xml` under the key `ElixirToolManagerSettings`.
  *
- * Registered only on rich IDEs (via `rich-platform-plugin.xml`) because the SDK
- * configuration performed by tool managers relies on Java-module APIs.  No `@Service`
- * annotation is present so the platform does not auto-register this class for all IDEs.
+ * Registered in the base `plugin.xml`, so available in every IDE including small IDEs
+ * (RubyMine, etc.); SDK configuration is small-IDE-safe (see
+ * [ToolManagerSdkChecker.configureSdks], which assigns the Facet SDK on small IDEs).
+ * No `@Service` annotation is present so the platform does not auto-register this class
+ * with default settings; it is registered explicitly with the desired storage.
  *
  * **Default behaviour**: all tool managers are **disabled** (opt-in model).
  * A tool manager must be explicitly enabled by the user before it is consulted

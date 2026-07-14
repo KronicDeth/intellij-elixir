@@ -38,19 +38,10 @@
                             serviceImplementation="org.elixir_lang.sdk.elixir.ProjectStructureSdkSettingsOpener"
                             overrides="true"/>
 
-        <!-- Tool Manager settings and SDK checker - rich IDE only because SDK configuration
-             relies on Java-module APIs (ModuleRootManager modifiable model, SdkRegistrar, etc.) -->
-        <!--suppress LightServiceMigrationXML -->
-        <projectService serviceImplementation="org.elixir_lang.tool_manager.ToolManagerSettings"/>
-        <!--suppress LightServiceMigrationXML -->
-        <projectService serviceImplementation="org.elixir_lang.tool_manager.ToolManagerSdkCheckerService"/>
-        <!--suppress LightServiceMigrationXML -->
-        <projectService serviceImplementation="org.elixir_lang.tool_manager.ToolManagerSdkAnalyser"/>
-        <projectConfigurable id="language.elixir.tool_managers"
-                             parentId="language.elixir"
-                             displayName="Tool Managers"
-                             instance="org.elixir_lang.tool_manager.ToolManagerConfigurable"/>
-        <backgroundPostStartupActivity implementation="org.elixir_lang.tool_manager.ToolManagerSdkCheckerStartupActivity"/>
+        <!-- Tool Manager settings, SDK checker, and settings page are registered in the base
+             plugin.xml so they load in small IDEs (RubyMine, etc.) too. SDK configuration is
+             small-IDE-safe: ToolManagerSdkChecker.configureSdks assigns the Facet SDK on small
+             IDEs (see ProcessOutput.isSmallIde branch) instead of the Java-module SDK. -->
     </extensions>
     <actions>
         <!--suppress PluginXmlCapitalization -->
