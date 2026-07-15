@@ -3,6 +3,9 @@
 ## Unreleased
 
 ### Enhancements
+* [@sh41](https://github.com/sh41)
+  * **Small IDE (RubyMine, PyCharm, etc.) users can now configure Elixir SDKs from mise.** Tool manager support -- including the Settings → Elixir → Tool Managers opt-in page -- is now available in small IDEs, not just IntelliJ IDEA. When mise has an Elixir installed for a module, a **"Configure from mise"** button appears on the "SDK is not defined" editor banner and next to that module's SDK selector in Settings → Elixir. One click creates the Elixir and Erlang SDKs and selects them for that module.
+  * **Settings → Elixir now guides SDK setup.** The page explains that SDKs are added on the SDKs / Internal Erlang SDKs child pages and links directly to them. Each module's SDK selector shows a live status line (resolved Elixir and Erlang SDK names, or what is wrong -- no SDK, invalid SDK, missing Erlang SDK), matching the status bar widget's wording. In small IDEs the page now lists **all** modules, including projects originally created in IntelliJ IDEA, which previously had no way to pick a per-module SDK in small IDEs.
 * [#3856](https://github.com/KronicDeth/intellij-elixir/pull/3856) - [@sh41](https://github.com/sh41)
   * **Mise users: the plugin now watches your mise config files and re-detects SDKs automatically.** New opt-in per-project settings page (Settings → Elixir → Tool Managers) controls which tool managers are active. Running `mise trust` or editing `.mise.toml` triggers a re-scan without restarting the IDE. Errors like "untrusted config" are now shown in notifications instead of silently ignored.
   * **SDK setup on project open is more reliable.** The initial SDK notification scan now waits for the IDE's internal project model to finish loading, preventing a race where newly registered SDKs could disappear moments after being added.
@@ -21,6 +24,11 @@
   * **Fewer "unknown AST node" warnings when decompiling OTP 26+ BEAM files.** Map comprehension nodes (`m_generate`, `mc`) introduced in OTP 26 are now decompiled correctly.
 
 ### Bug Fixes
+* [@sh41](https://github.com/sh41)
+  * **The "Setup Elixir Module SDK" / "Setup Elixir Facet SDK" editor banner links now work in small IDEs.** They previously called a Project Structure API that is a silent no-op in RubyMine and other small IDEs; they now open the Elixir SDK settings.
+  * **Settings → Elixir → SDKs / Internal Erlang SDKs no longer show an empty list** when SDKs exist. The shared SDK model was initialised without a project, which loads nothing from the SDK table.
+  * **Removing an SDK in Settings → Elixir → SDKs no longer throws** and the removed SDK no longer lingers as a "ghost" entry in the per-module SDK chooser.
+  * **SDKs registered outside the settings dialog (e.g. via "Configure from mise") now appear in Settings without restarting the IDE.** The settings model refreshes when the SDK table changes.
 * [#3849](https://github.com/KronicDeth/intellij-elixir/pull/3849) - [@sh41](https://github.com/sh41)
   * **Ctrl-click on `div`, `rem`, `is_nil` etc. now navigates to Elixir source instead of landing on a `.beam` file.** The resolver now sorts source results before decompiled ones.
   * **`describe`/`test` blocks resolve correctly when using `ExUnit.CaseTemplate`.** Previously these showed `?` icons in the structure view and wouldn't navigate. Now the plugin follows `use MyApp.ConnCase` chains to find the underlying `ExUnit.Case` macros.

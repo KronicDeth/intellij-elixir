@@ -236,6 +236,7 @@ Table of Contents[![Backers on Open Collective](https://opencollective.com/intel
                * [Default SDK](#default-sdk)
             * [Small IDEs](#small-ides)
                * [Elixir Facet SDK](#elixir-facet-sdk)
+               * [Configure from a tool manager (mise)](#configure-from-a-tool-manager-mise)
                * [Elixir SDKs](#elixir-sdks)
                * [Internal Erlang SDK](#internal-erlang-sdk)
          * [Show Parameters](#show-parameters)
@@ -4885,16 +4886,29 @@ These Class Paths are not just for code completion and search anymore, all paths
 
 Because Small IDEs like Rubymine do not have Project Structure, the Elixir SDK, Erlang SDK, and selected SDK must be configured in Preferences.
 
+The top of Preferences > Languages & Frameworks > Elixir explains where SDKs are created and links to the [Elixir SDKs](#elixir-sdks) and [Internal Erlang SDK](#internal-erlang-sdk) pages.
+
 ##### Elixir Facet SDK
 
-Facets are a feature of JetBrains OpenAPI that allow additional languages and frameworks to be added to a Module.  In Small IDEs, each Project has only one Module and its SDK **MUST** match the Small IDE's language, such as a Ruby SDK in Rubymine, so to allow an Elixir SDK to be selected, an Elixir Facet is added to the Module in Small IDEs.
+Facets are a feature of JetBrains OpenAPI that allow additional languages and frameworks to be added to a Module.  A Module's SDK **MUST** match the Small IDE's language, such as a Ruby SDK in Rubymine, so to allow an Elixir SDK to be selected, an Elixir Facet is added to the Module in Small IDEs.
 
 To configure the Elixir Facet SDK
 
 1. Open Preferences > Languages & Frameworks > Elixir
-2. Select a previously created Elixir SDK from the SDK combo box.
-   * If there is no Elixir SDK, you can [create one](#elixir-sdks) first.
-3. Click Apply to save the Preferences changes or OK to save and close.
+2. Select the module in the list on the left.  Every module in the project is listed, including projects that were originally created in IntelliJ IDEA.
+3. Select a previously created Elixir SDK from the SDK combo box.
+   * If there is no Elixir SDK, you can [create one](#elixir-sdks) first, or let [mise set one up for you](#configure-from-a-tool-manager-mise).
+   * The line under the combo box shows which Elixir and Erlang the module will use -- or what's missing if the selection won't work.
+4. Click Apply to save the Preferences changes or OK to save and close.
+
+##### Configure from a tool manager (mise)
+
+If you use [mise](https://mise.jdx.dev/) to manage your Elixir versions, the plugin can set up the SDK for you.  Enable mise under Preferences > Languages & Frameworks > Elixir > Tool Managers.  When mise has an Elixir installed for your project, a **Configure from mise** button appears:
+
+* in the banner at the top of the editor when you open an Elixir file that doesn't have an SDK yet, and
+* next to the module's SDK combo box in Preferences > Languages & Frameworks > Elixir.
+
+One click creates the Elixir and Erlang SDKs from your mise installation and selects them for that module.  Other modules are left alone, so different modules can use different versions.
 
 ##### Elixir SDKs
 

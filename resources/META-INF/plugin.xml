@@ -134,6 +134,23 @@
                             serviceImplementation="org.elixir_lang.sdk.elixir.SettingsSdkSettingsOpener"
                             open="true"/>
 
+        <!-- Tool Manager settings, SDK checker, and settings page. Registered here (base
+             descriptor) so they load in every IDE including small IDEs (RubyMine). SDK
+             configuration is small-IDE-safe: ToolManagerSdkChecker.configureSdks assigns the
+             Facet SDK on small IDEs (ProcessOutput.isSmallIde branch) instead of the
+             Java-module SDK, and SdkRegistrar operates purely on the ProjectJdkTable. -->
+        <!--suppress LightServiceMigrationXML -->
+        <projectService serviceImplementation="org.elixir_lang.tool_manager.ToolManagerSettings"/>
+        <!--suppress LightServiceMigrationXML -->
+        <projectService serviceImplementation="org.elixir_lang.tool_manager.ToolManagerSdkCheckerService"/>
+        <!--suppress LightServiceMigrationXML -->
+        <projectService serviceImplementation="org.elixir_lang.tool_manager.ToolManagerSdkAnalyser"/>
+        <projectConfigurable id="language.elixir.tool_managers"
+                             parentId="language.elixir"
+                             displayName="Tool Managers"
+                             instance="org.elixir_lang.tool_manager.ToolManagerConfigurable"/>
+        <backgroundPostStartupActivity implementation="org.elixir_lang.tool_manager.ToolManagerSdkCheckerStartupActivity"/>
+
 
         <!-- for template -->
         <internalFileTemplate name="Elixir Module"/>

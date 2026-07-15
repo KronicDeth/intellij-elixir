@@ -95,6 +95,9 @@ abstract class Configurable: SearchableConfigurable, com.intellij.openapi.option
             projectSdksModel.isModified || editorByProjectJdkImpl.any { entry -> entry.value.isModified }
 
     override fun reset() {
+        // The shared model is populated once (SdksService.initModel) and kept in sync via the
+        // SdkModel listeners; do NOT reset it here - re-cloning would invalidate the SDK objects
+        // held by other open SDK views (and break removeSdk, whose findSdk matches by identity).
         sdkList.refresh()
     }
 
@@ -110,6 +113,13 @@ abstract class Configurable: SearchableConfigurable, com.intellij.openapi.option
             }
         }
     }
+
+    /**
+     * The listener added to the shared, application-lifetime [ProjectSdksModel][com.intellij.openapi.roots.ui.configuration.projectRoot.ProjectSdksModel]
+     * in [addListeners]; kept so [disposeUIResources] can remove it. Without removal, one listener
+     * (pinning this Configurable and its Swing tree) accumulates on every Settings open.
+     */
+    private var sdkModelListener: SdkModel.Listener? = null
 
     private fun addListeners() {
         val listener = object : SdkModel.Listener {
@@ -170,6 +180,7 @@ abstract class Configurable: SearchableConfigurable, com.intellij.openapi.option
             }
         }
         projectSdksModel.addListener(listener)
+        sdkModelListener = listener
         sdkList.selectionModel.addListSelectionListener { event ->
             if (!event.valueIsAdjusting) {
                 updateSdkPanel(sdkList.selectedValue)
@@ -177,27 +188,42 @@ abstract class Configurable: SearchableConfigurable, com.intellij.openapi.option
         }
     }
 
+    override fun disposeUIResources() {
+        sdkModelListener?.let { projectSdksModel.removeListener(it) }
+        sdkModelListener = null
+        editorByProjectJdkImpl.clear()
+    }
+
     private fun addSdk() {
         projectSdksModel.doAdd(sdkListPanel, sdkType(), { sdk -> addCreatedSdk(sdk)  })
     }
 
     private fun removeSdk() {
-        sdkList.selectedValue?.let {
-            val sdk = projectSdksModel.findSdk(it)!!
-            SdkConfigurationUtil.removeSdk(sdk)
+        val selected = sdkList.selectedValue ?: return
+        removeSelectedSdk(selected)
+    }
 
-            projectSdksModel.removeSdk(sdk)
-            projectSdksModel.removeSdk(it)
-
-            editorByProjectJdkImpl[it]?.let {
-                sdkPanel.getValue(sdkPanel.key, false).let {
-                    sdkPanel.remove(it)
-                }
-            }
-            editorByProjectJdkImpl.remove(it)
-
-            sdkList.refresh()
+    /**
+     * Removes [selected] (the editable model clone shown in the list). Extracted for testing.
+     *
+     * `findSdk(clone)` returns the original table SDK, or null if the model no longer tracks it -
+     * guard rather than `!!`. `projectSdksModel.removeSdk(clone)` fires `beforeSdkRemove` so the
+     * combo model and module-library cleanup listeners run.
+     */
+    internal fun removeSelectedSdk(selected: ProjectJdkImpl) {
+        projectSdksModel.findSdk(selected)?.let { original ->
+            SdkConfigurationUtil.removeSdk(original)
         }
+        projectSdksModel.removeSdk(selected)
+
+        editorByProjectJdkImpl[selected]?.let {
+            sdkPanel.getValue(sdkPanel.key, false).let { value ->
+                sdkPanel.remove(value)
+            }
+        }
+        editorByProjectJdkImpl.remove(selected)
+
+        sdkList.refresh()
     }
 
     private fun updateSdkPanel(selectedValue: ProjectJdkImpl?) {
@@ -211,7 +237,7 @@ abstract class Configurable: SearchableConfigurable, com.intellij.openapi.option
 
 private fun Library.ModifiableModel.addRoots(roots: Array<VirtualFile>) =
         roots.forEach {
-            addRoot(it, com.intellij.openapi.roots.OrderRootType.CLASSES)
+            addRoot(it, OrderRootType.CLASSES)
         }
 
 private fun Library.ModifiableModel.clearRoots() {

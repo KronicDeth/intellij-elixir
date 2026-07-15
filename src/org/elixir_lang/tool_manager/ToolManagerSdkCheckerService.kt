@@ -25,8 +25,8 @@ import kotlin.time.Duration.Companion.milliseconds
 private val LOG = logger<ToolManagerSdkCheckerService>()
 
 /**
- * Project service (rich IDEs only, registered via `rich-platform-plugin.xml`) that owns the
- * tool-manager scan lifecycle.
+ * Project service (registered in the base `plugin.xml`, so available in every IDE including
+ * small IDEs like RubyMine) that owns the tool-manager scan lifecycle.
  *
  * Responsibilities:
  * - Waits for the JPS project model to be fully loaded before the first scan.
@@ -218,6 +218,6 @@ internal class ToolManagerSdkCheckerService(private val project: Project) : Disp
 
         fun getInstance(project: Project): ToolManagerSdkCheckerService =
             project.getService(ToolManagerSdkCheckerService::class.java)
-                ?: error("ToolManagerSdkCheckerService not registered (not a rich IDE?)")
+                ?: error("ToolManagerSdkCheckerService not registered")
     }
 }
