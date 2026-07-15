@@ -51,7 +51,13 @@ fun QualifiableAlias.computeReference(): PsiPolyVariantReference? =
             }
     }
 
-private fun isDefmoduleDeclarationName(alias: QualifiableAlias): Boolean {
+/**
+ * Whether [alias] is (part of) the declared name of an enclosing `defmodule`/`defprotocol`/`defimpl`.
+ * Declaration names are anchored by `ModuleSymbolDeclarationProvider` and must not carry references -
+ * an (even unresolving) reference over a declaration anchor shadows the declaration in the platform's
+ * declaration-or-reference arbitration.
+ */
+internal fun isDefmoduleDeclarationName(alias: QualifiableAlias): Boolean {
     val moduleCall = generateSequence(alias as PsiElement) { it.parent }
         .filterIsInstance<Call>()
         .firstOrNull { org.elixir_lang.psi.Module.`is`(it) }

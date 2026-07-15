@@ -273,10 +273,12 @@
                                      implementationClass="org.elixir_lang.model.psi.function.FunctionArityKeywordPairReferenceProvider"
                                      targetClass="org.elixir_lang.model.psi.function.FunctionSymbol"/>
 
-        <!-- Symbol-API: module declarations/references (`defmodule`, `alias`, `use`, `import`, qualifiers). -->
+        <!-- Symbol-API: module declarations/references. Hosted on the alias itself so every usage form is
+             covered: `alias`/`use`/`import` arguments, multi-alias braces, qualified-call qualifiers,
+             bare (aliased) names in code, struct literals, `@behaviour`. -->
         <psi.declarationProvider
                 implementation="org.elixir_lang.model.psi.module.ModuleSymbolDeclarationProvider"/>
-        <psi.symbolReferenceProvider hostElementClass="org.elixir_lang.psi.call.Call"
+        <psi.symbolReferenceProvider hostElementClass="org.elixir_lang.psi.QualifiableAlias"
                                      hostLanguage="Elixir"
                                      implementationClass="org.elixir_lang.model.psi.module.ModuleReferenceProvider"
                                      targetClass="org.elixir_lang.model.psi.module.ModuleSymbol"/>
