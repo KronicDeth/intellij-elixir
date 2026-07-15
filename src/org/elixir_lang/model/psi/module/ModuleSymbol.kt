@@ -89,7 +89,13 @@ class ModuleSymbol(
             val nameElement = moduleNameElement(call) ?: return null
             val moduleName = moduleNameText(call)?.removeElixirPrefix() ?: return null
 
-            return ModuleSymbol(call.containingFile, nameElement.textRange, moduleName)
+            // For a `defmodule` in a decompiled `.beam` mirror, containingFile is the in-memory mirror;
+            // originalFile is the navigable compiled `.beam` whose editor shows the decompiled text at
+            // the same offsets (same anchoring as TypeSymbol/FunctionSymbol). For source files,
+            // originalFile is the file itself.
+            val declarationFile = call.containingFile.originalFile
+
+            return ModuleSymbol(declarationFile, nameElement.textRange, moduleName)
         }
 
         @RequiresReadLock
