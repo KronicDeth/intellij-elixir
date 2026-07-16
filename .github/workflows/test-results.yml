@@ -1,0 +1,95 @@
+# Publishes the test results uploaded as artifacts by shared-test.yml.
+#
+# Publishing runs here, on workflow_run, instead of inside the test run itself
+# because the GITHUB_TOKEN of runs for fork and dependabot PRs is read-only,
+# making EnricoMi/publish-unit-test-result-action fail there with
+# "Resource not accessible by integration".
+# https://github.com/EnricoMi/publish-unit-test-result-action/tree/v2#support-fork-repositories-and-dependabot-branches
+#
+# This workflow must never check out or execute code from the triggering run
+# (see https://securitylab.github.com/research/github-actions-preventing-pwn-requests);
+# it only downloads the test-result XMLs and the event payload.
+name: Test Results
+
+on:
+  workflow_run:
+    workflows: [ "Test", "Release", "Tag Release" ]
+    types:
+      - completed
+
+permissions: {}
+
+jobs:
+  # The publish matrix is derived from the triggering run's artifacts rather
+  # than duplicating the os/idea-version matrix from shared-test.yml, so the
+  # two can't drift apart. Runs without test results (e.g. Tag Release with
+  # skip_tests) produce an empty list and no publish jobs.
+  collect:
+    name: Collect Test Result Artifacts
+    runs-on: ubuntu-22.04
+    if: github.event.workflow_run.conclusion == 'success' || github.event.workflow_run.conclusion == 'failure'
+    permissions:
+      actions: read
+    outputs:
+      artifacts: ${{ steps.list.outputs.result }}
+    steps:
+      - name: List Test Result Artifacts
+        id: list
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const artifacts = await github.paginate(github.rest.actions.listWorkflowRunArtifacts, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.payload.workflow_run.id,
+            });
+            return artifacts.map(a => a.name).filter(n => n.startsWith('Test Results ('));
+
+  publish:
+    name: Publish ${{ matrix.artifact }}
+    needs: collect
+    if: needs.collect.outputs.artifacts != '' && needs.collect.outputs.artifacts != '[]'
+    runs-on: ubuntu-22.04
+    permissions:
+      checks: write
+      # needed for the PR comment (comment_mode)
+      pull-requests: write
+      # required to download artifacts from the triggering run
+      actions: read
+    strategy:
+      fail-fast: false
+      matrix:
+        artifact: ${{ fromJson(needs.collect.outputs.artifacts) }}
+
+    steps:
+      - name: Download Test Results
+        id: download-test-results
+        uses: actions/download-artifact@v7
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ github.event.workflow_run.id }}
+          name: ${{ matrix.artifact }}
+          path: artifacts/test-results
+
+      - name: Download Event File
+        id: download-event-file
+        uses: actions/download-artifact@v7
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ github.event.workflow_run.id }}
+          name: Event File
+          path: artifacts/event-file
+
+      - name: Publish Test Results
+        id: publish-test-results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        with:
+          commit: ${{ github.event.workflow_run.head_sha }}
+          event_file: artifacts/event-file/event.json
+          event_name: ${{ github.event.workflow_run.event }}
+          # artifact names double as check names, matching what shared-test.yml
+          # published inline before this workflow existed
+          check_name: ${{ matrix.artifact }}
+          comment_mode: changes
+          files: 'artifacts/test-results/**/*.xml'
+          report_suite_logs: error
