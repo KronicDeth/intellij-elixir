@@ -30,11 +30,31 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+# Test results are published by test-results.yml (workflow_run) so they also
+# appear for fork and dependabot PRs, where this run's GITHUB_TOKEN is read-only.
+permissions:
+  contents: read
+  # gradle/actions/setup-gradle comments its job summary on failing PR builds
+  pull-requests: write
+
 defaults:
   run:
     shell: bash
 
 jobs:
+  # test-results.yml needs the event payload of this run to publish results
+  # against the right commit and pull request
+  event_file:
+    name: Event File
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Upload Event File
+        id: upload-event-file
+        uses: actions/upload-artifact@v7
+        with:
+          name: Event File
+          path: ${{ github.event_path }}
+
   test:
     runs-on: ${{ matrix.os }}
     strategy:
@@ -68,23 +88,14 @@ jobs:
         id: test
         run: ./gradlew -Dtestlogger.theme=standard -Dorg.gradle.console=plain --stacktrace check
 
-      - name: Publish Test Results
-        id: publish-test-results-linux
-        uses: EnricoMi/publish-unit-test-result-action@v2
-        if: always() && runner.os == 'Linux'
+      - name: Upload Test Results
+        id: upload-test-results
+        uses: actions/upload-artifact@v7
+        if: (!cancelled())
         with:
-          files: '**/build/test-results/**/*.xml'
-          check_name: Test Results (${{ matrix.os }}, ${{ matrix.idea-version }})
-          report_suite_logs: "error"
-
-      - name: Publish Test Results
-        id: publish-test-results-windows
-        uses: EnricoMi/publish-unit-test-result-action/windows@v2
-        if: always() && runner.os == 'Windows'
-        with:
-          files: '**/build/test-results/**/*.xml'
-          check_name: Test Results (${{ matrix.os }}, ${{ matrix.idea-version }})
-          report_suite_logs: "error"
+          name: Test Results (${{ matrix.os }}, ${{ matrix.idea-version }})
+          path: '**/build/test-results/**/*.xml'
+          if-no-files-found: warn
 
       - name: Summarize first failed tests
         id: summarize-failed-tests
