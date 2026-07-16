@@ -1,6 +1,8 @@
 package org.elixir_lang.sdk.wsl;
 
+import com.intellij.execution.wsl.DummyWslIjentAvailabilityService;
 import com.intellij.execution.wsl.WSLDistribution;
+import com.intellij.execution.wsl.WslIjentAvailabilityService;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.testFramework.ServiceContainerUtil;
@@ -30,6 +32,19 @@ public class ElixirWslSdkTest extends PlatformTestCase {
             ApplicationManager.getApplication(),
             WslCompatService.class,
             mockService,
+            getTestRootDisposable()
+        );
+
+        // The Windows IDE distribution bundles intellij.platform.ijent.impl, which (on the test
+        // classpath since IntelliJ Platform Gradle Plugin 2.18) overrides this service so that
+        // VFS/path operations on \\wsl.localhost\ paths route through a real IJent session. This
+        // suite uses fictional distribution names and must never contact real WSL, so restore the
+        // platform's own no-IJent implementation.
+        //noinspection UnstableApiUsage
+        ServiceContainerUtil.registerOrReplaceServiceInstance(
+            ApplicationManager.getApplication(),
+            WslIjentAvailabilityService.class,
+            new DummyWslIjentAvailabilityService(),
             getTestRootDisposable()
         );
     }
