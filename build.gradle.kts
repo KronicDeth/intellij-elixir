@@ -440,10 +440,22 @@ dependencies {
     testUIImplementation(libs.kodein.di.jvm)
     testUIImplementation(libs.kotlinx.coroutines.core.jvm)
 
-    // JUnit 5 is required for UI tests
+    // JUnit 5 is required for UI tests. Both dependencies are declared without versions so they
+    // resolve to whatever the IntelliJ test-framework-junit5/ide-starter artifacts request (see
+    // the consistent-resolution wiring below), keeping the Jupiter API/engine matched to what
+    // JetBrains compiled the Starter framework against.
     testUIImplementation(libs.junit.jupiter)
     testUIRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
+}
+
+// The IntelliJ test-framework/starter artifacts carry their JUnit dependencies in runtime scope
+// only, so the versionless junit-jupiter declaration above has no version opinion to inherit on
+// the compile classpath. Consistent resolution makes the compile classpath adopt the versions
+// resolved on the runtime classpath, where the JetBrains-requested JUnit version is visible.
+configurations.named("testUICompileClasspath") {
+    @Suppress("UnstableApiUsage")
+    shouldResolveConsistentlyWith(configurations["testUIRuntimeClasspath"])
 }
 
 // --- Run IDE Configuration ---

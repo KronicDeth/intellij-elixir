@@ -6,8 +6,8 @@
 
 [versions]
 # Plugin Versions
-kotlin = "2.4.0"
-intellij-platform = "2.17.0"
+kotlin = "2.4.10"
+intellij-platform = "2.18.1"
 gradle-download = "5.7.0"
 test-logger = "4.0.0"
 versions = "0.54.0"
@@ -15,7 +15,6 @@ versions = "0.54.0"
 # Dependency Versions
 commons-io = "2.22.0"
 junit = "4.13.2"
-junit-jupiter = "5.13.4"
 opentest4j = "1.3.0"
 mockito-core = "5.23.0"
 kodein = "7.32.0"
@@ -28,7 +27,9 @@ java = "21"
 [libraries]
 commons-io = { module = "commons-io:commons-io", version.ref = "commons-io" }
 junit = { module = "junit:junit", version.ref = "junit" }
-junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit-jupiter" }
+# No version: resolves to whatever the IntelliJ test-framework-junit5/ide-starter artifacts request,
+# so the Jupiter API/engine always matches what JetBrains compiled the Starter framework against.
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
 opentest4j = { module = "org.opentest4j:opentest4j", version.ref = "opentest4j" }
 mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockito-core" }
 kodein-di-jvm = { module = "org.kodein.di:kodein-di-jvm", version.ref = "kodein" }

@@ -1,6 +1,8 @@
 package org.elixir_lang.sdk.wsl;
 
 import com.intellij.execution.configurations.GeneralCommandLine;
+import com.intellij.execution.wsl.DummyWslIjentAvailabilityService;
+import com.intellij.execution.wsl.WslIjentAvailabilityService;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.testFramework.ServiceContainerUtil;
 import org.elixir_lang.PlatformTestCase;
@@ -31,6 +33,19 @@ public class WslArgumentConversionTest extends PlatformTestCase {
             ApplicationManager.getApplication(),
             WslCompatService.class,
             mockService,
+            getTestRootDisposable()
+        );
+
+        // The Windows IDE distribution bundles intellij.platform.ijent.impl, which (on the test
+        // classpath since IntelliJ Platform Gradle Plugin 2.18) overrides this service so that
+        // \\wsl.localhost\ paths boot a real IJent session inside a real WSL distribution. This
+        // suite uses fictional distribution names and must never contact real WSL, so restore the
+        // platform's own no-IJent implementation.
+        //noinspection UnstableApiUsage
+        ServiceContainerUtil.registerOrReplaceServiceInstance(
+            ApplicationManager.getApplication(),
+            WslIjentAvailabilityService.class,
+            new DummyWslIjentAvailabilityService(),
             getTestRootDisposable()
         );
     }
