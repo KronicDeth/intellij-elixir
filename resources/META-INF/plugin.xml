@@ -306,10 +306,6 @@
                                      hostLanguage="Elixir"
                                      implementationClass="org.elixir_lang.model.psi.variable.VariableReferenceProvider"
                                      targetClass="org.elixir_lang.model.psi.variable.VariableSymbol"/>
-        <psi.symbolReferenceProvider hostElementClass="org.elixir_lang.psi.ElixirVariable"
-                                     hostLanguage="Elixir"
-                                     implementationClass="org.elixir_lang.model.psi.variable.VariableReferenceProvider"
-                                     targetClass="org.elixir_lang.model.psi.variable.VariableSymbol"/>
 
         <!-- Find Usages -->
         <psi.symbolReferenceProvider hostElementClass="org.elixir_lang.psi.ElixirAtom"
@@ -321,7 +317,6 @@
                                      implementationClass="org.elixir_lang.model.psi.generic_server.GenServerRequestReferenceProvider"
                                      targetClass="org.elixir_lang.model.psi.generic_server.GenServerHandlerTarget"/>
         <targetElementEvaluator implementationClass="org.elixir_lang.TargetElementEvaluator" language="Elixir"/>
-        <usageTargetProvider implementation="org.elixir_lang.UsageTargetProvider"/>
 
         <!-- Go To Implementations -->
 
