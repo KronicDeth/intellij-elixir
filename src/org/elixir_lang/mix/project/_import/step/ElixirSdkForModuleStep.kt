@@ -9,22 +9,26 @@ import com.intellij.openapi.options.ConfigurationException
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.project.ex.ProjectManagerEx
+import com.intellij.openapi.projectRoots.ProjectJdkTable
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.roots.ex.ProjectRootManagerEx
 import com.intellij.openapi.roots.ui.configuration.JdkComboBox
 import com.intellij.openapi.roots.ui.configuration.projectRoot.ProjectSdksModel
 import com.intellij.openapi.ui.MultiLineLabelUI
+import com.intellij.platform.eel.EelMachine
+import com.intellij.platform.eel.provider.getEelDescriptor
 import com.intellij.util.ui.JBInsets
 import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.StartupUiUtil
 import org.elixir_lang.Elixir
 import org.elixir_lang.mix.project._import.Builder
 import org.elixir_lang.sdk.elixir.Type
-import org.jetbrains.annotations.NonNls
-import org.jetbrains.annotations.SystemDependent
+import org.jetbrains.annotations.VisibleForTesting
 import java.awt.Font
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
+import java.nio.file.InvalidPathException
+import java.nio.file.Path
 import javax.swing.*
 
 // Ported from `ProjectJdkForModuleStep`
@@ -33,70 +37,85 @@ class ElixirSdkForModuleStep(private val wizardContext: WizardContext) : ModuleW
     private val project: Project = wizardContext.project ?: ProjectManager.getInstance().defaultProject
 
     /**
-     * Wrapper that makes a project report isDefault() = false and provides the actual project path.
-     * This allows ProjectSdksModel.reset() to properly instantiate the EelProvider
-     * based on the project's path, even when the underlying project is the default project.
+     * The [EelMachine] of the environment the project is being imported from (e.g. a WSL distro
+     * when importing from a `\\wsl$\...` path), or null when the import directory cannot be parsed.
      *
-     * Without this wrapper, the default project returns null for projectFilePath, which causes
-     * getEelDescriptor() to return LocalEelDescriptor, filtering out WSL/remote SDKs.
-     *
-     * Raised https://youtrack.jetbrains.com/issue/IJPL-243914 to see if there is an alternative.
-     *
-     * WARNING: Project is @ApiStatus.NonExtendable, but implementing it is necessary here because
-     * the only alternative (syncSdks(EelDescriptor)) is @ApiStatus.Internal. The wrapper is only
-     * used as a parameter to ProjectSdksModel.reset(), which calls isDefault(), projectFilePath,
-     * and getService() on it.
-     *
-     * Java default methods are not delegated by Kotlin's `by` keyword, so getPresentableUrl() and
-     * scheduleSave() are overridden to delegate explicitly.
+     * ProjectSdksModel.reset() filters SDKs to the project's environment, but during import the
+     * wizard supplies the default project, which always resolves to the local environment, so
+     * WSL/remote SDKs are filtered out. The APIs that would let us pass the real target
+     * environment (syncSdks(EelMachine), sdkMatchesEel()) are @ApiStatus.Internal, and
+     * implementing Project to fake the path violates @NonExtendable on Project -- see
+     * https://youtrack.jetbrains.com/issue/IJPL-243914. Instead, the target environment is
+     * resolved from the wizard's project directory with the public (experimental)
+     * Path.getEelDescriptor(), and matching SDKs are re-added via the public
+     * ProjectSdksModel.addSdk() in [addImportTargetSdks].
      */
-    @Suppress("NonExtendableApiUsage")
-    private class NonDefaultProjectWrapper(
-        private val delegate: Project,
-        private val actualProjectPath: String?
-    ) : Project by delegate {
-        // To allow us to even attempt to use the Eel methods, we cannot be the default project
-        override fun isDefault(): Boolean = false
-        // and we need to have an actual project path
-        override fun getProjectFilePath(): String? = actualProjectPath
-
-        // Java default methods must be delegated explicitly
-        override fun getPresentableUrl(): @SystemDependent @NonNls String? {
-            return delegate.presentableUrl
+    @VisibleForTesting
+    internal fun importTargetMachine(): EelMachine? =
+        try {
+            Path.of(wizardContext.projectFileDirectory).getEelDescriptor().machine
+        } catch (_: InvalidPathException) {
+            null
         }
 
-        // Java default methods must be delegated explicitly
-        override fun scheduleSave() {
-            delegate.scheduleSave()
+    /**
+     * The [EelMachine] owning the SDK's home path, or null when the home path is absent or invalid.
+     */
+    @VisibleForTesting
+    internal fun sdkMachine(sdk: Sdk): EelMachine? =
+        sdk.homePath?.let { home ->
+            try {
+                Path.of(home).getEelDescriptor().machine
+            } catch (_: InvalidPathException) {
+                null
+            }
+        }
+
+    /**
+     * Whether the SDK should be visible for the current import target: hides SDKs from other
+     * environments (e.g. local SDKs when importing from WSL), mirroring the environment filtering
+     * that ProjectSdksModel.reset() applies for opened projects. Permissive when either
+     * environment cannot be determined, so SDK validation stays the deciding factor.
+     */
+    @VisibleForTesting
+    internal fun sdkVisibleForImportTarget(sdk: Sdk): Boolean {
+        val targetMachine = importTargetMachine() ?: return true
+        val machine = sdkMachine(sdk) ?: return true
+
+        return machine == targetMachine
+    }
+
+    /**
+     * Re-adds registered SDKs that reset() filtered out because the default project resolves to
+     * the local environment. Replicates the internal ProjectSdksModel.syncSdks(EelMachine) using
+     * public API: addSdk() clones the SDK into the model and fires sdkAdded, as syncSdks() does,
+     * and apply() treats SDKs already present in ProjectJdkTable as updates, not additions.
+     */
+    private fun addImportTargetSdks() {
+        val targetMachine = importTargetMachine() ?: return
+        val projectSdks = projectSdksModel.projectSdks
+
+        for (sdk in ProjectJdkTable.getInstance().allJdks) {
+            if (projectSdks.containsKey(sdk) || projectSdks.containsValue(sdk)) continue
+
+            if (sdkMachine(sdk) == targetMachine) {
+                projectSdksModel.addSdk(sdk)
+            }
         }
     }
 
     /**
-     * The project to use for SDK model operations.
-     * If the wizard context's project is the default project, we wrap it to make isDefault() return false
-     * and provide the actual import path, which enables proper EelProvider instantiation for environment-aware SDK filtering.
+     * Create a new ProjectSdksModel instance rather than using ProjectStructureConfigurable's
+     * shared instance, so that import-target SDKs added by [addImportTargetSdks] stay local to
+     * this wizard step.
      */
-    private val projectForSdkModel: Project = if (project.isDefault) {
-        // Construct a project file path from the import directory.
-        // The .idea/misc.xml path is used because getEelDescriptor() calls Path.of(filePath).getEelDescriptor(),
-        // which only needs the path prefix to determine the environment (e.g., //wsl$/Ubuntu/... for WSL).
-        val projectPath = wizardContext.projectFileDirectory.let { "$it/.idea/misc.xml" }
-        NonDefaultProjectWrapper(project, projectPath)
-    } else {
-        project
-    }
-
-    /**
-     * Create a new ProjectSdksModel instance rather than using ProjectStructureConfigurable's shared instance.
-     * This allows us to control the project reference passed to reset() via projectForSdkModel,
-     * ensuring proper EEL-based SDK filtering for import wizards.
-     */
-    private val projectSdksModel: ProjectSdksModel = ProjectSdksModel()
+    @get:VisibleForTesting
+    internal val projectSdksModel: ProjectSdksModel = ProjectSdksModel()
     private val jdkComboBox: JdkComboBox = JdkComboBox(
         this.project,
         projectSdksModel,
         { it == Type.instance },
-        { Elixir.elixirSdkHasErlangSdk(it) },
+        { sdk -> Elixir.elixirSdkHasErlangSdk(sdk) && sdkVisibleForImportTarget(sdk) },
         null,
         null
     ).apply {
@@ -171,7 +190,8 @@ class ElixirSdkForModuleStep(private val wizardContext: WizardContext) : ModuleW
     }
 
     override fun updateStep() {
-        projectSdksModel.reset(projectForSdkModel)
+        projectSdksModel.reset(project)
+        addImportTargetSdks()
         jdkComboBox.reloadModel()
         val defaultJdk = defaultJdk
 
