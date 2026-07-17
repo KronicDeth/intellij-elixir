@@ -312,7 +312,6 @@
                                      targetClass="org.elixir_lang.model.psi.variable.VariableSymbol"/>
 
         <!-- Find Usages -->
-        <referencesSearch implementation="org.elixir_lang.ReferencesSearch"/>
         <psi.symbolReferenceProvider hostElementClass="org.elixir_lang.psi.ElixirAtom"
                                      hostLanguage="Elixir"
                                      implementationClass="org.elixir_lang.model.psi.atom.AtomReferenceProvider"
