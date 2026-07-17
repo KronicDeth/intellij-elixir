@@ -312,8 +312,6 @@
                                      targetClass="org.elixir_lang.model.psi.variable.VariableSymbol"/>
 
         <!-- Find Usages -->
-        <findUsagesHandlerFactory implementation="org.elixir_lang.find_usages.handler.Factory"/>
-        <lang.findUsagesProvider language="Elixir" implementationClass="org.elixir_lang.find_usages.Provider"/>
         <referencesSearch implementation="org.elixir_lang.ReferencesSearch"/>
         <psi.symbolReferenceProvider hostElementClass="org.elixir_lang.psi.ElixirAtom"
                                      hostLanguage="Elixir"

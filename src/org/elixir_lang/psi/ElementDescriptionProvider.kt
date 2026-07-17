@@ -10,7 +10,6 @@ import org.elixir_lang.annotator.Parameter
 import org.elixir_lang.beam.psi.impl.CallDefinitionImpl
 import org.elixir_lang.beam.psi.impl.ModuleImpl
 import org.elixir_lang.beam.psi.impl.TypeDefinitionImpl
-import org.elixir_lang.find_usages.Provider
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function.ALIAS
 import org.elixir_lang.psi.call.name.Module.KERNEL
@@ -21,14 +20,11 @@ import org.elixir_lang.structure_view.element.modular.Module
 import org.elixir_lang.structure_view.element.structure.Structure
 
 /**
- * Dual to [Provider], where instead of each location being a separate method, they
- * are all one method, which means the same code can be used to detect the type of an element and then group all the
- * text ([Provider.getDescriptiveName],
- * [Provider.getHelpId],
- * [Provider.getNodeText]
- * [Provider.getType]) together together.
+ * Provides usage-view descriptions (type, short/long name, node text) for Elixir elements in a single
+ * [getElementDescription] method: the same code detects the element's type and then groups all of its
+ * descriptive text together, rather than each location being a separate method.
  */
-class ElementDescriptionProvider : com.intellij.psi.ElementDescriptionProvider {
+internal class ElementDescriptionProvider : com.intellij.psi.ElementDescriptionProvider {
     override fun getElementDescription(element: PsiElement, location: ElementDescriptionLocation): String? =
         when (element) {
             is AtOperation -> getElementDescription(element, location)

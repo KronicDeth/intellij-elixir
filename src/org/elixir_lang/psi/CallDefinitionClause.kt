@@ -8,7 +8,6 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.usageView.UsageViewTypeLocation
 import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.NameArityInterval
-import org.elixir_lang.find_usages.Provider
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function.*
 import org.elixir_lang.psi.call.name.Module.KERNEL
@@ -46,7 +45,7 @@ object CallDefinitionClause {
     }
 
     /**
-     * Description of element used in [Provider].
+     * Description of element used in find-usages and element-description presentation.
      *
      * @param call a [Call] that has already been checked with [.is]
      * @param location where the description will be used
