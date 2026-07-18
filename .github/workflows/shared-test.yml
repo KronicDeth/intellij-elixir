@@ -50,7 +50,7 @@ jobs:
     steps:
       - name: Upload Event File
         id: upload-event-file
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: Event File
           path: ${{ github.event_path }}
@@ -77,7 +77,7 @@ jobs:
     steps:
       - name: Checkout
         id: checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           ref: ${{ inputs.ref || github.ref }}
 
@@ -98,7 +98,7 @@ jobs:
 
       - name: Upload Test Results
         id: upload-test-results
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: (!cancelled())
         with:
           name: Test Results (${{ matrix.os }}, ${{ matrix.idea-version }})
@@ -159,7 +159,7 @@ jobs:
 
       - name: Upload Test Reports (on failure or when requested)
         id: upload-test-reports
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: ${{ always() && (failure() || inputs.upload-reports) }}
         with:
           name: test-reports-${{ matrix.os }}-${{ matrix.idea-version }}
@@ -178,7 +178,7 @@ jobs:
     steps:
       - name: Checkout
         id: checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           ref: ${{ inputs.ref || github.ref }}
 
@@ -236,7 +236,7 @@ jobs:
 
       - name: Upload Verify Reports
         id: upload-verify-reports
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: ${{ always() && inputs.upload-reports }}
         with:
           name: verify-plugin-reports
@@ -254,7 +254,7 @@ jobs:
           unzip -o "$zip_file" -d build/distributions/unpacked
 
       - name: Upload Plugin Artifact (contents)
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: ${{ steps.upload-plugin.outputs.artifact-name }}
           path: build/distributions/unpacked/
