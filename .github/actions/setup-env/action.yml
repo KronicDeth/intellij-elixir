@@ -15,6 +15,10 @@ inputs:
     description: 'IntelliJ IDEA version to test against. Keep in sync with the matrix in shared-test.yml'
     required: false
     default: '2026.1.2'  # should match first version in shared-test.yml
+  java-version:
+    description: 'JBR major version to install. Must match the Java level of idea-version: 25 for 2026.2+ (build 262), 21 for earlier.'
+    required: false
+    default: '21'
   github-token:
     description: 'GitHub token for API access (required for setup-java to download JBR)'
     required: true
@@ -49,21 +53,22 @@ runs:
         large-packages: false
         docker-images: ${{ inputs.free-docker-images == 'true' }}
 
+    # Keyed on the JBR major version so matrix legs on different Java levels (21 vs 25)
+    # cannot restore each other's runtime. No prefix restore-keys on purpose: a partial
+    # restore would be re-saved as a combined blob that grows with every version.
     - name: Restore JetBrains Runtime cache
       id: cache-jbr
       uses: actions/cache/restore@v6
       with:
         path: ${{ runner.tool_cache }}/Java_JetBrains_*
-        key: jbr-${{ runner.os }}-${{ runner.arch }}-21
-        restore-keys: |
-          jbr-${{ runner.os }}-${{ runner.arch }}-
+        key: jbr-${{ runner.os }}-${{ runner.arch }}-${{ inputs.java-version }}
 
-    - name: Setup JBR 21
+    - name: Setup JBR
       id: setup-java
       uses: actions/setup-java@v5
       with:
         distribution: 'jetbrains'
-        java-version: 21
+        java-version: ${{ inputs.java-version }}
         java-package: 'jdk'
         token: ${{ inputs.github-token }}
       env:
@@ -75,7 +80,7 @@ runs:
       uses: actions/cache/save@v6
       with:
         path: ${{ runner.tool_cache }}/Java_JetBrains_*
-        key: jbr-${{ runner.os }}-${{ runner.arch }}-${{ steps.setup-java.outputs.version }}
+        key: ${{ steps.cache-jbr.outputs.cache-primary-key }}
 
     # This sets project properties, allowing us to override gradle.properties via environment variables,
     # applying to all Gradle tasks. Means we don't need to do like `./gradlew -PplatformVersion=xxx`

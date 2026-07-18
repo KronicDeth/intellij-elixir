@@ -31,6 +31,7 @@ import org.jetbrains.intellij.platform.gradle.models.ProductRelease
 import org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask
 import org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 import quoter.QuoterService
@@ -64,7 +65,6 @@ project.configurations.all {
 
 // --- Version Catalog Captures ---
 // Capture these early to avoid "Extension 'libs' not found" errors in subproject blocks
-val javaVersionStr: String = libs.versions.java.get()
 val libJunit = libs.junit
 val libOpentest4j = libs.opentest4j
 val libCommonsIo = libs.commons.io
@@ -93,6 +93,26 @@ val actualPlatformVersion: String = if (useDynamicEapVersion) {
 } else {
     project.property("platformVersion").toString()
 }
+
+// --- Java Level (follows the target platform) ---
+// Platform build 262 (2026.2) ships jars compiled for Java 25; builds 253/261 are Java 21.
+// javac --release validates the class-file version of everything on the compile classpath,
+// so the Java level must follow the platform being built against -- a fixed level cannot
+// serve both 261 and 262. Mirrors IJPGP's PlatformJavaVersions mapping.
+// Release artefacts stay Java 21 because buildPlugin runs against the minimum platform.
+val platformBuildNumber: Int = actualPlatformVersion
+    .substringBefore('-') // strip EAP/SNAPSHOT suffixes, e.g. "262-EAP-SNAPSHOT"
+    .split('.')
+    .let { parts ->
+        val major = parts[0].toIntOrNull() ?: 0
+        when {
+            // Marketing version, e.g. "2026.2" or "2025.3.6" -> 262, 253
+            major >= 2000 -> (major - 2000) * 10 + (parts.getOrNull(1)?.toIntOrNull() ?: 0)
+            // Already a build number, e.g. "262.8665.258"
+            else -> major
+        }
+    }
+val javaVersionStr: String = if (platformBuildNumber >= 262) "25" else libs.versions.java.get()
 
 // Setup Paths
 val cachePath: Directory = layout.projectDirectory.dir("cache")
@@ -208,6 +228,14 @@ subprojects {
                 java.srcDirs("src")
                 resources.srcDirs("resources")
             }
+        }
+    }
+
+    // Kotlin subprojects (jps-shared) must use the same platform-derived Java level as the
+    // rest of the build, otherwise their published variants mismatch the root's toolchain.
+    pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
+        configure<KotlinJvmProjectExtension> {
+            jvmToolchain(javaVersionStr.toInt())
         }
     }
 }
@@ -678,6 +706,11 @@ registerResolveExternalDependenciesTasksForAllProjects()
 
 // ALL test tasks in ALL projects use the QuoterService (ensures cleanup on any failure)
 allprojects {
+    tasks.withType<JavaCompile>().configureEach {
+        options.encoding = "UTF-8"
+        options.release = javaVersionStr.toInt()
+    }
+
     tasks.withType<Test>().configureEach {
         // Validate Erlang is available before running tests.
         doFirst(ErlangAvailabilityCheckAction())
