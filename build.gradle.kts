@@ -94,12 +94,19 @@ val actualPlatformVersion: String = if (useDynamicEapVersion) {
     project.property("platformVersion").toString()
 }
 
-// --- Java Level (follows the target platform) ---
-// Platform build 262 (2026.2) ships jars compiled for Java 25; builds 253/261 are Java 21.
-// javac --release validates the class-file version of everything on the compile classpath,
+// IntelliJ Platform 262 (2026.2) ships JARs compiled for Java 25, and 253/261 are Java 21.
+// `javac --release` validates the class-file version of everything on the compile classpath,
 // so the Java level must follow the platform being built against -- a fixed level cannot
-// serve both 261 and 262. Mirrors IJPGP's PlatformJavaVersions mapping.
-// Release artefacts stay Java 21 because buildPlugin runs against the minimum platform.
+// serve both 261 and 262.
+//
+// The actual released JAR stays atJava 21 because buildPlugin runs against the minimum platform.
+//
+// This functionality copies what the IntelliJ Platform Gradle Plugin's PlatformJavaVersions does (permalinks
+// pinned to the 2.18.1 tag; repin when bumping the plugin):
+// https://github.com/JetBrains/intellij-platform-gradle-plugin/blob/d59281043510b321093f75fec7892d1774ac3060/src/main/kotlin/org/jetbrains/intellij/platform/gradle/utils/PlatformJavaVersions.kt#L11-L17
+// https://github.com/JetBrains/intellij-platform-gradle-plugin/blob/d59281043510b321093f75fec7892d1774ac3060/src/main/kotlin/org/jetbrains/intellij/platform/gradle/plugins/project/IntelliJPlatformBasePlugin.kt#L500-L516
+// https://github.com/JetBrains/intellij-platform-gradle-plugin/blob/d59281043510b321093f75fec7892d1774ac3060/src/main/kotlin/org/jetbrains/intellij/platform/gradle/plugins/project/IntelliJPlatformModulePlugin.kt#L79-L89
+// Background: https://github.com/JetBrains/intellij-platform-gradle-plugin/commit/467e0c7d
 val platformBuildNumber: Int = actualPlatformVersion
     .substringBefore('-') // strip EAP/SNAPSHOT suffixes, e.g. "262-EAP-SNAPSHOT"
     .split('.')
