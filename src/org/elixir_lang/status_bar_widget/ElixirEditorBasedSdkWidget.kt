@@ -11,7 +11,6 @@ import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
-import com.intellij.workspaceModel.ide.JpsProjectLoadingManager
 import com.intellij.openapi.projectRoots.ProjectJdkTable
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.roots.JdkOrderEntry
@@ -60,6 +59,7 @@ import org.elixir_lang.tool_manager.ToolManagerSettings
 import org.elixir_lang.tool_manager.ToolManagerSettingsListener
 import org.elixir_lang.tool_manager.ToolManagerVersions
 import org.elixir_lang.util.WriteActions
+import org.elixir_lang.util.awaitJpsProjectLoaded
 import java.util.concurrent.CancellationException
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -186,35 +186,12 @@ class ElixirEditorBasedSdkWidget(
     )
 
     init {
-        // Trigger the initial notification scan only after the JPS project model sync completes.
-        //
-        // At startup the platform loads the workspace model from a cache, then runs the
-        // `DelayedProjectSynchronizer` project activity which reads the actual .iml and
-        // jdk.table.xml files from disk and applies them to the workspace model.  This sync
-        // takes several seconds (WSL projects: 5–13 s).  Any SDK assignment we commit before
-        // the sync completes is overwritten when the sync applies the persisted .iml state.
-        //
-        // `JpsProjectLoadingManager.jpsProjectLoaded` fires immediately if the JPS model is
-        // already loaded, or after `DelayedProjectSynchronizer` finishes otherwise.  This
-        // guarantees the workspace model is stable (reflects the on-disk .iml) before we show
-        // the notification or let the user click an action.
-        //
-        // `JpsProjectLoadingManager` is @ApiStatus.Internal + @Deprecated in favour of
-        // `WorkspaceModelInternal.awaitSynchronizationWithJpsModel`.  We cannot use the
-        // replacement because it is both @ApiStatus.Experimental *and* absent from the 2025.3
-        // platform (verified: not present in tag idea/253.28294.334).  Since pluginSinceBuild
-        // is 253, using it directly would throw NoSuchMethodError on 2025.3.
-        // JpsProjectLoadingManager works across all supported versions (253 through 261+)
-        // and is the documented mechanism for this use case ("add a missing SDK").
-        // The Python plugin (PySdkFromEnvironmentVariableConfigurator) uses it for the same
-        // purpose.
-        @Suppress("UnstableApiUsage", "DEPRECATION")
+        // Trigger the initial notification scan only after the JPS project model sync completes: any SDK
+        // assignment committed before the sync applies the on-disk .iml state would be overwritten, so we must
+        // wait until the workspace model is stable before showing a notification or letting the user act on it.
+        // See `awaitJpsProjectLoaded` for why this uses the deprecated/internal API and the migration tickets.
         scope.launch {
-            suspendCancellableCoroutine { cont ->
-                JpsProjectLoadingManager.getInstance(project).jpsProjectLoaded {
-                    cont.resumeWith(Result.success(Unit))
-                }
-            }
+            awaitJpsProjectLoaded(project)
             notificationScanRequests.tryEmit(Unit)
         }
 

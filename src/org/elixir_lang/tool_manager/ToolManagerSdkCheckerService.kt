@@ -7,7 +7,6 @@ import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ModuleRootListener
 import com.intellij.openapi.util.Disposer
-import com.intellij.workspaceModel.ide.JpsProjectLoadingManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.cancel
@@ -15,9 +14,9 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import org.elixir_lang.util.ElixirCoroutineService
+import org.elixir_lang.util.awaitJpsProjectLoaded
 import com.intellij.util.messages.Topic
 import java.nio.file.Path
 import kotlin.time.Duration.Companion.milliseconds
@@ -93,15 +92,11 @@ internal class ToolManagerSdkCheckerService(private val project: Project) : Disp
             }
         })
 
-        // Wait for JPS project model sync before the initial scan so that module content roots
-        // and SDK assignments reflect the on-disk state rather than the workspace-model cache.
-        @Suppress("UnstableApiUsage", "DEPRECATION")
+        // Wait for JPS project model sync before the initial scan so that module content roots and SDK
+        // assignments reflect the on-disk state rather than the workspace-model cache.
+        // See [awaitJpsProjectLoaded] for why this uses the deprecated/internal API and the migration tickets.
         scope.launch {
-            suspendCancellableCoroutine<Unit> { cont ->
-                JpsProjectLoadingManager.getInstance(project).jpsProjectLoaded {
-                    cont.resumeWith(Result.success(Unit))
-                }
-            }
+            awaitJpsProjectLoaded(project)
             LOG.debug("JPS model loaded, emitting initial scan request for '${project.name}'")
             scanRequests.tryEmit(Unit)
         }
