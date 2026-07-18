@@ -62,9 +62,9 @@ jobs:
       matrix:
         os: [ ubuntu-22.04, windows-2025 ]
         idea-version:
-            - '2026.1.2'
-            - '2025.3.5'
-            # 2026.2 upgrades to Java 25, won't work in CI until we resolve issues. https://github.com/JetBrains/intellij-community/commit/aa1cfa9632ab
+            - '2026.2'
+            - '2026.1.4'
+            - '2025.3.6'
             # - 'LATEST-EAP-SNAPSHOT'
 
     steps:
@@ -180,13 +180,16 @@ jobs:
         with:
           setup-elixir: false
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          idea-version: '2026.1.2'
+          idea-version: '2026.2'
           free-docker-images: false
 
       - name: Build Plugin
         id: build-plugin
         run: ./gradlew buildPlugin
 
+      # Find these versions at:
+      # https://www.jetbrains.com/idea/download/other/
+      # https://www.jetbrains.com/ruby/download/other/
       - name: Verify Plugin
         id: verify-plugin
         # Fork to be replaced when/if https://github.com/ChrisCarini/intellij-platform-plugin-verifier-action/pull/102 merges
@@ -196,17 +199,18 @@ jobs:
         with:
           verifier-version: 1.404
           ide-versions: |
-            ideaIU:253.33514.17
-            ideaIU:261.24374.151
-            rubymine:2025.3.5
-            rubymine:2026.1.2
+            ideaIU:253.33813.25
+            ideaIU:261.26222.65
+            ideaIU:262.8665.258
+            rubymine:2025.3.6
+            rubymine:2026.1.4
           failure-levels: |
             COMPATIBILITY_PROBLEMS
             INVALID_PLUGIN
+            NON_EXTENDABLE_API_USAGES
           # Should probably have these two as well, but until there is a resolution for https://youtrack.jetbrains.com/issue/IJPL-243914
           # These will keep failing the build
           # OVERRIDE_ONLY_API_USAGES
-          # NON_EXTENDABLE_API_USAGES
           # We can't use this because RubyMine will fail. The verifier doesn't understand "optional"
           # MISSING_DEPENDENCIES
           external-prefixes: 'org.jetbrains.jps'

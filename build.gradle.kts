@@ -682,6 +682,11 @@ registerResolveExternalDependenciesTasksForAllProjects()
 
 // ALL test tasks in ALL projects use the QuoterService (ensures cleanup on any failure)
 allprojects {
+    tasks.withType<JavaCompile>().configureEach {
+        options.encoding = "UTF-8"
+        options.release = javaVersionStr.toInt()
+    }
+
     tasks.withType<Test>().configureEach {
         // Validate Erlang is available before running tests.
         doFirst(ErlangAvailabilityCheckAction())
