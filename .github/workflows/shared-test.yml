@@ -96,6 +96,13 @@ jobs:
           build-scan-publish: 'true'
           skip-searchable-options: 'true'
 
+      # Fail fast on compile errors (e.g. APIs removed in a newer platform) before the
+      # Elixir/quoter setup and test execution spend their minutes. testClasses aggregates
+      # main and test compilation across all modules; check reuses its outputs as UP-TO-DATE.
+      - name: Compile
+        id: compile
+        run: ./gradlew -Dorg.gradle.console=plain --stacktrace testClasses
+
       - name: Run Tests
         id: test
         run: ./gradlew -Dtestlogger.theme=standard -Dorg.gradle.console=plain --stacktrace check
