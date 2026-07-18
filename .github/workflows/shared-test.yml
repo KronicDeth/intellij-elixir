@@ -92,6 +92,7 @@ jobs:
           java-version: ${{ matrix.java-version || '21' }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
           build-scan-publish: 'true'
+          skip-searchable-options: 'true'
 
       - name: Run Tests
         id: test
@@ -192,6 +193,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           idea-version: '2026.1.4'
           free-docker-images: false
+          skip-searchable-options: 'true'
 
       - name: Build Plugin
         id: build-plugin
