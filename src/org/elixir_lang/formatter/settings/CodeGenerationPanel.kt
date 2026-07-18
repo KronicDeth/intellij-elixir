@@ -5,8 +5,8 @@ import com.intellij.application.options.codeStyle.CommenterForm
 import com.intellij.lang.Language
 import com.intellij.openapi.editor.colors.EditorColorsScheme
 import com.intellij.openapi.editor.highlighter.EditorHighlighter
+import com.intellij.openapi.editor.highlighter.EditorHighlighterFactory
 import com.intellij.openapi.fileTypes.FileType
-import com.intellij.openapi.fileTypes.FileTypeEditorHighlighterProviders
 import com.intellij.openapi.util.NlsContexts.TabTitle
 import com.intellij.psi.codeStyle.CodeStyleSettings
 import com.intellij.psi.codeStyle.CodeStyleSettingsCustomizable.CommenterOption
@@ -71,9 +71,12 @@ class CodeGenerationPanel(settings: CodeStyleSettings) : CodeStyleAbstractPanel(
     }
 
     override fun createHighlighter(colors: EditorColorsScheme): EditorHighlighter {
-        val fileType: FileType = getFileType()
-        return FileTypeEditorHighlighterProviders.getInstance().forFileType(fileType)
-            .getEditorHighlighter(null, fileType, null, colors)
+        // EditorHighlighterFactory rather than FileTypeEditorHighlighterProviders.forFileType():
+        // 2026.2 added a covariant forFileType override declared on the class itself, so bytecode
+        // compiled against 2026.2 references a method that does not exist on 2025.3/2026.1
+        // (NoSuchMethodError). EditorHighlighterFactory has the same signature in all supported
+        // builds and routes through the same provider EP.
+        return EditorHighlighterFactory.getInstance().createEditorHighlighter(getFileType(), colors, null)
     }
 
     companion object {
