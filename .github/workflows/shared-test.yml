@@ -62,10 +62,17 @@ jobs:
       matrix:
         os: [ ubuntu-22.04, windows-2025 ]
         idea-version:
+            - '2026.2'
             - '2026.1.4'
             - '2025.3.6'
-            # 2026.2 upgrades to Java 25, won't work in CI until we resolve issues. https://github.com/JetBrains/intellij-community/commit/aa1cfa9632ab
             # - 'LATEST-EAP-SNAPSHOT'
+        # 2026.2 (build 262) is compiled for and runs on Java 25; earlier builds use Java 21.
+        # The build script derives javac --release from the platform version; the installed
+        # JBR must match so it can compile and run the tests. Legs without an entry get the
+        # setup-env default of 21.
+        include:
+            - idea-version: '2026.2'
+              java-version: '25'
 
     steps:
       - name: Checkout
@@ -202,6 +209,7 @@ jobs:
           ide-versions: |
             ideaIU:253.33813.25
             ideaIU:261.26222.65
+            ideaIU:262.8665.258
             rubymine:2025.3.6
             rubymine:2026.1.4
           failure-levels: |
