@@ -6,6 +6,18 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+    # Pinned: Kotlin and kotlinx-coroutines must match the exact versions the
+    # IntelliJ Platform bundles for our minimum supported build. Bumping them
+    # independently breaks binary compatibility, so Dependabot must not touch
+    # them -- they are managed manually in gradle/libs.versions.toml.
+    # See https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#stdlib-miscellaneous
+    ignore:
+      # Kotlin stdlib and other org.jetbrains.kotlin:* artifacts.
+      - dependency-name: "org.jetbrains.kotlin:*"
+      # Kotlin Gradle plugin id (org.jetbrains.kotlin.jvm), resolved via its marker artifact.
+      - dependency-name: "org.jetbrains.kotlin.*"
+      # kotlinx-coroutines-core-jvm and siblings.
+      - dependency-name: "org.jetbrains.kotlinx:kotlinx-coroutines-*"
 #    cooldown:
 #      default-days: 5
 #      semver-major-days: 30

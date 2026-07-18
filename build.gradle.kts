@@ -31,6 +31,7 @@ import org.jetbrains.intellij.platform.gradle.models.ProductRelease
 import org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask
 import org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 import quoter.QuoterService
@@ -64,7 +65,6 @@ project.configurations.all {
 
 // --- Version Catalog Captures ---
 // Capture these early to avoid "Extension 'libs' not found" errors in subproject blocks
-val javaVersionStr: String = libs.versions.java.get()
 val libJunit = libs.junit
 val libOpentest4j = libs.opentest4j
 val libCommonsIo = libs.commons.io
@@ -93,6 +93,33 @@ val actualPlatformVersion: String = if (useDynamicEapVersion) {
 } else {
     project.property("platformVersion").toString()
 }
+
+// IntelliJ Platform 262 (2026.2) ships JARs compiled for Java 25, and 253/261 are Java 21.
+// `javac --release` validates the class-file version of everything on the compile classpath,
+// so the Java level must follow the platform being built against -- a fixed level cannot
+// serve both 261 and 262.
+//
+// The actual released JAR stays atJava 21 because buildPlugin runs against the minimum platform.
+//
+// This functionality copies what the IntelliJ Platform Gradle Plugin's PlatformJavaVersions does (permalinks
+// pinned to the 2.18.1 tag; repin when bumping the plugin):
+// https://github.com/JetBrains/intellij-platform-gradle-plugin/blob/d59281043510b321093f75fec7892d1774ac3060/src/main/kotlin/org/jetbrains/intellij/platform/gradle/utils/PlatformJavaVersions.kt#L11-L17
+// https://github.com/JetBrains/intellij-platform-gradle-plugin/blob/d59281043510b321093f75fec7892d1774ac3060/src/main/kotlin/org/jetbrains/intellij/platform/gradle/plugins/project/IntelliJPlatformBasePlugin.kt#L500-L516
+// https://github.com/JetBrains/intellij-platform-gradle-plugin/blob/d59281043510b321093f75fec7892d1774ac3060/src/main/kotlin/org/jetbrains/intellij/platform/gradle/plugins/project/IntelliJPlatformModulePlugin.kt#L79-L89
+// Background: https://github.com/JetBrains/intellij-platform-gradle-plugin/commit/467e0c7d
+val platformBuildNumber: Int = actualPlatformVersion
+    .substringBefore('-') // strip EAP/SNAPSHOT suffixes, e.g. "262-EAP-SNAPSHOT"
+    .split('.')
+    .let { parts ->
+        val major = parts[0].toIntOrNull() ?: 0
+        when {
+            // Marketing version, e.g. "2026.2" or "2025.3.6" -> 262, 253
+            major >= 2000 -> (major - 2000) * 10 + (parts.getOrNull(1)?.toIntOrNull() ?: 0)
+            // Already a build number, e.g. "262.8665.258"
+            else -> major
+        }
+    }
+val javaVersionStr: String = if (platformBuildNumber >= 262) "25" else libs.versions.java.get()
 
 // Setup Paths
 val cachePath: Directory = layout.projectDirectory.dir("cache")
@@ -208,6 +235,14 @@ subprojects {
                 java.srcDirs("src")
                 resources.srcDirs("resources")
             }
+        }
+    }
+
+    // Kotlin subprojects (jps-shared) must use the same platform-derived Java level as the
+    // rest of the build, otherwise their published variants mismatch the root's toolchain.
+    pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
+        configure<KotlinJvmProjectExtension> {
+            jvmToolchain(javaVersionStr.toInt())
         }
     }
 }
@@ -436,10 +471,6 @@ dependencies {
     @Suppress("AvoidDuplicateDependencies")
     mockitoAgent(libMockitoCore) { isTransitive = false }
 
-    // UI Test dependencies
-    testUIImplementation(libs.kodein.di.jvm)
-    testUIImplementation(libs.kotlinx.coroutines.core.jvm)
-
     // JUnit 5 is required for UI tests. Both dependencies are declared without versions so they
     // resolve to whatever the IntelliJ test-framework-junit5/ide-starter artifacts request (see
     // the consistent-resolution wiring below), keeping the Jupiter API/engine matched to what
@@ -520,12 +551,12 @@ tasks.withType<RunIdeTask>().configureEach {
 // In gradle.properties, define platform versions like:
 //
 // platformVersionIntellijIdeaEAP=261-EAP-SNAPSHOT
-// platformVersionIntellijIdea=2025.3.2
+// platformVersionIntellijIdea=2026.1.2
 //
 // excluding the base "platformVersion" and EAP variants (handled separately below).
 //
 // You can also then run with either gradlew (CLI) or using a Run Configuration in IntelliJ IDEA via:
-// `gradlew runRubyMine -PplatformVersionRubyMine=2025.2` to override a specific platform version at runtime,
+// `gradlew runRubyMine -PplatformVersionRubyMine=2026.1.4` to override a specific platform version at runtime,
 // which is useful for testing against multiple IDE versions without changing the build script.
 val platformVersionPrefix = "platformVersion"
 val runIdePlatformsList: List<String> = providers.gradlePropertiesPrefixedBy(platformVersionPrefix).get().keys
@@ -682,6 +713,11 @@ registerResolveExternalDependenciesTasksForAllProjects()
 
 // ALL test tasks in ALL projects use the QuoterService (ensures cleanup on any failure)
 allprojects {
+    tasks.withType<JavaCompile>().configureEach {
+        options.encoding = "UTF-8"
+        options.release = javaVersionStr.toInt()
+    }
+
     tasks.withType<Test>().configureEach {
         // Validate Erlang is available before running tests.
         doFirst(ErlangAvailabilityCheckAction())

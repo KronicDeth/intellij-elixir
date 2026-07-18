@@ -27,6 +27,7 @@ jobs:
   collect:
     name: Collect Test Result Artifacts
     runs-on: ubuntu-22.04
+    timeout-minutes: 10
     if: github.event.workflow_run.conclusion == 'success' || github.event.workflow_run.conclusion == 'failure'
     permissions:
       actions: read
@@ -35,7 +36,7 @@ jobs:
     steps:
       - name: List Test Result Artifacts
         id: list
-        uses: actions/github-script@v8
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           script: |
             const artifacts = await github.paginate(github.rest.actions.listWorkflowRunArtifacts, {
@@ -50,10 +51,9 @@ jobs:
     needs: collect
     if: needs.collect.outputs.artifacts != '' && needs.collect.outputs.artifacts != '[]'
     runs-on: ubuntu-22.04
+    timeout-minutes: 15
     permissions:
       checks: write
-      # needed for the PR comment (comment_mode)
-      pull-requests: write
       # required to download artifacts from the triggering run
       actions: read
     strategy:
@@ -64,7 +64,7 @@ jobs:
     steps:
       - name: Download Test Results
         id: download-test-results
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           github-token: ${{ github.token }}
           run-id: ${{ github.event.workflow_run.id }}
@@ -73,7 +73,7 @@ jobs:
 
       - name: Download Event File
         id: download-event-file
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           github-token: ${{ github.token }}
           run-id: ${{ github.event.workflow_run.id }}
@@ -82,7 +82,7 @@ jobs:
 
       - name: Publish Test Results
         id: publish-test-results
-        uses: EnricoMi/publish-unit-test-result-action@v2
+        uses: EnricoMi/publish-unit-test-result-action@d0a4676d0e0b938bc201470d88276b7c74c712b3 # v2.24.0
         with:
           commit: ${{ github.event.workflow_run.head_sha }}
           event_file: artifacts/event-file/event.json
@@ -90,6 +90,60 @@ jobs:
           # artifact names double as check names, matching what shared-test.yml
           # published inline before this workflow existed
           check_name: ${{ matrix.artifact }}
-          comment_mode: changes
+          # The PR comment is published once, by the comment job below, over all
+          # matrix cells at once. Commenting per cell would post one comment per
+          # os/idea-version pair, because the action finds its earlier comment by
+          # matching "## <comment_title>" and comment_title defaults to check_name.
+          comment_mode: off
+          files: 'artifacts/test-results/**/*.xml'
+          report_suite_logs: error
+
+  # A single comment over every matrix cell, per the action's "Use with matrix
+  # strategy" guidance. The check_name is static so that bumping an idea-version
+  # doesn't change the comment title, which would orphan the existing comment and
+  # start a new one on every open PR.
+  comment:
+    name: Comment Test Results
+    needs: collect
+    if: needs.collect.outputs.artifacts != '' && needs.collect.outputs.artifacts != '[]'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    permissions:
+      # the comment is backed by a check run holding the results digest
+      checks: write
+      pull-requests: write
+      # required to download artifacts from the triggering run
+      actions: read
+
+    steps:
+      # No merge-multiple, so each artifact keeps its own subdirectory and the
+      # per-cell XMLs don't overwrite each other.
+      - name: Download All Test Results
+        id: download-test-results
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ github.event.workflow_run.id }}
+          pattern: 'Test Results (*)'
+          path: artifacts/test-results
+
+      - name: Download Event File
+        id: download-event-file
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ github.event.workflow_run.id }}
+          name: Event File
+          path: artifacts/event-file
+
+      - name: Comment Test Results
+        id: comment-test-results
+        uses: EnricoMi/publish-unit-test-result-action@d0a4676d0e0b938bc201470d88276b7c74c712b3 # v2.24.0
+        with:
+          commit: ${{ github.event.workflow_run.head_sha }}
+          event_file: artifacts/event-file/event.json
+          event_name: ${{ github.event.workflow_run.event }}
+          check_name: Test Results
+          comment_mode: always
           files: 'artifacts/test-results/**/*.xml'
           report_suite_logs: error

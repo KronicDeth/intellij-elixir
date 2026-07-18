@@ -17,6 +17,5 @@ dependencies {
 repositories {
     mavenCentral()
 }
-kotlin {
-    jvmToolchain(21)
-}
+// Java level and Kotlin toolchain are configured by the root build script, derived from
+// the target platform (Java 25 for build 262+, otherwise the catalog's java version).

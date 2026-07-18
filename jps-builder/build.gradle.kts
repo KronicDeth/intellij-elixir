@@ -16,14 +16,8 @@ sourceSets {
     }
 }
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
-}
-
-tasks.withType<JavaCompile>().configureEach {
-    options.encoding = "UTF-8"
-}
+// Java level (source/target compatibility, --release, encoding) is configured by the root
+// build script, derived from the target platform (Java 25 for build 262+, otherwise 21).
 
 // Ensuring the necessary tasks are executed before tests
 tasks.test {

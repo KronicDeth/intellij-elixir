@@ -47,32 +47,42 @@ jobs:
   event_file:
     name: Event File
     runs-on: ubuntu-22.04
+    timeout-minutes: 5
     steps:
       - name: Upload Event File
         id: upload-event-file
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: Event File
           path: ${{ github.event_path }}
 
   test:
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
         os: [ ubuntu-22.04, windows-2025 ]
         idea-version:
-            - '2026.1.2'
-            - '2025.3.5'
-            # 2026.2 upgrades to Java 25, won't work in CI until we resolve issues. https://github.com/JetBrains/intellij-community/commit/aa1cfa9632ab
+            - '2026.2'
+            - '2026.1.4'
+            - '2025.3.6'
             # - 'LATEST-EAP-SNAPSHOT'
+        # 2026.2 (build 262) is compiled for and runs on Java 25; earlier builds use Java 21.
+        # The build script derives javac --release from the platform version; the installed
+        # JBR must match so it can compile and run the tests. Legs without an entry get the
+        # setup-env default of 21.
+        include:
+            - idea-version: '2026.2'
+              java-version: '25'
 
     steps:
       - name: Checkout
         id: checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           ref: ${{ inputs.ref || github.ref }}
+          persist-credentials: false
 
       - name: Setup Build Environment
         id: setup-env
@@ -81,8 +91,17 @@ jobs:
           elixir-version: ${{ inputs.elixir-version || '1.13.4' }}
           otp-version: ${{ inputs.otp-version || '24.3.4.6' }}
           idea-version: ${{ matrix.idea-version }}
+          java-version: ${{ matrix.java-version || '21' }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
           build-scan-publish: 'true'
+          skip-searchable-options: 'true'
+
+      # Fail fast on compile errors (e.g. APIs removed in a newer platform) before the
+      # Elixir/quoter setup and test execution spend their minutes. testClasses aggregates
+      # main and test compilation across all modules; check reuses its outputs as UP-TO-DATE.
+      - name: Compile
+        id: compile
+        run: ./gradlew -Dorg.gradle.console=plain --stacktrace testClasses
 
       - name: Run Tests
         id: test
@@ -90,7 +109,7 @@ jobs:
 
       - name: Upload Test Results
         id: upload-test-results
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: (!cancelled())
         with:
           name: Test Results (${{ matrix.os }}, ${{ matrix.idea-version }})
@@ -151,7 +170,7 @@ jobs:
 
       - name: Upload Test Reports (on failure or when requested)
         id: upload-test-reports
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: ${{ always() && (failure() || inputs.upload-reports) }}
         with:
           name: test-reports-${{ matrix.os }}-${{ matrix.idea-version }}
@@ -166,13 +185,15 @@ jobs:
 
   build-plugin:
     runs-on: ubuntu-22.04
+    timeout-minutes: 30
 
     steps:
       - name: Checkout
         id: checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           ref: ${{ inputs.ref || github.ref }}
+          persist-credentials: false
 
       - name: Setup Build Environment
         id: setup-env
@@ -180,13 +201,17 @@ jobs:
         with:
           setup-elixir: false
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          idea-version: '2026.1.2'
+          idea-version: '2026.1.4'
           free-docker-images: false
+          skip-searchable-options: 'true'
 
       - name: Build Plugin
         id: build-plugin
         run: ./gradlew buildPlugin
 
+      # Find these versions at:
+      # https://www.jetbrains.com/idea/download/other/
+      # https://www.jetbrains.com/ruby/download/other/
       - name: Verify Plugin
         id: verify-plugin
         # Fork to be replaced when/if https://github.com/ChrisCarini/intellij-platform-plugin-verifier-action/pull/102 merges
@@ -196,10 +221,11 @@ jobs:
         with:
           verifier-version: 1.404
           ide-versions: |
-            ideaIU:253.33514.17
-            ideaIU:261.24374.151
-            rubymine:2025.3.5
-            rubymine:2026.1.2
+            ideaIU:253.33813.25
+            ideaIU:261.26222.65
+            ideaIU:262.8665.258
+            rubymine:2025.3.6
+            rubymine:2026.1.4
           failure-levels: |
             COMPATIBILITY_PROBLEMS
             INVALID_PLUGIN
@@ -224,7 +250,7 @@ jobs:
 
       - name: Upload Verify Reports
         id: upload-verify-reports
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: ${{ always() && inputs.upload-reports }}
         with:
           name: verify-plugin-reports
@@ -242,7 +268,7 @@ jobs:
           unzip -o "$zip_file" -d build/distributions/unpacked
 
       - name: Upload Plugin Artifact (contents)
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: ${{ steps.upload-plugin.outputs.artifact-name }}
           path: build/distributions/unpacked/
