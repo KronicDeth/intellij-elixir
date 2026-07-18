@@ -27,6 +27,7 @@ jobs:
   collect:
     name: Collect Test Result Artifacts
     runs-on: ubuntu-22.04
+    timeout-minutes: 10
     if: github.event.workflow_run.conclusion == 'success' || github.event.workflow_run.conclusion == 'failure'
     permissions:
       actions: read
@@ -50,6 +51,7 @@ jobs:
     needs: collect
     if: needs.collect.outputs.artifacts != '' && needs.collect.outputs.artifacts != '[]'
     runs-on: ubuntu-22.04
+    timeout-minutes: 15
     permissions:
       checks: write
       # required to download artifacts from the triggering run
@@ -105,6 +107,7 @@ jobs:
     needs: collect
     if: needs.collect.outputs.artifacts != '' && needs.collect.outputs.artifacts != '[]'
     runs-on: ubuntu-22.04
+    timeout-minutes: 15
     permissions:
       # the comment is backed by a check run holding the results digest
       checks: write

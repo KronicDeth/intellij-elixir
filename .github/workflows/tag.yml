@@ -37,6 +37,7 @@ jobs:
     needs: [ test-and-verify ]
     if: ${{ always() && (needs.test-and-verify.result == 'success' || needs.test-and-verify.result == 'skipped') }}
     runs-on: ubuntu-22.04
+    timeout-minutes: 30
     permissions:
       contents: write
     steps:

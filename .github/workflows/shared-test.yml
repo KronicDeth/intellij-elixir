@@ -47,6 +47,7 @@ jobs:
   event_file:
     name: Event File
     runs-on: ubuntu-22.04
+    timeout-minutes: 5
     steps:
       - name: Upload Event File
         id: upload-event-file
@@ -57,6 +58,7 @@ jobs:
 
   test:
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
@@ -176,6 +178,7 @@ jobs:
 
   build-plugin:
     runs-on: ubuntu-22.04
+    timeout-minutes: 30
 
     steps:
       - name: Checkout
