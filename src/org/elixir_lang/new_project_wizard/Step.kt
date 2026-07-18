@@ -37,6 +37,8 @@ import org.elixir_lang.Elixir
 import org.elixir_lang.Mix
 import org.elixir_lang.module.ElixirModuleBuilder
 import org.elixir_lang.module.ElixirModuleType
+import org.elixir_lang.sdk.SdkDetectionContext
+import org.elixir_lang.sdk.SdkEnvironment
 import org.elixir_lang.sdk.elixir.Type
 import org.elixir_lang.sdk.erlang_dependent.ErlangSdkResolver
 import java.io.IOException
@@ -72,7 +74,7 @@ class Step(parent: NewProjectWizardStep) : AbstractNewProjectWizardStep(parent),
     override fun setupUI(builder: Panel) {
         with(builder) {
             row("Elixir SDK:") {
-                elixirSdkComboBox(context, sdkProperty) { erlangSdkForSetup = it }
+                elixirSdkComboBox(context, sdkProperty, pathProperty) { erlangSdkForSetup = it }
                     .columns(COLUMNS_MEDIUM)
             }
             @Suppress("DialogTitleCapitalization")
@@ -248,7 +250,6 @@ class Step(parent: NewProjectWizardStep) : AbstractNewProjectWizardStep(parent),
 }
 
 private val ELIXIR_SDK_TYPE_FILTER = { it: SdkTypeId -> it == Type.instance; }
-private val ANY_SDK_FILTER: ((Sdk) -> Boolean) = { true }
 private val ANY_SDK_TYPE_FILTER: ((SdkTypeId) -> Boolean) = { true }
 private val ANY_SUGGESTED_SDK_FILTER: ((SdkListItem.SuggestedItem) -> Boolean) = { true }
 private val APPLICATION_NAME_REGEX: Regex = Regex("[a-z]([a-z0-9_])*")
@@ -256,13 +257,18 @@ private val APPLICATION_NAME_REGEX: Regex = Regex("[a-z]([a-z0-9_])*")
 fun Row.elixirSdkComboBox(
     context: WizardContext,
     sdkProperty: ObservableMutableProperty<Sdk?>,
+    locationProperty: ObservableProperty<String>? = null,
     onErlangSdkRegistered: (Sdk) -> Unit = {},
 ): Cell<JdkComboBox> {
     val sdksModel = ProjectSdksModel()
 
     Disposer.register(context.disposable) {
+        SdkDetectionContext.clear()
         sdksModel.disposeUIResources()
     }
+
+    fun locationDirectory(): String? = locationProperty?.get()?.takeUnless(String::isBlank)
+    fun targetDescriptor() = locationDirectory()?.let { SdkEnvironment.eelDescriptor(it) }
 
     // After setupSdkPaths runs on a newly created Elixir SDK, verify it has a linked Erlang SDK.
     // If not (e.g. user cancelled the Erlang SDK selection dialog), remove it from the staged model
@@ -296,11 +302,22 @@ fun Row.elixirSdkComboBox(
         sdkProperty,
         ElixirModuleType.MODULE_TYPE_ID,
         ELIXIR_SDK_TYPE_FILTER,
-        ANY_SDK_FILTER,
+        { sdk -> SdkEnvironment.sdkVisibleFor(targetDescriptor(), sdk) },
         ANY_SUGGESTED_SDK_FILTER,
         ANY_SDK_TYPE_FILTER,
         newSdkCallback
     )
+
+    // The wizard supplies no Project, so createSdkComboBox's internal reset() only loaded local
+    // SDKs. Publish the location for SDK detection/creation and re-add SDKs registered for the
+    // target environment, re-syncing whenever the user edits the location (e.g. to a WSL path).
+    fun syncForLocation() {
+        SdkDetectionContext.set(locationDirectory())
+        SdkEnvironment.syncTargetSdks(sdksModel, targetDescriptor())
+        comboBox.reloadModel()
+    }
+    syncForLocation()
+    locationProperty?.afterChange(context.disposable) { syncForLocation() }
 
     return cell(comboBox)
         .validationOnApply { validateElixirSdk(sdkProperty, sdksModel) }

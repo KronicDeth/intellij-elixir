@@ -9,105 +9,62 @@ import com.intellij.openapi.options.ConfigurationException
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.project.ex.ProjectManagerEx
-import com.intellij.openapi.projectRoots.ProjectJdkTable
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.roots.ex.ProjectRootManagerEx
 import com.intellij.openapi.roots.ui.configuration.JdkComboBox
 import com.intellij.openapi.roots.ui.configuration.projectRoot.ProjectSdksModel
 import com.intellij.openapi.ui.MultiLineLabelUI
-import com.intellij.platform.eel.EelMachine
-import com.intellij.platform.eel.provider.getEelDescriptor
+import com.intellij.platform.eel.EelDescriptor
 import com.intellij.util.ui.JBInsets
 import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.StartupUiUtil
 import org.elixir_lang.Elixir
 import org.elixir_lang.mix.project._import.Builder
+import org.elixir_lang.sdk.SdkDetectionContext
+import org.elixir_lang.sdk.SdkEnvironment
 import org.elixir_lang.sdk.elixir.Type
 import org.jetbrains.annotations.VisibleForTesting
 import java.awt.Font
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
-import java.nio.file.InvalidPathException
-import java.nio.file.Path
 import javax.swing.*
 
 // Ported from `ProjectJdkForModuleStep`
 
+@Suppress("UnstableApiUsage")
 class ElixirSdkForModuleStep(private val wizardContext: WizardContext) : ModuleWizardStep() {
     private val project: Project = wizardContext.project ?: ProjectManager.getInstance().defaultProject
 
     /**
-     * The [EelMachine] of the environment the project is being imported from (e.g. a WSL distro
-     * when importing from a `\\wsl$\...` path), or null when the import directory cannot be parsed.
-     *
-     * ProjectSdksModel.reset() filters SDKs to the project's environment, but during import the
-     * wizard supplies the default project, which always resolves to the local environment, so
-     * WSL/remote SDKs are filtered out. The APIs that would let us pass the real target
-     * environment (syncSdks(EelMachine), sdkMatchesEel()) are @ApiStatus.Internal, and
-     * implementing Project to fake the path violates @NonExtendable on Project -- see
-     * https://youtrack.jetbrains.com/issue/IJPL-243914. Instead, the target environment is
-     * resolved from the wizard's project directory with the public (experimental)
-     * Path.getEelDescriptor(), and matching SDKs are re-added via the public
-     * ProjectSdksModel.addSdk() in [addImportTargetSdks].
+     * See [SdkEnvironment.eelDescriptor]; kept as a member for test access.
      */
     @VisibleForTesting
-    internal fun importTargetMachine(): EelMachine? =
-        try {
-            Path.of(wizardContext.projectFileDirectory).getEelDescriptor().machine
-        } catch (_: InvalidPathException) {
-            null
-        }
+    internal fun eelDescriptor(path: String): EelDescriptor? = SdkEnvironment.eelDescriptor(path)
 
     /**
-     * The [EelMachine] owning the SDK's home path, or null when the home path is absent or invalid.
+     * The [EelDescriptor] of the environment the project is being imported from, or null when
+     * the import directory cannot be parsed.
      */
     @VisibleForTesting
-    internal fun sdkMachine(sdk: Sdk): EelMachine? =
-        sdk.homePath?.let { home ->
-            try {
-                Path.of(home).getEelDescriptor().machine
-            } catch (_: InvalidPathException) {
-                null
-            }
-        }
+    internal fun importTargetDescriptor(): EelDescriptor? = eelDescriptor(wizardContext.projectFileDirectory)
 
     /**
-     * Whether the SDK should be visible for the current import target: hides SDKs from other
-     * environments (e.g. local SDKs when importing from WSL), mirroring the environment filtering
-     * that ProjectSdksModel.reset() applies for opened projects. Permissive when either
-     * environment cannot be determined, so SDK validation stays the deciding factor.
+     * See [SdkEnvironment.sdkDescriptor]; kept as a member for test access.
      */
     @VisibleForTesting
-    internal fun sdkVisibleForImportTarget(sdk: Sdk): Boolean {
-        val targetMachine = importTargetMachine() ?: return true
-        val machine = sdkMachine(sdk) ?: return true
-
-        return machine == targetMachine
-    }
+    internal fun sdkDescriptor(sdk: Sdk): EelDescriptor? = SdkEnvironment.sdkDescriptor(sdk)
 
     /**
-     * Re-adds registered SDKs that reset() filtered out because the default project resolves to
-     * the local environment. Replicates the internal ProjectSdksModel.syncSdks(EelMachine) using
-     * public API: addSdk() clones the SDK into the model and fires sdkAdded, as syncSdks() does,
-     * and apply() treats SDKs already present in ProjectJdkTable as updates, not additions.
+     * See [SdkEnvironment.sdkVisibleFor], applied to the import target.
      */
-    private fun addImportTargetSdks() {
-        val targetMachine = importTargetMachine() ?: return
-        val projectSdks = projectSdksModel.projectSdks
-
-        for (sdk in ProjectJdkTable.getInstance().allJdks) {
-            if (projectSdks.containsKey(sdk) || projectSdks.containsValue(sdk)) continue
-
-            if (sdkMachine(sdk) == targetMachine) {
-                projectSdksModel.addSdk(sdk)
-            }
-        }
-    }
+    @VisibleForTesting
+    internal fun sdkVisibleForImportTarget(sdk: Sdk): Boolean =
+        SdkEnvironment.sdkVisibleFor(importTargetDescriptor(), sdk)
 
     /**
      * Create a new ProjectSdksModel instance rather than using ProjectStructureConfigurable's
-     * shared instance, so that import-target SDKs added by [addImportTargetSdks] stay local to
-     * this wizard step.
+     * shared instance, so that import-target SDKs added by [SdkEnvironment.syncTargetSdks] stay
+     * local to this wizard step.
      */
     @get:VisibleForTesting
     internal val projectSdksModel: ProjectSdksModel = ProjectSdksModel()
@@ -190,8 +147,12 @@ class ElixirSdkForModuleStep(private val wizardContext: WizardContext) : ModuleW
     }
 
     override fun updateStep() {
+        // Publish the import directory so SDK detection (Type.suggestHomePaths) and the SDK home
+        // chooser scan/anchor to the import target environment instead of the local one -- the
+        // default project supplied to them during import carries no location.
+        SdkDetectionContext.set(wizardContext.projectFileDirectory)
         projectSdksModel.reset(project)
-        addImportTargetSdks()
+        SdkEnvironment.syncTargetSdks(projectSdksModel, importTargetDescriptor())
         jdkComboBox.reloadModel()
         val defaultJdk = defaultJdk
 
@@ -200,6 +161,11 @@ class ElixirSdkForModuleStep(private val wizardContext: WizardContext) : ModuleW
         }
 
         setAsDefaultButton.isEnabled = defaultJdk != null
+    }
+
+    override fun disposeUIResources() {
+        SdkDetectionContext.clear()
+        super.disposeUIResources()
     }
 
     private val jdk: Sdk?

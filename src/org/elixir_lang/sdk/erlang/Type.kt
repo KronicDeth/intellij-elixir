@@ -4,18 +4,17 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.fileChooser.FileChooserDescriptor
 import com.intellij.openapi.project.Project
 import org.elixir_lang.util.runWithEdtGuard
-import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.projectRoots.SdkModel
 import com.intellij.openapi.projectRoots.SdkModificator
 import com.intellij.openapi.projectRoots.SdkType
 import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.openapi.vfs.toNioPathOrNull
 import org.elixir_lang.cli.getExecutableFilepathWslSafe
 import org.elixir_lang.jps.shared.ErlangSdkTypeId
 import org.elixir_lang.jps.shared.cli.CliTool
 import org.elixir_lang.jps.shared.sdk.SdkPaths
+import org.elixir_lang.sdk.SdkDetectionContext
 import org.elixir_lang.sdk.SdkHomeKey
 import org.elixir_lang.sdk.SdkHomePaths
 import org.elixir_lang.sdk.SdkHomeScan
@@ -195,7 +194,10 @@ class Type : SdkType(ErlangSdkTypeId.ERLANG_SDK_TYPE_ID) {
     }
 
     override fun suggestHomePaths(project: Project?): Collection<String> {
-        return homePathByVersion(project?.guessProjectDir()?.toNioPathOrNull()).values
+        // SdkDetectionContext falls back to the wizard's import/new-project directory when the
+        // platform supplies the default project (import wizard, New Project), so WSL locations
+        // are still scanned for suggestions.
+        return homePathByVersion(SdkDetectionContext.resolve(project)).values
     }
 
     override fun isValidSdkHome(path: String): Boolean {

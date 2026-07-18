@@ -5,13 +5,11 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.fileChooser.FileChooserDescriptor
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.projectRoots.*
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.util.InvalidDataException
 import com.intellij.openapi.util.WriteExternalException
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.openapi.vfs.toNioPathOrNull
 import com.intellij.util.concurrency.annotations.RequiresBackgroundThread
 import org.apache.commons.io.FilenameUtils
 import org.elixir_lang.Icons
@@ -162,7 +160,10 @@ ELIXIR_SDK_HOME
     @Deprecated("Deprecated in Java")
     override fun suggestHomePaths(): Collection<String> = homePathByVersion(null).values
     override fun suggestHomePaths(project: Project?): @Unmodifiable Collection<String> =
-        homePathByVersion(project?.guessProjectDir()?.toNioPathOrNull()).values
+        // SdkDetectionContext falls back to the wizard's import/new-project directory when the
+        // platform supplies the default project (import wizard, New Project), so WSL locations
+        // are still scanned for suggestions.
+        homePathByVersion(SdkDetectionContext.resolve(project)).values
 
     override fun suggestSdkName(
         currentSdkName: String?,
