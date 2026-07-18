@@ -516,12 +516,12 @@ tasks.withType<RunIdeTask>().configureEach {
 // In gradle.properties, define platform versions like:
 //
 // platformVersionIntellijIdeaEAP=261-EAP-SNAPSHOT
-// platformVersionIntellijIdea=2025.3.2
+// platformVersionIntellijIdea=2026.1.2
 //
 // excluding the base "platformVersion" and EAP variants (handled separately below).
 //
 // You can also then run with either gradlew (CLI) or using a Run Configuration in IntelliJ IDEA via:
-// `gradlew runRubyMine -PplatformVersionRubyMine=2025.2` to override a specific platform version at runtime,
+// `gradlew runRubyMine -PplatformVersionRubyMine=2026.1.4` to override a specific platform version at runtime,
 // which is useful for testing against multiple IDE versions without changing the build script.
 val platformVersionPrefix = "platformVersion"
 val runIdePlatformsList: List<String> = providers.gradlePropertiesPrefixedBy(platformVersionPrefix).get().keys

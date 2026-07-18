@@ -3,7 +3,7 @@
     <name>Elixir</name>
     <vendor email="Kronic.Deth@gmail.com">Kadie Enheduanna Inanna</vendor>
 
-    <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
+    <!-- please see https://plugins.jetbrains.com/docs/intellij/build-number-ranges.html for description -->
     <idea-version since-build="253.28294.1"/>
 
     <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
