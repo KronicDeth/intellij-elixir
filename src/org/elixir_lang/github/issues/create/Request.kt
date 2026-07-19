@@ -1,12 +1,11 @@
 package org.elixir_lang.github.issues.create
 
-import com.intellij.ide.plugins.PluginManagerCore
 import com.intellij.openapi.application.ApplicationNamesInfo
 import com.intellij.openapi.application.ex.ApplicationInfoEx
 import com.intellij.openapi.diagnostic.Attachment
 import com.intellij.openapi.diagnostic.IdeaLoggingEvent
-import com.intellij.openapi.extensions.PluginId
 import com.intellij.util.ExceptionUtil
+import org.elixir_lang.pluginVersion
 
 class Request private constructor(val title: String, val body: String) {
     constructor(additionalInfo: String?, events: Array<IdeaLoggingEvent>) : this(
@@ -57,7 +56,7 @@ class Request private constructor(val title: String, val body: String) {
         private fun pluginVersion(stringBuilder: StringBuilder) {
             stringBuilder
                 .append("Plugin Version: ")
-                .append(PluginManagerCore.getPlugin(PluginId.getId("org.elixir_lang"))!!.version).append('\n')
+                .append(pluginVersion()).append('\n')
         }
 
         private fun application(stringBuilder: StringBuilder) {

@@ -4,7 +4,6 @@ import com.google.common.annotations.VisibleForTesting
 import com.google.common.base.CaseFormat
 import com.intellij.ide.actions.CreateFileFromTemplateDialog
 import com.intellij.ide.actions.TemplateKindCombo
-import com.intellij.lang.LangBundle
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.InputValidatorEx
 import com.intellij.openapi.ui.ValidationInfo
@@ -75,7 +74,7 @@ class Dialog(private val project: Project, val directory: PsiDirectory) : Create
         val canClose = canClose(text)
 
         return if (!canClose) {
-            val errorText = getErrorText(text) ?: LangBundle.message("incorrect.name")
+            val errorText = getErrorText(text) ?: INCORRECT_NAME_MESSAGE
 
             ValidationInfo(errorText, nameField)
         } else {
@@ -204,6 +203,8 @@ private const val INVALID_EX_UNIT_CASE_MESSAGE_FMT = "'%s' is not a valid ExUnit
         "<code>test/**/*_test.exs</code>.  Nested Aliases, like Foo.Bar.BazTest, are created in subdirectory for the " +
         "parent Aliases, foo/bar/baz_test.exs"
 private const val EXISTING_MODULE_MESSAGE_FMT = "'%s' already exists"
+// Same text as the platform's `LangBundle.message("incorrect.name")`, which is `@ApiStatus.Internal`
+private const val INCORRECT_NAME_MESSAGE = "Incorrect name"
 private val ALIAS_REGEX = Regex("[A-Z][0-9a-zA-Z_]*")
 private val MODULE_NAME_REGEX = Regex("$ALIAS_REGEX(\\.$ALIAS_REGEX)*")
 private val ESPEC_CASE_NAME_REGEX = Regex("${MODULE_NAME_REGEX}Spec")
