@@ -229,10 +229,10 @@ jobs:
           failure-levels: |
             COMPATIBILITY_PROBLEMS
             INVALID_PLUGIN
-          # Should probably have these two as well, but until there is a resolution for https://youtrack.jetbrains.com/issue/IJPL-243914
-          # These will keep failing the build
+            NON_EXTENDABLE_API_USAGES
+          # Should probably have this as well, but until there is a resolution for https://youtrack.jetbrains.com/issue/IJPL-243914
+          # it will keep failing the build
           # OVERRIDE_ONLY_API_USAGES
-          # NON_EXTENDABLE_API_USAGES
           # We can't use this because RubyMine will fail. The verifier doesn't understand "optional"
           # MISSING_DEPENDENCIES
           external-prefixes: 'org.jetbrains.jps'

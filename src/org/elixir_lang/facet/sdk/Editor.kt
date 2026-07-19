@@ -8,7 +8,7 @@ import com.intellij.openapi.options.ConfigurationException
 import com.intellij.openapi.project.ProjectBundle
 import com.intellij.openapi.projectRoots.*
 import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl
-import com.intellij.openapi.projectRoots.impl.SdkConfigurationUtil
+import org.elixir_lang.sdk.SdkHomeChooser
 import com.intellij.openapi.projectRoots.ui.PathEditor
 import com.intellij.openapi.projectRoots.ui.SdkPathEditor
 import com.intellij.openapi.roots.OrderRootType
@@ -27,6 +27,8 @@ import java.awt.BorderLayout
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
 import java.io.File
+import java.nio.file.InvalidPathException
+import java.nio.file.Path
 import java.util.*
 import javax.swing.JComponent
 import javax.swing.JLabel
@@ -244,14 +246,22 @@ class Editor(private val sdkModel: SdkModel, private val history: History, priva
         }
     }
 
-    /**
-     * See https://youtrack.jetbrains.com/issue/IJPL-243914 for reason why we can't move on from
-     * deprecated call.
-     */
-    @Suppress("DEPRECATION")
     private fun doSelectHomePath() {
         val sdkType = sdk.sdkType as SdkType
-        SdkConfigurationUtil.selectSdkHome(sdkType) { path -> doSetHomePath(path, sdkType) }
+        // Anchor the chooser at the SDK's current home so a WSL-hosted SDK opens in its distro;
+        // SdkHomeChooser also avoids the platform selectSdkHome's user.home-anchored environment
+        // check, which rejected every WSL pick with "Environment Mismatch".
+        val basePath = sdk.homePath
+            ?.takeUnless(String::isBlank)
+            ?.let { home ->
+                try {
+                    Path.of(home)
+                } catch (_: InvalidPathException) {
+                    null
+                }
+            }
+            ?: SdkHomeChooser.defaultBasePath()
+        SdkHomeChooser.selectSdkHome(sdkType, basePath) { path -> doSetHomePath(path, sdkType) }
     }
 
     private fun doSetHomePath(homePath: String?, sdkType: SdkType) {

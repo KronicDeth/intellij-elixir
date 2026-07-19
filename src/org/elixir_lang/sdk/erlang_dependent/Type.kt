@@ -13,6 +13,7 @@ import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.Ref
 import org.elixir_lang.sdk.ProcessOutput.isSmallIde
+import org.elixir_lang.sdk.SdkHomeChooser
 import org.elixir_lang.sdk.elixir.ElixirSdkMutation
 import org.elixir_lang.sdk.elixir.Type.Companion.erlangSdkType
 import org.elixir_lang.sdk.wsl.wslCompat
@@ -128,15 +129,9 @@ abstract class Type protected constructor(name: String) : DependentSdkType(name)
         erlangSdkToUse: Sdk? = null
     ): Sdk? {
         val result = Ref<Sdk?>(null)
-        // The 4-arg selectSdkHome(SdkType, Component?, Path, Consumer) was changed to a 5-arg form
-        // in 262.4852.50 by inserting Project? before Consumer (https://youtrack.jetbrains.com/issue/IJPL-236990/Docker-project.-Project-Settings.-Add-JDK-from-disk-File-Chooser-container-is-absent-in-the-tree#focus=Comments-27-13746689.0-0 /
-        // https://github.com/JetBrains/intellij-community/commit/edf92c9185e1a3e2f28c237c91e6fe493f7f80ac).
-        // The 5-arg form does not exist in 261, so there is no single call that compiles against both.
-        // Fall back to the 2-arg deprecated form until 261 support is dropped.
-        @Suppress("DEPRECATION")
-        SdkConfigurationUtil.selectSdkHome(sdkType, com.intellij.util.Consumer { home: String? ->
+        SdkHomeChooser.selectSdkHome(sdkType, getBasePath(dependencySdk)) { home ->
             val newSdk =
-                SdkConfigurationUtil.createSdk(sdkModel.sdks.toList(), home!!, sdkType, null, null)
+                SdkConfigurationUtil.createSdk(sdkModel.sdks.toList(), home, sdkType, null, null)
 
             // If creating an Elixir SDK and we have a specific Erlang SDK to use,
             // store it for use during configureSdkPaths and persist additional data immediately
@@ -149,7 +144,7 @@ abstract class Type protected constructor(name: String) : DependentSdkType(name)
 
             sdkCreatedCallback.accept(newSdk)
             result.set(newSdk)
-        })
+        }
         return result.get()
     }
 
@@ -188,9 +183,11 @@ abstract class Type protected constructor(name: String) : DependentSdkType(name)
                 return Path.of(dependencyHomePath).parent ?: Path.of(dependencyHomePath)
             }
         }
-        // Fallback: default to user home directory
-        LOG.debug("Using default base path: user.home")
-        return Path.of(System.getProperty("user.home"))
+        // Fallback: the wizard's published target directory (so creating the first Erlang SDK
+        // for a WSL project opens the chooser in that distro), else user home.
+        return SdkHomeChooser.defaultBasePath().also {
+            LOG.debug("Using default base path: $it")
+        }
     }
 
 
