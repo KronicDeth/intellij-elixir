@@ -49,6 +49,8 @@ import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.psi.scope.ancestorTypeSpec
 import org.elixir_lang.reference.Callable
+import org.elixir_lang.reference.CaptureNameArity
+import org.elixir_lang.psi.operation.capture.NonNumeric as CaptureNonNumeric
 import org.elixir_lang.structure_view.element.CallDefinitionSpecification
 import java.util.concurrent.Callable as JCallable
 
@@ -678,6 +680,8 @@ internal object ElixirUsageQueries {
 
             keywordKeyUsage(leaf, symbol)?.let { return listOf(it) }
 
+            captureUsage(leaf, symbol)?.let { return listOf(it) }
+
             val call = leaf.enclosingCalls().firstOrNull() ?: return emptyList()
             // Skip definition heads/clauses - they are declarations, not call sites.
             if (CallDefinitionClause.isHead(call) || CallDefinitionClause.`is`(call)) return emptyList()
@@ -709,6 +713,43 @@ internal object ElixirUsageQueries {
                     declaration = false,
                     usageType = CALL
                 )
+            )
+        }
+
+        /**
+         * If [leaf] is the captured NAME of a `&name/arity` or `&Mod.name/arity` capture that
+         * resolves to [symbol], the name occurrence, else `null`. The bare name inside a capture
+         * classifies as a variable to the [Callable] scope-walker (so the generic call-site path
+         * below cannot resolve it); the capture-aware resolution lives on the capture element's
+         * own [CaptureNameArity] reference, which this reuses.
+         */
+        @RequiresReadLock
+        private fun captureUsage(leaf: PsiElement, symbol: FunctionSymbol): PsiUsage? {
+            val capture = generateSequence(leaf) { it.parent }
+                .takeWhile { it !is PsiFile }
+                .filterIsInstance<CaptureNonNumeric>()
+                .firstOrNull() ?: return null
+            val reference = capture.reference as? CaptureNameArity ?: return null
+
+            // Only the captured name is a usage - not the `/arity` digits, and for a qualified
+            // capture not the `Mod.` qualifier (CaptureNameArity's range is the name alone).
+            val absoluteNameRange = reference.rangeInElement.shiftRight(capture.textRange.startOffset)
+            if (!absoluteNameRange.contains(leaf.textRange)) return null
+            if (reference.arity != symbol.arity) return null
+
+            val matches = reference.multiResolve(false)
+                .filter { it.isValidResult }
+                .mapNotNull { it.element as? Call }
+                .filter { CallDefinitionClause.`is`(it) }
+                .flatMap { FunctionSymbol.fromClause(it) }
+                .any { it == symbol }
+            if (!matches) return null
+
+            return ElixirPsiUsage.create(
+                capture,
+                reference.rangeInElement,
+                declaration = false,
+                usageType = CALL
             )
         }
 
