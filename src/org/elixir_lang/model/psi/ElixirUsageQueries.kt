@@ -994,7 +994,15 @@ internal object ElixirUsageQueries {
                 if (candidate.functionName() != symbol.name) continue
                 val nameElement = candidate.functionNameElement() ?: continue
                 if (!PsiTreeUtil.isAncestor(nameElement, leaf, false)) continue
-                if (ModuleAttributeReference.resolveSymbols(candidate).none { it == symbol }) continue
+                // Same name + same module means the same logical attribute: a re-declared
+                // (accumulated/overridden) attribute has several declaration sites, and a read
+                // resolves only to the nearest preceding one - identity comparison would make a
+                // read invisible when the rename starts from any of the other declarations.
+                if (ModuleAttributeReference.resolveSymbols(candidate)
+                        .none { it.name == symbol.name && it.moduleName == symbol.moduleName }
+                ) {
+                    continue
+                }
                 return listOf(
                     ElixirPsiUsage.create(
                         nameElement,
@@ -1021,7 +1029,11 @@ internal object ElixirUsageQueries {
                     ?: return@JCallable true
                 val seen = mutableSetOf<TextRange>(declaration.atIdentifier.textRange)
 
-                var sibling: PsiElement? = declaration
+                // Walk ALL of the declaration's siblings, not just the following ones: the rename
+                // can start from ANY of a re-declared attribute's declaration sites (or from a
+                // read, which resolves to the nearest preceding one), and the earlier declarations
+                // are just as much part of the logical attribute as the later ones.
+                var sibling: PsiElement? = declaration.parent?.firstChild ?: declaration
                 while (sibling != null) {
                     ProgressManager.checkCanceled()
                     val declarationCandidate = sibling as? AtUnqualifiedNoParenthesesCall<*>
