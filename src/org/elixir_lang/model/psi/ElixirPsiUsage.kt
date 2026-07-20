@@ -10,19 +10,28 @@ import com.intellij.usages.impl.rules.UsageType
 /**
  * A [PsiUsage] backed by a file + range, optionally carrying a [UsageType] so it is grouped under a
  * dedicated heading (e.g. "Implementation") in the usage view. Port of Markdown's `MarkdownPsiUsage`.
+ *
+ * [usageTextByName] is set when renaming must write something other than the target's new name
+ * verbatim into [range] - e.g. a multi-alias group member `Renamee` in `alias Grouped.{Renamee,
+ * Sibling}` must be rewritten with the new name RELATIVE to the group qualifier, and a bare
+ * aliased reference `Renamee.hello()` with only the new name's last segment. It must be a
+ * stateless string transformation (the platform may run it on the UI thread during in-place
+ * rename). `null` means the new name is written as-is.
  */
 @Suppress("UnstableApiUsage")
 class ElixirPsiUsage(
     override val file: PsiFile,
     override val range: TextRange,
     override val declaration: Boolean,
-    override val usageType: UsageType? = null
+    override val usageType: UsageType? = null,
+    val usageTextByName: ((String) -> String)? = null
 ) : PsiUsage {
     override fun createPointer(): Pointer<out PsiUsage> {
         val declaration = this.declaration // capture for the restore lambda
         val usageType = this.usageType
+        val usageTextByName = this.usageTextByName
         return Pointer.fileRangePointer(file, range) { restoredFile, restoredRange ->
-            ElixirPsiUsage(restoredFile, restoredRange, declaration, usageType)
+            ElixirPsiUsage(restoredFile, restoredRange, declaration, usageType, usageTextByName)
         }
     }
 
@@ -31,16 +40,18 @@ class ElixirPsiUsage(
             element: PsiElement,
             rangeInElement: TextRange,
             declaration: Boolean = false,
-            usageType: UsageType? = null
+            usageType: UsageType? = null,
+            usageTextByName: ((String) -> String)? = null
         ): ElixirPsiUsage =
             if (element is PsiFile) {
-                ElixirPsiUsage(element, rangeInElement, declaration, usageType)
+                ElixirPsiUsage(element, rangeInElement, declaration, usageType, usageTextByName)
             } else {
                 ElixirPsiUsage(
                     element.containingFile,
                     rangeInElement.shiftRight(element.textRange.startOffset),
                     declaration,
-                    usageType
+                    usageType,
+                    usageTextByName
                 )
             }
     }

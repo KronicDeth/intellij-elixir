@@ -119,7 +119,7 @@ internal object ElixirUsageQueries {
             usageQueries(project, target, LocalSearchScope(mirror)).mapTo(queries) { query ->
                 query.mapping { usage: Usage ->
                     if (usage is ElixirPsiUsage && usage.file !== compiledFile) {
-                        ElixirPsiUsage(compiledFile, usage.range, usage.declaration, usage.usageType)
+                        ElixirPsiUsage(compiledFile, usage.range, usage.declaration, usage.usageType, usage.usageTextByName)
                     } else {
                         usage
                     }
@@ -524,8 +524,31 @@ internal object ElixirUsageQueries {
             //   alias MyApp.Module, use MyApp.Module, MyApp.{Module, Other}, MyApp.Module in code
             val fqn = alias.fullyQualifiedName().removeElixirPrefix()
             if (fqn == symbol.moduleName) {
+                // When the matched node spells only a SUFFIX of the FQN - a multi-alias group
+                // member like `Renamee` in `alias Grouped.{Renamee, Sibling}` - a rename must
+                // write the new name RELATIVE to the surrounding qualifier: writing the full new
+                // name into the member slot would produce `Grouped.{Grouped.Fresh, Sibling}`.
+                // The qualifier prefix is recoverable without further PSI inspection: it is the
+                // FQN minus the node's own text. When the node spells the whole FQN the prefix is
+                // empty and the new name is written as-is. A rename that moves the module OUT of
+                // the qualifier (prefix no longer matches the new name) cannot be expressed
+                // inside the group; the full name is written then - imperfect, but it never
+                // corrupts the qualifier-preserving case.
+                val qualifierPrefix = fqn.removeSuffix(alias.text)
+                val usageTextByName: ((String) -> String)? =
+                    if (qualifierPrefix.isNotEmpty() && qualifierPrefix != fqn) {
+                        { newName -> if (newName.startsWith(qualifierPrefix)) newName.removePrefix(qualifierPrefix) else newName }
+                    } else {
+                        null
+                    }
                 return listOf(
-                    ElixirPsiUsage.create(alias, TextRange(0, alias.textLength), declaration = false, usageType = MODULE_REFERENCE)
+                    ElixirPsiUsage.create(
+                        alias,
+                        TextRange(0, alias.textLength),
+                        declaration = false,
+                        usageType = MODULE_REFERENCE,
+                        usageTextByName = usageTextByName
+                    )
                 )
             }
 
@@ -537,7 +560,15 @@ internal object ElixirUsageQueries {
             // in the enclosing defmodule? No index or scope resolution required.
             if (fqn == symbol.searchText && hasEnclosingModuleAlias(alias, symbol.moduleName)) {
                 return listOf(
-                    ElixirPsiUsage.create(alias, TextRange(0, alias.textLength), declaration = false, usageType = MODULE_REFERENCE)
+                    ElixirPsiUsage.create(
+                        alias,
+                        TextRange(0, alias.textLength),
+                        declaration = false,
+                        usageType = MODULE_REFERENCE,
+                        // A bare reference stays bare: the `alias` line it rides on is renamed in
+                        // the same pass, so only the new name's last segment belongs here.
+                        usageTextByName = { newName -> newName.substringAfterLast('.') }
+                    )
                 )
             }
 
@@ -557,10 +588,22 @@ internal object ElixirUsageQueries {
                     call.finalArguments()
                         ?.firstOrNull()
                         ?.stripAccessExpression()
-                        ?.let { it as? QualifiableAlias }
-                        ?.fullyQualifiedName()
-                        ?.removeElixirPrefix() == targetFqn
+                        ?.let { argument -> argumentAliasFqns(argument).any { it == targetFqn } } == true
             }
+        }
+
+        /**
+         * The fully-qualified names an alias/use/import argument brings into scope. A plain
+         * `alias Grouped.Renamee` argument IS a [QualifiableAlias]; a multi-alias group
+         * `alias Grouped.{Renamee, Sibling}` is not - its MEMBERS are the [QualifiableAlias]es,
+         * each of which computes its FQN through the group qualifier. Enumerating the argument
+         * itself plus its descendants covers both shapes (nested nodes resolve to their full
+         * FQN too, so extras are harmless duplicates, never wrong names).
+         */
+        private fun argumentAliasFqns(argument: PsiElement): Sequence<String> {
+            val self = (argument as? QualifiableAlias)?.let { sequenceOf(it) } ?: emptySequence()
+            val descendants = PsiTreeUtil.findChildrenOfType(argument, QualifiableAlias::class.java).asSequence()
+            return (self + descendants).map { it.fullyQualifiedName().removeElixirPrefix() }
         }
 
         private fun String.removeElixirPrefix(): String =
