@@ -3,6 +3,16 @@
 ## Unreleased
 
 ### Enhancements
+* [#3866](https://github.com/KronicDeth/intellij-elixir/pull/3866) - [@sh41](https://github.com/sh41)
+  * **Rename (Shift+F6) now works for functions, `name:arity` pairs, modules, module attributes, types, `@callback`s, protocol functions, and atoms**, propagating across every usage site -- including keyword-key usages like `import ... only:`, `@compile inline:`, `@dialyzer`, and `defoverridable`.
+  * **New navigation:** `name: arity` function references support Go-to-Declaration/Find Usages/rename; `@callback`/`@macrocallback` definitions navigate to and from their implementations; protocol functions support Find Usages to call sites; Ctrl-click on a `GenServer.call/cast` or `Process.send`/`send_after` message now jumps to the matching `handle_call`/`handle_cast`/`handle_info` clause.
+  * **Type variables** (e.g. `a` in `@type box(a) :: {:box, a}` or `@spec ... when a: term()`) now support Go-to-Declaration, Find Usages, and rename, scoped to the enclosing type/spec.
+  * **Decompiled `.beam` files now navigate like source.** Ctrl-click and Find Usages work from and into decompiled definitions and their call/spec sites, and semantic syntax highlighting now runs over decompiled text.
+  * **Completion improvements:** function-capture names (`&map_it/0`) filtered by arity; function names inside MFA-style atom references (`{Module, :function, args}`); module-attribute references; rebound/shadowed variables and implicitly-imported `Kernel` names no longer offered twice.
+  * **Two new inspections:** "Type variable used once" flags a type/spec variable referenced only once; "Unresolvable type" flags type names in specs that don't resolve to any type definition.
+* [#3868](https://github.com/KronicDeth/intellij-elixir/pull/3868) - [@sh41](https://github.com/sh41)
+  * **Decompiled BEAM files now show real `@type`/`@typep`/`@opaque` definitions** instead of collapsing them all to `term()`. For example, Erlang's `:queue` now decompiles its opaque type with its real parameters and body.
+  * **Map comprehension generators (`m_generate`, OTP 26+) in decompiled code now render as a proper `{key, value} <- map` pattern** instead of an unparseable expression.
 * [@sh41](https://github.com/sh41)
   * **Small IDE (RubyMine, PyCharm, etc.) users can now configure Elixir SDKs from mise.** Tool manager support -- including the Settings → Elixir → Tool Managers opt-in page -- is now available in small IDEs, not just IntelliJ IDEA. When mise has an Elixir installed for a module, a **"Configure from mise"** button appears on the "SDK is not defined" editor banner and next to that module's SDK selector in Settings → Elixir. One click creates the Elixir and Erlang SDKs and selects them for that module.
   * **Settings → Elixir now guides SDK setup.** The page explains that SDKs are added on the SDKs / Internal Erlang SDKs child pages and links directly to them. Each module's SDK selector shows a live status line (resolved Elixir and Erlang SDK names, or what is wrong -- no SDK, invalid SDK, missing Erlang SDK), matching the status bar widget's wording. In small IDEs the page now lists **all** modules, including projects originally created in IntelliJ IDEA, which previously had no way to pick a per-module SDK in small IDEs.
@@ -66,6 +76,16 @@
   * CONTRIBUTING.md: corrected JFlex regeneration instructions; `ElixirFlexLexer.java` moved from `src/` to `gen/`; documented 253 API constraints for debugger and terminal console.
 * [#3863](https://github.com/KronicDeth/intellij-elixir/pull/3863) - [@sh41](https://github.com/sh41)
   * Plugin artifact uploaded unpacked so downloading from GitHub Actions produces a ready-to-install zip without double-wrapping.
+* [#3879](https://github.com/KronicDeth/intellij-elixir/pull/3879) - [@sh41](https://github.com/sh41)
+  * Consolidated internal usage of `JpsProjectLoadingManager` (SDK-sync API) to a single, documented call site.
+* [#3877](https://github.com/KronicDeth/intellij-elixir/pull/3877), [#3878](https://github.com/KronicDeth/intellij-elixir/pull/3878) - [@joshuataylor](https://github.com/joshuataylor)
+  * Verified compatibility against IntelliJ IDEA 2026.2 EAP (262.8665.258); dependencies pinned to bundled platform versions.
+* [#3875](https://github.com/KronicDeth/intellij-elixir/pull/3875) - [@sh41](https://github.com/sh41)
+  * CI test results now published via `workflow_run` instead of the same-run job.
+* [#3874](https://github.com/KronicDeth/intellij-elixir/pull/3874), [#3864](https://github.com/KronicDeth/intellij-elixir/pull/3864) - [@sh41](https://github.com/sh41)
+  * Routine dependency bumps, including `org.jetbrains.qodana` to 2026.1.3.
+* [#3882](https://github.com/KronicDeth/intellij-elixir/pull/3882) - [@sh41](https://github.com/sh41)
+  * Plugin verifier: explicitly declare the dependency on `intellij.testRunner.plugin` so verification doesn't fail on its absence.
 
 ## v23.9.0
 
