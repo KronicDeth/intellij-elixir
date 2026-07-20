@@ -1,0 +1,6 @@
+<idea-plugin>
+    <!-- As of 2026.2 (build 262+), the SM test-runner classes (com.intellij.execution.testframework.sm.*)
+         used by the ExUnit/ESpec test runners were extracted from the core platform into the bundled
+         "intellij.testRunner.plugin". Declared as optional since it doesn't exist as a separate plugin ID
+         on pre-262 builds, where those classes are still embedded directly in the platform. -->
+</idea-plugin>
