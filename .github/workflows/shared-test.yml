@@ -201,7 +201,6 @@ jobs:
         with:
           setup-elixir: false
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          idea-version: '2026.1.4'
           free-docker-images: false
           skip-searchable-options: 'true'
 
