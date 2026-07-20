@@ -11,6 +11,8 @@ import com.intellij.psi.PsiReference
 import com.intellij.psi.search.PsiElementProcessor
 import com.intellij.psi.util.PsiTreeUtil
 import org.elixir_lang.psi.*
+import org.elixir_lang.psi.ModuleAttribute.isDocumentationName
+import org.elixir_lang.psi.ModuleAttribute.isTypeName
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function
 import org.elixir_lang.psi.call.name.Module
@@ -19,10 +21,8 @@ import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.siblingExpression
 import org.elixir_lang.psi.operation.Type
 import org.elixir_lang.psi.operation.infix.Normalized
-import org.elixir_lang.reference.ModuleAttribute.Companion.isDocumentationName
-import org.elixir_lang.reference.ModuleAttribute.Companion.isTypeName
 
-class Builder : FoldingBuilderEx() {
+internal class Builder : FoldingBuilderEx() {
     /**
      * Builds the folding regions for the specified node in the AST tree and its children.
      *

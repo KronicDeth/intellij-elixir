@@ -1,23 +1,27 @@
 package org.elixir_lang.documentation
 
-import com.intellij.psi.PsiReferenceService
+import com.intellij.model.psi.PsiSymbolReferenceService
 import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.PlatformTestCase
+import org.elixir_lang.model.psi.atom.AtomReference
+import org.elixir_lang.model.psi.atom.AtomSymbol
 import org.elixir_lang.psi.ElixirAtom
-import org.elixir_lang.reference.MfaFunctionReference
 
 /**
  * Integration tests verifying that hover documentation is produced when hovering over
  * the function atom in an MFA tuple (e.g. `:map` in `{Documented, :map, 2}`).
  *
  * The documentation provider pipeline is exercised end-to-end:
- *   MfaFunctionReference.resolve() → ElixirDocumentationProvider.generateHoverDoc()
+ *   AtomReference.resolve() → ElixirDocumentationProvider.generateHoverDoc()
  *
  * This validates success criterion #3 of the MFA tuple resolution plan:
  * "Hover on `:map` in `{Enum, :map, 2}` shows @doc for `Enum.map/2`."
  */
 class MfaTupleHoverDocumentationTest : PlatformTestCase() {
 
+    @RequiresReadLock
+    @Suppress("UnstableApiUsage")
     fun testHoverDocShowsForMfaFunctionAtom() {
         myFixture.configureByFiles("documented_function.ex")
 
@@ -27,16 +31,20 @@ class MfaTupleHoverDocumentationTest : PlatformTestCase() {
         val atom = PsiTreeUtil.getParentOfType(elementAtCaret!!, ElixirAtom::class.java, false)
         assertNotNull("No ElixirAtom at caret", atom)
 
-        val mfaRef = PsiReferenceService.getService()
-            .getReferences(atom!!, PsiReferenceService.Hints.NO_HINTS)
-            .filterIsInstance<MfaFunctionReference>()
+        val mfaRef = PsiSymbolReferenceService.getService()
+            .getReferences(atom!!)
+            .filterIsInstance<AtomReference>()
             .singleOrNull()
-        assertNotNull("No MfaFunctionReference on atom", mfaRef)
+        assertNotNull("No AtomReference on atom", mfaRef)
 
         val resolved = mfaRef!!.resolve()
         assertNotNull("MFA reference did not resolve", resolved)
 
-        val hover = ElixirDocumentationProvider().generateHoverDoc(resolved!!, atom)
+        val resolvedReferenceTargets = mfaRef.resolveReference().filterIsInstance<AtomSymbol>()
+        assertTrue("Expected AtomReference to resolve to AtomSymbol", resolvedReferenceTargets.isNotEmpty())
+
+        val hoverTarget = resolvedReferenceTargets.first().declarationElement() ?: resolved
+        val hover = ElixirDocumentationProvider().generateHoverDoc(hoverTarget!!, atom)
         assertNotNull("Hover documentation is null - @doc content not found for MFA function reference", hover)
 
         assertTrue(

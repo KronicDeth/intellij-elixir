@@ -143,11 +143,17 @@ private fun resolveMixFileRequest(project: Project, mixFile: VirtualFile): SyncR
     if (!mixFile.isValid || mixFile.name != MixProject.MIX_EXS) return null
     val module = ModuleUtil.findModuleForFile(mixFile, project) ?: return null
     val mixRoot = mixFile.parent ?: return null
-    val inContentRoot = ModuleRootManager
-        .getInstance(module)
-        .contentRoots
-        .any { contentRoot -> contentRoot == mixRoot }
-    return if (inContentRoot) SyncRequest.SyncModule(module) else null
+    val contentRoots = ModuleRootManager.getInstance(module).contentRoots
+    val inContentRoot = contentRoots.any { contentRoot -> contentRoot == mixRoot }
+    // apps/<app>/mix.exs in a single-module umbrella: the app dir is not a content root of its
+    // own, but its apps/ parent sits directly under one of the module's content roots.  Resolve
+    // to the owning umbrella module so that dep edits in app mix.exs files still trigger a
+    // module sync.  App dirs carved out as their own content roots (multi-module umbrella
+    // layout) already match the direct check above via their own module.
+    val inUmbrellaApp = !inContentRoot &&
+        mixRoot.parent?.name == "apps" &&
+        contentRoots.any { contentRoot -> contentRoot == mixRoot.parent?.parent }
+    return if (inContentRoot || inUmbrellaApp) SyncRequest.SyncModule(module) else null
 }
 
 // ---------------------------------------------------------------------------
@@ -509,9 +515,29 @@ internal suspend fun buildModuleDepsPlan(
             ?: return@readAction null
     } ?: return null
 
+    // Single-module umbrella: the module's content root is the umbrella root and the apps under
+    // apps/ are plain sub-directories, so the only mix.exs directly at a root is the umbrella's
+    // own (usually dep-less) one.  transitiveResolution parses just the mix.exs at each root it
+    // is given, so without expansion every app-declared dep would stay invisible and never be
+    // wired.  Expand the root set with each apps/<app> dir that carries its own mix.exs.  App
+    // dirs that are content roots in their own right belong to a child module (multi-module
+    // umbrella layout) whose own module plan wires them - they are skipped here so the umbrella
+    // module does not claim a child module's deps.
+    val resolutionRoots = readAction {
+        val projectFileIndex = ProjectRootManager.getInstance(project).fileIndex
+        contentRoots.flatMap { contentRoot ->
+            val appRoots = contentRoot.findChild("apps")?.children.orEmpty().filter { appDir ->
+                appDir.isDirectory &&
+                    appDir.findChild(MixProject.MIX_EXS)?.isValid == true &&
+                    projectFileIndex.getContentRootForFile(appDir) == contentRoot
+            }
+            listOf(contentRoot) + appRoots
+        }
+    }
+
     val psiManager = PsiManager.getInstance(project)
     val indicator = EmptyProgressIndicator()
-    val deps = transitiveResolution(psiManager, indicator, *contentRoots).toList()
+    val deps = transitiveResolution(psiManager, indicator, *resolutionRoots.toTypedArray()).toList()
     if (deps.isEmpty()) return null
 
     val externalLibraryPlans = buildExternalLibraryPlans(project, deps, contentRoots)
@@ -579,9 +605,18 @@ internal suspend fun buildModuleDepsPlan(
         }
     }
 
+    // An in_umbrella dep whose apps/<name> dir sits under one of this module's own content
+    // roots is a dep between two apps of the same single-module umbrella - the "dep module" is
+    // this module itself, so wiring it would only ever create an invalid module order entry.
+    val moduleDeps: Set<String> = readAction {
+        deps.filter { it.type == Dep.Type.MODULE }
+            .filterNot { dep -> contentRoots.any { root -> root.findFileByRelativePath(dep.path)?.isValid == true } }
+            .mapTo(LinkedHashSet()) { it.application }
+    }
+
     return ModuleDepsPlan(
         moduleName = moduleName,
-        moduleDeps = deps.filter { it.type == Dep.Type.MODULE }.mapTo(LinkedHashSet()) { it.application },
+        moduleDeps = moduleDeps,
         libraryDeps = libraryDeps,
         externalLibraryPlans = externalLibraryPlans,
     )

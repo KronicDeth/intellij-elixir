@@ -7,7 +7,7 @@ import org.elixir_lang.psi.ElixirFile;
 import static com.intellij.patterns.PlatformPatterns.psiElement;
 import static com.intellij.patterns.StandardPatterns.instanceOf;
 
-public class CallDefinitionClause extends CompletionContributor {
+final class CallDefinitionClause extends CompletionContributor {
     public CallDefinitionClause() {
         extend(
                 CompletionType.BASIC,

@@ -1,0 +1,23 @@
+<html lang="en">
+<body>
+<p>Reports type variables declared in a type specification head that are referenced only once.</p>
+<!-- tooltip end -->
+<p>A type variable that appears only in the head of a <code>@type</code>, <code>@typep</code>,
+<code>@opaque</code>, <code>@spec</code>, <code>@callback</code>, or <code>@macrocallback</code> and is
+never used in the body constrains nothing. Such a parameter is almost always a mistake - either the body
+should reference it, or the parameter is unnecessary.</p>
+<p>This inspection flags the declaring parameter (for example, <code>a</code> in
+<code>@type single_type(a) :: integer()</code>) when its name occurs fewer than twice across the whole
+specification.</p>
+<p>The following are not flagged:</p>
+<ul>
+    <li>Type variables referenced at least twice, for example <code>a</code> and <code>b</code> in
+        <code>@type pair(a, b) :: {a, b}</code> or the repeated <code>a</code> in
+        <code>@type twins(a) :: {a, a}</code>.</li>
+    <li>Parameters whose name begins with an underscore (for example <code>_a</code>), which conventionally
+        marks an intentionally unused variable.</li>
+</ul>
+<p>To fix a reported type variable, reference it in the body at least once more, or replace it with a
+concrete type such as <code>term()</code>.</p>
+</body>
+</html>

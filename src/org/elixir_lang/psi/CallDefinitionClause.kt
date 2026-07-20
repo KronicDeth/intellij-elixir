@@ -4,10 +4,10 @@ import com.intellij.openapi.progress.ProgressManager
 import com.intellij.psi.ElementDescriptionLocation
 import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveState
+import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.usageView.UsageViewTypeLocation
 import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.NameArityInterval
-import org.elixir_lang.find_usages.Provider
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function.*
 import org.elixir_lang.psi.call.name.Module.KERNEL
@@ -17,7 +17,7 @@ import org.elixir_lang.structure_view.element.CallDefinitionHead
 object CallDefinitionClause {
     /**
      * The enclosing macro call that acts as the modular scope of `call`.  Ignores enclosing `for` calls that
-     * [org.elixir_lang.psi.impl.PsiElementImplKt.enclosingMacroCall] doesn't.
+     * [enclosingMacroCall] doesn't.
      *
      * @param call a def(macro)?p?
      */
@@ -45,7 +45,7 @@ object CallDefinitionClause {
     }
 
     /**
-     * Description of element used in [Provider].
+     * Description of element used in find-usages and element-description presentation.
      *
      * @param call a [Call] that has already been checked with [.is]
      * @param location where the description will be used
@@ -72,6 +72,25 @@ object CallDefinitionClause {
     @RequiresReadLock
     @JvmStatic
     fun `is`(call: Call): Boolean = isFunction(call) || isMacro(call) || isGuard(call)
+
+    /**
+     * Returns `true` if [element] is at or within the name/head of any call-definition clause -
+     * i.e. inside the `foo(args)` head in `def foo(args)`. Used to suppress reference providers
+     * that must not fire on declaration names.
+     *
+     * Mirrors [org.elixir_lang.psi.Protocol.isHead] but applies to all `CallDefinitionClause`
+     * contexts, not just `defprotocol` bodies.
+     */
+    @RequiresReadLock
+    fun isHead(element: PsiElement): Boolean {
+        val defClause = generateSequence(element) { it.parent }
+            .filterIsInstance<Call>()
+            .firstOrNull { `is`(it) }
+            ?: return false
+        val nameIdentifier = nameIdentifier(defClause) ?: return false
+        return PsiTreeUtil.isAncestor(nameIdentifier, element, false) ||
+               PsiTreeUtil.isAncestor(element, nameIdentifier, false)
+    }
 
     @RequiresReadLock
     @JvmStatic
@@ -107,7 +126,7 @@ object CallDefinitionClause {
      * The name and arity range of the call definition this clause belongs to.
      *
      * @param call
-     * @return The name and arities of the [CallDefinition] this clause belongs.  Multiple arities occur when
+     * @return The name and arities of the [org.elixir_lang.structure_view.element.CallDefinition] this clause belongs.  Multiple arities occur when
      * default arguments are used, which produces an arity for each default argument that is turned on and off.
      * @see Call.resolvedFinalArityInterval
      */

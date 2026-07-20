@@ -1,21 +1,26 @@
 package org.elixir_lang.injection
 
 import com.intellij.codeInsight.daemon.impl.HighlightInfo
+import com.intellij.ide.impl.HeadlessDataManager
 import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.lang.injection.InjectedLanguageManager
 import com.intellij.psi.PsiFile
 import com.intellij.psi.util.PsiTreeUtil
-import org.elixir_lang.PlatformTestCase
+import org.elixir_lang.code_insight.assertGotoDeclarationChosenAtCaret
+import org.elixir_lang.code_insight.assertNoNavigationAtCaret
+import org.elixir_lang.code_insight.completionStringsAtCaret
+import org.elixir_lang.code_insight.gotoDeclarationDestinationAtCaret
+import org.elixir_lang.code_insight.nonDeclarationUsageCountAtCaret
+import org.elixir_lang.intellij_elixir.refactoring.InPlaceSymbolRenameTestCase
 import org.elixir_lang.psi.SigilHeredocLiteral
 import org.elixir_lang.psi.SigilLine
-import org.elixir_lang.reference.Callable.Companion.isVariable
 import org.elixir_lang.settings.ElixirExperimentalSettings
 import org.intellij.lang.regexp.RegExpLanguage
 
 /**
  * Tests for regex sigil injection to ensure interpolation doesn't cause false warnings
  */
-class RegexSigilInjectionTest : PlatformTestCase() {
+class RegexSigilInjectionTest : InPlaceSymbolRenameTestCase() {
     private var originalEnableHtmlInjection = false
 
     override fun setUp() {
@@ -23,6 +28,7 @@ class RegexSigilInjectionTest : PlatformTestCase() {
         val settings = ElixirExperimentalSettings.instance
         originalEnableHtmlInjection = settings.state.enableHtmlInjection
         settings.state.enableHtmlInjection = true
+        HeadlessDataManager.fallbackToProductionDataManager(myFixture.testRootDisposable)
         ensureSigilInjectorRegistered()
     }
 
@@ -70,8 +76,14 @@ class RegexSigilInjectionTest : PlatformTestCase() {
         )
     }
 
-    fun testInterpolatedRegexSigilVariableReferenceResolves() {
-        assertNoProblemHighlights(
+    /**
+     * A variable interpolated inside an injected regex sigil must be the *same* symbol as its
+     * outer declaration: renaming it via the real Shift+F6 gesture (with the caret on the
+     * interpolated usage) must rewrite both the declaration and the interpolated usage.
+     */
+    fun testInterpolatedRegexSigilVariableRenamesDeclarationAndUsage() {
+        val file = myFixture.configureByText(
+            "test.ex",
             """
                 defmodule Test do
                   def test do
@@ -81,18 +93,25 @@ class RegexSigilInjectionTest : PlatformTestCase() {
                 end
             """.trimIndent()
         )
+        assertRegexInjectionPresent(file)
 
-        val reference = myFixture.file.findReferenceAt(myFixture.caretOffset)
-        assertNotNull("Expected reference for interpolated variable", reference)
+        inPlaceRenameAtCaret("resource_type")
 
-        val resolved = reference!!.resolve()
-        assertNotNull("Expected interpolated variable to resolve", resolved)
-        assertTrue("Interpolated variable should be treated as variable", isVariable(resolved!!))
-        assertEquals("payload_type", resolved.text)
+        myFixture.checkResult(
+            """
+                defmodule Test do
+                  def test do
+                    resource_type = "foo"
+                    regex = ~r|/items/#{resource_type}|
+                  end
+                end
+            """.trimIndent()
+        )
     }
 
-    fun testInterpolatedRegexHeredocVariableReferenceResolves() {
-        assertNoProblemHighlights(
+    fun testInterpolatedRegexHeredocVariableRenamesDeclarationAndUsage() {
+        val file = myFixture.configureByText(
+            "test.ex",
             """
                 defmodule Test do
                   def test do
@@ -104,15 +123,198 @@ class RegexSigilInjectionTest : PlatformTestCase() {
                 end
             """.trimIndent()
         )
+        assertRegexInjectionPresent(file)
 
-        val reference = myFixture.file.findReferenceAt(myFixture.caretOffset)
-        assertNotNull("Expected reference for interpolated heredoc variable", reference)
+        inPlaceRenameAtCaret("resource_type")
 
-        val resolved = reference!!.resolve()
-        assertNotNull("Expected interpolated heredoc variable to resolve", resolved)
-        assertTrue("Interpolated heredoc variable should be treated as variable", isVariable(resolved!!))
-        assertEquals("payload_type", resolved.text)
+        myFixture.checkResult(
+            """
+                defmodule Test do
+                  def test do
+                    resource_type = "foo"
+                    regex = ~r'''
+                    ^/items/#{resource_type}$
+                    '''
+                  end
+                end
+            """.trimIndent()
+        )
     }
+
+    // ---- Navigation (Ctrl+Click / Go To Declaration) ----
+
+    /**
+     * Ctrl+Click on a variable interpolated inside an injected regex sigil must navigate to its
+     * outer declaration (`GTDUOutcome.GTD`), exactly as Ctrl+Click does anywhere else.
+     */
+    fun testCtrlClickOnInterpolatedRegexSigilVariableChoosesGotoDeclaration() {
+        myFixture.configureByText(
+            "test.ex",
+            """
+                defmodule Test do
+                  def test do
+                    payload_type = "foo"
+                    regex = ~r|/items/#{<caret>payload_type}|
+                  end
+                end
+            """.trimIndent()
+        )
+        assertGotoDeclarationAtCaret()
+    }
+
+    fun testCtrlClickOnInterpolatedRegexHeredocVariableChoosesGotoDeclaration() {
+        myFixture.configureByText(
+            "test.ex",
+            """
+                defmodule Test do
+                  def test do
+                    payload_type = "foo"
+                    regex = ~r'''
+                    ^/items/#{<caret>payload_type}$
+                    '''
+                  end
+                end
+            """.trimIndent()
+        )
+        assertGotoDeclarationAtCaret()
+    }
+
+    // ---- Completion ----
+
+    /**
+     * Completion at a caret inside an interpolation within an injected regex sigil must offer the
+     * in-scope variables (the interpolation is host Elixir, excluded from the RegExp injection).
+     */
+    fun testCompletionInsideInterpolatedRegexSigilOffersInScopeVariables() {
+        myFixture.configureByText(
+            "test.ex",
+            """
+                defmodule Test do
+                  def test do
+                    payload_type = "foo"
+                    payload_name = "bar"
+                    regex = ~r|/items/#{payload<caret>}|
+                  end
+                end
+            """.trimIndent()
+        )
+        assertInterpolationCompletionOffersInScopeVariables()
+    }
+
+    fun testCompletionInsideInterpolatedRegexHeredocOffersInScopeVariables() {
+        myFixture.configureByText(
+            "test.ex",
+            """
+                defmodule Test do
+                  def test do
+                    payload_type = "foo"
+                    payload_name = "bar"
+                    regex = ~r'''
+                    ^/items/#{payload<caret>}$
+                    '''
+                  end
+                end
+            """.trimIndent()
+        )
+        assertInterpolationCompletionOffersInScopeVariables()
+    }
+
+    // ---- Find Usages ----
+
+    /**
+     * Find Usages from the declaration must include the read that lives inside the interpolation of
+     * an injected regex sigil.
+     */
+    fun testFindUsagesFromDeclarationIncludesInterpolatedRegexSigilUsage() {
+        myFixture.configureByText(
+            "test.ex",
+            """
+                defmodule Test do
+                  def test do
+                    <caret>payload_type = "foo"
+                    regex = ~r|/items/#{payload_type}|
+                  end
+                end
+            """.trimIndent()
+        )
+        assertEquals(1, myFixture.nonDeclarationUsageCountAtCaret(project))
+    }
+
+    fun testFindUsagesFromDeclarationIncludesInterpolatedRegexHeredocUsage() {
+        myFixture.configureByText(
+            "test.ex",
+            """
+                defmodule Test do
+                  def test do
+                    <caret>payload_type = "foo"
+                    regex = ~r'''
+                    ^/items/#{payload_type}$
+                    '''
+                  end
+                end
+            """.trimIndent()
+        )
+        assertEquals(1, myFixture.nonDeclarationUsageCountAtCaret(project))
+    }
+
+    // ---- Negative: non-interpolating sigil (~R) treats #{...} as literal text ----
+
+    /**
+     * Uppercase sigils (e.g. `~R`) do **not** interpolate: `#{payload_type}` is literal text, not a
+     * variable read. None of navigation, completion, or find-usages may treat it as a reference.
+     */
+    fun testCtrlClickInsideNonInterpolatingSigilFindsNoDeclaration() {
+        myFixture.configureByText(
+            "test.ex",
+            """
+                defmodule Test do
+                  def test do
+                    payload_type = "foo"
+                    literal = ~R|/items/#{<caret>payload_type}|
+                  end
+                end
+            """.trimIndent()
+        )
+        myFixture.assertNoNavigationAtCaret(
+            "Literal text inside a non-interpolating sigil must not navigate to a declaration"
+        )
+    }
+
+    fun testCompletionInsideNonInterpolatingSigilDoesNotOfferVariables() {
+        myFixture.configureByText(
+            "test.ex",
+            """
+                defmodule Test do
+                  def test do
+                    payload_type = "foo"
+                    payload_name = "bar"
+                    literal = ~R|/items/#{payload<caret>}|
+                  end
+                end
+            """.trimIndent()
+        )
+        val strings = myFixture.completionStringsAtCaret()
+        assertTrue(
+            "Non-interpolating sigil text must not offer in-scope variables, got: $strings",
+            strings == null || (!strings.contains("payload_type") && !strings.contains("payload_name"))
+        )
+    }
+
+    fun testFindUsagesFromDeclarationExcludesNonInterpolatingSigilText() {
+        myFixture.configureByText(
+            "test.ex",
+            """
+                defmodule Test do
+                  def test do
+                    <caret>payload_type = "foo"
+                    literal = ~R|/items/#{payload_type}|
+                  end
+                end
+            """.trimIndent()
+        )
+        assertEquals(0, myFixture.nonDeclarationUsageCountAtCaret(project))
+    }
+
 
     /**
      * Test that literal regex sigils (uppercase ~R) work correctly without interpolation
@@ -211,6 +413,29 @@ class RegexSigilInjectionTest : PlatformTestCase() {
             "Unexpected highlights: ${formatHighlights(problemHighlights)}",
             problemHighlights.isEmpty()
         )
+    }
+
+    private fun assertGotoDeclarationAtCaret() {
+        // Ctrl+Click chooses "go to declaration" (a single unambiguous target), not "show usages".
+        myFixture.assertGotoDeclarationChosenAtCaret()
+
+        // Perform the real navigation and assert WHERE it landed: the payload_type *declaration*
+        // (the first occurrence in the file), not merely that some target existed.
+        val destination = myFixture.gotoDeclarationDestinationAtCaret()
+        assertNotNull("Go To Declaration produced no destination element", destination)
+        assertEquals("payload_type", destination!!.text)
+        assertEquals(
+            "Go To Declaration must land on the payload_type declaration",
+            myFixture.file.text.indexOf("payload_type"),
+            destination.textRange.startOffset
+        )
+    }
+
+    private fun assertInterpolationCompletionOffersInScopeVariables() {
+        val strings = myFixture.completionStringsAtCaret()
+        assertNotNull("Completion not shown inside interpolation", strings)
+        assertTrue("Expected 'payload_type' offered inside interpolation, got: $strings", strings!!.contains("payload_type"))
+        assertTrue("Expected 'payload_name' offered inside interpolation, got: $strings", strings.contains("payload_name"))
     }
 
     private fun assertRegexInjectionPresent(file: PsiFile) {

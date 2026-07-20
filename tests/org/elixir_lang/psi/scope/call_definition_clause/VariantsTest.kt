@@ -2,10 +2,8 @@ package org.elixir_lang.psi.scope.call_definition_clause
 
 import com.intellij.codeInsight.completion.CompletionType
 import com.intellij.codeInsight.lookup.LookupElement
-import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.codeInsight.lookup.LookupElementPresentation
 import org.elixir_lang.PlatformTestCase
-import org.elixir_lang.psi.call.Call
 
 class VariantsTest : PlatformTestCase() {
     fun testIssue453() {
@@ -18,47 +16,46 @@ class VariantsTest : PlatformTestCase() {
 
     fun testIssue462() {
         myFixture.configureByFiles("self_completion.ex")
-        val head = myFixture
-            .file
-            .findElementAt(myFixture.caretOffset - 1)!!
-            .parent
-            .parent
-        assertInstanceOf(head, Call::class.java)
-        val reference = head.reference
-        assertNotNull("Call definition head does not have a reference", reference)
-        val variants = reference!!.variants
-        var count = 0
-        for (variant in variants) {
-            if (variant is LookupElement) {
-                if (variant.lookupString == "the_function_currently_being_defined") {
-                    count += 1
-                }
-            }
-        }
-        assertEquals("There is at least one entry for the function currently being defined in variants", 0, count)
+        myFixture.complete(CompletionType.BASIC)
+        val variants = myFixture.lookupElementStrings.orEmpty()
+        assertFalse(
+            "Function currently being defined should not appear in completion variants",
+            variants.contains("the_function_currently_being_defined")
+        )
     }
 
     fun testIssue2073() {
         myFixture.configureByFile("callback.ex")
-        val element = myFixture.file.findElementAt(myFixture.caretOffset - 1)!!.parent.parent
-        assertInstanceOf(element, Call::class.java)
-        val variants = element.reference!!.variants.filterIsInstance<LookupElementBuilder>()
+        val variants = myFixture.complete(CompletionType.BASIC).orEmpty().toList()
 
-        val functionCallbackVariant = variants.find { it.lookupString == "function_callback" }
-        assertNotNull(functionCallbackVariant)
+        assertRenderedVariant(
+            variants,
+            lookupString = "function_callback",
+            expectedTailText = "/0 (callback.ex defmodule Behaviour)"
+        )
+        assertRenderedVariant(
+            variants,
+            lookupString = "macro_callback",
+            expectedTailText = "/1 (callback.ex defmodule Behaviour)"
+        )
+    }
 
-        val functionCallbackLookupElementPresentation = LookupElementPresentation()
-        functionCallbackVariant!!.renderElement(functionCallbackLookupElementPresentation)
-        assertEquals("function_callback", functionCallbackLookupElementPresentation.itemText)
-        assertEquals("/0 (/src/callback.ex defmodule Behaviour)", functionCallbackLookupElementPresentation.tailText)
+    /**
+     * Finds the completion [LookupElement] whose lookup string is [lookupString], renders it, and
+     * asserts its item text equals [lookupString] and its tail text equals [expectedTailText].
+     */
+    private fun assertRenderedVariant(
+        variants: List<LookupElement>,
+        lookupString: String,
+        expectedTailText: String
+    ) {
+        val variant = variants.find { it.lookupString == lookupString }
+        assertNotNull("Completion variant '$lookupString' not offered", variant)
 
-        val macroCallbackVariant = variants.find { it.lookupString == "macro_callback" }
-        assertNotNull(macroCallbackVariant)
-
-        val macroCallbackLookupElementPresentation = LookupElementPresentation()
-        macroCallbackVariant!!.renderElement(macroCallbackLookupElementPresentation)
-        assertEquals("macro_callback", macroCallbackLookupElementPresentation.itemText)
-        assertEquals("/1 (/src/callback.ex defmodule Behaviour)", macroCallbackLookupElementPresentation.tailText)
+        val presentation = LookupElementPresentation()
+        variant!!.renderElement(presentation)
+        assertEquals(lookupString, presentation.itemText)
+        assertEquals(expectedTailText, presentation.tailText)
     }
 
     override fun getTestDataPath(): String = "testData/org/elixir_lang/psi/scope/call_definition_clause/variants"

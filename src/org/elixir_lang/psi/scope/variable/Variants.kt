@@ -11,7 +11,7 @@ import org.elixir_lang.psi.putInitialVisitedElement
 import org.elixir_lang.psi.scope.Variable
 
 class Variants : Variable() {
-    private var lookupElementByElement = mutableMapOf<PsiElement, LookupElement>()
+    private var lookupElementByName = mutableMapOf<String, LookupElement>()
 
     /**
      * Decides whether `match` matches the criteria being searched for.  All other [.execute] methods
@@ -24,7 +24,11 @@ class Variants : Variable() {
         val name = (declaration as? PsiNamedElement)?.name ?: match.name
 
         if (name != null) {
-            lookupElementByElement.computeIfAbsent(declaration) {
+            // Dedup by name: a variable rebound in the same scope or shadowed across nested scopes has
+            // multiple declaration sites, but the completion popup only shows the name, so each name
+            // must appear once. `treeWalkUp` visits the nearest (innermost/shadowing) binding first,
+            // so `computeIfAbsent` keeps that one as the navigation target.
+            lookupElementByName.computeIfAbsent(name) {
                 LookupElementBuilder
                         .createWithSmartPointer(name, declaration)
                         .withRenderer(org.elixir_lang.code_insight.lookup.element_renderer.Variable(name))
@@ -34,7 +38,7 @@ class Variants : Variable() {
         return true
     }
 
-    private fun toList(): List<LookupElement> = lookupElementByElement.values.toList()
+    private fun toList(): List<LookupElement> = lookupElementByName.values.toList()
 
     companion object {
         fun lookupElementList(entrance: PsiElement): List<LookupElement> {

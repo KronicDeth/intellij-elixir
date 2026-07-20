@@ -22,10 +22,10 @@ import org.elixir_lang.beam.decompiler.Default
 import org.elixir_lang.beam.decompiler.Options
 import org.elixir_lang.beam.decompiler.appendNotDecompiledBody
 import org.elixir_lang.beam.decompiler.decompiler
+import org.elixir_lang.model.psi.type.TypeBuiltins.BUILTIN_ARITY_BY_NAME
 import org.elixir_lang.beam.term.inspect
 import org.elixir_lang.psi.call.name.Function.*
 import org.elixir_lang.psi.call.name.Module
-import org.elixir_lang.reference.resolver.Type.BUILTIN_ARITY_BY_NAME
 import java.util.*
 
 internal class Decompiler : BinaryFileDecompiler {

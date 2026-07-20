@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.elixir_lang.mix.library.CONSOLIDATED_LIBRARY_SUFFIX
+import org.elixir_lang.mix.sync.MixDepsSyncService.Companion.LOG
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -232,6 +233,25 @@ class MixDepsSyncService(private val project: Project, cs: CoroutineScope) {
 @VisibleForTesting
 internal fun scopedDepLibraryName(contentRootUrl: String, depName: String): String =
     "$depName [$contentRootUrl]"
+
+/**
+ * Inverse of [scopedDepLibraryName]: extracts the embedded content-root URL from a root-scoped
+ * library name, or returns null when [libraryName] does not have the `"<dep> [<url>]"` shape
+ * (legacy unscoped names, consolidated libraries, user-created libraries).
+ *
+ * Used by stale-entry pruning to decide whether an invalid library order entry references a
+ * content root that is no longer part of the project.
+ */
+@VisibleForTesting
+internal fun scopedLibraryNameContentRootUrl(libraryName: String): String? {
+    if (!libraryName.endsWith("]")) return null
+    // First occurrence, not last: dep names are Mix app atoms and can never contain " [", but
+    // the content-root URL may (a directory named "work [old]" is legal on every OS).  Matching
+    // the last occurrence would truncate such URLs and misclassify the entry as stale.
+    val markerIndex = libraryName.indexOf(" [")
+    if (markerIndex <= 0) return null
+    return libraryName.substring(markerIndex + 2, libraryName.length - 1)
+}
 
 // ---------------------------------------------------------------------------
 // Internal top-level plan data classes

@@ -1,17 +1,17 @@
 package org.elixir_lang.reference.mfa_tuple
 
+import com.intellij.model.psi.PsiSymbolReferenceService
 import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.roots.ModuleRootModificationUtil
 import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.newvfs.impl.VfsRootAccess
-import com.intellij.psi.PsiReferenceService
 import com.intellij.psi.util.PsiTreeUtil
 import org.elixir_lang.PlatformTestCase
 import org.elixir_lang.beam.psi.impl.CallDefinitionImpl
+import org.elixir_lang.model.psi.atom.AtomReference
 import org.elixir_lang.psi.ElixirAtom
-import org.elixir_lang.reference.MfaFunctionReference
 import java.io.File
 
 /**
@@ -42,7 +42,7 @@ class ErlangMfaTupleReferenceTest : PlatformTestCase() {
      * defined in the `:math` BEAM module.
      */
     fun testErlangMfaFunctionAtomResolvesFromBeam() {
-        val reference = mfaFunctionReferenceAtCaret("erlang_mfa.ex")
+        val reference = atomReferenceAtCaret("erlang_mfa.ex")
 
         val resolveResults = reference.multiResolve(false)
         assertTrue(
@@ -66,7 +66,7 @@ class ErlangMfaTupleReferenceTest : PlatformTestCase() {
      * `resolve()` must return non-null for `:sqrt` in `{:math, :sqrt, 1}`.
      */
     fun testErlangMfaResolveReturnsSingleElement() {
-        val reference = mfaFunctionReferenceAtCaret("erlang_mfa.ex")
+        val reference = atomReferenceAtCaret("erlang_mfa.ex")
 
         val resolved = reference.resolve()
         assertNotNull("resolve() returned null for Erlang MFA {:math, :sqrt, 1}", resolved)
@@ -82,12 +82,12 @@ class ErlangMfaTupleReferenceTest : PlatformTestCase() {
      * do not show unresolved-reference errors.
      */
     fun testErlangMfaReferenceIsSoft() {
-        val reference = mfaFunctionReferenceAtCaret("erlang_mfa.ex")
+        val reference = atomReferenceAtCaret("erlang_mfa.ex")
 
-        assertTrue("MfaFunctionReference must be soft", reference.isSoft)
+        assertTrue("AtomReference must be soft", reference.isSoft)
     }
 
-    private fun mfaFunctionReferenceAtCaret(fileName: String): MfaFunctionReference {
+    private fun atomReferenceAtCaret(fileName: String): AtomReference {
         myFixture.configureByFile(fileName)
 
         val elementAtCaret = myFixture.file.findElementAt(myFixture.caretOffset)
@@ -95,11 +95,12 @@ class ErlangMfaTupleReferenceTest : PlatformTestCase() {
         val atom = PsiTreeUtil.getParentOfType(elementAtCaret, ElixirAtom::class.java, false)
             ?: error("No ElixirAtom at caret in $fileName")
 
-        return PsiReferenceService.getService()
-            .getReferences(atom, PsiReferenceService.Hints.NO_HINTS)
-            .filterIsInstance<MfaFunctionReference>()
+        @Suppress("UnstableApiUsage")
+        return PsiSymbolReferenceService.getService()
+            .getReferences(atom)
+            .filterIsInstance<AtomReference>()
             .singleOrNull()
-            ?: error("Expected MfaFunctionReference at caret in $fileName")
+            ?: error("Expected AtomReference at caret in $fileName")
     }
 
     private fun addBeamLibrary() {

@@ -9,6 +9,7 @@ import com.intellij.openapi.editor.markup.TextAttributes
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.*
+import org.elixir_lang.model.psi.variable.VariableSymbol
 import org.elixir_lang.ElixirSyntaxHighlighter
 import org.elixir_lang.beam.psi.impl.CallDefinitionImpl
 import org.elixir_lang.psi.AtOperation
@@ -182,26 +183,23 @@ internal class Callable : Annotator, DumbAware {
                     referrerTextAttributesKeys
                 )
             }
-            org.elixir_lang.reference.Callable.isParameter(resolved) -> {
-                CallHighlight.nullablePut(
-                    previousCallHighlight,
-                    PARAMETER_TEXT_ATTRIBUTE_KEYS
-                )
-            }
-            org.elixir_lang.reference.Callable.isParameterWithDefault(resolved) -> {
-                CallHighlight.nullablePut(
-                    previousCallHighlight,
-                    PARAMETER_TEXT_ATTRIBUTE_KEYS
-                )
-            }
-            org.elixir_lang.reference.Callable.isVariable(resolved) -> {
-                CallHighlight.nullablePut(
-                    previousCallHighlight,
-                    VARIABLE_TEXT_ATTRIBUTE_KEYS
-                )
-            }
-            else -> {
-                previousCallHighlight
+            else -> when (VariableSymbol.classify(resolved)) {
+                VariableSymbol.Kind.PARAMETER ->
+                    CallHighlight.nullablePut(
+                        previousCallHighlight,
+                        PARAMETER_TEXT_ATTRIBUTE_KEYS
+                    )
+                VariableSymbol.Kind.VARIABLE ->
+                    CallHighlight.nullablePut(
+                        previousCallHighlight,
+                        VARIABLE_TEXT_ATTRIBUTE_KEYS
+                    )
+                VariableSymbol.Kind.IGNORED ->
+                    CallHighlight.nullablePut(
+                        previousCallHighlight,
+                        IGNORED_VARIABLE_TEXT_ATTRIBUTE_KEYS
+                    )
+                null -> previousCallHighlight
             }
         }
 
@@ -210,13 +208,23 @@ internal class Callable : Annotator, DumbAware {
             is Call -> callHighlight(resolved, previousCallHighlight)
             is CallDefinitionImpl<*> -> callHighlight(resolved, previousCallHighlight)
             else ->
-                if (org.elixir_lang.reference.Callable.isIgnored(resolved)) {
-                    CallHighlight.nullablePut(
-                        previousCallHighlight,
-                        IGNORED_VARIABLE_TEXT_ATTRIBUTE_KEYS
-                    )
-                } else {
-                    previousCallHighlight
+                when (VariableSymbol.classify(resolved)) {
+                    VariableSymbol.Kind.IGNORED ->
+                        CallHighlight.nullablePut(
+                            previousCallHighlight,
+                            IGNORED_VARIABLE_TEXT_ATTRIBUTE_KEYS
+                        )
+                    VariableSymbol.Kind.PARAMETER ->
+                        CallHighlight.nullablePut(
+                            previousCallHighlight,
+                            PARAMETER_TEXT_ATTRIBUTE_KEYS
+                        )
+                    VariableSymbol.Kind.VARIABLE ->
+                        CallHighlight.nullablePut(
+                            previousCallHighlight,
+                            VARIABLE_TEXT_ATTRIBUTE_KEYS
+                        )
+                    null -> previousCallHighlight
                 }
         }
 
@@ -370,7 +378,7 @@ internal class Callable : Annotator, DumbAware {
             arrayOf(ElixirSyntaxHighlighter.FUNCTION_CALL, ElixirSyntaxHighlighter.PREDEFINED_CALL)
 
         private val PREDEFINED_LOCATION_STRING_SET = HashSet(
-            Arrays.asList(
+            listOf(
                 KERNEL,
                 KERNEL_SPECIAL_FORMS
             )
@@ -402,8 +410,5 @@ internal class Callable : Annotator, DumbAware {
                 else -> null
             }
                 ?: standardTextAttributeKeys
-
-        private fun sameFile(referrer: PsiElement, resolved: PsiElement): Boolean =
-            referrer.containingFile.virtualFile == resolved.containingFile.virtualFile
     }
 }

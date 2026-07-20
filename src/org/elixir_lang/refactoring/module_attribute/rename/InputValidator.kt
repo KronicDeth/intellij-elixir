@@ -7,11 +7,12 @@ import com.intellij.psi.PsiElement
 import com.intellij.refactoring.rename.RenameInputValidator
 import com.intellij.refactoring.rename.RenameInputValidatorEx
 import com.intellij.util.ProcessingContext
-import org.elixir_lang.psi.call.Call
-import org.elixir_lang.refactoring.module_attribute.rename.Handler.Companion.isAvailableOnResolved
-import org.elixir_lang.refactoring.module_attribute.rename.Inplace.Companion.isIdentifier
+import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
+import java.util.regex.Pattern
 
-class InputValidator : RenameInputValidatorEx {
+private val IDENTIFIER_PATTERN = Pattern.compile("@[a-z_][0-9a-zA-Z_]*[?!]?")
+
+internal class InputValidator : RenameInputValidatorEx {
     /**
      * Called only if all input validators ([RenameInputValidator]) accept
      * the new name in [.isInputValid]
@@ -22,7 +23,7 @@ class InputValidator : RenameInputValidatorEx {
      * @return null if newName is a valid name, custom error message otherwise
      */
     override fun getErrorMessage(newName: String, project: Project): String? =
-            if (!isIdentifier(newName)) {
+            if (!IDENTIFIER_PATTERN.matcher(newName).matches()) {
                 "`" + newName + "` is not a valid module attribute name: module attributes (1) MUST " +
                         "start with an @ symbol which (2) MUST be followed by lowercase letter or underscore (`_`) and " +
                         "(3) then any combination of digits (`0` - `9`), lowercase letters (`a` - `z`), " +
@@ -32,13 +33,13 @@ class InputValidator : RenameInputValidatorEx {
             }
 
     override fun getPattern(): ElementPattern<out PsiElement> {
-        return object : ElementPattern<Call> {
+        return object : ElementPattern<PsiElement> {
             override fun accepts(o: Any?): Boolean = false
 
             override fun accepts(o: Any?, context: ProcessingContext): Boolean =
-                    o is PsiElement && isAvailableOnResolved(o)
+                    o is AtUnqualifiedNoParenthesesCall<*>
 
-            override fun getCondition(): ElementPatternCondition<Call>? = null
+            override fun getCondition(): ElementPatternCondition<PsiElement>? = null
         }
     }
 
@@ -48,6 +49,6 @@ class InputValidator : RenameInputValidatorEx {
      * otherwise default message "newName is not a valid identifier" would be shown
      */
     override fun isInputValid(newName: String, element: PsiElement, context: ProcessingContext): Boolean =
-    // allow defer to getErrorMessage
+            // allow defer to getErrorMessage
             true
 }

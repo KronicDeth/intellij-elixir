@@ -13,6 +13,10 @@ import org.elixir_lang.eex.Language
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.CallDefinitionClause.`is`
+import org.elixir_lang.psi.ModuleAttribute.isCallbackName
+import org.elixir_lang.psi.ModuleAttribute.isDocumentationName
+import org.elixir_lang.psi.ModuleAttribute.isSpecificationName
+import org.elixir_lang.psi.ModuleAttribute.isTypeName
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function
 import org.elixir_lang.psi.call.name.Function.UNQUOTE_SPLICING
@@ -20,10 +24,6 @@ import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.impl.identifierName
 import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.psi.operation.*
-import org.elixir_lang.reference.ModuleAttribute.Companion.isCallbackName
-import org.elixir_lang.reference.ModuleAttribute.Companion.isDocumentationName
-import org.elixir_lang.reference.ModuleAttribute.Companion.isSpecificationName
-import org.elixir_lang.reference.ModuleAttribute.Companion.isTypeName
 import org.elixir_lang.structure_view.element.CallDefinitionHead.Companion.stripAllOuterParentheses
 
 /**

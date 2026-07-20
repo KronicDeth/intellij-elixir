@@ -1,8 +1,5 @@
 package org.elixir_lang.psi
 
-import com.ericsson.otp.erlang.OtpErlangAtom
-import com.ericsson.otp.erlang.OtpErlangLong
-import com.ericsson.otp.erlang.OtpErlangRangeException
 import com.intellij.psi.ElementDescriptionLocation
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiNamedElement
@@ -16,7 +13,7 @@ import org.elixir_lang.Name
 import org.elixir_lang.NameArityInterval
 import org.elixir_lang.beam.psi.impl.CallDefinitionImpl
 import org.elixir_lang.beam.psi.impl.ModuleImpl
-import org.elixir_lang.errorreport.Logger
+import org.elixir_lang.model.psi.FunctionArityKeywordPair
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function.IMPORT
 import org.elixir_lang.psi.call.name.Module.KERNEL
@@ -241,21 +238,11 @@ object Import {
         return { nameArityInterval -> !only(nameArityInterval) }
     }
 
-    private fun keywordKeyToName(keywordKey: Quotable): String? = (keywordKey.quote() as? OtpErlangAtom)?.atomValue()
+    private fun keywordKeyToName(keywordKey: Quotable): String? =
+        FunctionArityKeywordPair.nameFromKey(keywordKey)
 
     private fun keywordValueToArity(keywordValue: Quotable): Int? =
-        (keywordValue.quote() as? OtpErlangLong)?.let { quotedKeywordValue ->
-            try {
-                quotedKeywordValue.intValue()
-            } catch (_: OtpErlangRangeException) {
-                Logger.error(
-                    Import::class.java,
-                    "Arity in OtpErlangLong could not be downcast to an int",
-                    keywordValue
-                )
-                null
-            }
-        }
+        FunctionArityKeywordPair.arityFromValue(keywordValue)
 
     private fun onlyNameArityIntervalFilter(element: PsiElement): (NameArityInterval) -> Boolean {
         val aritiesByName = aritiesByNameFromNameByArityKeywordList(element)

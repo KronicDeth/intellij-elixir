@@ -6,9 +6,9 @@ import com.intellij.psi.scope.PsiScopeProcessor
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
 import org.elixir_lang.psi.ElixirMatchedUnqualifiedNoArgumentsCall
 import org.elixir_lang.psi.ElixirUnmatchedAtUnqualifiedNoParenthesesCall
+import org.elixir_lang.psi.ModuleAttribute.isNonReferencing
 import org.elixir_lang.psi.Use
 import org.elixir_lang.psi.call.Call
-import org.elixir_lang.reference.ModuleAttribute.Companion.isNonReferencing
 
 abstract class ModuleAttribute : PsiScopeProcessor {
     override fun execute(element: PsiElement, state: ResolveState): Boolean =

@@ -41,8 +41,12 @@ import org.elixir_lang.psi.operation.not_in.Normalized as NotInNormalized
 @RequiresReadLock
 fun Call.computeReference(): PsiReference? =
     /* if the call is just the identifier for a module attribute reference, then don't return a Callable reference,
-           and instead let {@link #getReference(AtNonNumericOperation) handle it */
-    if (!this.isModuleAttributeNameElement() &&
+           and instead let the dedicated module-attribute reference path handle it */
+    // Any element in the head of a call-definition clause is a declaration name, not a call site.
+    // Protocol heads were already guarded this way; now the full CDC family is covered.
+    if (CallDefinitionClause.isHead(this)) {
+        null
+    } else if (!this.isModuleAttributeNameElement() &&
         // if a bitstring segment option then the option is a pseudo-function
         !isBitStreamSegmentOption(this) &&
         !this.isSlashInCaptureNameSlashArity() &&
@@ -124,7 +128,13 @@ private fun PsiElement.isSlashInCaptureNameSlashArity(): Boolean =
 
 
 private fun Call.computeCallableReference(): PsiReference? =
-    if (Callable.isDefiner(this)) {
+    if (CallDefinitionClause.`is`(this)) {
+        // Function clause declarations are owned by FunctionSymbolDeclarationProvider.
+        // A legacy reference here would shadow the FunctionSymbol declaration.
+        null
+    } else if (Callable.isDefiner(this)) {
+        // Other definers (defmodule, defprotocol, defimpl, defdelegate) still use the legacy path
+        // until their respective Symbol API phases are complete.
         Callable.definer(this)
     } else if (isCalling(KERNEL, __MODULE__, 0)) {
         org.elixir_lang.psi.__MODULE__.reference(this)
@@ -135,7 +145,10 @@ private fun Call.computeCallableReference(): PsiReference? =
             if (this.isTypeSpecPseudoFunction()) {
                 null
             } else {
-                org.elixir_lang.reference.Type(ancestorTypeSpec, this)
+                // Type-spec references (`@type`/`@spec` usage sites) are owned by Symbol API providers:
+                // - TypeReferenceProvider for type names
+                // - SpecFunctionReferenceProvider for @spec function heads
+                null
             }
         } else {
             Callable(this)

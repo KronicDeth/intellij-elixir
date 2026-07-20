@@ -6,10 +6,11 @@ import com.intellij.psi.ResolveState
 import com.intellij.psi.scope.PsiScopeProcessor
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.concurrency.annotations.RequiresReadLock
+import org.elixir_lang.ecto.Query
+import org.elixir_lang.ecto.Schema
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
-import org.elixir_lang.psi.call.name.Function
 import org.elixir_lang.psi.call.name.Function.*
 import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.ex_unit.Assertions
@@ -18,11 +19,11 @@ import org.elixir_lang.psi.impl.call.CallImpl.hasDoBlockOrKeyword
 import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.declarations.UseScopeImpl
 import org.elixir_lang.psi.impl.declarations.UseScopeImpl.selector
+import org.elixir_lang.psi.mix.Generator
 import org.elixir_lang.psi.operation.*
 import org.elixir_lang.psi.operation.infix.Position
 import org.elixir_lang.psi.operation.infix.Triple
 import org.elixir_lang.psi.scope.WhileIn.whileIn
-import org.elixir_lang.reference.ModuleAttribute
 import org.elixir_lang.structure_view.element.Callback
 import org.elixir_lang.structure_view.element.Delegation
 
@@ -157,22 +158,22 @@ object ProcessDeclarationsImpl {
                         Use.`is`(call) ||
                         call.isCalling(KERNEL, DESTRUCTURE) || // left operand
                         call.isCallingMacro(KERNEL, IF) || // match in condition
-                        call.isCallingMacro(KERNEL, Function.FOR) || // comprehension match variable
+                        call.isCallingMacro(KERNEL, FOR) || // comprehension match variable
                         call.isCalling(KERNEL, MATCH_QUESTION_MARK) ||
                         call.isCalling(KERNEL, REQUIRE) ||
                         call.isCallingMacro(KERNEL, UNLESS) || // match in condition
                         call.isCallingMacro(KERNEL, "with") || // <- or = variable
                         QuoteMacro.`is`(call) || // quote :bind_quoted keys for Variable resolver OR call definitions for Callable resolver
-                        org.elixir_lang.psi.mix.Generator.isEmbed(call, state) ||
+                        Generator.isEmbed(call, state) ||
                         Assertions.isChild(call, state)
                 -> processor.execute(call, state)
-                org.elixir_lang.ecto.Schema.isChild(call, state) -> {
+                Schema.isChild(call, state) -> {
                     processor.execute(call, state)
                 }
                 hasDoBlockOrKeyword(call) ->
                     // unknown macros that take do blocks often allow variables to be declared in their arguments
                     processor.execute(call, state)
-                org.elixir_lang.ecto.Query.isChild(call, state) -> {
+                Query.isChild(call, state) -> {
                     processor.execute(call, state)
                 }
                 else -> true
@@ -297,8 +298,8 @@ object ProcessDeclarationsImpl {
     ): Boolean {
         val rightOperand = match.rightOperand()
         val leftOperand = match.leftOperand()
-        var checkRight = false
-        var checkLeft = false
+        var checkRight: Boolean
+        var checkLeft: Boolean
 
         val triple = Triple(match.children)
         val position = triple.ancestorPosition(lastParent)
@@ -378,7 +379,7 @@ object ProcessDeclarationsImpl {
         val parent = stabOperation.parent
 
         if (parent is ElixirStab) {
-            val grandParent = parent.getParent()
+            val grandParent = parent.parent
 
             if (grandParent is ElixirBlockItem) {
                 val blockIdentifier = grandParent.blockIdentifier
@@ -391,7 +392,7 @@ object ProcessDeclarationsImpl {
                     declaringScope = false
                 }
             } else if (grandParent is ElixirDoBlock) {
-                val call = grandParent.getParent() as Call
+                val call = grandParent.parent as Call
 
                 if (call.isCalling(KERNEL, COND)) {
                     declaringScope = false
@@ -420,7 +421,7 @@ object ProcessDeclarationsImpl {
                 .let { processDeclarations(it, processor, state, lastParent, place) }
         } else {
             if (lastParent !is ElixirFile) {
-                org.elixir_lang.errorreport.Logger.error(
+                Logger.error(
                     PsiElement::class.java,
                     "Scope is not lastParent's parent\nlastParent:\n" + lastParent.text,
                     scope

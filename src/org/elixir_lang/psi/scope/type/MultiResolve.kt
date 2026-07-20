@@ -16,7 +16,7 @@ import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.psi.operation.*
 import org.elixir_lang.psi.scope.ResolveResultOrderedSet
 import org.elixir_lang.psi.scope.WhileIn.whileIn
-import org.elixir_lang.reference.Type.Companion.typeHead
+import org.elixir_lang.structure_view.element.Type as TypeElement
 
 class MultiResolve
 private constructor(private val name: String,
@@ -27,9 +27,16 @@ private constructor(private val name: String,
                     ?.let { executeOnTypeHead(definition, it, state) }
                     ?: true
 
-    private fun executeOnTypeHead(definition: Call, typeHead: Call, state: ResolveState): Boolean =
-            executeOnTypeHeadArguments(typeHead, state)
-                    && executeOnTypeHeadName(definition, typeHead, state)
+    private fun executeOnTypeHead(definition: Call, typeHead: Call, state: ResolveState): Boolean {
+        // Only `@type`/`@typep`/`@opaque` heads declare type variables. In `@spec`/`@callback`/`@macrocallback`
+        // heads the arguments are type usages (references to real types or `when`-bound variables), so processing
+        // them as declarations would wrongly self-resolve a bare name like `config` in `@spec check(config, opts)`
+        // and short-circuit resolution before reaching the actual `@type config` or `when` binding.
+        val argumentsKeepProcessing =
+            if (TypeElement.`is`(definition)) executeOnTypeHeadArguments(typeHead, state) else true
+
+        return argumentsKeepProcessing && executeOnTypeHeadName(definition, typeHead, state)
+    }
 
     private fun executeOnTypeHeadArguments(typeHead: Call, state: ResolveState): Boolean =
             typeHead.finalArguments()?.let { executeOnTypeHeadArguments(it, state) }
@@ -69,8 +76,13 @@ private constructor(private val name: String,
         }
     }
 
-    override fun executeOnParameter(parameter: PsiElement, state: ResolveState): Boolean =
-            when (parameter) {
+    override fun executeOnParameter(parameter: PsiElement, state: ResolveState): Boolean {
+        // The left side of a `name :: type` annotation (e.g. the `my_id` in `@spec do_it(my_id :: my_id())`) is a
+        // label for the type on its right, not a type-variable declaration. Registering it would shadow a real
+        // `@type`/`@spec ... when` binding of the same name and short-circuit resolution, so skip it here.
+        if (parameter.isNamedTypeLabelOperand()) return true
+
+        return when (parameter) {
                 is ElixirAccessExpression -> executeOnParameter(parameter.stripAccessExpression(), state)
                 is ElixirParentheticalStab ->
                     parameter.stab?.stabOperationList?.singleOrNull()
@@ -157,6 +169,17 @@ private constructor(private val name: String,
                     true
                 }
             }
+    }
+
+    /**
+     * Whether this element is the left-hand label of a `name :: type` annotation (e.g. `my_id` in `my_id :: my_id()`).
+     * Such a label names the type on its right rather than declaring a type variable, so it must not be registered as
+     * a resolvable declaration.
+     */
+    private fun PsiElement.isNamedTypeLabelOperand(): Boolean {
+        val typeOperation = PsiTreeUtil.getParentOfType(this, Type::class.java) ?: return false
+        return typeOperation.leftOperand()?.stripAccessExpression() === this
+    }
 
     private fun executeOnParameter(parameter: PsiElement, name: String?, state: ResolveState): Boolean =
             if (this.arity == 0 && name != null && name.startsWith(this.name)) {
@@ -188,5 +211,29 @@ private constructor(private val name: String,
 
             return multiResolve.resolveResults()
         }
+
+        private tailrec fun typeHead(typeSpec: PsiElement): Call? =
+            when (typeSpec) {
+                is AtUnqualifiedNoParenthesesCall<*> -> {
+                    val finalArgument = typeSpec.finalArguments()?.singleOrNull()
+
+                    if (finalArgument != null) {
+                        typeHead(finalArgument)
+                    } else {
+                        null
+                    }
+                }
+                is Type -> typeSpec.leftOperand() as? Call
+                is When -> {
+                    val leftOperand = typeSpec.leftOperand()
+
+                    if (leftOperand != null) {
+                        typeHead(leftOperand)
+                    } else {
+                        null
+                    }
+                }
+                else -> null
+            }
     }
 }

@@ -8,6 +8,9 @@ import com.intellij.psi.PsiPolyVariantReference
 import com.intellij.psi.PsiReferenceBase
 import com.intellij.psi.ResolveResult
 import com.intellij.psi.impl.source.resolve.ResolveCache
+import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.util.IncorrectOperationException
+import org.elixir_lang.psi.ElementFactory
 import org.elixir_lang.psi.ElixirAlias
 import org.elixir_lang.psi.QualifiableAlias
 import org.elixir_lang.psi.QualifiedAlias
@@ -16,6 +19,16 @@ import org.elixir_lang.psi.scope.module.Variants
 class Module(qualifiableAlias: QualifiableAlias) :
         PsiReferenceBase<QualifiableAlias>(qualifiableAlias, textRange(qualifiableAlias)),
         PsiPolyVariantReference {
+    @Throws(IncorrectOperationException::class)
+    override fun handleElementRename(newElementName: String): PsiElement {
+        val replacementAlias = PsiTreeUtil.findChildOfType(
+            ElementFactory.createFile(myElement.project, newElementName),
+            QualifiableAlias::class.java
+        ) ?: throw IncorrectOperationException("Unable to parse module alias name: $newElementName")
+
+        return myElement.replace(replacementAlias)
+    }
+
     override fun getVariants(): Array<LookupElement> = Variants.lookupElements(myElement).toTypedArray()
 
     override fun isReferenceTo(element: PsiElement): Boolean {

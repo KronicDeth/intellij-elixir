@@ -6,8 +6,6 @@ import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.newvfs.impl.VfsRootAccess
-import com.intellij.psi.PsiPolyVariantReference
-import org.elixir_lang.PlatformTestCase
 import java.io.File
 
 /**
@@ -25,9 +23,12 @@ import java.io.File
  *
  * Covers Case 11 / Case 11a from issue #2691.
  *
+ * Drives the real Ctrl+Q gesture at the caret (see [QuickDocumentationTestCase]) rather than
+ * hand-resolving the atom/call reference, so it locks the user-visible behaviour.
+ *
  * @see ErlangAtomQualifierHoverDocumentationTest for the OTP 27 embedded-docs variant
  */
-class ErlangAtomQualifierHoverDocumentationOTP23Test : PlatformTestCase() {
+class ErlangAtomQualifierHoverDocumentationOTP23Test : QuickDocumentationTestCase() {
     override fun setUp() {
         super.setUp()
         addBeamLibrary()
@@ -44,17 +45,7 @@ class ErlangAtomQualifierHoverDocumentationOTP23Test : PlatformTestCase() {
     fun testModuleAtomHoverShowsModuleDocsFromDecompilerMirror() {
         myFixture.configureByFiles("module_atom_hover.ex")
 
-        val elementAtCaret = myFixture.file.findElementAt(myFixture.caretOffset)
-        assertNotNull("No element at caret", elementAtCaret)
-
-        val atom = elementAtCaret!!.parent
-        val reference = atom.reference
-        assertNotNull("No reference on module atom", reference)
-
-        val resolved = reference!!.resolve()
-        assertNotNull("Module atom did not resolve", resolved)
-
-        val hover = ElixirDocumentationProvider().generateHoverDoc(resolved!!, atom)
+        val hover = quickDocumentationAtCaret()
         assertNotNull("Hover documentation is null -- decompiled mirror docs were not picked up", hover)
 
         assertTrue("Expected module definition for :queue", hover!!.contains("<i>module</i> <b>:queue</b>"))
@@ -67,18 +58,7 @@ class ErlangAtomQualifierHoverDocumentationOTP23Test : PlatformTestCase() {
     fun testAtomQualifiedFunctionHoverShowsDocsFromDecompilerMirror() {
         myFixture.configureByFiles("function_hover.ex")
 
-        val elementAtCaret = myFixture.file.findElementAt(myFixture.caretOffset)
-        assertNotNull("No element at caret", elementAtCaret)
-
-        val call = elementAtCaret!!.parent.parent
-        val reference = call.reference
-        assertNotNull("No reference on atom-qualified function call", reference)
-        assertInstanceOf(reference, PsiPolyVariantReference::class.java)
-
-        val resolved = reference!!.resolve()
-        assertNotNull("Atom-qualified function call did not resolve", resolved)
-
-        val hover = ElixirDocumentationProvider().generateHoverDoc(resolved!!, call)
+        val hover = quickDocumentationAtCaret()
         assertNotNull("Hover documentation is null -- decompiled mirror docs were not picked up", hover)
 
         assertTrue("Expected module definition for :queue", hover!!.contains("<i>module</i> <b>:queue</b>"))

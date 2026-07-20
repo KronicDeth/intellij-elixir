@@ -213,6 +213,10 @@
                 implementationClass="org.elixir_lang.code_insight.completion.contributor.CallDefinitionClause"
                 language="Elixir"/>
 
+        <completion.contributor
+                implementationClass="org.elixir_lang.code_insight.completion.contributor.ModuleAttribute"
+                language="Elixir"/>
+
         <codeInsight.lineMarkerProvider
                 implementationClass="org.elixir_lang.code_insight.line_marker_provider.CallDefinition"
                 language="Elixir"/>
@@ -223,21 +227,104 @@
                            implementationClass="org.elixir_lang.code_insight.highlighting.brace_matcher.NonTrivial"/>
         <lang.commenter language="Elixir" implementationClass="org.elixir_lang.ElixirCommenter"/>
 
+        <!-- Symbol-API pilot: @callback / @macrocallback code insight.
+             declarationProvider makes the callback name a declaration (Ctrl-Click → Show Usages);
+             the searcher supplies the self-declaration usage and implementation usages. -->
+        <psi.declarationProvider
+                implementation="org.elixir_lang.model.psi.callback.CallbackSymbolDeclarationProvider"/>
+        <searcher forClass="com.intellij.find.usages.api.UsageSearchParameters"
+                  implementationClass="org.elixir_lang.model.psi.ElixirSymbolUsageSearcher"/>
+        <searcher forClass="com.intellij.refactoring.rename.api.RenameUsageSearchParameters"
+                  implementationClass="org.elixir_lang.model.psi.ElixirRenameUsageSearcher"/>
+        <!-- Reverse navigation: implementing `def`/`defmacro` name → the `@callback` it implements. -->
+        <psi.symbolReferenceProvider hostElementClass="org.elixir_lang.psi.call.Call"
+                                     hostLanguage="Elixir"
+                                     implementationClass="org.elixir_lang.model.psi.callback.CallbackImplReferenceProvider"
+                                     targetClass="org.elixir_lang.model.psi.callback.Callback"/>
+
+        <!-- Symbol-API: defprotocol / defimpl code insight.
+             declarationProvider makes the protocol function name a declaration (Ctrl-Click → Show Usages);
+             the searcher supplies the self-declaration usage and implementation usages. -->
+        <psi.declarationProvider
+                implementation="org.elixir_lang.model.psi.protocol.ProtocolFunctionDeclarationProvider"/>
+        <!-- Reverse navigation: implementing `def`/`defmacro` inside defimpl → the protocol function it implements. -->
+        <psi.symbolReferenceProvider hostElementClass="org.elixir_lang.psi.call.Call"
+                                     hostLanguage="Elixir"
+                                     implementationClass="org.elixir_lang.model.psi.protocol.ProtocolImplReferenceProvider"
+                                     targetClass="org.elixir_lang.model.psi.protocol.ProtocolFunction"/>
+
+        <!-- Symbol-API: function definitions (def/defp/defmacro/defmacrop) -->
+        <psi.declarationProvider
+                implementation="org.elixir_lang.model.psi.function.FunctionSymbolDeclarationProvider"/>
+        <!-- @spec function head (`@spec foo(...) :: ...`) → function definition. -->
+        <psi.symbolReferenceProvider hostElementClass="org.elixir_lang.psi.call.Call"
+                                     hostLanguage="Elixir"
+                                     implementationClass="org.elixir_lang.model.psi.function.SpecFunctionReferenceProvider"
+                                     targetClass="org.elixir_lang.model.psi.function.FunctionSymbol"/>
+        <!-- Forward navigation: call site → function definition (Go To Declaration / Ctrl+Click). -->
+        <psi.symbolReferenceProvider hostElementClass="org.elixir_lang.psi.call.Call"
+                                     hostLanguage="Elixir"
+                                     implementationClass="org.elixir_lang.model.psi.function.FunctionCallReferenceProvider"
+                                     targetClass="org.elixir_lang.model.psi.function.FunctionSymbol"/>
+        <!-- `name: arity` keyword-pair key (`import :only`/`:except`, `@compile :inline`, `@dialyzer`,
+             `defoverridable`) -> the function/macro (or `@callback` for `defoverridable`) it names. -->
+        <psi.symbolReferenceProvider hostElementClass="org.elixir_lang.psi.call.Call"
+                                     hostLanguage="Elixir"
+                                     implementationClass="org.elixir_lang.model.psi.function.FunctionArityKeywordPairReferenceProvider"
+                                     targetClass="org.elixir_lang.model.psi.function.FunctionSymbol"/>
+
+        <!-- Symbol-API: module declarations/references. Hosted on the alias itself so every usage form is
+             covered: `alias`/`use`/`import` arguments, multi-alias braces, qualified-call qualifiers,
+             bare (aliased) names in code, struct literals, `@behaviour`. -->
+        <psi.declarationProvider
+                implementation="org.elixir_lang.model.psi.module.ModuleSymbolDeclarationProvider"/>
+        <psi.symbolReferenceProvider hostElementClass="org.elixir_lang.psi.QualifiableAlias"
+                                     hostLanguage="Elixir"
+                                     implementationClass="org.elixir_lang.model.psi.module.ModuleReferenceProvider"
+                                     targetClass="org.elixir_lang.model.psi.module.ModuleSymbol"/>
+        <!-- Symbol-API: @type/@typep/@opaque declarations and references in type specs. -->
+        <psi.declarationProvider
+                implementation="org.elixir_lang.model.psi.type.TypeSymbolDeclarationProvider"/>
+        <psi.symbolReferenceProvider hostElementClass="org.elixir_lang.psi.call.Call"
+                                     hostLanguage="Elixir"
+                                     implementationClass="org.elixir_lang.model.psi.type.TypeReferenceProvider"
+                                     targetClass="org.elixir_lang.model.psi.type.TypeSymbol"/>
+        <!-- Symbol-API: type variables declared in `@type` heads and `@spec ... when` clauses. -->
+        <psi.declarationProvider
+                implementation="org.elixir_lang.model.psi.type.TypeVariableSymbolDeclarationProvider"/>
+        <!-- Symbol-API: module attribute declarations/references (`@name`). -->
+        <psi.declarationProvider
+                implementation="org.elixir_lang.model.psi.module_attribute.ModuleAttributeDeclarationProvider"/>
+        <psi.symbolReferenceProvider hostElementClass="org.elixir_lang.psi.call.Call"
+                                     hostLanguage="Elixir"
+                                     implementationClass="org.elixir_lang.model.psi.module_attribute.ModuleAttributeReferenceProvider"
+                                     targetClass="org.elixir_lang.model.psi.module_attribute.ModuleAttributeSymbol"/>
+        <!-- Symbol-API: local variables and parameters. -->
+        <psi.declarationProvider
+                implementation="org.elixir_lang.model.psi.variable.VariableSymbolDeclarationProvider"/>
+        <psi.symbolReferenceProvider hostElementClass="org.elixir_lang.psi.call.Call"
+                                     hostLanguage="Elixir"
+                                     implementationClass="org.elixir_lang.model.psi.variable.VariableReferenceProvider"
+                                     targetClass="org.elixir_lang.model.psi.variable.VariableSymbol"/>
+
         <!-- Find Usages -->
-        <findUsagesHandlerFactory implementation="org.elixir_lang.find_usages.handler.Factory"/>
-        <lang.findUsagesProvider language="Elixir" implementationClass="org.elixir_lang.find_usages.Provider"/>
-        <readWriteAccessDetector implementation="org.elixir_lang.ReadWriteAccessDetector"/>
-        <referencesSearch implementation="org.elixir_lang.ReferencesSearch"/>
-        <psi.referenceContributor language="Elixir"
-                                  implementation="org.elixir_lang.reference.MfaTupleReferenceContributor"/>
+        <psi.symbolReferenceProvider hostElementClass="org.elixir_lang.psi.ElixirAtom"
+                                     hostLanguage="Elixir"
+                                     implementationClass="org.elixir_lang.model.psi.atom.AtomReferenceProvider"
+                                     targetClass="org.elixir_lang.model.psi.atom.AtomSymbol"/>
+        <psi.symbolReferenceProvider hostElementClass="org.elixir_lang.psi.ElixirAtom"
+                                     hostLanguage="Elixir"
+                                     implementationClass="org.elixir_lang.model.psi.generic_server.GenServerRequestReferenceProvider"
+                                     targetClass="org.elixir_lang.model.psi.generic_server.GenServerHandlerTarget"/>
         <targetElementEvaluator implementationClass="org.elixir_lang.TargetElementEvaluator" language="Elixir"/>
-        <usageTargetProvider implementation="org.elixir_lang.UsageTargetProvider"/>
-        <usageTypeProvider implementation="org.elixir_lang.UsageTypeProvider"/>
 
         <!-- Go To Implementations -->
 
         <stubIndex implementation="org.elixir_lang.psi.stub.index.ImplementedProtocolName"/>
         <definitionsScopedSearch implementation="org.elixir_lang.DefinitionsScopedSearch"/>
+        <!-- Concise row rendering for the Go To Implementation / Go To Target popups. -->
+        <gotoTargetPresentationProvider
+                implementation="org.elixir_lang.navigation.ElixirGotoTargetPresentationProvider"/>
         <codeInsight.lineMarkerProvider language="Elixir"
                                         implementationClass="org.elixir_lang.code_insight.line_marker_provider.Protocol"/>
 
@@ -265,6 +352,10 @@
 
         <lang.parserDefinition language="Elixir" implementationClass="org.elixir_lang.ElixirParserDefinition"/>
         <lang.psiStructureViewFactory language="Elixir" implementationClass="org.elixir_lang.structure_view.Factory"/>
+        <!-- Breadcrumbs (path shown at the bottom of the editor) and Sticky Lines (declarations pinned to the top of
+             the editor while scrolling) are both derived from this provider; the platform has no separate sticky-lines
+             extension point. -->
+        <breadcrumbsInfoProvider implementation="org.elixir_lang.breadcrumbs.Provider"/>
         <lang.quoteHandler language="Elixir" implementationClass="org.elixir_lang.QuoteHandler"/>
         <lang.syntaxHighlighterFactory
                 implementationClass="org.elixir_lang.ElixirSyntaxHighlighterFactory"
@@ -292,19 +383,22 @@
         <localInspection displayName="Unresolvable module qualifier" enabledByDefault="true" groupName="Elixir"
                          implementationClass="org.elixir_lang.inspection.UnresolvableModuleQualifier"
                          language="Elixir" level="ERROR" shortName="UnresolvableModuleQualifier"/>
+        <localInspection displayName="Unresolvable type" enabledByDefault="true" groupName="Elixir"
+                         implementationClass="org.elixir_lang.inspection.UnresolvableType"
+                         language="Elixir" level="ERROR" shortName="UnresolvableType"/>
+        <localInspection displayName="Type variable used once" enabledByDefault="true" groupName="Elixir"
+                         implementationClass="org.elixir_lang.inspection.TypeVariableUsedOnce"
+                         language="Elixir" level="ERROR" shortName="TypeVariableUsedOnce"/>
         <spellchecker.support implementationClass="org.elixir_lang.spell_checking.Strategy" language="Elixir"/>
         <spellchecker.bundledDictionaryProvider
                 implementation="org.elixir_lang.spell_checking.BundledDictionaryProvider"/>
 
-        <!-- module attribute refactoring -->
-        <renameHandler implementation="org.elixir_lang.refactoring.module_attribute.rename.Handler"/>
+        <!-- Rename wiring: keep platform default handler/processor; no custom rename handler or processor EPs.
+             Elixir rename is Symbol-API only; veto the legacy PsiElementRenameHandler so it never competes
+             with the Symbol renamer (which would otherwise raise the "What would you like to do?" chooser). -->
+        <vetoRenameCondition implementation="org.elixir_lang.refactoring.ElixirVetoRenameCondition"/>
         <renameInputValidator implementation="org.elixir_lang.refactoring.module_attribute.rename.InputValidator"/>
-        <renamePsiElementProcessor implementation="org.elixir_lang.refactoring.module_attribute.rename.Processor"/>
-
-        <!-- variable refactoring -->
-        <renameHandler implementation="org.elixir_lang.refactoring.variable.rename.Handler"/>
         <renameInputValidator implementation="org.elixir_lang.refactoring.variable.rename.InputValidator"/>
-        <renamePsiElementProcessor implementation="org.elixir_lang.refactoring.variable.rename.Processor"/>
 
         <stubIndex implementation="org.elixir_lang.psi.stub.index.AllName"/>
         <typedHandler implementation="org.elixir_lang.TypedHandler"/>

@@ -42,6 +42,10 @@ tasks.test {
     environment("ELIXIR_VERSION", elixirVersion)
 
     include("**/*Test.class")
+
+    // Allow the task to succeed when a global --tests filter matches nothing in this subproject
+    // (e.g., when running `gradlew test --tests SomeTestInRootProject`)
+    filter.isFailOnNoMatchingTests = false
 }
 
 configurations {

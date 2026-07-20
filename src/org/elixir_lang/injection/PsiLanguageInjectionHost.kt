@@ -4,9 +4,9 @@ import com.intellij.psi.LiteralTextEscaper
 import com.intellij.psi.PsiElement
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
 import org.elixir_lang.psi.ElixirNoParenthesesKeywords
+import org.elixir_lang.psi.ModuleAttribute.DOCUMENTATION_NAME_SET
 import org.elixir_lang.psi.Parent
 import org.elixir_lang.psi.Sigil
-import org.elixir_lang.reference.ModuleAttribute.Companion.DOCUMENTATION_NAME_SET
 import org.elixir_lang.settings.ElixirExperimentalSettings
 
 object PsiLanguageInjectionHost {
