@@ -56,7 +56,7 @@ class Request private constructor(val title: String, val body: String) {
         private fun pluginVersion(stringBuilder: StringBuilder) {
             stringBuilder
                 .append("Plugin Version: ")
-                .append(Plugin.version).append('\n')
+                .append(Plugin.version ?: "unknown (run from sources)").append('\n')
         }
 
         private fun application(stringBuilder: StringBuilder) {
