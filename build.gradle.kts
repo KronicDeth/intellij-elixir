@@ -145,7 +145,11 @@ val versionSuffix: String = when {
     }.format(Date())
 }
 
-version = "$basePluginVersion$versionSuffix"
+// The Tag Release workflow (.github/workflows/tag.yml) passes the release tag (minus the leading "v") as
+// pluginVersionOverride so the built plugin's version matches the git tag exactly; the computed
+// base+suffix version is only for builds that are never tagged (local dev, push-to-main CI).
+version = providers.gradleProperty("pluginVersionOverride").orNull?.takeIf(String::isNotEmpty)
+    ?: "$basePluginVersion$versionSuffix"
 
 logger.lifecycle("[elixir-build] platform=$actualPlatformVersion version=$version channel=$publishChannel dynamicEap=$useDynamicEapVersion skipSearchableOptions=$skipSearchableOptions quoterExe=$quoterExe quoterTmpPath=${quoterTmpPath.asFile.absolutePath}")
 

@@ -17,7 +17,10 @@ class ModuleAttributeFindUsagesTest : PlatformTestCase() {
     }
 
     fun testFindUsagesOnDeclarationFindsWritesAndReads() {
-        assertEquals(2, nonDeclarationUsageCount("usages_module_attribute_declaration.ex"))
+        // The other write (`@module_attribute 2`) plus BOTH reads: a re-declared attribute is one
+        // logical attribute, so the read that resolves to the second declaration is a usage of the
+        // first declaration's symbol too.
+        assertEquals(3, nonDeclarationUsageCount("usages_module_attribute_declaration.ex"))
     }
 
     fun testCtrlClickOnUsageChoosesGotoDeclaration() {

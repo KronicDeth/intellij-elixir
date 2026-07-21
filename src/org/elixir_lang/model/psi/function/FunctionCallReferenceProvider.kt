@@ -14,7 +14,9 @@ import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
 import org.elixir_lang.psi.CallDefinitionClause
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.isModuleAttributeNameElement
+import org.elixir_lang.psi.operation.capture.NonNumeric
 import org.elixir_lang.reference.Callable
+import org.elixir_lang.reference.CaptureNameArity
 
 /**
  * Attaches a [FunctionCallReference] to a call-site expression, so "Go To Declaration" (Ctrl+Click)
@@ -55,10 +57,24 @@ internal class FunctionCallReferenceProvider : PsiSymbolReferenceProvider {
         if (CallDefinitionClause.isHead(element)) return emptyList()
         // Local variable/parameter identifiers are owned by VariableSymbol.
         if (VariableSymbol.classify(element) != null) return emptyList()
+        // The captured name of `&name/arity` / `&Mod.name/arity` is owned by
+        // CaptureFunctionReferenceProvider: the capture-aware arity lives on the capture operation,
+        // while this provider would resolve the bare name call with arity 0 - an empty reference
+        // that shadows the capture-hosted one at the same offset.
+        if (isCaptureName(element)) return emptyList()
         val nameElement = element.functionNameElement() ?: return emptyList()
         val rangeInElement = nameElement.textRange.shiftLeft(element.textRange.startOffset)
         return listOf(FunctionCallReference(element, rangeInElement))
     }
 
     override fun getSearchRequests(project: Project, target: Symbol): Collection<SearchRequest> = emptyList()
+
+    /** True when [call] is the captured name (`name` / `Mod.name`) of an enclosing `&name/arity`. */
+    @RequiresReadLock
+    private fun isCaptureName(call: Call): Boolean =
+        generateSequence(call.parent) { it.parent }
+            .takeWhile { it !is PsiFile }
+            .filterIsInstance<NonNumeric>()
+            .firstOrNull()
+            ?.let { capture -> (capture.reference as? CaptureNameArity)?.nameElement === call } == true
 }

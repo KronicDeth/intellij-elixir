@@ -9,6 +9,8 @@ import com.intellij.find.usages.api.UsageOptions
 import com.intellij.find.usages.impl.AllSearchOptions
 import com.intellij.find.usages.impl.buildQuery
 import com.intellij.find.usages.impl.searchTargets
+import com.intellij.model.psi.impl.targetSymbols
+import com.intellij.refactoring.rename.api.RenameTarget
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.editor.Editor
@@ -350,3 +352,23 @@ fun CodeInsightTestFixture.nonDeclarationUsageCountAtCaret(project: Project): In
 /** Number of Find Usages search targets resolved at the caret. */
 @Suppress("UnstableApiUsage")
 fun CodeInsightTestFixture.searchTargetCountAtCaret(): Int = searchTargets(file, caretOffset).size
+
+/**
+ * Renames the symbol at the caret the way the user-facing Rename refactoring (Shift+F6) does.
+ *
+ * The rename target is resolved from the caret exactly as the platform's Symbol rename handler
+ * resolves it: [targetSymbols] is the same resolution that feeds the `SYMBOLS` data key the
+ * handler reads, and every renameable Elixir symbol implements
+ * [com.intellij.refactoring.rename.api.RenameTarget] directly. The target is then handed to
+ * [CodeInsightTestFixture.renameTarget] - the platform's test entry point for the
+ * `RenameTarget`-based rename pipeline (the same drive JetBrains' own new-rename-API tests use),
+ * which runs the production search (the registered `RenameUsageSearcher` → queries → file updates
+ * in a write command) headlessly and unmocked. Callers assert on the resulting document text.
+ */
+@Suppress("UnstableApiUsage")
+fun CodeInsightTestFixture.renameTargetAtCaret(newName: String) {
+    val targets = targetSymbols(file, caretOffset).filterIsInstance<RenameTarget>().distinct()
+    val target = targets.singleOrNull()
+        ?: throw AssertionError("Expected exactly one rename target at the caret, got ${targets.size}: $targets")
+    renameTarget(target, newName)
+}
