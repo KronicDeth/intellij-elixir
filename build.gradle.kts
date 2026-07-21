@@ -368,16 +368,18 @@ intellijPlatform {
     }
 }
 
-// Capture values eagerly so the task action doesn't reference Project objects (config cache safe)
-val verifierReportsDir: File = layout.buildDirectory.dir("reports/pluginVerifier").get().asFile
-val projectDirFile: File = projectDir
-
 val openVerificationReports = tasks.register("openVerificationReports") {
     description = "Opens plugin verification markdown reports in the IDE"
     group = "verification"
 
     // Always run when triggered (no up-to-date checking)
     outputs.upToDateWhen { false }
+
+    // Locals (not top-level script properties): the doLast action must capture plain File values -
+    // a top-level val is a field on the script object, and capturing it drags the whole script into
+    // the configuration cache, which cannot serialize script object references.
+    val verifierReportsDir: File = layout.buildDirectory.dir("reports/pluginVerifier").get().asFile
+    val projectDirFile: File = projectDir
 
     doLast {
         val mdFiles = verifierReportsDir.listFiles()

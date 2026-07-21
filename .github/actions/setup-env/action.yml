@@ -12,9 +12,9 @@ inputs:
     required: false
     default: '24.3.4.6'
   idea-version:
-    description: 'IntelliJ IDEA version to test against. Keep in sync with the matrix in shared-test.yml'
+    description: 'IntelliJ IDEA platform version to build/test against. Defaults to the minimum supported platform (matches pluginSinceBuild) so release/tag builds get it for free; override per-leg to test against a newer platform (see the matrix in shared-test.yml).'
     required: false
-    default: '2026.2'  # should match first version in shared-test.yml
+    default: '2025.3.6'
   java-version:
     description: 'JBR major version to install. Must match the Java level of idea-version: 25 for 2026.2+ (build 262), 21 for earlier.'
     required: false
