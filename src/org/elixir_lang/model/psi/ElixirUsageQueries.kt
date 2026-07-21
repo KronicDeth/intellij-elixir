@@ -942,7 +942,11 @@ internal object ElixirUsageQueries {
                 ) {
                     continue
                 }
-                if (isSameMatchRightOperandReadOfDeclaration(symbol, candidate)) continue
+                // NOTE: the right-hand read of a rebinding (`x` in `x = x + 1`) semantically reads
+                // the PREVIOUS binding, but a rebinding chain is one user-facing variable (the
+                // symbol's search scope starts at the chain root - see
+                // VariableSymbol.maximalSearchScope), so it is a usage regardless of which
+                // binding anchors the symbol.
                 return listOf(
                     ElixirPsiUsage.create(
                         nameElement,
@@ -953,29 +957,6 @@ internal object ElixirUsageQueries {
                 )
             }
             return emptyList()
-        }
-
-        @RequiresReadLock
-        private fun isSameMatchRightOperandReadOfDeclaration(symbol: VariableSymbol, candidate: PsiElement): Boolean {
-            val declarationElement = generateSequence(symbol.file.findElementAt(symbol.range.startOffset)) { it.parent }
-                .firstOrNull { element ->
-                    VariableSymbol.nameIdentifierElement(element)?.textRange == symbol.range
-                } ?: return false
-            val declarationMatch = generateSequence(declarationElement) { it.parent }
-                .filterIsInstance<org.elixir_lang.psi.operation.Match>()
-                .firstOrNull()
-                ?: return false
-            val candidateInSameMatch = PsiTreeUtil.isAncestor(declarationMatch, candidate, false)
-            if (!candidateInSameMatch) return false
-
-            val declarationOnLeft = declarationMatch.leftOperand()?.let { left ->
-                PsiTreeUtil.isAncestor(left, declarationElement, false)
-            } == true
-            val candidateOnRight = declarationMatch.rightOperand()?.let { right ->
-                PsiTreeUtil.isAncestor(right, candidate, false)
-            } == true
-
-            return declarationOnLeft && candidateOnRight
         }
     }
 

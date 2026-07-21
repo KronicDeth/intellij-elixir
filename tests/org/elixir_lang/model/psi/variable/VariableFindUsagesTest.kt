@@ -44,8 +44,13 @@ class VariableFindUsagesTest : PlatformTestCase() {
         assertEquals(5, nonDeclarationUsageCount("usages_variable_rebinding_and_pin.ex"))
     }
 
-    fun testFindUsagesOnRebindingDeclarationExcludesSameLineRhsRead() {
-        assertEquals(1, nonDeclarationUsageCount("usages_variable_rebinding_declaration_same_line_rhs.ex"))
+    fun testFindUsagesOnRebindingDeclarationCoversWholeChain() {
+        // A rebinding chain (`value = parameter; ^value = value; value = value + 1; value`) is one
+        // user-facing variable, so Find Usages from ANY of its bindings covers the whole chain:
+        // the first binding (write), the pin read, both same-line rhs reads, and the final read.
+        // (Previously the same-line rhs read and everything before the caret's binding were
+        // excluded - renaming from a later binding then corrupted the chain.)
+        assertEquals(5, nonDeclarationUsageCount("usages_variable_rebinding_declaration_same_line_rhs.ex"))
     }
 
     fun testFindUsagesOnParameterDeclarationIncludesPinRead() {

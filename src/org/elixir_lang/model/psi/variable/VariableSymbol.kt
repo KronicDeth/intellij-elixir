@@ -4,6 +4,7 @@ import com.intellij.find.usages.api.SearchTarget
 import com.intellij.find.usages.api.UsageHandler
 import com.intellij.icons.AllIcons
 import com.intellij.model.Pointer
+import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.util.TextRange
 import com.intellij.platform.backend.navigation.NavigationRequest
 import com.intellij.platform.backend.navigation.NavigationTarget
@@ -17,6 +18,10 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.refactoring.rename.api.RenameTarget
 import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.model.psi.ElixirSymbolWithUsages
+import org.elixir_lang.psi.ElixirAnonymousFunction
+import org.elixir_lang.psi.ElixirStabBody
+import org.elixir_lang.psi.ElixirStabNoParenthesesSignature
+import org.elixir_lang.psi.ElixirStabParenthesesSignature
 import org.elixir_lang.psi.ElixirVariable
 import org.elixir_lang.psi.CallDefinitionClause
 import org.elixir_lang.psi.operation.Match
@@ -81,8 +86,58 @@ class VariableSymbol(
     override val maximalSearchScope: SearchScope?
         @RequiresReadLock get() {
             val declaration = declarationCall() as? UnqualifiedNoArgumentsCall<*> ?: return null
-            return UseScopeImpl.get(declaration)
+            return UseScopeImpl.get(chainRootDeclaration(declaration))
         }
+
+    /**
+     * The earliest same-named declaration in this declaration's rebinding chain - possibly itself.
+     *
+     * A rebinding (`x = x + 1` after `x = input`) SHADOWS the earlier binding, but the chain
+     * reads and writes one user-facing variable, so search and rename must span the whole chain.
+     * A use scope anchored at a later rebinding is `SELF_AND_FOLLOWING_SIBLINGS` and would miss
+     * the earlier bindings and the reads that resolve to them. The chain root is the earliest of:
+     * this declaration, any same-named declaration in a PRECEDING statement of an enclosing stab
+     * body, or a same-named parameter of the enclosing definition clause head. The walk stops at
+     * the definition-clause and anonymous-function boundaries: a same-named variable in another
+     * function (or in the enclosing scope of an `fn` that rebinds locally) is a different
+     * variable.
+     */
+    @RequiresReadLock
+    private fun chainRootDeclaration(declaration: UnqualifiedNoArgumentsCall<*>): UnqualifiedNoArgumentsCall<*> {
+        val candidates = mutableListOf<UnqualifiedNoArgumentsCall<*>>(declaration)
+
+        val ancestorsInClause = generateSequence(declaration as PsiElement) { it.parent }
+            .takeWhile {
+                it !is PsiFile &&
+                    it !is ElixirAnonymousFunction &&
+                    !(it is Call && CallDefinitionClause.`is`(it))
+            }
+
+        // Same-named declarations in preceding statements of every enclosing stab body.
+        ancestorsInClause
+            .filter { it.parent is ElixirStabBody }
+            .forEach { statement ->
+                var sibling = statement.prevSibling
+                while (sibling != null) {
+                    ProgressManager.checkCanceled()
+                    PsiTreeUtil.findChildrenOfType(sibling, UnqualifiedNoArgumentsCall::class.java)
+                        .filterTo(candidates) { variableName(it) == name && isDeclaration(it) }
+                    sibling = sibling.prevSibling
+                }
+            }
+
+        // A same-named parameter of the enclosing definition clause is the outermost chain root.
+        generateSequence(declaration as PsiElement) { it.parent }
+            .filterIsInstance<Call>()
+            .firstOrNull { CallDefinitionClause.`is`(it) }
+            ?.let { clause -> CallDefinitionClause.head(clause) }
+            ?.let { head ->
+                PsiTreeUtil.findChildrenOfType(head, UnqualifiedNoArgumentsCall::class.java)
+                    .filterTo(candidates) { variableName(it) == name && isDeclaration(it) }
+            }
+
+        return candidates.minByOrNull { it.textRange.startOffset } ?: declaration
+    }
 
     override val usageHandler: UsageHandler
         get() = UsageHandler.createEmptyUsageHandler(name)
@@ -167,8 +222,9 @@ class VariableSymbol(
 
             return when (classify(element)) {
                 Kind.PARAMETER, Kind.IGNORED ->
-                    org.elixir_lang.reference.Callable.isParameter(element) ||
-                        org.elixir_lang.reference.Callable.isParameterWithDefault(element) ||
+                    ((org.elixir_lang.reference.Callable.isParameter(element) ||
+                        org.elixir_lang.reference.Callable.isParameterWithDefault(element)) &&
+                        !isInsideAnonymousFunctionBody(element)) ||
                         isVariableDeclaration(element)
                 Kind.VARIABLE -> isVariableDeclaration(element)
                 null -> false
@@ -179,6 +235,10 @@ class VariableSymbol(
         private fun isVariableDeclaration(element: PsiElement): Boolean {
             if (isPinnedSite(element)) return false
 
+            // A binding in a stab-clause PATTERN (`{:ok, value} -> ...` in case/receive/with-else)
+            // declares a variable for the clause body without any `=` Match.
+            if (isInsideStabSignature(element)) return true
+
             val match = generateSequence(element) { it.parent }
                 .filterIsInstance<Match>()
                 .firstOrNull()
@@ -186,6 +246,49 @@ class VariableSymbol(
 
             return match.leftOperand()?.let { left -> PsiTreeUtil.isAncestor(left, element, false) } ?: false
         }
+
+        /**
+         * The nearest stab-related container of [element]: a body (clause/function body) or a
+         * signature (clause pattern / `fn` parameter list), or `null` outside any stab.
+         */
+        private fun nearestStabContainer(element: PsiElement): PsiElement? =
+            generateSequence(element) { it.parent }
+                .takeWhile { it !is PsiFile }
+                .firstOrNull {
+                    it is ElixirStabBody ||
+                        it is ElixirStabNoParenthesesSignature ||
+                        it is ElixirStabParenthesesSignature
+                }
+
+        /**
+         * True when [element] sits in the BODY of an anonymous function (`fn ... -> body end`).
+         *
+         * The legacy parameter classifier ([org.elixir_lang.annotator.Parameter]) marks EVERYTHING
+         * inside an `ElixirAnonymousFunction` as a parameter - including reads in the `fn` BODY -
+         * which would make a closure read of an outer variable its own "declaration" and break
+         * rename from inside the closure. Parameter-ness is discounted exactly there and nowhere
+         * else ([org.elixir_lang.reference.Callable.isParameter] walks to the definition clause
+         * for genuine parameters, `<-` bindings, and clause patterns, all of which really are
+         * declarations).
+         */
+        private fun isInsideAnonymousFunctionBody(element: PsiElement): Boolean {
+            var nearestIsBody: Boolean? = null
+            for (ancestor in generateSequence(element) { it.parent }.takeWhile { it !is PsiFile }) {
+                when (ancestor) {
+                    is ElixirAnonymousFunction -> return nearestIsBody == true
+                    is ElixirStabBody -> if (nearestIsBody == null) nearestIsBody = true
+                    is ElixirStabNoParenthesesSignature, is ElixirStabParenthesesSignature ->
+                        if (nearestIsBody == null) nearestIsBody = false
+                    else -> {}
+                }
+            }
+            return false
+        }
+
+        private fun isInsideStabSignature(element: PsiElement): Boolean =
+            nearestStabContainer(element).let {
+                it is ElixirStabNoParenthesesSignature || it is ElixirStabParenthesesSignature
+            }
 
         @RequiresReadLock
         private fun isInMatchRightOperand(element: PsiElement): Boolean =
