@@ -3,8 +3,6 @@ package org.elixir_lang.create_module
 import com.google.common.annotations.VisibleForTesting
 import com.google.common.base.CaseFormat
 import com.intellij.ide.actions.CreateFileFromTemplateDialog
-import com.intellij.ide.actions.TemplateKindCombo
-import com.intellij.lang.LangBundle
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.InputValidatorEx
 import com.intellij.openapi.ui.ValidationInfo
@@ -75,7 +73,7 @@ class Dialog(private val project: Project, val directory: PsiDirectory) : Create
         val canClose = canClose(text)
 
         return if (!canClose) {
-            val errorText = getErrorText(text) ?: LangBundle.message("incorrect.name")
+            val errorText = getErrorText(text) ?: "Incorrect name"
 
             ValidationInfo(errorText, nameField)
         } else {
