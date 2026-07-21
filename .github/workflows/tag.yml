@@ -57,12 +57,16 @@ jobs:
       - name: Build with Gradle (canary)
         id: build-plugin-canary
         if: ${{ inputs.prerelease }}
-        run: ./gradlew buildPlugin --no-scan -PpublishChannels=canary --stacktrace
+        env:
+          TAG: ${{ inputs.tag }}
+        run: ./gradlew buildPlugin --no-scan -PpublishChannels=canary "-PpluginVersionOverride=${TAG#v}" --stacktrace
 
       - name: Build with Gradle (release)
         id: build-plugin-default
         if: ${{ !inputs.prerelease }}
-        run: ./gradlew buildPlugin --no-scan -PpublishChannels=default --stacktrace
+        env:
+          TAG: ${{ inputs.tag }}
+        run: ./gradlew buildPlugin --no-scan -PpublishChannels=default "-PpluginVersionOverride=${TAG#v}" --stacktrace
 
       - name: Create Release
         id: create_release
