@@ -154,9 +154,16 @@ internal object ElixirUsageQueries {
             }
 
             is AtomSymbol -> {
-                queries += atomUsageQuery(project, target.name, searchScope) { atomSymbol ->
-                    atomSymbol == target
-                }
+                // An AtomSymbol IS a function reference (module/name/arity/macro, anchored at the
+                // def clause's name identifier - see AtomSymbol.fromClause), so renaming from the
+                // atom must rename everything renaming from the def would: the declaration
+                // family, call sites, specs, captures, keyword pairs - and the atoms themselves,
+                // which FunctionCallSiteMapper's own atomUsage branch already finds. Reuse the
+                // function queries via the field-for-field equivalent FunctionSymbol.
+                val functionSymbol =
+                    FunctionSymbol(target.file, target.range, target.moduleName, target.name, target.arity, target.macro)
+                queries += functionDeclarationFamilyQuery(project, functionSymbol, searchScope)
+                queries += functionCallSiteQuery(project, functionSymbol, searchScope)
             }
 
             is ModuleSymbol -> {
@@ -418,19 +425,6 @@ internal object ElixirUsageQueries {
                 .inContexts(SearchContext.inCode())
                 .inScope(searchScope)
                 .buildQuery(FunctionCallSiteMapper(symbol.createPointer()))
-
-    private fun atomUsageQuery(
-        project: Project,
-        atomText: String,
-        searchScope: SearchScope,
-        atomMatches: (AtomSymbol) -> Boolean
-    ): Query<out PsiUsage> =
-            SearchService.getInstance()
-                .searchWord(project, atomText)
-                .caseSensitive(true)
-                .inContexts(SearchContext.inCode())
-                .inScope(searchScope)
-                .buildQuery(AtomUsageMapper(atomMatches))
 
     private fun typeUsageQuery(
         project: Project,
@@ -822,36 +816,6 @@ internal object ElixirUsageQueries {
                 TextRange(0, leaf.textLength),
                 declaration = false,
                 usageType = CALL
-            )
-        }
-    }
-
-    private class AtomUsageMapper(
-        private val atomMatches: (AtomSymbol) -> Boolean
-    ) : LeafOccurrenceMapper<PsiUsage> {
-        @RequiresReadLock
-        override fun mapOccurrence(occurrence: LeafOccurrence): Collection<PsiUsage> {
-            val (_, leaf, _) = occurrence
-            val atom = PsiTreeUtil.getParentOfType(leaf, ElixirAtom::class.java, false) ?: return emptyList()
-            val references = PsiSymbolReferenceService.getService()
-                .getReferences(atom)
-                .filterIsInstance<AtomReference>()
-            if (references.isEmpty()) return emptyList()
-
-            val matches = references.any { reference ->
-                reference.resolveReference()
-                    .filterIsInstance<AtomSymbol>()
-                    .any(atomMatches)
-            }
-            if (!matches) return emptyList()
-
-            return listOf(
-                ElixirPsiUsage.create(
-                    leaf,
-                    TextRange(0, leaf.textLength),
-                    declaration = false,
-                    usageType = CALL
-                )
             )
         }
     }
