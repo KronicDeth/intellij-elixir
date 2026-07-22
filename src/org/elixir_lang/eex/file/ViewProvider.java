@@ -2,6 +2,7 @@ package org.elixir_lang.eex.file;
 
 import com.intellij.lang.LanguageParserDefinitions;
 import com.intellij.lang.ParserDefinition;
+import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.LanguageFileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -83,6 +84,13 @@ public class ViewProvider extends MultiplePsiFilesPerDocumentFileViewProvider
                     .map(LanguageFileType.class::cast)
                     .map(LanguageFileType::getLanguage)
                     .orElse(null);
+        }
+
+        if (templateDataLanguage == null) {
+            FileType fileType = virtualFile.getFileType();
+            if (fileType instanceof org.elixir_lang.eex.file.Type eexType) {
+                templateDataLanguage = eexType.defaultTemplateDataLanguage();
+            }
         }
 
         if (templateDataLanguage == null) {

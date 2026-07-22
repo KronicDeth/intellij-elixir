@@ -19,6 +19,8 @@ internal open class Type protected constructor(lang: Language? = org.elixir_lang
     override fun getDefaultExtension(): String = DEFAULT_EXTENSION
     override fun getIcon(): Icon? = Icons.FILE
 
+    open fun defaultTemplateDataLanguage(): Language? = null
+
     companion object {
         private const val DEFAULT_EXTENSION = "eex"
 
