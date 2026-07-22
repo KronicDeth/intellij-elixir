@@ -17,8 +17,8 @@ public class InfixParsingTestCase extends ParsingTestCase {
      * Static Methods
      */
 
-    private static void assertOperator(Operation operation, @NotNull String operatorText) {
-        assertEquals(operatorText, operation.operator().getText());
+    private static void assertEquals(Operation operation) {
+        assertEquals("=", operation.operator().getText());
     }
 
     /*
@@ -29,15 +29,15 @@ public class InfixParsingTestCase extends ParsingTestCase {
         Operation[] operations = operations();
 
         assertEquals(1, operations.length);
-        assertOperator(operations[0], "=");
+        assertEquals(operations[0]);
     }
 
     public void testIssue251WithNoLeftOperand() {
         Operation[] operations = operations();
 
         assertEquals(2, operations.length);
-        assertOperator(operations[0], "=");
-        assertOperator(operations[1], "=");
+        assertEquals(operations[0]);
+        assertEquals(operations[1]);
     }
 
     public void testWellFormed() {
@@ -45,8 +45,8 @@ public class InfixParsingTestCase extends ParsingTestCase {
 
         assertEquals(2, operations.length);
 
-        assertOperator(operations[0], "=");
-        assertOperator(operations[1], "=");
+        assertEquals(operations[0]);
+        assertEquals(operations[1]);
     }
 
     /*
@@ -65,7 +65,7 @@ public class InfixParsingTestCase extends ParsingTestCase {
         PsiFile root = root();
         Collection<Operation> operationCollection = PsiTreeUtil.findChildrenOfType(root, Operation.class);
 
-        return operationCollection.toArray(new Operation[operationCollection.size()]);
+        return operationCollection.toArray(new Operation[0]);
     }
 
     @NotNull

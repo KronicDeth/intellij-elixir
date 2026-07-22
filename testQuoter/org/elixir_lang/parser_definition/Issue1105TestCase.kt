@@ -1,6 +1,6 @@
 package org.elixir_lang.parser_definition
 
-class Issue1105 : ParsingTestCase() {
+class Issue1105TestCase : ParsingTestCase() {
     fun testAssociatedAtom() {
         assertParsedAndQuotedCorrectly()
     }
