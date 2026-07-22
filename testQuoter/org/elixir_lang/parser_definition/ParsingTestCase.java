@@ -59,6 +59,7 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
         PsiFile root = fileViewProvider.getPsi(ElixirLanguage.INSTANCE);
         final List<PsiElement> errorElementList = new LinkedList<>();
 
+        assertNotNull(root);
         root.accept(
                 new PsiRecursiveElementWalkingVisitor() {
                     @Override

@@ -1,6 +1,6 @@
 package org.elixir_lang.parser_definition;
 
-public class Issue580 extends ParsingTestCase {
+public class Issue580TestCase extends ParsingTestCase {
    public void testFn1() {
       assertParsedAndQuotedCorrectly();
    }

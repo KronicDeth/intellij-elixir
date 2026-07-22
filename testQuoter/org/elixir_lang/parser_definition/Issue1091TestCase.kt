@@ -1,6 +1,6 @@
 package org.elixir_lang.parser_definition
 
-class Issue1091 : ParsingTestCase() {
+class Issue1091TestCase : ParsingTestCase() {
     fun testMapExpressionEOL() {
         assertParsedAndQuotedCorrectly()
     }

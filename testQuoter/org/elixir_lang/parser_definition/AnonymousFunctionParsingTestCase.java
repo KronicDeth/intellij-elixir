@@ -13,7 +13,7 @@ public class AnonymousFunctionParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testFnExpressionEnd() throws Exception {
+    public void testFnExpressionEnd() {
         assertParsedAndQuotedAroundError(false);
     }
 
@@ -21,11 +21,11 @@ public class AnonymousFunctionParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testFnKeywordsInParenthesesWhenExpressionStabEnd() throws Exception {
+    public void testFnKeywordsInParenthesesWhenExpressionStabEnd() {
         assertParsedAndQuotedCorrectly(false);
     }
 
-    public void testFnMatchedExpressionStabEnd() throws Exception {
+    public void testFnMatchedExpressionStabEnd() {
         assertParsedAndQuotedCorrectly(false);
     }
 
@@ -53,7 +53,7 @@ public class AnonymousFunctionParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testFnPositionalsAndKeywordsInParenthesesWhenExpressionStabEnd() throws Exception {
+    public void testFnPositionalsAndKeywordsInParenthesesWhenExpressionStabEnd() {
         assertParsedAndQuotedCorrectly(false);
     }
 
@@ -65,7 +65,7 @@ public class AnonymousFunctionParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testFnStabExpressionEnd() throws Exception {
+    public void testFnStabExpressionEnd() {
         assertParsedAndQuotedCorrectly(false);
     }
 

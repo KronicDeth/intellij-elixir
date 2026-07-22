@@ -20,8 +20,6 @@ import com.adarshr.gradle.testlogger.TestLoggerExtension
 import com.adarshr.gradle.testlogger.theme.ThemeType
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import de.undercouch.gradle.tasks.download.Download
-import org.gradle.api.artifacts.Configuration
-import org.gradle.api.specs.Spec
 import deps.registerResolveExternalDependenciesTasksForAllProjects
 import elixir.ElixirService
 import org.jetbrains.intellij.platform.gradle.Constants
@@ -271,6 +269,17 @@ sourceSets {
         compileClasspath += sourceSets["main"].output + sourceSets["test"].output
         runtimeClasspath += sourceSets["main"].output + sourceSets["test"].output
     })
+    // The parser/quoter tests (org.elixir_lang.parser_definition) live in their own source root so
+    // the `testQuoter` task that runs them - the only tests needing the external Elixir quoter daemon
+    // - is fully independent of the daemon-free `test` task. Depends on `test` output for the shared
+    // Quoter client (org.elixir_lang.intellij_elixir).
+    create("testQuoter", Action<SourceSet> {
+        java.srcDir("testQuoter")
+        // Reuse the `test` compile classpath so testQuoter compiles against the same IntelliJ platform
+        // (which provides the Kotlin stdlib - kotlin.stdlib.default.dependency=false in this project).
+        compileClasspath += sourceSets["main"].output + sourceSets["test"].output + sourceSets["test"].compileClasspath
+        runtimeClasspath += sourceSets["main"].output + sourceSets["test"].output
+    })
 }
 
 idea {
@@ -280,6 +289,7 @@ idea {
         generatedSourceDirs.add(file("gen"))
         testSources.from(sourceSets["testUI"].kotlin.srcDirs)
         testResources.from(sourceSets["testUI"].resources.srcDirs)
+        testSources.from(sourceSets["testQuoter"].java.srcDirs)
     }
 }
 
@@ -288,6 +298,14 @@ val testUIImplementation = configurations.getByName("testUIImplementation") {
 }
 
 val testUIRuntimeOnly = configurations.getByName("testUIRuntimeOnly") {
+    extendsFrom(configurations.testRuntimeOnly.get())
+}
+
+val testQuoterImplementation = configurations.getByName("testQuoterImplementation") {
+    extendsFrom(configurations.testImplementation.get())
+}
+
+val testQuoterRuntimeOnly = configurations.getByName("testQuoterRuntimeOnly") {
     extendsFrom(configurations.testRuntimeOnly.get())
 }
 
@@ -462,6 +480,11 @@ dependencies {
         zipSigner()
         testFramework(TestFrameworkType.Platform)
         testFramework(TestFrameworkType.Plugin.Java)
+        // The testQuoter source set needs the same platform test framework as `test`, added to its
+        // own implementation configuration so the testQuoter task's classpath carries
+        // com.intellij.testFramework.ParsingTestCase (the parsing tests' superclass).
+        testFramework(TestFrameworkType.Platform, configurationName = "testQuoterImplementation")
+        testFramework(TestFrameworkType.Plugin.Java, configurationName = "testQuoterImplementation")
         // UI Test framework dependencies
         testFramework(TestFrameworkType.Starter, configurationName = "testUIImplementation")
         testFramework(TestFrameworkType.JUnit5, configurationName = "testUIImplementation")
@@ -730,16 +753,60 @@ allprojects {
     }
 }
 
+// The default `test` task runs everything EXCEPT the parser/quoter suite (those tests now live in
+// the `testQuoter` source root), so it does not need the external Elixir quoter daemon and never
+// starts it.
 tasks.named<Test>("test") {
-    dependsOn("prepareTestSandbox", startQuoter)
-    usesService(quoterService)
+    // getElixir builds/populates the Elixir stdlib ebin that the BEAM decompiler tests
+    // (org.elixir_lang.beam.*) read via ELIXIR_EBIN_DIRECTORY. No quoter daemon needed here.
+    dependsOn("prepareTestSandbox", getElixir)
 
-    environment("ELIXIR_LANG_ELIXIR_PATH", elixirPath.asFile.absolutePath)
     environment("ELIXIR_EBIN_DIRECTORY", elixirPath.dir("lib/elixir/ebin/").asFile.absolutePath + File.separator)
     environment("ELIXIR_VERSION", elixirVersion)
 
     // Add Mockito as javaagent to avoid dynamic loading warnings (root project only)
     jvmArgs("-javaagent:${mockitoAgent.asPath}")
+}
+
+// The parser/quoter suite: every test here quotes source through the external Elixir quoter daemon
+// (org.elixir_lang.intellij_elixir.Quoter). Registered via intellijPlatformTesting.testIde so it
+// inherits the IntelliJ platform sandbox and IDE classpath; we bind it to the `testQuoter` source
+// set (whose implementation config carries the platform test framework) and add the daemon. `check`
+// depends on it (below), so CI (`./gradlew check`) still runs the full suite.
+intellijPlatformTesting.testIde.register("testQuoter") {
+    type = IntelliJPlatformType.fromCode(providers.gradleProperty("platformType").getOrElse("IU"))
+    version = actualPlatformVersion
+
+    task {
+        description = "Runs the parser/quoter tests that require the external Elixir quoter daemon."
+        group = "verification"
+
+        // Run the testQuoter source set (the moved parser_definition tests). Appending its runtime
+        // classpath to testIde's IDE classpath supplies both the test classes and the platform test
+        // framework (com.intellij.testFramework.ParsingTestCase, the parsing tests' superclass).
+        testClassesDirs = sourceSets["testQuoter"].output.classesDirs
+        classpath += sourceSets["testQuoter"].runtimeClasspath
+
+        // The parsing tests are JUnit 3 (com.intellij.testFramework.ParsingTestCase -> TestCase),
+        // discovered by the JUnit 4 runner (matches the default `test` task).
+        useJUnit()
+
+        dependsOn(startQuoter)
+        usesService(quoterService)
+
+        environment("ELIXIR_LANG_ELIXIR_PATH", elixirPath.asFile.absolutePath)
+        environment("ELIXIR_EBIN_DIRECTORY", elixirPath.dir("lib/elixir/ebin/").asFile.absolutePath + File.separator)
+        environment("ELIXIR_VERSION", elixirVersion)
+
+        jvmArgs("-javaagent:${mockitoAgent.asPath}")
+
+        filter { includeTestsMatching("org.elixir_lang.parser_definition.*") }
+    }
+}
+
+// Keep `./gradlew check` (and therefore CI) running the full suite across both test tasks.
+tasks.named("check") {
+    dependsOn("testQuoter")
 }
 
 tasks.named<Zip>("buildPlugin") {

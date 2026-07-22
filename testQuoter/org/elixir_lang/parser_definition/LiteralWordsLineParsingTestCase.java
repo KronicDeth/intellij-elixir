@@ -1,11 +1,9 @@
 package org.elixir_lang.parser_definition;
 
-import java.lang.reflect.InvocationTargetException;
-
 /**
  * Created by kadie.enheduanna.inanna on 8/8/14.
  */
-public class LiteralSigilLineParsingTestCase extends ParsingTestCase {
+public class LiteralWordsLineParsingTestCase extends ParsingTestCase {
     public void testBraces() {
         assertParsedAndQuotedCorrectly();
     }
@@ -52,6 +50,6 @@ public class LiteralSigilLineParsingTestCase extends ParsingTestCase {
 
     @Override
     protected String getTestDataPath() {
-        return super.getTestDataPath() + "/literal_sigil_line_parsing_test_case";
+        return super.getTestDataPath() + "/literal_words_line_parsing_test_case";
     }
 }

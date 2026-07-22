@@ -1,6 +1,6 @@
 package org.elixir_lang.parser_definition;
 
-public class Issue821 extends ParsingTestCase {
+public class Issue821TestCase extends ParsingTestCase {
     public void testEndKeywordKey() {
         assertParsedAndQuotedCorrectly();
     }

@@ -1,7 +1,5 @@
 package org.elixir_lang.parser_definition;
 
-import java.lang.reflect.InvocationTargetException;
-
 /**
  * Created by kadie.enheduanna.inanna on 8/8/14.
  */
