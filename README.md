@@ -303,7 +303,7 @@ The plugin works both in the rich IDEs that allow alternative language SDK selec
 | [PHPStorm](https://www.jetbrains.com/phpstorm/download/download-thanks.html)                             | Small      | PHP         | [Subscription](https://www.jetbrains.com/phpstorm/buy/#edition=discounts) | 30-days                                                                              | Commercial           | N/A                                                                                                             |
 | [PyCharm Community Edition](https://www.jetbrains.com/pycharm/download/download-thanks.html?code=PCC)    | Small      | Python      | Free                                                                      | N/A                                                                                  | Apache 2.0           | [JetBrains/intellij-community subdirectory](https://github.com/JetBrains/intellij-community/tree/master/python) |
 | [PyCharm Professional Edition](https://www.jetbrains.com/pycharm/download/download-thanks.html)          | Small      | Python      | [Subscription](https://www.jetbrains.com/pycharm/buy/#edition=discounts)  | N/A                                                                                  | Commercial           | N/A                                                                                                             |
-| [Rider](https://www.jetbrains.com/rider/download/download-thanks.html)                                   | Small      | .NET        | [Subcription](https://www.jetbrains.com/rider/buy/#edition=discounts)     | N/A                                                                                  | Commercial           | N/A                                                                                                             |
+| [Rider](https://www.jetbrains.com/rider/download/download-thanks.html)                                   | Small      | .NET        | [Subscription](https://www.jetbrains.com/rider/buy/#edition=discounts)     | N/A                                                                                  | Commercial           | N/A                                                                                                             |
 | [RubyMine](https://www.jetbrains.com/ruby/download/download-thanks.html)                                 | Small      | Ruby        | [Subscription](https://www.jetbrains.com/ruby/buy/#edition=discounts)     | 30-days ([90-day for whole team](https://www.jetbrains.com/ruby/buy/#edition=trial)) | Commercial           | N/A                                                                                                             |
 | [WebStorm](https://www.jetbrains.com/webstorm/download/download-thanks.html)                             | Small      | JavaScript  | [Subscription](https://www.jetbrains.com/webstorm/buy/#edition=discounts) | 30-days                                                                              | Commercial           | N/A                                                                                                             |
 
@@ -2762,7 +2762,7 @@ You can get documentation for functions and macros that have a `@doc`, aliases o
 
 ##### For a function
 
-1. Place the cursor over the name of callback being referneced.
+1. Place the cursor over the name of callback being referenced.
 2. Display the documentation with either:
    * A keyboard shortcut: F1 to show rendered `@doc`
    * From the menu: View > Quick Documentation
@@ -2922,7 +2922,7 @@ After reinstalling Erlang with docs, restart the IDE so it re-indexes the `.beam
 
 Although it is exceedingly rare, as most Elixir projects use `mix`, it is supported to run/debug `elixir` directly, such as when doing `elixir script.exs`.
 
-1. Run > Edit Configuations...
+1. Run > Edit Configurations...
 
    ![Edit Run Configurations](/screenshots/features/run_debug_configurations/Edit%20Configurations.png?raw=true "Edit Run Configurations")
 2. Click +
@@ -3061,7 +3061,7 @@ If you want to run `iex` in the context of the project, you need to run `iex -S 
 8. (Optionally) click the `...` button on the "Environment variables" line to add environment variables.
 9. Click "OK" to save the Run Configuration and close the dialog
 
-Wih the Run Configuration defined, you can either Run or Debug `iex -S mix`
+With the Run Configuration defined, you can either Run or Debug `iex -S mix`
 
 ##### Running
 
