@@ -87,6 +87,13 @@ jobs:
           commit: ${{ github.event.workflow_run.head_sha }}
           event_file: artifacts/event-file/event.json
           event_name: ${{ github.event.workflow_run.event }}
+          # Failing tests must not turn this check red: the Test workflow is the gate, and it already
+          # decides what blocks a merge (an informational leg such as Elixir 1.19 deliberately fails
+          # tests without failing the workflow). These checks exist to report numbers, not to judge.
+          # "errors" rather than "nothing" keeps one canary: Gradle records every test failure as
+          # <failure>, so this only goes red when the reporting itself breaks - unparseable result
+          # files, or a suite that could not run - which would otherwise silently undercount.
+          fail_on: errors
           # artifact names double as check names, matching what shared-test.yml
           # published inline before this workflow existed
           check_name: ${{ matrix.artifact }}
@@ -147,3 +154,6 @@ jobs:
           comment_mode: always
           files: 'artifacts/test-results/**/*.xml'
           report_suite_logs: error
+          # See the per-cell publish job above: report the numbers, leave the pass/fail verdict to
+          # the Test workflow.
+          fail_on: errors
