@@ -170,6 +170,29 @@ public class DecompilerTest extends PlatformTestCase {
         assertDecompiled("inet_db");
     }
 
+    // Map comprehension (`mc`, `#{K => V || ...}`): must render `into: %{}` with a `{key, value}` body.
+    public void testMapComprehension() throws IOException {
+        assertDecompiled("map_comprehension");
+    }
+
+    // OTP-28 zip generator (`zip`, `A <- As && B <- Bs`): must render via `Enum.zip/1`.
+    public void testZipGenerator() throws IOException {
+        assertDecompiled("zip_generator");
+    }
+
+    // Both together, mirroring the `asn1ct_check.create_map_value/2` SDK-sweep failure.
+    public void testZipMapComprehension() throws IOException {
+        assertDecompiled("zip_map_comprehension");
+    }
+
+    // A map generator INSIDE a zip (`K := V <- M && X <- L`). Distinct from the three cases above:
+    // the zipped generator's pattern is a map_field_exact, not an ordinary pattern, so rendering it
+    // verbatim produces `{k => v, x}`, which is only valid inside a `%{}` literal and does not parse
+    // in the zip's tuple pattern.
+    public void testZipMapGenerator() throws IOException {
+        assertDecompiled("zip_map_generator");
+    }
+
     /*
      * Instance Methods
      */
