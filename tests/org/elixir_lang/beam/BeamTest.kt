@@ -8,13 +8,37 @@ import org.elixir_lang.psi.call.name.Function.DEFP
 import org.junit.Assert
 import java.io.BufferedInputStream
 import java.io.DataInputStream
+import java.io.File
 import java.io.FileInputStream
 
-class BeamTest: PlatformTestCase() {
-    private var ebinDirectory: String? = null
+/**
+ * Two kinds of coverage for the BEAM chunk parser:
+ *
+ *  1. **Specific / deterministic** - parse frozen `.beam` fixtures (checked into testData) from
+ *     multiple Elixir versions and assert exact, known structure (module name, particular
+ *     call-definitions with their macro/arity, and the name-completeness invariant). Version-stable
+ *     because the inputs are frozen.
+ *
+ *  2. **Exhaustive / generic** - parse EVERY `.beam` shipped by the resolved Elixir and Erlang SDKs
+ *     and assert only the version-independent invariants (parses without throwing, has a module
+ *     name, call-definitions parse). This exercises the parser against real, current compiler output
+ *     for the version under test, so a new Erlang/Elixir version's format/pattern issues surface
+ *     here instead of in the wild.
+ */
+class BeamTest : PlatformTestCase() {
 
-    fun testElixirModule() {
-        val beam = beam("Elixir.Kernel")
+    /*
+     * Specific tests against frozen fixtures (one per Elixir version).
+     */
+
+    fun testElixirKernel_1_13_4() = assertElixirKernel(fixtureDir("1.13.4"))
+    fun testElixirKernel_1_19_5() = assertElixirKernel(fixtureDir("1.19.5"))
+
+    fun testElixirInterpolation_1_13_4() = assertElixirInterpolation(fixtureDir("1.13.4"))
+    fun testElixirInterpolation_1_19_5() = assertElixirInterpolation(fixtureDir("1.19.5"))
+
+    private fun assertElixirKernel(ebinDirectory: File) {
+        val beam = beamIn(ebinDirectory, "Elixir.Kernel")
         Assert.assertNotNull(beam)
         val atoms = beam!!.atoms()
         Assert.assertNotNull(atoms)
@@ -33,8 +57,8 @@ class BeamTest: PlatformTestCase() {
         Assert.assertEquals(1, nodes[1].arity)
     }
 
-    fun testErlangModule() {
-        val beam = beam("elixir_interpolation")
+    private fun assertElixirInterpolation(ebinDirectory: File) {
+        val beam = beamIn(ebinDirectory, "elixir_interpolation")
         Assert.assertNotNull(beam)
         val atoms = beam!!.atoms()
         Assert.assertNotNull(atoms)
@@ -60,26 +84,14 @@ class BeamTest: PlatformTestCase() {
         Assert.assertEquals(8, secondExtract.arity)
     }
 
-    private fun beam(baseName: String): Beam? {
-        val path = "$ebinDirectory$baseName.beam"
-        val dataInputStream = DataInputStream(
-            BufferedInputStream(
-                FileInputStream(path)
-            )
-        )
-        return from(dataInputStream, path)
-    }
+    /*
+     * Helpers. (The exhaustive per-beam sweep over the resolved SDKs lives in SdkBeamParseTest.)
+     */
 
+    private fun fixtureDir(version: String): File =
+        File("testData/org/elixir_lang/beam/parser/$version")
 
-    override fun setUp() {
-        super.setUp()
-        val ebinDirectory = System.getenv("ELIXIR_EBIN_DIRECTORY")
-        Assert.assertNotNull("ELIXIR_EBIN_DIRECTORY is not set", ebinDirectory)
-        this.ebinDirectory = ebinDirectory
-    }
-
-    override fun tearDown() {
-        super.tearDown()
-        ebinDirectory = null
-    }
+    private fun beamIn(ebinDirectory: File, baseName: String): Beam? =
+        DataInputStream(BufferedInputStream(FileInputStream(File(ebinDirectory, "$baseName.beam"))))
+            .use { from(it, File(ebinDirectory, "$baseName.beam").path) }
 }
