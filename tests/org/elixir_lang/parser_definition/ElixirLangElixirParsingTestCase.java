@@ -313,11 +313,11 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
     }
 
     public void testCompileSample() {
-        assertParsed("lib/elixir/test/elixir/fixtures/compile_sample.ex");
+        assertParsedFrozenFixture("lib/elixir/test/elixir/fixtures/compile_sample.ex");
     }
 
     public void testUnicodeUnicode() {
-        assertParsed("lib/elixir/unicode/unicode.ex");
+        assertParsedFrozenFixture("lib/elixir/unicode/unicode.ex");
     }
 
     public void testExUnit() {
@@ -685,23 +685,23 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
     }
 
     public void testDepsStatusCustomRawRepoLibRawRepo() {
-        assertParsed("lib/mix/test/fixtures/deps_status/custom/raw_repo/lib/raw_repo.ex");
+        assertParsedFrozenFixture("lib/mix/test/fixtures/deps_status/custom/raw_repo/lib/raw_repo.ex");
     }
 
     public void testNoMixfileLibA() {
-        assertParsed("lib/mix/test/fixtures/no_mixfile/lib/a.ex");
+        assertParsedFrozenFixture("lib/mix/test/fixtures/no_mixfile/lib/a.ex");
     }
 
     public void testNoMixfileLibB() {
-        assertParsed("lib/mix/test/fixtures/no_mixfile/lib/b.ex");
+        assertParsedFrozenFixture("lib/mix/test/fixtures/no_mixfile/lib/b.ex");
     }
 
     public void testUmbrellaDepDepsUmbrellaAppsBarLibBar() {
-        assertParsed("lib/mix/test/fixtures/umbrella_dep/deps/umbrella/apps/bar/lib/bar.ex");
+        assertParsedFrozenFixture("lib/mix/test/fixtures/umbrella_dep/deps/umbrella/apps/bar/lib/bar.ex");
     }
 
     public void testUmbrellaDepDepsUmbrellaAppsFooLibFoo() {
-        assertParsed("lib/mix/test/fixtures/umbrella_dep/deps/umbrella/apps/foo/lib/foo.ex");
+        assertParsedFrozenFixture("lib/mix/test/fixtures/umbrella_dep/deps/umbrella/apps/foo/lib/foo.ex");
     }
 
     /*
@@ -717,6 +717,19 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
     /*
      * Private Instance Methods
      */
+
+    private static final String FROZEN_FIXTURE_ROOT =
+            "testData/org/elixir_lang/parser_definition/elixir_source";
+
+    /**
+     * Parse + quote a `.ex` frozen under testData rather than read from the resolved SDK
+     * (ELIXIR_LANG_ELIXIR_PATH). Used for paths that exist only in a full elixir-lang/elixir source
+     * checkout - internal test fixtures and source not shipped in an installed SDK - so the suite
+     * stays green against an installed (e.g. mise-managed) SDK.
+     */
+    private void assertParsedFrozenFixture(String relativePath) {
+        assertParsed(new File(FROZEN_FIXTURE_ROOT, relativePath));
+    }
 
     private void assertParsed(String relativePath) {
         File rootFile = new File(getTestDataPath());
