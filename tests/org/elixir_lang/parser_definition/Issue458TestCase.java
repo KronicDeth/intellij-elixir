@@ -1,6 +1,6 @@
 package org.elixir_lang.parser_definition;
 
-public class Issue458 extends ParsingTestCase {
+public class Issue458TestCase extends ParsingTestCase {
     public void testNoNewline() {
         assertParsedAndQuotedCorrectly();
     }

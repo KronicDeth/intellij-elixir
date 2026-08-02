@@ -1,6 +1,6 @@
 package org.elixir_lang.parser_definition;
 
-public class Issue674 extends ParsingTestCase {
+public class Issue674TestCase extends ParsingTestCase {
     public void testFeymartynov() {
         assertParsedAndQuotedCorrectly();
     }

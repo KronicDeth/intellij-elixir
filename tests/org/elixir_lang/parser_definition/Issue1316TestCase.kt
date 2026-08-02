@@ -1,6 +1,6 @@
 package org.elixir_lang.parser_definition
 
-class Issue1316 : ParsingTestCase() {
+class Issue1316TestCase : ParsingTestCase() {
     fun testIssue1316() {
         assertParsedAndQuotedCorrectly()
     }
