@@ -198,6 +198,11 @@ public class DecompilerTest extends PlatformTestCase {
         assertDecompiled("strict_generators");
     }
 
+    // OTP-25 `maybe ... [else ...] end` (EEP 49): must render as Elixir `with`.
+    public void testMaybeExpr() throws IOException {
+        assertDecompiled("maybe_expr");
+    }
+
     /*
      * Instance Methods
      */
