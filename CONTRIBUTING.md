@@ -6,6 +6,7 @@
   - [Development](#development)
     - [Importing the project](#importing-the-project)
     - [Building and running](#building-and-running)
+      - [Elixir and Erlang](#elixir-and-erlang)
     - [Windows Development Setup](#windows-development-setup)
       - [Prerequisites](#prerequisites)
       - [Building on Windows](#building-on-windows)
@@ -15,9 +16,28 @@
       - [Testing in other IDEs](#testing-in-other-ides)
       - [Running the latest EAP snapshot](#running-the-latest-eap-snapshot)
       - [Testing](#testing)
+        - [Test tasks](#test-tasks)
+        - [Debugging a failing test](#debugging-a-failing-test)
+      - [Which versions CI tests against](#which-versions-ci-tests-against)
+        - [Widening Elixir support](#widening-elixir-support)
+        - [Reading a leg in the checks list](#reading-a-leg-in-the-checks-list)
+      - [Working with a different Elixir/OTP version](#working-with-a-different-elixirotp-version)
     - [From IntelliJ IDEA](#from-intellij-idea)
       - [Running the plugin in a specific IDE](#running-the-plugin-in-a-specific-ide)
       - [Verification](#verification)
+    - [GrammarKit (Parser / PSI Generation)](#grammarkit-parser--psi-generation)
+      - [Prerequisites](#prerequisites-1)
+      - [Regenerating Parser Code](#regenerating-parser-code)
+      - [Fixing CRLF Line Endings (Windows)](#fixing-crlf-line-endings-windows)
+      - [Source Layout: `gen/` vs `src/`](#source-layout-gen-vs-src)
+      - [Key BNF Concepts](#key-bnf-concepts)
+      - [`ElixirPsiImplUtil` Method Resolution](#elixirpsiimplutil-method-resolution)
+      - [Testing After BNF Changes](#testing-after-bnf-changes)
+      - [Suppressing Warnings in the BNF](#suppressing-warnings-in-the-bnf)
+    - [JFlex Lexer Regeneration](#jflex-lexer-regeneration)
+      - [Prerequisites](#prerequisites-2)
+      - [Regenerating the Lexer](#regenerating-the-lexer)
+      - [⚠️ No Manual Post-Regeneration Step Required](#-no-manual-post-regeneration-step-required)
     - [Color Schemes](#color-schemes)
       - [Customizing Scheme](#customizing-scheme)
       - [Exporting Settings](#exporting-settings)
@@ -60,37 +80,76 @@
 
 Gradle will handle all dependency management, including fetching the Intellij IDEA platform specified in `gradle.properties`, so you can use a normal JDK instead of setting up an "Intellij Platform Plugin SDK".
 
-**NOTE:** The tests require Erlang, Elixir, and Hex installed. The `jps-builder:test` task discovers your Erlang installation by running `erl -eval 'io:format("~s", [code:root_dir()]).'` - ensure `erl` (or `erl.exe` on Windows) is on your PATH. You can set `ERLANG_SDK_HOME` and `ELIXIR_EBIN_DIRECTORY` environment variables to override auto-detection. You can run individual JUnit tests via the JUnit run configuration type, but note that some tests require additional setup which the Gradle `test` task does for you, and these tests won't work when run outside Gradle without some additional work. See `build.gradle.kts` for details.
+#### Elixir and Erlang
+
+**The tests need Elixir and Erlang. The build does not compile them from source** - it *resolves* an
+already-installed pair. The `resolveElixirErlangSdks` task looks in this order and stops at the first hit:
+
+| # | Erlang | Elixir |
+|---|---|---|
+| 1 | `ERLANG_SDK_HOME` env var | `ELIXIR_SDK_HOME` env var |
+| 2 | `erl` on `PATH` | `elixir` on `PATH` |
+| 3 | `mise install erlang@<expected>` | `mise install elixir@<expected>` |
+| 4 | - | download + `make` from source (last resort, slow) |
+
+It then exports `ELIXIR_LANG_ELIXIR_PATH`, `ELIXIR_EBIN_DIRECTORY`, `ELIXIR_VERSION`, `ERLANG_SDK_HOME`
+and a `PATH` prefix to every test task, so you never set those by hand.
+
+The **expected** versions come from [mise](https://mise.jdx.dev), which this project requires:
+
+```sh
+mise install          # installs the pinned Elixir, Erlang and JBR
+```
+
+`mise.toml` is the committed pin. The build does not parse it - it asks mise (`mise current elixir`)
+for the version that will actually be on your `PATH`, so a personal override in the gitignored
+`mise.local.toml` is honoured rather than silently disagreeing with the build.
+
+You can override per invocation, which takes priority over mise entirely:
+
+```sh
+./gradlew check -PelixirVersion=1.17.3 -PotpVersion=27.1.2
+```
+
+With neither mise nor both properties, the build stops and tells you so - it never guesses. If what
+mise reports is not installed, the resolver works down the list above, and step 4 means it can turn
+into a from-source Elixir build that takes many minutes. See
+[Working with a different Elixir/OTP version](#working-with-a-different-elixirotp-version).
+
+Building the quoter (see [Test tasks](#test-tasks)) additionally needs network access on a cold cache -
+it downloads `KronicDeth/intellij_elixir` and runs `mix local.hex` / `mix local.rebar` / `mix deps.get`.
+
+**NOTE:** Tests that need an Elixir SDK fail rather than skip when it is missing, so run them through
+Gradle. Running one from the IDE's JUnit runner works only if you supply the environment variables
+listed above yourself.
 
 **NOTE:** If you're having trouble running the plugin against Intellij IDEA 14.1 on Mac, see this [comment](https://github.com/KronicDeth/intellij-elixir/pull/504#issuecomment-284275036).
 
 ### Windows Development Setup
 
 #### Prerequisites
-- **Build Environment**: Git Bash, MSYS2, WSL, or native Windows
-- **Erlang/OTP**: **Required for running tests** (not just building)
-  - Download from: https://www.erlang.org/downloads (OTP 24.3+ recommended)
-  - Or via Chocolatey: `choco install erlang`
-  - **IMPORTANT**: Must be on PATH (`erl.exe` command must work)
-  - Tests will auto-detect Erlang installation via `erl -eval` command
-  - Alternative: Set `ERLANG_SDK_HOME` environment variable to override auto-detection
-- **Elixir**: Required for running tests
-  - Download from: https://elixir-lang.org/install.html#windows
-  - Or via Chocolatey: `choco install elixir`
-  - Or use GitHub Actions approach with `erlef/setup-beam` (installs both Erlang and Elixir)
-- **Make**: Required for building Elixir from source
-  - Via Chocolatey: `choco install make`
-  - Via Git Bash: Included by default
-  - Via MSYS2: `pacman -S make`
-- **Java 21+**: JetBrains Runtime or any Java 21+ distribution
+- **Build Environment**: PowerShell, Git Bash, MSYS2, WSL, or cmd. PowerShell is fine for every Gradle
+  task including the quoter build - see the argument-quoting note below.
+- **Erlang/OTP** and **Elixir**: **required for running tests** (not just building), at the versions
+  [above](#elixir-and-erlang). Install both with `mise install`, or install them yourself and put
+  `erl`/`erl.exe` and `elixir` on `PATH`, or point `ERLANG_SDK_HOME`/`ELIXIR_SDK_HOME` at them.
+- **JetBrains Runtime**: **21** for IDEA 2025.3 and 2026.1, **25** for 2026.2 and later.
+  `build.gradle.kts` picks the bytecode level from the platform build number (262+ → 25), and
+  `javac --release` validates the platform JARs against it, so the wrong JDK fails the compile rather
+  than producing a bad build. `mise install` provisions the pinned JBR.
+- **Make**: *not* required in the normal path. Only the last-resort from-source Elixir fallback uses it.
+
+> [!IMPORTANT]
+> In PowerShell, quote `-P` flags that contain a dot: `.\gradlew.bat "-PelixirVersion=1.17.3"`.
+> Unquoted, PowerShell splits the argument and Gradle reports ``Task '.17.3' not found``.
 
 #### Building on Windows
-```bash
-# Full build with tests
-./gradlew test
+```powershell
+# Everything: test + :jps-builder:test
+.\gradlew.bat check
 
-# Build plugin only (no tests)
-./gradlew buildPlugin
+# Build the plugin zip only, no tests
+.\gradlew.bat buildPlugin
 ```
 
 #### Platform Support
@@ -105,21 +164,22 @@ The build system automatically detects your platform:
 - Verify no orphaned Erlang processes: `tasklist | findstr erl`
 - Kill orphaned processes: `taskkill /F /IM erl.exe`
 
-**Elixir build fails:**
-- Ensure `make` is on PATH: `make --version`
-- Try running in Git Bash (not PowerShell/cmd)
-
-**getQuoterDeps fails in PowerShell (erl not found):**
-- Run the task from Git Bash so `/usr/bin/sh` sees a full PATH.
-- Example:
-  - `cd /c/Users/user/IdeaProjects/intellij-elixir`
-  - `./gradlew.bat getQuoterDeps --rerun-tasks --no-build-cache --no-configuration-cache`
-- If needed, add Erlang to Git Bash PATH, e.g. `export PATH="/c/Program Files/erl-24.3.4.6/bin:$PATH"`.
+**`erl` not found, or the build starts compiling Elixir from source:**
+- The resolver could not find the *expected* version. Check what it decided - it logs
+  `Expected versions (from ...): Elixir ..., Erlang ...` followed by `Resolved SDKs: ...` with the
+  source of each (`env:ERLANG_SDK_HOME`, `path`, `mise`, `source-download`).
+- Confirm what mise reports (`mise current elixir`, `mise current erlang`) is actually installed, or
+  pass `-PelixirVersion=` / `-PotpVersion=` to match what you have.
+- As a last resort, set `ERLANG_SDK_HOME` and `ELIXIR_SDK_HOME` explicitly - they take priority over
+  everything else.
 
 **Path with spaces warning:**
 - Cosmetic only - Erlang installed in "Program Files" shows warnings but works correctly
 
 **kerl build fails on Linux as of May 2026**
+
+This affects only the from-source Elixir/Erlang fallback, which the normal path never reaches - if you
+hit it, the real problem is that the resolver could not find your installed pair (see above).
 
 If you see this:
 ```text
@@ -181,19 +241,171 @@ For example, to launch the latest RubyMine EAP:
 
 #### Testing
 
-To run all tests `./gradlew test`.
+##### Test tasks
 
-To run a specific test:
+| Task | Source root | What it covers | Quoter daemon | Network on a cold cache |
+|---|---|---|---|---|
+| `test` | `tests/` | the whole JUnit suite, parser tests included | **yes** | **yes** |
+| `:jps-builder:test` | `jps-builder/tests/` | the JPS build process | no | no |
+| `check` | - | both of the above | yes | yes |
+| `testUI` | `testUI/kotlin` | IDE UI tests; needs a built plugin | no | no |
+
 ```sh
-./gradlew test --tests "org.elixir_lang.psi.operation.PrefixTest"
+./gradlew check                                                        # everything
+./gradlew test --tests "org.elixir_lang.psi.operation.PrefixTest"      # a single test
+./gradlew test --tests "org.elixir_lang.parser_definition.*"           # just the parser suite
 ```
+
+`test` builds and starts the Elixir quoter daemon, because the parser tests
+(`org.elixir_lang.parser_definition.*`) quote source through it and compare the result against the
+plugin's own quoting. Gradle stops the daemon at the end of the build. On a warm cache this costs
+about a second; the first run in a fresh clone downloads and builds the quoter.
 
 To build (so you get a .zip file):
 ```sh
-./gradlew build
-# Or without tests
-./gradlew build -x test
+./gradlew buildPlugin        # the zip, no tests - prefer this
+./gradlew build              # the zip AND the full suite
+./gradlew build -x test      # the zip, skipping the root suite
 ```
+
+##### Debugging a failing test
+
+- **Quoting mismatches** report only the first divergence, as
+  `quoted forms diverge at {2}[0]{1}[0]: keyword key, expected :from_brackets, got :line`, where the
+  path notation is `{i}` tuple, `[i]` list, `[:key]` keyword, `%{key}` map. Pass
+  `-Delixir.quoter.fullDump=true` for the complete side-by-side terms.
+- **The platform log** for a failing test is written to
+  `build/idea-sandbox/.../log_*/splitTestLogs/` rather than stderr, and stderr carries a
+  `Log saved to:` pointer. The `test` task sets `idea.split.test.logs=true` for this - without it the
+  buffered log is duplicated into the JUnit XML and can grow past what report tooling can parse.
+
+#### Which versions CI tests against
+
+`.github/ci-versions.json` declares every version CI uses - the supported IDEA platforms (with the
+JBR level each needs and the products to verify them against) and the Elixir/OTP pairs.
+Edit that one file to add or bump a version: the test legs, the plugin verifier's IDE lists, and the
+release build's default platform are all derived from it.
+
+Tests always run against IntelliJ IDEA. The legs are every declared IDEA version on Ubuntu with
+`beam.baseline`, plus one leg per `beam.additional` pair on the minimum supported IDEA, plus
+`beam.baseline` on Windows.
+
+Two scripts in `.github/scripts` read that file, so you can see what a change to it produces without
+pushing:
+
+| Script | Answers |
+|---|---|
+| `compose-legs.js` | which test and verification legs exist |
+| `resolve-versions.js` | which versions a caller gets when it names none (`SETUP_ELIXIR=true` to include Elixir) |
+
+```sh
+node .github/scripts/compose-legs.js
+SETUP_ELIXIR=true node .github/scripts/resolve-versions.js
+```
+
+Outside the runner they print what they would otherwise hand to the workflow - the leg tables and the
+resolved versions - so a bad declaration is diagnosable locally rather than from a failed run.
+
+| | Elixir | OTP | Status |
+|---|---|---|---|
+| `beam.baseline` | 1.13.4 | 24.3.4.6 | **supported** - must be green |
+| `beam.additional` | every minor above the baseline | see the file | unsupported - informational |
+
+Check which OTP an Elixir supports against the
+[compatibility table](https://elixir.hexdocs.pm/compatibility-and-deprecations.html) - it accounts for
+support added in patch releases, e.g. 1.14 is "23 - 25 (and Erlang/OTP 26 from v1.14.5)". Within that
+range, prefer the version's `recommended_otp` from
+[`elixir-versions.yml`](https://github.com/elixir-lang/elixir-lang.github.com/blob/main/_data/elixir-versions.yml),
+or the highest supported OTP where none is declared. Don't use that file's `otp_versions` list to
+decide the range: it is per-minor and misses patch-level additions.
+
+##### Widening Elixir support
+
+`beam.additional` is a ratchet. Each entry moves one Elixir version from unsupported to supported:
+
+1. **Add the pair** with `"continue-on-error": true`. That declares it **unsupported**, and its leg is
+   expected to be red. Adding a version is safe at any time - it cannot block a merge.
+2. **Fix what it reports**, until the leg goes green.
+3. **Delete its `continue-on-error`.** The version is now **supported**: from then on, any change that
+   breaks it fails the pipeline.
+
+`continue-on-error` covers the whole leg - toolchain setup, compile, sandbox, quoter build and tests -
+not just the test step, because an unsupported Elixir can fail at any of those and they all mean the
+same thing. `setup-beam` may not publish the pair; the quoter may not compile on it. The annotation on
+a failed informational leg names the phase it died in, so you can tell those apart.
+
+##### Reading a leg in the checks list
+
+Each leg is named after the axis its group varies, so the part that distinguishes it survives the
+checks list's truncation: `test (IDEA 2026.2)`, `test (1.19.5+28.1)` (Elixir + OTP),
+`test (Win25, IDEA 2025.3.6)`. The same name is used for the leg's `Test Results (...)` check, so a
+row in one list maps to the other without translating.
+
+A leg that stopped **before its tests ran** says so in the name:
+
+```
+Test Results (1.19.5+28.1, INCOMPLETE - failed at quoter build)
+```
+
+That matters because the check's own title only ever describes the result files it found - a leg that
+never compiled published the six `:jps-builder:test` cases and nothing else, and the title reads
+`All 6 tests pass`. Treat `INCOMPLETE` as "these numbers cover only what got as far as running"; the
+stage named after it is where the leg actually died.
+
+The same information arrives as a comment on the pull request: one table of totals and one row per leg,
+split by whether the leg can block a merge. The icons say only that:
+
+| Icon | Meaning |
+|---|---|
+| ✅ | passed |
+| ❌ | a **required** leg failed - tests, or an earlier stage; either way it blocks |
+| ⚠️ | an **informational** leg failed - this version is not supported yet |
+| ⬜ | the leg published no results at all |
+| ❔ | the leg did not report its status, so no claim is made either way |
+
+The status text names the reason: `tests failed` with a count beside it, versus
+`failed at quoter build` where the counts cover only what ran. For *which* tests failed, follow a row
+to its `Test Results (...)` check or read the **Failed tests** summary on the leg's own job - the
+comment deals in counts only.
+
+#### Working with a different Elixir/OTP version
+
+The pinned pair is the one you get by default. To work against another:
+
+**Just for one run** - nothing on disk changes, and this is what CI does:
+
+```sh
+./gradlew check -PelixirVersion=1.17.3 -PotpVersion=27.1.2
+```
+
+**Switch your working copy** - `mise use` writes `mise.toml`, and the build follows it immediately:
+
+```sh
+mise use elixir@1.17.3-otp-27 erlang@27.1.2
+```
+
+To switch only for yourself without touching the committed pin, add `--env local`; that writes the
+gitignored `mise.local.toml`, which outranks `mise.toml`. The build follows either, because it asks
+mise for the effective version rather than reading a file.
+
+> [!NOTE]
+> You do not need the exact `-otp-N` suffix in `-PelixirVersion` - mise resolves `1.17.3` to the
+> installed `1.17.3-otp-27`. If the version is not installed yet, the resolver runs `mise install` for
+> you; installing it up front (`mise install elixir@1.17.3-otp-27 erlang@27.1.2`) just makes the first
+> build faster.
+
+**Expect the known failures** from the table above; compare against them before assuming you broke
+something. `./gradlew check` on the pinned pair must stay at zero.
+
+**Adding a version to CI** is one edit to `.github/ci-versions.json` - add a `beam.additional`
+entry, or an `idea.additionalToTest` entry for a platform. The matrix, the JBR levels and the verifier's IDE
+lists all follow from it.
+
+Other IDEs appear only in plugin *verification*. Each IDEA version lists the products to verify it
+against in a `verify` array, and CI runs one job per product/version pair (`.github/workflows/shared-verify.yml`),
+each verifying the plugin zip that was built once. Adding a product is one entry in that array; the
+values are `intellij-repository` artifact ids (`ideaIU`, `rubymine`, `pycharmPC`, `webstorm`, ...),
+not marketing names.
 
 ### From IntelliJ IDEA
 #### Running the plugin in a specific IDE
@@ -204,7 +416,9 @@ To build (so you get a .zip file):
 
 #### Verification
 1. Expand `verification`
-2. Double click `test`
+2. Double click `check` - it runs `test` and `:jps-builder:test`.
+
+The committed **Run Tests** configuration under `.run/` already runs `check`.
 
 ### GrammarKit (Parser / PSI Generation)
 
@@ -239,6 +453,16 @@ Many `gen/` files may show whitespace-only or formatting diffs from a generator 
 The `gen/` directory must contain **only** GrammarKit/JFlex-generated files. All hand-written code lives in `src/`. Both directories are source roots with the same package structure (`org.elixir_lang`), so files can be moved between them without changing imports.
 
 Generated files have a header comment: `// This is a generated file. Not intended for manual editing.` (GrammarKit) or `/* The following code was generated by JFlex */` (JFlex). If you need to add hand-written code that lives alongside generated PSI classes (e.g. a new `PsiScopeProcessor`, stub type, or operation interface), place it in `src/` under the matching package path.
+
+The full set of source roots:
+
+| Root | Contents |
+|---|---|
+| `src/` | hand-written plugin code |
+| `gen/` | GrammarKit/JFlex output - never edit by hand |
+| `tests/` | the JUnit suite, run by `test` |
+| `testUI/kotlin` | IDE UI tests run by `testUI` |
+| `jps-shared/`, `jps-builder/` | JPS model and build-process modules |
 
 #### Key BNF Concepts
 
@@ -286,6 +510,7 @@ After regenerating parser code:
 
 **`//noinspection BnfResolve` for JFlex tokens:** GrammarKit warns `Unresolved rule reference` for tokens that are defined by JFlex (e.g. `pin = DO`), not by BNF rules. These are false positives - suppress them with a comment on the line above:
 ```bnf
+//noinspection BnfResolve
 pin = DO
 ```
 
