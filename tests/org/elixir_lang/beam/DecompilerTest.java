@@ -203,6 +203,12 @@ public class DecompilerTest extends PlatformTestCase {
         assertDecompiled("maybe_expr");
     }
 
+    // Erlang types whose names are reserved Elixir words (e.g. `-type nil()`) have no valid Elixir
+    // `@type`; they must be preserved as comments so the source stays parseable.
+    public void testReservedTypeName() throws IOException {
+        assertDecompiled("reserved_type");
+    }
+
     /*
      * Instance Methods
      */

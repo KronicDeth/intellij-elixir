@@ -4,6 +4,7 @@ import org.elixir_lang.beam.Beam
 import org.elixir_lang.beam.chunk.Atoms
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.AbstractCodeCompileOptions
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.attribute.Type
+import org.elixir_lang.beam.decompiler.ReservedTypeName
 import org.elixir_lang.beam.psi.stubs.ModuleStub
 import org.elixir_lang.beam.type.VisibilityNameArity
 import org.elixir_lang.model.psi.type.TypeBuiltins.BUILTIN_ARITY_BY_NAME
@@ -30,6 +31,10 @@ object TypeDefinitions {
         val sortedSet = TreeSet<VisibilityNameArity>()
 
         for ((name, arities) in BUILTIN_ARITY_BY_NAME) {
+            // Reserved-word names are commented out by the decompiler (no valid Elixir `@type`), so they
+            // have no mirror `@type` call to pair with - don't emit a stub that setMirror can't resolve.
+            if (ReservedTypeName.isReserved(name)) continue
+
             for (arity in arities) {
                 sortedSet.add(VisibilityNameArity(Visibility.PUBLIC, name, arity))
             }
@@ -57,7 +62,11 @@ object TypeDefinitions {
             .macroStringAttributes
             .filterIsInstance<Type>()
             .mapNotNull { type ->
-                type.name?.let { name -> VisibilityNameArity(visibility(type), name, type.arity) }
+                // Reserved-word type names are commented out by the decompiler (no valid Elixir `@type`),
+                // so they have no mirror `@type` call - drop the stub to keep setMirror consistent.
+                type.name
+                    ?.takeUnless { ReservedTypeName.isReserved(it) }
+                    ?.let { name -> VisibilityNameArity(visibility(type), name, type.arity) }
             }
             .groupBy(VisibilityNameArity::visibility)
             .mapValues { (_, visibilityNameArityList) -> TreeSet(visibilityNameArityList) }
