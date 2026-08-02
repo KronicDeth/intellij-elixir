@@ -8,7 +8,8 @@
 # To try one without committing: ./gradlew check -PelixirVersion=1.17.3 -PotpVersion=27.1.2
 #
 # The Elixir/OTP pairs CI tests are declared in .github/ci-versions.json; keep the pin here equal to
-# its beam.earliest entry. The other pair CI runs is Elixir 1.17.3 / OTP 27.1.2 (informational).
+# its beam.baseline entry - the one supported pair, which must stay green. Every pair under
+# beam.additional is informational until its leg goes green; that file is the list, not this comment.
 
 [settings]
 # Record exact versions: `mise use elixir@1.17` writes 1.17.3-otp-27 rather than a fuzzy "1.17".

@@ -1,24 +1,24 @@
 name: 'Setup Build Environment'
-description: 'Sets up Java, Elixir, and Gradle for IntelliJ plugin builds'
+description: 'Sets up Java, Elixir, and Gradle for IntelliJ plugin builds. Version inputs left empty are resolved from .github/ci-versions.json, so the repository must be checked out before calling this action.'
 
 # Note, can't do type hinting in composite actions yet...
 inputs:
   elixir-version:
-    description: 'Elixir version'
+    description: 'Elixir version. Empty resolves to beam.baseline.elixir in .github/ci-versions.json.'
     required: false
-    default: '1.13.4'
+    default: ''
   otp-version:
-    description: 'OTP version'
+    description: 'OTP version. Empty resolves to beam.baseline.otp in .github/ci-versions.json.'
     required: false
-    default: '24.3.4.6'
+    default: ''
   idea-version:
-    description: 'IntelliJ IDEA platform version to build/test against. Defaults to the minimum supported platform (matches pluginSinceBuild) so release/tag builds get it for free; override per-leg to test against a newer platform (see the matrix in shared-test.yml).'
+    description: 'IntelliJ IDEA platform version to build/test against. Empty resolves to idea.minimumSupported.version in .github/ci-versions.json (which matches pluginSinceBuild), so release/tag builds get the minimum supported platform for free; override per-leg to test against a newer platform (see the test-matrix job in shared-test.yml).'
     required: false
-    default: '2025.3.6'
+    default: ''
   java-version:
-    description: 'JBR major version to install. Must match the Java level of idea-version: 25 for 2026.2+ (build 262), 21 for earlier.'
+    description: 'JBR major version to install. Must match the Java level of idea-version: 25 for 2026.2+ (build 262), 21 for earlier. Empty resolves to the java declared for idea-version in .github/ci-versions.json.'
     required: false
-    default: '21'
+    default: ''
   github-token:
     description: 'GitHub token for API access (required for setup-java to download JBR)'
     required: true
@@ -27,7 +27,7 @@ inputs:
     required: false
     default: 'false'
   setup-elixir:
-    description: 'If true, will setup the Elixir environment, restore and cache Elixir build artifacts. Not needed for the verify-plugin job.'
+    description: 'If true, install the Elixir/OTP toolchain (erlef/setup-beam). Not needed for the verify-plugin job.'
     required: false
     default: 'true'
   skip-searchable-options:
@@ -42,6 +42,27 @@ inputs:
 runs:
   using: composite
   steps:
+    # Any version input left empty is resolved from the CI declaration, so callers that don't care
+    # (release/tag/build-plugin) always get the minimum supported platform and its JBR level
+    # without restating it. The test matrix passes every value explicitly, so its legs read neither
+    # the file nor anything but their own inputs. Must run before the JBR cache restore, which keys
+    # on java-version.
+    #
+    # Two things the caller has to get right: the repository must already be checked out, since this
+    # reads a file from it, and the checkout must include .github/scripts as well as the declaration.
+    # A caller that checks out sparsely and omits either gets "Cannot find module" or the resolver's
+    # own "not found" error, both before any version is known.
+    - name: Resolve versions
+      id: resolve
+      shell: bash
+      env:
+        IDEA_VERSION: ${{ inputs.idea-version }}
+        JAVA_VERSION: ${{ inputs.java-version }}
+        ELIXIR_VERSION: ${{ inputs.elixir-version }}
+        OTP_VERSION: ${{ inputs.otp-version }}
+        SETUP_ELIXIR: ${{ inputs.setup-elixir }}
+      run: node .github/scripts/resolve-versions.js
+
     - name: Free Disk Space
       id: free-disk-space
       ## Windows runners appear to have plenty of free space on D:
@@ -61,14 +82,14 @@ runs:
       uses: actions/cache/restore@v6
       with:
         path: ${{ runner.tool_cache }}/Java_JetBrains_*
-        key: jbr-${{ runner.os }}-${{ runner.arch }}-${{ inputs.java-version }}
+        key: jbr-${{ runner.os }}-${{ runner.arch }}-${{ steps.resolve.outputs.java-version }}
 
     - name: Setup JBR
       id: setup-java
       uses: actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95 # v5.6.0
       with:
         distribution: 'jetbrains'
-        java-version: ${{ inputs.java-version }}
+        java-version: ${{ steps.resolve.outputs.java-version }}
         java-package: 'jdk'
         token: ${{ inputs.github-token }}
       env:
@@ -96,61 +117,42 @@ runs:
     - name: Export Environment Variables
       id: export-environment-variables
       shell: bash
+      env:
+        IDEA_VERSION: ${{ steps.resolve.outputs.idea-version }}
+        SKIP_SEARCHABLE_OPTIONS: ${{ inputs.skip-searchable-options }}
       run: |
-        if [ "${{ inputs.idea-version }}" = "LATEST-EAP-SNAPSHOT" ]; then
+        if [ "$IDEA_VERSION" = "LATEST-EAP-SNAPSHOT" ]; then
           # Use VersionFetcher to resolve the actual EAP version
           echo "ORG_GRADLE_PROJECT_useDynamicEapVersion=true" >> $GITHUB_ENV
-        elif [ -n "${{ inputs.idea-version }}" ]; then
-          echo "ORG_GRADLE_PROJECT_platformVersion=${{ inputs.idea-version }}" >> $GITHUB_ENV
+        elif [ -n "$IDEA_VERSION" ]; then
+          echo "ORG_GRADLE_PROJECT_platformVersion=$IDEA_VERSION" >> $GITHUB_ENV
         fi
-        echo "ORG_GRADLE_PROJECT_skipSearchableOptions=${{ inputs.skip-searchable-options }}" >> $GITHUB_ENV
+        echo "ORG_GRADLE_PROJECT_skipSearchableOptions=$SKIP_SEARCHABLE_OPTIONS" >> $GITHUB_ENV
 
     - name: Setup Gradle
       id: setup-gradle
       uses: gradle/actions/setup-gradle@v6
       with:
         cache-disabled: true
-        add-job-summary-as-pr-comment: 'on-failure'
+        # avoid async in shutdown until https://github.com/nodejs/node/pull/61999 lands in the action runner's JS version.
+        add-job-summary-as-pr-comment: 'never'
         build-scan-publish: ${{ inputs.build-scan-publish }}
         build-scan-terms-of-use-url: 'https://gradle.com/help/legal-terms-of-use'
         build-scan-terms-of-use-agree: 'yes'
         github-token: ${{ inputs.github-token }}
-
-    - name: Restore Elixir cache
-      id: cache-elixir-restore
-      if: ${{ inputs.setup-elixir == 'true' }}
-      uses: actions/cache/restore@v6
-      with:
-        path: |
-          cache/elixir-${{ inputs.elixir-version }}-intellij_elixir-2.1.0/_build
-          cache/elixir-${{ inputs.elixir-version }}-intellij_elixir-2.1.0/deps
-        key: elixir-${{ runner.os }}-${{ runner.arch }}-${{ inputs.elixir-version }}-otp-${{ inputs.otp-version }}-quoter-${{ hashFiles('gradle.properties') }}
-        restore-keys: |
-          elixir-${{ runner.os }}-${{ runner.arch }}-${{ inputs.elixir-version }}-otp-${{ inputs.otp-version }}-
 
     - name: Setup Elixir
       id: setup-elixir
       if: ${{ inputs.setup-elixir == 'true' }}
       uses: erlef/setup-beam@54075bcc5e249e4758d363f27d099f55d843f124 # v1.24.1
       with:
-        otp-version: ${{ inputs.otp-version }}
-        elixir-version: ${{ inputs.elixir-version }}
+        otp-version: ${{ steps.resolve.outputs.otp-version }}
+        elixir-version: ${{ steps.resolve.outputs.elixir-version }}
 
     - name: Export Elixir Environment Variables
       id: export-elixir-environment-variables
-      if: ${{ inputs.setup-elixir == 'true' && inputs.elixir-version != '' }}
+      if: ${{ inputs.setup-elixir == 'true' && steps.resolve.outputs.elixir-version != '' }}
       shell: bash
       run: |
-        echo "OTP_RELEASE=${{ inputs.otp-version }}" >> $GITHUB_ENV
+        echo "OTP_RELEASE=${{ steps.resolve.outputs.otp-version }}" >> $GITHUB_ENV
         echo "ERLANG_SDK_HOME=$(erl -eval 'io:format("~s", [code:root_dir()]).' -noshell -run init stop)" >> $GITHUB_ENV
-
-    - name: Save Elixir cache
-      id: cache-elixir-save
-      if: always() && steps.cache-elixir-restore.outputs.cache-hit != 'true' && inputs.setup-elixir == 'true' && steps.setup-elixir.outcome == 'success'
-      uses: actions/cache/save@v6
-      with:
-        path: |
-          cache/elixir-${{ inputs.elixir-version }}-intellij_elixir-2.1.0
-          !cache/**/tmp/pipe/**
-          !cache/**/distillery/priv
-        key: ${{ steps.cache-elixir-restore.outputs.cache-primary-key }}
