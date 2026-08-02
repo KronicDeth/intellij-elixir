@@ -40,6 +40,16 @@ object Call {
         return "(${nameString}).($argumentsString)"
     }
 
+    private fun inlineNamedFunctionCallToMacroString(name: OtpErlangTuple, term: OtpErlangTuple, scope: Scope): String {
+        // An immediately-invoked Erlang named fun `(fun F(...) -> ... end)(Args)`.  NamedFun already
+        // renders the target as a self-delimiting, parenthesized `(name = fn ... end)`, so no extra
+        // wrapping is needed - just append the anonymous call: `(name = fn ... end).(args)`.
+        val nameString = NamedFun.toMacroStringDeclaredScope(name, scope).macroString.string
+        val argumentsString = argumentsString(term)
+
+        return "${nameString}.($argumentsString)"
+    }
+
     private fun argumentsString(term: OtpErlangTuple): String =
             toArguments(term)
                     ?.let { argumentsToString(it) }
@@ -134,6 +144,9 @@ object Call {
             } ?:
             Fun.ifTo(name) {
                 inlineAnonymousFunctionCallToMacroString(it, term, scope)
+            } ?:
+            NamedFun.ifTo(name) {
+                inlineNamedFunctionCallToMacroString(it, term, scope)
             } ?:
             namedFunctionCallToString(term)
         }

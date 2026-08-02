@@ -209,6 +209,12 @@ public class DecompilerTest extends PlatformTestCase {
         assertDecompiled("reserved_type");
     }
 
+    // Erlang named funs (`fun F(...) -> ... end`): render as a plain `fn` (with a caveat comment),
+    // both when bound to a variable and when immediately invoked.
+    public void testNamedFun() throws IOException {
+        assertDecompiled("named_fun");
+    }
+
     /*
      * Instance Methods
      */
