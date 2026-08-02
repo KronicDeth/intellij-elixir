@@ -771,6 +771,17 @@ tasks.named<Test>("test") {
 
     // Add Mockito as javaagent to avoid dynamic loading warnings (root project only)
     jvmArgs("-javaagent:${mockitoAgent.asPath}")
+
+    // On failure the platform's TestLoggerFactory dumps its whole buffered log - the failing test's
+    // exception and full stack included - to stderr, which Gradle then stores in the JUnit XML's
+    // <system-err> next to the same stack already in <failure>. That doubled every failure and, on a
+    // suite that fails widely, produced a result file too large for the report publisher to parse.
+    // idea.split.test.logs writes the buffer to a per-test file under the sandbox log dir
+    // (log_*/splitTestLogs/) and leaves a "Log saved to:" pointer on stderr, so the stack is stored
+    // once, nothing is discarded, and other stderr still reaches the XML. The files are picked up by
+    // the test-reports artifact in .github/workflows/shared-test.yml. (idea.log.path cannot redirect
+    // them here - the IntelliJ Platform Gradle Plugin sets the sandbox log path itself and wins.)
+    systemProperty("idea.split.test.logs", "true")
 }
 
 tasks.named<Zip>("buildPlugin") {

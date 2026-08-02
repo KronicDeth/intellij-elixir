@@ -183,6 +183,7 @@ jobs:
             **/build/reports/tests/**
             **/build/test-results/**
             **/build/reports/problems/**
+            **/sandbox/**/log*/splitTestLogs/**
           retention-days: 30
           include-hidden-files: true
           overwrite: true
