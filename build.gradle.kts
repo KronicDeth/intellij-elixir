@@ -74,6 +74,9 @@ val libMockitoCore = libs.mockito.core
 val elixirVersion = project.property("elixirVersion") as String
 val quoterVersion = project.property("quoterVersion") as String
 
+val quoterRepo = providers.gradleProperty("quoterRepo").getOrElse("KronicDeth/intellij_elixir")
+val quoterRef = providers.gradleProperty("quoterRef").getOrElse("v$quoterVersion")
+
 // Publish channel: "default" for release, "canary" for pre-release
 val publishChannel: String = providers.gradleProperty("publishChannels").getOrElse("canary")
 
@@ -626,7 +629,7 @@ val getElixir = tasks.register("getElixir") {
 
 val getQuoter = tasks.register<Download>("getQuoter") {
     description = "Downloads the Quoter tool"
-    src("https://github.com/KronicDeth/intellij_elixir/archive/v${quoterVersion}.zip")
+    src("https://github.com/$quoterRepo/archive/$quoterRef.zip")
     dest(cachePath.file("intellij_elixir-${quoterVersion}.zip"))
     overwrite(false)
 }
