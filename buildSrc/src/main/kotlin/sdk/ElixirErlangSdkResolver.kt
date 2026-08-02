@@ -300,7 +300,11 @@ class ElixirErlangSdkResolver(
             logger.warn("mise install $tool@$version failed (exit ${installResult.exitCode})")
         }
 
-        val whereResult = execAndCapture(listOf("mise", "where", tool), projectDir) ?: return null
+        // `mise where <tool>` (no version) reports whatever the cwd's mise config resolves, NOT what
+        // was just installed - so asking for a version that differs from the local pin silently
+        // returns the pinned version's path. Always ask for the version explicitly.
+        val whereResult =
+            execAndCapture(listOf("mise", "where", "$tool@$version"), projectDir) ?: return null
         if (whereResult.exitCode != 0 || whereResult.output.isBlank()) {
             return null
         }
@@ -318,12 +322,15 @@ class ElixirErlangSdkResolver(
     private fun detectElixirVersion(home: File, erlangHome: File?): String? {
         val binDir = File(home, "bin")
         val elixirExec = File(binDir, elixirExecutableName())
+        val command = listOf(elixirExec.absolutePath, "-e", "IO.puts System.version")
+        val environment = elixirExecutionEnvironment(erlangHome)
         val result = execAndCapture(
-            listOf(elixirExec.absolutePath, "-e", "IO.puts(System.version())"),
+            command,
             projectDir,
-            elixirExecutionEnvironment(erlangHome)
+            environment
         ) ?: return null
         if (result.exitCode != 0) {
+            logger.lifecycle("${command.joinToString(" ")} exited with code ${result.exitCode}\n${result.output}")
             return null
         }
         return lastNonEmptyLine(result.output)
@@ -331,24 +338,8 @@ class ElixirErlangSdkResolver(
 
     private fun elixirExecutionEnvironment(erlangHome: File?): Map<String, String> {
         val home = erlangHome?.takeIf { isValidErlangHome(it) } ?: return emptyMap()
-        val binDir = File(home, "bin")
-        val existingPath = System.getenv("PATH")
-            ?: System.getenv("Path")
-            ?: ""
-        val newPath = if (existingPath.isBlank()) {
-            binDir.absolutePath
-        } else {
-            "${binDir.absolutePath}${File.pathSeparator}$existingPath"
-        }
-        return buildMap {
-            // Ensure Elixir finds Erlang on Windows by setting ERTS_BIN and PATH.
-            put("ERTS_BIN", binDir.absolutePath + File.separator)
-            put("PATH", newPath)
-            if (isWindows()) {
-                put("Path", newPath)
-            }
-            put("ERLANG_SDK_HOME", home.absolutePath)
-        }
+        // Shared with the quoter build tasks (see MixEnvironment.kt).
+        return erlangRuntimeEnvironment(home)
     }
 
     private data class SdkCandidate(

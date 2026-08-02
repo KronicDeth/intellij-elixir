@@ -1,0 +1,21 @@
+# The project's toolchain pin. `mise install` provisions everything here.
+#
+# This is the single source of truth for the Elixir/Erlang the build targets: `resolveElixirErlangSdks`
+# asks mise (`mise current <tool>`) rather than parsing this file, so a per-developer override in the
+# gitignored mise.local.toml is honoured instead of silently disagreeing with your PATH.
+#
+# To switch versions:            mise use elixir@1.17.3-otp-27 erlang@27.1.2
+# To try one without committing: ./gradlew check -PelixirVersion=1.17.3 -PotpVersion=27.1.2
+#
+# The Elixir/OTP pairs CI tests are declared in .github/ci-versions.json; keep the pin here equal to
+# its beam.earliest entry. The other pair CI runs is Elixir 1.17.3 / OTP 27.1.2 (informational).
+
+[settings]
+# Record exact versions: `mise use elixir@1.17` writes 1.17.3-otp-27 rather than a fuzzy "1.17".
+pin = true
+
+[tools]
+elixir = "1.13.4-otp-24"
+erlang = "24.3.4.6"
+# GitHub Actions uses JBR 21. IntelliJ Platform 2026.2+ needs JBR 25 - see CONTRIBUTING.md.
+java = "jetbrains-21.0.11-b1163.116"

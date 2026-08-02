@@ -58,7 +58,7 @@ class WindowsQuoterPlatform : QuoterPlatform {
         logger.lifecycle("Starting Quoter daemon (Windows - managed process)...")
 
         val windowsExecutable = toWindowsExecutable(executable)
-        logger.debug("Executable: ${windowsExecutable.absolutePath}")
+        logger.debug("Running: ${windowsExecutable.absolutePath} start")
 
         // Use ProcessBuilder for better control over the child process
         val pb = ProcessBuilder(windowsExecutable.absolutePath, "start")
@@ -146,10 +146,15 @@ class WindowsQuoterPlatform : QuoterPlatform {
         // Clean stdout by removing any lines that appear in stderr
         val cleanedOutput = cleanStdout(pidOutput.toString(), errorStream.toString())
 
-        // Verify the cleaned output is a valid PID (numeric)
-        if (cleanedOutput.matches(Regex("^\\d+$"))) {
-            logger.debug("Quoter daemon responding with PID: $cleanedOutput")
-            return Pair(true, cleanedOutput)
+        // The node may print boot warnings to stdout before the PID (e.g. OTP 28 emitting
+        // `inet_parse:".../etc/hosts":N: erroneous line, SKIPPED` for a malformed hosts file), so
+        // extract the PID as the last purely-numeric line rather than requiring the whole output.
+        val pidLine = cleanedOutput.lineSequence()
+            .map { it.trim() }
+            .lastOrNull { it.matches(Regex("^\\d+$")) }
+        if (pidLine != null) {
+            logger.debug("Quoter daemon responding with PID: $pidLine")
+            return Pair(true, pidLine)
         }
 
         logger.debug("Invalid PID output after cleaning: '$cleanedOutput'")

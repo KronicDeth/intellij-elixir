@@ -7,7 +7,8 @@
  * - Windows: Full support (Git Bash, MSYS2, WSL, or native)
  *
  * Key Components:
- * 1. ElixirService (BuildService): Manages Elixir installation and build
+ * 1. resolveElixirErlangSdks: resolves the Elixir/Erlang SDK (mise/PATH/env aware) for the quoter
+ *    build and the test tasks; shared with testUI. No from-source Elixir build in the normal path.
  * 2. QuoterService (BuildService): Manages Quoter daemon lifecycle with guaranteed cleanup
  * 3. Platform abstraction: Automatic detection and platform-specific implementations
  * 4. Tasks: Thin wrappers for CI caching and developer discoverability
@@ -20,10 +21,7 @@ import com.adarshr.gradle.testlogger.TestLoggerExtension
 import com.adarshr.gradle.testlogger.theme.ThemeType
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import de.undercouch.gradle.tasks.download.Download
-import org.gradle.api.artifacts.Configuration
-import org.gradle.api.specs.Spec
 import deps.registerResolveExternalDependenciesTasksForAllProjects
-import elixir.ElixirService
 import org.jetbrains.intellij.platform.gradle.Constants
 import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
@@ -39,9 +37,11 @@ import quoter.tasks.GetQuoterDepsTask
 import quoter.tasks.ReleaseQuoterTask
 import quoter.tasks.StartQuoterTask
 import sdk.ElixirErlangSdkArgumentProvider
+import sdk.MiseCurrentVersionValueSource
 import sdk.ErlangAvailabilityCheckAction
-import sdk.PrepareElixirSdkTask
 import sdk.ResolveElixirErlangSdksTask
+import sdk.versionWithoutBuildTag
+import sdk.elixirTestEnvironment
 import versioning.PluginVersion
 import versioning.VersionFetcher
 import java.text.SimpleDateFormat
@@ -71,11 +71,40 @@ val libCommonsIo = libs.commons.io
 val libMockitoCore = libs.mockito.core
 
 // --- Configuration Properties ---
-val elixirVersion = project.property("elixirVersion") as String
-val quoterVersion = project.property("quoterVersion") as String
+
+// Which Elixir/OTP the build targets. Explicit properties win; otherwise mise is asked what this
+// project resolves to (mise.toml, overridable per-developer in the gitignored mise.local.toml).
+//
+// Properties are authoritative rather than a fallback: -PelixirVersion means "use this one", and
+// consulting mise first would let a local override silently outrank an explicit request. It also
+// keeps mise off the critical path for CI, which passes both flags and has no mise installed.
+fun miseVersionOf(tool: String): Provider<String> =
+    providers.of(MiseCurrentVersionValueSource::class) {
+        parameters.tool.set(tool)
+        parameters.workingDir.set(layout.projectDirectory.asFile)
+    }
+
+val expectedElixirVersion: Provider<String> =
+    providers.gradleProperty("elixirVersion").orElse(miseVersionOf("elixir"))
+val expectedOtpVersion: Provider<String> =
+    providers.gradleProperty("otpVersion").orElse(miseVersionOf("erlang"))
+val expectedVersionSource: String =
+    if (providers.gradleProperty("elixirVersion").isPresent) "-PelixirVersion/-PotpVersion" else "mise"
+
+// Names the per-version cache directories below, so a quoter built under one Elixir is never reused
+// for another. The -otp-N build tag is stripped: mise reports "1.13.4-otp-24" where CI passes
+// "1.13.4", and they are the same Elixir - keeping the tag would give the two a cache tree each.
+// Only "unresolved" when neither properties nor mise answered; resolveElixirErlangSdks then fails
+// with instructions before anything writes to that path.
+val elixirVersion: String = versionWithoutBuildTag(expectedElixirVersion.getOrElse("unresolved"))
 
 val quoterRepo = providers.gradleProperty("quoterRepo").getOrElse("KronicDeth/intellij_elixir")
-val quoterRef = providers.gradleProperty("quoterRef").getOrElse("v$quoterVersion")
+val quoterRef = providers.gradleProperty("quoterRef").getOrElse("v2.1.0")
+// Cache namespace for the quoter, derived from the ref ('/' is illegal in a path segment). Keeps
+// each repo/ref's downloaded zip, build dir, and daemon tmp dir separate, so switching source
+// never reuses another's artifacts. CI computes the identical slug in its "Resolve quoter cache slug"
+// step in .github/workflows/shared-test.yml (quoterRef with '/' -> '-').
+val quoterRefSlug = quoterRef.replace('/', '-')
 
 // Publish channel: "default" for release, "canary" for pre-release
 val publishChannel: String = providers.gradleProperty("publishChannels").getOrElse("canary")
@@ -127,9 +156,16 @@ val javaVersionStr: String = if (platformBuildNumber >= 262) "25" else libs.vers
 // Setup Paths
 val cachePath: Directory = layout.projectDirectory.dir("cache")
 val elixirPath: Directory = cachePath.dir("elixir-$elixirVersion")
-val quoterUnzippedPath: Directory = cachePath.dir("elixir-$elixirVersion-intellij_elixir-$quoterVersion")
+val quoterUnzippedPath: Directory = cachePath.dir("elixir-$elixirVersion-intellij_elixir-$quoterRefSlug")
 val quoterExe: RegularFile = quoterUnzippedPath.file("_build/dev/rel/intellij_elixir/bin/intellij_elixir")
-val quoterTmpPath: Directory = cachePath.dir("quoter_tmp_$quoterVersion")
+val quoterTmpPath: Directory = cachePath.dir("quoter_tmp_$quoterRefSlug")
+// hex/rebar + fetched deps are cached under the project (used by the quoter mix build). Both are
+// declared outputs of getQuoterDeps, so the build cache restores them with `deps` and an up-to-date
+// task skips the `mix local.hex`/`local.rebar` network round-trips. mixArchivesPath is the ROOT: mix
+// installs archives flat, so getQuoterDeps namespaces a subdirectory per Elixir/OTP pair (see
+// sdk.mixArchivesDir) to stop one pair's hex being loaded by another.
+val mixHomePath: Directory = cachePath.dir("mix_home")
+val mixArchivesPath: Directory = cachePath.dir("mix_archives")
 
 // EXPORT FOR SUBPROJECTS (Required for jps-builder to access this path)
 extra["elixirPath"] = elixirPath.asFile.absolutePath
@@ -611,26 +647,13 @@ runIdePlatformsList.forEach { platform ->
 }
 
 // --- External Tools (Elixir & Quoter) ---
-val expectedElixirVersion = elixirVersion
-val prepareElixirSdk = tasks.register<PrepareElixirSdkTask>("prepareElixirSdk") {
-    description = "Downloads and builds Elixir from source if needed"
-    group = "verification"
-    elixirVersion.set(expectedElixirVersion)
-    projectDir.set(layout.projectDirectory)
-    elixirHome.set(elixirPath)
-    markerFile.set(elixirPath.file(".installed"))
-}
-
-val getElixir = tasks.register("getElixir") {
-    description = "Prepares the Elixir SDK"
-    dependsOn(prepareElixirSdk)
-}
-
-
+// Elixir/Erlang for the quoter build come from the mise/PATH/env-aware `resolveElixirErlangSdks`
+// (shared with testUI) - no from-source Elixir build. Its output (elixir.sdk.path / erlang.sdk.path)
+// is read by the quoter tasks and the test tasks.
 val getQuoter = tasks.register<Download>("getQuoter") {
     description = "Downloads the Quoter tool"
     src("https://github.com/$quoterRepo/archive/$quoterRef.zip")
-    dest(cachePath.file("intellij_elixir-${quoterVersion}.zip"))
+    dest(cachePath.file("intellij_elixir-$quoterRefSlug.zip"))
     overwrite(false)
 }
 
@@ -643,7 +666,7 @@ val unzipQuoter = tasks.register<Copy>("unzipQuoter") {
     into(quoterUnzippedPath)
 
     from(zipTree(getQuoter.get().dest)) {
-        // 2. Strip the top-level directory 'intellij_elixir-${quoterVersion}' on the fly
+        // 2. Strip the archive's single top-level directory (name varies by tag/branch) on the fly
         eachFile {
             relativePath = RelativePath(true, *relativePath.segments.drop(1).toTypedArray())
         }
@@ -655,12 +678,14 @@ val unzipQuoter = tasks.register<Copy>("unzipQuoter") {
 
 val getQuoterDeps = tasks.register<GetQuoterDepsTask>("getQuoterDeps") {
     description = "Prepares the Quoter dependencies"
-    dependsOn(unzipQuoter, prepareElixirSdk)
-    workingDir(quoterUnzippedPath)
+    dependsOn(unzipQuoter, resolveElixirErlangSdks)
 
     // Configure the task
     quoterDir.set(quoterUnzippedPath)
     depsDir.set(quoterUnzippedPath.dir("deps"))
+    sdkProperties.set(sdkPropertiesFile)
+    mixHome.set(mixHomePath)
+    mixArchivesRoot.set(mixArchivesPath)
 
     // INPUTS: mix.exs and mix.lock define requirements
     inputs.file(quoterUnzippedPath.file("mix.exs"))
@@ -674,11 +699,13 @@ val getQuoterDeps = tasks.register<GetQuoterDepsTask>("getQuoterDeps") {
 val releaseQuoter = tasks.register<ReleaseQuoterTask>("releaseQuoter") {
     description = "Builds the Quoter tool"
     dependsOn(getQuoterDeps)
-    workingDir(quoterUnzippedPath)
 
     // Configure the task
     quoterDir.set(quoterUnzippedPath)
     buildDir.set(quoterUnzippedPath.dir("_build"))
+    sdkProperties.set(sdkPropertiesFile)
+    mixHome.set(mixHomePath)
+    mixArchivesRoot.set(mixArchivesPath)
 
     // INPUTS: mix.exs, lockfile, source code, and dependencies
     inputs.files(
@@ -690,24 +717,13 @@ val releaseQuoter = tasks.register<ReleaseQuoterTask>("releaseQuoter") {
     inputs.dir(quoterUnzippedPath.dir("deps")).withPathSensitivity(PathSensitivity.RELATIVE)
 }
 
-// Register ElixirService - manages Elixir installation and build
-val elixirService = gradle.sharedServices.registerIfAbsent("elixir", ElixirService::class) {
-    val versionString = elixirVersion
-    parameters {
-        elixirVersion.set(versionString)
-        projectDir.set(layout.projectDirectory)
-    }
-}
-
-// Register the QuoterService - Gradle calls close() at build end regardless of failure
-// Depends on ElixirService for Mix commands
+// Register the QuoterService - Gradle calls close() at build end regardless of failure.
+// The daemon is a self-contained mix release (bundled ERTS), so it needs no Elixir/Erlang SDK here.
 // See: https://docs.gradle.org/current/userguide/build_services.html
 val quoterService = gradle.sharedServices.registerIfAbsent("quoter", QuoterService::class) {
-    val elixirSvc = elixirService
     parameters {
         executable.set(quoterExe)
         tmpDir.set(quoterTmpPath)
-        elixirService.set(elixirSvc)
     }
 }
 
@@ -733,13 +749,25 @@ allprojects {
     }
 }
 
+// The whole JUnit suite. The parser tests (org.elixir_lang.parser_definition) quote source through
+// the external Elixir quoter daemon and compare it against the plugin's own quoting, so this task
+// owns the daemon's lifecycle - hence startQuoter and usesService below.
 tasks.named<Test>("test") {
-    dependsOn("prepareTestSandbox", startQuoter)
+    // ELIXIR_LANG_ELIXIR_PATH/EBIN/VERSION come from the resolved SDK (mise/PATH/env): the BEAM
+    // decompiler tests read the Elixir stdlib ebin, and the parser tests read stdlib sources.
+    // Resolved paths are only known at execution, so set env in a doFirst reading the resolver
+    // output.
+    dependsOn("prepareTestSandbox", resolveElixirErlangSdks, startQuoter)
     usesService(quoterService)
 
-    environment("ELIXIR_LANG_ELIXIR_PATH", elixirPath.asFile.absolutePath)
-    environment("ELIXIR_EBIN_DIRECTORY", elixirPath.dir("lib/elixir/ebin/").asFile.absolutePath + File.separator)
-    environment("ELIXIR_VERSION", elixirVersion)
+    val sdkProps = sdkPropertiesFile
+    doFirst {
+        environment(elixirTestEnvironment(sdkProps.get().asFile))
+    }
+
+    // The parsing tests are JUnit 3 (com.intellij.testFramework.ParsingTestCase -> TestCase),
+    // discovered by the JUnit 4 runner.
+    useJUnit()
 
     // Add Mockito as javaagent to avoid dynamic loading warnings (root project only)
     jvmArgs("-javaagent:${mockitoAgent.asPath}")
@@ -759,9 +787,9 @@ val resolveElixirErlangSdks = tasks.register<ResolveElixirErlangSdksTask>("resol
     description = "Resolves Erlang and Elixir SDKs for testing"
     group = "verification"
     projectDir.set(layout.projectDirectory)
-    toolVersionsFile.set(layout.projectDirectory.file(".tool-versions"))
-    gradlePropertiesFile.set(layout.projectDirectory.file("gradle.properties"))
     elixirVersion.set(expectedElixirVersion)
+    otpVersion.set(expectedOtpVersion)
+    versionSource.set(expectedVersionSource)
     outputFile.set(sdkPropertiesFile)
 }
 
