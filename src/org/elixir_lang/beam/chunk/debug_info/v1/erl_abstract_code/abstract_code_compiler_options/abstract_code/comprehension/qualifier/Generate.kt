@@ -6,9 +6,10 @@ import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Scope
 
 /**
- * The `generate` list comprehension generator, `Pattern <- Expression`.
+ * The `generate` list comprehension generator, `Pattern <- Expression` (and its OTP-28 strict form
+ * `generate_strict`, `Pattern <:- Expression`).
  */
-object Generate : Generator("generate", "generate expression") {
+object Generate : Generator(setOf("generate", "generate_strict"), "generate expression") {
     override fun patternMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope): MacroStringDeclaredScope =
             toPattern(term)
                     ?.let { AbstractCode.toMacroStringDeclaredScope(it, scope) }

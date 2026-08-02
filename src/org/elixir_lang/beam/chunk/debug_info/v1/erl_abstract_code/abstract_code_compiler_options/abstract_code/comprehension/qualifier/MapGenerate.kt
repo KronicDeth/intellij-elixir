@@ -7,14 +7,15 @@ import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Scope
 
 /**
- * The `m_generate` map comprehension generator introduced in OTP 26: `Key := Value <- MapExpression`.
+ * The `m_generate` map comprehension generator introduced in OTP 26: `Key := Value <- MapExpression`
+ * (and its OTP-28 strict form `m_generate_strict`, `Key := Value <:- MapExpression`).
  *
  * The pattern (element 2) is a `map_field_exact`/`map_field_assoc` tuple
  * (`{map_field_exact, Anno, KeyPattern, ValuePattern}`).  Iterating a map in an Elixir comprehension yields
  * `{key, value}` tuples, so the key/value patterns are rendered as a two-element tuple pattern
  * `{key_pattern, value_pattern} <- expression`, consistent with list and bitstring generators.
  */
-object MapGenerate : Generator("m_generate", "map generate expression") {
+object MapGenerate : Generator(setOf("m_generate", "m_generate_strict"), "map generate expression") {
     override fun patternMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope): MacroStringDeclaredScope {
         val pattern = toPattern(term)
 

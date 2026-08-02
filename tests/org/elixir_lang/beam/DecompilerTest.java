@@ -193,6 +193,11 @@ public class DecompilerTest extends PlatformTestCase {
         assertDecompiled("zip_map_generator");
     }
 
+    // OTP-28 strict generators (`<:-` / `<:=`): list, bitstring, and map variants must render as `<-`.
+    public void testStrictGenerators() throws IOException {
+        assertDecompiled("strict_generators");
+    }
+
     /*
      * Instance Methods
      */

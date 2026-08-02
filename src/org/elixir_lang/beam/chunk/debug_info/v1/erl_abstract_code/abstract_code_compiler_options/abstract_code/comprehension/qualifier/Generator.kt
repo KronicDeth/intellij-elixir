@@ -13,13 +13,18 @@ import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_
  *
  * Every generator has the Erlang abstract form `{Tag, Anno, Pattern, Expression}` and renders as
  * `pattern <- expression`, with the expression's declared scope threaded into the pattern's scope (so a variable
- * bound by the expression is in scope for the pattern).  Subtypes supply only what differs: the [tag], the
+ * bound by the expression is in scope for the pattern).  Subtypes supply only what differs: the [tags], the
  * [expressionDescription] used in error messages, how the pattern is rendered ([patternMacroStringDeclaredScope]),
  * and, when the surrounding syntax is not a plain `pattern <- expression`, how the two are combined ([macroString]).
+ *
+ * Each subtype matches more than one [tags] value because OTP 28 (EEP 70) added a *strict* variant of every
+ * generator (`generate_strict`/`b_generate_strict`/`m_generate_strict`, written `<:-`/`<:=`), identical in
+ * abstract shape to its non-strict counterpart.  Elixir has no strict-generator syntax, so both render the
+ * same `<-` form - the strictness distinction (raise vs. skip on a non-matching element) is not expressible.
  */
-abstract class Generator(private val tag: String, private val expressionDescription: String) {
+abstract class Generator(private val tags: Set<String>, private val expressionDescription: String) {
     fun ifToMacroStringDeclaredScope(term: OtpErlangObject, scope: Scope): MacroStringDeclaredScope? =
-            ifTag(term, tag) { toMacroStringDeclaredScope(it, scope) }
+            ifTag(term, tags) { toMacroStringDeclaredScope(it, scope) }
 
     fun toMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope): MacroStringDeclaredScope {
         val (expressionMacroString, expressionDeclaredScope) = expressionMacroStringDeclaredScope(term, scope)
