@@ -21,10 +21,11 @@ sourceSets {
 
 // Ensuring the necessary tasks are executed before tests
 tasks.test {
-    dependsOn(":getElixir")
+    // Elixir stdlib ebin comes from the SDK resolved by the root `resolveElixirErlangSdks`
+    // (mise/PATH/env aware) - no from-source Elixir build. Resolved paths are known only at
+    // execution, so set env in a doFirst reading the resolver's output.
+    dependsOn(":resolveElixirErlangSdks")
 
-    val elixirPath = project.property("elixirPath") as String
-    val elixirVersion = project.property("elixirVersion") as String
     useJUnit()
     jvmArgs(
         "--add-opens=java.base/java.lang=ALL-UNNAMED",
@@ -37,9 +38,10 @@ tasks.test {
         "--add-opens=java.base/java.nio=ALL-UNNAMED",
     )
 
-    environment("ELIXIR_LANG_ELIXIR_PATH", elixirPath)
-    environment("ELIXIR_EBIN_DIRECTORY", "${elixirPath}/lib/elixir/ebin/")
-    environment("ELIXIR_VERSION", elixirVersion)
+    val sdkProps = rootProject.layout.buildDirectory.file("elixir-erlang-sdks.properties")
+    doFirst {
+        environment(sdk.elixirTestEnvironment(sdkProps.get().asFile))
+    }
 
     include("**/*Test.class")
 

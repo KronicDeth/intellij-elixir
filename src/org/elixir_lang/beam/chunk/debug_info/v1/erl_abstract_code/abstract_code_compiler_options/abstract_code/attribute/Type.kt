@@ -10,6 +10,7 @@ import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Attributes
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.anonymousVariableToAny
 import org.elixir_lang.beam.decompiler.Options
+import org.elixir_lang.beam.decompiler.ReservedTypeName
 import org.elixir_lang.code.Identifier
 
 private const val TYPE_ATTRIBUTE_NAME = "type"
@@ -32,8 +33,14 @@ class Type(val attributes: Attributes, attribute: Attribute): MacroString(attrib
     override fun toMacroString(options: Options): String {
         val elixirAttributeName = elixirAttributeName()
         val subtypeMacroString = subtypeMacroString()
+        val rendered = "@$elixirAttributeName $subtypeMacroString"
 
-        return "@$elixirAttributeName $subtypeMacroString"
+        // A type whose name is a reserved Elixir word (e.g. an Erlang `-type nil()`) has no valid
+        // Elixir declaration, so preserve it as a comment instead of emitting unparseable source.
+        return name
+            ?.takeIf { ReservedTypeName.isReserved(it) }
+            ?.let { ReservedTypeName.commentOut(it, rendered) }
+            ?: rendered
     }
 
     private fun elixirAttributeName() =

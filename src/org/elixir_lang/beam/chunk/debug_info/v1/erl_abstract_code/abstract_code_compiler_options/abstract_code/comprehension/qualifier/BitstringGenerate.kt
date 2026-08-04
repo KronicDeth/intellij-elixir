@@ -9,9 +9,10 @@ import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Scope
 
 /**
- * The `b_generate` bitstring comprehension generator, `<<Pattern <- Expression>>`.
+ * The `b_generate` bitstring comprehension generator, `<<Pattern <- Expression>>` (and its OTP-28
+ * strict form `b_generate_strict`, `<<Pattern <:= Expression>>`).
  */
-object BitstringGenerate : Generator("b_generate", "bitstring generate expression") {
+object BitstringGenerate : Generator(setOf("b_generate", "b_generate_strict"), "bitstring generate expression") {
     override fun patternMacroStringDeclaredScope(term: OtpErlangTuple, scope: Scope): MacroStringDeclaredScope =
             toPattern(term)
                     ?.let { patternToMacroStringDeclaredScope(it, scope) }

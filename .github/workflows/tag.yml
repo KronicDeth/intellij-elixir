@@ -29,9 +29,6 @@ jobs:
   test-and-verify:
     if: ${{ !inputs.skip_tests }}
     uses: ./.github/workflows/shared-test.yml
-    with:
-      elixir-version: '1.13.4'
-      otp-version: '24.3.4.6'
 
   release:
     needs: [ test-and-verify ]

@@ -1,46 +1,78 @@
 package quoter.tasks
 
-import elixir.ElixirService
+import org.gradle.api.DefaultTask
+import org.gradle.api.GradleException
 import org.gradle.api.file.DirectoryProperty
-import org.gradle.api.provider.Property
-import org.gradle.api.services.ServiceReference
-import org.gradle.api.tasks.Exec
-import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
-import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
+import org.gradle.api.tasks.TaskAction
+import org.gradle.process.ExecOperations
+import sdk.mixArchivesDir
+import sdk.mixEnvironment
+import sdk.mixExecutable
+import sdk.readPropertiesFile
+import java.io.File
+import javax.inject.Inject
 
 /**
- * Task that creates a Mix release for the Quoter project.
- * Uses ElixirService to get platform-specific mix executable and environment.
+ * Creates a Mix release for the Quoter project using the Elixir/Erlang SDK resolved by
+ * `resolveElixirErlangSdks` (mise/PATH/env aware) - no from-source Elixir build required. The
+ * release bundles ERTS from the resolved Erlang, so the daemon is self-contained at runtime.
  */
-abstract class ReleaseQuoterTask : Exec() {
+abstract class ReleaseQuoterTask : DefaultTask() {
 
-    @get:ServiceReference("elixir")
-    abstract val elixirService: Property<ElixirService>
+    /** Properties file written by `resolveElixirErlangSdks` (elixir.sdk.path / erlang.sdk.path). */
+    @get:InputFile
+    @get:PathSensitive(PathSensitivity.NONE)
+    abstract val sdkProperties: RegularFileProperty
 
-    @get:InputDirectory
-    @get:PathSensitive(PathSensitivity.RELATIVE)
+    /**
+     * Working directory for `mix`. @Internal rather than @InputDirectory because this task's own
+     * `_build` output is nested inside it, which would make it perpetually out of date. The real
+     * inputs (mix.exs, mix.lock, lib, config, deps) are declared at the registration site.
+     */
+    @get:Internal
     abstract val quoterDir: DirectoryProperty
+
+    /** Populated by `getQuoterDeps` (which declares both as outputs); consumed here, never written. */
+    @get:Internal
+    abstract val mixHome: DirectoryProperty
+
+    /** Root holding one [mixArchivesDir] per Elixir/OTP pair - not MIX_ARCHIVES itself. */
+    @get:Internal
+    abstract val mixArchivesRoot: DirectoryProperty
 
     @get:OutputDirectory
     abstract val buildDir: DirectoryProperty
 
+    @get:Inject
+    abstract val execOps: ExecOperations
+
     init {
-        // Configure task to cache outputs
         outputs.cacheIf { true }
     }
 
-    override fun exec() {
-        // Get the service and ensure Elixir is ready
-        val service = elixirService.get()
-        service.ensureReady()
+    @TaskAction
+    fun release() {
+        val props = readPropertiesFile(sdkProperties.get().asFile)
+        val elixirHome = File(props["elixir.sdk.path"] ?: throw GradleException("Missing elixir.sdk.path"))
+        val erlangHome = File(props["erlang.sdk.path"] ?: throw GradleException("Missing erlang.sdk.path"))
+        val mixExe = mixExecutable(elixirHome)
+        val archives = mixArchivesDir(
+            mixArchivesRoot.get().asFile,
+            props["elixir.version"],
+            props["erlang.version"]
+        )
+        val mixEnv = mixEnvironment(erlangHome, mixHome.get().asFile, archives)
 
-        // Configure the command
-        commandLine(service.getExecutable("mix"), "release", "--overwrite")
-        environment(service.getMixEnvironment())
-
-        // Execute
-        super.exec()
+        execOps.exec {
+            commandLine(mixExe, "release", "--overwrite")
+            workingDir(quoterDir.get().asFile)
+            environment(mixEnv)
+        }
     }
 }

@@ -64,7 +64,7 @@ public class ListParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testKeywordValue() throws Exception {
+    public void testKeywordValue() {
         assertParsedAndQuotedAroundError(false);
     }
 

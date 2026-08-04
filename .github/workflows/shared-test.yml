@@ -10,16 +10,6 @@ on:
         required: false
         type: string
         default: ''
-      elixir-version:
-        description: 'Elixir version to use'
-        required: false
-        type: string
-        default: '1.13.4'
-      otp-version:
-        description: 'OTP version to use'
-        required: false
-        type: string
-        default: '24.3.4.6'
       upload-test-reports:
         description: 'Upload test reports as artifacts'
         required: false
@@ -61,25 +51,71 @@ jobs:
           name: Event File
           path: ${{ github.event_path }}
 
+  # Composes the test legs from .github/ci-versions.json so the minimum supported IDEA version is
+  # declared once there and referenced by three legs, instead of being restated per leg. A
+  # generator job is needed because a strategy.matrix expression can only read the github, needs,
+  # vars and inputs contexts -- never a file.
+  test-matrix:
+    name: Test Matrix
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    outputs:
+      matrix: ${{ steps.compose.outputs.matrix }}
+      verify: ${{ steps.compose.outputs.verify }}
+      verify-any: ${{ steps.compose.outputs.verify-any }}
+    steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.ref || github.ref }}
+          persist-credentials: false
+          # The declaration and the generator that reads it, nothing else.
+          sparse-checkout: |
+            .github/ci-versions.json
+            .github/scripts
+          sparse-checkout-cone-mode: false
+
+      # Keep the generator in a file. Inlining it here - as jq, python or node -e - puts a program
+      # inside a single-quoted shell word, where one apostrophe anywhere in it, comments included,
+      # ends the string and turns the rest into shell. That failure takes out the whole matrix, and
+      # `bash -n` on the extracted `run:` block is the only cheap way to catch it. A file also runs on
+      # its own: with GITHUB_OUTPUT and GITHUB_STEP_SUMMARY unset it prints the legs it would compose
+      # (see CONTRIBUTING), so a declaration change is checkable without pushing.
+      - name: Compose test legs
+        id: compose
+        run: node .github/scripts/compose-legs.js
+
   test:
+    # Explicit name: with a generated matrix the auto-generated one is assembled from the whole
+    # include object (nested beam included) and changes shape whenever the declaration does.
+    #
+    # The label leads, because the checks graph truncates around 24-27 characters and the leading
+    # fields were the ones that barely varied: os was ubuntu-22.04 for ten of eleven legs and
+    # `test (ubuntu-22.04, 2025...` was all a reviewer could read. See Compose test legs.
+    name: test (${{ matrix.label }})
+    needs: test-matrix
     runs-on: ${{ matrix.os }}
     timeout-minutes: 30
+    # NOTE: continue-on-error is deliberately NOT set here. A job-level continue-on-error keeps the
+    # workflow run green but still publishes a FAILED check run, which blocks the pull request's
+    # merge button. The tolerance is applied to the Run tests step instead (see below), so an
+    # informational leg's job - and therefore its check - passes.
     strategy:
+      # Keep fail-fast off: a cancelled leg uploads no test results, which would make
+      # test-results.yml's per-cell checks vanish intermittently.
       fail-fast: false
-      matrix:
-        os: [ ubuntu-22.04, windows-2025 ]
-        idea-version:
-            - '2026.2'
-            - '2026.1.4'
-            - '2025.3.6'
-            # - 'LATEST-EAP-SNAPSHOT'
-        # 2026.2 (build 262) is compiled for and runs on Java 25; earlier builds use Java 21.
-        # The build script derives javac --release from the platform version; the installed
-        # JBR must match so it can compile and run the tests. Legs without an entry get the
-        # setup-env default of 21.
-        include:
-            - idea-version: '2026.2'
-              java-version: '25'
+      matrix: ${{ fromJson(needs.test-matrix.outputs.matrix) }}
+
+    # Flags shared by every Gradle step. BOTH version flags are required and must match what
+    # setup-beam put on PATH. They are the only source of the expected versions here: the runners have
+    # no mise, so resolveElixirErlangSdks fails outright without them, and a value that disagrees with
+    # PATH sends the resolver into a doomed from-source build.
+    env:
+      GRADLE_FLAGS: >-
+        -Dorg.gradle.console=plain --stacktrace
+        -PelixirVersion=${{ matrix.beam.elixir }}
+        -PotpVersion=${{ matrix.beam.otp }}
 
     steps:
       - name: Checkout
@@ -91,37 +127,168 @@ jobs:
 
       - name: Setup Build Environment
         id: setup-env
+        continue-on-error: ${{ matrix.beam.continue-on-error || false }}
         uses: ./.github/actions/setup-env
         with:
-          elixir-version: ${{ inputs.elixir-version || '1.13.4' }}
-          otp-version: ${{ inputs.otp-version || '24.3.4.6' }}
+          elixir-version: ${{ matrix.beam.elixir }}
+          otp-version: ${{ matrix.beam.otp }}
           idea-version: ${{ matrix.idea-version }}
-          java-version: ${{ matrix.java-version || '21' }}
+          java-version: ${{ matrix.java-version }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
           build-scan-publish: 'true'
           skip-searchable-options: 'true'
 
-      # Fail fast on compile errors (e.g. APIs removed in a newer platform) before the
-      # Elixir/quoter setup and test execution spend their minutes. testClasses aggregates
-      # main and test compilation across all modules; check reuses its outputs as UP-TO-DATE.
+      # Restore the quoter build cache (deps + _build) so the Build quoter step goes incremental. This
+      # and its Save counterpart live here, not in setup-env, so the whole cache lifecycle sits next to
+      # the quoter build. The dir is namespaced by the gradle.properties quoterRef slug (slashes ->
+      # dashes), matching build.gradle.kts quoterRefSlug.
+      - name: Resolve quoter cache slug
+        id: quoter-slug
+        run: |
+          ref=$(grep -E '^quoterRef=' gradle.properties | head -1 | cut -d= -f2-)
+          ref="${ref:-v2.1.0}"
+          echo "slug=${ref//\//-}" >> "$GITHUB_OUTPUT"
+
+      - name: Restore Elixir cache
+        id: restore-elixir-cache
+        uses: actions/cache/restore@v6
+        with:
+          path: |
+            cache/elixir-${{ matrix.beam.elixir }}-intellij_elixir-${{ steps.quoter-slug.outputs.slug }}/_build
+            cache/elixir-${{ matrix.beam.elixir }}-intellij_elixir-${{ steps.quoter-slug.outputs.slug }}/deps
+          key: elixir-${{ runner.os }}-${{ runner.arch }}-${{ matrix.beam.elixir }}-otp-${{ matrix.beam.otp }}-quoter-${{ hashFiles('gradle.properties') }}
+          restore-keys: |
+            elixir-${{ runner.os }}-${{ runner.arch }}-${{ matrix.beam.elixir }}-otp-${{ matrix.beam.otp }}-
+
+      # Timed phases; Gradle up-to-date checking makes each reuse the prior step's output (no rework):
+      #   Compile         - fail-fast compile gate; no packaging, Elixir, or quoter.
+      #   Prepare sandbox - stage the plugin into the test sandbox (not the buildPlugin distribution).
+      #   Build quoter    - releaseQuoter builds the executable; does not start the daemon.
+      #   Run tests       - check (test + :jps-builder:test); owns the quoter daemon start/stop.
       - name: Compile
         id: compile
-        run: ./gradlew -Dorg.gradle.console=plain --stacktrace testClasses
+        continue-on-error: ${{ matrix.beam.continue-on-error || false }}
+        run: ./gradlew $GRADLE_FLAGS testClasses
 
-      - name: Run Tests
+      - name: Prepare test sandbox
+        id: prepare-sandbox
+        continue-on-error: ${{ matrix.beam.continue-on-error || false }}
+        run: ./gradlew $GRADLE_FLAGS prepareTestSandbox
+
+      - name: Build quoter
+        id: build-quoter
+        continue-on-error: ${{ matrix.beam.continue-on-error || false }}
+        run: ./gradlew $GRADLE_FLAGS releaseQuoter
+
+      # Save the quoter build (_build/deps) now that releaseQuoter has produced it - setup-env only
+      # restores this cache; it cannot save it (those dirs do not exist until this step runs).
+      - name: Save Elixir cache
+        id: save-elixir-cache
+        if: always() && steps.build-quoter.outcome == 'success' && steps.restore-elixir-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: |
+            cache/elixir-${{ matrix.beam.elixir }}-intellij_elixir-${{ steps.quoter-slug.outputs.slug }}
+            !cache/**/tmp/pipe/**
+            !cache/**/distillery/priv
+          key: ${{ steps.restore-elixir-cache.outputs.cache-primary-key }}
+
+      # An Elixir the declaration marks unsupported may fail at any phase above, not only here -
+      # setup-beam may not publish the pair, the quoter may not compile on it - and all of those
+      # mean the same thing. Hence the repetition: tolerate every phase, or a leg that dies before
+      # the tests becomes a merge-blocking job despite being declared informational.
+      - name: Run tests
         id: test
-        run: ./gradlew -Dtestlogger.theme=standard -Dorg.gradle.console=plain --stacktrace check
+        continue-on-error: ${{ matrix.beam.continue-on-error || false }}
+        run: ./gradlew $GRADLE_FLAGS -Dtestlogger.theme=standard check
 
+      # Without this the reporting cannot tell a leg that never compiled from one that passed: it
+      # publishes whatever result XMLs exist, so the check reads "All 6 tests pass" for the six
+      # :jps-builder:test cases while ~6 500 never started.
+      #
+      # Separate from `Flag informational leg failure` below because every leg needs a status file,
+      # green and required ones included, while that step fires only for a failed informational leg.
+      # This is where the failing stage is named; the flag step consumes the output.
+      - name: Record leg status
+        id: leg-status
+        if: always()
+        env:
+          SETUP_ENV_OUTCOME: ${{ steps.setup-env.outcome }}
+          COMPILE_OUTCOME: ${{ steps.compile.outcome }}
+          SANDBOX_OUTCOME: ${{ steps.prepare-sandbox.outcome }}
+          QUOTER_OUTCOME: ${{ steps.build-quoter.outcome }}
+          TEST_OUTCOME: ${{ steps.test.outcome }}
+          LABEL: ${{ matrix.label }}
+          LEG_OS: ${{ matrix.os }}
+          IDEA: ${{ matrix.idea-version }}
+          ELIXIR: ${{ matrix.beam.elixir }}
+          OTP: ${{ matrix.beam.otp }}
+          INFORMATIONAL: ${{ matrix.beam.continue-on-error || false }}
+        run: node .github/scripts/record-leg-status.js
+
+      - name: Upload Leg Status
+        id: upload-leg-status
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: Leg Status (${{ matrix.label }})
+          path: leg-status.json
+          if-no-files-found: warn
+
+      # Without this the informational leg's failure would be visible only in the job summary: the
+      # job is green, so nothing in the PR's checks list would hint at it. An annotation surfaces on
+      # the run and in the PR's Checks tab without turning anything red. It is an `::error`
+      # annotation, not `::warning`, purely so it stands out - the quoter build emits ~19 Elixir
+      # deprecation warnings that this was getting lost among. It cannot change any conclusion.
+      #
+      # Gated on the leg actually being informational. A baseline leg reaches these steps too -
+      # `always()` runs them after its first hard failure - and announcing "does not block the merge"
+      # about a leg that does block it is worse than saying nothing during triage.
+      - name: Flag informational leg failure
+        id: flag-informational-failure
+        if: >-
+          ${{ always() && (matrix.beam.continue-on-error || false)
+              && steps.leg-status.outputs.failed-at != '' }}
+        env:
+          PHASE: ${{ steps.leg-status.outputs.failed-at }}
+        run: |
+          leg="Elixir ${{ matrix.beam.elixir }} / OTP ${{ matrix.beam.otp }} on IDEA ${{ matrix.idea-version }}"
+          echo "::error title=Informational leg failed::$leg failed at $PHASE. This leg is informational and does not block the merge; see the Failed tests summary and the Test Results check for details."
+          {
+            # :warning: in the summary, against the ::error annotation above, is deliberate: the icon
+            # encodes whether this blocks a merge - which it does not - while the annotation level
+            # only controls how visible it is in the log.
+            echo "### :warning: Informational leg failed"
+            echo
+            echo "\`$leg\` failed at **$PHASE** but does not block the merge."
+            echo
+            echo "It stays informational until it goes green; at that point remove"
+            echo '`continue-on-error` from its `beam.additional` entry in `.github/ci-versions.json`'
+            echo "so the version becomes supported and any later regression fails the pipeline."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # Gracefully terminate the daemon BEFORE GitHub Action's post-job step runs
+      # to try to resolve issues with windows-2025 shutdown.
+      - name: Stop Gradle Daemon
+        if: always()
+        run: ./gradlew --stop
+
+      # test-results.yml uses this name as the check name, so the INCOMPLETE marker Record leg status
+      # appends fixes the misleading check on its own, with no change to that workflow. The fallback
+      # keeps a leg publishing under its plain name if the status step never produced an output -
+      # upload-artifact rejects an empty name, and losing the XMLs is worse than losing the marker.
       - name: Upload Test Results
         id: upload-test-results
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: (!cancelled())
         with:
-          name: Test Results (${{ matrix.os }}, ${{ matrix.idea-version }})
+          name: ${{ steps.leg-status.outputs.artifact-name || format('Test Results ({0})', matrix.label) }}
           path: '**/build/test-results/**/*.xml'
           if-no-files-found: warn
 
-      - name: Summarize first failed tests
+      # Every result file is scanned so the heading can carry the real total; only the first
+      # MAX_LISTED are named, with a pointer to the log for the rest.
+      - name: Summarize failed tests
         id: summarize-failed-tests
         if: always()
         run: |
@@ -133,7 +300,7 @@ jobs:
           import os
           import xml.etree.ElementTree as ET
 
-          MAX_FAILURES = 10
+          MAX_LISTED = 10
           seen = set()
           failed = []
 
@@ -159,30 +326,32 @@ jobs:
 
                   seen.add(item)
                   failed.append(item)
-                  if len(failed) >= MAX_FAILURES:
-                      break
-
-              if len(failed) >= MAX_FAILURES:
-                  break
 
           if not failed:
               raise SystemExit(0)
 
           with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as s:
-              s.write("### Failed tests (max 10)\n\n")
-              s.writelines(f"- `{cls}.{name}`\n" for cls, name in failed)
+              s.write(f"### Failed tests ({len(failed)})\n\n")
+              s.writelines(f"- `{cls}.{name}`\n" for cls, name in failed[:MAX_LISTED])
+              remaining = len(failed) - MAX_LISTED
+              if remaining > 0:
+                  s.write(f"\nSee the full log for the remaining {remaining} failures.\n")
           PY
 
       - name: Upload Test Reports (on failure or when requested)
         id: upload-test-reports
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        if: ${{ always() && (failure() || inputs.upload-test-reports) }}
+        # steps.test.outcome is checked as well as failure(): an informational leg tolerates its own
+        # test failure, so the job never enters a failed state and failure() alone would skip the
+        # upload for precisely the leg whose reports are wanted.
+        if: ${{ always() && (failure() || steps.test.outcome == 'failure' || steps.build-quoter.outcome == 'failure' || inputs.upload-test-reports) }}
         with:
-          name: test-reports-${{ matrix.os }}-${{ matrix.idea-version }}
+          name: test-reports-${{ matrix.os }}-${{ matrix.idea-version }}-elixir-${{ matrix.beam.elixir }}-otp-${{ matrix.beam.otp }}
           path: |
             **/build/reports/tests/**
             **/build/test-results/**
             **/build/reports/problems/**
+            **/sandbox/**/log*/splitTestLogs/**
           retention-days: 30
           include-hidden-files: true
           overwrite: true
@@ -206,65 +375,28 @@ jobs:
         with:
           setup-elixir: false
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          free-docker-images: false
           skip-searchable-options: 'true'
 
       - name: Build Plugin
         id: build-plugin
         run: ./gradlew buildPlugin
 
-      # Find these versions at:
-      # https://www.jetbrains.com/idea/download/other/
-      # https://www.jetbrains.com/ruby/download/other/
-      - name: Verify Plugin
-        id: verify-plugin
-        # Fork to be replaced when/if https://github.com/ChrisCarini/intellij-platform-plugin-verifier-action/pull/102 merges
-        uses: sh41/intellij-platform-plugin-verifier-action@add_format_options
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          verifier-version: 1.404
-          ide-versions: |
-            ideaIU:253.33813.25
-            ideaIU:261.26222.65
-            ideaIU:262.8665.258
-            rubymine:2025.3.6
-            rubymine:2026.1.4
-          failure-levels: |
-            COMPATIBILITY_PROBLEMS
-            INVALID_PLUGIN
-            NON_EXTENDABLE_API_USAGES
-          # Should probably have this as well, but until there is a resolution for https://youtrack.jetbrains.com/issue/IJPL-243914
-          # it will keep failing the build
-          # OVERRIDE_ONLY_API_USAGES
-          # We can't use this because RubyMine will fail. The verifier doesn't understand "optional"
-          # MISSING_DEPENDENCIES
-          external-prefixes: 'org.jetbrains.jps'
-          verification-reports-formats: 'plain,markdown,html'
-          add-to-summary: 'verification-verdict.txt,compatibility-problems.txt,invalid-plugin.txt'
-
-      - name: Print Verification Output
-        id: print-verification-output
-        if: always()
-        run: |
-          log_file="${{ steps.verify-plugin.outputs.verification-output-log-filename }}"
-          if [ -n "$log_file" ] && [ -f "$log_file" ]; then
-            cat "$log_file"
-          fi
-
-      - name: Upload Verify Reports
-        id: upload-verify-reports
+      # The verify job below consumes this: a fixed artifact name, so a matrix leg does not have to
+      # know the version-stamped name used for the human-facing upload further down.
+      - name: Upload Plugin Distribution
+        id: upload-plugin-distribution
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        if: ${{ always() && inputs.upload-verifier-reports }}
         with:
-          name: verify-plugin-reports
-          path: |
-            ${{ steps.verify-plugin.outputs.verification-output-log-filename }}
-            ${{ steps.verify-plugin.outputs.verification-reports-dir }}
+          name: plugin-distribution
+          path: build/distributions/*.zip
+          # 30 days so a manual `Verify Plugin` dispatch (plugin: latest-ci) can still reach
+          # it well after the run. Storage is free on public repositories - artifact quotas apply to
+          # private repos only - and at 8 MB this is noise next to the test-report artifacts.
           retention-days: 30
+          if-no-files-found: error
 
-      - name: Upload Plugin Artifact
-        id: upload-plugin
+      - name: Unzip Plugin Artifact
+        id: unzip-plugin
         run: |
           zip_file=$(ls build/distributions/*.zip | head -1)
           artifact_name=$(basename "$zip_file" .zip)
@@ -272,8 +404,33 @@ jobs:
           unzip -o "$zip_file" -d build/distributions/unpacked
 
       - name: Upload Plugin Artifact (contents)
+        id: upload-plugin
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: ${{ steps.upload-plugin.outputs.artifact-name }}
+          name: ${{ steps.unzip-plugin.outputs.artifact-name }}
           path: build/distributions/unpacked/
-          retention-days: 1
+          # Same 30 days as the zip above, for the same reason: this is the copy a human downloads to
+          # install a PR build, and storage costs nothing on a public repository.
+          retention-days: 30
+
+  # Fanned out over one job per product x version by a reusable workflow, verifying the artifact
+  # build-plugin uploaded. Kept separate so the verification machinery - and the reasons it runs one
+  # IDE per job - lives in one place: .github/workflows/shared-verify.yml.
+  verify:
+    needs: [ test-matrix, build-plugin ]
+    if: ${{ needs.test-matrix.outputs.verify-any == 'true' }}
+    # A called workflow's token can never exceed the CALLING JOB's permissions, and the
+    # workflow-level block above does not apply to it: without this, shared-verify.yml's declared
+    # `actions: read` is offered `actions: none` and the whole run is rejected at validation time
+    # ("The workflow is requesting 'actions: read', but is only allowed 'actions: none'"), producing a
+    # startup failure with no jobs at all. contents: read has to be restated too, because job-level
+    # permissions replace the workflow-level set rather than adding to it.
+    permissions:
+      contents: read
+      actions: read
+    uses: ./.github/workflows/shared-verify.yml
+    with:
+      matrix: ${{ needs.test-matrix.outputs.verify }}
+      # inputs is empty for pull_request events, so this is false there, matching what the inline
+      # verification did before: reports upload only for workflow_call runs that ask for them.
+      upload-verifier-reports: ${{ inputs.upload-verifier-reports || false }}

@@ -17,6 +17,12 @@ public class InfixParsingTestCase extends ParsingTestCase {
      * Static Methods
      */
 
+    /**
+     * Deliberately NOT named {@code assertEquals}: a one-argument overload of the framework's own
+     * assertion reads as "assert this is equal to..." at the call site while actually asserting a
+     * hard-coded operator, and it silently competes with {@code Assert.assertEquals} during overload
+     * resolution.
+     */
     private static void assertOperator(Operation operation, @NotNull String operatorText) {
         assertEquals(operatorText, operation.operator().getText());
     }
@@ -65,7 +71,7 @@ public class InfixParsingTestCase extends ParsingTestCase {
         PsiFile root = root();
         Collection<Operation> operationCollection = PsiTreeUtil.findChildrenOfType(root, Operation.class);
 
-        return operationCollection.toArray(new Operation[operationCollection.size()]);
+        return operationCollection.toArray(new Operation[0]);
     }
 
     @NotNull

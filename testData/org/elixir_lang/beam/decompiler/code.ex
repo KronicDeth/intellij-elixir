@@ -428,12 +428,16 @@ defmodule :code do
     allAvailable = :maps.fold(fn file, path, acc ->
         [{:filename.rootname(file), :filename.append(path, file), false} | acc]
     end, [], allModules)
-    orderFun = named_anonymous_function f do
+    orderFun = (f = fn
+      # Decompiled from an Erlang named fun. Elixir has no named anonymous functions, so
+      # `f` is bound to the fn here to keep self-references readable; it will still
+      # NOT compile if the body recurses, as Elixir cannot see `f` inside its own
+      # definition (recursion must go through a module function).
       {a, _, _}, {b, _, _} ->
         f.(a, b)
       a, b ->
         a <= b
-    end
+    end)
     :lists.umerge(orderFun, :lists.sort(orderFun, allLoaded), :lists.sort(orderFun, allAvailable))
   end
 

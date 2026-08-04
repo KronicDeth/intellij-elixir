@@ -1,12 +1,10 @@
 package quoter
 
-import elixir.ElixirService
 import platform.detectPlatform
 import platform.logPlatformDetection
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.logging.Logging
-import org.gradle.api.provider.Property
 import org.gradle.api.services.BuildService
 import org.gradle.api.services.BuildServiceParameters
 import org.gradle.process.ExecOperations
@@ -31,9 +29,6 @@ abstract class QuoterService : BuildService<QuoterService.Params>, AutoCloseable
 
         /** Temporary directory for quoter runtime files */
         val tmpDir: DirectoryProperty
-
-        /** Reference to ElixirService for Mix commands (future use) */
-        val elixirService: Property<ElixirService>
     }
 
     @get:Inject
@@ -92,6 +87,14 @@ abstract class QuoterService : BuildService<QuoterService.Params>, AutoCloseable
                 logger.lifecycle("Quoter daemon not ready yet (Attempt ${attempt + 1}/$maxAttempts). Retrying...")
             }
         }
+
+        // The daemon was spawned but never became ready. close() only stops the daemon once
+        // `started` is true (which we never reach), so stop the spawned process here - otherwise it
+        // leaks and holds the distributed node name, making every subsequent start fail with
+        // "name ... in use by another Erlang node".
+        logger.warn("Quoter daemon did not become ready; stopping the spawned process to avoid a leak.")
+        quoterPlatform.stopDaemon(execOps, executable, releaseTmp, process, logger)
+        process = null
 
         throw RuntimeException("Quoter daemon failed to start after $maxAttempts attempts.")
     }

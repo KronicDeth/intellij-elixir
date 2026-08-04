@@ -7,7 +7,6 @@ import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Char
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Float
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Map
-import org.elixir_lang.errorreport.Logger
 
 
 object AbstractCode {
@@ -64,6 +63,7 @@ object AbstractCode {
             Integer.ifToMacroStringDeclaredScope(term) ?:
             Map.ifToMacroStringDeclaredScope(term, scope) ?:
             MapField.ifToMacroStringDeclaredScope(term, scope) ?:
+            Maybe.ifToMacroStringDeclaredScope(term, scope) ?:
             Match.ifToMacroStringDeclaredScope(term, scope) ?:
             NamedFun.ifToMacroStringDeclaredScope(term, scope) ?:
             Nil.ifToMacroStringDeclaredScope(term) ?:

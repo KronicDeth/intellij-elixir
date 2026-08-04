@@ -21,6 +21,7 @@ import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_
 import org.elixir_lang.beam.decompiler.Default
 import org.elixir_lang.beam.decompiler.Options
 import org.elixir_lang.beam.decompiler.appendNotDecompiledBody
+import org.elixir_lang.beam.decompiler.ReservedTypeName
 import org.elixir_lang.beam.decompiler.decompiler
 import org.elixir_lang.model.psi.type.TypeBuiltins.BUILTIN_ARITY_BY_NAME
 import org.elixir_lang.beam.term.inspect
@@ -104,27 +105,21 @@ private fun appendTypes(
 
         for (name in BUILTIN_ARITY_BY_NAME.keys.sorted()) {
             for (arity in BUILTIN_ARITY_BY_NAME[name]!!.sorted()) {
-                decompiled.append("  @type ").append(name).append('(')
-
-                if ((name == "maybe_improper_list" ||
+                val parameters = when {
+                    (name == "maybe_improper_list" ||
                             name == "nonempty_improper_list" ||
-                            name == "nonempty_maybe_improper_list")
-                    && arity == 2
-                ) {
-                    decompiled.append("element :: term(), tail :: term()")
-                } else if (name == "non_empty_list" && arity == 1) {
-                    decompiled.append("element :: term()")
-                } else {
-                    for (i in 1..arity) {
-                        if (i > 1) {
-                            decompiled.append(", ")
-                        }
+                            name == "nonempty_maybe_improper_list") && arity == 2 ->
+                        "element :: term(), tail :: term()"
 
-                        decompiled.append("type").append(i)
-                    }
+                    name == "non_empty_list" && arity == 1 -> "element :: term()"
+                    else -> (1..arity).joinToString(", ") { "type$it" }
                 }
 
-                decompiled.append(") :: ...\n")
+                // Routed through appendTypeDeclaration so a built-in that is a reserved Elixir word
+                // would be commented out rather than emitted as invalid source - the same rule
+                // TypeDefinitions applies when deciding which built-ins get a stub. None is today;
+                // keeping the two derived from one rule is what stops them drifting apart.
+                appendTypeDeclaration(decompiled, name, "@type $name($parameters) :: ...")
             }
         }
     }
@@ -144,6 +139,29 @@ private fun appendTypes(
             appendTypes(decompiled, abstractCodeCompileOptions, documentation, Options())
         } else {
             documentation?.docs?.typeDocumentedByArityByName()?.let { appendTypes(decompiled, it) }
+        }
+    }
+}
+
+/**
+ * Appends a single `@type`/`@opaque` declaration line, indented two spaces.  If [name] is a reserved
+ * Elixir word it cannot name an Elixir type, so the declaration is emitted commented out (still
+ * indented) to keep the source parseable - see [ReservedTypeName].
+ */
+private fun appendTypeDeclaration(decompiled: StringBuilder, name: String, declaration: String) {
+    val rendered = if (ReservedTypeName.isReserved(name)) {
+        ReservedTypeName.commentOut(name, declaration)
+    } else {
+        declaration
+    }
+
+    // Indent only the first line; a commented multi-line block carries its own continuation indent
+    // (see ReservedTypeName.commentOut), matching how the abstract-code type path appends attributes.
+    rendered.lineSequence().forEachIndexed { index, line ->
+        if (index == 0) {
+            decompiled.append("  ").append(line).append('\n')
+        } else {
+            decompiled.append(line).append('\n')
         }
     }
 }
@@ -176,20 +194,11 @@ private fun appendTypes(decompiled: StringBuilder, documentedByArityByName: Map<
                 for (signature in signatures) {
                     val cleaned = signature.replace("\r", "")
                     val (attr, body) = erlangTypeSignatureToElixir(cleaned)
-                    decompiled.append("  @").append(attr).append(' ').append(body).append('\n')
+                    appendTypeDeclaration(decompiled, name, "@$attr $body")
                 }
             } else {
-                decompiled.append("  @type ").append(name).append('(')
-
-                for (i in 1..arity) {
-                    if (i > 1) {
-                        decompiled.append(", ")
-                    }
-
-                    decompiled.append("type").append(i)
-                }
-
-                decompiled.append(") :: ...\n")
+                val head = "$name(" + (1..arity).joinToString(", ") { "type$it" } + ")"
+                appendTypeDeclaration(decompiled, name, "@type $head :: ...")
             }
         }
     }
