@@ -108,7 +108,26 @@ jobs:
           # matching "## <comment_title>" and comment_title defaults to check_name.
           comment_mode: off
           files: 'artifacts/test-results/**/*.xml'
-          report_suite_logs: error
+          # Every annotation on this check should BE a test failure. The action annotates a failed
+          # test at `warning` level - that is fixed, not a consequence of fail_on above - so anything
+          # else it emits at the same level is indistinguishable from the failure at a glance, and the
+          # one line naming the broken test was arriving 1-of-22 on the Elixir 1.14 leg:
+          #
+          #   report_suite_logs: error    ->  10 x "Logging on stderr of test suite <suite>"
+          #   check_run_annotations       ->  11 x "6580 tests found (test 1 to 767)" notices
+          #
+          # `none` for both leaves exactly the failures. Suite-level stderr is still in the leg's job
+          # log and its test-reports-* artifact, and the readable list of failures is the `Failed
+          # tests` summary that shared-test.yml writes on the leg's own job.
+          #
+          # check_run_annotations has to be set explicitly: it defaults to "all tests, skipped tests",
+          # and while check_run_annotations_branch normally limits those to the default branch, this
+          # workflow RUNS on the default branch (workflow_run), so the action always considers itself
+          # in scope and every leg gets them.
+          #
+          # Failure annotations themselves are governed by `ignore_runs`, which must stay false.
+          check_run_annotations: none
+          report_suite_logs: none
 
   # A single aggregate check over every matrix cell, per the action's "Use with
   # matrix strategy" guidance, plus the pull request comment. The check_name is
@@ -190,7 +209,11 @@ jobs:
           # the per-leg figures come from the per-cell check runs, which are published for free.
           json_file: test-results.json
           files: 'artifacts/test-results/**/*.xml'
-          report_suite_logs: error
+          # As in the per-cell publish job above, and for the same reason: an annotation on this check
+          # should mean a test failed. Here it also keeps the aggregate from repeating all 11 legs'
+          # worth of "N tests found" notices.
+          check_run_annotations: none
+          report_suite_logs: none
           # See the per-cell publish job above: report the numbers, leave the pass/fail verdict to
           # the Test workflow.
           fail_on: errors
