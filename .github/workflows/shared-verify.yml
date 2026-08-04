@@ -199,6 +199,7 @@ jobs:
         if: ${{ inputs.matrix == '' }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
           BRANCH: ${{ github.ref_name }}
           PLUGIN: ${{ inputs.plugin }}
           PLUGIN_ARTIFACT: ${{ inputs.plugin-artifact || 'plugin-distribution' }}
