@@ -3,6 +3,10 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Contributing](#contributing)
+  - [Changelog](#changelog)
+    - [Which group](#which-group)
+    - [Format](#format)
+    - [Skipping the check](#skipping-the-check)
   - [Development](#development)
     - [Importing the project](#importing-the-project)
     - [Building and running](#building-and-running)
@@ -45,11 +49,69 @@
       - [Convert ICLS to Additional Text Attributes format](#convert-icls-to-additional-text-attributes-format)
       - [Add Additional Text Attributes to plugin](#add-additional-text-attributes-to-plugin)
   - [Building](#building)
+    - [Plugin version scheme](#plugin-version-scheme)
     - [Documentation](#documentation)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Contributing
+
+## Changelog
+
+**Every pull request needs an entry in [`CHANGELOG.md`](CHANGELOG.md) under `## Unreleased`.** CI
+checks this and fails the `Changelog / changelog-entry` job if the file is untouched.
+
+`CHANGELOG.md` is not just a record. The Gradle Changelog Plugin renders the entry for the version
+being built into the plugin's `changeNotes`, which is the **"What's New"** users read on the
+[Marketplace page](https://plugins.jetbrains.com/plugin/7522-elixir) and in the IDE's Plugins settings
+dialog. A change that never reaches `CHANGELOG.md` is invisible to users, not merely undocumented.
+
+### Which group
+
+Not every group reaches users. Pick accordingly:
+
+| Group | Published to users? |
+|---|---|
+| `### Breaking changes` | **yes** |
+| `### Enhancements` | **yes** |
+| `### Bug Fixes` | **yes** |
+| `### Threading / Platform Hygiene` | no - recorded for contributors |
+| `### Build / CI` | no - recorded for contributors |
+
+If a change has no effect anyone using the plugin can observe, it belongs in one of the lower two. The
+group vocabulary and which of them publish are declared in `gradle.properties` (`changelogGroups`,
+`changelogPublishedGroups`), and CI checks your entry against them.
+
+### Format
+
+`CHANGELOG.md` follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Add your entry under
+`## [Unreleased]`, in the group that matches, using a `-` bullet with a link to the PR and your
+`@handle`. Nested sub-bullets are fine and render correctly, so one PR link can carry several items:
+
+```markdown
+## [Unreleased]
+
+### Enhancements
+- [#1234](https://github.com/KronicDeth/intellij-elixir/pull/1234) - [@you](https://github.com/you)
+  - **Go-to-Declaration now works on `foo`.** Lead with what a user can now do, then name the API if
+    it helps - the readers are Elixir developers, so `ElixirPsiImplUtil` is fair game once the effect
+    is clear.
+```
+
+Write for someone deciding whether to upgrade. Say what changed and why it matters; for a fix, say
+what used to go wrong.
+
+Two mechanical things to know:
+
+- **Every entry must be a list item.** The changelog parser models list items and nothing else, so a
+  bare paragraph under a group heading is silently dropped when the file is rewritten at release.
+- **Do not add a version heading.** Only `## [Unreleased]` gets edited by hand; `./gradlew
+  patchChangelog` creates the release section at release time.
+
+### Skipping the check
+
+Apply the **`no-changelog`** label when there is genuinely nothing to record - a test-only fix, or a
+revert of something that never shipped. Dependabot pull requests are exempt automatically.
 
 ## Development
 
@@ -576,6 +638,47 @@ JetBrains plugins are able to set the text attribute values for `TextAttributeKe
 1. In `plugin.xml` inside the `idea-plugin extensions[defaultExtensionNs="com.intellij"]` tag, add a new additionalTextAttribute tag: `<additionalTextAttributes file="colorSchemes/Elixir$SCHEME_NAME.xml" scheme="SCHEME_NAME"/>`
 
 ## Building
+
+### Plugin version scheme
+
+The built plugin's version depends on how it was produced:
+
+| Build | Version | Example |
+|---|---|---|
+| Tagged release (`tag.yml`, `-PpluginVersionOverride`) | the git tag verbatim | `24.0.0` |
+| Release channel (`-PpublishChannels=default`) | base version, no suffix | `24.0.0` |
+| CI canary | `<base>-pre+<UTC commit time>.<commit>` | `24.0.1-pre+20260804164541.64e3d69a` |
+| Local build | `<base>-dev+<UTC commit time>.<commit>` | `24.0.1-dev+20260804164541.64e3d69a` |
+| `-PversionSuffix=<s>` | `<base>-<s>` | `24.0.1-rc1` |
+
+`<base>` is `pluginVersion` from `gradle.properties`, with the patch bumped for any non-release
+channel so the IDE does not offer to "update" a local build to the released one. A work tree that
+differs from `HEAD` in any way adds `-wip` after the commit - **including untracked files**, since
+an un-added source file is compiled into the plugin just like a committed one.
+
+Why the commit is there: the version string is the **only** field identifying the built code in a
+JetBrains Marketplace exception report. The IDE sends `IdeaPluginDescriptor.version` as
+`plugin.version`, and the exception analyzer surfaces it as `pluginVersion` with no companion
+metadata - so without the commit, a crash report cannot be traced to a source revision.
+`-dev` vs `-pre` separates a maintainer's own sandbox reports from real canary users' reports.
+
+The timestamp is the **commit's** committer date, not the build's clock. A build-clock stamp reads as
+a source date without being one, which is how a report from a build stamped 30 June turned out to be
+running source from three weeks earlier. Committer date rather than author date, so a rebased or
+amended commit sorts later.
+
+Three consequences worth knowing:
+
+- The whole suffix is a pure function of (commit, dirty), so **rebuilding unchanged source produces an
+  identical version** and leaves `patchPluginXml` - and everything downstream of the patched
+  descriptor - `UP-TO-DATE`. A wall-clock stamp re-runs all of it on every reconfiguration.
+- Reading `HEAD` is a configuration-cache input (`versioning.GitSourceIdValueSource`), so committing
+  or flipping the tree's dirty state invalidates the configuration cache. Ordinary editing does not:
+  a tree that was already dirty stays dirty, so the value is unchanged and the cache is reused.
+  Release builds skip the lookup entirely.
+- If `git` is unavailable the version falls back to a build-clock stamp with no commit. The two are
+  told apart by the commit: a lone timestamp is a build time, a timestamp followed by a commit is that
+  commit's time.
 
 ### Documentation
 
