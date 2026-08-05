@@ -6,10 +6,48 @@ Any changes to the README are delayed until the last PR before release because i
 README and assumed that any features in the README MUST exist in the version they can install from the JetBrains
 repository, so documenting `main` features in the README leads to just more support work.
 
+## Promote the changelog
+
+`CHANGELOG.md` is in [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) format and is the single
+source of the plugin's change notes: the Gradle Changelog Plugin renders it into `changeNotes`, which is
+the "What's New" on the [Marketplace page](https://plugins.jetbrains.com/plugin/7522-elixir) and in the
+IDE's Plugins settings dialog. Contributors add entries under `## [Unreleased]` as they go (see the
+Changelog section of [`CONTRIBUTING.md`](CONTRIBUTING.md)), so there is nothing to write at release -
+only to promote.
+
+The panel shows the version being built plus the five before it, and publishes only the
+`### Breaking changes`, `### Enhancements` and `### Bug Fixes` groups; `### Threading / Platform
+Hygiene` and `### Build / CI` are recorded for contributors and filtered out. All three settings live in
+`gradle.properties`: `changelogGroups`, `changelogPublishedGroups` and `changelogPublishedVersions`.
+
+**Do this before `buildPlugin`** - the built zip embeds the rendered notes.
+
+1. Set `pluginVersion` in `gradle.properties` to the release version.
+2. Promote `## [Unreleased]` into a dated section for it:
+
+   ```sh
+   ./gradlew patchChangelog -PpublishChannels=default
+   ```
+
+   `-PpublishChannels=default` is **required**. Without it the build bumps the patch for canary
+   versioning, and `patchChangelog` would stamp that bumped number instead of the release: a `24.1.0`
+   release would be recorded as `## [24.1.1]`.
+
+3. Review and commit the result. The task adds the dated release heading and opens a fresh
+   `## [Unreleased]` scaffolded with the five group headings.
+
+If `## [Unreleased]` is empty the task skips with `missing release note in the 'Unreleased'` and
+changes nothing - which means the release has no notes, so check why before continuing.
+
 ## Build Release
 
-1. Update `version` in `gradle.properties` to the release version used in `resources/META-INF/plugin.xml`.
+1. `pluginVersion` in `gradle.properties` was already set in the previous step. Do **not** edit
+   `resources/META-INF/plugin.xml` - Gradle patches its `<version>` and `<change-notes>` during
+   `patchPluginXml`, so any value committed there is overwritten.
 2. Run the `buildPlugin` gradle task.
+
+The **Tag Release** workflow checks that the tag's version matches `pluginVersion`, so a forgotten
+bump fails before anything is built rather than shipping a mislabelled artifact.
 
 ## Smoke Test Built Release
 

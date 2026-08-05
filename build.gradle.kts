@@ -22,6 +22,7 @@ import com.adarshr.gradle.testlogger.theme.ThemeType
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import de.undercouch.gradle.tasks.download.Download
 import deps.registerResolveExternalDependenciesTasksForAllProjects
+import org.jetbrains.changelog.Changelog
 import org.jetbrains.intellij.platform.gradle.Constants
 import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
@@ -42,6 +43,7 @@ import sdk.ErlangAvailabilityCheckAction
 import sdk.ResolveElixirErlangSdksTask
 import sdk.versionWithoutBuildTag
 import sdk.elixirTestEnvironment
+import versioning.ChangelogSettings
 import versioning.GitSourceIdValueSource
 import versioning.PluginVersion
 import versioning.VersionFetcher
@@ -51,6 +53,7 @@ import java.util.*
 // Uses the Version Catalog defined in gradle/libs.versions.toml
 plugins {
     alias(libs.plugins.intellij.platform)
+    alias(libs.plugins.changelog)
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.download)
     alias(libs.plugins.test.logger)
@@ -223,6 +226,78 @@ version = providers.gradleProperty("pluginVersionOverride").orNull?.takeIf(Strin
 
 logger.lifecycle("[elixir-build] platform=$actualPlatformVersion version=$version channel=$publishChannel dynamicEap=$useDynamicEapVersion skipSearchableOptions=$skipSearchableOptions quoterExe=$quoterExe quoterTmpPath=${quoterTmpPath.asFile.absolutePath}")
 
+// --- Changelog ---
+// CHANGELOG.md is the single source of the plugin's change notes. resources/META-INF/changelog.html
+// used to hold a separately hand-written copy for users, and it went stale: 24.0.0 shipped with
+// v23.9.0 as its newest section, so everyone who installed it read notes for a version two releases
+// old. Deriving changeNotes from CHANGELOG.md makes that failure unreachable.
+//
+// What publishes is declared in gradle.properties and validated in ChangelogSettings, so that the
+// per-pull-request check in changelog.yml reads the same declaration from a properties file.
+val changelogSettings = ChangelogSettings.from(
+    groups = providers.gradleProperty("changelogGroups").get(),
+    publishedGroups = providers.gradleProperty("changelogPublishedGroups").get(),
+    publishedVersions = providers.gradleProperty("changelogPublishedVersions").get(),
+)
+val changelogVersion: String = ChangelogSettings.marketingVersion(version.toString())
+
+changelog {
+    // Keep a Changelog format is this plugin's native format, so the parser needs no configuration:
+    // `path`, `headerParserRegex`, `unreleasedTerm` and `itemPrefix` all default correctly, and the
+    // IntelliJ Platform Gradle Plugin supplies `repositoryUrl` and an empty version prefix.
+    version = changelogVersion
+    groups = changelogSettings.groups
+}
+
+// A lazy provider, NOT an eager read. This matters: rendering eagerly at configuration time produced
+// a plain String that the configuration cache stored without recording CHANGELOG.md as an input, so
+// editing the changelog left the cache valid and the build kept publishing the previous notes - the
+// same staleness bug in a new place. Going through the extension's own providers makes the file a
+// tracked input. This is also the shape the IntelliJ Platform Plugin Template uses.
+val renderedChangeNotes: Provider<String> = providers.provider {
+    // getAll() returns file order, newest first, with Unreleased leading when present.
+    val all = changelog.getAll()
+
+    // The version being built, or Unreleased when it has no section of its own - which is the normal
+    // case for a canary, whose patch is bumped past the last release.
+    val startKey = sequenceOf(changelogVersion, changelog.unreleasedTerm.get())
+        .firstOrNull(all::containsKey)
+
+    val ordered = all.keys.toList()
+    val startIndex = startKey?.let(ordered::indexOf)?.takeIf { it >= 0 } ?: 0
+
+    ordered.drop(startIndex)
+        .asSequence()
+        .map { key ->
+            val item = all.getValue(key)
+            // Group-level selection has to be expressed through an item-level filter: `groups` does
+            // not filter, and withFilter's predicate receives each item's text, never its section
+            // name. So take the item strings belonging to the published groups and keep exactly
+            // those. Keeping rather than excluding biases a duplicated line toward being published,
+            // which is the safer mistake.
+            val published = item.sections
+                .filterKeys { it in changelogSettings.publishedGroups }
+                .values.flatten().toSet()
+            changelog.renderItem(
+                item
+                    // A version heading per section, since more than one version is listed. Plain
+                    // withHeader renders it bracketed ("[v23.9.0]"); withLinkedHeader(false) gives
+                    // the bare version, which is what a reader wants.
+                    .withHeader(true)
+                    .withLinkedHeader(false)
+                    .withLinks(false)
+                    .withEmptySections(false)
+                    .withFilter { it in published },
+                Changelog.OutputType.HTML,
+            )
+        }
+        // A version whose entries were all in unpublished groups renders as a lone heading, so drop it
+        // rather than showing an empty one - and do not let it consume one of the slots.
+        .filter { it.contains("<li>") }
+        .take(changelogSettings.publishedVersions)
+        .joinToString("\n")
+}
+
 //// --- Dependency Updates Configuration ---
 //// Run with: ./gradlew dependencyUpdates --no-parallel
 //// The --no-parallel flag is required by the plugin in Gradle 9+ (see plugin README known issues).
@@ -380,7 +455,7 @@ intellijPlatform {
         val stripTag = { text: String, tag: String -> text.replace("<${tag}>", "").replace("</${tag}>", "") }
         val bodyInnerHTML = { path: String -> stripTag(stripTag(file(path).readText(), "html"), "body") }
 
-        changeNotes = bodyInnerHTML("resources/META-INF/changelog.html")
+        changeNotes = renderedChangeNotes
         description = bodyInnerHTML("resources/META-INF/description.html")
 
         ideaVersion {
@@ -879,3 +954,5 @@ tasks.register<Test>("testUI") {
 //        setProperty("termsOfServiceAgree", "yes")
 //    }
 //}
+
+
