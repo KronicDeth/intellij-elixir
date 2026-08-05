@@ -3,6 +3,10 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Contributing](#contributing)
+  - [Changelog](#changelog)
+    - [Which group](#which-group)
+    - [Format](#format)
+    - [Skipping the check](#skipping-the-check)
   - [Development](#development)
     - [Importing the project](#importing-the-project)
     - [Building and running](#building-and-running)
@@ -51,6 +55,63 @@
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Contributing
+
+## Changelog
+
+**Every pull request needs an entry in [`CHANGELOG.md`](CHANGELOG.md) under `## Unreleased`.** CI
+checks this and fails the `Changelog / changelog-entry` job if the file is untouched.
+
+`CHANGELOG.md` is not just a record. The Gradle Changelog Plugin renders the entry for the version
+being built into the plugin's `changeNotes`, which is the **"What's New"** users read on the
+[Marketplace page](https://plugins.jetbrains.com/plugin/7522-elixir) and in the IDE's Plugins settings
+dialog. A change that never reaches `CHANGELOG.md` is invisible to users, not merely undocumented.
+
+### Which group
+
+Not every group reaches users. Pick accordingly:
+
+| Group | Published to users? |
+|---|---|
+| `### Breaking changes` | **yes** |
+| `### Enhancements` | **yes** |
+| `### Bug Fixes` | **yes** |
+| `### Threading / Platform Hygiene` | no - recorded for contributors |
+| `### Build / CI` | no - recorded for contributors |
+
+If a change has no effect anyone using the plugin can observe, it belongs in one of the lower two. The
+group vocabulary and which of them publish are declared in `gradle.properties` (`changelogGroups`,
+`changelogPublishedGroups`), and CI checks your entry against them.
+
+### Format
+
+`CHANGELOG.md` follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Add your entry under
+`## [Unreleased]`, in the group that matches, using a `-` bullet with a link to the PR and your
+`@handle`. Nested sub-bullets are fine and render correctly, so one PR link can carry several items:
+
+```markdown
+## [Unreleased]
+
+### Enhancements
+- [#1234](https://github.com/KronicDeth/intellij-elixir/pull/1234) - [@you](https://github.com/you)
+  - **Go-to-Declaration now works on `foo`.** Lead with what a user can now do, then name the API if
+    it helps - the readers are Elixir developers, so `ElixirPsiImplUtil` is fair game once the effect
+    is clear.
+```
+
+Write for someone deciding whether to upgrade. Say what changed and why it matters; for a fix, say
+what used to go wrong.
+
+Two mechanical things to know:
+
+- **Every entry must be a list item.** The changelog parser models list items and nothing else, so a
+  bare paragraph under a group heading is silently dropped when the file is rewritten at release.
+- **Do not add a version heading.** Only `## [Unreleased]` gets edited by hand; `./gradlew
+  patchChangelog` creates the release section at release time.
+
+### Skipping the check
+
+Apply the **`no-changelog`** label when there is genuinely nothing to record - a test-only fix, or a
+revert of something that never shipped. Dependabot pull requests are exempt automatically.
 
 ## Development
 

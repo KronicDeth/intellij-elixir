@@ -1,0 +1,146 @@
+name: Changelog
+on:
+  pull_request:
+    # labeled/unlabeled are needed so adding or removing the skip label re-evaluates the check rather
+    # than leaving a stale red or green result behind.
+    types: [ opened, synchronize, reopened, labeled, unlabeled ]
+
+jobs:
+  # CHANGELOG.md is the single source of the plugin's change notes: the Gradle Changelog Plugin renders
+  # the entry for the version being built into changeNotes, which is the "What's New" shown on the
+  # Marketplace page and in the Plugins settings dialog. A change that never reaches CHANGELOG.md is
+  # therefore invisible to users forever, not merely undocumented.
+  #
+  # Two deliberate exemptions:
+  #   - the `no-changelog` label, for work with genuinely nothing to say (a test-only fix, a revert of
+  #     something never released)
+  #   - dependabot, which cannot write entries; its bumps are recorded by whoever batches them up
+  #
+  # NOTE: this makes the omission visible, not impossible. Blocking a merge additionally requires
+  # marking "Changelog / changelog-entry" a required status check in the branch protection rules for
+  # main - that cannot be configured from the workflow file.
+  changelog-entry:
+    if: >-
+      ${{ !contains(github.event.pull_request.labels.*.name, 'no-changelog')
+          && github.event.pull_request.user.login != 'dependabot[bot]' }}
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      # Asks the API which files the pull request touches rather than checking out and diffing: no
+      # checkout, no fetch-depth guesswork about how far back the merge base is.
+      - name: Require a CHANGELOG.md entry
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          if gh api "repos/${REPO}/pulls/${PR}/files" --paginate --jq '.[].filename' \
+              | grep -qx 'CHANGELOG.md'; then
+            echo "CHANGELOG.md is updated by this pull request."
+            exit 0
+          fi
+          echo "::error title=Missing changelog entry::This pull request does not touch CHANGELOG.md. Add an entry under '## [Unreleased]' - see the Changelog section of CONTRIBUTING.md for which group to use. Entries under Breaking changes, Enhancements and Bug Fixes are published to the Marketplace as the plugin's What's New; Threading / Platform Hygiene and Build / CI are recorded but not published. If there is genuinely nothing to record, apply the 'no-changelog' label."
+          exit 1
+
+      # Touching the file is not the same as recording something. These checks cover what the build
+      # cannot: that the entry landed in Unreleased, is shaped so the parser will keep it, and sits
+      # under a group that actually publishes.
+      #
+      # Deliberately NOT re-checked here: whether CHANGELOG.md parses at all. A heading the changelog
+      # parser rejects fails patchPluginXml, which prepareTestSandbox depends on, so every leg of the
+      # test matrix already goes red on it. Running getChangelog here would only prove it a twelfth
+      # time, and would cost this job a JDK and a Gradle configuration it currently does without.
+      - name: Checkout the changelog
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          # gradle.properties comes along so the group names are read from the same declaration the
+          # build uses, rather than restated here where they would drift.
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            CHANGELOG.md
+            gradle.properties
+
+      - name: Validate the Unreleased section
+        run: |
+          python3 - <<'PY'
+          import re, sys
+
+          changelog = open("CHANGELOG.md", encoding="utf-8").read()
+
+          # The same declaration the build reads. A properties file, so no need to parse Kotlin.
+          props = {}
+          for line in open("gradle.properties", encoding="utf-8"):
+              line = line.strip()
+              if line and not line.startswith("#") and "=" in line:
+                  key, _, value = line.partition("=")
+                  props[key.strip()] = value.strip()
+
+          def names(key):
+              if key not in props:
+                  print(f"::error title=Missing property::gradle.properties has no {key}, so the allowed section names are unknown. Fix the declaration rather than skipping this check.")
+                  sys.exit(1)
+              return [part.strip() for part in props[key].split(",") if part.strip()]
+
+          allowed = names("changelogGroups")
+          published = set(names("changelogPublishedGroups"))
+
+          section = re.search(r'^## \[Unreleased\]\s*$(.*?)(?=^## |\Z)', changelog, re.S | re.M)
+          if not section:
+              print("::error title=No Unreleased section::CHANGELOG.md has no '## [Unreleased]' heading. Entries go there; release headings are created by patchChangelog.")
+              sys.exit(1)
+          body = section.group(1)
+
+          failed = False
+
+          # 1. Something has to be recorded, and it has to be a list item - the parser models list
+          #    items and nothing else.
+          items = re.findall(r'^\s*- ', body, re.M)
+          if not items:
+              print("::error title=Empty Unreleased section::CHANGELOG.md was changed, but '## [Unreleased]' has no entries. Add a '-' bullet under the group that matches, or apply the 'no-changelog' label if there is genuinely nothing to record.")
+              failed = True
+
+          # 2. Prose at column zero is silently dropped when patchChangelog rewrites the file, so it
+          #    is never a safe way to record anything. Indented lines are continuations of an item.
+          for line in body.splitlines():
+              if not line.strip() or line.startswith("### ") or re.match(r'^\s*- ', line) or re.match(r'^\s+\S', line):
+                  continue
+              print(f"::error title=Entry is not a list item::In '## [Unreleased]': {line.strip()[:120]} -- every entry must be a '-' bullet. A bare paragraph is dropped when the release section is generated, so it would never reach anyone.")
+              failed = True
+
+          # 3. A group the build does not know about is excluded from the published notes without a
+          #    word, so a typo silently costs a user-visible entry.
+          for group in re.findall(r'^### (.+)$', body, re.M):
+              if group.strip() not in allowed:
+                  print(f"::error title=Unknown group::'### {group.strip()}' is not one of {allowed}. Entries under an unrecognised group are silently dropped from the plugin's What's New.")
+                  failed = True
+
+          if failed:
+              sys.exit(1)
+
+          groups_used = [g.strip() for g in re.findall(r'^### (.+)$', body, re.M)]
+          visible = [g for g in groups_used if g in published]
+          print(f"Unreleased has {len(items)} entrie(s) under {groups_used}.")
+          print(f"Published to users: {visible or 'none - all entries are in groups that are recorded but not published'}.")
+          PY
+
+      # A version heading is patchChangelog's to write, so a hand-written one usually means a mistake.
+      # A warning rather than a failure: the release promotion commit legitimately adds one, and this
+      # job cannot tell that apart from a contributor doing it by hand.
+      - name: Warn on a hand-written version heading
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          added=$(gh api "repos/${REPO}/pulls/${PR}/files" --paginate \
+            --jq '.[] | select(.filename == "CHANGELOG.md") | .patch' \
+            | grep -E '^\+## \[[0-9]' || true)
+          if [[ -n "$added" ]]; then
+            echo "::warning title=Version heading added by hand::This pull request adds a release heading to CHANGELOG.md. Only '## [Unreleased]' is edited by hand - release sections come from 'gradlew patchChangelog -PpublishChannels=default'. Ignore this if the pull request IS the release promotion."
+          else
+            echo "No hand-written version heading."
+          fi
