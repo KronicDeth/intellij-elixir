@@ -103,7 +103,9 @@ To create release notes for the new tag
 5. Set the "Release title" to `vVERSION`
 6. Add the release notes
 1. Thanks for bug reporters for the release (use the Milestone filter to find issues fixed for the release version)
-2. The changes from the for the release (copy directly from `CHANGELOG.md`)
+2. The changes for the release - **already filled in** if you used the Tag Release workflow, which
+   renders the body from `CHANGELOG.md`. Unlike the plugin's "What's New", it keeps every group,
+   including `### Threading / Platform Hygiene` and `### Build / CI`.
 3. README updates (copy directly from `README.md`)
 7. Attach the `build/distributions/intellij-elixir-VERSION.zip` binary.
 8. Click Publish Release
