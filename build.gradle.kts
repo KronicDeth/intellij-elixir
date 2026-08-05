@@ -42,6 +42,7 @@ import sdk.ErlangAvailabilityCheckAction
 import sdk.ResolveElixirErlangSdksTask
 import sdk.versionWithoutBuildTag
 import sdk.elixirTestEnvironment
+import versioning.GitSourceIdValueSource
 import versioning.PluginVersion
 import versioning.VersionFetcher
 import java.text.SimpleDateFormat
@@ -173,15 +174,45 @@ extra["elixirPath"] = elixirPath.asFile.absolutePath
 // Version suffix logic:
 // - "default" channel = no suffix (release build)
 // - explicit versionSuffix property = use that
-// - otherwise = "-pre+<timestamp>" (canary build)
+// - CI, untagged = "-pre+<commit time>.<commit>" (canary build)
+// - local        = "-dev+<commit time>.<commit>"
+//
+// The version string is the ONLY field identifying the built code in a Marketplace exception report:
+// the IDE sends IdeaPluginDescriptor.version as `plugin.version`, and the exception-analyzer API
+// surfaces it as `pluginVersion` with no companion metadata. So it has to say what the build was made
+// from, and a build-clock timestamp reads as a source date without being one.
+//
+// `-dev` vs `-pre` separates a maintainer's own sandbox reports from real canary users, which is
+// otherwise only recoverable by looking for debugger frames and home directories in the stack trace.
+//
+// The timestamp is the commit's, so the whole suffix is a pure function of the source: ordering still
+// works (committer dates advance along a branch, and PluginVersion's patch bump keeps any untagged
+// build ahead of the released one), and rebuilding unchanged source no longer churns the version and
+// with it patchPluginXml. See versioning.GitSourceIdValueSource for the rest of the reasoning.
+
+// Left as a Provider and only resolved in the branch that uses it: reading HEAD makes the commit a
+// configuration-cache input, and neither a release (versioned from its tag) nor an explicit
+// -PversionSuffix build should pay that invalidation for a value it discards.
+val sourceIdProvider = providers.of(GitSourceIdValueSource::class) {
+    parameters.workingDir.set(layout.projectDirectory.asFile)
+}
+
 val versionSuffix: String = when {
     publishChannel == "default" -> ""
     providers.gradleProperty("versionSuffix").isPresent &&
         providers.gradleProperty("versionSuffix").get().isNotEmpty() ->
             "-${providers.gradleProperty("versionSuffix").get()}"
-    else -> "-pre+" + SimpleDateFormat("yyyyMMddHHmmss").apply {
-        timeZone = TimeZone.getTimeZone("UTC")
-    }.format(Date())
+    else -> {
+        // GitHub Actions (and most CI) set CI=true; absence means a developer's machine.
+        val channelTag = if (System.getenv("CI").isNullOrBlank()) "dev" else "pre"
+        // Without git there is no commit and no commit time, so the build clock is all that is left
+        // to order builds by. The absent commit is what marks the timestamp as a build time.
+        val metadata = sourceIdProvider.orNull
+            ?: SimpleDateFormat("yyyyMMddHHmmss").apply {
+                timeZone = TimeZone.getTimeZone("UTC")
+            }.format(Date())
+        "-$channelTag+$metadata"
+    }
 }
 
 // The Tag Release workflow (.github/workflows/tag.yml) passes the release tag (minus the leading "v") as
