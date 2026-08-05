@@ -27,7 +27,7 @@ junit = "4.13.2"
 opentest4j = "1.3.0"
 mockito-core = "5.23.0"
 kodein = "7.32.0"
-qodana = "2026.1.3"
+qodana = "2026.2.0"
 
 # See https://plugins.jetbrains.com/docs/intellij/build-number-ranges.html#platformVersions
 # 2026.1 (261.x) requires Java 21.
