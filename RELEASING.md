@@ -25,6 +25,31 @@ repository, so documenting `main` features in the README leads to just more supp
 
 ## Tag release
 
+Prefer the **Tag Release** workflow (`.github/workflows/tag.yml`). Its `validate-tag` job runs before
+anything is built, so a mistake costs seconds instead of the whole test matrix, and it checks:
+
+| Check | Applies to |
+|---|---|
+| `v<major>.<minor>.<patch>` for a release, `…-pre-<n>` for a pre-release | both, per the `prerelease` input |
+| Dispatched from `main` | releases only |
+| Tag does not already exist | both |
+| Version higher than every existing tag | both |
+| Tag version matches `pluginVersion` in `gradle.properties` | both |
+
+There is deliberately no change-notes check here. The notes are rendered from `CHANGELOG.md`, so no
+separate file can go stale against the tag, and that every change is recorded at all is enforced per
+pull request by `changelog.yml`.
+
+One input is worth understanding rather than just satisfying: **the `prerelease` checkbox defaults to
+ticked.** Leaving it ticked for a release would build the release version on the canary channel, so the
+tag shape and the flag must agree.
+
+The leading `v` is not decoration: `refs/tags/v*` globs and `git describe` both rely on it, and the
+repository carries tags that got this wrong four different ways (a missing `v`, a doubled `vv`, one
+that is just `v`, and four-component versions).
+
+Tagging by hand **bypasses every check above** - get it right yourself, or use the workflow.
+
 1. `git tag -a vVERSION -m "Version VERSION"`
 2. `git push`
 3. `git push --tags`
