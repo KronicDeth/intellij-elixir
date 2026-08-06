@@ -8,6 +8,14 @@
     version is listed with its release date, so upgrading after skipping a few releases shows what you
     missed rather than one undifferentiated list.
 
+### Bug Fixes
+- [#3901](https://github.com/KronicDeth/intellij-elixir/pull/3901) - [@sh41](https://github.com/sh41)
+  - **Semantic syntax highlighting now appears in decompiled `.beam` files.** Function names, types and
+    the rest were being coloured by the annotators and then discarded before they reached the editor, so
+    decompiled code showed only the plain lexer colours. v24.0.0 announced this as working; it was not.
+  - **Opening a decompiled `.beam` file no longer reports "PsiFile's context does not match the context
+    of the editor",** which reached users as an IDE error report.
+
 ### Build / CI
 - [@sh41](https://github.com/sh41)
   - `CHANGELOG.md` is now in [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) format and is the
