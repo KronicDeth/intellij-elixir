@@ -58,7 +58,7 @@
 
 ## Changelog
 
-**Every pull request needs an entry in [`CHANGELOG.md`](CHANGELOG.md) under `## Unreleased`.** CI
+**Every pull request needs an entry in [`CHANGELOG.md`](CHANGELOG.md) under `## [Unreleased]`.** CI
 checks this and fails the `Changelog / changelog-entry` job if the file is untouched.
 
 `CHANGELOG.md` is not just a record. The Gradle Changelog Plugin renders the entry for the version
@@ -117,26 +117,16 @@ revert of something that never shipped. Dependabot pull requests are exempt auto
 
 ### Importing the project
 
-1. Import the project via `File > New > Project from Existing Sources...`  OR from the `Import Project` option of the splash menu
-2. Select the checkout of `intellij-elixir` directory
-3. Select "Import project from external model" from the radio button group
-4. Select Gradle from the external models
-5. Click Next
-6. In "Import Project from Gradle"
-   1. Check "Use auto-import"
-   2. Check "Create separate module per source set"
-   3. Ensure Gradle JVM is **AT LEAST** Java 21+.
-   Your import settings should look something like this:<br/>
-   ![Gradle settings](screenshots/contributing/gradle_settings.png?raw=true "Gradle settings")
-   4. Click Finish
-7. When the "Gradle Project Data to Import" dialog pops up
-   1. Leave "Elixir (root module), ":jps-builder", and "jps-shared" checked.<br/>
-   ![Select modules](screenshots/contributing/select_modules.png?raw=true "Select modules")
-   2. Click OK
-8. When the "Import Gradle Projects" dialog pops up
-   1. Leave "intellij-elixir" checked.  You can remove the old main module:<br/>
-     ![Remove module](screenshots/contributing/remove_module.png?raw=true "Remove module")
-9. Install [Kotlin Plugin](https://plugins.jetbrains.com/plugin/6954-kotlin)
+1. **Fork** [`KronicDeth/intellij-elixir`](https://github.com/KronicDeth/intellij-elixir) on GitHub.
+   Pull requests are opened from a fork, so do this before cloning.
+2. In the IDE, choose **File > New > Project from Version Control...** (or **Clone Repository** from the
+   Welcome screen).
+3. Enter your fork's URL and clone it.
+4. Open the clone and accept the trust prompt. IDEA detects the Gradle build and imports it, including
+   the `:jps-shared` and `:jps-builder` subprojects.
+
+For plugin development setup and background generally, see JetBrains'
+[Developing plugins](https://plugins.jetbrains.com/docs/intellij/developing-plugins.html) documentation.
 
 ### Building and running
 
@@ -184,8 +174,6 @@ it downloads `KronicDeth/intellij_elixir` and runs `mix local.hex` / `mix local.
 **NOTE:** Tests that need an Elixir SDK fail rather than skip when it is missing, so run them through
 Gradle. Running one from the IDE's JUnit runner works only if you supply the environment variables
 listed above yourself.
-
-**NOTE:** If you're having trouble running the plugin against Intellij IDEA 14.1 on Mac, see this [comment](https://github.com/KronicDeth/intellij-elixir/pull/504#issuecomment-284275036).
 
 ### Windows Development Setup
 
@@ -289,6 +277,10 @@ To test another IDE, you can use one of the following tasks:
 - `runRustRover` / `runRustRoverEAP`
 - `runCLion` / `runCLionEAP`
 - `runGoLand` / `runGoLandEAP`
+- `runPhpStorm` / `runPhpStormEAP`
+
+These task names are generated from the `platformVersion*` properties in `gradle.properties`, so that
+file is the authoritative list if it drifts from this one.
 
 #### Running the latest EAP snapshot
 
@@ -472,8 +464,9 @@ not marketing names.
 ### From IntelliJ IDEA
 #### Running the plugin in a specific IDE
 1. Open the Gradle Tool Window (`View > Tool Windows > Gradle` OR from the Gradle button on the right tool button bar)
-2. Expand `Elixir (root) > Tasks > intellij platform`
-3. Double click `runIntelliJCommunity` (or which IDE you want to test with)
+2. Expand `intellij-elixir (root) > Tasks > intellij platform`
+3. Double click `runIntellijIdea` (or the task for whichever IDE you want to test with - see
+   [Testing in other IDEs](#testing-in-other-ides))
 4. Now the Run Configuration will be selected, and you can click the green arrow at the top of the screen.
 
 #### Verification
@@ -499,7 +492,7 @@ The Elixir parser and PSI element classes in `gen/` are generated from `src/org/
 The GrammarKit generator writes files with CRLF line endings, but the repository uses LF. After regenerating, convert line endings from Git Bash:
 
 ```bash
-cd ~/IdeaProjects/intellij-elixir/intellij-elixir
+cd ~/IdeaProjects/intellij-elixir
 find gen -type f | xargs dos2unix.exe
 ```
 
@@ -580,7 +573,7 @@ pin = DO
 
 ### JFlex Lexer Regeneration
 
-The Elixir lexer `src/org/elixir_lang/ElixirFlexLexer.java` is generated from `src/org/elixir_lang/Elixir.flex` using [JFlex](https://jflex.de/). If you modify `Elixir.flex` (e.g. adding a new state, changing a rule, or fixing escape handling), you must regenerate the lexer.
+The Elixir lexer `gen/org/elixir_lang/ElixirFlexLexer.java` is generated from `src/org/elixir_lang/Elixir.flex` using [JFlex](https://jflex.de/). If you modify `Elixir.flex` (e.g. adding a new state, changing a rule, or fixing escape handling), you must regenerate the lexer.
 
 #### Prerequisites
 - Install the **GrammarKit** plugin in IntelliJ IDEA (it bundles JFlex). Settings → Plugins → search "Grammar-Kit".
@@ -603,7 +596,7 @@ after regeneration.
 
 ### Color Schemes
 
-JetBrains plugins are able to set the text attribute values for `TextAttributeKey`s that are unique to the plugin by using `additionalTextAttributes` entries in `src/META-INF/plugin.xml`.  If you have a Color Scheme for Elixir you like, you can propose it as the default for a named theme by extracting the `additionTextAttributes` `file` from an Exported Settings `.jar`.
+JetBrains plugins are able to set the text attribute values for `TextAttributeKey`s that are unique to the plugin by using `additionalTextAttributes` entries in `resources/META-INF/plugin.xml` (the plugin ships two: `colorSchemes/ElixirDefault.xml` for the `Default` scheme and `colorSchemes/ElixirDarcula.xml` for `Darcula`).  If you have a Color Scheme for Elixir you like, you can propose it as the default for a named theme by extracting the `additionTextAttributes` `file` from an Exported Settings `.jar`.
 
 #### Customizing Scheme
 
@@ -627,7 +620,7 @@ JetBrains plugins are able to set the text attribute values for `TextAttributeKe
 
 #### Convert ICLS to Additional Text Attributes format
 
-1. `mv colors/colors/My\ $SCHEME_NAME.icls $INTELLIJ_ELIXIR/colorSchemes/ElixirSCHEME_NAME.xml` (`$SCHEME_NAME` will be `Default`, `Darcula` or another shared theme name.)
+1. `mv colors/colors/My\ $SCHEME_NAME.icls $INTELLIJ_ELIXIR/colorSchemes/Elixir$SCHEME_NAME.xml` (`$SCHEME_NAME` will be `Default`, `Darcula` or another shared theme name.)
 2. Remove all elements except for `scheme attributes`.
 3. Remove the outer `scheme` tag
 4. Rename the `attributes` tag to `list`.
@@ -635,7 +628,7 @@ JetBrains plugins are able to set the text attribute values for `TextAttributeKe
 
 #### Add Additional Text Attributes to plugin
 
-1. In `plugin.xml` inside the `idea-plugin extensions[defaultExtensionNs="com.intellij"]` tag, add a new additionalTextAttribute tag: `<additionalTextAttributes file="colorSchemes/Elixir$SCHEME_NAME.xml" scheme="SCHEME_NAME"/>`
+1. In `resources/META-INF/plugin.xml` inside the `idea-plugin extensions[defaultExtensionNs="com.intellij"]` tag, add a new additionalTextAttribute tag: `<additionalTextAttributes file="colorSchemes/Elixir$SCHEME_NAME.xml" scheme="SCHEME_NAME"/>`
 
 ## Building
 
@@ -682,18 +675,19 @@ Three consequences worth knowing:
 
 ### Documentation
 
-The documentation files ([`CHANGELOG.md`](CHANGELOG.md), [`CONTRIBUTING.md`](CONTRIBUTING.md), [`README.md`](README.md),
-and [`UPGRADING.md`](UPGRADING.md)) all have table of contents generated by
-[`doctoc`](https://github.com/thlorenz/doctoc).
+Three files carry a table of contents generated by [`doctoc`](https://github.com/thlorenz/doctoc):
+[`AGENTS.md`](AGENTS.md), [`CONTRIBUTING.md`](CONTRIBUTING.md) and
+[`COLOR_SCHEME_DESIGN.md`](COLOR_SCHEME_DESIGN.md). `CHANGELOG.md`, `README.md`, `RELEASING.md` and
+`UPGRADING.md` have none - do not add one.
 
-Install `doctoc` (globally) using `npm`
+Regenerate with `mise`, which needs no global install:
 
-```sh
-npm install -g doctoc
+```powershell
+mise exec -c "npx doctoc AGENTS.md CONTRIBUTING.md COLOR_SCHEME_DESIGN.md" node@25.4.0
 ```
 
-Then regenerate the table of contents using `doctoc`
+Use `-c` rather than `--`: PowerShell strips `--` before `mise` sees it.
 
-```sh
-doctoc .
-```
+> [!IMPORTANT]
+> **Always name the files. Never run `doctoc .`** It recurses and ignores `.gitignore`, so it inserts a
+> TOC into every markdown file it can reach.
