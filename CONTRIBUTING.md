@@ -137,12 +137,12 @@ Gradle will handle all dependency management, including fetching the Intellij ID
 **The tests need Elixir and Erlang. The build does not compile them from source** - it *resolves* an
 already-installed pair. The `resolveElixirErlangSdks` task looks in this order and stops at the first hit:
 
-| # | Erlang | Elixir |
-|---|---|---|
-| 1 | `ERLANG_SDK_HOME` env var | `ELIXIR_SDK_HOME` env var |
-| 2 | `erl` on `PATH` | `elixir` on `PATH` |
-| 3 | `mise install erlang@<expected>` | `mise install elixir@<expected>` |
-| 4 | - | download + `make` from source (last resort, slow) |
+| # | Erlang                           | Elixir                                            |
+|---|----------------------------------|---------------------------------------------------|
+| 1 | `ERLANG_SDK_HOME` env var        | `ELIXIR_SDK_HOME` env var                         |
+| 2 | `erl` on `PATH`                  | `elixir` on `PATH`                                |
+| 3 | `mise install erlang@<expected>` | `mise install elixir@<expected>`                  |
+| 4 | -                                | download + `make` from source (last resort, slow) |
 
 It then exports `ELIXIR_LANG_ELIXIR_PATH`, `ELIXIR_EBIN_DIRECTORY`, `ELIXIR_VERSION`, `ERLANG_SDK_HOME`
 and a `PATH` prefix to every test task, so you never set those by hand.
@@ -363,7 +363,13 @@ resolved versions - so a bad declaration is diagnosable locally rather than from
 | | Elixir | OTP | Status |
 |---|---|---|---|
 | `beam.baseline` | 1.13.4 | 24.3.4.6 | **supported** - must be green |
-| `beam.additional` | every minor above the baseline | see the file | unsupported - informational |
+| `beam.additional` | later minors, plus pairs covering an OTP major no other leg covers | see the file | **supported** when the entry has no `continue-on-error`, otherwise informational |
+
+`beam.additional` is not one-entry-per-Elixir-minor: a pair may exist to cover an **OTP major** no other
+pair covers, because most of the decompiled surface is Erlang and the BEAM chunk formats track OTP
+rather than Elixir. So the same Elixir can appear twice with different OTPs - `1.13.4` currently does.
+For such a leg, prefer the cleanest in-window Elixir so it isolates the OTP surface instead of
+inheriting a quoting backlog.
 
 Check which OTP an Elixir supports against the
 [compatibility table](https://elixir.hexdocs.pm/compatibility-and-deprecations.html) - it accounts for
@@ -375,7 +381,8 @@ decide the range: it is per-minor and misses patch-level additions.
 
 ##### Widening Elixir support
 
-`beam.additional` is a ratchet. Each entry moves one Elixir version from unsupported to supported:
+`beam.additional` is a ratchet. Each entry moves one pair - an Elixir version, an OTP major, or both -
+from unsupported to supported:
 
 1. **Add the pair** with `"continue-on-error": true`. That declares it **unsupported**, and its leg is
    expected to be red. Adding a version is safe at any time - it cannot block a merge.

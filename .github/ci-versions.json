@@ -31,7 +31,12 @@
     "  Check OTP support against https://elixir.hexdocs.pm/compatibility-and-deprecations.html, which",
     "    is patch-aware: 1.14 is '23 - 25 (and Erlang/OTP 26 from v1.14.5)'. Do NOT use otp_versions",
     "    from elixir-lang.github.com's _data/elixir-versions.yml to decide the range - it is per-MINOR",
-    "    and misses OTP support added in a patch. Within the range prefer that file's recommended_otp."
+    "    and misses OTP support added in a patch. Within the range prefer that file's recommended_otp.",
+    "  A pair may also exist to cover an OTP major no other pair covers - ~75% of the swept BEAM surface",
+    "    is Erlang and the chunk formats track OTP, not Elixir - so the same Elixir may appear twice with",
+    "    different OTPs. Read by OTP major the pairs below are {24, 25, 26, 27, 28}. Prefer the cleanest",
+    "    in-window Elixir for such a leg so it isolates the OTP surface instead of inheriting a quoting",
+    "    backlog: 1.13.4 is 0-fail, 1.18.4 fails 291 but is the newest Elixir whose quoter still builds."
   ],
   "idea": {
     "minimumSupported": { "version": "2025.3.6", "java": "21", "verify": [ "ideaIU", "rubymine" ] },
@@ -43,11 +48,13 @@
   "beam": {
     "baseline": { "elixir": "1.13.4", "otp": "24.3.4.6" },
     "additional": [
+      { "elixir": "1.13.4", "otp": "25.3.2.21" },
       { "elixir": "1.14.5", "otp": "26.2.5.21", "continue-on-error": true },
       { "elixir": "1.15.8", "otp": "26.2.5.21", "continue-on-error": true },
       { "elixir": "1.16.3", "otp": "26.2.5.21", "continue-on-error": true },
       { "elixir": "1.17.3", "otp": "27.1.2", "continue-on-error": true },
       { "elixir": "1.18.4", "otp": "27.3.4", "continue-on-error": true },
+      { "elixir": "1.18.4", "otp": "28.4", "continue-on-error": true },
       { "elixir": "1.19.5", "otp": "28.1", "continue-on-error": true },
       { "elixir": "1.20.2", "otp": "28.4", "continue-on-error": true }
     ]

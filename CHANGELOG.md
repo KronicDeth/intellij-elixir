@@ -35,6 +35,13 @@
     and the quoter's `_build`/`deps` join both. Two OTPs for one Elixir previously shared a build tree
     and overwrote each other, and switching versions re-downloaded hex and rebar. The first build per
     pair after this change reinstalls and rebuilds once.
+  - CI now covers OTP 25, and runs a decompiler sweep against OTP 28 for the first time. Two
+    `beam.additional` pairs were added, `1.13.4 / 25.3.2.21` and `1.18.4 / 28.4`, chosen to cover OTP
+    majors rather than Elixir minors: most of the decompiled surface is Erlang and the BEAM chunk formats
+    track OTP. **OTP 25 is now a supported pair** - measured locally at 6 560 tests, 0 failures, so its
+    leg is required and any later change that breaks it fails the pipeline. OTP 28 stays informational:
+    its 291 failures are all pre-existing Elixir-keyed quoting cases, with no OTP-28 decompiler
+    failures.
 
 ## [24.0.0] - 2026-08-04
 
