@@ -19,7 +19,7 @@ intellij-platform = "2.18.1"
 gradle-download = "5.7.0"
 test-logger = "4.0.0"
 changelog = "2.4.0"
-versions = "0.54.0"
+versions = "0.59.0"
 
 # Dependency Versions
 commons-io = "2.22.0"
