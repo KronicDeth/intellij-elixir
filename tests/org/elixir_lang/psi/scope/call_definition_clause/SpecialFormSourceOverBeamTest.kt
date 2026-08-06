@@ -5,12 +5,11 @@ import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.roots.LibraryOrderEntry
 import com.intellij.openapi.roots.ModuleRootModificationUtil
-import com.intellij.openapi.roots.OrderRootType
-import com.intellij.openapi.roots.libraries.Library
 import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.testFramework.common.runAll
 import org.elixir_lang.PlatformTestCase
+import org.elixir_lang.beam.BeamLibraryFixture
 import org.elixir_lang.beam.psi.impl.CallDefinitionImpl
 import java.io.File
 
@@ -91,18 +90,14 @@ class SpecialFormSourceOverBeamTest : PlatformTestCase() {
             null
         }
 
-        val libraryName = "special-forms-$name"
-        val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
-        val library = WriteAction.computeAndWait<Library, RuntimeException> {
-            val lib = libraryTable.createLibrary(libraryName)
-            val model = lib.modifiableModel
-            model.addRoot(ebinVirtualDir!!, OrderRootType.CLASSES)
-            libVirtualDir?.let { model.addRoot(it, OrderRootType.SOURCES) }
-            model.commit()
-            lib
-        }
-
-        ModuleRootModificationUtil.addDependency(myFixture.module, library)
+        // Library name carries the test name: the light project is shared, so a fixed name would collide.
+        BeamLibraryFixture.addLibrary(
+            project,
+            myFixture.module,
+            "special-forms-$name",
+            listOf(ebinVirtualDir!!),
+            listOfNotNull(libVirtualDir),
+        )
     }
 
     private fun specialFormElementsAtCaret(): List<LookupElement> {

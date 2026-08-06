@@ -1,11 +1,8 @@
 package org.elixir_lang.documentation
 
-import com.intellij.openapi.application.WriteAction
-import com.intellij.openapi.roots.ModuleRootModificationUtil
-import com.intellij.openapi.roots.OrderRootType
-import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.newvfs.impl.VfsRootAccess
+import org.elixir_lang.beam.BeamLibraryFixture
 import java.io.File
 
 /**
@@ -88,30 +85,11 @@ class ErlangAtomQualifierHoverDocumentationOTP23Test : QuickDocumentationTestCas
         val appDirVf = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(appDir)
         assertNotNull("Could not find app directory: ${appDir.absolutePath}", appDirVf)
 
-        WriteAction.run<Throwable> {
-            val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
-            val model = libraryTable.modifiableModel
-            val library = model.createLibrary(LIBRARY_NAME)
-            val libModel = library.modifiableModel
-            libModel.addRoot(appDirVf!!, OrderRootType.CLASSES)
-            libModel.commit()
-            model.commit()
-
-            ModuleRootModificationUtil.addDependency(myFixture.module, library)
-        }
+        BeamLibraryFixture.addLibrary(project, myFixture.module, LIBRARY_NAME, listOf(appDirVf!!))
     }
 
     private fun removeBeamLibrary() {
-        WriteAction.run<Throwable> {
-            val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
-            val library = libraryTable.getLibraryByName(LIBRARY_NAME)
-            if (library != null) {
-                libraryTable.modifiableModel.let { model ->
-                    model.removeLibrary(library)
-                    model.commit()
-                }
-            }
-        }
+        BeamLibraryFixture.removeLibrary(project, myFixture.module, LIBRARY_NAME)
     }
 
     override fun getTestDataPath(): String =

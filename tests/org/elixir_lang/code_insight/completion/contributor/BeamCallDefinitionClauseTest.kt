@@ -4,14 +4,13 @@ import com.intellij.codeInsight.completion.CompletionType
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupElementPresentation
 import com.intellij.openapi.application.WriteAction
-import com.intellij.openapi.roots.ModuleRootModificationUtil
-import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.roots.LibraryOrderEntry
-import com.intellij.openapi.roots.libraries.Library
+import com.intellij.openapi.roots.ModuleRootModificationUtil
 import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.testFramework.common.runAll
 import org.elixir_lang.PlatformTestCase
+import org.elixir_lang.beam.BeamLibraryFixture
 import org.elixir_lang.beam.psi.impl.CallDefinitionImpl
 import java.io.File
 
@@ -87,16 +86,8 @@ class BeamCallDefinitionClauseTest : PlatformTestCase() {
         // Include test name to guarantee uniqueness within a shared light project.
         val libraryName = "beam-$name"
 
-        val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
-        val library = WriteAction.computeAndWait<Library, RuntimeException> {
-            val lib = libraryTable.createLibrary(libraryName)
-            val model = lib.modifiableModel
-            model.addRoot(ebinVirtualDir!!, OrderRootType.CLASSES)
-            model.commit()
-            lib
-        }
+        BeamLibraryFixture.addLibrary(project, myFixture.module, libraryName, listOf(ebinVirtualDir!!))
 
-        ModuleRootModificationUtil.addDependency(myFixture.module, library)
         return libraryName
     }
 
@@ -121,17 +112,14 @@ class BeamCallDefinitionClauseTest : PlatformTestCase() {
         // Include test name to guarantee uniqueness within a shared light project.
         val libraryName = "beam-source-$name"
 
-        val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
-        val library = WriteAction.computeAndWait<Library, RuntimeException> {
-            val lib = libraryTable.createLibrary(libraryName)
-            val model = lib.modifiableModel
-            model.addRoot(ebinVirtualDir!!, OrderRootType.CLASSES)
-            model.addRoot(libVirtualDir!!, OrderRootType.SOURCES)
-            model.commit()
-            lib
-        }
+        BeamLibraryFixture.addLibrary(
+            project,
+            myFixture.module,
+            libraryName,
+            listOf(ebinVirtualDir!!),
+            listOf(libVirtualDir!!),
+        )
 
-        ModuleRootModificationUtil.addDependency(myFixture.module, library)
         return libraryName
     }
 
