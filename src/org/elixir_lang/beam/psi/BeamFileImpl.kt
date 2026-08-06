@@ -1,6 +1,9 @@
 package org.elixir_lang.beam.psi
 
 import com.ericsson.otp.erlang.OtpErlangDecodeException
+import com.intellij.codeInsight.multiverse.CodeInsightContextManager
+import com.intellij.codeInsight.multiverse.CodeInsightContextManagerImpl
+import com.intellij.codeInsight.multiverse.isSharedSourceSupportEnabled
 import com.intellij.lang.FileASTNode
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.Logger
@@ -63,14 +66,17 @@ class BeamFileImpl private constructor(
     override fun getDecompiledPsiFile(): PsiFile = mirror as PsiFile
 
     /**
-     * Returns the mirror previously built by [getMirror] without triggering decompilation.
+     * The mirror [getMirror] already built, without triggering decompilation.
      *
-     * The highlighting daemon ([com.intellij.codeInsight.daemon.impl.DaemonCodeAnalyzerImpl.queuePassesCreation] via
-     * [com.intellij.codeInsight.daemon.impl.TextEditorBackgroundHighlighter.getCachedFileToHighlight]) submits a
-     * `PsiCompiledFile` for semantic highlighting by swapping it for this cached mirror. If this returned the
-     * inherited default of `null`, the daemon would bail out of scheduling passes on every attempt and no annotator
-     * (semantic) highlighting would ever run over the decompiled `.beam` text, even though [getMirror] had built a
-     * full AST. Mirrors [com.intellij.psi.impl.compiled.ClsFileImpl.getCachedMirror].
+     * **Must stay overridden.** `DaemonCodeAnalyzerImpl.queuePassesCreation` swaps a `PsiCompiledFile` for
+     * this before scheduling highlighting passes. The inherited default returns `null`, which costs more
+     * than the highlighting: the daemon then falls back to `renewFile()`, which builds the mirror, returns
+     * non-null, and so triggers a restart - which asks for the cached mirror again. Measured on an idle
+     * editor with one decompiled file open, that loops every ~300 ms indefinitely.
+     *
+     * `@ApiStatus.Internal` with no public equivalent, and `getMirror()` is not a stand-in - the cached and
+     * building calls are what separate the EDT path from the background one -
+     * [IJPL-252078](https://youtrack.jetbrains.com/issue/IJPL-252078).
      */
     override fun getCachedMirror(): PsiFile? = mirrorFileElement?.psi as PsiFile?
 
@@ -419,8 +425,15 @@ class BeamFileImpl private constructor(
                         ElixirLanguage,
                         mirrorText,
                         false,
-                        false
+                        false,
+                        // noSizeLimit, as ClsFileImpl.getMirror does. PsiFileFactoryImpl discards the language
+                        // passed here (`language = viewProvider.getBaseLanguage()`), and calcBaseLanguage
+                        // answers PlainTextLanguage for text over `idea.max.intellisense.filesize`, which
+                        // makes setMirror below throw InvalidMirrorException. No fixture decompiles large
+                        // enough to cover it.
+                        true
                     )
+                    propagateCodeInsightContextTo(mirror)
                     mirrorTreeElement = SourceTreeToPsiMap.psiToTreeNotNull(mirror)
                     try {
                         val finalMirrorTreeElement = mirrorTreeElement
@@ -439,6 +452,36 @@ class BeamFileImpl private constructor(
             }
         }
         return mirrorTreeElement!!.psi
+    }
+
+    /**
+     * Copies this file's [com.intellij.codeInsight.multiverse.CodeInsightContext] onto [mirror]'s view
+     * provider, as [com.intellij.psi.impl.compiled.ClsFileImpl.getMirror] does.
+     *
+     * The platform never does this itself - a [PsiFileFactory]-built mirror always reports `DefaultContext` -
+     * so without it the daemon logs `PsiFile's context does not match the context of the editor` on every
+     * decompiled `.beam`, which reaches users as an error report. Shared-source support is on by default, so
+     * this is the normal path.
+     *
+     * Only the setter needs the `@ApiStatus.Internal` `CodeInsightContextManagerImpl`; the service, reading a
+     * context and [isSharedSourceSupportEnabled] are all public on `CodeInsightContextManager`, so they go
+     * through that. The cast is what `CodeInsightContextManagerImpl.getInstanceImpl` does internally, against
+     * the single registered implementation, and using it directly keeps the plugin verifier's internal-API
+     * findings to the two that are unavoidable - naming the type, and the call - instead of five. The whole
+     * core-api `codeInsight.multiverse` package is `@ApiStatus.Experimental` regardless -
+     * [IJPL-252078](https://youtrack.jetbrains.com/issue/IJPL-252078).
+     */
+    @Suppress("UnstableApiUsage")
+    private fun propagateCodeInsightContextTo(mirror: PsiFile) {
+        val project = manager.project
+
+        if (isSharedSourceSupportEnabled(project)) {
+            val contextManager = CodeInsightContextManager.getInstance(project)
+            // Read before the cast: a smart-cast `contextManager` would bind this to the impl instead.
+            val context = contextManager.getCodeInsightContext(viewProvider)
+
+            (contextManager as CodeInsightContextManagerImpl).setCodeInsightContext(mirror.viewProvider, context)
+        }
     }
 
     override fun setMirror(element: TreeElement) {
