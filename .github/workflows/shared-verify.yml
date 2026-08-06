@@ -294,10 +294,15 @@ jobs:
 
       # One invocation per job, so the action's fixed verification_result.log name needs no
       # per-product copy - the artifact name carries the product and version instead.
+      #
+      # `inputs.upload-verifier-reports` is always false on `pull_request`: the `inputs` context is
+      # empty for that trigger, and a `workflow_call` default applies only when the workflow is called.
+      # `failure()` is what uploads there, and it works only while `Verify Plugin` has no
+      # `continue-on-error`.
       - name: Upload Verify Reports
         id: upload-verify-reports
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        if: ${{ always() && inputs.upload-verifier-reports && steps.verify.outputs.verification-output-log-filename != '' }}
+        if: ${{ (failure() || inputs.upload-verifier-reports) && steps.verify.outputs.verification-output-log-filename != '' }}
         with:
           name: verify-plugin-reports-${{ matrix.product }}-${{ matrix.version }}
           path: |

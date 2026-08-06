@@ -27,6 +27,10 @@
     is genuinely nothing to record.
   - The Tag Release workflow validates the tag shape against the `prerelease` input, that a release is
     cut from `main`, that the tag is new and increases, and that it matches `pluginVersion`.
+  - Plugin verifier reports are now uploaded whenever a verification leg fails, including on pull
+    requests. Previously the upload was gated on an input that is always empty for `pull_request`, so
+    the reports were unobtainable on exactly the runs that needed them and the evidence had to be dug
+    out of a raw job log. Green runs still upload nothing unless a caller asks.
 
 ## [24.0.0] - 2026-08-04
 

@@ -16,7 +16,7 @@ on:
         type: boolean
         default: false
       upload-verifier-reports:
-        description: 'Upload test reports as artifacts'
+        description: 'Upload each verification leg''s reports as an artifact, even when it passes.'
         required: false
         type: boolean
         default: true
@@ -431,6 +431,6 @@ jobs:
     uses: ./.github/workflows/shared-verify.yml
     with:
       matrix: ${{ needs.test-matrix.outputs.verify }}
-      # inputs is empty for pull_request events, so this is false there, matching what the inline
-      # verification did before: reports upload only for workflow_call runs that ask for them.
+      # Empty for pull_request, so false there. Failing legs still upload: shared-verify.yml ORs in
+      # `failure()`.
       upload-verifier-reports: ${{ inputs.upload-verifier-reports || false }}
