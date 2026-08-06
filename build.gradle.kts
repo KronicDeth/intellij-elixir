@@ -194,6 +194,9 @@ val mixArchivesForPair: File =
 
 // EXPORT FOR SUBPROJECTS (Required for jps-builder to access this path)
 extra["elixirPath"] = elixirPath.asFile.absolutePath
+// Declared as test-task inputs in both projects - see the root `test` task for why.
+extra["expectedElixirVersion"] = expectedElixirVersion.getOrElse("unresolved")
+extra["expectedOtpVersion"] = expectedOtpVersion.getOrElse("unresolved")
 
 // Version suffix logic:
 // - "default" channel = no suffix (release build)
@@ -891,6 +894,15 @@ tasks.named<Test>("test") {
     doFirst {
         environment(elixirTestEnvironment(sdkProps.get().asFile))
     }
+
+    // The Elixir/OTP versions reach the test JVM as environment variables set in that doFirst, which
+    // Gradle cannot see, so they have to be declared or a version switch does not invalidate this task.
+    // Without them `mise use erlang@X elixir@Y && gradlew check` reports the *previous* pair's results:
+    // the task is UP-TO-DATE, and because the cache key is equally blind the build cache restores those
+    // results even after a cleanTest. Measured before this was added - a 1.18.4/OTP-28 run "passed" in
+    // 28 s with 1.13.4/OTP-25's results.
+    inputs.property("elixirVersion", expectedElixirVersion)
+    inputs.property("otpVersion", expectedOtpVersion)
 
     // The parsing tests are JUnit 3 (com.intellij.testFramework.ParsingTestCase -> TestCase),
     // discovered by the JUnit 4 runner.

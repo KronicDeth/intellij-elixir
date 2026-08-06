@@ -43,6 +43,12 @@ tasks.test {
         environment(sdk.elixirTestEnvironment(sdkProps.get().asFile))
     }
 
+    // Same reason as the root `test` task: the versions arrive as environment variables set in that
+    // doFirst, so without declaring them a version switch leaves this task UP-TO-DATE (or restores the
+    // previous pair's results from the build cache) and reports the wrong pair's numbers.
+    inputs.property("elixirVersion", rootProject.extra["expectedElixirVersion"])
+    inputs.property("otpVersion", rootProject.extra["expectedOtpVersion"])
+
     include("**/*Test.class")
 
     // Allow the task to succeed when a global --tests filter matches nothing in this subproject

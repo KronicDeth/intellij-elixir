@@ -42,6 +42,10 @@
     leg is required and any later change that breaks it fails the pipeline. OTP 28 stays informational:
     its 291 failures are all pre-existing Elixir-keyed quoting cases, with no OTP-28 decompiler
     failures.
+  - Switching Elixir/OTP versions now re-runs the tests. The versions reach the test JVM as environment
+    variables, which Gradle could not see, so `mise use erlang@X elixir@Y` followed by `check` reported
+    the *previous* pair's results - the task was up to date, and the build cache would even restore
+    those results after a `cleanTest`. Both test tasks now declare the versions as inputs.
 
 ## [24.0.0] - 2026-08-04
 
