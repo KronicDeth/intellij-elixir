@@ -1,14 +1,11 @@
 package org.elixir_lang.reference.mfa_tuple
 
 import com.intellij.model.psi.PsiSymbolReferenceService
-import com.intellij.openapi.application.WriteAction
-import com.intellij.openapi.roots.ModuleRootModificationUtil
-import com.intellij.openapi.roots.OrderRootType
-import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.newvfs.impl.VfsRootAccess
 import com.intellij.psi.util.PsiTreeUtil
 import org.elixir_lang.PlatformTestCase
+import org.elixir_lang.beam.BeamLibraryFixture
 import org.elixir_lang.beam.psi.impl.CallDefinitionImpl
 import org.elixir_lang.model.psi.atom.AtomReference
 import org.elixir_lang.psi.ElixirAtom
@@ -113,30 +110,11 @@ class ErlangMfaTupleReferenceTest : PlatformTestCase() {
         val beamDirVf = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(File(beamDir))
         assertNotNull("Could not find beam test data directory: $beamDir", beamDirVf)
 
-        WriteAction.run<Throwable> {
-            val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
-            val model = libraryTable.modifiableModel
-            val library = model.createLibrary(LIBRARY_NAME)
-            val libModel = library.modifiableModel
-            libModel.addRoot(beamDirVf!!, OrderRootType.CLASSES)
-            libModel.commit()
-            model.commit()
-
-            ModuleRootModificationUtil.addDependency(myFixture.module, library)
-        }
+        BeamLibraryFixture.addLibrary(project, myFixture.module, LIBRARY_NAME, listOf(beamDirVf!!))
     }
 
     private fun removeBeamLibrary() {
-        WriteAction.run<Throwable> {
-            val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
-            val library = libraryTable.getLibraryByName(LIBRARY_NAME)
-            if (library != null) {
-                libraryTable.modifiableModel.let { model ->
-                    model.removeLibrary(library)
-                    model.commit()
-                }
-            }
-        }
+        BeamLibraryFixture.removeLibrary(project, myFixture.module, LIBRARY_NAME)
     }
 
     override fun getTestDataPath(): String = "testData/org/elixir_lang/reference/mfa_tuple"

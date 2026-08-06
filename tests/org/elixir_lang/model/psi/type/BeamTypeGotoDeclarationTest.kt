@@ -1,18 +1,8 @@
 package org.elixir_lang.model.psi.type
 
 import com.intellij.ide.impl.HeadlessDataManager
-import com.intellij.openapi.application.WriteAction
-import com.intellij.openapi.roots.ModuleRootModificationUtil
-import com.intellij.openapi.roots.OrderRootType
-import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar
-import com.intellij.openapi.vfs.LocalFileSystem
-import com.intellij.openapi.vfs.newvfs.impl.VfsRootAccess
-import org.elixir_lang.PlatformTestCase
-import org.elixir_lang.code_insight.assertGotoDeclarationChosenAtCaret
-import org.elixir_lang.code_insight.assertShowUsagesChosenAtCaret
-import org.elixir_lang.code_insight.gotoDeclarationDestinationAtCaret
-import org.elixir_lang.code_insight.nonDeclarationUsageCountAtCaret
-import org.elixir_lang.code_insight.psiUsagesAtCaret
+import org.elixir_lang.beam.BeamLibraryTestCase
+import org.elixir_lang.code_insight.*
 import java.io.File
 
 /**
@@ -21,13 +11,12 @@ import java.io.File
  * source `@type`s these resolve to `TypeDefinitionImpl` decompiled PSI, so they exercise the branch of
  * the type reference that navigates into the `.beam` mirror rather than a source attribute.
  */
-class BeamTypeGotoDeclarationTest : PlatformTestCase() {
+class BeamTypeGotoDeclarationTest : BeamLibraryTestCase() {
     override fun getTestDataPath(): String = "testData/org/elixir_lang/model/psi/type"
 
     override fun setUp() {
         super.setUp()
         HeadlessDataManager.fallbackToProductionDataManager(myFixture.testRootDisposable)
-        addBeamLibrary()
     }
 
     fun testCtrlClickOnRemoteBeamTypeChoosesGotoDeclaration() {
@@ -158,14 +147,17 @@ class BeamTypeGotoDeclarationTest : PlatformTestCase() {
         // round-trip) skip, which is why they stay green while the IDE collapses every within-beam usage onto
         // line 1. The adapter short-circuits to line -1 for any file whose `getFileType().isBinary()` is true,
         // so the fix is that the within-beam usages must resolve to a file the usage view treats as text.
-        val rows = com.intellij.openapi.application.ReadAction.compute<List<Pair<Int, String?>>, RuntimeException> {
-            usages.map { u ->
-                val adapter = com.intellij.usages.UsageInfo2UsageAdapter(
-                    com.intellij.usageView.UsageInfo(u.file, u.range, false)
-                )
-                Pair(adapter.line, adapter.usageInfo.virtualFile?.name)
+        // Callable, not a bare lambda: the lambda binds the deprecated Runnable overload and returns Void.
+        val rows = com.intellij.openapi.application.ReadAction.nonBlocking(
+            java.util.concurrent.Callable {
+                usages.map { u ->
+                    val adapter = com.intellij.usages.UsageInfo2UsageAdapter(
+                        com.intellij.usageView.UsageInfo(u.file, u.range, false)
+                    )
+                    Pair(adapter.line, adapter.usageInfo.virtualFile?.name)
+                }
             }
-        }
+        ).executeSynchronously()
         val distinctLines = rows.map { it.first }.distinct().sorted()
         val vfiles = rows.map { it.second }.distinct()
         assertEquals(
@@ -239,69 +231,5 @@ class BeamTypeGotoDeclarationTest : PlatformTestCase() {
             "The `queue` identifier should sit inside the decompiled `@opaque queue(item)` definition",
             generateSequence(target) { it.parent }.any { it.text.startsWith("@opaque queue") }
         )
-    }
-
-    private fun openBeamAndMoveCaretTo(beamName: String, anchor: String) {
-        val beamIo = File(File(testDataPath, "ebin").absoluteFile, beamName)
-        val beamVf = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(beamIo)
-        assertNotNull("Could not find decompiled $beamName in VFS", beamVf)
-        myFixture.configureFromExistingVirtualFile(beamVf!!)
-        val text = myFixture.editor.document.text
-        val anchorIndex = text.indexOf(anchor)
-        assertTrue("Anchor '$anchor' not found in decompiled $beamName", anchorIndex >= 0)
-        myFixture.editor.caretModel.moveToOffset(anchorIndex + anchor.length - 1)
-    }
-
-    @Throws(Exception::class)
-    override fun tearDown() {
-        try {
-            removeBeamLibrary()
-        } finally {
-            super.tearDown()
-        }
-    }
-
-    private fun addBeamLibrary() {
-        val ebinDir = File(testDataPath, "ebin").absoluteFile
-        assertTrue("ebin/ fixture directory not found at ${ebinDir.absolutePath}", ebinDir.isDirectory)
-
-        VfsRootAccess.allowRootAccess(myFixture.testRootDisposable, ebinDir.path)
-
-        val ebinVf = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(ebinDir)
-        assertNotNull("Could not find ebin/ fixture directory in VFS", ebinVf)
-
-        WriteAction.run<Throwable> {
-            val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
-            val model = libraryTable.modifiableModel
-            val library = model.createLibrary(BEAM_LIBRARY_NAME)
-            val libModel = library.modifiableModel
-            libModel.addRoot(ebinVf!!, OrderRootType.CLASSES)
-            libModel.commit()
-            model.commit()
-
-            ModuleRootModificationUtil.addDependency(myFixture.module, library)
-        }
-    }
-
-    private fun removeBeamLibrary() {
-        ModuleRootModificationUtil.updateModel(myFixture.module) { model ->
-            model.orderEntries
-                .filter { it.presentableName == BEAM_LIBRARY_NAME }
-                .forEach { model.removeOrderEntry(it) }
-        }
-
-        WriteAction.run<Throwable> {
-            val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
-            libraryTable.getLibraryByName(BEAM_LIBRARY_NAME)?.let { library ->
-                libraryTable.modifiableModel.let { model ->
-                    model.removeLibrary(library)
-                    model.commit()
-                }
-            }
-        }
-    }
-
-    companion object {
-        private const val BEAM_LIBRARY_NAME = "type-goto-beam-lib"
     }
 }

@@ -1,13 +1,10 @@
 package org.elixir_lang.reference.callable
 
-import com.intellij.openapi.application.WriteAction
-import com.intellij.openapi.roots.ModuleRootModificationUtil
-import com.intellij.openapi.roots.OrderRootType
-import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.newvfs.impl.VfsRootAccess
 import com.intellij.psi.PsiPolyVariantReference
 import org.elixir_lang.PlatformTestCase
+import org.elixir_lang.beam.BeamLibraryFixture
 import java.io.File
 
 /**
@@ -124,30 +121,11 @@ class ErlangAtomQualifierTest : PlatformTestCase() {
         val beamDirVf = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(File(beamDir))
         assertNotNull("Could not find beam test data directory: $beamDir", beamDirVf)
 
-        WriteAction.run<Throwable> {
-            val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
-            val model = libraryTable.modifiableModel
-            val library = model.createLibrary("erlang_test_lib")
-            val libModel = library.modifiableModel
-            libModel.addRoot(beamDirVf!!, OrderRootType.CLASSES)
-            libModel.commit()
-            model.commit()
-
-            ModuleRootModificationUtil.addDependency(myFixture.module, library)
-        }
+        BeamLibraryFixture.addLibrary(project, myFixture.module, "erlang_test_lib", listOf(beamDirVf!!))
     }
 
     private fun removeBeamLibrary() {
-        WriteAction.run<Throwable> {
-            val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
-            val library = libraryTable.getLibraryByName("erlang_test_lib")
-            if (library != null) {
-                libraryTable.modifiableModel.let { model ->
-                    model.removeLibrary(library)
-                    model.commit()
-                }
-            }
-        }
+        BeamLibraryFixture.removeLibrary(project, myFixture.module, "erlang_test_lib")
     }
 
     override fun getTestDataPath(): String =
