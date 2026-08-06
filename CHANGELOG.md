@@ -31,6 +31,10 @@
     requests. Previously the upload was gated on an input that is always empty for `pull_request`, so
     the reports were unobtainable on exactly the runs that needed them and the evidence had to be dug
     out of a raw job log. Green runs still upload nothing unless a caller asks.
+  - Everything scoped to an Elixir/OTP pair is now keyed on the pair: `MIX_HOME` joins `MIX_ARCHIVES`,
+    and the quoter's `_build`/`deps` join both. Two OTPs for one Elixir previously shared a build tree
+    and overwrote each other, and switching versions re-downloaded hex and rebar. The first build per
+    pair after this change reinstalls and rebuilds once.
 
 ## [24.0.0] - 2026-08-04
 

@@ -140,8 +140,9 @@ jobs:
 
       # Restore the quoter build cache (deps + _build) so the Build quoter step goes incremental. This
       # and its Save counterpart live here, not in setup-env, so the whole cache lifecycle sits next to
-      # the quoter build. The dir is namespaced by the gradle.properties quoterRef slug (slashes ->
-      # dashes), matching build.gradle.kts quoterRefSlug.
+      # the quoter build. The dir must name what build.gradle.kts writes - the Elixir/OTP pair (sdk
+      # .pairToken) plus the gradle.properties quoterRef slug (slashes -> dashes, quoterRefSlug) - or
+      # the cache silently covers nothing.
       - name: Resolve quoter cache slug
         id: quoter-slug
         run: |
@@ -154,8 +155,8 @@ jobs:
         uses: actions/cache/restore@v6
         with:
           path: |
-            cache/elixir-${{ matrix.beam.elixir }}-intellij_elixir-${{ steps.quoter-slug.outputs.slug }}/_build
-            cache/elixir-${{ matrix.beam.elixir }}-intellij_elixir-${{ steps.quoter-slug.outputs.slug }}/deps
+            cache/elixir-${{ matrix.beam.elixir }}-otp-${{ matrix.beam.otp }}-intellij_elixir-${{ steps.quoter-slug.outputs.slug }}/_build
+            cache/elixir-${{ matrix.beam.elixir }}-otp-${{ matrix.beam.otp }}-intellij_elixir-${{ steps.quoter-slug.outputs.slug }}/deps
           key: elixir-${{ runner.os }}-${{ runner.arch }}-${{ matrix.beam.elixir }}-otp-${{ matrix.beam.otp }}-quoter-${{ hashFiles('gradle.properties') }}
           restore-keys: |
             elixir-${{ runner.os }}-${{ runner.arch }}-${{ matrix.beam.elixir }}-otp-${{ matrix.beam.otp }}-
@@ -188,7 +189,7 @@ jobs:
         uses: actions/cache/save@v6
         with:
           path: |
-            cache/elixir-${{ matrix.beam.elixir }}-intellij_elixir-${{ steps.quoter-slug.outputs.slug }}
+            cache/elixir-${{ matrix.beam.elixir }}-otp-${{ matrix.beam.otp }}-intellij_elixir-${{ steps.quoter-slug.outputs.slug }}
             !cache/**/tmp/pipe/**
             !cache/**/distillery/priv
           key: ${{ steps.restore-elixir-cache.outputs.cache-primary-key }}
