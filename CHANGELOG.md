@@ -46,6 +46,10 @@
     variables, which Gradle could not see, so `mise use erlang@X elixir@Y` followed by `check` reported
     the *previous* pair's results - the task was up to date, and the build cache would even restore
     those results after a `cleanTest`. Both test tasks now declare the versions as inputs.
+  - A transient 5xx from JetBrains' artifact CDN no longer loses a whole test leg. Gradle already treats
+    repository server errors as retryable, but its default budget is three attempts over about three
+    seconds; `gradle.properties` now allows eight from a 3-second doubling backoff, roughly six minutes,
+    for every build - CI and local alike.
   - CI restores the Elixir quoter cache again - it never had. `actions/cache` identifies an entry by key
     *and* by a version hashed from the literal `path:` lines, and the restore and save steps listed
     different paths, so they addressed different entries under one key. Every leg missed, rebuilt its
