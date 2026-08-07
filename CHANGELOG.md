@@ -46,6 +46,12 @@
     variables, which Gradle could not see, so `mise use erlang@X elixir@Y` followed by `check` reported
     the *previous* pair's results - the task was up to date, and the build cache would even restore
     those results after a `cleanTest`. Both test tasks now declare the versions as inputs.
+  - CI restores the Elixir quoter cache again - it never had. `actions/cache` identifies an entry by key
+    *and* by a version hashed from the literal `path:` lines, and the restore and save steps listed
+    different paths, so they addressed different entries under one key. Every leg missed, rebuilt its
+    quoter dependencies from Hex, then failed to save against the entry an earlier run had left there -
+    reported as `Unable to reserve cache`, which reads as a harmless race between legs. Both steps now
+    take the path list from one place.
 
 ## [24.0.0] - 2026-08-04
 
