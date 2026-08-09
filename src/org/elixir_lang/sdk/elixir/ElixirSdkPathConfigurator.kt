@@ -4,6 +4,7 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.projectRoots.ProjectJdkTable
 import com.intellij.openapi.projectRoots.Sdk
+import com.intellij.openapi.projectRoots.SdkModel
 import com.intellij.openapi.projectRoots.SdkModificator
 import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.vfs.VfsUtil
@@ -17,7 +18,7 @@ import java.nio.file.Paths
 object ElixirSdkPathConfigurator {
     private val LOG = Logger.getInstance(ElixirSdkPathConfigurator::class.java)
 
-    fun configure(sdk: Sdk) {
+    fun configure(sdk: Sdk, sdkModel: SdkModel? = null) {
         LOG.info("Configuring SDK paths for ${sdk.name}")
         val sdkModificator = sdk.sdkModificator
 
@@ -30,7 +31,7 @@ object ElixirSdkPathConfigurator {
         // is registered to consume JavadocOrderRootType roots.
         addSourcePaths(sdkModificator)
 
-        val erlangSdk = ElixirInternalErlangSdkSetup.configureInternalErlangSdk(sdk, sdkModificator)
+        val erlangSdk = ElixirInternalErlangSdkSetup.configureInternalErlangSdk(sdk, sdkModificator, sdkModel)
         if (erlangSdk == null) {
             // Only remove SDKs that are not yet in ProjectJdkTable (wizard/new-SDK path).
             // An existing SDK that temporarily can't resolve its Erlang pairing must not be removed -

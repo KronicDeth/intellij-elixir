@@ -7,6 +7,7 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.diagnostic.trace
 import com.intellij.openapi.projectRoots.ProjectJdkTable
 import com.intellij.openapi.projectRoots.Sdk
+import com.intellij.openapi.projectRoots.SdkModel
 import com.intellij.openapi.projectRoots.SdkModificator
 import com.intellij.openapi.ui.Messages
 import kotlinx.coroutines.runBlocking
@@ -38,16 +39,18 @@ object ElixirInternalErlangSdkSetup {
      *
      * Resolution order:
      * 1. Explicit SDK stored in UserData (set by the wizard when creating Erlang + Elixir together)
-     * 2. Already-linked SDK from existing SdkAdditionalData
+     * 2. Already-linked SDK from existing SdkAdditionalData, looked up in [sdkModel] before
+     *    ProjectJdkTable so a dependency chosen in the same dialog resolves before it is committed
      * 3. Any registered Erlang SDK in ProjectJdkTable
      * 4. Prompt the user to pick a mise-installed Erlang SDK (mise Elixir SDKs only)
      */
     internal fun configureInternalErlangSdk(
         elixirSdk: Sdk,
         elixirSdkModificator: SdkModificator,
+        sdkModel: SdkModel? = null,
     ): Sdk? {
         val existingAdditionalData = elixirSdk.sdkAdditionalData as? SdkAdditionalData
-        val existingErlangSdk = existingAdditionalData?.let { data -> ReadActions.compute { data.getErlangSdk() } }
+        val existingErlangSdk = existingAdditionalData?.let { data -> ReadActions.compute { data.getErlangSdk(sdkModel) } }
         val explicitErlangSdk = elixirSdk.getUserData(ERLANG_SDK_KEY)
 
         LOG.trace { "[${elixirSdk.name}] configureInternalErlangSdk: explicitErlangSdk=${explicitErlangSdk?.name}, existingErlangSdk=${existingErlangSdk?.name}" }
