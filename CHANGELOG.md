@@ -56,6 +56,9 @@
     quoter dependencies from Hex, then failed to save against the entry an earlier run had left there -
     reported as `Unable to reserve cache`, which reads as a harmless race between legs. Both steps now
     take the path list from one place.
+  - The test results comment now leads with failures on the **required** legs, the only figure that
+    decides whether a pull request can merge, and reports `tests per leg` in place of a cross-leg
+    union that read 12,913 for a run in which no leg ran more than 6,659.
 
 ## [24.0.0] - 2026-08-04
 
