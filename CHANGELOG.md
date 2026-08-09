@@ -2,13 +2,27 @@
 
 ## [Unreleased]
 
+### Breaking changes
+
 ### Enhancements
+
+### Bug Fixes
+
+### Threading / Platform Hygiene
+
+### Build / CI
+
+## [24.0.1] - 2026-08-09
+
+### Enhancements
+
 - [@sh41](https://github.com/sh41)
   - **The plugin's "What's New" now shows the last six releases instead of the whole history.** Each
     version is listed with its release date, so upgrading after skipping a few releases shows what you
     missed rather than one undifferentiated list.
 
 ### Bug Fixes
+
 - [@sh41](https://github.com/sh41)
   - **Adding an Elixir SDK registers it again.** [#3888](https://github.com/KronicDeth/intellij-elixir/issues/3888) -
     the SDK list stayed empty and "Elixir Facet SDK is not defined" persisted, because setting up the
@@ -28,6 +42,7 @@
     of the editor",** which reached users as an IDE error report.
 
 ### Build / CI
+
 - [@sh41](https://github.com/sh41)
   - `CHANGELOG.md` is now in [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) format and is the
     single source of the plugin change notes, rendered by the Gradle Changelog Plugin.
@@ -35,6 +50,7 @@
     gone stale, so 24.0.0 shipped with v23.9.0 as its newest section.
   - Every pull request now needs a `CHANGELOG.md` entry, checked by `changelog.yml`: it must land under
     `## [Unreleased]`, be a list item, and use a known group. Apply the `no-changelog` label when there
+
     is genuinely nothing to record.
   - The Tag Release workflow validates the tag shape against the `prerelease` input, that a release is
     cut from `main`, that the tag is new and increases, and that it matches `pluginVersion`.
@@ -74,6 +90,7 @@
 ## [24.0.0] - 2026-08-04
 
 ### Enhancements
+
 - [#3866](https://github.com/KronicDeth/intellij-elixir/pull/3866) - [@sh41](https://github.com/sh41)
   - **Rename (Shift+F6) now works for functions, `name:arity` pairs, modules, module attributes, types, `@callback`s, protocol functions, and atoms**, propagating across every usage site -- including keyword-key usages like `import ... only:`, `@compile inline:`, `@dialyzer`, and `defoverridable`.
   - **New navigation:** `name: arity` function references support Go-to-Declaration/Find Usages/rename; `@callback`/`@macrocallback` definitions navigate to and from their implementations; protocol functions support Find Usages to call sites; Ctrl-click on a `GenServer.call/cast` or `Process.send`/`send_after` message now jumps to the matching `handle_call`/`handle_cast`/`handle_info` clause.
@@ -103,7 +120,6 @@
   - **BEAM viewer improvement (View → Tool Windows → BEAM Viewer):** the StrT (string table) tab now shows individual strings with their lengths and auto-sizes columns.
 - [#3852](https://github.com/KronicDeth/intellij-elixir/pull/3852) - [@sh41](https://github.com/sh41)
   - **Fewer "unknown AST node" warnings when decompiling OTP 26+ BEAM files.** Map comprehension nodes (`m_generate`, `mc`) introduced in OTP 26 are now decompiled correctly.
-
 - [#3836](https://github.com/KronicDeth/intellij-elixir/pull/3836) - [@joshuataylor](https://github.com/joshuataylor)
   - Mix settings and Mix deps checking reworked, Experimental Settings added, and mise SDK detection improved.
 - [#3843](https://github.com/KronicDeth/intellij-elixir/pull/3843) - [@sh41](https://github.com/sh41)
@@ -115,7 +131,9 @@
 - Erlang SDK prompt for mise Elixir SDKs -- when adding a mise-detected Elixir SDK without an Erlang SDK registered, a chooser dialog now lists valid mise-installed Erlang SDKs (sorted newest first, broken installations filtered out). The selected Erlang SDK is registered and linked automatically. - [@joshuataylor](https://github.com/joshuataylor)
 - Status bar widget -- when no Elixir SDK is configured, the widget popup now shows a "Detected Elixir SDKs" section listing valid mise installations. Clicking one registers the Elixir SDK, prompts for Erlang if needed, and sets it as the project SDK. - [@joshuataylor](https://github.com/joshuataylor)
 - When an Elixir SDK is added via Project Structure and no Erlang SDK is explicitly set, `configureInternalErlangSdk` now falls back to any Erlang SDK already registered in `ProjectJdkTable`. - [@joshuataylor](https://github.com/joshuataylor)
+
 ### Bug Fixes
+
 - [#3873](https://github.com/KronicDeth/intellij-elixir/pull/3873) - [@sh41](https://github.com/sh41)
   - **The "Setup Elixir Module SDK" / "Setup Elixir Facet SDK" editor banner links now work in small IDEs.** They previously called a Project Structure API that is a silent no-op in RubyMine and other small IDEs; they now open the Elixir SDK settings.
   - **Settings → Elixir → SDKs / Internal Erlang SDKs no longer show an empty list** when SDKs exist. The shared SDK model was initialised without a project, which loads nothing from the SDK table.
@@ -136,7 +154,6 @@
   - **Debugger no longer risks a threading crash** when gathering SDK paths at session start.
 - [#3855](https://github.com/KronicDeth/intellij-elixir/pull/3855) - [@sh41](https://github.com/sh41)
   - **Run configurations are more stable on 2025.3+.** Internal threading contracts are now enforced on the code paths that build Mix/Elixir/IEx command lines, preventing potential crashes when launching run configs.
-
 - [#3841](https://github.com/KronicDeth/intellij-elixir/pull/3841) - [@sh41](https://github.com/sh41)
   - **Decompiling `.beam` files built by newer OTP no longer fails on unknown instructions.** Adds `TypedRegister` (OTP 25+) and opcodes 177-191 (OTP 25-29) to the BEAM decompiler.
 - [#3837](https://github.com/KronicDeth/intellij-elixir/pull/3837) - [@sh41](https://github.com/sh41)
@@ -150,10 +167,10 @@
   - `ProgressManager.checkCanceled()` added to `while` loops in `@RequiresReadLock` methods.
   - Replace `Dispatchers.EDT` with `Dispatchers.UI` in `ElixirSdkStatusWidget` (EDT holds write-intent lock unnecessarily for pure UI updates).
   - Use no-arg `AnAction` constructor in `RefreshAllElixirSdksAction` to fix DevKit inspection.
+
 ### Threading / Platform Hygiene
 
 - *No user-visible behaviour changes. These improve long-term stability and IDE responsiveness.*
-
 - [#3858](https://github.com/KronicDeth/intellij-elixir/pull/3858) - [@sh41](https://github.com/sh41)
   - `@RequiresReadLock` / `@RequiresBackgroundThread` annotations added across PSI, structure view, navigation, SDK, mix, and utility layers.
   - `ProgressManager.checkCanceled()` added in large-set iteration loops (improves cancellation responsiveness during long operations).
@@ -163,7 +180,6 @@
 ### Build / CI
 
 - *No user-visible changes. These affect contributors and CI infrastructure only.*
-
 - [#3855](https://github.com/KronicDeth/intellij-elixir/pull/3855) - [@sh41](https://github.com/sh41)
   - GitHub Actions now summarizes the first ≤10 failed tests in the job summary.
   - Reverted to upstream `setup-beam` action (win25 runner issues resolved upstream).
@@ -197,7 +213,9 @@
   - Test Results checks no longer fail the run when tests fail.
 
 ## [23.8.2] - 2026-05-16
+
 ### Enhancements
+
 - [#3822](https://github.com/KronicDeth/intellij-elixir/pull/3822) - [@sh41](https://github.com/sh41)
   - Moved 108 hand-written `.kt`/`.java` files from `gen/` to `src/` -- these files were vulnerable to silent overwrite by parser regeneration. Regenerating `gen/` previously clobbered them with GrammarKit stubs, causing `StackOverflowError` at runtime when hand-written interface names matched BNF rule names (visitor generates self-recursive methods).
   - Renamed 3 PSI interfaces to avoid GrammarKit visitor collisions: `Heredoc` -> `HeredocLiteral`, `HeredocLine` -> `HeredocLineable`, `SigilHeredoc` -> `SigilHeredocLiteral`.
@@ -215,6 +233,7 @@
   - Added `@RequiresReadLock` annotations to PSI-accessing methods across 10 files (`CallDefinitionClause`, `Definition`, `Implementation`, `Module`, `Protocol`, `ElixirPsiImplUtil`, `PsiElementImpl`, `PsiNamedElementImpl`, `CallImpl`, `CanonicallyNamedImpl`). Enables the `ThreadingConcurrency` inspection to statically detect callers that don't hold the read lock.
 
 ### Bug Fixes
+
 - [#3832](https://github.com/KronicDeth/intellij-elixir/pull/3832) - [@joshuataylor](https://github.com/joshuataylor)
   - `BulkDecompilation` -- wrapped `ModuleManager.modules`, `ModuleRootManager.sdk`/`.contentRoots`, and `ProjectRootManager.projectSdk` access in `readAction {}`. Previously accessed on `Dispatchers.Default` without a read lock, causing crashes on 2025.2+.
   - `DirectoryConfigurator` -- wrapped `ModuleManager.getInstance(otpAppProject).modules` in `ReadAction.nonBlocking` inside `Task.Backgroundable` for newly attached umbrella sub-projects.
@@ -230,6 +249,7 @@
   - Downgraded non-critical decompiler/documentation-provider errors from `Logger.error()` to `logger.warn()`. `Logger.error()` creates a `Throwable` and shows an IDE error notification in internal mode -- too noisy for situations where code simply doesn't recognise an element (unknown Erlang AST nodes from newer OTP versions, missing decompiled functions, unhandled element types).
 
 ### Build / CI
+
 - [#3830](https://github.com/KronicDeth/intellij-elixir/pull/3830) - [@joshuataylor](https://github.com/joshuataylor)
   - Bumped IntelliJ 2026.1.x target to 2026.1.2.
 - [#3832](https://github.com/KronicDeth/intellij-elixir/pull/3832) - [@joshuataylor](https://github.com/joshuataylor)
@@ -237,9 +257,11 @@
   - Bumped intellij-platform plugin to 2.16.0.
 - [#3831](https://github.com/KronicDeth/intellij-elixir/pull/3831) - [@joshuataylor](https://github.com/joshuataylor)
   - Bumped JetBrains JDK to `jetbrains-21.0.10-b1163.110`.
+
 ## [23.5.0] - 2026-05-15
 
 ### Enhancements
+
 - [#3817](https://github.com/KronicDeth/intellij-elixir/pull/3817) - [@sh41](https://github.com/sh41)
   - All Elixir settings panels (Credo, Dialyzer, SDKs, Experimental Settings) grouped under a single "Elixir" parent configurable in both full IDEs and small IDEs (RubyMine, PyCharm, etc.). Dropped redundant "Elixir" prefixes from child panel display names.
   - Top-level configurable selection refactored to a service-provider strategy (`TopLevelElixirConfigurableFactory`) with small IDE and rich platform implementations, replacing the `isSmallIde` class detection approach.
@@ -251,6 +273,7 @@
   - `--mute-exit-status` added to Credo command line so lint-level exit codes are not treated as execution failures.
 
 ### Bug Fixes
+
 - [#3817](https://github.com/KronicDeth/intellij-elixir/pull/3817) - [@sh41](https://github.com/sh41)
   - Credo inspection read-action lock churn: consolidated 4-6 separate `runReadAction(Computable { })` calls per output line into a single `runReadAction {}` block per finding. Under 2025.3+ writer-preference locking, the repeated lock acquire/release blocked the EDT when a write action was pending. Partially fixes [#3790](https://github.com/KronicDeth/intellij-elixir/issues/3790).
   - Credo "Configure credo" notification action used internal `ShowSettingsUtilImpl` API -- replaced with `ShowSettingsUtil.getInstance()` and added `project.isDisposed` guard.
@@ -260,6 +283,7 @@
 ## [23.4.0] - 2026-05-15
 
 ### Enhancements
+
 - [#3820](https://github.com/KronicDeth/intellij-elixir/pull/3820) - [@sh41](https://github.com/sh41)
   - Status bar SDK widget -- module SDK inconsistency detection: detects dangling SDK references (module `.iml` references an SDK name that no longer exists in the JDK table, e.g. project cloned between WSL distributions) and SDK mismatches (module uses a different SDK than the project SDK). Notifications fire reactively with deduplication and include specific navigation instructions.
   - Status bar SDK widget -- folder mark validation: detects misconfigured source/test/excluded folder marks on Mix project modules. Uses debounced `rootsChanged()` via `MutableSharedFlow` + 2-second debounce to prevent thrashing during bulk operations. Tracks active notifications and expires them when the issue resolves.
@@ -270,6 +294,7 @@
   - `isSmallIde` detection fix: `ApplicationInfo` product codes instead of class detection (class detection broke in 2026.1).
 
 ### Bug Fixes
+
 - [#3820](https://github.com/KronicDeth/intellij-elixir/pull/3820) - [@sh41](https://github.com/sh41)
   - "Run Mix ExUnit" context menu missing on test directories containing non-matching `.ex` files in subdirectories: `containsFileWithSuffix` recursive directory walker returned `false` (stop) on non-matching `ElixirFile` instead of `true` (continue), and the `PsiDirectory` branch propagated that premature stop. Renamed `Finder.kt` -> `ContainsFileWithSuffix.kt`. Fixes [#3804](https://github.com/KronicDeth/intellij-elixir/issues/3804).
   - Replaced deprecated `SystemUtils.isWindows`/`isMac` (Apache Commons) with IntelliJ `SystemInfo`/`OS` utilities across the codebase.
@@ -280,6 +305,7 @@
 ## [23.3.0] - 2026-05-15
 
 ### Enhancements
+
 - [#3819](https://github.com/KronicDeth/intellij-elixir/pull/3819) - [@sh41](https://github.com/sh41)
   - Erlang external documentation support: parse external `.chunk` files (`<app>/doc/chunks/<module>.chunk`) and normalise doc payload across binary, charlist, and structured-term (`application/erlang+html`) variants. Covers OTP 23, 26, and 27 packaging layouts. BEAM decompilation now loads external chunk docs into generated mirror source.
   - Erlang module resolution via atom qualifier syntax: `:math.sqrt(2)`, `:ets.lookup(table, key)` and similar calls now resolve correctly. `maybeModularNameToModulars()` widened from `Set<Call>` to `Set<PsiNamedElement>` to include BEAM-decompiled `ModuleImpl` instances. Unblocks Go-to-Declaration, Find Usages, and autocomplete for all Erlang modules used with atom qualifier syntax.
@@ -288,6 +314,7 @@
   - `isDocumentationHost` consolidated into single source of truth in `PsiLanguageInjectionHost`, used by both the injection host and the markdown `Injector`.
 
 ### Bug Fixes
+
 - [#3819](https://github.com/KronicDeth/intellij-elixir/pull/3819) - [@sh41](https://github.com/sh41)
   - Quick Documentation (hover/Ctrl+Q) for qualified function calls like `Enum.map(list, fun)` and `GenServer.call(pid, msg)` -- previously showed no docs or fell back to module doc. Four root causes fixed: `ElixirRelativeIdentifier` not forwarded in `getCustomDocumentationElement`; `singleOrNull` returning `null` for multi-clause resolutions (replaced with `firstOrNull`); `filterIsInstance<Call>()` dropping `CallDefinitionImpl` from BEAM-only modules; arity-relaxed fallback not filtering by exact function name. Fixes [#3636](https://github.com/KronicDeth/intellij-elixir/issues/3636).
   - Hover docs for BEAM macros with default arguments (e.g. `Logger.info("hello")`): added `Docs.documentedByNameFallback()` that searches the name's `TreeMap` for the nearest arity. `BeamDocsHelper` now dispatches by `Definition` kind (function vs macro). Possibly addresses [#3650](https://github.com/KronicDeth/intellij-elixir/issues/3650), [#3553](https://github.com/KronicDeth/intellij-elixir/issues/3553), [#3552](https://github.com/KronicDeth/intellij-elixir/issues/3552), [#3324](https://github.com/KronicDeth/intellij-elixir/issues/3324), [#3468](https://github.com/KronicDeth/intellij-elixir/issues/3468), [#2691](https://github.com/KronicDeth/intellij-elixir/issues/2691).
@@ -299,6 +326,7 @@
 ## [23.2.0] - 2026-05-15
 
 ### Enhancements
+
 - [#3818](https://github.com/KronicDeth/intellij-elixir/pull/3818) - [@sh41](https://github.com/sh41)
   - Code completion deduplication: multi-clause functions (e.g. `Enum.map_every` with 5 clauses) now appear once in completion results instead of once per clause head. Shared `PreferFunctionHead` logic selects bare function heads over implementation clauses.
   - Parameter info deduplication: parameter hints grouped by `(name, arity)` -- separate arities still show distinct hints, but multiple clauses of the same arity no longer produce duplicate entries.
@@ -307,6 +335,7 @@
   - `DefinitionsScopedSearch` cancellation: added `ProgressManager.checkCanceled()` at loop boundaries and honour `Processor.process()` return value for early-exit, preventing hangs during large-project searches.
 
 ### Bug Fixes
+
 - [#3818](https://github.com/KronicDeth/intellij-elixir/pull/3818) - [@sh41](https://github.com/sh41)
   - **Breaking change**: removed `nameArityInAnyModule` global fallback from resolver. Previously, when `resolveInScope` found no results, the resolver fell back to a global stub-index search returning every function with a matching name from every module (all marked `validResult=false`). This polluted parameter hints with unrelated modules (e.g. hovering `Enum.map()` showed hints from `Stream.Reducers`, `Ecto`, `Phoenix`), caused Go-to-Definition to navigate to wrong-module definitions, and filled the resolution cache with irrelevant results. Calls that were previously "resolved" to functions in unrelated modules will now correctly appear as unresolved references.
   - Infinite loop in `UnaliasedName.up` when resolving `QualifiedMultipleAliases` -- function overload ordering caused mutual recursion.
@@ -319,6 +348,7 @@
 ## [23.1.0] - 2026-05-15
 
 ### Enhancements
+
 - [#3816](https://github.com/KronicDeth/intellij-elixir/pull/3816) - [@sh41](https://github.com/sh41)
   - Project-scoped coroutine service (`ElixirCoroutineService`) with `supervisedChildScope` for structured, lifecycle-bound concurrency across plugin subsystems.
   - Debugger runtime (Process, Node, MailBox) migrated from unmanaged `executeOnPooledThread` to structured coroutine scopes with cooperative cancellation via `ensureActive()`. Clean `CancellationException` handling prevents false error reports on shutdown.
@@ -332,6 +362,7 @@
   - Removed blocking pooled-thread wrappers from SDK lookup; tightened read-action/background boundaries.
 
 ### Bug Fixes
+
 - [#3816](https://github.com/KronicDeth/intellij-elixir/pull/3816) - [@sh41](https://github.com/sh41)
   - Debugger node network calls dispatched off EDT via serial `nodeDispatcher`, fixing EDT blocking during debug sessions.
   - VFS blocking read in debugger breakpoint availability checks -- `getModuleName()` directory traversal triggered blocking disk reads on the VFS, now stops at file boundaries. Partially fixes [#3790](https://github.com/KronicDeth/intellij-elixir/issues/3790).
@@ -342,6 +373,7 @@
 ## [23.0.7] - 2026-05-15
 
 ### Enhancements
+
 - [#3815](https://github.com/KronicDeth/intellij-elixir/pull/3815) - [@sh41](https://github.com/sh41)
   - Unicode identifier and atom support in the JFlex lexer -- Elixir supports Unicode identifiers (e.g. `def ΦΤ§ do`) and bare Unicode atoms (e.g. `:ΦΤ§`), but the lexer only recognised ASCII characters. Added Unicode letter/digit support using JFlex POSIX character classes.
   - Erlang private functions now decompiled as `defp` instead of `def`, using the BEAM export table to classify functions.
@@ -352,6 +384,7 @@
   - Improved parse error diagnostics: error reports now include the parser error description and failing source line, with top-10 unique error pattern summary in the bulk-decompile run log.
 
 ### Bug Fixes
+
 - [#3815](https://github.com/KronicDeth/intellij-elixir/pull/3815) - [@sh41](https://github.com/sh41)
   - FD leak fix (WSL/IJent): `InputStream` opened per BEAM file was never closed; after ~20K sequential reads during bulk decompilation, IJent exhausted its vsock FD limit, crashed the gRPC connection, and froze the IDE. Wrapped in `use {}` to release FDs immediately. Fixes [#3613](https://github.com/KronicDeth/intellij-elixir/issues/3613).
   - Parenthesise block expressions (`case`/`if`/`try`) and nested binary literals inside binary element type specs -- previously emitted unparseable Elixir. Fixes [#3554](https://github.com/KronicDeth/intellij-elixir/issues/3554), [#3555](https://github.com/KronicDeth/intellij-elixir/issues/3555).
@@ -378,14 +411,17 @@
 ## [23.0.6] - 2026-05-14
 
 ### Enhancements
+
 - [#3814](https://github.com/KronicDeth/intellij-elixir/pull/3814) - [@sh41](https://github.com/sh41)
   - 2026.2 compatibility: use deprecated `selectSdkHome` 2-arg form in SDK setup to compile against both 261 and 262 API. **Note**: On WSL, the SDK file chooser now opens at the user home directory instead of the WSL distribution root. This will be restored when 261 support is dropped.
 
 ### Bug Fixes
+
 - [#3814](https://github.com/KronicDeth/intellij-elixir/pull/3814) - [@sh41](https://github.com/sh41)
   - Fix unreachable `?: "IU"` fallback for `platformType` Gradle property -- `get()` throws on missing properties, so the elvis operator was dead code. Now uses `getOrElse("IU")`.
 
 ### Build / CI
+
 - [#3814](https://github.com/KronicDeth/intellij-elixir/pull/3814) - [@sh41](https://github.com/sh41)
   - CI matrix updated to `windows-2025` runners. IDEA EAP version pinned to `261.24374.34` (Java 25 incompatibility with `LATEST-EAP-SNAPSHOT`).
   - Plugin verifier pinned to 1.384 with markdown/HTML/plain report formats and clickable report output.
@@ -393,16 +429,19 @@
 ## [23.0.5] - 2026-04-28
 
 ### Bug Fixes
+
 - Fixed Umbrella project import crash when root folder and child app share the same name (e.g., `emqx/` root with `apps/emqx/` child). The quick import path (`File` -> `Open` on `mix.exs`) bypassed the wizard's duplicate detection, causing `ModuleWithNameAlreadyExists`. Module names are now disambiguated using the relative path (e.g., `emqx` for the root, `emqx-apps-emqx` for the child). - [@joshuataylor](https://github.com/joshuataylor), (Thanks to [@JiaRG](https://github.com/JiaRG) for the thorough and reproducible bug report and excellent example umbrella project!)
 
 ## [23.0.4] - 2026-04-26
 
 ### Enhancements
+
 - 2026.1 compatibility: remove deprecated `OpenProjectTask.copy()` call in `DirectoryConfigurator`. - [@joshuataylor](https://github.com/joshuataylor)
 - 2026.1 compatibility: use `ActionUtil.performAction()` instead of directly invoking `@OverrideOnly` method in `InstallMixDependenciesAction`. - [@joshuataylor](https://github.com/joshuataylor)
 - Remove internal API usage: replace `DiagnosticBundle`, `AbstractMessage`, and `PlatformUtils` with public alternatives for plugin verification compatibility. - [@joshuataylor](https://github.com/joshuataylor)
 
 ### Build / CI
+
 - Bump Gradle from 9.3.1 to 9.4.1. - [@joshuataylor](https://github.com/joshuataylor)
 - Bump kotlinx-coroutines from 1.9.0 to 1.10.2. - [@joshuataylor](https://github.com/joshuataylor)
 - Bump gradle-download from 5.6.0 to 5.7.0. - [@joshuataylor](https://github.com/joshuataylor)
@@ -412,6 +451,7 @@
 ## [23.0.3] - 2026-04-26
 
 ### Bug Fixes
+
 - [#3806](https://github.com/KronicDeth/intellij-elixir/pull/3806) - [@sh41](https://github.com/sh41)
   - Fix indexing deadlock by reading BEAM files from `FileContent` instead of reopening `VirtualFile` input stream. Avoids deadlock on WSL/IJ environments during annotation and highlighting passes.
 - [#3807](https://github.com/KronicDeth/intellij-elixir/pull/3807) - [@sh41](https://github.com/sh41)
@@ -420,6 +460,7 @@
 ## [23.0.2] - 2026-04-17
 
 ### Enhancements
+
 - [#3763](https://github.com/KronicDeth/intellij-elixir/pull/3763) - [@sh41](https://github.com/sh41)
   - JPS plugin refactor: fix JPS builder classpath (broken since September 2024), move `HomePath` into IDE module, persist Elixir SDK derived data (`mix-home`, `wsl-unc-path`) with a `data-version` marker and migration, and separate JPS builder from shared modules.
 - [#3792](https://github.com/KronicDeth/intellij-elixir/pull/3792) - [@sh41](https://github.com/sh41)
@@ -435,6 +476,7 @@
 - Handle uncompressed literals and improve error reporting in BEAM `Literals` parsing. - [@sh41](https://github.com/sh41)
 
 ### Bug Fixes
+
 - Fix broken IDE navigation by specifying base platform rather than module. - [@sh41](https://github.com/sh41)
 - Fix process kill on Windows. - [@sh41](https://github.com/sh41)
 - Fix compile server classpath for JPS module jars. - [@sh41](https://github.com/sh41)
@@ -444,11 +486,13 @@
 - Less aggressive SDK version differentiation in `SdkHomeScan`. - [@sh41](https://github.com/sh41)
 
 ### Build / CI
+
 - Bump intellij-platform from 2.11.0 to 2.12.0. - [@joshuataylor](https://github.com/joshuataylor)
 
 ## [23.0.1] - 2026-03-06
 
 ### Enhancements
+
 - [#3787](https://github.com/KronicDeth/intellij-elixir/pull/3787) - [@joshuataylor](https://github.com/joshuataylor)
   - Remove internal API usage to improve plugin verification compatibility.
 - [#3788](https://github.com/KronicDeth/intellij-elixir/pull/3788) - [@joshuataylor](https://github.com/joshuataylor)
@@ -457,6 +501,7 @@
 ## [23.0.0] - 2026-02-09
 
 ### Enhancements
+
 - WSL Support - [@sh41](https://github.com/sh41) - see [release announcement](https://github.com/KronicDeth/intellij-elixir/releases/tag/v23.0.0) for full details!
   - Windows Subsystem for Linux support enabling Elixir development in WSL from Windows JetBrains IDEs. Originally submitted as [#3749](https://github.com/KronicDeth/intellij-elixir/pull/3749), broken into 7 stacked PRs for review. Resolves [#1384](https://github.com/KronicDeth/intellij-elixir/issues/1384), [#1911](https://github.com/KronicDeth/intellij-elixir/issues/1911), [#2499](https://github.com/KronicDeth/intellij-elixir/issues/2499), [#3470](https://github.com/KronicDeth/intellij-elixir/issues/3470), [#3674](https://github.com/KronicDeth/intellij-elixir/issues/3674), [#3746](https://github.com/KronicDeth/intellij-elixir/issues/3746). May also help with [#3659](https://github.com/KronicDeth/intellij-elixir/issues/3659), [#3716](https://github.com/KronicDeth/intellij-elixir/issues/3716), [#3715](https://github.com/KronicDeth/intellij-elixir/issues/3715). See the [README WSL section](https://github.com/KronicDeth/intellij-elixir?tab=readme-ov-file#windows-subsystem-for-linux-wsl-support) for setup instructions.
   - SDK discovery for Elixir and Erlang inside WSL distributions (asdf, mise, kerl, kiex, Homebrew, Nix).
@@ -474,6 +519,7 @@
   - IntelliJ IDE Starter-based UI test infrastructure for automated IDE testing.
 
 ### Bug Fixes
+
 - [#3761](https://github.com/KronicDeth/intellij-elixir/pull/3761) - [@sh41](https://github.com/sh41)
   - Fix deadlock when `/deps` directory is deleted while the deps watcher is active.
   - Fix JPS Builder module name handling (broken since September 2024).
@@ -483,9 +529,11 @@
 ## [22.0.0] - 2025-12-16
 
 ### Breaking changes
+
 - This release supports 2025.3+ IDEs only (253.xxx).
 
 ### Enhancements
+
 - [#3696](https://github.com/KronicDeth/intellij-elixir/pull/3696) - [@mwnciau](https://github.com/mwnciau)
   - HEEx support with `.heex` file type recognition, syntax highlighting for `{@assigns}` and `{expressions}`, relative component support (`<.component>` tags), and CSS/JavaScript injection in `<style>` and `<script>` tags.
 - Language Injection for literal sigils (`~H`, `~r`, etc.) - [@polymorfiq](https://github.com/polymorfiq)
@@ -496,57 +544,67 @@
 - Extensive EDT threading fixes for 2025.2+ compatibility.
 
 ## [21.0.0] - 2025-05-17
+
 ### Enhancements
+
 - [#3651](https://github.com/KronicDeth/intellij-elixir/pull/3681) - [@joshuataylor](https://github.com/joshuataylor)
   - Support Jetbrains 2025.1 and relax until-build.
 
 ## [20.0.1] - 2024-11-29
 
 ### Bug Fixes
+
 - [#3651](https://github.com/KronicDeth/intellij-elixir/pull/3667) - [@joshuataylor](https://github.com/joshuataylor)
   - Support Webstorm 2024.3 (243.21565.180). Thanks to [@Kae-Tempest](https://github.com/Kae-Tempest) for the report!
 
 ## [20.0.0] - 2024-11-14
 
 ### Enhancements
+
 - [#3651](https://github.com/KronicDeth/intellij-elixir/pull/3651) - [@joshuataylor](https://github.com/joshuataylor)
   - Support Jetbrains 2024.3 (243.21565.193)
 
 ## [19.0.1] - 2024-08-20
 
 ### Enhancements
+
 - [#3639](https://github.com/KronicDeth/intellij-elixir/pull/3639) - [@joshuataylor](https://github.com/joshuataylor)
   - Support JetBrains Exception Analyzer
-
 - [#3640](https://github.com/KronicDeth/intellij-elixir/pull/3640) - [@joshuataylor](https://github.com/joshuataylor)
   - Bump intellij platform gradle to 2.0.1 and IdeaVIM to 2.16.0
-
 - [#3643](https://github.com/KronicDeth/intellij-elixir/pull/3643) - [@joshuataylor](https://github.com/joshuataylor)
-  - Fix RubyMine freezing for umbrella projects but showing the new project wizard as a temporary workaround. 
+  - Fix RubyMine freezing for umbrella projects but showing the new project wizard as a temporary workaround.
 
 ## [19.0.0] - 2024-08-14
 
 ### Breaking changes
+
 - [#3619](https://github.com/KronicDeth/intellij-elixir/pull/3619) - [@joshuataylor](https://github.com/joshuataylor)
   - Drop support for < 2024.2 IDEs
 
 ### Enhancements
+
 - [#3619](https://github.com/KronicDeth/intellij-elixir/pull/3619) - [@joshuataylor](https://github.com/joshuataylor)
   - Support IntelliJ Gradle Plugin 2.0
 
 ## [18.0.1] - 2024-08-05
+
 ### Enhancements
+
 - [#3582](https://github.com/KronicDeth/intellij-elixir/pull/3582) - [@rNoz](https://github.com/rNoz)
   - Enabling proper code generation for comments (Comment with Line/Block Comment)
 
 ## [18.0.0] - 2024-08-03
+
 ### Breaking changes
+
 - [#3569](https://github.com/KronicDeth/intellij-elixir/pull/3569) - [@ashleysommer](https://github.com/ashleysommer), [@joshuataylor](https://github.com/joshuataylor)
   - Drop support for < 2024.1 IDEs.
 
 ## [17.0.1] - 2023-12-24
 
 ### Bug Fixes
+
 - [#3491](https://github.com/KronicDeth/intellij-elixir/pull/3491) - [@neominik](https://github.com/neominik)
   - Render code snippets that are not links.
 - [#3562](https://github.com/KronicDeth/intellij-elixir/pull/3562) - [@ashleysommer](https://github.com/ashleysommer)
@@ -557,14 +615,17 @@
 ## [17.0.0] - 2024-01-11
 
 ### Breaking changes
+
 - [#3500](https://github.com/KronicDeth/intellij-elixir/pull/3500) - [@KronicDeth](https://github.com/KronicDeth)
   - Drop support for <= 2023.2 IDEs.
 
 ### Enhancements
+
 - [#2402](https://github.com/KronicDeth/intellij-elixir/pull/3402) - [@joshuataylor](https://github.com/joshuataylor)
   - Support 2023.3 IDEs.
 
 ### Bug Fixes
+
 - [#3431](https://github.com/KronicDeth/intellij-elixir/pull/3431) - [@KronicDeth](https://github.com/KronicDeth)
   - Add `displayName` in `plugin.xml` for configurables for faster menu loading.
     - `org.elixir_lang.facet.configurable.Project` - "Elixir"
@@ -574,3 +635,32 @@
 ## [16.0.0] - 2023-09-12
 
 - The [CHANGELOG for v15](https://github.com/KronicDeth/intellij-elixir/blob/v15.1.0/CHANGELOG.md) can be found in [the v16.0.0 tag](https://github.com/KronicDeth/intellij-elixir/tree/v16.0.0).
+
+[Unreleased]: https://github.com/KronicDeth/intellij-elixir//compare/v24.0.1...HEAD
+[24.0.1]: https://github.com/KronicDeth/intellij-elixir//compare/v24.0.0...v24.0.1
+[24.0.0]: https://github.com/KronicDeth/intellij-elixir//compare/v23.8.2...v24.0.0
+[23.8.2]: https://github.com/KronicDeth/intellij-elixir//compare/v23.5.0...v23.8.2
+[23.5.0]: https://github.com/KronicDeth/intellij-elixir//compare/v23.4.0...v23.5.0
+[23.4.0]: https://github.com/KronicDeth/intellij-elixir//compare/v23.3.0...v23.4.0
+[23.3.0]: https://github.com/KronicDeth/intellij-elixir//compare/v23.2.0...v23.3.0
+[23.2.0]: https://github.com/KronicDeth/intellij-elixir//compare/v23.1.0...v23.2.0
+[23.1.0]: https://github.com/KronicDeth/intellij-elixir//compare/v23.0.7...v23.1.0
+[23.0.7]: https://github.com/KronicDeth/intellij-elixir//compare/v23.0.6...v23.0.7
+[23.0.6]: https://github.com/KronicDeth/intellij-elixir//compare/v23.0.5...v23.0.6
+[23.0.5]: https://github.com/KronicDeth/intellij-elixir//compare/v23.0.4...v23.0.5
+[23.0.4]: https://github.com/KronicDeth/intellij-elixir//compare/v23.0.3...v23.0.4
+[23.0.3]: https://github.com/KronicDeth/intellij-elixir//compare/v23.0.2...v23.0.3
+[23.0.2]: https://github.com/KronicDeth/intellij-elixir//compare/v23.0.1...v23.0.2
+[23.0.1]: https://github.com/KronicDeth/intellij-elixir//compare/v23.0.0...v23.0.1
+[23.0.0]: https://github.com/KronicDeth/intellij-elixir//compare/v22.0.0...v23.0.0
+[22.0.0]: https://github.com/KronicDeth/intellij-elixir//compare/v21.0.0...v22.0.0
+[21.0.0]: https://github.com/KronicDeth/intellij-elixir//compare/v20.0.1...v21.0.0
+[20.0.1]: https://github.com/KronicDeth/intellij-elixir//compare/v20.0.0...v20.0.1
+[20.0.0]: https://github.com/KronicDeth/intellij-elixir//compare/v19.0.1...v20.0.0
+[19.0.1]: https://github.com/KronicDeth/intellij-elixir//compare/v19.0.0...v19.0.1
+[19.0.0]: https://github.com/KronicDeth/intellij-elixir//compare/v18.0.1...v19.0.0
+[18.0.1]: https://github.com/KronicDeth/intellij-elixir//compare/v18.0.0...v18.0.1
+[18.0.0]: https://github.com/KronicDeth/intellij-elixir//compare/v17.0.1...v18.0.0
+[17.0.1]: https://github.com/KronicDeth/intellij-elixir//compare/v17.0.0...v17.0.1
+[17.0.0]: https://github.com/KronicDeth/intellij-elixir//compare/v16.0.0...v17.0.0
+[16.0.0]: https://github.com/KronicDeth/intellij-elixir//commits/v16.0.0
