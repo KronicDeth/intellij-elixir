@@ -148,6 +148,11 @@ ELIXIR_SDK_HOME
         ElixirSdkPathConfigurator.configure(sdk)
     }
 
+    override fun setupSdkPaths(sdk: Sdk, sdkModel: SdkModel): Boolean {
+        ElixirSdkPathConfigurator.configure(sdk, sdkModel)
+        return true
+    }
+
     @Deprecated("Deprecated in Java")
     // IntelliJ SDKType still requires this deprecated override.
     @Suppress("DEPRECATION")

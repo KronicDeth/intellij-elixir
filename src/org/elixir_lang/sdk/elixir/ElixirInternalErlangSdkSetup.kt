@@ -7,6 +7,7 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.diagnostic.trace
 import com.intellij.openapi.projectRoots.ProjectJdkTable
 import com.intellij.openapi.projectRoots.Sdk
+import com.intellij.openapi.projectRoots.SdkModel
 import com.intellij.openapi.projectRoots.SdkModificator
 import com.intellij.openapi.ui.Messages
 import kotlinx.coroutines.runBlocking
@@ -17,6 +18,7 @@ import org.elixir_lang.sdk.SdkRegistrar
 import org.elixir_lang.sdk.erlang_dependent.ErlangSdkResolver
 import org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData
 import org.elixir_lang.sdk.erlang_dependent.Type.Companion.ERLANG_SDK_KEY
+import org.elixir_lang.util.ReadActions
 import org.elixir_lang.util.WriteActions
 import org.elixir_lang.sdk.erlang.Type as ErlangSdkType
 
@@ -37,23 +39,25 @@ object ElixirInternalErlangSdkSetup {
      *
      * Resolution order:
      * 1. Explicit SDK stored in UserData (set by the wizard when creating Erlang + Elixir together)
-     * 2. Already-linked SDK from existing SdkAdditionalData
+     * 2. Already-linked SDK from existing SdkAdditionalData, looked up in [sdkModel] before
+     *    ProjectJdkTable so a dependency chosen in the same dialog resolves before it is committed
      * 3. Any registered Erlang SDK in ProjectJdkTable
      * 4. Prompt the user to pick a mise-installed Erlang SDK (mise Elixir SDKs only)
      */
     internal fun configureInternalErlangSdk(
         elixirSdk: Sdk,
         elixirSdkModificator: SdkModificator,
+        sdkModel: SdkModel? = null,
     ): Sdk? {
         val existingAdditionalData = elixirSdk.sdkAdditionalData as? SdkAdditionalData
-        val existingErlangSdk = existingAdditionalData?.getErlangSdk()
+        val existingErlangSdk = existingAdditionalData?.let { data -> ReadActions.compute { data.getErlangSdk(sdkModel) } }
         val explicitErlangSdk = elixirSdk.getUserData(ERLANG_SDK_KEY)
 
         LOG.trace { "[${elixirSdk.name}] configureInternalErlangSdk: explicitErlangSdk=${explicitErlangSdk?.name}, existingErlangSdk=${existingErlangSdk?.name}" }
 
         val erlangSdk = explicitErlangSdk
             ?: existingErlangSdk
-            ?: ErlangSdkResolver.findAnyRegistered()?.also { LOG.trace { "[${elixirSdk.name}] Resolution: found via findAnyRegistered: '${it.name}'" } }
+            ?: ReadActions.compute { ErlangSdkResolver.findAnyRegistered() }?.also { LOG.trace { "[${elixirSdk.name}] Resolution: found via findAnyRegistered: '${it.name}'" } }
             ?: promptForMiseErlangSdk(elixirSdk)?.also { LOG.trace { "[${elixirSdk.name}] Resolution: found via promptForMiseErlangSdk: '${it.name}'" } }
 
         if (erlangSdk != null) {

@@ -36,10 +36,14 @@ interface ErlangSdkResolver {
          * are registered. Used as a fallback when no Erlang SDK has been explicitly paired with an
          * Elixir SDK.
          */
-        fun findAnyRegistered(): Sdk? =
-            ProjectJdkTable.getInstance()
+        @RequiresReadLock
+        fun findAnyRegistered(): Sdk? {
+            ThreadingAssertions.assertReadAccess()
+
+            return ProjectJdkTable.getInstance()
                 .getSdksOfType(org.elixir_lang.sdk.erlang.Type.instance)
                 .firstOrNull { it.homePath != null }
+        }
     }
 }
 

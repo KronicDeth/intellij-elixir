@@ -4,10 +4,12 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.projectRoots.ProjectJdkTable
 import com.intellij.openapi.projectRoots.Sdk
+import com.intellij.openapi.projectRoots.SdkModel
 import com.intellij.openapi.projectRoots.SdkModificator
 import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.vfs.VfsUtil
 import org.elixir_lang.sdk.SdkEbinPaths
+import org.elixir_lang.util.ReadActions
 import org.elixir_lang.util.WriteActions
 import java.io.File
 import java.nio.file.Path
@@ -16,7 +18,7 @@ import java.nio.file.Paths
 object ElixirSdkPathConfigurator {
     private val LOG = Logger.getInstance(ElixirSdkPathConfigurator::class.java)
 
-    fun configure(sdk: Sdk) {
+    fun configure(sdk: Sdk, sdkModel: SdkModel? = null) {
         LOG.info("Configuring SDK paths for ${sdk.name}")
         val sdkModificator = sdk.sdkModificator
 
@@ -29,12 +31,12 @@ object ElixirSdkPathConfigurator {
         // is registered to consume JavadocOrderRootType roots.
         addSourcePaths(sdkModificator)
 
-        val erlangSdk = ElixirInternalErlangSdkSetup.configureInternalErlangSdk(sdk, sdkModificator)
+        val erlangSdk = ElixirInternalErlangSdkSetup.configureInternalErlangSdk(sdk, sdkModificator, sdkModel)
         if (erlangSdk == null) {
             // Only remove SDKs that are not yet in ProjectJdkTable (wizard/new-SDK path).
             // An existing SDK that temporarily can't resolve its Erlang pairing must not be removed -
             // the caller (e.g. SdkRegistrar.registerOrUpdateElixirSdk) owns the SDK's lifecycle.
-            if (ProjectJdkTable.getInstance().findJdk(sdk.name) == null) {
+            if (ReadActions.compute { ProjectJdkTable.getInstance().findJdk(sdk.name) } == null) {
                 LOG.warn("No Erlang SDK found for new Elixir SDK '${sdk.name}'; removing incomplete SDK")
                 WriteActions.runWriteAction { ProjectJdkTable.getInstance().removeJdk(sdk) }
             } else {
