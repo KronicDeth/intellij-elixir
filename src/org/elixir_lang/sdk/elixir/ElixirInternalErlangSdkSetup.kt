@@ -17,6 +17,7 @@ import org.elixir_lang.sdk.SdkRegistrar
 import org.elixir_lang.sdk.erlang_dependent.ErlangSdkResolver
 import org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData
 import org.elixir_lang.sdk.erlang_dependent.Type.Companion.ERLANG_SDK_KEY
+import org.elixir_lang.util.ReadActions
 import org.elixir_lang.util.WriteActions
 import org.elixir_lang.sdk.erlang.Type as ErlangSdkType
 
@@ -46,14 +47,14 @@ object ElixirInternalErlangSdkSetup {
         elixirSdkModificator: SdkModificator,
     ): Sdk? {
         val existingAdditionalData = elixirSdk.sdkAdditionalData as? SdkAdditionalData
-        val existingErlangSdk = existingAdditionalData?.getErlangSdk()
+        val existingErlangSdk = existingAdditionalData?.let { data -> ReadActions.compute { data.getErlangSdk() } }
         val explicitErlangSdk = elixirSdk.getUserData(ERLANG_SDK_KEY)
 
         LOG.trace { "[${elixirSdk.name}] configureInternalErlangSdk: explicitErlangSdk=${explicitErlangSdk?.name}, existingErlangSdk=${existingErlangSdk?.name}" }
 
         val erlangSdk = explicitErlangSdk
             ?: existingErlangSdk
-            ?: ErlangSdkResolver.findAnyRegistered()?.also { LOG.trace { "[${elixirSdk.name}] Resolution: found via findAnyRegistered: '${it.name}'" } }
+            ?: ReadActions.compute { ErlangSdkResolver.findAnyRegistered() }?.also { LOG.trace { "[${elixirSdk.name}] Resolution: found via findAnyRegistered: '${it.name}'" } }
             ?: promptForMiseErlangSdk(elixirSdk)?.also { LOG.trace { "[${elixirSdk.name}] Resolution: found via promptForMiseErlangSdk: '${it.name}'" } }
 
         if (erlangSdk != null) {

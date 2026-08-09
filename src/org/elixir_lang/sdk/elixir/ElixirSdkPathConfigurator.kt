@@ -8,6 +8,7 @@ import com.intellij.openapi.projectRoots.SdkModificator
 import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.vfs.VfsUtil
 import org.elixir_lang.sdk.SdkEbinPaths
+import org.elixir_lang.util.ReadActions
 import org.elixir_lang.util.WriteActions
 import java.io.File
 import java.nio.file.Path
@@ -34,7 +35,7 @@ object ElixirSdkPathConfigurator {
             // Only remove SDKs that are not yet in ProjectJdkTable (wizard/new-SDK path).
             // An existing SDK that temporarily can't resolve its Erlang pairing must not be removed -
             // the caller (e.g. SdkRegistrar.registerOrUpdateElixirSdk) owns the SDK's lifecycle.
-            if (ProjectJdkTable.getInstance().findJdk(sdk.name) == null) {
+            if (ReadActions.compute { ProjectJdkTable.getInstance().findJdk(sdk.name) } == null) {
                 LOG.warn("No Erlang SDK found for new Elixir SDK '${sdk.name}'; removing incomplete SDK")
                 WriteActions.runWriteAction { ProjectJdkTable.getInstance().removeJdk(sdk) }
             } else {
