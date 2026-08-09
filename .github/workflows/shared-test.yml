@@ -16,7 +16,7 @@ on:
         type: boolean
         default: false
       upload-verifier-reports:
-        description: 'Upload test reports as artifacts'
+        description: 'Upload each verification leg''s reports as an artifact, even when it passes.'
         required: false
         type: boolean
         default: true
@@ -140,22 +140,45 @@ jobs:
 
       # Restore the quoter build cache (deps + _build) so the Build quoter step goes incremental. This
       # and its Save counterpart live here, not in setup-env, so the whole cache lifecycle sits next to
-      # the quoter build. The dir is namespaced by the gradle.properties quoterRef slug (slashes ->
-      # dashes), matching build.gradle.kts quoterRefSlug.
+      # the quoter build. The dir must name what build.gradle.kts writes - the Elixir/OTP pair (sdk
+      # .pairToken) plus the gradle.properties quoterRef slug (slashes -> dashes, quoterRefSlug) - or
+      # the cache silently covers nothing.
       - name: Resolve quoter cache slug
         id: quoter-slug
+        env:
+          ELIXIR_VERSION: ${{ matrix.beam.elixir }}
+          OTP_VERSION: ${{ matrix.beam.otp }}
         run: |
           ref=$(grep -E '^quoterRef=' gradle.properties | head -1 | cut -d= -f2-)
           ref="${ref:-v2.1.0}"
-          echo "slug=${ref//\//-}" >> "$GITHUB_OUTPUT"
+          slug="${ref//\//-}"
+          echo "slug=$slug" >> "$GITHUB_OUTPUT"
+          # Non-word characters collapse to "-" in sdk.pathToken, so do the same here - every OTP in
+          # ci-versions.json is already path-safe, but a future one that is not must not make the
+          # workflow and the build disagree about the directory name.
+          pair="elixir-$(printf %s "$ELIXIR_VERSION" | tr -c 'A-Za-z0-9._-' '-')"
+          pair="$pair-otp-$(printf %s "$OTP_VERSION" | tr -c 'A-Za-z0-9._-' '-')"
+          # Emitted once and consumed by BOTH cache steps, because they have to agree exactly.
+          # actions/cache identifies an entry by (key, version), and the version is a sha256 of the
+          # literal `path:` lines joined by "|" - the raw pattern strings, not the files they expand
+          # to (toolkit packages/cache: restoreCache and saveCacheV2 both hash the `paths` argument,
+          # saveCacheV1 hashes it in reserveCache). Two different lists therefore address two
+          # different entries under one key: restore looks up a version save never wrote, so it
+          # misses on every run, rebuilds the quoter from Hex, and then save collides with the entry
+          # some earlier run left under that key and reports "Unable to reserve cache".
+          {
+            echo "paths<<CACHE_PATHS_EOF"
+            echo "cache/${pair}-intellij_elixir-${slug}"
+            echo '!cache/**/tmp/pipe/**'
+            echo '!cache/**/distillery/priv'
+            echo "CACHE_PATHS_EOF"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Restore Elixir cache
         id: restore-elixir-cache
         uses: actions/cache/restore@v6
         with:
-          path: |
-            cache/elixir-${{ matrix.beam.elixir }}-intellij_elixir-${{ steps.quoter-slug.outputs.slug }}/_build
-            cache/elixir-${{ matrix.beam.elixir }}-intellij_elixir-${{ steps.quoter-slug.outputs.slug }}/deps
+          path: ${{ steps.quoter-slug.outputs.paths }}
           key: elixir-${{ runner.os }}-${{ runner.arch }}-${{ matrix.beam.elixir }}-otp-${{ matrix.beam.otp }}-quoter-${{ hashFiles('gradle.properties') }}
           restore-keys: |
             elixir-${{ runner.os }}-${{ runner.arch }}-${{ matrix.beam.elixir }}-otp-${{ matrix.beam.otp }}-
@@ -182,15 +205,14 @@ jobs:
 
       # Save the quoter build (_build/deps) now that releaseQuoter has produced it - setup-env only
       # restores this cache; it cannot save it (those dirs do not exist until this step runs).
+      # `path` must stay the shared output, never a list written out here - see Resolve quoter cache
+      # slug for what diverging from Restore costs.
       - name: Save Elixir cache
         id: save-elixir-cache
         if: always() && steps.build-quoter.outcome == 'success' && steps.restore-elixir-cache.outputs.cache-hit != 'true'
         uses: actions/cache/save@v6
         with:
-          path: |
-            cache/elixir-${{ matrix.beam.elixir }}-intellij_elixir-${{ steps.quoter-slug.outputs.slug }}
-            !cache/**/tmp/pipe/**
-            !cache/**/distillery/priv
+          path: ${{ steps.quoter-slug.outputs.paths }}
           key: ${{ steps.restore-elixir-cache.outputs.cache-primary-key }}
 
       # An Elixir the declaration marks unsupported may fail at any phase above, not only here -
@@ -431,6 +453,6 @@ jobs:
     uses: ./.github/workflows/shared-verify.yml
     with:
       matrix: ${{ needs.test-matrix.outputs.verify }}
-      # inputs is empty for pull_request events, so this is false there, matching what the inline
-      # verification did before: reports upload only for workflow_call runs that ask for them.
+      # Empty for pull_request, so false there. Failing legs still upload: shared-verify.yml ORs in
+      # `failure()`.
       upload-verifier-reports: ${{ inputs.upload-verifier-reports || false }}

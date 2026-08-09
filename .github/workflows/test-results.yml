@@ -540,6 +540,85 @@ jobs:
             if (noResults.length) headline.push(`**${noResults.length} produced no results**`);
             body.push(headline.join(' · '), '');
 
+            // Required legs are the only ones that can block a merge, so their verdict goes first - ahead of
+            // every other number here, all of which span both kinds of leg. On a matrix like this one the
+            // informational legs contribute ALL of the failures, so a pull request whose required legs are
+            // entirely green still led with "291 failed" and "1,251 failing runs", and the one figure that
+            // has to be zero for the pipeline to pass appeared nowhere. Computed from the same per-leg
+            // digests the tables below use, so the two cannot disagree.
+            const required = groups[0].rows;
+            const requiredIncomplete = required.filter(
+              (leg) => !leg.hasResults || leg.status.tests_ran === false,
+            );
+            // A required leg that published results but whose check carries no usable digest contributes an
+            // unknown number of failures, so the total is a floor, not the answer. Said, not hidden.
+            const requiredUncounted = required.filter((leg) => leg.hasResults && !leg.counts);
+            const requiredFailingLegs = required.filter(
+              (leg) => leg.counts && leg.counts.tests_fail + leg.counts.tests_error > 0,
+            );
+            // Summed across legs, so this counts runs rather than distinct tests - the same distinction the
+            // note under the aggregate table draws. A leg's digest cannot say which of its failures another
+            // leg also hit, and the number that matters here is zero either way.
+            const requiredFailingRuns = required.reduce(
+              (total, leg) => total + (leg.counts ? leg.counts.tests_fail + leg.counts.tests_error : 0),
+              0,
+            );
+
+            // The whole verdict is one bold span, so the clauses inside it carry no emphasis of their own:
+            // nesting `**` inside `**` does not reliably render as bold in GitHub-flavoured markdown.
+            const gate = [];
+            if (requiredFailingRuns) {
+              gate.push(
+                `${count(requiredFailingRuns)} failing test ${requiredFailingRuns === 1 ? 'run' : 'runs'}` +
+                  ` across ${requiredFailingLegs.length} of ${required.length}` +
+                  ` ${required.length === 1 ? 'leg' : 'legs'}`,
+              );
+            }
+            if (requiredIncomplete.length) {
+              gate.push(
+                requiredIncomplete.length === 1
+                  ? '1 leg did not run its tests'
+                  : `${requiredIncomplete.length} legs did not run their tests`,
+              );
+            }
+
+            if (!required.length) {
+              body.push(
+                '❔ **No leg reported itself as required**, so nothing here says whether this commit can' +
+                  ' merge.',
+                '',
+              );
+            } else if (gate.length) {
+              // A red gate stays red whatever the missing legs would have added; the caveat sits outside the
+              // verdict because it qualifies the number rather than the judgement.
+              const verdict = `❌ **Required legs: ${gate.join('; ')}.**`;
+              body.push(
+                requiredUncounted.length
+                  ? `${verdict} ${requiredUncounted.length} required` +
+                      ` ${requiredUncounted.length === 1 ? 'leg' : 'legs'} published no counts, so that is a` +
+                      ' lower bound.'
+                  : verdict,
+                '',
+              );
+            } else if (requiredUncounted.length) {
+              // Never ✅ here. A tick beside "and some of them did not report" is the same lie as a tick on a
+              // leg that never compiled: the gate is unknown, so it says unknown.
+              const counted = required.length - requiredUncounted.length;
+              body.push(
+                counted === 0
+                  ? '❔ **No required leg reported counts**, so whether anything blocks a merge is unknown.'
+                  : `❔ **Required legs: 0 failing tests among the ${counted} that reported counts**, but` +
+                      ` ${requiredUncounted.length} published none - so whether anything blocks a merge is` +
+                      ' unknown.',
+                '',
+              );
+            } else {
+              body.push(
+                `✅ **Required legs: 0 failing tests**, all ${required.length} ran to completion.`,
+                '',
+              );
+            }
+
             const timed = rows.filter((leg) => Number.isFinite(leg.seconds)).map((leg) => leg.seconds);
 
             if (aggregate && aggregate.stats) {
@@ -550,26 +629,57 @@ jobs:
               const runnerTime = timed.length ? timed.reduce((total, seconds) => total + seconds, 0) : undefined;
               const failures = stats.tests_fail + stats.tests_error;
               const failingRuns = stats.runs_fail + stats.runs_error;
+              // stats.runs_succ rather than a subtraction, so passing runs stay the action's arithmetic like
+              // every other figure here. The fallback only covers the field being absent from a future schema.
+              const passingRuns = Number.isFinite(stats.runs_succ)
+                ? stats.runs_succ
+                : stats.runs - failingRuns - stats.runs_skip;
+
+              // The action's `tests` is the union of distinct (class, test name) pairs over EVERY leg's XMLs,
+              // and on this matrix that roughly doubles the real figure: `org.elixir_lang.beam.SdkBeamParseTest`
+              // names each case after a `.beam` path in the resolved SDK, and the Erlang half of those - about
+              // 1 400 of ~1 700 - carries the OTP application version in the path (`erlang/kernel-8.3.2.2/...`),
+              // so every OTP bump renames nearly all of them. Measured on run 31156815241: 4 897 ordinary tests
+              // identical on every leg, 8 016 distinct sweep cases across the matrix, 12 913 together against
+              // 6 560-6 659 that any single leg actually ran. Nobody can act on that union, so it is not shown;
+              // each leg's own count comes from the per-leg digests already decoded above.
+              // Legs that never got to their tests are excluded - their 6 would otherwise be the bottom of the
+              // range. If nothing reported a status, every leg counts and the ❔ note below says the totals are
+              // of unknown completeness.
+              const anyStatus = rows.some((leg) => leg.status);
+              const legTests = rows
+                .filter((leg) => leg.counts && (!anyStatus || (leg.status && leg.status.tests_ran === true)))
+                .map((leg) => leg.counts.tests);
+              const perLeg = legTests.length
+                ? Math.min(...legTests) === Math.max(...legTests)
+                  ? count(legTests[0])
+                  : `${count(Math.min(...legTests))} - ${count(Math.max(...legTests))}`
+                : '-';
+              // Named exactly for what was measured, so the row does not quietly speak for the legs it skipped.
+              const perLegLabel =
+                legTests.length && legTests.length < rows.length ? 'tests per completed leg' : 'tests per leg';
 
               body.push(
                 '| | count |',
                 '|---|---:|',
-                `| tests | ${count(stats.tests)} |`,
-                `| ✅ passed | ${count(stats.tests_succ)} |`,
-                `| ❌ failed | ${failures ? `**${count(failures)}**` : count(failures)} |`,
-                `| 💤 skipped | ${count(stats.tests_skip)} |`,
+                `| ${perLegLabel} | ${perLeg} |`,
                 `| runs | ${count(stats.runs)} |`,
+                `| ✅ passing runs | ${count(passingRuns)} |`,
                 `| ❌ failing runs | ${failingRuns ? `**${count(failingRuns)}**` : count(failingRuns)} |`,
+                `| 💤 skipped runs | ${count(stats.runs_skip)} |`,
+                `| ❌ distinct tests failing somewhere | ${failures ? `**${count(failures)}**` : count(failures)} |`,
                 `| result files | ${count(stats.files)} |`,
                 `| wall clock (longest leg) | ${duration(wallClock)} |`,
                 `| runner time (all legs) | ${duration(runnerTime)} |`,
                 '',
-                // The action's own check title says "291 fail" while its body says "960 ❌", and both are right.
-                // Which one answers "how bad is this" depends on the matrix, so name both rather than picking.
-                '`tests` counts distinct test cases; `runs` counts executions, so a test present in every leg is' +
-                  ' one test and as many runs as there are legs. **`failing runs` is the number to read** for a' +
-                  ' matrix whose job is per-version validation; `failed` is how many distinct tests fail' +
-                  ' *somewhere*.',
+                // The action's own check title says "291 fail" while its body says "1,251 ❌", and both are
+                // right. Which one answers "how bad is this" depends on the matrix, so name both rather than
+                // picking - but say which is which, because "291" reads like a per-leg number and is not one.
+                '`runs` counts executions across the whole matrix, so a test present in every leg is one test' +
+                  ' and as many runs as there are legs - **that is the figure to read** for a matrix whose job' +
+                  ' is per-version validation. `distinct tests failing somewhere` collapses it back: a test that' +
+                  ' fails on four legs counts once. Every row spans required and informational legs alike; only' +
+                  ' the required-leg line above decides whether this commit can merge.',
                 '',
               );
 
@@ -592,7 +702,8 @@ jobs:
               if (unknown.length) {
                 body.push(
                   `❔ ${unknown.length} ${unknown.length === 1 ? 'leg' : 'legs'} did not report a status, so` +
-                    ' whether their totals are complete is unknown.',
+                    ' whether their totals are complete is unknown - and, since nothing says whether they are' +
+                    ' required, they are not in the required-leg line either.',
                   '',
                 );
               }

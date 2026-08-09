@@ -41,7 +41,7 @@ fun erlangRuntimeEnvironment(erlangHome: File): Map<String, String> {
  * Full environment for `mix` commands: the Erlang runtime environment plus MIX_HOME/MIX_ARCHIVES so
  * hex/rebar and fetched dependencies are cached under the project rather than the user's home.
  *
- * Pass [mixArchives] the per-version directory from [mixArchivesDir], not the shared root.
+ * Pass both the per-pair directories from [mixPairDir], never a shared root - see that function.
  */
 fun mixEnvironment(erlangHome: File, mixHome: File, mixArchives: File): Map<String, String> =
     erlangRuntimeEnvironment(erlangHome) + mapOf(
@@ -50,20 +50,37 @@ fun mixEnvironment(erlangHome: File, mixHome: File, mixArchives: File): Map<Stri
     )
 
 /**
- * MIX_ARCHIVES directory for one Elixir/OTP pair, under the shared [root].
+ * Directory for one Elixir/OTP pair under a shared [root]. Used for both MIX_ARCHIVES and MIX_HOME.
  *
- * Mix namespaces MIX_HOME by Elixir version itself (`<MIX_HOME>/elixir/1-15/`), but installs archives
- * flat into MIX_ARCHIVES (`hex-2.5.1/`). A single shared archives directory therefore hands a hex
- * compiled by one Elixir/OTP to another, which fails to load:
+ * Mix installs archives flat into MIX_ARCHIVES (`hex-2.5.1/`), so a single shared archives directory
+ * hands a hex compiled by one Elixir/OTP to another, which fails to load:
  *
  *     Error loading module 'Elixir.Hex': corrupt atom table
  *
- * Namespacing by both versions keeps each pair's hex separate. OTP is part of the key because the
- * archive is BEAM code: an Elixir release ships per-OTP builds, and the loader rejects a chunk layout
- * from a different OTP.
+ * OTP is part of the key because the archive is BEAM code: an Elixir release ships per-OTP builds, and
+ * the loader rejects a chunk layout from a different OTP.
+ *
+ * MIX_HOME is keyed the same way even though mix namespaces it internally by Elixir version
+ * (`<MIX_HOME>/elixir/1-15/`), for two reasons. That namespacing is not universal - Elixir 1.13 writes
+ * `rebar3` to the root - so the pairs are not reliably isolated from each other. And a shared MIX_HOME
+ * is declared as an output of `getQuoterDeps`, so one pair's install changed another pair's output
+ * snapshot. Keying it makes each pair's contents provably its own, which is what lets the task skip a
+ * reinstall it already has.
  */
-fun mixArchivesDir(root: File, elixirVersion: String?, erlangVersion: String?): File =
-    File(root, "elixir-${pathToken(elixirVersion)}-otp-${pathToken(erlangVersion)}")
+fun mixPairDir(root: File, elixirVersion: String?, erlangVersion: String?): File =
+    File(root, pairToken(elixirVersion, erlangVersion))
+
+/**
+ * `elixir-<elixir>-otp-<otp>` - the one naming rule for anything scoped to a single Elixir/OTP pair.
+ *
+ * Shared with the quoter build directory rather than being private to [mixPairDir]: the reason given
+ * above for keying MIX_ARCHIVES on OTP - the content is BEAM code, and the loader rejects a chunk
+ * layout from a different OTP - applies just as much to the quoter's own `_build` and `deps`. Both
+ * therefore derive their directory name here, so a pair's build tree and the hex/rebar that produced
+ * it cannot end up scoped differently.
+ */
+fun pairToken(elixirVersion: String?, erlangVersion: String?): String =
+    "elixir-${pathToken(elixirVersion)}-otp-${pathToken(erlangVersion)}"
 
 /** Reduce a version string to something safe to use as a single path segment. */
 private fun pathToken(version: String?): String =

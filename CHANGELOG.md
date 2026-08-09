@@ -27,6 +27,38 @@
     is genuinely nothing to record.
   - The Tag Release workflow validates the tag shape against the `prerelease` input, that a release is
     cut from `main`, that the tag is new and increases, and that it matches `pluginVersion`.
+  - Plugin verifier reports are now uploaded whenever a verification leg fails, including on pull
+    requests. Previously the upload was gated on an input that is always empty for `pull_request`, so
+    the reports were unobtainable on exactly the runs that needed them and the evidence had to be dug
+    out of a raw job log. Green runs still upload nothing unless a caller asks.
+  - Everything scoped to an Elixir/OTP pair is now keyed on the pair: `MIX_HOME` joins `MIX_ARCHIVES`,
+    and the quoter's `_build`/`deps` join both. Two OTPs for one Elixir previously shared a build tree
+    and overwrote each other, and switching versions re-downloaded hex and rebar. The first build per
+    pair after this change reinstalls and rebuilds once.
+  - CI now covers OTP 25, and runs a decompiler sweep against OTP 28 for the first time. Two
+    `beam.additional` pairs were added, `1.13.4 / 25.3.2.21` and `1.18.4 / 28.4`, chosen to cover OTP
+    majors rather than Elixir minors: most of the decompiled surface is Erlang and the BEAM chunk formats
+    track OTP. **OTP 25 is now a supported pair** - measured locally at 6 560 tests, 0 failures, so its
+    leg is required and any later change that breaks it fails the pipeline. OTP 28 stays informational:
+    its 291 failures are all pre-existing Elixir-keyed quoting cases, with no OTP-28 decompiler
+    failures.
+  - Switching Elixir/OTP versions now re-runs the tests. The versions reach the test JVM as environment
+    variables, which Gradle could not see, so `mise use erlang@X elixir@Y` followed by `check` reported
+    the *previous* pair's results - the task was up to date, and the build cache would even restore
+    those results after a `cleanTest`. Both test tasks now declare the versions as inputs.
+  - A transient 5xx from JetBrains' artifact CDN no longer loses a whole test leg. Gradle already treats
+    repository server errors as retryable, but its default budget is three attempts over about three
+    seconds; `gradle.properties` now allows eight from a 3-second doubling backoff, roughly six minutes,
+    for every build - CI and local alike.
+  - CI restores the Elixir quoter cache again - it never had. `actions/cache` identifies an entry by key
+    *and* by a version hashed from the literal `path:` lines, and the restore and save steps listed
+    different paths, so they addressed different entries under one key. Every leg missed, rebuilt its
+    quoter dependencies from Hex, then failed to save against the entry an earlier run had left there -
+    reported as `Unable to reserve cache`, which reads as a harmless race between legs. Both steps now
+    take the path list from one place.
+  - The test results comment now leads with failures on the **required** legs, the only figure that
+    decides whether a pull request can merge, and reports `tests per leg` in place of a cross-leg
+    union that read 12,913 for a run in which no leg ran more than 6,659.
 
 ## [24.0.0] - 2026-08-04
 

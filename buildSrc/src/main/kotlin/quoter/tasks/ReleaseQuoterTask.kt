@@ -11,7 +11,6 @@ import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.process.ExecOperations
-import sdk.mixArchivesDir
 import sdk.mixEnvironment
 import sdk.mixExecutable
 import sdk.readPropertiesFile
@@ -42,9 +41,9 @@ abstract class ReleaseQuoterTask : DefaultTask() {
     @get:Internal
     abstract val mixHome: DirectoryProperty
 
-    /** Root holding one [mixArchivesDir] per Elixir/OTP pair - not MIX_ARCHIVES itself. */
+    /** MIX_ARCHIVES for this build's Elixir/OTP pair; populated by `getQuoterDeps`, read here. */
     @get:Internal
-    abstract val mixArchivesRoot: DirectoryProperty
+    abstract val mixArchives: DirectoryProperty
 
     @get:OutputDirectory
     abstract val buildDir: DirectoryProperty
@@ -62,11 +61,7 @@ abstract class ReleaseQuoterTask : DefaultTask() {
         val elixirHome = File(props["elixir.sdk.path"] ?: throw GradleException("Missing elixir.sdk.path"))
         val erlangHome = File(props["erlang.sdk.path"] ?: throw GradleException("Missing erlang.sdk.path"))
         val mixExe = mixExecutable(elixirHome)
-        val archives = mixArchivesDir(
-            mixArchivesRoot.get().asFile,
-            props["elixir.version"],
-            props["erlang.version"]
-        )
+        val archives = mixArchives.get().asFile
         val mixEnv = mixEnvironment(erlangHome, mixHome.get().asFile, archives)
 
         execOps.exec {

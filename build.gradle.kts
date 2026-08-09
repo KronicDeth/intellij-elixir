@@ -41,6 +41,8 @@ import sdk.ElixirErlangSdkArgumentProvider
 import sdk.MiseCurrentVersionValueSource
 import sdk.ErlangAvailabilityCheckAction
 import sdk.ResolveElixirErlangSdksTask
+import sdk.mixPairDir
+import sdk.pairToken
 import sdk.versionWithoutBuildTag
 import sdk.elixirTestEnvironment
 import versioning.ChangelogSettings
@@ -95,9 +97,11 @@ val expectedOtpVersion: Provider<String> =
 val expectedVersionSource: String =
     if (providers.gradleProperty("elixirVersion").isPresent) "-PelixirVersion/-PotpVersion" else "mise"
 
-// Names the per-version cache directories below, so a quoter built under one Elixir is never reused
-// for another. The -otp-N build tag is stripped: mise reports "1.13.4-otp-24" where CI passes
-// "1.13.4", and they are the same Elixir - keeping the tag would give the two a cache tree each.
+// The Elixir half of the cache directory names below (the quoter tree pairs this with the OTP version;
+// see quoterUnzippedPath), so a quoter built under one Elixir is never reused for another. The -otp-N
+// build tag is stripped: mise reports "1.13.4-otp-24" where CI passes "1.13.4", and they are the same
+// Elixir - keeping the tag would give the two a cache tree each. Note that tag is not the OTP version:
+// it records which OTP that Elixir release was built for, and the pair keying uses the real one.
 // Only "unresolved" when neither properties nor mise answered; resolveElixirErlangSdks then fails
 // with instructions before anything writes to that path.
 val elixirVersion: String = versionWithoutBuildTag(expectedElixirVersion.getOrElse("unresolved"))
@@ -160,19 +164,39 @@ val javaVersionStr: String = if (platformBuildNumber >= 262) "25" else libs.vers
 // Setup Paths
 val cachePath: Directory = layout.projectDirectory.dir("cache")
 val elixirPath: Directory = cachePath.dir("elixir-$elixirVersion")
-val quoterUnzippedPath: Directory = cachePath.dir("elixir-$elixirVersion-intellij_elixir-$quoterRefSlug")
+// Keyed on the Elixir/OTP PAIR, via the same rule as MIX_HOME/MIX_ARCHIVES below. `_build` and `deps`
+// hold BEAM code and a distillery release, so the reason MIX_ARCHIVES is pair-keyed - the loader
+// rejects a chunk layout built by a different OTP - applies here unchanged. Keyed on Elixir alone,
+// 1.13.4/24.3.4.6 and 1.13.4/25.3.2.21 shared one tree and overwrote each other's build, while their
+// hex/rebar sat in correctly separated pair directories.
+val quoterUnzippedPath: Directory =
+    cachePath.dir("${pairToken(elixirVersion, expectedOtpVersion.getOrElse("unresolved"))}-intellij_elixir-$quoterRefSlug")
 val quoterExe: RegularFile = quoterUnzippedPath.file("_build/dev/rel/intellij_elixir/bin/intellij_elixir")
 val quoterTmpPath: Directory = cachePath.dir("quoter_tmp_$quoterRefSlug")
-// hex/rebar + fetched deps are cached under the project (used by the quoter mix build). Both are
-// declared outputs of getQuoterDeps, so the build cache restores them with `deps` and an up-to-date
-// task skips the `mix local.hex`/`local.rebar` network round-trips. mixArchivesPath is the ROOT: mix
-// installs archives flat, so getQuoterDeps namespaces a subdirectory per Elixir/OTP pair (see
-// sdk.mixArchivesDir) to stop one pair's hex being loaded by another.
+// hex/rebar + fetched deps are cached under the project (used by the quoter mix build).
 val mixHomePath: Directory = cachePath.dir("mix_home")
 val mixArchivesPath: Directory = cachePath.dir("mix_archives")
 
+// MIX_HOME and MIX_ARCHIVES for the pair this build targets. getQuoterDeps declares both as outputs, so
+// each must be the PAIR directory and never the shared root: with a root declared, a sibling pair's
+// install changed this task's output snapshot, so the other pair's entry could not be restored and a
+// version switch reinstalled hex and rebar over the network. Pair-keying also makes anything present
+// provably this pair's, which is what lets the task skip an install it already has.
+//
+// Keyed on the *expected* versions so the paths are known at configuration time - safe because
+// resolveElixirErlangSdks rejects any SDK whose actual version is not isCompatibleVersion with the
+// expected one. Both quoter tasks are wired from these two values, so a declared output and the
+// directory mix actually writes cannot drift apart.
+val mixHomeForPair: File =
+    mixPairDir(mixHomePath.asFile, elixirVersion, expectedOtpVersion.getOrElse("unresolved"))
+val mixArchivesForPair: File =
+    mixPairDir(mixArchivesPath.asFile, elixirVersion, expectedOtpVersion.getOrElse("unresolved"))
+
 // EXPORT FOR SUBPROJECTS (Required for jps-builder to access this path)
 extra["elixirPath"] = elixirPath.asFile.absolutePath
+// Declared as test-task inputs in both projects - see the root `test` task for why.
+extra["expectedElixirVersion"] = expectedElixirVersion.getOrElse("unresolved")
+extra["expectedOtpVersion"] = expectedOtpVersion.getOrElse("unresolved")
 
 // Version suffix logic:
 // - "default" channel = no suffix (release build)
@@ -790,8 +814,8 @@ val getQuoterDeps = tasks.register<GetQuoterDepsTask>("getQuoterDeps") {
     quoterDir.set(quoterUnzippedPath)
     depsDir.set(quoterUnzippedPath.dir("deps"))
     sdkProperties.set(sdkPropertiesFile)
-    mixHome.set(mixHomePath)
-    mixArchivesRoot.set(mixArchivesPath)
+    mixHome.set(mixHomeForPair)
+    mixArchives.set(mixArchivesForPair)
 
     // INPUTS: mix.exs and mix.lock define requirements
     inputs.file(quoterUnzippedPath.file("mix.exs"))
@@ -810,8 +834,8 @@ val releaseQuoter = tasks.register<ReleaseQuoterTask>("releaseQuoter") {
     quoterDir.set(quoterUnzippedPath)
     buildDir.set(quoterUnzippedPath.dir("_build"))
     sdkProperties.set(sdkPropertiesFile)
-    mixHome.set(mixHomePath)
-    mixArchivesRoot.set(mixArchivesPath)
+    mixHome.set(mixHomeForPair)
+    mixArchives.set(mixArchivesForPair)
 
     // INPUTS: mix.exs, lockfile, source code, and dependencies
     inputs.files(
@@ -870,6 +894,15 @@ tasks.named<Test>("test") {
     doFirst {
         environment(elixirTestEnvironment(sdkProps.get().asFile))
     }
+
+    // The Elixir/OTP versions reach the test JVM as environment variables set in that doFirst, which
+    // Gradle cannot see, so they have to be declared or a version switch does not invalidate this task.
+    // Without them `mise use erlang@X elixir@Y && gradlew check` reports the *previous* pair's results:
+    // the task is UP-TO-DATE, and because the cache key is equally blind the build cache restores those
+    // results even after a cleanTest. Measured before this was added - a 1.18.4/OTP-28 run "passed" in
+    // 28 s with 1.13.4/OTP-25's results.
+    inputs.property("elixirVersion", expectedElixirVersion)
+    inputs.property("otpVersion", expectedOtpVersion)
 
     // The parsing tests are JUnit 3 (com.intellij.testFramework.ParsingTestCase -> TestCase),
     // discovered by the JUnit 4 runner.
