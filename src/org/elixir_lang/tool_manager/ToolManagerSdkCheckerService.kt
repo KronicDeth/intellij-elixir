@@ -47,7 +47,10 @@ internal class ToolManagerSdkCheckerService(private val project: Project) : Disp
         settings = ToolManagerSettings.getInstance(project),
     )
 
+    // replay = 1 so a request emitted before the collector below subscribes is still delivered:
+    // MutableSharedFlow discards tryEmit when it has no subscribers.
     private val scanRequests = MutableSharedFlow<Unit>(
+        replay = 1,
         extraBufferCapacity = 1,
         onBufferOverflow = BufferOverflow.DROP_OLDEST,
     )

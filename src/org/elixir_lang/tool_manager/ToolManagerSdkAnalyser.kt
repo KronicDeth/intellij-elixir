@@ -66,7 +66,10 @@ internal class ToolManagerSdkAnalyser(private val project: Project) : Disposable
     val latestAnalysisResult: ToolManagerAnalysisResult?
         get() = latestAnalysis
 
+    // replay = 1 so a request emitted before the collector below subscribes is still delivered:
+    // MutableSharedFlow discards tryEmit when it has no subscribers.
     private val analysisRequests = MutableSharedFlow<Unit>(
+        replay = 1,
         extraBufferCapacity = 1,
         onBufferOverflow = BufferOverflow.DROP_OLDEST,
     )
