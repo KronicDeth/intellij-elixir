@@ -9,6 +9,17 @@
     missed rather than one undifferentiated list.
 
 ### Bug Fixes
+- [@sh41](https://github.com/sh41)
+  - **Adding an Elixir SDK registers it again.** [#3888](https://github.com/KronicDeth/intellij-elixir/issues/3888) -
+    the SDK list stayed empty and "Elixir Facet SDK is not defined" persisted, because setting up the
+    SDK's paths read the SDK table without a read lock and the resulting error aborted registration
+    before the SDK reached the list.
+  - **A newly added Elixir SDK is paired with the Erlang SDK you picked,** rather than whichever one
+    happened to be registered first. The chosen SDK is not committed until the dialog is applied, and
+    the pairing was resolved without consulting the dialog's uncommitted SDKs.
+  - **The "Configure from mise" action no longer goes missing from the SDK banner.** The startup scan
+    request could be dropped before its collector was listening, leaving the project with no tool
+    manager scan at all.
 - [#3901](https://github.com/KronicDeth/intellij-elixir/pull/3901) - [@sh41](https://github.com/sh41)
   - **Semantic syntax highlighting now appears in decompiled `.beam` files.** Function names, types and
     the rest were being coloured by the annotators and then discarded before they reached the editor, so
