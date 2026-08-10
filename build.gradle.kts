@@ -172,6 +172,12 @@ val elixirPath: Directory = cachePath.dir("elixir-$elixirVersion")
 val quoterUnzippedPath: Directory =
     cachePath.dir("${pairToken(elixirVersion, expectedOtpVersion.getOrElse("unresolved"))}-intellij_elixir-$quoterRefSlug")
 val quoterExe: RegularFile = quoterUnzippedPath.file("_build/dev/rel/intellij_elixir/bin/intellij_elixir")
+// Whether the daemon could be built, written by releaseQuoter and read by startQuoter and the test
+// tasks. Beside the release it describes, so it is keyed on the Elixir/OTP pair like the rest of that
+// tree; in the shared cache root it would describe whichever pair built last.
+val quoterAvailabilityFile: RegularFile = quoterUnzippedPath.file("quoter-availability.properties")
+// Opts back in to a hard failure at releaseQuoter, for debugging the quoter itself.
+val quoterRequired: Boolean = providers.gradleProperty("quoterRequired").getOrElse("false").toBoolean()
 val quoterTmpPath: Directory = cachePath.dir("quoter_tmp_$quoterRefSlug")
 // hex/rebar + fetched deps are cached under the project (used by the quoter mix build).
 val mixHomePath: Directory = cachePath.dir("mix_home")
@@ -833,6 +839,8 @@ val releaseQuoter = tasks.register<ReleaseQuoterTask>("releaseQuoter") {
     // Configure the task
     quoterDir.set(quoterUnzippedPath)
     buildDir.set(quoterUnzippedPath.dir("_build"))
+    availabilityFile.set(quoterAvailabilityFile)
+    required.set(quoterRequired)
     sdkProperties.set(sdkPropertiesFile)
     mixHome.set(mixHomeForPair)
     mixArchives.set(mixArchivesForPair)
@@ -860,6 +868,8 @@ val quoterService = gradle.sharedServices.registerIfAbsent("quoter", QuoterServi
 val startQuoter = tasks.register<StartQuoterTask>("startQuoter") {
     description = "Starts the Quoter tool"
     dependsOn(releaseQuoter)
+
+    availabilityFile.set(quoterAvailabilityFile)
 }
 
 registerResolveExternalDependenciesTasksForAllProjects()
@@ -891,9 +901,18 @@ tasks.named<Test>("test") {
     usesService(quoterService)
 
     val sdkProps = sdkPropertiesFile
+    val quoterAvailability = quoterAvailabilityFile.asFile
     doFirst {
-        environment(elixirTestEnvironment(sdkProps.get().asFile))
+        environment(elixirTestEnvironment(sdkProps.get().asFile, quoterAvailability))
     }
+
+    // QUOTER_AVAILABLE reaches the test JVM through that doFirst, so - as with the versions below -
+    // Gradle cannot see it. Undeclared, a run that gains or loses a daemon stays UP-TO-DATE and
+    // reports the other run's results. Optional: `-x releaseQuoter` leaves no marker.
+    inputs.file(quoterAvailability)
+        .withPropertyName("quoterAvailability")
+        .withPathSensitivity(PathSensitivity.NONE)
+        .optional(true)
 
     // The Elixir/OTP versions reach the test JVM as environment variables set in that doFirst, which
     // Gradle cannot see, so they have to be declared or a version switch does not invalidate this task.

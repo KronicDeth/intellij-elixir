@@ -2,6 +2,7 @@ package org.elixir_lang.quoter
 
 import com.intellij.util.system.OS
 import org.elixir_lang.PlatformTestCase
+import org.elixir_lang.intellij_elixir.Quoter
 import java.io.File
 
 /**
@@ -40,6 +41,11 @@ class PipeLocationTest : PlatformTestCase() {
         if (OS.CURRENT == OS.Windows) {
             return
         }
+
+        // Only the daemon creates these pipes, so with no daemon this asserts nothing. Report that
+        // rather than "No quoter_tmp_* directory found", which names the symptom and leaves the cause
+        // to be guessed. After the Windows return, because there is no daemon to need there either.
+        Quoter.assertAvailable()
 
         val projectRoot = File(System.getProperty("user.dir"))
         val cacheDir = File(projectRoot, "cache")
