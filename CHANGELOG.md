@@ -12,6 +12,15 @@
 
 ### Build / CI
 
+- [@sh41](https://github.com/sh41)
+  - **A quoter that fails to build no longer stops the whole test suite.** `releaseQuoter` records
+    whether it produced a daemon and succeeds either way, so the tests that need no quoter still run.
+    The ones that need it fail immediately, naming the Elixir/OTP pair and the recorded reason - they
+    fail rather than skip, so the counts still say what was not asserted. A recorded failure is never
+    up to date, so the next build retries it, and `mix release` output is logged in full when it fails.
+  - `-PquoterRequired=true` stops the build at `releaseQuoter` instead, for anyone debugging the
+    quoter itself.
+
 ## [24.0.1] - 2026-08-09
 
 ### Enhancements

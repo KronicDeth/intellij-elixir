@@ -30,6 +30,14 @@ object Quoter {
 
     private const val ABSENT = "(no term at this path)"
 
+    /**
+     * Set by the build: "false" when no daemon could be built for the Elixir/OTP pair under test.
+     * Anything else, absent included, means carry on and let the call decide.
+     */
+    private const val AVAILABLE_VARIABLE = "QUOTER_AVAILABLE"
+
+    private const val UNAVAILABLE_REASON_VARIABLE = "QUOTER_UNAVAILABLE_REASON"
+
     @JvmStatic
     fun assertError(file: PsiFile) {
         val text = file.text
@@ -46,6 +54,32 @@ object Quoter {
         } catch (e: OtpErlangExit) {
             throw RuntimeException(e)
         }
+    }
+
+    /**
+     * Fails a test needing the reference quoter when the build could not produce one for this
+     * Elixir/OTP pair. Call it from any test whose precondition is a running daemon, not only those
+     * that quote - otherwise the test reports its own symptom and leaves the cause to be guessed.
+     *
+     * A failure and not an `Assume`: skipping would report a clean run for assertions that were never
+     * made, and would let a quoter that stopped building on a supported pair pass unnoticed instead of
+     * turning a required leg red.
+     *
+     * Also the reason it runs before [IntellijElixir.getLocalNode] - otherwise each of these tests
+     * pays an OTP node setup and a timeout only to report that no message arrived.
+     */
+    @JvmStatic
+    fun assertAvailable() {
+        if (System.getenv(AVAILABLE_VARIABLE) != "false") return
+
+        val reason = System.getenv(UNAVAILABLE_REASON_VARIABLE) ?: "no reason recorded"
+        val elixirVersion = System.getenv("ELIXIR_VERSION").orEmpty().ifEmpty { "unknown" }
+        val otpVersion = System.getenv("ERLANG_VERSION").orEmpty().ifEmpty { "unknown" }
+
+        throw AssertionError(
+            "Quoter daemon unavailable for Elixir $elixirVersion / OTP $otpVersion: $reason\n" +
+                "This test needs the reference quoter; the rest of the suite does not."
+        )
     }
 
     @Contract("null -> fail")
@@ -285,6 +319,8 @@ object Quoter {
     }
 
     fun quote(code: String): OtpErlangTuple? {
+        assertAvailable()
+
         val otpNode = IntellijElixir.getLocalNode()
         val otpMbox = otpNode.createMbox()
         val request: OtpErlangObject = elixirString(code)

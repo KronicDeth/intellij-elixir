@@ -1,5 +1,6 @@
 package sdk
 
+import quoter.QuoterAvailability
 import java.io.File
 
 /**
@@ -91,16 +92,36 @@ private fun pathToken(version: String?): String =
  * stdlib source/ebin: the resolved Erlang runtime env (so `erl` is on PATH) plus the
  * ELIXIR_LANG_ELIXIR_PATH / ELIXIR_EBIN_DIRECTORY / ELIXIR_VERSION vars pointed at the resolved SDK.
  * Read the properties file produced by `resolveElixirErlangSdks`.
+ *
+ * [quoterAvailabilityFile] is the marker `releaseQuoter` writes, forwarded as
+ * QUOTER_AVAILABLE/QUOTER_UNAVAILABLE_REASON so the tests that quote can fail immediately and by name
+ * rather than each waiting for a daemon that is not there. Taken from the marker rather than a Gradle
+ * property, so a stale run cannot claim a daemon it did not build. Callers whose tests never quote
+ * (jps-builder) omit it and set neither variable.
  */
-fun elixirTestEnvironment(sdkPropertiesFile: File): Map<String, String> {
+fun elixirTestEnvironment(
+    sdkPropertiesFile: File,
+    quoterAvailabilityFile: File? = null
+): Map<String, String> {
     val props = readPropertiesFile(sdkPropertiesFile)
     val elixirHome = File(props["elixir.sdk.path"] ?: error("Missing elixir.sdk.path in ${sdkPropertiesFile.absolutePath}"))
     val erlangHome = File(props["erlang.sdk.path"] ?: error("Missing erlang.sdk.path in ${sdkPropertiesFile.absolutePath}"))
     val version = props["elixir.version"].orEmpty()
     val ebin = File(elixirHome, "lib${File.separator}elixir${File.separator}ebin")
+    val quoterEnvironment = quoterAvailabilityFile?.let(QuoterAvailability::readFrom)?.let { availability ->
+        buildMap {
+            put(QuoterAvailability.AVAILABLE_ENVIRONMENT_VARIABLE, availability.available.toString())
+            if (!availability.available && availability.reason != null) {
+                put(QuoterAvailability.REASON_ENVIRONMENT_VARIABLE, availability.reason)
+            }
+        }
+    }.orEmpty()
+
     return erlangRuntimeEnvironment(erlangHome) + mapOf(
         "ELIXIR_LANG_ELIXIR_PATH" to elixirHome.absolutePath,
         "ELIXIR_EBIN_DIRECTORY" to ebin.absolutePath + File.separator,
         "ELIXIR_VERSION" to version,
-    )
+        // Lets a failure name the whole pair; ELIXIR_VERSION alone would not.
+        "ERLANG_VERSION" to props["erlang.version"].orEmpty(),
+    ) + quoterEnvironment
 }

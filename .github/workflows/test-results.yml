@@ -416,7 +416,7 @@ jobs:
 
               const icon = leg.status.informational ? '⚠️' : '❌';
               // The text carries the reason, so it does not repeat the count: "tests failed" with 291 in the ❌
-              // column, against "failed at quoter build" where the counts are partial and the number is
+              // column, against "failed at compile" where the counts are partial and the number is
               // meaningless.
               return { icon, text: failedAt === 'tests' ? 'tests failed' : `failed at ${safe(failedAt, 40)}` };
             }

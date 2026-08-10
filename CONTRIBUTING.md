@@ -299,7 +299,7 @@ For example, to launch the latest RubyMine EAP:
 
 | Task | Source root | What it covers | Quoter daemon | Network on a cold cache |
 |---|---|---|---|---|
-| `test` | `tests/` | the whole JUnit suite, parser tests included | **yes** | **yes** |
+| `test` | `tests/` | the whole JUnit suite, parser tests included | **yes** (soft) | **yes** |
 | `:jps-builder:test` | `jps-builder/tests/` | the JPS build process | no | no |
 | `check` | - | both of the above | yes | yes |
 | `testUI` | `testUI/kotlin` | IDE UI tests; needs a built plugin | no | no |
@@ -314,6 +314,20 @@ For example, to launch the latest RubyMine EAP:
 (`org.elixir_lang.parser_definition.*`) quote source through it and compare the result against the
 plugin's own quoting. Gradle stops the daemon at the end of the build. On a warm cache this costs
 about a second; the first run in a fresh clone downloads and builds the quoter.
+
+The quoter is a **soft** requirement, because it may not build for every Elixir/OTP pair the pipeline
+tests against. `releaseQuoter` records whether it produced a daemon and succeeds either way, so only
+the tests that quote through it fail - immediately and by name - and the rest of the suite runs. They
+fail rather than skip so the counts still say what was not asserted. A recorded failure is never up to
+date, so the next build retries the quoter; recovering from an offline run or a killed compile needs
+nothing from you. Dependency fetching (`getQuoterDeps`) is not soft: no network on a cold cache still
+fails the build outright.
+
+To stop at the quoter instead, which is what you want when debugging the quoter itself:
+
+```sh
+./gradlew check -PquoterRequired=true
+```
 
 To build (so you get a .zip file):
 ```sh
@@ -392,8 +406,8 @@ from unsupported to supported:
 
 `continue-on-error` covers the whole leg - toolchain setup, compile, sandbox, quoter build and tests -
 not just the test step, because an unsupported Elixir can fail at any of those and they all mean the
-same thing. `setup-beam` may not publish the pair; the quoter may not compile on it. The annotation on
-a failed informational leg names the phase it died in, so you can tell those apart.
+same thing. `setup-beam` may not publish the pair. The annotation on a failed informational leg names
+the phase it died in, so you can tell those apart.
 
 ##### Reading a leg in the checks list
 
@@ -405,7 +419,7 @@ row in one list maps to the other without translating.
 A leg that stopped **before its tests ran** says so in the name:
 
 ```
-Test Results (1.19.5+28.1, INCOMPLETE - failed at quoter build)
+Test Results (1.19.5+28.1, INCOMPLETE - failed at compile)
 ```
 
 That matters because the check's own title only ever describes the result files it found - a leg that
@@ -425,7 +439,7 @@ split by whether the leg can block a merge. The icons say only that:
 | ❔ | the leg did not report its status, so no claim is made either way |
 
 The status text names the reason: `tests failed` with a count beside it, versus
-`failed at quoter build` where the counts cover only what ran. For *which* tests failed, follow a row
+`failed at compile` where the counts cover only what ran. For *which* tests failed, follow a row
 to its `Test Results (...)` check or read the **Failed tests** summary on the leg's own job - the
 comment deals in counts only.
 
