@@ -329,6 +329,14 @@ To stop at the quoter instead, which is what you want when debugging the quoter 
 ./gradlew check -PquoterRequired=true
 ```
 
+The quoter is built with `MIX_ENV=prod`, so its release lands in
+`cache/<pair>-intellij_elixir-<ref>/_build/prod/rel/intellij_elixir`. The environment is set by the
+build rather than left to `mix release`, which has no preferred environment and assembles under `:dev`
+when `MIX_ENV` is unset - compiling the quoter's dev/test-only dependencies, none of which the daemon
+needs at runtime. Exporting `MIX_ENV` overrides this, and the path the build looks in follows the
+same value, so the two cannot disagree. If you switch it, expect one extra `releaseQuoter` run; the
+`_build` subtree for the previous environment is left behind and can be deleted.
+
 To build (so you get a .zip file):
 ```sh
 ./gradlew buildPlugin        # the zip, no tests - prefer this

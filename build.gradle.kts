@@ -43,6 +43,8 @@ import sdk.ErlangAvailabilityCheckAction
 import sdk.ResolveElixirErlangSdksTask
 import sdk.mixPairDir
 import sdk.pairToken
+import sdk.quoterReleaseExecutablePath
+import sdk.resolveMixEnv
 import sdk.versionWithoutBuildTag
 import sdk.elixirTestEnvironment
 import versioning.ChangelogSettings
@@ -171,7 +173,12 @@ val elixirPath: Directory = cachePath.dir("elixir-$elixirVersion")
 // hex/rebar sat in correctly separated pair directories.
 val quoterUnzippedPath: Directory =
     cachePath.dir("${pairToken(elixirVersion, expectedOtpVersion.getOrElse("unresolved"))}-intellij_elixir-$quoterRefSlug")
-val quoterExe: RegularFile = quoterUnzippedPath.file("_build/dev/rel/intellij_elixir/bin/intellij_elixir")
+// MIX_ENV for both quoter mix tasks AND the launcher path below - one value, so the directory the build
+// looks in is the one mix wrote. Read through `providers` rather than System.getenv so the
+// configuration cache treats it as an input and re-resolves when it changes. Defaults to prod; see
+// sdk.resolveMixEnv for why the build pins this instead of taking mix's default.
+val quoterMixEnv: String = resolveMixEnv(providers.environmentVariable("MIX_ENV").orNull)
+val quoterExe: RegularFile = quoterUnzippedPath.file(quoterReleaseExecutablePath(quoterMixEnv))
 // Whether the daemon could be built, written by releaseQuoter and read by startQuoter and the test
 // tasks. Beside the release it describes, so it is keyed on the Elixir/OTP pair like the rest of that
 // tree; in the shared cache root it would describe whichever pair built last.
@@ -822,6 +829,7 @@ val getQuoterDeps = tasks.register<GetQuoterDepsTask>("getQuoterDeps") {
     sdkProperties.set(sdkPropertiesFile)
     mixHome.set(mixHomeForPair)
     mixArchives.set(mixArchivesForPair)
+    mixEnv.set(quoterMixEnv)
 
     // INPUTS: mix.exs and mix.lock define requirements
     inputs.file(quoterUnzippedPath.file("mix.exs"))
@@ -844,6 +852,7 @@ val releaseQuoter = tasks.register<ReleaseQuoterTask>("releaseQuoter") {
     sdkProperties.set(sdkPropertiesFile)
     mixHome.set(mixHomeForPair)
     mixArchives.set(mixArchivesForPair)
+    mixEnv.set(quoterMixEnv)
 
     // INPUTS: mix.exs, lockfile, source code, and dependencies
     inputs.files(

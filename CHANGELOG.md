@@ -34,6 +34,12 @@
     up to date, so the next build retries it, and `mix release` output is logged in full when it fails.
   - `-PquoterRequired=true` stops the build at `releaseQuoter` instead, for anyone debugging the
     quoter itself.
+  - **The quoter is built with an explicit `MIX_ENV=prod`, and its release path derives from the same
+    value.** `mix release` has no preferred environment, so an unset `MIX_ENV` built under `:dev`,
+    compiling dev/test-only dependencies the daemon never uses; with the path hard-coded to
+    `_build/dev`, an ambient `MIX_ENV` could leave the marker claiming a daemon `startQuoter` could not
+    find. `deps.get` fetches `--only` that environment too, taking the cold-cache download for the
+    pinned quoter from eleven packages to two. An exported `MIX_ENV` still overrides all of it.
 
 ## [24.0.1] - 2026-08-09
 

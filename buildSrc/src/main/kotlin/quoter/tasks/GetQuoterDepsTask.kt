@@ -4,6 +4,8 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
@@ -69,6 +71,17 @@ abstract class GetQuoterDepsTask : DefaultTask() {
     @get:OutputDirectory
     abstract val depsDir: DirectoryProperty
 
+    /**
+     * MIX_ENV for the fetch, from `sdk.resolveMixEnv` - the same value `releaseQuoter` builds under, so
+     * `deps` holds what that release needs and nothing else.
+     *
+     * It reaches `mix deps.get` twice over, and only the second one does anything. `deps.get` ignores
+     * MIX_ENV by design, fetching every dependency in the lock whatever its `only:`, so the environment
+     * has to be named again as `--only <env>`.
+     */
+    @get:Input
+    abstract val mixEnv: Property<String>
+
     @get:Inject
     abstract val execOps: ExecOperations
 
@@ -85,14 +98,18 @@ abstract class GetQuoterDepsTask : DefaultTask() {
         val mixExe = mixExecutable(elixirHome)
         val home = mixHome.get().asFile.apply { mkdirs() }
         val archives = mixArchives.get().asFile.apply { mkdirs() }
-        val mixEnv = mixEnvironment(erlangHome, home, archives)
+        // `--only <env>` can have nothing to fetch - a quoter whose every dependency is dev/test-only
+        // has an empty prod set - and mix then does not create `deps` at all. It is a declared output
+        // here and a declared input of `releaseQuoter`, so create it rather than leave that to mix.
+        depsDir.get().asFile.mkdirs()
+        val environment = mixEnvironment(erlangHome, home, archives, mixEnv.get())
         val dir = quoterDir.get().asFile
 
         fun mix(vararg args: String) {
             execOps.exec {
                 commandLine(listOf(mixExe) + args)
                 workingDir(dir)
-                environment(mixEnv)
+                environment(environment)
             }
         }
 
@@ -122,6 +139,10 @@ abstract class GetQuoterDepsTask : DefaultTask() {
             logger.info("Reusing ${installedRebar.name} in ${home.name}; skipping mix local.rebar")
         }
 
-        mix("deps.get")
+        // `--only` because deps.get is the one mix task that disregards MIX_ENV: unrestricted it fetches
+        // the whole lock, so the quoter's dev/test-only dependencies were downloaded on a cold cache for
+        // a prod release that never compiles them. Never prunes `deps` - mix leaves an already-fetched
+        // dependency alone - so switching environments locally leaves the previous set in place.
+        mix("deps.get", "--only", mixEnv.get())
     }
 }
