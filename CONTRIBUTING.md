@@ -169,7 +169,8 @@ into a from-source Elixir build that takes many minutes. See
 [Working with a different Elixir/OTP version](#working-with-a-different-elixirotp-version).
 
 Building the quoter (see [Test tasks](#test-tasks)) additionally needs network access on a cold cache -
-it downloads `KronicDeth/intellij_elixir` and runs `mix local.hex` / `mix local.rebar` / `mix deps.get`.
+it downloads the `quoterRepo`/`quoterRef` pinned in `gradle.properties` and runs `mix local.hex` /
+`mix local.rebar` / `mix deps.get`.
 
 **NOTE:** Tests that need an Elixir SDK fail rather than skip when it is missing, so run them through
 Gradle. Running one from the IDE's JUnit runner works only if you supply the environment variables

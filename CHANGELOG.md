@@ -40,6 +40,9 @@
     and `ORG_GRADLE_PROJECT_quoterRef`, and silent when they disagreed, since a cache entry naming a
     directory nothing writes misses on every restore and then collides on save. A `quoterCachePaths`
     task reports them instead, and `--github-output="$GITHUB_OUTPUT"` reduces the step to one line.
+  - **The quoter is pinned to a commit SHA of `sh41/intellij_elixir` instead of the `v2.1.0` tag.**
+    v2.1.0 predates `mix release` and still uses `use Mix.Config` and `Supervisor.Spec`, so it warned
+    on every Elixir the pipeline tests. Same quoter, modernised build, unchanged quoted forms.
   - **The quoter is built with an explicit `MIX_ENV=prod`, and its release path derives from the same
     value.** `mix release` has no preferred environment, so an unset `MIX_ENV` built under `:dev`,
     compiling dev/test-only dependencies the daemon never uses; with the path hard-coded to
