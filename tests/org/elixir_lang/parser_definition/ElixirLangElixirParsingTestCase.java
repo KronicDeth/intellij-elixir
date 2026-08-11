@@ -28,8 +28,17 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
         assertParsed("lib/eex/lib/eex/smart_engine.ex");
     }
 
+    /**
+     * Frozen because Elixir <b>deleted</b> this file in 1.14: EEx tokenization moved into
+     * {@code EEx.Compiler}, so {@code lib/eex/lib/eex/tokenizer.ex} exists in 1.13.4 and in no release
+     * after it. Read live, this failed with {@code FileNotFoundException} on every leg above 1.13.4 -
+     * eight of the nine declared pairs - while saying nothing about the parser.
+     *
+     * <p>The frozen copy is 1.13.4's. It is still a real 244-line Elixir file exercising real
+     * constructs, so the coverage is kept rather than deleted with the upstream file.
+     */
     public void testEexTokenizer() {
-        assertParsed("lib/eex/lib/eex/tokenizer.ex");
+        assertParsedFrozenFixture("lib/eex/lib/eex/tokenizer.ex");
     }
 
     public void testAccess() {
