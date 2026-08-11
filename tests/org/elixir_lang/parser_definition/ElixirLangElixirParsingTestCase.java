@@ -433,8 +433,9 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
         assertParsed("lib/logger/lib/logger/backends/console.ex");
     }
 
+    /** Frozen: Elixir deleted this in 1.15. Present in 1.13.4 and 1.14.5, absent from 1.15.8 on. */
     public void testLoggerConfig() {
-        assertParsed("lib/logger/lib/logger/config.ex");
+        assertParsedFrozenFixture("lib/logger/lib/logger/config.ex");
     }
 
     public void testLoggerFormatter() {
@@ -449,8 +450,9 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
         assertParsed("lib/logger/lib/logger/utils.ex");
     }
 
+    /** Frozen: Elixir deleted this in 1.15. Present in 1.13.4 and 1.14.5, absent from 1.15.8 on. */
     public void testLoggerWatcher() {
-        assertParsed("lib/logger/lib/logger/watcher.ex");
+        assertParsedFrozenFixture("lib/logger/lib/logger/watcher.ex");
     }
 
     public void testMix() {
@@ -513,8 +515,9 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
         assertParsed("lib/mix/lib/mix/rebar.ex");
     }
 
+    /** Frozen: Elixir deleted this in 1.15. Present in 1.13.4 and 1.14.5, absent from 1.15.8 on. */
     public void testMixPublicKey() {
-        assertParsed("lib/mix/lib/mix/public_key.ex");
+        assertParsedFrozenFixture("lib/mix/lib/mix/public_key.ex");
     }
 
     public void testMixRemoteConverger() {
