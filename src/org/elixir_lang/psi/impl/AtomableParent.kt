@@ -15,7 +15,8 @@ class AtomableParent(val wrapped: Parent) : Parent by wrapped {
         val quotedChildren = QuotableImpl.quote(interpolation.children)
         val interpolationMetadata = QuotableImpl.metadata(interpolation)
 
-        val quotedKernelToStringCall = QuotableImpl.quotedFunctionCall(
+        val quotedKernelToStringCall = QuotableImpl.quotedInterpolationCall(
+                interpolation,
                 Module.prependElixirPrefix(Module.KERNEL),
                 "to_string",
                 interpolationMetadata,

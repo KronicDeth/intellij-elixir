@@ -68,6 +68,15 @@ abstract class ReleaseQuoterTask : DefaultTask() {
     @get:Input
     abstract val required: Property<Boolean>
 
+    /**
+     * MIX_ENV for the release, from `sdk.resolveMixEnv`. An @Input, not a constant read here, because it
+     * selects which `_build/<env>` subtree the launcher lands in: a change has to re-run this task, or
+     * [availabilityFile] would keep reporting a daemon built under the previous environment while
+     * `startQuoter` looks for one under the new one.
+     */
+    @get:Input
+    abstract val mixEnv: Property<String>
+
     @get:Inject
     abstract val execOps: ExecOperations
 
@@ -94,7 +103,7 @@ abstract class ReleaseQuoterTask : DefaultTask() {
         val erlangHome = File(props["erlang.sdk.path"] ?: throw GradleException("Missing erlang.sdk.path"))
         val mixExe = mixExecutable(elixirHome)
         val archives = mixArchives.get().asFile
-        val mixEnv = mixEnvironment(erlangHome, mixHome.get().asFile, archives)
+        val environment = mixEnvironment(erlangHome, mixHome.get().asFile, archives, mixEnv.get())
 
         // Captured rather than streamed, because the reason has to outlive this task - the tests that
         // need the daemon fail later, in another JVM. One buffer for both streams keeps the failure in
@@ -104,7 +113,7 @@ abstract class ReleaseQuoterTask : DefaultTask() {
         val result = execOps.exec {
             commandLine(mixExe, "release", "--overwrite")
             workingDir(quoterDir.get().asFile)
-            environment(mixEnv)
+            environment(environment)
             standardOutput = captured
             errorOutput = captured
             isIgnoreExitValue = true

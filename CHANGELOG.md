@@ -13,6 +13,17 @@
 ### Build / CI
 
 - [@sh41](https://github.com/sh41)
+  - **Quoting now follows the Elixir version behind the file instead of emitting one shape for every
+    version.** Elixir's quoted form changes between releases, so a single answer was wrong everywhere
+    but one version, and each fix for a newer Elixir was a regression on an older one. A quoting
+    dialect is resolved from the module's Elixir SDK and cached per file, and six divergences are gated
+    on the release that changed them: `from_brackets` on a bracketed expression and the `__block__`
+    wrapper around a solitary `not`/`!` (1.15.0), `from_interpolation` (1.16.0), `from_brackets` on
+    every other bracket form (1.16.2), and both `...` as a nullary call and `one +(two)` as the call
+    `one(+two)` (1.17.0). Files with no module or no Elixir SDK take the newest dialect. Nothing in
+    production reads the quoted form - its consumers read atoms and arities - so this is test
+    correctness across the nine Elixir/OTP pairs CI covers, not behaviour anyone can observe in the
+    IDE.
   - **A quoter that fails to build no longer stops the whole test suite.** `releaseQuoter` records
     whether it produced a daemon and succeeds either way, so the tests that need no quoter still run.
     The ones that need it fail immediately, naming the Elixir/OTP pair and the recorded reason - they
@@ -20,6 +31,21 @@
     up to date, so the next build retries it, and `mix release` output is logged in full when it fails.
   - `-PquoterRequired=true` stops the build at `releaseQuoter` instead, for anyone debugging the
     quoter itself.
+  - **CI asks the build for the quoter cache paths instead of re-deriving them.** The workflow grepped
+    `quoterRef` out of `gradle.properties` and rebuilt the Elixir/OTP pair token in bash - second
+    implementations of rules owned by `build.gradle.kts` and `sdk.pairToken`, blind to `-PquoterRef`
+    and `ORG_GRADLE_PROJECT_quoterRef`, and silent when they disagreed, since a cache entry naming a
+    directory nothing writes misses on every restore and then collides on save. A `quoterCachePaths`
+    task reports them instead, and `--github-output="$GITHUB_OUTPUT"` reduces the step to one line.
+  - **The quoter is pinned to a commit SHA of `sh41/intellij_elixir` instead of the `v2.1.0` tag.**
+    v2.1.0 predates `mix release` and still uses `use Mix.Config` and `Supervisor.Spec`, so it warned
+    on every Elixir the pipeline tests. Same quoter, modernised build, unchanged quoted forms.
+  - **The quoter is built with an explicit `MIX_ENV=prod`, and its release path derives from the same
+    value.** `mix release` has no preferred environment, so an unset `MIX_ENV` built under `:dev`,
+    compiling dev/test-only dependencies the daemon never uses; with the path hard-coded to
+    `_build/dev`, an ambient `MIX_ENV` could leave the marker claiming a daemon `startQuoter` could not
+    find. `deps.get` fetches `--only` that environment too, taking the cold-cache download for the
+    pinned quoter from eleven packages to two. An exported `MIX_ENV` still overrides all of it.
 
 ## [24.0.1] - 2026-08-09
 

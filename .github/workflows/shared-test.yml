@@ -140,45 +140,32 @@ jobs:
 
       # Restore the quoter build cache (deps + _build) so the Build quoter step goes incremental. This
       # and its Save counterpart live here, not in setup-env, so the whole cache lifecycle sits next to
-      # the quoter build. The dir must name what build.gradle.kts writes - the Elixir/OTP pair (sdk
-      # .pairToken) plus the gradle.properties quoterRef slug (slashes -> dashes, quoterRefSlug) - or
-      # the cache silently covers nothing.
-      - name: Resolve quoter cache slug
-        id: quoter-slug
-        env:
-          ELIXIR_VERSION: ${{ matrix.beam.elixir }}
-          OTP_VERSION: ${{ matrix.beam.otp }}
-        run: |
-          ref=$(grep -E '^quoterRef=' gradle.properties | head -1 | cut -d= -f2-)
-          ref="${ref:-v2.1.0}"
-          slug="${ref//\//-}"
-          echo "slug=$slug" >> "$GITHUB_OUTPUT"
-          # Non-word characters collapse to "-" in sdk.pathToken, so do the same here - every OTP in
-          # ci-versions.json is already path-safe, but a future one that is not must not make the
-          # workflow and the build disagree about the directory name.
-          pair="elixir-$(printf %s "$ELIXIR_VERSION" | tr -c 'A-Za-z0-9._-' '-')"
-          pair="$pair-otp-$(printf %s "$OTP_VERSION" | tr -c 'A-Za-z0-9._-' '-')"
-          # Emitted once and consumed by BOTH cache steps, because they have to agree exactly.
-          # actions/cache identifies an entry by (key, version), and the version is a sha256 of the
-          # literal `path:` lines joined by "|" - the raw pattern strings, not the files they expand
-          # to (toolkit packages/cache: restoreCache and saveCacheV2 both hash the `paths` argument,
-          # saveCacheV1 hashes it in reserveCache). Two different lists therefore address two
-          # different entries under one key: restore looks up a version save never wrote, so it
-          # misses on every run, rebuilds the quoter from Hex, and then save collides with the entry
-          # some earlier run left under that key and reports "Unable to reserve cache".
-          {
-            echo "paths<<CACHE_PATHS_EOF"
-            echo "cache/${pair}-intellij_elixir-${slug}"
-            echo '!cache/**/tmp/pipe/**'
-            echo '!cache/**/distillery/priv'
-            echo "CACHE_PATHS_EOF"
-          } >> "$GITHUB_OUTPUT"
+      # the quoter build.
+      #
+      # The patterns come from the build rather than being derived here. Deriving them meant grepping
+      # quoterRef out of gradle.properties and rebuilding the Elixir/OTP pair token in bash - second
+      # implementations of rules owned by build.gradle.kts and sdk.pairToken, and a cache naming a
+      # directory nothing writes covers nothing, silently. The grep was also blind to -PquoterRef and
+      # ORG_GRADLE_PROJECT_quoterRef. GRADLE_FLAGS is required: configuration resolves the expected
+      # Elixir/OTP versions, and the runners have no mise.
+      #
+      # Emitted once and consumed by BOTH cache steps, because they have to agree exactly.
+      # actions/cache identifies an entry by (key, version), and the version is a sha256 of the
+      # literal `path:` lines joined by "|" - the raw pattern strings, not the files they expand
+      # to (toolkit packages/cache: restoreCache and saveCacheV2 both hash the `paths` argument,
+      # saveCacheV1 hashes it in reserveCache). Two different lists therefore address two
+      # different entries under one key: restore looks up a version save never wrote, so it
+      # misses on every run, rebuilds the quoter from Hex, and then save collides with the entry
+      # some earlier run left under that key and reports "Unable to reserve cache".
+      - name: Resolve quoter cache paths
+        id: quoter-cache
+        run: ./gradlew $GRADLE_FLAGS -q quoterCachePaths --github-output="$GITHUB_OUTPUT"
 
       - name: Restore Elixir cache
         id: restore-elixir-cache
         uses: actions/cache/restore@v6
         with:
-          path: ${{ steps.quoter-slug.outputs.paths }}
+          path: ${{ steps.quoter-cache.outputs.paths }}
           key: elixir-${{ runner.os }}-${{ runner.arch }}-${{ matrix.beam.elixir }}-otp-${{ matrix.beam.otp }}-quoter-${{ hashFiles('gradle.properties') }}
           restore-keys: |
             elixir-${{ runner.os }}-${{ runner.arch }}-${{ matrix.beam.elixir }}-otp-${{ matrix.beam.otp }}-
@@ -212,7 +199,7 @@ jobs:
         if: always() && steps.build-quoter.outcome == 'success' && steps.restore-elixir-cache.outputs.cache-hit != 'true'
         uses: actions/cache/save@v6
         with:
-          path: ${{ steps.quoter-slug.outputs.paths }}
+          path: ${{ steps.quoter-cache.outputs.paths }}
           key: ${{ steps.restore-elixir-cache.outputs.cache-primary-key }}
 
       # An Elixir the declaration marks unsupported may fail at any phase above, not only here -

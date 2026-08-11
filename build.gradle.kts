@@ -35,6 +35,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 import quoter.QuoterService
 import quoter.tasks.GetQuoterDepsTask
+import quoter.tasks.QuoterCachePathsTask
 import quoter.tasks.ReleaseQuoterTask
 import quoter.tasks.StartQuoterTask
 import sdk.ElixirErlangSdkArgumentProvider
@@ -43,6 +44,8 @@ import sdk.ErlangAvailabilityCheckAction
 import sdk.ResolveElixirErlangSdksTask
 import sdk.mixPairDir
 import sdk.pairToken
+import sdk.quoterReleaseExecutablePath
+import sdk.resolveMixEnv
 import sdk.versionWithoutBuildTag
 import sdk.elixirTestEnvironment
 import versioning.ChangelogSettings
@@ -110,8 +113,7 @@ val quoterRepo = providers.gradleProperty("quoterRepo").getOrElse("KronicDeth/in
 val quoterRef = providers.gradleProperty("quoterRef").getOrElse("v2.1.0")
 // Cache namespace for the quoter, derived from the ref ('/' is illegal in a path segment). Keeps
 // each repo/ref's downloaded zip, build dir, and daemon tmp dir separate, so switching source
-// never reuses another's artifacts. CI computes the identical slug in its "Resolve quoter cache slug"
-// step in .github/workflows/shared-test.yml (quoterRef with '/' -> '-').
+// never reuses another's artifacts.
 val quoterRefSlug = quoterRef.replace('/', '-')
 
 // Publish channel: "default" for release, "canary" for pre-release
@@ -171,7 +173,12 @@ val elixirPath: Directory = cachePath.dir("elixir-$elixirVersion")
 // hex/rebar sat in correctly separated pair directories.
 val quoterUnzippedPath: Directory =
     cachePath.dir("${pairToken(elixirVersion, expectedOtpVersion.getOrElse("unresolved"))}-intellij_elixir-$quoterRefSlug")
-val quoterExe: RegularFile = quoterUnzippedPath.file("_build/dev/rel/intellij_elixir/bin/intellij_elixir")
+// MIX_ENV for both quoter mix tasks AND the launcher path below - one value, so the directory the build
+// looks in is the one mix wrote. Read through `providers` rather than System.getenv so the
+// configuration cache treats it as an input and re-resolves when it changes. Defaults to prod; see
+// sdk.resolveMixEnv for why the build pins this instead of taking mix's default.
+val quoterMixEnv: String = resolveMixEnv(providers.environmentVariable("MIX_ENV").orNull)
+val quoterExe: RegularFile = quoterUnzippedPath.file(quoterReleaseExecutablePath(quoterMixEnv))
 // Whether the daemon could be built, written by releaseQuoter and read by startQuoter and the test
 // tasks. Beside the release it describes, so it is keyed on the Elixir/OTP pair like the rest of that
 // tree; in the shared cache root it would describe whichever pair built last.
@@ -822,6 +829,7 @@ val getQuoterDeps = tasks.register<GetQuoterDepsTask>("getQuoterDeps") {
     sdkProperties.set(sdkPropertiesFile)
     mixHome.set(mixHomeForPair)
     mixArchives.set(mixArchivesForPair)
+    mixEnv.set(quoterMixEnv)
 
     // INPUTS: mix.exs and mix.lock define requirements
     inputs.file(quoterUnzippedPath.file("mix.exs"))
@@ -844,6 +852,7 @@ val releaseQuoter = tasks.register<ReleaseQuoterTask>("releaseQuoter") {
     sdkProperties.set(sdkPropertiesFile)
     mixHome.set(mixHomeForPair)
     mixArchives.set(mixArchivesForPair)
+    mixEnv.set(quoterMixEnv)
 
     // INPUTS: mix.exs, lockfile, source code, and dependencies
     inputs.files(
@@ -863,6 +872,25 @@ val quoterService = gradle.sharedServices.registerIfAbsent("quoter", QuoterServi
         executable.set(quoterExe)
         tmpDir.set(quoterTmpPath)
     }
+}
+
+// Consumed by CI, which must name the directory this build writes rather than re-derive it - see the
+// task's own documentation. Repo-relative and forward-slashed: the same value feeds the Windows legs,
+// and actions/cache exclusion patterns are forward-slashed regardless of runner.
+tasks.register<QuoterCachePathsTask>("quoterCachePaths") {
+    description = "Reports the actions/cache path patterns for the quoter build tree"
+    outputName.set("paths")
+    patterns.set(
+        listOf(
+            layout.projectDirectory.asFile.toPath()
+                .relativize(quoterUnzippedPath.asFile.toPath())
+                .joinToString("/"),
+            // Sockets, not build output - actions/cache cannot archive them.
+            "!cache/**/tmp/pipe/**",
+            // Only present while quoterRef points at a Distillery-era quoter (v2.1.0 and earlier).
+            "!cache/**/distillery/priv",
+        )
+    )
 }
 
 val startQuoter = tasks.register<StartQuoterTask>("startQuoter") {
@@ -1006,5 +1034,3 @@ tasks.register<Test>("testUI") {
 //        setProperty("termsOfServiceAgree", "yes")
 //    }
 //}
-
-

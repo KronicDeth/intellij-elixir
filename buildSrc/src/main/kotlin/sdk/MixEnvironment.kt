@@ -38,16 +38,57 @@ fun erlangRuntimeEnvironment(erlangHome: File): Map<String, String> {
     }
 }
 
+/** MIX_ENV the quoter is built under when nothing in the environment asks for another. */
+const val DEFAULT_MIX_ENV = "prod"
+
 /**
- * Full environment for `mix` commands: the Erlang runtime environment plus MIX_HOME/MIX_ARCHIVES so
- * hex/rebar and fetched dependencies are cached under the project rather than the user's home.
+ * The MIX_ENV to build the quoter under, given the ambient value (`null` when unset).
  *
- * Pass both the per-pair directories from [mixPairDir], never a shared root - see that function.
+ * Resolved rather than left to mix, because `mix release` has no preferred environment: with MIX_ENV
+ * unset it assembles under `:dev`, which compiles the quoter's dev/test-only dependencies - credo and
+ * dialyxir, plus whatever else the pinned `quoterRef` declares, hundreds of files - ahead of the
+ * quoter's own three, and emits their warnings. The daemon needs none of them at runtime.
+ *
+ * The value belongs to the build, not to mix's default, for a second reason: it decides a path.
+ * [quoterReleaseExecutablePath] derives the launcher location from the same value that
+ * [mixEnvironment] hands to the child process, so the directory the build looks in cannot drift from
+ * the one mix writes. Before this was pinned, an ambient MIX_ENV was enough to separate them - Gradle's
+ * `environment(Map)` adds to the inherited environment rather than replacing it, so `MIX_ENV=test` in a
+ * shell reached `mix release`, which still exited 0, so the availability marker recorded a daemon that
+ * `startQuoter` then could not find.
+ *
+ * An explicit ambient MIX_ENV still wins, so a contributor can build the quoter in another environment
+ * without editing the build; the path follows it.
  */
-fun mixEnvironment(erlangHome: File, mixHome: File, mixArchives: File): Map<String, String> =
+fun resolveMixEnv(ambient: String?): String =
+    ambient?.trim()?.takeIf { it.isNotEmpty() } ?: DEFAULT_MIX_ENV
+
+/**
+ * Path of the quoter daemon's release launcher relative to the quoter project directory, for the
+ * [mixEnv] the release was assembled under. Derive it from [resolveMixEnv], never hard-code the
+ * environment segment - see that function.
+ */
+fun quoterReleaseExecutablePath(mixEnv: String): String =
+    "_build/$mixEnv/rel/intellij_elixir/bin/intellij_elixir"
+
+/**
+ * Full environment for `mix` commands: the Erlang runtime environment, MIX_HOME/MIX_ARCHIVES so
+ * hex/rebar and fetched dependencies are cached under the project rather than the user's home, and
+ * MIX_ENV so neither the environment the build inherits nor mix's own default decides it.
+ *
+ * Pass both the per-pair directories from [mixPairDir], never a shared root - see that function - and
+ * [mixEnv] from [resolveMixEnv].
+ */
+fun mixEnvironment(
+    erlangHome: File,
+    mixHome: File,
+    mixArchives: File,
+    mixEnv: String
+): Map<String, String> =
     erlangRuntimeEnvironment(erlangHome) + mapOf(
         "MIX_HOME" to mixHome.absolutePath,
         "MIX_ARCHIVES" to mixArchives.absolutePath,
+        "MIX_ENV" to mixEnv,
     )
 
 /**
