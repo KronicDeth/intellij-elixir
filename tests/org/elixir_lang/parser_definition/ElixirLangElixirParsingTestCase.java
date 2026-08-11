@@ -213,8 +213,9 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
         assertParsed("lib/elixir/lib/module.ex");
     }
 
+    /** Frozen: Elixir deleted this in 1.18. Copy is 1.17.3's, the last release to ship it. */
     public void testModuleLocalsTracker() {
-        assertParsed("lib/elixir/lib/module/locals_tracker.ex");
+        assertParsedFrozenFixture("lib/elixir/lib/module/locals_tracker.ex");
     }
 
     public void testNode() {
@@ -397,8 +398,9 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
         assertParsed("lib/iex/lib/iex/app.ex");
     }
 
+    /** Frozen: Elixir deleted this in 1.19. Copy is 1.18.4's, the last release to ship it. */
     public void testIexCli() {
-        assertParsed("lib/iex/lib/iex/cli.ex");
+        assertParsedFrozenFixture("lib/iex/lib/iex/cli.ex");
     }
 
     public void testIexConfig() {
@@ -664,8 +666,9 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
         assertParsed("lib/mix/lib/mix/tasks/local.hex.ex");
     }
 
+    /** Frozen: Elixir deleted this in 1.19. Copy is 1.18.4's, the last release to ship it. */
     public void testMixTasksLocalPublicKeys() {
-        assertParsed("lib/mix/lib/mix/tasks/local.public_keys.ex");
+        assertParsedFrozenFixture("lib/mix/lib/mix/tasks/local.public_keys.ex");
     }
 
     public void testMixTasksLocalRebar() {
