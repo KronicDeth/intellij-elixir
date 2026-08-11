@@ -34,6 +34,12 @@
     up to date, so the next build retries it, and `mix release` output is logged in full when it fails.
   - `-PquoterRequired=true` stops the build at `releaseQuoter` instead, for anyone debugging the
     quoter itself.
+  - **CI asks the build for the quoter cache paths instead of re-deriving them.** The workflow grepped
+    `quoterRef` out of `gradle.properties` and rebuilt the Elixir/OTP pair token in bash - second
+    implementations of rules owned by `build.gradle.kts` and `sdk.pairToken`, blind to `-PquoterRef`
+    and `ORG_GRADLE_PROJECT_quoterRef`, and silent when they disagreed, since a cache entry naming a
+    directory nothing writes misses on every restore and then collides on save. A `quoterCachePaths`
+    task reports them instead, and `--github-output="$GITHUB_OUTPUT"` reduces the step to one line.
   - **The quoter is built with an explicit `MIX_ENV=prod`, and its release path derives from the same
     value.** `mix release` has no preferred environment, so an unset `MIX_ENV` built under `:dev`,
     compiling dev/test-only dependencies the daemon never uses; with the path hard-coded to

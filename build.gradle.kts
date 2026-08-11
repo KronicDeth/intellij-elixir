@@ -35,6 +35,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 import quoter.QuoterService
 import quoter.tasks.GetQuoterDepsTask
+import quoter.tasks.QuoterCachePathsTask
 import quoter.tasks.ReleaseQuoterTask
 import quoter.tasks.StartQuoterTask
 import sdk.ElixirErlangSdkArgumentProvider
@@ -112,8 +113,7 @@ val quoterRepo = providers.gradleProperty("quoterRepo").getOrElse("KronicDeth/in
 val quoterRef = providers.gradleProperty("quoterRef").getOrElse("v2.1.0")
 // Cache namespace for the quoter, derived from the ref ('/' is illegal in a path segment). Keeps
 // each repo/ref's downloaded zip, build dir, and daemon tmp dir separate, so switching source
-// never reuses another's artifacts. CI computes the identical slug in its "Resolve quoter cache slug"
-// step in .github/workflows/shared-test.yml (quoterRef with '/' -> '-').
+// never reuses another's artifacts.
 val quoterRefSlug = quoterRef.replace('/', '-')
 
 // Publish channel: "default" for release, "canary" for pre-release
@@ -874,6 +874,25 @@ val quoterService = gradle.sharedServices.registerIfAbsent("quoter", QuoterServi
     }
 }
 
+// Consumed by CI, which must name the directory this build writes rather than re-derive it - see the
+// task's own documentation. Repo-relative and forward-slashed: the same value feeds the Windows legs,
+// and actions/cache exclusion patterns are forward-slashed regardless of runner.
+tasks.register<QuoterCachePathsTask>("quoterCachePaths") {
+    description = "Reports the actions/cache path patterns for the quoter build tree"
+    outputName.set("paths")
+    patterns.set(
+        listOf(
+            layout.projectDirectory.asFile.toPath()
+                .relativize(quoterUnzippedPath.asFile.toPath())
+                .joinToString("/"),
+            // Sockets, not build output - actions/cache cannot archive them.
+            "!cache/**/tmp/pipe/**",
+            // Only present while quoterRef points at a Distillery-era quoter (v2.1.0 and earlier).
+            "!cache/**/distillery/priv",
+        )
+    )
+}
+
 val startQuoter = tasks.register<StartQuoterTask>("startQuoter") {
     description = "Starts the Quoter tool"
     dependsOn(releaseQuoter)
@@ -1015,5 +1034,3 @@ tasks.register<Test>("testUI") {
 //        setProperty("termsOfServiceAgree", "yes")
 //    }
 //}
-
-
