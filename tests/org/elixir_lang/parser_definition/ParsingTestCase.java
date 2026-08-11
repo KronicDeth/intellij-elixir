@@ -7,6 +7,8 @@ import org.elixir_lang.ElixirLanguage;
 import org.elixir_lang.ElixirParserDefinition;
 import org.elixir_lang.intellij_elixir.Quoter;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
+import org.elixir_lang.psi.quoting.QuotingDialect;
+import org.elixir_lang.psi.quoting.QuotingDialectResolver;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.LinkedList;
@@ -22,6 +24,29 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
 
     protected ParsingTestCase(String extension, ParserDefinition... parserDefinitions) {
         super("", extension, parserDefinitions);
+    }
+
+    /**
+     * Quotes in the dialect of the Elixir the reference quoter is running, so both sides of
+     * {@link #assertQuotedCorrectly()} speak the same version.
+     *
+     * These are light fixtures with no Elixir SDK, so production resolution would reach
+     * {@link QuotingDialect#FALLBACK} on every CI leg and every leg would compare against the same
+     * dialect however old the Elixir it ran. {@code ELIXIR_VERSION} is exported to the test JVM by
+     * the build, from the SDK it resolved - the same SDK the quoter was built against.
+     *
+     * Absent (a bare {@code ./gradlew test} outside the build's environment), the override is not
+     * installed at all and resolution falls back as production would.
+     */
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+
+        String elixirVersion = System.getenv("ELIXIR_VERSION");
+
+        if (elixirVersion != null && !elixirVersion.isBlank()) {
+            QuotingDialectResolver.overrideDialect(getProject(), QuotingDialect.of(elixirVersion));
+        }
     }
 
     protected void assertParsedAndQuotedAroundError() {

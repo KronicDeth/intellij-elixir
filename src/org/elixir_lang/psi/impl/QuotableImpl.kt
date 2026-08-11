@@ -20,6 +20,8 @@ import org.elixir_lang.psi.impl.ParentImpl.addChildTextCodePoints
 import org.elixir_lang.psi.impl.ParentImpl.elixirCharList
 import org.elixir_lang.psi.impl.ParentImpl.elixirString
 import org.elixir_lang.psi.operation.*
+import org.elixir_lang.psi.quoting.QuotingDialect
+import org.elixir_lang.psi.quoting.QuotingDialectResolver.dialectFor
 import org.jetbrains.annotations.Contract
 import java.lang.Double
 import java.lang.Long
@@ -58,7 +60,13 @@ fun ElixirStabBody.quote(metadata: OtpErlangList): OtpErlangObject =
                 }
                 .map { it as Quotable }
                 .map { it.quote() }
-                .let { QuotableImpl.buildBlock(it.toList(), metadata) }
+                .let {
+                    QuotableImpl.buildBlock(
+                        it.toList(),
+                        metadata,
+                        QuotableImpl.rearrangesUnaryOperators(this)
+                    )
+                }
 
 object QuotableImpl {
     private val AMBIGUOUS_OP = OtpErlangAtom("ambiguous_op")
@@ -334,10 +342,11 @@ object QuotableImpl {
         val bracketArguments = atUnqualifiedBracketOperation.bracketArguments
         val quotedBracketArguments = bracketArguments.quote()
 
+        // `@1[:a]` - Elixir's `bracket_at_expr -> at_op_eol access_expr bracket_arg`.
         return quotedFunctionCall(
                 "Elixir.Access",
                 "get",
-                metadata(bracketArguments),
+                bracketIdentifierMetadata(bracketArguments),
                 quotedContainer,
                 quotedBracketArguments
         )
@@ -484,10 +493,11 @@ object QuotableImpl {
         val bracketArguments = atUnqualifiedBracketOperation.bracketArguments
         val quotedBracketArguments = bracketArguments.quote()
 
+        // `@foo[:a]` - Elixir's `bracket_at_expr -> at_op_eol dot_bracket_identifier bracket_arg`.
         return quotedFunctionCall(
                 "Elixir.Access",
                 "get",
-                metadata(bracketArguments),
+                bracketIdentifierMetadata(bracketArguments),
                 quotedContainer,
                 quotedBracketArguments
         )
@@ -551,18 +561,34 @@ object QuotableImpl {
 
         assert(children.size == 2)
 
-        val quotedMatchedExpression = (children[0] as Quotable).quote()
+        val container = children[0]
+        val quotedMatchedExpression = (container as Quotable).quote()
         val bracketArguments = children[1] as Quotable
         val quotedBracketArguments = bracketArguments.quote()
+
+        // Two Elixir productions land here, and they gained `from_brackets` two minors apart:
+        // `bracket_expr -> access_expr bracket_arg` (`[1, 2][0]`) at 1.15.0, and
+        // `bracket_at_expr -> at_op_eol access_expr bracket_arg` (`@Alias[:a]`) at 1.16.2. There is
+        // dedicated PSI for `@1[...]` and `@foo[...]`, but every other `@`-prefixed operand - an
+        // alias, a string, a sigil, a list, `@&1` - reaches this generic operation, so the `@` is
+        // what tells the two apart.
+        val metadata = if (container.isAtPrefixed()) {
+            bracketIdentifierMetadata(bracketArguments)
+        } else {
+            bracketedExpressionMetadata(bracketArguments)
+        }
 
         return quotedFunctionCall(
                 "Elixir.Access",
                 "get",
-                metadata(bracketArguments),
+                metadata,
                 quotedMatchedExpression,
                 quotedBracketArguments
         )
     }
+
+    /** Whether [this] is an `@`-prefix operation, so bracket access on it is Elixir's `bracket_at_expr`. */
+    private fun PsiElement.isAtPrefixed(): Boolean = stripAccessExpression() is AtOperation
 
     @Contract(pure = true)
     @JvmStatic
@@ -784,10 +810,11 @@ object QuotableImpl {
         val bracketArguments = qualifiedBracketOperation.bracketArguments
         val quotedBracketArguments = bracketArguments.quote()
 
+        // `Foo.bar[:a]` - Elixir's `dot_bracket_identifier -> matched_expr dot_op bracket_identifier`.
         return quotedFunctionCall(
                 "Elixir.Access",
                 "get",
-                metadata(bracketArguments),
+                bracketIdentifierMetadata(bracketArguments),
                 quotedContainer,
                 quotedBracketArguments
         )
@@ -890,10 +917,11 @@ object QuotableImpl {
         val bracketArguments = unqualifiedBracketOperation.bracketArguments
         val quotedBracketArguments = bracketArguments.quote()
 
+        // `foo[:a]` - Elixir's `dot_bracket_identifier -> bracket_identifier`.
         return quotedFunctionCall(
                 "Elixir.Access",
                 "get",
-                metadata(bracketArguments),
+                bracketIdentifierMetadata(bracketArguments),
                 quotedContainer,
                 quotedBracketArguments
         )
@@ -967,6 +995,14 @@ object QuotableImpl {
                     callMetadata,
                     *quotedBlockArguments
             )
+        } else if (identifierText == "..." && dialectFor(identifier).quotesEllipsisAsNullaryCall) {
+            // Elixir 1.17.0 gave the parser an `ellipsis_op` production built with
+            // `build_nullary_op`, so `...` - in a `@spec` or on its own - became a call with no
+            // arguments, `{:..., meta, []}`, where before it quoted as a variable, `{:..., meta, nil}`.
+            quoted = quotedFunctionCall(
+                identifierText,
+                callMetadata
+            )
         } else {
             /* @note quotedFunctionCall cannot be used here because in the 3-tuple for function calls, the elements are
               {name, metadata, arguments}, while for an ambiguous call or variable, the elements are
@@ -999,13 +1035,30 @@ object QuotableImpl {
 
     @Contract(pure = true)
     @JvmStatic
-    fun quote(parentheticalStab: ElixirParentheticalStab): OtpErlangObject =
-        parentheticalStab.stab?.quote(emptyMetadata(parentheticalStab)) ?:
-        // @note CANNOT use quotedFunctionCall because it requires metadata and gives nil instead of [] when no
-        //   arguments are given while empty block is quoted as `{__block__, [], []}`
-        OtpErlangTuple(
-                arrayOf(BLOCK, emptyMetadata(parentheticalStab), OtpErlangList())
-        )
+    fun quote(parentheticalStab: ElixirParentheticalStab): OtpErlangObject {
+        val stab = parentheticalStab.stab
+            // @note CANNOT use quotedFunctionCall because it requires metadata and gives nil instead of [] when no
+            //   arguments are given while empty block is quoted as `{__block__, [], []}`
+            ?: return OtpErlangTuple(
+                    arrayOf(BLOCK, emptyMetadata(parentheticalStab), OtpErlangList())
+            )
+
+        val quoted = stab.quote(emptyMetadata(parentheticalStab))
+
+        // Elixir 1.15.0's `build_paren_stab` took over wrapping a solitary `not`/`!`, so from then
+        // on it happens here rather than in every block - and with empty metadata, because that
+        // clause returns before the one that adds the parentheses' own.
+        return if (!rearrangesUnaryOperators(parentheticalStab) && isRearrangedUnary(quoted)) {
+            blockFunctionCall(listOf(quoted), OtpErlangList())
+        } else {
+            quoted
+        }
+    }
+
+    /** A `not` or `!` call, the `?rearrange_uop` operators. */
+    private fun isRearrangedUnary(quoted: OtpErlangObject): Boolean =
+        Macro.isLocalCall(quoted) &&
+                (quoted as OtpErlangTuple).elementAt(0) in REARRANGED_UNARY_OPERATORS
 
     private fun emptyMetadata(parentheticalStab: ElixirParentheticalStab): OtpErlangList = metadata(parentheticalStab)
 
@@ -1369,7 +1422,7 @@ object QuotableImpl {
         )
 
         // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L76-L79
-        return toBlock(quotedChildren)
+        return toBlock(quotedChildren, rearrangesUnaryOperators(file))
     }
 
     @Contract(pure = true)
@@ -1485,7 +1538,9 @@ object QuotableImpl {
     @Contract(pure = true)
     private fun quote(children: Array<Quotable>) =
         // Uses toBlock because this is for inside interpolation, which functions the same as an embedded file
-        children.map(Quotable::quote).let { toBlock(it) }
+        children.map(Quotable::quote).let {
+            toBlock(it, rearrangesUnaryOperators(children.firstOrNull()))
+        }
 
     @JvmStatic
     fun quotedFunctionCall(
@@ -1502,6 +1557,79 @@ object QuotableImpl {
     fun metadata(operator: Operator): OtpErlangList = metadata(operator.operatorTokenNode())
     @JvmStatic
     fun metadata(element: PsiElement): OtpErlangList = metadata(element.node)
+
+    /**
+     * `Access.get/2` metadata for bracket access on an expression - `[1, 2][0]`, Elixir's
+     * `bracket_expr -> access_expr bracket_arg`. Carries `from_brackets` from 1.15.0, two minors
+     * before the other four bracket forms do.
+     */
+    @RequiresReadLock
+    private fun bracketedExpressionMetadata(bracketArguments: PsiElement): OtpErlangList =
+        bracketMetadata(
+            bracketArguments,
+            dialectFor(bracketArguments).emitsFromBracketsOnBracketedExpression
+        )
+
+    /**
+     * `Access.get/2` metadata for the four bracket forms Elixir 1.16.2 brought in line with
+     * [bracketedExpressionMetadata]: `foo[:a]`, `Foo.bar[:a]`, `@foo[:a]` and `@1[:a]`.
+     */
+    @RequiresReadLock
+    private fun bracketIdentifierMetadata(bracketArguments: PsiElement): OtpErlangList =
+        bracketMetadata(
+            bracketArguments,
+            dialectFor(bracketArguments).emitsFromBracketsOnEveryBracketForm
+        )
+
+    /** `from_brackets` leads the keyword list, as `meta_with_from_brackets` prepends it. */
+    private fun bracketMetadata(bracketArguments: PsiElement, fromBrackets: Boolean): OtpErlangList =
+        if (fromBrackets) {
+            OtpErlangList(
+                arrayOf<OtpErlangObject>(
+                    keywordTuple("from_brackets", true),
+                    lineNumberKeywordTuple(bracketArguments.node)
+                )
+            )
+        } else {
+            metadata(bracketArguments)
+        }
+
+    /**
+     * The `Kernel.to_string/1` call that interpolation quotes to, tagged `from_interpolation` from
+     * Elixir 1.16.0 on.
+     *
+     * Only the outer call is tagged; the inner `.` call that names `Kernel.to_string` keeps the
+     * plain metadata, matching `{{:., [line: 1], [Kernel, :to_string]},
+     * [from_interpolation: true, line: 1], [...]}`.
+     */
+    @RequiresReadLock
+    @JvmStatic
+    fun quotedInterpolationCall(
+        interpolation: ElixirInterpolation,
+        module: String,
+        identifier: String,
+        metadata: OtpErlangList,
+        vararg arguments: OtpErlangObject
+    ): OtpErlangTuple {
+        if (!dialectFor(interpolation).emitsFromInterpolation) {
+            return quotedFunctionCall(module, identifier, metadata, *arguments)
+        }
+
+        val quotedQualifiedIdentifier = quotedFunctionCall(
+            ".",
+            metadata,
+            OtpErlangAtom(module),
+            OtpErlangAtom(identifier)
+        )
+
+        return quotedFunctionCall(
+            quotedQualifiedIdentifier,
+            OtpErlangList(
+                arrayOf(keywordTuple("from_interpolation", true), *metadata.elements())
+            ),
+            *arguments
+        )
+    }
 
     @JvmStatic
     fun quotedFunctionCall(
@@ -1770,12 +1898,26 @@ object QuotableImpl {
      * See https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L724-L725
      */
     @Contract(pure = true)
-    private fun toBlock(quotedChildren: List<OtpErlangObject>): OtpErlangObject =
+    private fun toBlock(
+        quotedChildren: List<OtpErlangObject>,
+        rearrangeUnaryOperators: Boolean
+    ): OtpErlangObject =
             when (quotedChildren.size) {
                 0 -> emptyBlock()
-                1 -> buildBlock(quotedChildren, OtpErlangList())
+                1 -> buildBlock(quotedChildren, OtpErlangList(), rearrangeUnaryOperators)
                 else -> blockFunctionCall(quotedChildren, OtpErlangList())
             }
+
+    /**
+     * Whether a solitary `not`/`!` in a block built from [element] takes a `__block__` wrapper.
+     *
+     * Elixir 1.15.0 moved that wrapper out of `build_block` - which a file, a stab body and an
+     * interpolation all go through - and into `build_paren_stab`, so from then on only a
+     * parenthesised single unary expression carries it. `unquote_splicing` is unaffected.
+     */
+    @RequiresReadLock
+    internal fun rearrangesUnaryOperators(element: PsiElement?): Boolean =
+        (element?.let(::dialectFor) ?: QuotingDialect.FALLBACK).wrapsSolitaryUnaryNotInEveryBlock
 
     private fun emptyBlock() =
              otpErlangTuple(
@@ -1797,7 +1939,11 @@ object QuotableImpl {
      * @param quotedChildren
      */
     @Contract(pure = true)
-    internal fun buildBlock(quotedChildren: List<OtpErlangObject>, metadata: OtpErlangList): OtpErlangObject =
+    internal fun buildBlock(
+        quotedChildren: List<OtpErlangObject>,
+        metadata: OtpErlangList,
+        rearrangeUnaryOperators: Boolean
+    ): OtpErlangObject =
             when (quotedChildren.size) {
                 0 -> NIL
                 1 -> {
@@ -1807,7 +1953,15 @@ object QuotableImpl {
                     if (Macro.isLocalCall(quotedChild)) {
                         // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L547
                         when ((quotedChild as OtpErlangTuple).elementAt(0)) {
-                            EXCLAMATION_POINT, NOT, UNQUOTE_SPLICING ->
+                            // `unquote_splicing` wraps in every version; `not` and `!` stopped
+                            // wrapping here in 1.15.0 and wrap only inside parentheses from then on.
+                            EXCLAMATION_POINT, NOT ->
+                                if (rearrangeUnaryOperators) {
+                                    blockFunctionCall(quotedChildren, metadata)
+                                } else {
+                                    quotedChild
+                                }
+                            UNQUOTE_SPLICING ->
                                 blockFunctionCall(quotedChildren, metadata)
                             else ->
                                 quotedChild
