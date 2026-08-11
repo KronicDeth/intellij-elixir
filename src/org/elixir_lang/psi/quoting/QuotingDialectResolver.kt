@@ -1,0 +1,102 @@
+package org.elixir_lang.psi.quoting
+
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.projectRoots.Sdk
+import com.intellij.openapi.roots.ProjectRootModificationTracker
+import com.intellij.openapi.util.Key
+import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiFile
+import com.intellij.psi.util.CachedValue
+import com.intellij.psi.util.CachedValueProvider
+import com.intellij.psi.util.CachedValuesManager
+import com.intellij.util.concurrency.ThreadingAssertions
+import com.intellij.util.concurrency.annotations.RequiresReadLock
+import org.elixir_lang.sdk.elixir.ElixirVersionDetector
+import org.elixir_lang.sdk.elixir.ElixirSdkLookup
+import org.elixir_lang.sdk.elixir.sdk
+import org.jetbrains.annotations.TestOnly
+
+/**
+ * Resolves the [QuotingDialect] to quote a given element in.
+ *
+ * Quoting recurses through the parameterless `Quotable.quote()`, so a child inherits nothing from
+ * its parent's call, and consumers call `quote()` on arbitrary nodes rather than only on a file
+ * root. The dialect therefore has to be derivable from any element on its own, which is what this
+ * resolves: element to containing file to module to Elixir SDK to version.
+ */
+object QuotingDialectResolver {
+    /**
+     * Set by tests that must exercise a specific dialect. See [overrideDialect] for why this exists
+     * at all rather than the test reading the version the way production does.
+     */
+    private val OVERRIDE_KEY = Key.create<QuotingDialect>("ELIXIR_QUOTING_DIALECT_OVERRIDE")
+
+    private val CACHE_KEY = Key.create<CachedValue<QuotingDialect>>("ELIXIR_QUOTING_DIALECT")
+
+    /**
+     * The dialect for [element], or [QuotingDialect.FALLBACK] when its Elixir version cannot be
+     * determined.
+     *
+     * Only the handful of sites that actually diverge between versions call this, not every node of
+     * a parse, so the cost is bounded by the number of bracket, interpolation and ellipsis
+     * constructs in the file rather than by its size.
+     */
+    @RequiresReadLock
+    fun dialectFor(element: PsiElement): QuotingDialect {
+        // Before the read-access assertion below, and before touching the module model: an override
+        // needs neither, which is what lets the parser tests - light fixtures with a mock project
+        // that has no module, no SDK and no ProjectFileIndex - resolve a dialect at all.
+        element.project.getUserData(OVERRIDE_KEY)?.let { return it }
+
+        val file = element.containingFile ?: return QuotingDialect.FALLBACK
+
+        return CachedValuesManager.getCachedValue(file, CACHE_KEY) {
+            // Invalidated on root changes, so pointing a module at a different Elixir SDK - or
+            // changing that SDK's home - re-resolves rather than serving the old dialect for the
+            // rest of the session.
+            CachedValueProvider.Result.create(
+                resolve(file),
+                ProjectRootModificationTracker.getInstance(file.project)
+            )
+        }
+    }
+
+    @RequiresReadLock
+    private fun resolve(file: PsiFile): QuotingDialect {
+        ThreadingAssertions.assertReadAccess()
+        val sdk = ElixirSdkLookup.resolve(file).sdk ?: return QuotingDialect.FALLBACK
+
+        return QuotingDialect.of(version(sdk))
+    }
+
+    /**
+     * The Elixir version recorded on [sdk], without reading `elixir.app`.
+     *
+     * Deliberately **not** `ElixirVersionDetector.canonicalVersion(sdk)`: that falls back to file
+     * I/O on a cold cache, and it is annotated `@RequiresBackgroundThread` and asserts no read lock
+     * is held - both of which quoting violates, since it runs synchronously inside a read action
+     * and on the EDT. The user data is the same value that call would cache, and the SDK's version
+     * string carries the version too (`"mise Elixir 1.13.4 (OTP 24)"`), so between them a
+     * configured SDK is covered without ever going to disk.
+     */
+    private fun version(sdk: Sdk): String? =
+        sdk.getUserData(ElixirVersionDetector.ELIXIR_VERSION_KEY) ?: sdk.versionString
+
+    /**
+     * Forces [dialect] for every element in [project], or clears the override when it is null.
+     *
+     * The parser tests run against light fixtures with no Elixir SDK, so production resolution would
+     * always reach [QuotingDialect.FALLBACK] and every CI leg would test the same dialect no matter
+     * which Elixir it ran against. They set this instead, from the `ELIXIR_VERSION` the build
+     * already exports to the test JVM.
+     *
+     * The env var stays on the test side of that seam on purpose: it is a build artefact, and a
+     * production code path that read it would be a test-only backdoor in shipped code of exactly
+     * the kind that later gets depended on.
+     */
+    @TestOnly
+    @JvmStatic
+    fun overrideDialect(project: Project, dialect: QuotingDialect?) {
+        project.putUserData(OVERRIDE_KEY, dialect)
+    }
+}
