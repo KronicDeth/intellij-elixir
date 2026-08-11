@@ -125,6 +125,22 @@ class QuotingDialectTest {
             listOf(false, false, false, false, true),
             QuotingDialect.entries.map { it.quotesEllipsisAsNullaryCall }
         )
+        assertEquals(
+            listOf(false, false, false, false, true),
+            QuotingDialect.entries.map { it.quotesAmbiguousDualOperatorAsCall }
+        )
+    }
+
+    /**
+     * Shares [QuotingDialect.V1_17] with the ellipsis change, so the boundary is asserted on the
+     * versions either side of it as well as across the constants - a threshold that silently moved to
+     * 1.16.2 would still pass the list above by matching the ellipsis row.
+     */
+    @Test
+    fun `the ambiguous dual operator call is on from 1_17_0`() {
+        assertEquals(false, QuotingDialect.of("1.16.3").quotesAmbiguousDualOperatorAsCall)
+        assertEquals(true, QuotingDialect.of("1.17.0").quotesAmbiguousDualOperatorAsCall)
+        assertEquals(true, QuotingDialect.FALLBACK.quotesAmbiguousDualOperatorAsCall)
     }
 
     /**

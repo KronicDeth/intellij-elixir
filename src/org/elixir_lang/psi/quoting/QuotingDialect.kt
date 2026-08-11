@@ -73,6 +73,15 @@ enum class QuotingDialect {
      * `elixir_parser.yrl` gained `sub_matched_expr -> ellipsis_op : build_nullary_op('$1')` in
      * v1.17.0; v1.16.3 has no `ellipsis_op` production. Note this is **not** the 1.19 the code
      * comment on the plugin side claimed: quoting `...` gives `nil` on 1.16.3 and `[]` on 1.17.3.
+     *
+     * 1.17.0 also widened which ambiguous dual operators make the identifier before them a call.
+     * `elixir_tokenizer.erl`'s `handle_space_sensitive_tokens` refused the `op_identifier`
+     * conversion when the character after the sign was any of `( [ < { % + - / > :`; 1.17.0 shrank
+     * that guard to `NotMarker =/= Sign, NotMarker =/= $/, NotMarker =/= $>`, so `one +(two)` went
+     * from the operation `one + two` to the call `one(+two)`. From elixir-lang/elixir b8f069d08
+     * ("Fix parsing of ambiguous operators followed by containers"), first released in v1.17.0.
+     *
+     * Read via [quotesAmbiguousDualOperatorAsCall].
      */
     V1_17;
 
@@ -93,6 +102,14 @@ enum class QuotingDialect {
 
     /** `...` as `{:..., meta, []}` rather than `{:..., meta, nil}`. */
     val quotesEllipsisAsNullaryCall: Boolean get() = this >= V1_17
+
+    /**
+     * `one +(two)` as the call `one(+two)` rather than the operation `one + two` - a container, `%`
+     * or the opposite sign after a spaced dual operator. `one +two` is a call in every version this
+     * plugin supports and is not affected; `one ++two` and `one +/two` are operations in every
+     * version, being the exclusions 1.17.0 kept.
+     */
+    val quotesAmbiguousDualOperatorAsCall: Boolean get() = this >= V1_17
 
     companion object {
         /**

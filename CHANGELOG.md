@@ -6,20 +6,6 @@
 
 ### Enhancements
 
-- [@sh41](https://github.com/sh41)
-  - **Quoting now follows the Elixir version behind the file instead of emitting one shape for every
-    version.** Elixir's quoted form changes between releases, so a single answer was wrong everywhere
-    but one version, and each fix for a newer Elixir was a regression on an older one. A quoting
-    dialect is now resolved from the module's Elixir SDK and cached per file, and the five known
-    divergences are gated on the release that changed them: `from_brackets` on a bracketed
-    expression (1.15.0), `from_interpolation` (1.16.0), `from_brackets` on every other bracket form
-    (1.16.2), and `...` as a nullary call rather than a variable (1.17.0). Files with no module or no
-    Elixir SDK take the newest dialect.
-  - **A solitary `not` or `!` is no longer wrapped in `__block__` outside parentheses on Elixir
-    1.15 and later.** 1.15.0 moved that wrapper from every block position into parenthesised
-    expressions only, so `( -> ! one )`, `a not in b` and `"#{!x}"` were each quoted with a spurious
-    block. Inside parentheses it is still wrapped, and `unquote_splicing` is unchanged.
-
 ### Bug Fixes
 
 ### Threading / Platform Hygiene
@@ -27,6 +13,17 @@
 ### Build / CI
 
 - [@sh41](https://github.com/sh41)
+  - **Quoting now follows the Elixir version behind the file instead of emitting one shape for every
+    version.** Elixir's quoted form changes between releases, so a single answer was wrong everywhere
+    but one version, and each fix for a newer Elixir was a regression on an older one. A quoting
+    dialect is resolved from the module's Elixir SDK and cached per file, and six divergences are gated
+    on the release that changed them: `from_brackets` on a bracketed expression and the `__block__`
+    wrapper around a solitary `not`/`!` (1.15.0), `from_interpolation` (1.16.0), `from_brackets` on
+    every other bracket form (1.16.2), and both `...` as a nullary call and `one +(two)` as the call
+    `one(+two)` (1.17.0). Files with no module or no Elixir SDK take the newest dialect. Nothing in
+    production reads the quoted form - its consumers read atoms and arities - so this is test
+    correctness across the nine Elixir/OTP pairs CI covers, not behaviour anyone can observe in the
+    IDE.
   - **A quoter that fails to build no longer stops the whole test suite.** `releaseQuoter` records
     whether it produced a daemon and succeeds either way, so the tests that need no quoter still run.
     The ones that need it fail immediately, naming the Elixir/OTP pair and the recorded reason - they

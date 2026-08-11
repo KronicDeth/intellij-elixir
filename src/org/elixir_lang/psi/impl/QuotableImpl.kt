@@ -98,9 +98,12 @@ object QuotableImpl {
         return OtpErlangTuple(children.map { it as Quotable }.map(Quotable::quote).toTypedArray())
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun quote(infix: Infix): OtpErlangObject {
+        ambiguousDualOperatorCall(infix)?.let { return it }
+
         val quotedLeftOperand = infix.leftOperand()!!.quote()
 
         val operator = infix.operator()
@@ -115,6 +118,63 @@ object QuotableImpl {
                 metadata(operator),
                 quotedLeftOperand,
                 quotedRightOperand
+        )
+    }
+
+    /**
+     * `one +(two)` quoted as the no-parentheses call `one(+two)` - what Elixir does from 1.17.0 - or
+     * `null` when this is not that shape or the dialect predates it, leaving the caller's
+     * binary-operation quoting correct.
+     *
+     * The plugin's lexer implements the pre-1.17.0 rule, so `one +two` already parses as a call and
+     * quotes through [quote] for `UnqualifiedNoParenthesesCall` instead. What arrives here as an
+     * operation is only the set 1.17.0 added - a container, `%` or the opposite sign after the sign -
+     * so this reshapes rather than re-lexes: `{op, [left, right]}` becomes
+     * `{leftIdentifier, [{op, [right]}]}`.
+     *
+     * Reshaping at quote time keeps one parse tree per file, which the shared `.txt` fixtures and the
+     * SDK-less lexer both require. The cost is that the PSI still reads as an operation on a 1.17
+     * project, so anything that walks the tree rather than the quoted form sees the older reading.
+     *
+     * FIXME This is interim, and belongs in the lexer. Deciding it here reconstructs from post-parse
+     * PSI what the lexer knew and discarded, so it only reaches the case where the ambiguous operator
+     * is the outermost node: `a + b +(c)` quotes as `(a + b) + c` where Elixir 1.17 gives `a + b(+c)`,
+     * and `one +(two) + three` as `one(+two) + three` where Elixir gives `one(+two + three)`. Both are
+     * out of reach because **association** was committed at lex time, and no reshape at a single node
+     * can move an operand across an operator that bound differently. The fix is `op_identifier`
+     * classification in `Elixir.flex` - keyed on the file's Elixir version, since the exclusion set
+     * changed at 1.17.0 - with an `Elixir.bnf` rule that produces this shape directly, at which point
+     * delete this function rather than leaving two mechanisms for one rule.
+     */
+    @RequiresReadLock
+    private fun ambiguousDualOperatorCall(infix: Infix): OtpErlangObject? {
+        val operator = infix.operator()
+        val sign = operator.text.singleOrNull()?.takeIf { it == '+' || it == '-' } ?: return null
+
+        // `?dual_op(Sign), not(?is_space(NotMarker))`: a space before the sign and none after is what
+        // makes the identifier a call rather than the operation's left operand.
+        if (operator.prevSibling !is PsiWhiteSpace) return null
+        val afterOperator = operator.nextSibling?.takeUnless { it is PsiWhiteSpace } ?: return null
+
+        // `NotMarker =/= Sign, NotMarker =/= $/, NotMarker =/= $>` - the three exclusions 1.17.0 kept.
+        val notMarker = afterOperator.text.firstOrNull() ?: return null
+        if (notMarker == sign || notMarker == '/' || notMarker == '>') return null
+
+        val call = infix.leftOperand() as? UnqualifiedNoArgumentsCall<*> ?: return null
+        // A `do` block makes it a call on its own terms, with the block as keyword arguments.
+        if (call.doBlock != null) return null
+
+        val identifier = call.identifier
+
+        if (!dialectFor(identifier).quotesAmbiguousDualOperatorAsCall) return null
+
+        val quotedRightOperand = infix.rightOperand()?.quote() ?: return null
+
+        return quotedFunctionCall(
+                identifier.text,
+                // `ambiguous_op` leads the keyword list, as Elixir's `meta_with_ambiguous_op` prepends it.
+                OtpErlangList(arrayOf(AMBIGUOUS_OP_KEYWORD_PAIR, metadata(identifier).elementAt(0))),
+                quotedFunctionCall(sign.toString(), metadata(operator), quotedRightOperand)
         )
     }
 
