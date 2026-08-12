@@ -12,6 +12,7 @@ import com.intellij.psi.PsiReference;
 import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.psi.search.SearchScope;
+import com.intellij.util.concurrency.annotations.RequiresReadLock;
 import java.util.Set;
 
 public interface ElixirUnmatchedAtUnqualifiedNoParenthesesCall extends ElixirUnmatchedExpression, AtUnqualifiedNoParenthesesCall<UnmatchedAtUnqualifiedNoParenthesesCall>, StubBasedPsiElement<UnmatchedAtUnqualifiedNoParenthesesCall> {
@@ -25,10 +26,13 @@ public interface ElixirUnmatchedAtUnqualifiedNoParenthesesCall extends ElixirUnm
   @NotNull
   ElixirNoParenthesesOneArgument getNoParenthesesOneArgument();
 
+  @RequiresReadLock
   @Nullable String canonicalName();
 
+  @RequiresReadLock
   @NotNull Set<String> canonicalNameSet();
 
+  @RequiresReadLock
   @Nullable String functionName();
 
   @Nullable PsiElement functionNameElement();
@@ -37,12 +41,16 @@ public interface ElixirUnmatchedAtUnqualifiedNoParenthesesCall extends ElixirUnm
   //matching getDoBlock(ElixirUnmatchedAtUnqualifiedNoParenthesesCall, ...)
   //methods are not found in ElixirPsiImplUtil
 
+  @RequiresReadLock
   boolean hasDoBlockOrKeyword();
 
+  @RequiresReadLock
   @Nullable String getName();
 
+  @RequiresReadLock
   @Nullable PsiElement getNameIdentifier();
 
+  @RequiresReadLock
   @NotNull ItemPresentation getPresentation();
 
   @Nullable PsiReference getReference();
@@ -53,38 +61,51 @@ public interface ElixirUnmatchedAtUnqualifiedNoParenthesesCall extends ElixirUnm
 
   @NotNull SearchScope getUseScope();
 
+  @RequiresReadLock
   boolean isCalling(@NotNull String resolvedModuleName, @NotNull String functionName);
 
+  @RequiresReadLock
   boolean isCalling(@NotNull String resolvedModuleName, @NotNull String functionName, int resolvedFinalArity);
 
+  @RequiresReadLock
   boolean isCallingMacro(@NotNull String resolvedModuleName, @NotNull String functionName);
 
+  @RequiresReadLock
   boolean isCallingMacro(@NotNull String resolvedModuleName, @NotNull String functionName, int resolvedFinalArity);
 
+  @RequiresReadLock
   @Nullable String implementedProtocolName();
 
   @Nullable String moduleName();
 
+  @RequiresReadLock
   @NotNull PsiElement[] primaryArguments();
 
+  @RequiresReadLock
   @Nullable Integer primaryArity();
 
+  @RequiresReadLock
   boolean processDeclarations(@NotNull PsiScopeProcessor processor, @NotNull ResolveState state, PsiElement lastParent, @NotNull PsiElement place);
 
   @NotNull OtpErlangObject quote();
 
+  @RequiresReadLock
   int resolvedFinalArity();
 
+  @RequiresReadLock
   @NotNull ArityInterval resolvedFinalArityInterval();
 
   @Nullable String resolvedModuleName();
 
+  @RequiresReadLock
   @Nullable Integer resolvedPrimaryArity();
 
+  @RequiresReadLock
   @Nullable Integer resolvedSecondaryArity();
 
   @Nullable PsiElement[] secondaryArguments();
 
+  @RequiresReadLock
   @Nullable Integer secondaryArity();
 
   @NotNull PsiElement setName(@NotNull String newName);

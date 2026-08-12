@@ -9,6 +9,7 @@ import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiPolyVariantReference;
 import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.PsiScopeProcessor;
+import com.intellij.util.concurrency.annotations.RequiresReadLock;
 
 public interface ElixirMatchedQualifiedAlias extends ElixirMatchedExpression, NamedElement, QualifiedAlias {
 
@@ -23,6 +24,7 @@ public interface ElixirMatchedQualifiedAlias extends ElixirMatchedExpression, Na
 
   @NotNull String fullyQualifiedName();
 
+  @RequiresReadLock
   @NotNull String getName();
 
   @Nullable PsiElement getNameIdentifier();

@@ -1,5 +1,6 @@
 {
   parserClass="org.elixir_lang.parser.ElixirParser"
+  parserUtilClass="org.elixir_lang.parser.ElixirParserUtil"
 
   extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
   // direct children of matchedExpression
@@ -943,7 +944,10 @@ matchedExpression ::= matchedInMatchOperation |
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L50
  */
 
-private nonNumeric ::= !numeric
+// Complement of `captureNumericOperation`: a number belongs to that rule only when joined to the `&`,
+// which is always below Elixir 1.15.0 and only without a space from 1.15.0 on.  Both rules must test
+// the same predicate, or a spaced `& 1` matches neither and parses as an error.
+private nonNumeric ::= !(<<captureArgument>> numeric)
 capturePrefixOperator ::= CAPTURE_OPERATOR
                           {
                             implements = "org.elixir_lang.psi.Operator"
@@ -1712,7 +1716,11 @@ matchedAccessExpression ::= accessExpression
  *
  */
 
-captureNumericOperation ::= capturePrefixOperator numeric
+/*
+ * `&1` is one capture argument; from Elixir 1.15.0 `& 1` is instead `&` applied to `1`.  See
+ * ElixirParserUtil.captureArgument, and `nonNumeric`, which negates the same predicate.
+ */
+captureNumericOperation ::= capturePrefixOperator <<captureArgument>> numeric
 
 /*
  *

@@ -4,7 +4,7 @@ package org.elixir_lang.parser;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.lang.PsiBuilder.Marker;
 import static org.elixir_lang.psi.ElixirTypes.*;
-import static com.intellij.lang.parser.GeneratedParserUtilBase.*;
+import static org.elixir_lang.parser.ElixirParserUtil.*;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.tree.TokenSet;
@@ -506,13 +506,14 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // capturePrefixOperator numeric
+  // capturePrefixOperator <<captureArgument>> numeric
   public static boolean captureNumericOperation(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "captureNumericOperation")) return false;
     if (!nextTokenIs(b, CAPTURE_OPERATOR)) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = capturePrefixOperator(b, l + 1);
+    r = r && captureArgument(b, l + 1);
     r = r && numeric(b, l + 1);
     exit_section_(b, m, CAPTURE_NUMERIC_OPERATION, r);
     return r;
@@ -2672,13 +2673,24 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // !numeric
+  // !(<<captureArgument>> numeric)
   static boolean nonNumeric(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "nonNumeric")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NOT_);
-    r = !numeric(b, l + 1);
+    r = !nonNumeric_0(b, l + 1);
     exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  // <<captureArgument>> numeric
+  private static boolean nonNumeric_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "nonNumeric_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = captureArgument(b, l + 1);
+    r = r && numeric(b, l + 1);
+    exit_section_(b, m, null, r);
     return r;
   }
 

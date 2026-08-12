@@ -11,6 +11,7 @@ import static org.elixir_lang.psi.ElixirTypes.*;
 import org.elixir_lang.psi.*;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.psi.PsiReference;
+import com.intellij.util.concurrency.annotations.RequiresReadLock;
 
 public class ElixirAtomImpl extends ElixirAtomMixin implements ElixirAtom {
 
@@ -45,6 +46,7 @@ public class ElixirAtomImpl extends ElixirAtomMixin implements ElixirAtom {
   }
 
   @Override
+  @RequiresReadLock
   public @Nullable String getName() {
     return ElixirPsiImplUtil.getName(this);
   }

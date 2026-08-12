@@ -94,6 +94,22 @@ enum class QuotingDialect {
      */
     val wrapsSolitaryUnaryNotInEveryBlock: Boolean get() = this < V1_15
 
+    /**
+     * Whether `&` must be immediately followed by its digit for the two to be one capture argument.
+     * `&1` always is; `& 1` is too below 1.15.0, but from 1.15.0 it is `&` applied to `1`, which
+     * binds the rest of the expression - so `& & 1 + & 2` is `&((&1) + (&2))` up to 1.14.5 and
+     * `&(&(1 + &2))` from 1.15.0.
+     *
+     * `elixir_parser.yrl`'s `access_expr -> capture_op_eol int` became
+     * `access_expr -> capture_int int`, and `elixir_tokenizer.erl` emits `capture_int` only for an
+     * adjacent digit; the `_eol` token it replaced permitted whitespace. From elixir-lang/elixir
+     * 9fb3cf603 ("Fix ambiguity in &INT with brackets"), first released in v1.15.0.
+     *
+     * Read by the parser rather than the quoter, unlike everything else here: the divergence is in
+     * how the tokens bind, which no reshape of the quoted form can express.
+     */
+    val requiresAdjacentCaptureArgument: Boolean get() = this >= V1_15
+
     /** The `Kernel.to_string/1` call that `"a#{b}c"` quotes to. */
     val emitsFromInterpolation: Boolean get() = this >= V1_16_0
 
@@ -120,6 +136,7 @@ enum class QuotingDialect {
          * wrong-but-modern quoted form is the least surprising default. It is also the direction
          * that ages well, since a new threshold added below shifts the fallback forward with it.
          */
+        @JvmStatic
         val FALLBACK: QuotingDialect = entries.last()
 
         /** Leading `MAJOR.MINOR[.PATCH]`, wherever it sits in the string. */
