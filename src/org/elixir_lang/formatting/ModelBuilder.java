@@ -64,6 +64,11 @@ public class ModelBuilder implements FormattingModelBuilder {
                 .after(ElixirTypes.AT_OPERATOR).none()
                 .withinPair(ElixirTypes.OPENING_BIT, ElixirTypes.CLOSING_BIT).spaceIf(elixirCustomSettings.SPACE_WITHIN_BITS)
                 .withinPair(ElixirTypes.OPENING_BRACKET, ElixirTypes.CLOSING_BRACKET).spaceIf(elixirCommonSettings.SPACE_WITHIN_BRACKETS)
+                /* From Elixir 1.15.0 `& 1` is `&` applied to `1`, not the capture argument `&1`, so
+                   spacing here would change what the code means: `& &1 + &2` is `&(&1 + &2)` but
+                   `& & 1 + & 2` is `&(&(1 + &2))`.  Must precede the general CAPTURE_OPERATOR rule
+                   below - SpacingBuilder takes the first match. */
+                .afterInside(ElixirTypes.CAPTURE_OPERATOR, ElixirTypes.CAPTURE_NUMERIC_OPERATION).none()
                 .after(ElixirTypes.CAPTURE_OPERATOR).spaceIf(elixirCustomSettings.SPACE_AFTER_CAPTURE_OPERATOR)
                 .afterInside(
                         ElixirTypes.COMMA,
