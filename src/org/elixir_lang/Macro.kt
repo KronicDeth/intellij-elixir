@@ -240,10 +240,32 @@ object Macro {
 
                         val leftCommaJoined = commaJoinOrEmptyParentheses(leftList, false)
 
+                        // A `cond`/`case`/`receive` clause's single condition needs parenthesizing
+                        // whenever its raw term is `case`-tagged, for two different reasons that both
+                        // end up checked here:
+                        //
+                        // - Still rendered as a literal `case ... do ... end` (or nested inside a
+                        //   match, `source = case ... do ... end`, e.g. from deinlining `&&`/`||`):
+                        //   the bare `end ->` is ambiguous - the parser reads `end` as closing the
+                        //   enclosing macro instead of the inner block - the same reason
+                        //   `operandToString` parenthesizes a binary operation's left operand.
+                        // - Deinlined to `and`/`or`/`&&`/`||` by `toString` (`ifDeinlineToString`):
+                        //   the rendered text no longer ends with `end` at all, but `and`/`or` bind
+                        //   looser than `->`, so it still needs parens - just for precedence instead
+                        //   of a dangling `end`.
+                        //
+                        // Checking the raw term's tag catches both `case`-shaped origins regardless of
+                        // how `toString` ends up rendering them; checking the rendered text separately
+                        // catches the match-wrapped form, whose raw term is `=`, not `case`.
                         val leftString = if (leftList.arity() == 1) {
-                            ifCaseTo(leftList.elementAt(0)) { _, _ ->
+                            val condition = leftList.elementAt(0)
+                            val isCaseTagged = ifCaseTo(condition) { _, _ -> true } ?: false
+
+                            if (isCaseTagged || leftCommaJoined.trimEnd().endsWith("end")) {
                                 "($leftCommaJoined)"
-                            } ?: leftCommaJoined
+                            } else {
+                                leftCommaJoined
+                            }
                         } else {
                             leftCommaJoined
                         }
