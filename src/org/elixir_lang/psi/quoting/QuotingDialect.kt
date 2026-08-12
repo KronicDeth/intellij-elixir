@@ -82,6 +82,25 @@ enum class QuotingDialect {
      * ("Fix parsing of ambiguous operators followed by containers"), first released in v1.17.0.
      *
      * Read via [quotesAmbiguousDualOperatorAsCall].
+     *
+     * 1.17.0 also stopped a parenthesised expression from picking up metadata from parentheses that
+     * merely nest around it. Below 1.17.0, `build_paren_stab`'s non-`rearrange_uop` clause ran its
+     * body through `build_stab/1` and, whenever that returned a `__block__` (from a solitary
+     * `not`/`!` already rearranged by an inner paren, `unquote_splicing`, or several expressions),
+     * appended this layer's own `line` to its metadata: `Meta ++ meta_from_token_with_closing(...)`.
+     * Each further layer of plain parentheses around the same `__block__` appended another `line`
+     * entry, so `&(((&1 not in ?0..?9)))` carries `[line: N, line: N]` on that block below 1.17.0 -
+     * one entry per enclosing paren beyond the innermost, not one entry total. From 1.17.0,
+     * `build_paren_stab` calls `build_block/2` directly, whose single-expression clause is
+     * `build_block([Expr], _Meta) -> Expr` - the passed-in metadata is discarded unconditionally, so
+     * enclosing parentheses stop contributing anything and the innermost `__block__`'s own metadata
+     * (empty, for the `rearrange_uop` case) is all that survives.
+     *
+     * Verified against `elixir_parser.yrl` at v1.14.5 (`build_stab/3`), v1.16.3 and v1.17.3
+     * (`build_paren_stab/3`, `build_block/1` and `/2`), and by quoting
+     * `&(((&1 not in ?0..?9)))` with each of 1.16.3 and 1.17.3.
+     *
+     * Read via [mergesEnclosingParenMetadataOntoBlock].
      */
     V1_17,
 
@@ -138,6 +157,14 @@ enum class QuotingDialect {
      * version, being the exclusions 1.17.0 kept.
      */
     val quotesAmbiguousDualOperatorAsCall: Boolean get() = this >= V1_17
+
+    /**
+     * Whether a plain pair of parentheses around an expression that already quotes to a `__block__`
+     * appends its own `line` to that block's metadata, rather than leaving the block's metadata as
+     * the inner parentheses (or expression) produced it. True below [V1_17] - see there for why this
+     * one reads downwards, like [wrapsSolitaryUnaryNotInEveryBlock].
+     */
+    val mergesEnclosingParenMetadataOntoBlock: Boolean get() = this < V1_17
 
     /**
      * Whether a `do:` block's `__block__` (and an empty file's implicit top-level `__block__`)

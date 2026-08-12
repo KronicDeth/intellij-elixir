@@ -143,6 +143,22 @@ class QuotingDialectTest {
     }
 
     /**
+     * Shares [QuotingDialect.V1_17] with the ellipsis and ambiguous-operator changes, but reads
+     * downwards like [QuotingDialect.wrapsSolitaryUnaryNotInEveryBlock] - on below the threshold,
+     * off from it - since 1.17.0 *dropped* the merge rather than adding it.
+     */
+    @Test
+    fun `merging an enclosing paren's own metadata onto an already-block child is on only below 1_17`() {
+        assertEquals(
+            listOf(true, true, true, true, false, false),
+            QuotingDialect.entries.map { it.mergesEnclosingParenMetadataOntoBlock }
+        )
+        assertEquals(true, QuotingDialect.of("1.16.3").mergesEnclosingParenMetadataOntoBlock)
+        assertEquals(false, QuotingDialect.of("1.17.0").mergesEnclosingParenMetadataOntoBlock)
+        assertEquals(false, QuotingDialect.FALLBACK.mergesEnclosingParenMetadataOntoBlock)
+    }
+
+    /**
      * Shares [QuotingDialect.V1_17] with the ellipsis change, so the boundary is asserted on the
      * versions either side of it as well as across the constants - a threshold that silently moved to
      * 1.16.2 would still pass the list above by matching the ellipsis row.
