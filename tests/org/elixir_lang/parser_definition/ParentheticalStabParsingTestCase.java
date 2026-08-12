@@ -5,6 +5,24 @@ public class ParentheticalStabParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
+    /**
+     * A solitary `not`/`!` is wrapped in `__block__` in every block position below Elixir 1.15.0 and
+     * only inside parentheses from 1.15.0, so which of these get a wrapper is version-dependent.
+     * Quoting is compared against the reference quoter for the Elixir the leg runs, so these assert
+     * whichever answer is right there rather than pinning one of the two.
+     */
+    public void testParensNot() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testSolitaryNotAcrossPositions() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testSolitaryNotInParentheses() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     public void testEmptyParenthesesStab() {
         assertParsedAndQuotedCorrectly();
     }
