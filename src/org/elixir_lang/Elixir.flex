@@ -140,8 +140,14 @@ CLOSING_CURLY = "}"
  */
 
 FOUR_TOKEN_BITSTRING_OPERATOR = "<<>>"
+/* Only ever reached as an operator atom, `:..//`, because {OPERATOR} is used in exactly one rule -
+   the <ATOM_START> one that returns ATOM_FRAGMENT.  A stepped range in expression position is still
+   {RANGE_OPERATOR} and {TERNARY_OPERATOR} separately, as `1..10//2` never puts the four characters
+   next to each other.  Elixir accepts `:..//` but rejects `://`, so this is one operator and not two. */
+FOUR_TOKEN_STEPPED_RANGE_OPERATOR = "..//"
 FOUR_TOKEN_WHEN_OPERATOR = "when"
 FOUR_TOKEN_OPERATOR = {FOUR_TOKEN_BITSTRING_OPERATOR} |
+                      {FOUR_TOKEN_STEPPED_RANGE_OPERATOR} |
                       {FOUR_TOKEN_WHEN_OPERATOR}
 
 THREE_TOKEN_AND_SYMBOL_OPERATOR = "&&&"
