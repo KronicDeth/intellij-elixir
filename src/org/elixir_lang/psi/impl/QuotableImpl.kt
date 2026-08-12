@@ -1458,6 +1458,7 @@ object QuotableImpl {
     fun quote(@Suppress("UNUSED_PARAMETER") emptyParentheses: ElixirEmptyParentheses): OtpErlangObject =
          emptyBlock()
 
+    @RequiresReadLock
     @JvmStatic
     fun quote(file: ElixirFile): OtpErlangObject {
         val quotedChildren = LinkedList<OtpErlangObject>()
@@ -1482,7 +1483,10 @@ object QuotableImpl {
         )
 
         // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L76-L79
-        return toBlock(quotedChildren, rearrangesUnaryOperators(file))
+        // See QuotingDialect.V1_20.
+        val emptyMetadata =
+            if (dialectFor(file).emitsLineMetadataOnBlock) metadata(file) else OtpErlangList()
+        return toBlock(quotedChildren, rearrangesUnaryOperators(file), emptyMetadata)
     }
 
     @Contract(pure = true)
@@ -1960,10 +1964,11 @@ object QuotableImpl {
     @Contract(pure = true)
     private fun toBlock(
         quotedChildren: List<OtpErlangObject>,
-        rearrangeUnaryOperators: Boolean
+        rearrangeUnaryOperators: Boolean,
+        emptyMetadata: OtpErlangList = OtpErlangList()
     ): OtpErlangObject =
             when (quotedChildren.size) {
-                0 -> emptyBlock()
+                0 -> otpErlangTuple(BLOCK, emptyMetadata, OtpErlangList())
                 1 -> buildBlock(quotedChildren, OtpErlangList(), rearrangeUnaryOperators)
                 else -> blockFunctionCall(quotedChildren, OtpErlangList())
             }

@@ -83,7 +83,19 @@ enum class QuotingDialect {
      *
      * Read via [quotesAmbiguousDualOperatorAsCall].
      */
-    V1_17;
+    V1_17,
+
+    /**
+     * Elixir 1.20.0 added `line` metadata to two `__block__` forms that previously carried none: a
+     * `do:` block's value now carries the line of its own `do` token
+     * (elixir-lang/elixir 90e1826c7), and a 0-byte file's implicit top-level block now carries
+     * `line: 1` (elixir-lang/elixir 7da1b76b6). Both first released in v1.20.0-rc.0. Only `line` is
+     * added, not `column` - the rest of each commit is gated behind `?columns()`/`?token_metadata()`,
+     * which neither this plugin nor its reference quoter enables.
+     *
+     * Read via [emitsLineMetadataOnBlock].
+     */
+    V1_20;
 
     /** `[1, 2][0]` and friends - the `bracket_expr -> access_expr bracket_arg` production. */
     val emitsFromBracketsOnBracketedExpression: Boolean get() = this >= V1_15
@@ -127,6 +139,12 @@ enum class QuotingDialect {
      */
     val quotesAmbiguousDualOperatorAsCall: Boolean get() = this >= V1_17
 
+    /**
+     * Whether a `do:` block's `__block__` (and an empty file's implicit top-level `__block__`)
+     * carries `line` metadata instead of `[]`.
+     */
+    val emitsLineMetadataOnBlock: Boolean get() = this >= V1_20
+
     companion object {
         /**
          * The dialect to assume when the Elixir version behind an element cannot be determined - no
@@ -159,6 +177,7 @@ enum class QuotingDialect {
             val numbers = Triple(major.toInt(), minor.toInt(), patch.ifEmpty { "0" }.toInt())
 
             return when {
+                numbers >= Triple(1, 20, 0) -> V1_20
                 numbers >= Triple(1, 17, 0) -> V1_17
                 numbers >= Triple(1, 16, 2) -> V1_16_2
                 numbers >= Triple(1, 16, 0) -> V1_16_0

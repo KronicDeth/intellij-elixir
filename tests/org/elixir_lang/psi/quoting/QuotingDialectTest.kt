@@ -48,11 +48,18 @@ class QuotingDialectTest {
     }
 
     @Test
+    fun `do-block and empty-file blocks gain line metadata at 1_20_0`() {
+        assertEquals(QuotingDialect.V1_17, QuotingDialect.of("1.19.5"))
+        assertEquals(QuotingDialect.V1_20, QuotingDialect.of("1.20.0"))
+        assertEquals(QuotingDialect.V1_20, QuotingDialect.of("1.20.2"))
+    }
+
+    @Test
     fun `versions after the newest threshold resolve to it`() {
         assertEquals(QuotingDialect.V1_17, QuotingDialect.of("1.18.4"))
         assertEquals(QuotingDialect.V1_17, QuotingDialect.of("1.19.5"))
-        assertEquals(QuotingDialect.V1_17, QuotingDialect.of("1.20.3"))
-        assertEquals(QuotingDialect.V1_17, QuotingDialect.of("2.0.0"))
+        assertEquals(QuotingDialect.V1_20, QuotingDialect.of("1.20.3"))
+        assertEquals(QuotingDialect.V1_20, QuotingDialect.of("2.0.0"))
     }
 
     /** Minor is compared numerically, so 1.9 must not sort above 1.15 the way strings would. */
@@ -110,24 +117,28 @@ class QuotingDialectTest {
     @Test
     fun `each divergence is on from its own threshold and stays on`() {
         assertEquals(
-            listOf(false, true, true, true, true),
+            listOf(false, true, true, true, true, true),
             QuotingDialect.entries.map { it.emitsFromBracketsOnBracketedExpression }
         )
         assertEquals(
-            listOf(false, false, true, true, true),
+            listOf(false, false, true, true, true, true),
             QuotingDialect.entries.map { it.emitsFromInterpolation }
         )
         assertEquals(
-            listOf(false, false, false, true, true),
+            listOf(false, false, false, true, true, true),
             QuotingDialect.entries.map { it.emitsFromBracketsOnEveryBracketForm }
         )
         assertEquals(
-            listOf(false, false, false, false, true),
+            listOf(false, false, false, false, true, true),
             QuotingDialect.entries.map { it.quotesEllipsisAsNullaryCall }
         )
         assertEquals(
-            listOf(false, false, false, false, true),
+            listOf(false, false, false, false, true, true),
             QuotingDialect.entries.map { it.quotesAmbiguousDualOperatorAsCall }
+        )
+        assertEquals(
+            listOf(false, false, false, false, false, true),
+            QuotingDialect.entries.map { it.emitsLineMetadataOnBlock }
         )
     }
 
@@ -152,7 +163,7 @@ class QuotingDialectTest {
     @Test
     fun `the unary block wrapper is on only below 1_15`() {
         assertEquals(
-            listOf(true, false, false, false, false),
+            listOf(true, false, false, false, false, false),
             QuotingDialect.entries.map { it.wrapsSolitaryUnaryNotInEveryBlock }
         )
         assertEquals(true, QuotingDialect.of("1.14.5").wrapsSolitaryUnaryNotInEveryBlock)
