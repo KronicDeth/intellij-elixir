@@ -14,6 +14,7 @@ import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiPolyVariantReference;
 import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.PsiScopeProcessor;
+import com.intellij.util.concurrency.annotations.RequiresReadLock;
 
 public class ElixirUnmatchedQualifiedAliasImpl extends ElixirUnmatchedExpressionImpl implements ElixirUnmatchedQualifiedAlias {
 
@@ -56,6 +57,7 @@ public class ElixirUnmatchedQualifiedAliasImpl extends ElixirUnmatchedExpression
   }
 
   @Override
+  @RequiresReadLock
   public @NotNull String getName() {
     return ElixirPsiImplUtil.getName(this);
   }

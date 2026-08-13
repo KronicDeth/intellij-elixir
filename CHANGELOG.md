@@ -6,13 +6,32 @@
 
 ### Enhancements
 
+- [#3914](https://github.com/KronicDeth/intellij-elixir/issues/3914) [@sh41](https://github.com/sh41)
+  - **Parsing/Lexing of Elixir 1.13.4 through 1.20.2 is now fully supported**
+
 ### Bug Fixes
+
+- [#3914](https://github.com/KronicDeth/intellij-elixir/issues/3914) [@sh41](https://github.com/sh41)
+  - **A capture argument keeps its Elixir 1.15+ meaning when reformatted.** `&1` is one argument, but
+    `& 1` is `&` applied to `1` from Elixir 1.15.0 on - a change to a whole expression's meaning, not a
+    style choice. Reformat Code no longer inserts that space, so `&(&1 + &2)` cannot silently become
+    `&(&(1 + &2))`.
+  - **`&1` and `& 1` parse the way the project's own Elixir version parses them,** rather than always
+    the way Elixir versions before 1.15.0 do. A spaced capture argument now binds the rest of the
+    expression on 1.15+ and stays one argument below it, matching each Elixir's own tokenizer.
+  - **The stepped range operator now parses as an atom, `:..//`,** instead of splitting into the atom
+    `:..` and a stranded `//` that Elixir's own tokenizer never leaves stranded.
+  - **Opening some decompiled `.beam` files no longer shows a spurious parse error.** A `cond`/`case`/
+    `receive` clause whose condition renders as a `do...end` block - as `Mix.Project`, `Mix.Release`
+    and `Mix.Task` in Elixir 1.20 all do, from compiling `&&`/`||` - needs parentheses before its own
+    `->`, the same rule already applied to a binary operator's left operand; the decompiler was missing
+    it for clause conditions.
 
 ### Threading / Platform Hygiene
 
 ### Build / CI
 
-- [@sh41](https://github.com/sh41)
+- [#3913](https://github.com/KronicDeth/intellij-elixir/issues/3913) [@sh41](https://github.com/sh41)
   - **Quoting now follows the Elixir version behind the file instead of emitting one shape for every
     version.** Elixir's quoted form changes between releases, so a single answer was wrong everywhere
     but one version, and each fix for a newer Elixir was a regression on an older one. A quoting

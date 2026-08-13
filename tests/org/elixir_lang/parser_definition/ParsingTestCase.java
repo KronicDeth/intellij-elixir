@@ -68,6 +68,27 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
         assertQuotedCorrectly();
     }
 
+    /**
+     * For a construct the parser accepts in every version, but that the reference quoter started
+     * rejecting as invalid Elixir from {@code dialect} on - so only one side of the boundary can be
+     * asserted per run, chosen by the dialect the leg's real Elixir resolves to (set in
+     * {@link #setUp()}), not by which Elixir wrote the test.
+     */
+    protected void assertParsedAndQuotedCorrectlyBefore(QuotingDialect dialect) {
+        assertParsedAndQuotedCorrectlyBefore(dialect, true);
+    }
+
+    protected void assertParsedAndQuotedCorrectlyBefore(QuotingDialect dialect, boolean checkResult) {
+        doTest(checkResult);
+
+        if (QuotingDialectResolver.dialectFor(myFile).compareTo(dialect) >= 0) {
+            assertQuotedAroundError();
+        } else {
+            assertWithoutLocalError();
+            assertQuotedCorrectly();
+        }
+    }
+
     protected void assertParsedWithErrors() {
         assertParsedWithErrors(true);
     }

@@ -28,14 +28,30 @@ import java.io.FileInputStream
 class BeamTest : PlatformTestCase() {
 
     /*
-     * Specific tests against frozen fixtures (one per Elixir version).
+     * Specific tests against frozen fixtures. Both halves of the directory name are load-bearing, for
+     * different reasons, which is why it names a pair rather than either version alone:
+     *
+     *  - **OTP major** decides the *format*, and so which parser branch is exercised. The two
+     *    directories differ on exactly the two OTP-24-vs-28 chunk changes, hitting both sentinel
+     *    branches: a compressed `LitT` versus a zero-size sentinel, and `AtU8`. The major, not the patch
+     *    - the format does not move within a major, and naming the patch would force a rename on every
+     *    OTP bump.
+     *  - **Elixir version** decides the asserted *content*. `extract/6` and `extract/8` below come from
+     *    `lib/elixir/src/elixir_interpolation.erl` - Elixir's own source, merely compiled by the paired
+     *    OTP's `erlc`. Those arities agree across 1.13.4 and 1.19.5, so the dependency is latent today,
+     *    but a regenerated fixture from an Elixir that moved them would fail here with nothing in the
+     *    name to say what it needed.
+     *
+     * So the name is *provenance* - what produced these bytes - not a coordinate in the CI matrix. It
+     * does not go stale when `ci-versions.json` re-pairs an Elixir with a different OTP, which is
+     * exactly what the old Elixir-only names did.
      */
 
-    fun testElixirKernel_1_13_4() = assertElixirKernel(fixtureDir("1.13.4"))
-    fun testElixirKernel_1_19_5() = assertElixirKernel(fixtureDir("1.19.5"))
+    fun testElixirKernel_otp_24() = assertElixirKernel(fixtureDir("elixir-1.13.4-otp-24"))
+    fun testElixirKernel_otp_28() = assertElixirKernel(fixtureDir("elixir-1.19.5-otp-28"))
 
-    fun testElixirInterpolation_1_13_4() = assertElixirInterpolation(fixtureDir("1.13.4"))
-    fun testElixirInterpolation_1_19_5() = assertElixirInterpolation(fixtureDir("1.19.5"))
+    fun testElixirInterpolation_otp_24() = assertElixirInterpolation(fixtureDir("elixir-1.13.4-otp-24"))
+    fun testElixirInterpolation_otp_28() = assertElixirInterpolation(fixtureDir("elixir-1.19.5-otp-28"))
 
     private fun assertElixirKernel(ebinDirectory: File) {
         val beam = beamIn(ebinDirectory, "Elixir.Kernel")
@@ -88,8 +104,17 @@ class BeamTest : PlatformTestCase() {
      * Helpers. (The exhaustive per-beam sweep over the resolved SDKs lives in SdkBeamParseTest.)
      */
 
-    private fun fixtureDir(version: String): File =
-        File("testData/org/elixir_lang/beam/parser/$version")
+    /**
+     * A frozen-fixture directory, named `elixir-<elixir>-otp-<otpMajor>` after the pair that produced it.
+     *
+     * The OTP segment is the **major only**, deliberately unlike `sdk.pairToken`'s
+     * `elixir-<elixir>-otp-<fullOtpVersion>`, so do not "align" the two: the chunk format changes on the
+     * major, and carrying the patch would force a rename on every OTP bump. That is what made the old
+     * Elixir-only names go stale when 1.19.5 moved from OTP 28.1 to 28.4 - they were a matrix coordinate,
+     * and the matrix moved.
+     */
+    private fun fixtureDir(pair: String): File =
+        File("testData/org/elixir_lang/beam/parser/$pair")
 
     private fun beamIn(ebinDirectory: File, baseName: String): Beam? =
         DataInputStream(BufferedInputStream(FileInputStream(File(ebinDirectory, "$baseName.beam"))))

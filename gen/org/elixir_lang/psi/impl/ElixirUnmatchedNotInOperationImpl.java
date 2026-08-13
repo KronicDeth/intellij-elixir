@@ -12,6 +12,7 @@ import org.elixir_lang.psi.*;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.PsiScopeProcessor;
+import com.intellij.util.concurrency.annotations.RequiresReadLock;
 
 public class ElixirUnmatchedNotInOperationImpl extends ElixirUnmatchedExpressionImpl implements ElixirUnmatchedNotInOperation {
 
@@ -49,6 +50,7 @@ public class ElixirUnmatchedNotInOperationImpl extends ElixirUnmatchedExpression
   }
 
   @Override
+  @RequiresReadLock
   public @Nullable String functionName() {
     return ElixirPsiImplUtil.functionName(this);
   }
@@ -64,26 +66,31 @@ public class ElixirUnmatchedNotInOperationImpl extends ElixirUnmatchedExpression
   }
 
   @Override
+  @RequiresReadLock
   public boolean hasDoBlockOrKeyword() {
     return ElixirPsiImplUtil.hasDoBlockOrKeyword(this);
   }
 
   @Override
+  @RequiresReadLock
   public boolean isCalling(@NotNull String resolvedModuleName, @NotNull String functionName) {
     return ElixirPsiImplUtil.isCalling(this, resolvedModuleName, functionName);
   }
 
   @Override
+  @RequiresReadLock
   public boolean isCalling(@NotNull String resolvedModuleName, @NotNull String functionName, int resolvedFinalArity) {
     return ElixirPsiImplUtil.isCalling(this, resolvedModuleName, functionName, resolvedFinalArity);
   }
 
   @Override
+  @RequiresReadLock
   public boolean isCallingMacro(@NotNull String resolvedModuleName, @NotNull String functionName) {
     return ElixirPsiImplUtil.isCallingMacro(this, resolvedModuleName, functionName);
   }
 
   @Override
+  @RequiresReadLock
   public boolean isCallingMacro(@NotNull String resolvedModuleName, @NotNull String functionName, int resolvedFinalArity) {
     return ElixirPsiImplUtil.isCallingMacro(this, resolvedModuleName, functionName, resolvedFinalArity);
   }
@@ -99,16 +106,19 @@ public class ElixirUnmatchedNotInOperationImpl extends ElixirUnmatchedExpression
   }
 
   @Override
+  @RequiresReadLock
   public @NotNull PsiElement[] primaryArguments() {
     return ElixirPsiImplUtil.primaryArguments(this);
   }
 
   @Override
+  @RequiresReadLock
   public @Nullable Integer primaryArity() {
     return ElixirPsiImplUtil.primaryArity(this);
   }
 
   @Override
+  @RequiresReadLock
   public boolean processDeclarations(@NotNull PsiScopeProcessor processor, @NotNull ResolveState state, PsiElement lastParent, @NotNull PsiElement place) {
     return ElixirPsiImplUtil.processDeclarations(this, processor, state, lastParent, place);
   }
@@ -119,11 +129,13 @@ public class ElixirUnmatchedNotInOperationImpl extends ElixirUnmatchedExpression
   }
 
   @Override
+  @RequiresReadLock
   public int resolvedFinalArity() {
     return ElixirPsiImplUtil.resolvedFinalArity(this);
   }
 
   @Override
+  @RequiresReadLock
   public @NotNull ArityInterval resolvedFinalArityInterval() {
     return ElixirPsiImplUtil.resolvedFinalArityInterval(this);
   }
@@ -134,11 +146,13 @@ public class ElixirUnmatchedNotInOperationImpl extends ElixirUnmatchedExpression
   }
 
   @Override
+  @RequiresReadLock
   public @Nullable Integer resolvedPrimaryArity() {
     return ElixirPsiImplUtil.resolvedPrimaryArity(this);
   }
 
   @Override
+  @RequiresReadLock
   public @Nullable Integer resolvedSecondaryArity() {
     return ElixirPsiImplUtil.resolvedSecondaryArity(this);
   }
@@ -154,6 +168,7 @@ public class ElixirUnmatchedNotInOperationImpl extends ElixirUnmatchedExpression
   }
 
   @Override
+  @RequiresReadLock
   public @Nullable Integer secondaryArity() {
     return ElixirPsiImplUtil.secondaryArity(this);
   }

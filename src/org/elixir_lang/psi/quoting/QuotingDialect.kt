@@ -82,8 +82,39 @@ enum class QuotingDialect {
      * ("Fix parsing of ambiguous operators followed by containers"), first released in v1.17.0.
      *
      * Read via [quotesAmbiguousDualOperatorAsCall].
+     *
+     * 1.17.0 also stopped a parenthesised expression from picking up metadata from parentheses that
+     * merely nest around it. Below 1.17.0, `build_paren_stab`'s non-`rearrange_uop` clause ran its
+     * body through `build_stab/1` and, whenever that returned a `__block__` (from a solitary
+     * `not`/`!` already rearranged by an inner paren, `unquote_splicing`, or several expressions),
+     * appended this layer's own `line` to its metadata: `Meta ++ meta_from_token_with_closing(...)`.
+     * Each further layer of plain parentheses around the same `__block__` appended another `line`
+     * entry, so `&(((&1 not in ?0..?9)))` carries `[line: N, line: N]` on that block below 1.17.0 -
+     * one entry per enclosing paren beyond the innermost, not one entry total. From 1.17.0,
+     * `build_paren_stab` calls `build_block/2` directly, whose single-expression clause is
+     * `build_block([Expr], _Meta) -> Expr` - the passed-in metadata is discarded unconditionally, so
+     * enclosing parentheses stop contributing anything and the innermost `__block__`'s own metadata
+     * (empty, for the `rearrange_uop` case) is all that survives.
+     *
+     * Verified against `elixir_parser.yrl` at v1.14.5 (`build_stab/3`), v1.16.3 and v1.17.3
+     * (`build_paren_stab/3`, `build_block/1` and `/2`), and by quoting
+     * `&(((&1 not in ?0..?9)))` with each of 1.16.3 and 1.17.3.
+     *
+     * Read via [mergesEnclosingParenMetadataOntoBlock].
      */
-    V1_17;
+    V1_17,
+
+    /**
+     * Elixir 1.20.0 added `line` metadata to two `__block__` forms that previously carried none: a
+     * `do:` block's value now carries the line of its own `do` token
+     * (elixir-lang/elixir 90e1826c7), and a 0-byte file's implicit top-level block now carries
+     * `line: 1` (elixir-lang/elixir 7da1b76b6). Both first released in v1.20.0-rc.0. Only `line` is
+     * added, not `column` - the rest of each commit is gated behind `?columns()`/`?token_metadata()`,
+     * which neither this plugin nor its reference quoter enables.
+     *
+     * Read via [emitsLineMetadataOnBlock].
+     */
+    V1_20;
 
     /** `[1, 2][0]` and friends - the `bracket_expr -> access_expr bracket_arg` production. */
     val emitsFromBracketsOnBracketedExpression: Boolean get() = this >= V1_15
@@ -93,6 +124,22 @@ enum class QuotingDialect {
      * only inside parentheses. True below [V1_15] - see there for why this one reads downwards.
      */
     val wrapsSolitaryUnaryNotInEveryBlock: Boolean get() = this < V1_15
+
+    /**
+     * Whether `&` must be immediately followed by its digit for the two to be one capture argument.
+     * `&1` always is; `& 1` is too below 1.15.0, but from 1.15.0 it is `&` applied to `1`, which
+     * binds the rest of the expression - so `& & 1 + & 2` is `&((&1) + (&2))` up to 1.14.5 and
+     * `&(&(1 + &2))` from 1.15.0.
+     *
+     * `elixir_parser.yrl`'s `access_expr -> capture_op_eol int` became
+     * `access_expr -> capture_int int`, and `elixir_tokenizer.erl` emits `capture_int` only for an
+     * adjacent digit; the `_eol` token it replaced permitted whitespace. From elixir-lang/elixir
+     * 9fb3cf603 ("Fix ambiguity in &INT with brackets"), first released in v1.15.0.
+     *
+     * Read by the parser rather than the quoter, unlike everything else here: the divergence is in
+     * how the tokens bind, which no reshape of the quoted form can express.
+     */
+    val requiresAdjacentCaptureArgument: Boolean get() = this >= V1_15
 
     /** The `Kernel.to_string/1` call that `"a#{b}c"` quotes to. */
     val emitsFromInterpolation: Boolean get() = this >= V1_16_0
@@ -111,6 +158,20 @@ enum class QuotingDialect {
      */
     val quotesAmbiguousDualOperatorAsCall: Boolean get() = this >= V1_17
 
+    /**
+     * Whether a plain pair of parentheses around an expression that already quotes to a `__block__`
+     * appends its own `line` to that block's metadata, rather than leaving the block's metadata as
+     * the inner parentheses (or expression) produced it. True below [V1_17] - see there for why this
+     * one reads downwards, like [wrapsSolitaryUnaryNotInEveryBlock].
+     */
+    val mergesEnclosingParenMetadataOntoBlock: Boolean get() = this < V1_17
+
+    /**
+     * Whether a `do:` block's `__block__` (and an empty file's implicit top-level `__block__`)
+     * carries `line` metadata instead of `[]`.
+     */
+    val emitsLineMetadataOnBlock: Boolean get() = this >= V1_20
+
     companion object {
         /**
          * The dialect to assume when the Elixir version behind an element cannot be determined - no
@@ -120,6 +181,7 @@ enum class QuotingDialect {
          * wrong-but-modern quoted form is the least surprising default. It is also the direction
          * that ages well, since a new threshold added below shifts the fallback forward with it.
          */
+        @JvmStatic
         val FALLBACK: QuotingDialect = entries.last()
 
         /** Leading `MAJOR.MINOR[.PATCH]`, wherever it sits in the string. */
@@ -142,6 +204,7 @@ enum class QuotingDialect {
             val numbers = Triple(major.toInt(), minor.toInt(), patch.ifEmpty { "0" }.toInt())
 
             return when {
+                numbers >= Triple(1, 20, 0) -> V1_20
                 numbers >= Triple(1, 17, 0) -> V1_17
                 numbers >= Triple(1, 16, 2) -> V1_16_2
                 numbers >= Triple(1, 16, 0) -> V1_16_0

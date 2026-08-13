@@ -8,6 +8,7 @@ import com.intellij.psi.NavigatablePsiElement;
 import com.intellij.psi.PsiNamedElement;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.psi.PsiReference;
+import com.intellij.util.concurrency.annotations.RequiresReadLock;
 
 public interface ElixirAtom extends NavigatablePsiElement, PsiNamedElement, Quotable {
 
@@ -18,6 +19,7 @@ public interface ElixirAtom extends NavigatablePsiElement, PsiNamedElement, Quot
 
   @NotNull OtpErlangObject quote();
 
+  @RequiresReadLock
   @Nullable String getName();
 
   @NotNull PsiElement setName(@NotNull String newName);

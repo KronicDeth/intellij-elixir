@@ -11,6 +11,7 @@ import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.PsiScopeProcessor;
+import com.intellij.util.concurrency.annotations.RequiresReadLock;
 import java.util.Set;
 
 public interface ElixirMatchedQualifiedNoArgumentsCall extends ElixirMatchedExpression, MatchedCall, QualifiedNoArgumentsCall<MatchedQualifiedNoArgumentsCall>, StubBasedPsiElement<MatchedQualifiedNoArgumentsCall> {
@@ -24,22 +25,30 @@ public interface ElixirMatchedQualifiedNoArgumentsCall extends ElixirMatchedExpr
   @NotNull
   ElixirRelativeIdentifier getRelativeIdentifier();
 
+  @RequiresReadLock
   @Nullable String canonicalName();
 
+  @RequiresReadLock
   @NotNull Set<String> canonicalNameSet();
 
+  @RequiresReadLock
   @Nullable String functionName();
 
+  @RequiresReadLock
   @NotNull PsiElement functionNameElement();
 
   @Nullable ElixirDoBlock getDoBlock();
 
+  @RequiresReadLock
   boolean hasDoBlockOrKeyword();
 
+  @RequiresReadLock
   @Nullable String getName();
 
+  @RequiresReadLock
   @Nullable PsiElement getNameIdentifier();
 
+  @RequiresReadLock
   @NotNull ItemPresentation getPresentation();
 
   @Nullable PsiReference getReference();
@@ -52,40 +61,54 @@ public interface ElixirMatchedQualifiedNoArgumentsCall extends ElixirMatchedExpr
   //matching getUseScope(ElixirMatchedQualifiedNoArgumentsCall, ...)
   //methods are not found in ElixirPsiImplUtil
 
+  @RequiresReadLock
   @Nullable String implementedProtocolName();
 
+  @RequiresReadLock
   boolean isCalling(@NotNull String resolvedModuleName, @NotNull String functionName);
 
+  @RequiresReadLock
   boolean isCalling(@NotNull String resolvedModuleName, @NotNull String functionName, int resolvedFinalArity);
 
+  @RequiresReadLock
   boolean isCallingMacro(@NotNull String resolvedModuleName, @NotNull String functionName);
 
+  @RequiresReadLock
   boolean isCallingMacro(@NotNull String resolvedModuleName, @NotNull String functionName, int resolvedFinalArity);
 
+  @RequiresReadLock
   @NotNull String moduleName();
 
   @Nullable PsiElement[] primaryArguments();
 
+  @RequiresReadLock
   @Nullable Integer primaryArity();
 
+  @RequiresReadLock
   boolean processDeclarations(@NotNull PsiScopeProcessor processor, @NotNull ResolveState state, PsiElement lastParent, @NotNull PsiElement place);
 
   @NotNull PsiElement qualifier();
 
   @NotNull OtpErlangObject quote();
 
+  @RequiresReadLock
   int resolvedFinalArity();
 
+  @RequiresReadLock
   @NotNull ArityInterval resolvedFinalArityInterval();
 
+  @RequiresReadLock
   @NotNull String resolvedModuleName();
 
+  @RequiresReadLock
   @Nullable Integer resolvedPrimaryArity();
 
+  @RequiresReadLock
   @Nullable Integer resolvedSecondaryArity();
 
   @Nullable PsiElement[] secondaryArguments();
 
+  @RequiresReadLock
   @Nullable Integer secondaryArity();
 
   @NotNull PsiElement setName(@NotNull String newName);

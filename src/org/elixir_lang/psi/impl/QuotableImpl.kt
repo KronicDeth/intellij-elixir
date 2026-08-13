@@ -64,7 +64,8 @@ fun ElixirStabBody.quote(metadata: OtpErlangList): OtpErlangObject =
                     QuotableImpl.buildBlock(
                         it.toList(),
                         metadata,
-                        QuotableImpl.rearrangesUnaryOperators(this)
+                        QuotableImpl.rearrangesUnaryOperators(this),
+                        QuotableImpl.mergesEnclosingParenMetadataOntoBlock(this)
                     )
                 }
 
@@ -1120,6 +1121,16 @@ object QuotableImpl {
         Macro.isLocalCall(quoted) &&
                 (quoted as OtpErlangTuple).elementAt(0) in REARRANGED_UNARY_OPERATORS
 
+    /** [block]'s own metadata with [extra] appended, as `Meta ++ meta_from_token_with_closing(...)` does. */
+    private fun appendMetadata(block: OtpErlangTuple, extra: OtpErlangList): OtpErlangTuple =
+        OtpErlangTuple(
+            arrayOf(
+                block.elementAt(0),
+                otpErlangList((block.elementAt(1) as OtpErlangList).elements().toList() + extra.elements()),
+                block.elementAt(2)
+            )
+        )
+
     private fun emptyMetadata(parentheticalStab: ElixirParentheticalStab): OtpErlangList = metadata(parentheticalStab)
 
     /* @note quotedFunctionCall cannot be used here because in the 3-tuple for function calls, the elements are
@@ -1458,6 +1469,7 @@ object QuotableImpl {
     fun quote(@Suppress("UNUSED_PARAMETER") emptyParentheses: ElixirEmptyParentheses): OtpErlangObject =
          emptyBlock()
 
+    @RequiresReadLock
     @JvmStatic
     fun quote(file: ElixirFile): OtpErlangObject {
         val quotedChildren = LinkedList<OtpErlangObject>()
@@ -1482,7 +1494,10 @@ object QuotableImpl {
         )
 
         // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L76-L79
-        return toBlock(quotedChildren, rearrangesUnaryOperators(file))
+        // See QuotingDialect.V1_20.
+        val emptyMetadata =
+            if (dialectFor(file).emitsLineMetadataOnBlock) metadata(file) else OtpErlangList()
+        return toBlock(quotedChildren, rearrangesUnaryOperators(file), emptyMetadata)
     }
 
     @Contract(pure = true)
@@ -1960,11 +1975,15 @@ object QuotableImpl {
     @Contract(pure = true)
     private fun toBlock(
         quotedChildren: List<OtpErlangObject>,
-        rearrangeUnaryOperators: Boolean
+        rearrangeUnaryOperators: Boolean,
+        emptyMetadata: OtpErlangList = OtpErlangList()
     ): OtpErlangObject =
             when (quotedChildren.size) {
-                0 -> emptyBlock()
-                1 -> buildBlock(quotedChildren, OtpErlangList(), rearrangeUnaryOperators)
+                0 -> otpErlangTuple(BLOCK, emptyMetadata, OtpErlangList())
+                // A file's own metadata never reaches a single- or multi-expression body (only an
+                // empty one, above) - see quote(ElixirFile) - so there is nothing here for the merge
+                // below to accumulate; pass `false` rather than resolving a dialect for nothing.
+                1 -> buildBlock(quotedChildren, OtpErlangList(), rearrangeUnaryOperators, false)
                 else -> blockFunctionCall(quotedChildren, OtpErlangList())
             }
 
@@ -1978,6 +1997,21 @@ object QuotableImpl {
     @RequiresReadLock
     internal fun rearrangesUnaryOperators(element: PsiElement?): Boolean =
         (element?.let(::dialectFor) ?: QuotingDialect.FALLBACK).wrapsSolitaryUnaryNotInEveryBlock
+
+    /**
+     * Whether a solitary expression that already quotes to a `__block__` - from a nested
+     * parenthetical stab's own `rearrange_uop` wrap, `unquote_splicing`, or several expressions -
+     * picks up [element]'s own metadata too, rather than being passed through unchanged.
+     *
+     * Only [quote] for [ElixirParentheticalStab] ever calls [buildBlock] with non-empty metadata for
+     * a single-expression body - a file's is always empty (see [toBlock]) and a do-block's own
+     * metadata exists only from [QuotingDialect.V1_20], where this predicate is already `false` - so
+     * gating on it here is exactly the parenthetical-stab case `build_paren_stab` gates on, without
+     * needing to know the caller.
+     */
+    @RequiresReadLock
+    internal fun mergesEnclosingParenMetadataOntoBlock(element: PsiElement?): Boolean =
+        (element?.let(::dialectFor) ?: QuotingDialect.FALLBACK).mergesEnclosingParenMetadataOntoBlock
 
     private fun emptyBlock() =
              otpErlangTuple(
@@ -2002,7 +2036,8 @@ object QuotableImpl {
     internal fun buildBlock(
         quotedChildren: List<OtpErlangObject>,
         metadata: OtpErlangList,
-        rearrangeUnaryOperators: Boolean
+        rearrangeUnaryOperators: Boolean,
+        mergesEnclosingParenMetadataOntoBlock: Boolean = false
     ): OtpErlangObject =
             when (quotedChildren.size) {
                 0 -> NIL
@@ -2023,6 +2058,18 @@ object QuotableImpl {
                                 }
                             UNQUOTE_SPLICING ->
                                 blockFunctionCall(quotedChildren, metadata)
+                            // The sole child is already a `__block__` - typically a nested
+                            // parenthetical stab that rearranged a `not`/`!`, spliced an
+                            // `unquote_splicing`, or held several expressions itself. Below 1.17.0,
+                            // this level's own metadata is appended to what is already there rather
+                            // than discarded, so parentheses nested around the same block each add
+                            // one more entry - see QuotingDialect.V1_17.
+                            BLOCK ->
+                                if (mergesEnclosingParenMetadataOntoBlock) {
+                                    appendMetadata(quotedChild, metadata)
+                                } else {
+                                    quotedChild
+                                }
                             else ->
                                 quotedChild
                         }

@@ -42,6 +42,7 @@ object QuotingDialectResolver {
      * constructs in the file rather than by its size.
      */
     @RequiresReadLock
+    @JvmStatic
     fun dialectFor(element: PsiElement): QuotingDialect {
         // Before the read-access assertion below, and before touching the module model: an override
         // needs neither, which is what lets the parser tests - light fixtures with a mock project

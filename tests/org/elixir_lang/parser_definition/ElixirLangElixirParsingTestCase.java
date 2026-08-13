@@ -28,8 +28,17 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
         assertParsed("lib/eex/lib/eex/smart_engine.ex");
     }
 
+    /**
+     * Frozen because Elixir <b>deleted</b> this file in 1.14: EEx tokenization moved into
+     * {@code EEx.Compiler}, so {@code lib/eex/lib/eex/tokenizer.ex} exists in 1.13.4 and in no release
+     * after it. Read live, this failed with {@code FileNotFoundException} on every leg above 1.13.4 -
+     * eight of the nine declared pairs - while saying nothing about the parser.
+     *
+     * <p>The frozen copy is 1.13.4's. It is still a real 244-line Elixir file exercising real
+     * constructs, so the coverage is kept rather than deleted with the upstream file.
+     */
     public void testEexTokenizer() {
-        assertParsed("lib/eex/lib/eex/tokenizer.ex");
+        assertParsedFrozenFixture("lib/eex/lib/eex/tokenizer.ex");
     }
 
     public void testAccess() {
@@ -204,8 +213,9 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
         assertParsed("lib/elixir/lib/module.ex");
     }
 
+    /** Frozen: Elixir deleted this in 1.18. Copy is 1.17.3's, the last release to ship it. */
     public void testModuleLocalsTracker() {
-        assertParsed("lib/elixir/lib/module/locals_tracker.ex");
+        assertParsedFrozenFixture("lib/elixir/lib/module/locals_tracker.ex");
     }
 
     public void testNode() {
@@ -388,8 +398,9 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
         assertParsed("lib/iex/lib/iex/app.ex");
     }
 
+    /** Frozen: Elixir deleted this in 1.19. Copy is 1.18.4's, the last release to ship it. */
     public void testIexCli() {
-        assertParsed("lib/iex/lib/iex/cli.ex");
+        assertParsedFrozenFixture("lib/iex/lib/iex/cli.ex");
     }
 
     public void testIexConfig() {
@@ -424,8 +435,9 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
         assertParsed("lib/logger/lib/logger/backends/console.ex");
     }
 
+    /** Frozen: Elixir deleted this in 1.15. Present in 1.13.4 and 1.14.5, absent from 1.15.8 on. */
     public void testLoggerConfig() {
-        assertParsed("lib/logger/lib/logger/config.ex");
+        assertParsedFrozenFixture("lib/logger/lib/logger/config.ex");
     }
 
     public void testLoggerFormatter() {
@@ -440,8 +452,9 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
         assertParsed("lib/logger/lib/logger/utils.ex");
     }
 
+    /** Frozen: Elixir deleted this in 1.15. Present in 1.13.4 and 1.14.5, absent from 1.15.8 on. */
     public void testLoggerWatcher() {
-        assertParsed("lib/logger/lib/logger/watcher.ex");
+        assertParsedFrozenFixture("lib/logger/lib/logger/watcher.ex");
     }
 
     public void testMix() {
@@ -504,8 +517,9 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
         assertParsed("lib/mix/lib/mix/rebar.ex");
     }
 
+    /** Frozen: Elixir deleted this in 1.15. Present in 1.13.4 and 1.14.5, absent from 1.15.8 on. */
     public void testMixPublicKey() {
-        assertParsed("lib/mix/lib/mix/public_key.ex");
+        assertParsedFrozenFixture("lib/mix/lib/mix/public_key.ex");
     }
 
     public void testMixRemoteConverger() {
@@ -652,8 +666,9 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
         assertParsed("lib/mix/lib/mix/tasks/local.hex.ex");
     }
 
+    /** Frozen: Elixir deleted this in 1.19. Copy is 1.18.4's, the last release to ship it. */
     public void testMixTasksLocalPublicKeys() {
-        assertParsed("lib/mix/lib/mix/tasks/local.public_keys.ex");
+        assertParsedFrozenFixture("lib/mix/lib/mix/tasks/local.public_keys.ex");
     }
 
     public void testMixTasksLocalRebar() {

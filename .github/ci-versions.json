@@ -49,13 +49,13 @@
     "baseline": { "elixir": "1.13.4", "otp": "24.3.4.6" },
     "additional": [
       { "elixir": "1.13.4", "otp": "25.3.2.21" },
-      { "elixir": "1.14.5", "otp": "26.2.5.21", "continue-on-error": true },
-      { "elixir": "1.15.8", "otp": "26.2.5.21", "continue-on-error": true },
-      { "elixir": "1.16.3", "otp": "26.2.5.21", "continue-on-error": true },
-      { "elixir": "1.17.3", "otp": "27.1.2", "continue-on-error": true },
-      { "elixir": "1.18.4", "otp": "27.3.4", "continue-on-error": true },
-      { "elixir": "1.19.5", "otp": "28.4", "continue-on-error": true },
-      { "elixir": "1.20.2", "otp": "29.0", "continue-on-error": true }
+      { "elixir": "1.14.5", "otp": "26.2.5.21" },
+      { "elixir": "1.15.8", "otp": "26.2.5.21" },
+      { "elixir": "1.16.3", "otp": "26.2.5.21" },
+      { "elixir": "1.17.3", "otp": "27.1.2" },
+      { "elixir": "1.18.4", "otp": "27.3.4" },
+      { "elixir": "1.19.5", "otp": "28.4" },
+      { "elixir": "1.20.2", "otp": "29.0" }
     ]
   }
 }
