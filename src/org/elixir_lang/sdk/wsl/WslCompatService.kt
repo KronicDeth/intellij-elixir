@@ -7,7 +7,10 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.util.system.OS
 import org.jetbrains.annotations.VisibleForTesting
+import java.io.IOException
+import java.nio.file.InvalidPathException
 import java.nio.file.Paths
+import java.util.concurrent.CancellationException
 import kotlin.io.path.absolutePathString
 
 const val MODERN_WSL_PREFIX = "\\\\wsl.localhost\\"
@@ -74,19 +77,37 @@ interface WslCompatService {
      *  use a symlink of `latest` -> `1.19.1` or `1.19` -> `1.19.1`. It also helps to keep a standard WSL prefix for
      *  things like class paths in SDK data avoiding having a mix of //wsl$/distro and //wsl.localhost/distro paths.
      *
+     *  Performs filesystem I/O (boots WSL distros for `\\wsl.localhost` paths). Never call under
+     *  a read or write lock, and never in a loop over the SDK table - use [pathsEqualWslAware]
+     *  for comparison.
+     *
      * @param path the path to canonicalize
      * @return the canonicalized path,
      */
     fun canonicalizePath(path: String): String {
+        // Must stay outside the try/catch below: moving it inside would let an unresolvable-path
+        // fallback silently swallow a genuine read-lock violation.
+        check(!ApplicationManager.getApplication().holdsReadLock()) {
+            "canonicalizePath() resolves symlinks and must not be called under a read lock - " +
+                "filesystem I/O on a \\\\wsl.localhost path boots the WSL distro and can block indefinitely"
+        }
         val maybeConvertedPath = path.canonicalizeWslPrefix()
+        // toRealPath can fail for reasons other than IOException - a dead IJent bridge can surface
+        // as e.g. ClassNotFoundException when the ijent module isn't fully wired up. Any such
+        // failure means the path can't be resolved, which is valid input: fall back lexically.
+        // Cancellation is not a resolution failure: ProcessCanceledException extends
+        // CancellationException, and both must reach the platform's cancellation machinery.
         return try {
             toRealPath(maybeConvertedPath)
+        } catch (e: CancellationException) {
+            throw e
         } catch (_: Exception) {
             maybeConvertedPath
         }
     }
 
     @VisibleForTesting
+    @Throws(IOException::class, InvalidPathException::class)
     fun toRealPath(myPath: String) = Paths.get(myPath).toRealPath().absolutePathString()
 
     /**
@@ -130,15 +151,28 @@ interface WslCompatService {
         this
 
     /**
-     * Compares two SDK home paths, normalizing WSL UNC paths before comparison.
+     * Pure lexical normalization for path comparison: WSL UNC prefix rewrite
+     * ([canonicalizeWslPrefix]) plus system-independent separators. Performs NO filesystem
+     * access - safe to call under any lock.
+     */
+    fun normalizeForComparison(path: String): String =
+        FileUtil.toSystemIndependentName(path.canonicalizeWslPrefix())
+
+    /**
+     * Compares two SDK home paths lexically after WSL-prefix and separator normalization.
+     * Performs NO filesystem access, so it is safe to call inside read/write actions and in
+     * `ProjectJdkTable` scan predicates.
+     *
+     * Symlinks are NOT resolved here. Persisted SDK home paths are canonicalized once at
+     * registration (see [canonicalizePath]); callers comparing an external (user-supplied) path
+     * against persisted paths must canonicalize the external path once, off-lock, before
+     * comparing.
      */
     fun pathsEqualWslAware(first: String?, second: String?): Boolean =
         if (first.isNullOrBlank() || second.isNullOrBlank()) {
             false
         } else {
-                val canonicalizedFirst = canonicalizePath(first)
-                val canonicalizedSecond = canonicalizePath(second)
-                FileUtil.pathsEqual(canonicalizedFirst, canonicalizedSecond)
+            FileUtil.pathsEqual(normalizeForComparison(first), normalizeForComparison(second))
         }
 
     /**

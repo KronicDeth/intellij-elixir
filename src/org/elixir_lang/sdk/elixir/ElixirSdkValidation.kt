@@ -1,5 +1,6 @@
 package org.elixir_lang.sdk.elixir
 
+import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.util.io.FileUtil
@@ -12,6 +13,7 @@ import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.sdk.erlang.ErlangVersionDetector
 import org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData
 import org.elixir_lang.sdk.wsl.wslCompat
+import java.util.concurrent.Callable
 
 /**
  * Validation and health-check queries for Elixir SDK pairings.
@@ -34,24 +36,37 @@ object ElixirSdkValidation {
      * when either side cannot be determined (e.g. missing BEAM file, missing Erlang SDK),
      * or when the user has suppressed this warning for the SDK.
      *
-     * Must be called on a background thread and under a read lock.
-     *
-     * - Background thread: reads `Elixir.System.beam` and `OTP_VERSION` from disk.
-     * - Read lock: resolves the paired Erlang SDK via [SdkAdditionalData.getErlangSdk],
-     *   which may access the SDK table through [org.elixir_lang.sdk.erlang_dependent.ErlangSdkResolver].
+     * Must be called on a background thread. Callers must NOT wrap this call in a read action:
+     * it takes its own short read action internally to resolve the paired Erlang SDK, then does
+     * the (potentially WSL-booting) file I/O in [detectOtpMismatch] with no lock held. An outer
+     * read action would hold the lock across that I/O too - see
+     * [WslCompatService.canonicalizePath] for why that risks freezing the IDE.
      *
      * Use [org.elixir_lang.util.runWithEdtGuard] when calling from EDT-context code such as
      * [org.elixir_lang.sdk.erlang_dependent.AdditionalDataConfigurable].
      */
     @RequiresBackgroundThread
-    @RequiresReadLock
     fun detectOtpMismatch(sdk: Sdk): Pair<String, String>? {
         ThreadingAssertions.assertBackgroundThread()
+        val erlangSdk = ReadAction.nonBlocking(Callable { pairedErlangSdkForMismatchCheck(sdk) })
+            .executeSynchronously() ?: return null
+        return detectOtpMismatch(sdk, erlangSdk)
+    }
+
+    /**
+     * Resolves the Erlang SDK to compare [sdk] against for [detectOtpMismatch], or `null` when
+     * there is nothing to compare (no pairing, or the user suppressed the warning).
+     *
+     * Requires a read lock: reads [SdkAdditionalData] and resolves the paired Erlang SDK via
+     * [SdkAdditionalData.getErlangSdk], which may access the SDK table through
+     * [org.elixir_lang.sdk.erlang_dependent.ErlangSdkResolver]. Performs no file I/O.
+     */
+    @RequiresReadLock
+    private fun pairedErlangSdkForMismatchCheck(sdk: Sdk): Sdk? {
         ThreadingAssertions.assertReadAccess()
         val additionalData = sdk.sdkAdditionalData as? SdkAdditionalData ?: return null
         if (additionalData.isSuppressOtpMismatchWarning()) return null
-        val erlangSdk = additionalData.getErlangSdk() ?: return null
-        return detectOtpMismatch(sdk, erlangSdk)
+        return additionalData.getErlangSdk()
     }
 
     /**

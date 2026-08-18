@@ -174,9 +174,8 @@ ELIXIR_SDK_HOME
         currentSdkName: String?,
         sdkHome: String,
     ): String {
-        val canonicalHome = wslCompat.canonicalizePath(sdkHome)
         val otpMajor = runWithEdtGuard("Detecting Elixir SDK...") {
-            ElixirBuildInfo.elixirOtpRelease(canonicalHome)
+            ElixirBuildInfo.elixirOtpRelease(wslCompat.canonicalizePath(sdkHome))
         }
         return suggestSdkNameForHome(sdkHome, null, otpMajor, null)
     }
@@ -236,9 +235,8 @@ ELIXIR_SDK_HOME
         internal fun versionStringForHome(sdkHome: String, resolvedVersion: String?): String? {
             val version = ElixirVersionDetector.elixirVersion(sdkHome, resolvedVersion) ?: return null
             val source = SdkPaths.detectSource(sdkHome)
-            val canonicalHome = wslCompat.canonicalizePath(sdkHome)
             val otpMajor = runWithEdtGuard("Detecting Elixir SDK...") {
-                ElixirBuildInfo.elixirOtpRelease(canonicalHome)
+                ElixirBuildInfo.elixirOtpRelease(wslCompat.canonicalizePath(sdkHome))
             }
             return buildString {
                 if (source != null) {

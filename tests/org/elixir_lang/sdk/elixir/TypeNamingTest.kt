@@ -10,6 +10,7 @@ import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito.*
 import java.io.File
 import java.nio.file.Files
+import java.nio.file.NoSuchFileException
 
 /**
  * Tests for Elixir SDK Type naming methods.
@@ -121,7 +122,7 @@ class TypeNamingTest : PlatformTestCase() {
 
     fun testSuggestSdkName_doesNotThrowWhenCanonicalizeFails() {
         val throwingService = spy(MockWslCompatService())
-        doThrow(IllegalStateException("boom"))
+        doThrow(NoSuchFileException("boom"))
             .`when`(throwingService)
             .toRealPath(anyString())
 
@@ -164,7 +165,7 @@ class TypeNamingTest : PlatformTestCase() {
 
     fun testGetVersionString_doesNotThrowWhenCanonicalizeFails() {
         val throwingService = spy(MockWslCompatService())
-        doThrow(IllegalStateException("boom"))
+        doThrow(NoSuchFileException("boom"))
             .`when`(throwingService)
             .toRealPath(anyString())
 
@@ -185,7 +186,7 @@ class TypeNamingTest : PlatformTestCase() {
         VfsRootAccess.allowRootAccess(testRootDisposable, sdkHome)
 
         val throwingService = spy(MockWslCompatService())
-        doThrow(IllegalStateException("boom"))
+        doThrow(NoSuchFileException("boom"))
             .`when`(throwingService)
             .toRealPath(anyString())
 

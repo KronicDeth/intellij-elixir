@@ -428,10 +428,10 @@ class ElixirEditorBasedSdkWidget(
 
     private suspend fun collectNotificationScanIoData(modelData: NotificationScanModelData): NotificationScanIoData {
         val snapshot = modelData.projectSdkSnapshot
-        // detectOtpMismatch(sdk) is @RequiresReadLock: it reads sdkAdditionalData (suppression flag + paired
-        // Erlang SDK) from the model. This runs on Dispatchers.IO, which holds no read lock, so wrap the call in
-        // a read action. The single-arg overload is used deliberately to keep honouring isSuppressOtpMismatchWarning.
-        val projectSdkOtpMismatch = snapshot.elixirSdk?.let { elixirSdk -> readAction { detectOtpMismatch(elixirSdk) } }
+        // detectOtpMismatch(sdk) takes its own short read action internally and does its file I/O
+        // unlocked - do NOT wrap this call in an outer readAction (see its KDoc for why). The
+        // single-arg overload is used deliberately to keep honouring isSuppressOtpMismatchWarning.
+        val projectSdkOtpMismatch = snapshot.elixirSdk?.let { elixirSdk -> detectOtpMismatch(elixirSdk) }
         return NotificationScanIoData(
             projectSdkOtpMismatch = projectSdkOtpMismatch,
             classpathIssues = detectClasspathIssues(snapshot),
