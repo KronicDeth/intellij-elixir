@@ -57,6 +57,18 @@
     metadata) and froze copies of stdlib files that newer Elixirs deleted, so the parsing corpus no
     longer shifts underneath the tests.
 
+- [#3916](https://github.com/KronicDeth/intellij-elixir/pull/3916) [@sh41](https://github.com/sh41)
+  - **`testUI` builds and runs again.** `kodein-di-jvm` and `kotlinx-coroutines-core-jvm` were
+    silently dropped from its dependencies by an earlier commit; both are genuinely required.
+  - **The released plugin now compiles against 2025.3, its declared minimum supported version**,
+    instead of a newer platform - closing a gap where only the post-release Plugin Verifier check
+    stood between an incompatibility and a real user's install.
+  - **The shipped plugin no longer accidentally bundles its own copy of `kotlin-stdlib`.**
+  - Bumped `gradle-wrapper` to 9.7.0 (with its distribution checksum now verified),
+    `org.jetbrains.changelog` to 2.5.0, and migrated `com.github.ben-manes.versions` to the
+    maintained `io.github.ben-manes.versions` id at 0.61.0. Dropped the unused `qodana` version
+    catalog entry (`qodana.yml`'s linter tag is the only declaration now, bumped to 2026.2).
+
 ## [24.0.1] - 2026-08-09
 
 ### Enhancements
