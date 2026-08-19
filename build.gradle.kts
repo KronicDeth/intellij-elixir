@@ -658,8 +658,11 @@ dependencies {
     @Suppress("AvoidDuplicateDependencies")
     mockitoAgent(libMockitoCore) { isTransitive = false }
 
-    // UI Test dependencies
+    // Explicit here (not pulled in via ide-starter) because the IntelliJ Platform Gradle Plugin
+    // strips anything the target IDE already bundles from ide-starter's own dependencies, but
+    // testUI's tests run in the host Gradle JVM, not the sandboxed IDE - so nothing else supplies them.
     testUIImplementation(libs.kodein.di.jvm)
+    testUIImplementation(libs.kotlinx.coroutines.core.jvm)
 
     // JUnit 5 is required for UI tests. Both dependencies are declared without versions so they
     // resolve to whatever the IntelliJ test-framework-junit5/ide-starter artifacts request (see
