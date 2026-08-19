@@ -141,7 +141,8 @@ val actualPlatformVersion: String = if (useDynamicEapVersion) {
 // so the Java level must follow the platform being built against -- a fixed level cannot
 // serve both 261 and 262.
 //
-// The actual released JAR stays atJava 21 because buildPlugin runs against the minimum platform.
+// The actual released JAR stays at Java 21 because buildPlugin runs against platformVersion's
+// default (gradle.properties), which tracks the minimum supported platform.
 //
 // This functionality copies what the IntelliJ Platform Gradle Plugin's PlatformJavaVersions does (permalinks
 // pinned to the 2.18.1 tag; repin when bumping the plugin):
@@ -626,6 +627,9 @@ tasks.withType<KotlinJvmCompile>().configureEach {
     compilerOptions {
         jvmTarget = JvmTarget.valueOf("JVM_$javaVersionStr")
         freeCompilerArgs.add("-jvm-default=enable")
+        // Restricts stdlib references to what 2025.3 (minimumSupported) bundles, independent of
+        // the newer compiler in gradle/libs.versions.toml's kotlin entry. Doesn't cover
+        // jps-shared - a separate project, its own tasks.withType block needed there too.
         apiVersion = KotlinVersion.KOTLIN_2_2
     }
 }

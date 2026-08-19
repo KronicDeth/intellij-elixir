@@ -1,3 +1,6 @@
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
+import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
+
 plugins {
     kotlin("jvm")
     alias(libs.plugins.test.logger)
@@ -9,6 +12,14 @@ base {
 
 tasks.testClasses {
     enabled = false
+}
+
+// Restricts stdlib references to what 2025.3 (minimumSupported) bundles - the root project's
+// own copy of this (build.gradle.kts) doesn't reach this separate project.
+tasks.withType<KotlinJvmCompile>().configureEach {
+    compilerOptions {
+        apiVersion = KotlinVersion.KOTLIN_2_2
+    }
 }
 
 dependencies {
