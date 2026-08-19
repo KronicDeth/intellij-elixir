@@ -141,7 +141,8 @@ val actualPlatformVersion: String = if (useDynamicEapVersion) {
 // so the Java level must follow the platform being built against -- a fixed level cannot
 // serve both 261 and 262.
 //
-// The actual released JAR stays atJava 21 because buildPlugin runs against the minimum platform.
+// The actual released JAR stays at Java 21 because buildPlugin runs against platformVersion's
+// default (gradle.properties), which tracks the minimum supported platform.
 //
 // This functionality copies what the IntelliJ Platform Gradle Plugin's PlatformJavaVersions does (permalinks
 // pinned to the 2.18.1 tag; repin when bumping the plugin):
@@ -336,8 +337,7 @@ val renderedChangeNotes: Provider<String> = providers.provider {
 }
 
 //// --- Dependency Updates Configuration ---
-//// Run with: ./gradlew dependencyUpdates --no-parallel
-//// The --no-parallel flag is required by the plugin in Gradle 9+ (see plugin README known issues).
+//// Run with: ./gradlew dependencyUpdates
 tasks.withType<DependencyUpdatesTask> {
     gradleReleaseChannel = "current"
 
@@ -627,6 +627,9 @@ tasks.withType<KotlinJvmCompile>().configureEach {
     compilerOptions {
         jvmTarget = JvmTarget.valueOf("JVM_$javaVersionStr")
         freeCompilerArgs.add("-jvm-default=enable")
+        // Restricts stdlib references to what 2025.3 (minimumSupported) bundles, independent of
+        // the newer compiler in gradle/libs.versions.toml's kotlin entry. Doesn't cover
+        // jps-shared - a separate project, its own tasks.withType block needed there too.
         apiVersion = KotlinVersion.KOTLIN_2_2
     }
 }
@@ -658,6 +661,12 @@ dependencies {
     testImplementation(libMockitoCore)
     @Suppress("AvoidDuplicateDependencies")
     mockitoAgent(libMockitoCore) { isTransitive = false }
+
+    // Explicit here (not pulled in via ide-starter) because the IntelliJ Platform Gradle Plugin
+    // strips anything the target IDE already bundles from ide-starter's own dependencies, but
+    // testUI's tests run in the host Gradle JVM, not the sandboxed IDE - so nothing else supplies them.
+    testUIImplementation(libs.kodein.di.jvm)
+    testUIImplementation(libs.kotlinx.coroutines.core.jvm)
 
     // JUnit 5 is required for UI tests. Both dependencies are declared without versions so they
     // resolve to whatever the IntelliJ test-framework-junit5/ide-starter artifacts request (see

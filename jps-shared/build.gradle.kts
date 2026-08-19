@@ -1,3 +1,6 @@
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
+import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
+
 plugins {
     kotlin("jvm")
     alias(libs.plugins.test.logger)
@@ -11,8 +14,20 @@ tasks.testClasses {
     enabled = false
 }
 
+// Restricts stdlib references to what 2025.3 (minimumSupported) bundles - the root project's
+// own copy of this (build.gradle.kts) doesn't reach this separate project.
+tasks.withType<KotlinJvmCompile>().configureEach {
+    compilerOptions {
+        apiVersion = KotlinVersion.KOTLIN_2_2
+    }
+}
+
 dependencies {
-    implementation(kotlin("stdlib-jdk8"))
+    // compileOnly: the external JPS build process this module runs in already gets kotlin-stdlib
+    // from the platform (ClasspathBootstrap.addKotlinStdlib in intellij-community). implementation
+    // would additionally leak a bundled copy onto main's runtime classpath and into the shipped
+    // plugin, via implementation(project(":jps-shared")).
+    compileOnly(kotlin("stdlib-jdk8"))
 }
 repositories {
     mavenCentral()
