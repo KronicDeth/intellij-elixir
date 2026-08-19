@@ -24,8 +24,9 @@ import java.util.concurrent.Callable
  *    [org.elixir_lang.sdk.erlang.ErlangVersionDetector.detectRelease]).
  *  - `detectOtpMismatch(sdk)` - the single-argument overload used by the refresh actions. It resolves
  *    the paired Erlang SDK via [SdkAdditionalData.getErlangSdk] (which needs the Erlang SDK registered
- *    in the [ProjectJdkTable]) and honours the per-SDK suppress flag. It is `@RequiresReadLock` +
- *    `@RequiresBackgroundThread`, so it is invoked inside a [ReadAction] on a pooled thread.
+ *    in the [ProjectJdkTable]) and honours the per-SDK suppress flag. It is `@RequiresBackgroundThread`
+ *    and takes its own short internal read action for that resolution - callers must NOT wrap the
+ *    whole call in an outer [ReadAction], which would hold the read lock across its file I/O too.
  *
  * Every call is dispatched off the EDT to satisfy the `@RequiresBackgroundThread` contract.
  */
@@ -96,7 +97,7 @@ class OtpMismatchTest : PlatformTestCase() {
         assertEquals(
             "Should resolve the paired Erlang SDK and report the mismatch",
             "27" to "25",
-            detectOnBackgroundThreadUnderReadAction(elixirSdk),
+            detectSingleArgOnBackgroundThread(elixirSdk),
         )
     }
 
@@ -107,7 +108,7 @@ class OtpMismatchTest : PlatformTestCase() {
 
         assertNull(
             "A suppressed OTP-mismatch warning must short-circuit to null even when majors differ",
-            detectOnBackgroundThreadUnderReadAction(elixirSdk),
+            detectSingleArgOnBackgroundThread(elixirSdk),
         )
     }
 
@@ -120,14 +121,14 @@ class OtpMismatchTest : PlatformTestCase() {
             .executeOnPooledThread(Callable { ElixirSdkValidation.detectOtpMismatch(elixirSdk, erlangSdk) })
             .get()
 
-    /** Runs the read-lock-requiring single-arg overload on a pooled thread inside a read action. */
-    private fun detectOnBackgroundThreadUnderReadAction(elixirSdk: Sdk): Pair<String, String>? =
-        ApplicationManager.getApplication().executeOnPooledThread(
-            Callable {
-                ReadAction.nonBlocking(Callable { ElixirSdkValidation.detectOtpMismatch(elixirSdk) })
-                    .executeSynchronously()
-            },
-        ).get()
+    /**
+     * Runs the single-arg overload on a pooled thread, without an outer read action - it manages
+     * its own short internal read action for the SDK resolution and does its file I/O unlocked.
+     */
+    private fun detectSingleArgOnBackgroundThread(elixirSdk: Sdk): Pair<String, String>? =
+        ApplicationManager.getApplication()
+            .executeOnPooledThread(Callable { ElixirSdkValidation.detectOtpMismatch(elixirSdk) })
+            .get()
 
     private fun newElixirSdk(otpMajor: String): Sdk {
         val sdk = ProjectJdkImpl("Test Elixir SDK", Type.instance, "/fake/elixir/1.16", "")

@@ -6,65 +6,56 @@
 
 ### Enhancements
 
-- [#3914](https://github.com/KronicDeth/intellij-elixir/issues/3914) [@sh41](https://github.com/sh41)
-  - **Parsing/Lexing of Elixir 1.13.4 through 1.20.2 is now fully supported**
+- [#3914](https://github.com/KronicDeth/intellij-elixir/pull/3914) [@sh41](https://github.com/sh41)
+  - **Elixir 1.13 through 1.20 are now fully supported.** Code written for any Elixir from 1.13.4 to
+    1.20.2 parses without spurious errors, including syntax whose meaning changed between releases.
+  - **`.beam` files compiled by OTP 24 through 29 decompile to valid Elixir.**
 
 ### Bug Fixes
 
-- [#3914](https://github.com/KronicDeth/intellij-elixir/issues/3914) [@sh41](https://github.com/sh41)
-  - **A capture argument keeps its Elixir 1.15+ meaning when reformatted.** `&1` is one argument, but
-    `& 1` is `&` applied to `1` from Elixir 1.15.0 on - a change to a whole expression's meaning, not a
-    style choice. Reformat Code no longer inserts that space, so `&(&1 + &2)` cannot silently become
-    `&(&(1 + &2))`.
-  - **`&1` and `& 1` parse the way the project's own Elixir version parses them,** rather than always
-    the way Elixir versions before 1.15.0 do. A spaced capture argument now binds the rest of the
-    expression on 1.15+ and stays one argument below it, matching each Elixir's own tokenizer.
-  - **The stepped range operator now parses as an atom, `:..//`,** instead of splitting into the atom
-    `:..` and a stranded `//` that Elixir's own tokenizer never leaves stranded.
-  - **Opening some decompiled `.beam` files no longer shows a spurious parse error.** A `cond`/`case`/
-    `receive` clause whose condition renders as a `do...end` block - as `Mix.Project`, `Mix.Release`
-    and `Mix.Task` in Elixir 1.20 all do, from compiling `&&`/`||` - needs parentheses before its own
-    `->`, the same rule already applied to a binary operator's left operand; the decompiler was missing
-    it for clause conditions.
+- [#3914](https://github.com/KronicDeth/intellij-elixir/pull/3914) [@sh41](https://github.com/sh41)
+  - **Reformat Code no longer changes what a capture expression means.** Since Elixir 1.15,
+    `&1` and `& 1` are different expressions; the formatter was inserting that space, silently
+    turning `&(&1 + &2)` into code meaning `&(&(1 + &2))`.
+  - **`& 1` now parses the way the containing module/project's configured Elixir SDK parses it**. The
+    plugin previously always used the pre-1.15 meaning.
+    - On Elixir 1.15 and higher: `&` applied to the whole following expression.
+    - On Elixir 1.14 and lower: the single capture argument `&1`.
+  - **The stepped-range atom `:..//` no longer shows a parse error.** It was previously read as
+    `:..` followed by a stray `//`.
+  - **Decompiled `.beam` files no longer show a parse error when a `cond` or `case` clause condition
+    ends in `end`**. This fixes decompilation of `Mix.Project`, `Mix.Release`, and `Mix.Task` on
+    Elixir 1.20+.
+
+- [#3915](https://github.com/KronicDeth/intellij-elixir/pull/3915) [@sh41](https://github.com/sh41)
+  - **The IDE no longer starts every WSL distro that hosts a registered Erlang or Elixir SDK, and
+    will no longer freeze if WSL is slow or hangs while starting.** Checking whether two WSL-hosted
+    SDKs are the same no longer touches the distro's filesystem.
 
 ### Threading / Platform Hygiene
 
 ### Build / CI
 
-- [#3913](https://github.com/KronicDeth/intellij-elixir/issues/3913) [@sh41](https://github.com/sh41)
-  - **Quoting now follows the Elixir version behind the file instead of emitting one shape for every
-    version.** Elixir's quoted form changes between releases, so a single answer was wrong everywhere
-    but one version, and each fix for a newer Elixir was a regression on an older one. A quoting
-    dialect is resolved from the module's Elixir SDK and cached per file, and six divergences are gated
-    on the release that changed them: `from_brackets` on a bracketed expression and the `__block__`
-    wrapper around a solitary `not`/`!` (1.15.0), `from_interpolation` (1.16.0), `from_brackets` on
-    every other bracket form (1.16.2), and both `...` as a nullary call and `one +(two)` as the call
-    `one(+two)` (1.17.0). Files with no module or no Elixir SDK take the newest dialect. Nothing in
-    production reads the quoted form - its consumers read atoms and arities - so this is test
-    correctness across the nine Elixir/OTP pairs CI covers, not behaviour anyone can observe in the
-    IDE.
-  - **A quoter that fails to build no longer stops the whole test suite.** `releaseQuoter` records
-    whether it produced a daemon and succeeds either way, so the tests that need no quoter still run.
-    The ones that need it fail immediately, naming the Elixir/OTP pair and the recorded reason - they
-    fail rather than skip, so the counts still say what was not asserted. A recorded failure is never
-    up to date, so the next build retries it, and `mix release` output is logged in full when it fails.
-  - `-PquoterRequired=true` stops the build at `releaseQuoter` instead, for anyone debugging the
-    quoter itself.
-  - **CI asks the build for the quoter cache paths instead of re-deriving them.** The workflow grepped
-    `quoterRef` out of `gradle.properties` and rebuilt the Elixir/OTP pair token in bash - second
-    implementations of rules owned by `build.gradle.kts` and `sdk.pairToken`, blind to `-PquoterRef`
-    and `ORG_GRADLE_PROJECT_quoterRef`, and silent when they disagreed, since a cache entry naming a
-    directory nothing writes misses on every restore and then collides on save. A `quoterCachePaths`
-    task reports them instead, and `--github-output="$GITHUB_OUTPUT"` reduces the step to one line.
-  - **The quoter is pinned to a commit SHA of `sh41/intellij_elixir` instead of the `v2.1.0` tag.**
-    v2.1.0 predates `mix release` and still uses `use Mix.Config` and `Supervisor.Spec`, so it warned
-    on every Elixir the pipeline tests. Same quoter, modernised build, unchanged quoted forms.
-  - **The quoter is built with an explicit `MIX_ENV=prod`, and its release path derives from the same
-    value.** `mix release` has no preferred environment, so an unset `MIX_ENV` built under `:dev`,
-    compiling dev/test-only dependencies the daemon never uses; with the path hard-coded to
-    `_build/dev`, an ambient `MIX_ENV` could leave the marker claiming a daemon `startQuoter` could not
-    find. `deps.get` fetches `--only` that environment too, taking the cold-cache download for the
-    pinned quoter from eleven packages to two. An exported `MIX_ENV` still overrides all of it.
+- [#3913](https://github.com/KronicDeth/intellij-elixir/pull/3913) [@sh41](https://github.com/sh41)
+  - **Quoter tests now respect the quoting rules for the Elixir version under test.** Six quoted-form
+    divergences are gated on the release that introduced each, so the same fixtures pass on every
+    Elixir/OTP pair CI tests.
+  - **A quoter that fails to build no longer blocks the whole test suite.** Tests that require the
+    quoter fail immediately with the recorded reason; all other tests run as normal.
+    `-PquoterRequired=true` restores the hard stop for anyone debugging the quoter itself.
+  - **CI gets the quoter cache paths from the build** (a `quoterCachePaths` task) instead of
+    re-deriving them in bash, so the workflow can no longer disagree with Gradle about where the
+    cache lives.
+  - **The quoter is pinned to a commit of `sh41/intellij_elixir` which can be built without warnings
+    on all Elixir versions 1.13-1.20**, pending merge/tagging of the
+    [PR](https://github.com/KronicDeth/intellij_elixir/pull/11).
+  - **The quoter builds with an explicit `MIX_ENV=prod`**, and only prod dependencies are fetched. An exported `MIX_ENV` still overrides it.
+
+- [#3914](https://github.com/KronicDeth/intellij-elixir/pull/3914) [@sh41](https://github.com/sh41)
+  - **All Elixir/OTP test legs now pass and are required for merge.** Getting there also gated two
+    more quoted-form divergences by version (1.20's `__block__` line metadata, pre-1.17 parens
+    metadata) and froze copies of stdlib files that newer Elixirs deleted, so the parsing corpus no
+    longer shifts underneath the tests.
 
 ## [24.0.1] - 2026-08-09
 

@@ -127,6 +127,26 @@ class ErlangSdkResolverTest : PlatformTestCase() {
         assertEquals(erlangSdk, (result as ErlangSdkResult.Success).sdk)
     }
 
+    fun testResolveByHomePath_matchesAcrossWslPrefixSpellings() {
+        // Registered Erlang SDK home uses the legacy \\wsl$\ spelling; the persisted Elixir SDK
+        // configuration uses the modern \\wsl.localhost\ spelling for the same install. Path-first
+        // resolution must match across both spellings of the same distro.
+        val legacyHomePath = "\\\\wsl$\\Ubuntu-24.04\\home\\testuser\\.asdf\\installs\\erlang\\26.0"
+        val modernHomePath = "\\\\wsl.localhost\\Ubuntu-24.04\\home\\testuser\\.asdf\\installs\\erlang\\26.0"
+        val erlangSdk = createSdk(name = "Erlang 26", sdkType = ErlangSdkType.instance, homePath = legacyHomePath)
+
+        val elixirSdk = createElixirSdk { sdk ->
+            SdkAdditionalData(sdk).apply {
+                readExternal(erlangSdkElement(name = "Erlang 26", homePath = modernHomePath))
+            }
+        }
+
+        val result = resolver.resolveErlangSdkResult(elixirSdk, sdkModel(erlangSdk))
+
+        assertTrue("Should resolve across WSL prefix spellings", result is ErlangSdkResult.Success)
+        assertEquals(erlangSdk, (result as ErlangSdkResult.Success).sdk)
+    }
+
     fun testResolveByName_legacyFallback() {
         val configuredName = "Erlang 26"
         val erlangSdk = createSdk(name = configuredName, sdkType = ErlangSdkType.instance, homePath = "/fake/erlang/26.0")

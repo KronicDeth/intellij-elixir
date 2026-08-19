@@ -117,11 +117,7 @@ class MockWslCompatService(
         // Mock implementation returns a well-formed Windows UNC path
         val linuxAsWindows = linuxPath.replace('/', '\\')
         val converted = "\\\\wsl.localhost\\${distribution.msId}$linuxAsWindows"
-        return try {
-            canonicalizePath(converted)
-        } catch (_: Exception) {
-            converted
-        }
+        return canonicalizePath(converted)
     }
 
     override fun convertSingleWslPath(windowsPath: String, distribution: WSLDistribution): String? {

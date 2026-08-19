@@ -87,15 +87,16 @@ internal class WslCompatServiceImpl : WslCompatService {
             return null
         }
 
-        return try {
-            // Delegate to native IntelliJ API
+        // canonicalizePath handles an unresolvable path on its own; keep it outside this try or
+        // a catch(Exception) here would also swallow its read-lock assertion.
+        val converted = try {
             val wslPath = WslPath(distribution.msId, linuxPath)
-            val converted = wslPath.toWindowsUncPath()
-            canonicalizePath(converted)
+            wslPath.toWindowsUncPath()
         } catch (e: Exception) {
             log.debug("Error converting Linux path to Windows UNC: $linuxPath", e)
-            null
+            return null
         }
+        return canonicalizePath(converted)
     }
 
     override fun convertSingleWslPath(windowsPath: String, distribution: WSLDistribution): String? {

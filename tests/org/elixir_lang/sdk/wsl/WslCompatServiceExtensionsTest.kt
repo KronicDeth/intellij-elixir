@@ -1,11 +1,15 @@
 package org.elixir_lang.sdk.wsl
 
 import com.intellij.execution.wsl.WSLDistribution
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.ReadAction
+import com.intellij.openapi.util.io.FileUtil
 import com.intellij.util.system.OS
 import org.elixir_lang.PlatformTestCase
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito
 import org.mockito.Mockito.*
+import java.util.concurrent.Callable
 
 class WslCompatServiceExtensionsTest : PlatformTestCase() {
     private val wslCompatMock = MockWslCompatService()
@@ -88,120 +92,122 @@ class WslCompatServiceExtensionsTest : PlatformTestCase() {
         assertEquals(linuxPath, converted)
     }
 
-    fun testPathsEqualWslAware_returnsTrueWhenEqualButRealpathThrowsWindows() {
+    // -------------------------------------------------------------------------
+    // pathsEqualWslAware: pure lexical comparison, no filesystem access at all.
+    // -------------------------------------------------------------------------
+
+    fun testPathsEqualWslAware_neverTouchesTheFilesystem() {
+        // toRealPath throws AssertionError rather than a caught type, so any call that reaches it
+        // fails the test loudly instead of silently falling back.
+        val spiedService = spy(wslCompatMock)
+        doThrow(AssertionError("pathsEqualWslAware must not perform filesystem I/O"))
+            .`when`(spiedService)
+            .toRealPath(anyString())
+
+        assertTrue(spiedService.pathsEqualWslAware("C:\\sdk-a", "C:\\sdk-a"))
+        assertFalse(spiedService.pathsEqualWslAware("C:\\sdk-a", "C:\\sdk-b"))
+        verify(spiedService, never()).toRealPath(anyString())
+    }
+
+    fun testPathsEqualWslAware_returnsTrueForIdenticalWindowsPaths() {
         val myPath = "C:\\sdk-a"
-        val throwingService = spy(wslCompatMock)
-        doThrow(IllegalStateException("boom"))
-            .`when`(throwingService)
-            .toRealPath(anyString())
-
-        val equal = throwingService.pathsEqualWslAware(myPath, myPath)
-
-        assertTrue(equal)
-        verify(throwingService, times(2)).toRealPath(anyString())
+        assertTrue(wslCompatMock.pathsEqualWslAware(myPath, myPath))
     }
 
-    fun testPathsEqualWslAware_returnsTrueWhenEqualButRealpathThrowsLinux() {
-        val myPath = "/home/testuser/.local/share//mise//installs//elixir//1.15.7"
-        val throwingService = spy(wslCompatMock)
-        doThrow(IllegalStateException("boom"))
-            .`when`(throwingService)
-            .toRealPath(anyString())
-
-        val equal = throwingService.pathsEqualWslAware(myPath, myPath)
-
-        assertTrue(equal)
-        verify(throwingService, times(2)).toRealPath(anyString())
+    fun testPathsEqualWslAware_returnsFalseForDifferentWindowsPaths() {
+        assertFalse(wslCompatMock.pathsEqualWslAware("C:\\sdk-a", "C:\\sdk-b"))
     }
 
-    fun testPathsEqualWslAware_returnsTrueWhenEqualButRealpathThrowsWsl() {
-        val myPath = "\\\\wsl.localhost\\Ubuntu-24.04\\home\\testuser\\.local\\share\\mise\\installs\\elixir\\1.15.7"
-        val throwingService = spy(wslCompatMock)
-        doThrow(IllegalStateException("boom"))
-            .`when`(throwingService)
-            .toRealPath(anyString())
-
-        val equal = throwingService.pathsEqualWslAware(myPath, myPath)
-
-        assertTrue(equal)
-        verify(throwingService, times(2)).toRealPath(anyString())
+    fun testPathsEqualWslAware_returnsTrueForIdenticalLinuxPaths() {
+        val myPath = "/home/testuser/.local/share/mise/installs/elixir/1.15.7"
+        assertTrue(wslCompatMock.pathsEqualWslAware(myPath, myPath))
     }
 
-    fun testPathsEqualWslAware_returnsTrueWhenEqualButRealpathThrowsDifferentPrefixWsl() {
-        val myPath = "\\\\wsl.localhost\\Ubuntu-24.04\\home\\testuser\\.local\\share\\mise\\installs\\elixir\\1.15.7"
-        val myPath2 = "\\\\wsl$\\Ubuntu-24.04\\home\\testuser\\.local\\share\\mise\\installs\\elixir\\1.15.7"
-        val throwingService = spy(wslCompatMock)
-        doThrow(IllegalStateException("boom"))
-            .`when`(throwingService)
-            .toRealPath(anyString())
-
-        val equal = throwingService.pathsEqualWslAware(myPath, myPath2)
-
-        assertTrue(equal)
-        // path is canonicalized before comparison, so same path calls twice
-        verify(throwingService, times(2)).toRealPath(anyString())
+    fun testPathsEqualWslAware_returnsFalseForDifferentLinuxPaths() {
+        val myPath = "/home/testuser/.local/share/mise/installs/elixir/1.15.7"
+        val myPath2 = "/home/testuser/.local/share/mise/installs/elixir/1.19.7"
+        assertFalse(wslCompatMock.pathsEqualWslAware(myPath, myPath2))
     }
 
-    fun testPathsEqualWslAware_returnsFalseWhenNotEqualButRealpathThrowsWindows() {
-        val myPath = "C:\\sdk-a"
-        val myPath2 = "C:\\sdk-b"
-        val throwingService = spy(wslCompatMock)
-        doThrow(IllegalStateException("boom"))
-            .`when`(throwingService)
-            .toRealPath(anyString())
-
-        val equal = throwingService.pathsEqualWslAware(myPath, myPath2)
-
-        assertFalse(equal)
-        verify(throwingService).toRealPath(myPath)
-        verify(throwingService).toRealPath(myPath2)
+    fun testPathsEqualWslAware_rewritesLegacyWslPrefixBeforeComparing() {
+        val modern = "\\\\wsl.localhost\\Ubuntu-24.04\\home\\testuser\\.local\\share\\mise\\installs\\elixir\\1.15.7"
+        val legacy = "\\\\wsl$\\Ubuntu-24.04\\home\\testuser\\.local\\share\\mise\\installs\\elixir\\1.15.7"
+        // Default mock policy is legacy -> modern.
+        assertTrue(wslCompatMock.pathsEqualWslAware(modern, legacy))
     }
 
-    fun testPathsEqualWslAware_returnsFalseWhenNotEqualButRealpathThrowsLinux() {
-        val myPath = "/home/testuser/.local/share//mise//installs//elixir//1.15.7"
-        val myPath2 = "/home/testuser/.local/share//mise//installs//elixir//1.19.7"
-        val throwingService = spy(wslCompatMock)
-        doThrow(IllegalStateException("boom"))
-            .`when`(throwingService)
-            .toRealPath(anyString())
-
-        val equal = throwingService.pathsEqualWslAware(myPath, myPath2)
-
-        assertFalse(equal)
-        verify(throwingService).toRealPath(myPath)
-        verify(throwingService).toRealPath(myPath2)
+    fun testPathsEqualWslAware_rewritesModernWslPrefixBeforeComparing() {
+        val legacyOnlyPolicy = MockWslCompatService(prefixConversionOverride = MODERN_WSL_PREFIX to LEGACY_WSL_PREFIX)
+        val modern = "\\\\wsl.localhost\\Ubuntu-24.04\\home\\testuser\\.local\\share\\mise\\installs\\elixir\\1.15.7"
+        val legacy = "\\\\wsl$\\Ubuntu-24.04\\home\\testuser\\.local\\share\\mise\\installs\\elixir\\1.15.7"
+        assertTrue(legacyOnlyPolicy.pathsEqualWslAware(modern, legacy))
     }
 
-    fun testPathsEqualWslAware_returnsFalseWhenNotEqualButRealpathThrowsWsl() {
-        val myPath = "\\\\wsl.localhost\\Ubuntu-24.04\\home\\testuser\\.local\\share\\mise\\installs\\elixir\\1.15.7"
-        val myPath2 = "\\\\wsl.localhost\\Ubuntu-24.04\\home\\testuser\\.local\\share\\mise\\installs\\elixir\\1.19.7"
-        val throwingService = spy(wslCompatMock)
-        doThrow(IllegalStateException("boom"))
-            .`when`(throwingService)
-            .toRealPath(anyString())
-
-        val equal = throwingService.pathsEqualWslAware(myPath, myPath2)
-
-        assertFalse(equal)
-        verify(throwingService).toRealPath(myPath)
-        verify(throwingService).toRealPath(myPath2)
+    fun testPathsEqualWslAware_returnsFalseForDifferentWslDistros() {
+        val ubuntuA = "\\\\wsl.localhost\\Ubuntu-24.04\\home\\testuser\\project"
+        val ubuntuB = "\\\\wsl.localhost\\ItronUbuntu\\home\\testuser\\project"
+        assertFalse(wslCompatMock.pathsEqualWslAware(ubuntuA, ubuntuB))
     }
 
-    fun testPathsEqualWslAware_returnsFalseWhenNotEqualButRealpathThrowsDifferentPrefixWsl() {
-        val myPath = "\\\\wsl.localhost\\Ubuntu-24.04\\home\\testuser\\.local\\share\\mise\\installs\\elixir\\1.15.7"
-        val myPath2 = "\\\\wsl$\\Ubuntu-24.04\\home\\testuser\\.local\\share\\mise\\installs\\elixir\\1.19.7"
-        val myPath2Canonicalized = "\\\\wsl.localhost\\Ubuntu-24.04\\home\\testuser\\.local\\share\\mise\\installs\\elixir\\1.19.7"
-        val throwingService = spy(wslCompatMock)
-        doThrow(IllegalStateException("boom"))
-            .`when`(throwingService)
-            .toRealPath(anyString())
+    fun testPathsEqualWslAware_treatsMixedSeparatorsAsEqual() {
+        val forwardSlash = "\\\\wsl.localhost\\Ubuntu-24.04\\home\\testuser\\a/b"
+        val backslash = "\\\\wsl.localhost\\Ubuntu-24.04\\home\\testuser\\a\\b"
+        assertTrue(wslCompatMock.pathsEqualWslAware(forwardSlash, backslash))
+    }
 
-        val equal = throwingService.pathsEqualWslAware(myPath, myPath2)
+    fun testPathsEqualWslAware_returnsFalseForNullOrBlank() {
+        assertFalse(wslCompatMock.pathsEqualWslAware(null, "C:\\sdk-a"))
+        assertFalse(wslCompatMock.pathsEqualWslAware("C:\\sdk-a", null))
+        assertFalse(wslCompatMock.pathsEqualWslAware(null, null))
+        assertFalse(wslCompatMock.pathsEqualWslAware("", "C:\\sdk-a"))
+        assertFalse(wslCompatMock.pathsEqualWslAware("   ", "   "))
+    }
 
-        assertFalse(equal)
-        // path is canonicalized before comparison, so same path calls twice
-        verify(throwingService).toRealPath(myPath)
-        verify(throwingService).toRealPath(myPath2Canonicalized)
+    fun testPathsEqualWslAware_matchesFileUtilPathsEqualCaseRule() {
+        // Asserted against FileUtil.pathsEqual itself, not a hard-coded expectation, so this
+        // passes under either case-sensitivity rule the CI matrix runs under.
+        val lower = "\\\\wsl.localhost\\ubuntu-24.04\\home\\testuser\\project"
+        val upper = "\\\\wsl.localhost\\Ubuntu-24.04\\HOME\\testuser\\project"
+        assertEquals(FileUtil.pathsEqual(lower, upper), wslCompatMock.pathsEqualWslAware(lower, upper))
+    }
+
+    fun testPathsEqualWslAware_treatsWindowsDriveLettersCaseInsensitively() {
+        if (OS.CURRENT != OS.Windows) return
+        assertTrue(wslCompatMock.pathsEqualWslAware("C:\\Elixir", "c:/elixir"))
+    }
+
+    // -------------------------------------------------------------------------
+    // canonicalizePath: the I/O funnel - must never run under a read lock, and
+    // must never throw for a path that simply cannot be resolved.
+    // -------------------------------------------------------------------------
+
+    fun testCanonicalizePath_throwsUnderReadLock() {
+        val real = WslCompatServiceImpl()
+        // Must run on a pooled thread: test methods themselves run on the EDT, and the EDT's
+        // implicit write-intent read access does not register as holdsReadLock().
+        val threw = ApplicationManager.getApplication().executeOnPooledThread(Callable {
+            try {
+                ReadAction.nonBlocking(Callable {
+                    real.canonicalizePath("C:\\sdk-a")
+                }).executeSynchronously()
+                false
+            } catch (_: IllegalStateException) {
+                true
+            }
+        }).get()
+
+        assertTrue("Expected canonicalizePath to throw when called under a read lock", threw)
+    }
+
+    fun testCanonicalizePath_fallsBackToLexicalFormForNonexistentPath() {
+        val real = WslCompatServiceImpl()
+        val nonexistent = "\\\\wsl.localhost\\NoSuchDistro-doesNotExist\\home\\nobody"
+
+        // Must not throw, and must not boot anything - it returns the prefix-rewritten string.
+        val expected = with(real) { nonexistent.canonicalizeWslPrefix() }
+        val result = real.canonicalizePath(nonexistent)
+
+        assertEquals(expected, result)
     }
 
     // -------------------------------------------------------------------------
