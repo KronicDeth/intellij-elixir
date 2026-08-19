@@ -336,8 +336,7 @@ val renderedChangeNotes: Provider<String> = providers.provider {
 }
 
 //// --- Dependency Updates Configuration ---
-//// Run with: ./gradlew dependencyUpdates --no-parallel
-//// The --no-parallel flag is required by the plugin in Gradle 9+ (see plugin README known issues).
+//// Run with: ./gradlew dependencyUpdates
 tasks.withType<DependencyUpdatesTask> {
     gradleReleaseChannel = "current"
 

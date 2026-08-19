@@ -18,7 +18,7 @@ kotlin = "2.3.20"
 intellij-platform = "2.18.1"
 gradle-download = "5.7.0"
 test-logger = "4.0.0"
-versions = "0.54.0"
+versions = "0.61.0"
 changelog = "2.5.0"
 
 # Dependency Versions
@@ -48,4 +48,4 @@ kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 download = { id = "de.undercouch.download", version.ref = "gradle-download" }
 test-logger = { id = "com.adarshr.test-logger", version.ref = "test-logger" }
 changelog = { id = "org.jetbrains.changelog", version.ref = "changelog" }
-versions = { id = "com.github.ben-manes.versions", version.ref = "versions" }
+versions = { id = "io.github.ben-manes.versions", version.ref = "versions" }
