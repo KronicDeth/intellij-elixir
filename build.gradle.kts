@@ -658,6 +658,9 @@ dependencies {
     @Suppress("AvoidDuplicateDependencies")
     mockitoAgent(libMockitoCore) { isTransitive = false }
 
+    // UI Test dependencies
+    testUIImplementation(libs.kodein.di.jvm)
+
     // JUnit 5 is required for UI tests. Both dependencies are declared without versions so they
     // resolve to whatever the IntelliJ test-framework-junit5/ide-starter artifacts request (see
     // the consistent-resolution wiring below), keeping the Jupiter API/engine matched to what
