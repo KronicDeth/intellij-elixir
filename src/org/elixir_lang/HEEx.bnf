@@ -14,7 +14,11 @@
   elementTypeClass="org.elixir_lang.heex.psi.ElementType"
   tokenTypeClass="org.elixir_lang.heex.psi.TokenType"
 
+  // Types.java is maintained by hand; it also declares HEEX_OUTER_ELEMENT, an
+  // OuterLanguageElementType that cannot be expressed here.
   tokens = [
+    BRACE_CLOSING = "BRACE_CLOSING"
+    BRACE_OPENING = "BRACE_OPENING"
     CLOSING = "%>"
     COMMENT = "Comment"
     COMMENT_MARKER = "#"
