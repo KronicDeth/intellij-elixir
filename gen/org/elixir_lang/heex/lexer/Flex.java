@@ -302,6 +302,12 @@ public class Flex implements com.intellij.lexer.FlexLexer {
   /* user code: */
   private int openBraceCount = 0;
 
+  // The lexical state to return to once an embedded <% %>/<%= %> tag closes - YYINITIAL, or
+  // SCRIPT_TAG/STYLE_TAG if the tag was encountered while inside a <script>/<style> body. Not part
+  // of getState(): every {OPENING} match writes it before WHITESPACE_MAYBE reads it, and
+  // WHITESPACE_MAYBE is never entered at state 0, so restarting the lexer cannot observe a stale value.
+  private int tagReturnState = YYINITIAL;
+
   private void handleInState(int nextLexicalState) {
     yypushback(yylength());
     yybegin(nextLexicalState);
@@ -574,7 +580,7 @@ public class Flex implements com.intellij.lexer.FlexLexer {
           // fall through
           case 22: break;
           case 3:
-            { handleInState(YYINITIAL);
+            { handleInState(tagReturnState);
             }
           // fall through
           case 23: break;
@@ -642,7 +648,8 @@ public class Flex implements com.intellij.lexer.FlexLexer {
           // fall through
           case 33: break;
           case 14:
-            { yybegin(MARKER_MAYBE);
+            { tagReturnState = yystate();
+                      yybegin(MARKER_MAYBE);
                       return Types.OPENING;
             }
           // fall through
@@ -662,7 +669,7 @@ public class Flex implements com.intellij.lexer.FlexLexer {
             // lookahead expression with fixed lookahead length
             zzMarkedPos = Character.offsetByCodePoints
                 (zzBufferL, zzMarkedPos, -3);
-            { yybegin(YYINITIAL);
+            { yybegin(tagReturnState);
                                          return TokenType.WHITE_SPACE;
             }
           // fall through

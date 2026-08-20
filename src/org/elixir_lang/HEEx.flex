@@ -20,6 +20,12 @@ import org.elixir_lang.heex.psi.Types;
 %{
   private int openBraceCount = 0;
 
+  // The lexical state to return to once an embedded <% %>/<%= %> tag closes - YYINITIAL, or
+  // SCRIPT_TAG/STYLE_TAG if the tag was encountered while inside a <script>/<style> body. Not part
+  // of getState(): every {OPENING} match writes it before WHITESPACE_MAYBE reads it, and
+  // WHITESPACE_MAYBE is never entered at state 0, so restarting the lexer cannot observe a stale value.
+  private int tagReturnState = YYINITIAL;
+
   private void handleInState(int nextLexicalState) {
     yypushback(yylength());
     yybegin(nextLexicalState);
@@ -74,7 +80,8 @@ END_STYLE_TAG = "</style>"
 
 <YYINITIAL,SCRIPT_TAG,STYLE_TAG> {
   {ESCAPED_OPENING} { return Types.ESCAPED_OPENING; }
-  {OPENING}         { yybegin(MARKER_MAYBE);
+  {OPENING}         { tagReturnState = yystate();
+                      yybegin(MARKER_MAYBE);
                       return Types.OPENING; }
   {ANY}             { return Types.DATA; }
 }
@@ -131,7 +138,7 @@ END_STYLE_TAG = "</style>"
 
 <WHITESPACE_MAYBE> {
   // Only completely whitespace before a procedural tag counts as whitespace
-  {WHITE_SPACE} / {PROCEDURAL_OPENING} { yybegin(YYINITIAL);
+  {WHITE_SPACE} / {PROCEDURAL_OPENING} { yybegin(tagReturnState);
                                          return TokenType.WHITE_SPACE; }
-  {ANY}                                { handleInState(YYINITIAL); }
+  {ANY}                                { handleInState(tagReturnState); }
 }
