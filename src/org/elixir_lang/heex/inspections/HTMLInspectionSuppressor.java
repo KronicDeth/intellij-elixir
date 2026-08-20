@@ -8,6 +8,7 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.xml.XmlTag;
 import org.elixir_lang.heex.HeexLanguage;
+import org.elixir_lang.heex.xml.ComponentTagName;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -31,8 +32,9 @@ public class HTMLInspectionSuppressor implements InspectionSuppressor {
         if (file != null && file.getViewProvider().hasLanguage(HeexLanguage.INSTANCE)) {
             XmlTag xmlTag = PsiTreeUtil.getParentOfType(element, XmlTag.class, false);
 
-            // Tag names that contain dots are HEEx components
-            return xmlTag != null && xmlTag.getName().contains(".");
+            // Only valid HEEx component syntax is suppressed; a dotted name that
+            // Phoenix.LiveView.HTMLEngine.classify_type/1 would reject is flagged like any typo.
+            return xmlTag != null && ComponentTagName.parse(xmlTag.getName()) != null;
         }
 
         return false;

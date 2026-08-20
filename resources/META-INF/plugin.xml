@@ -111,6 +111,16 @@
             implementationClass="org.elixir_lang.heex.html.HeexHTMLOuterLanguageRangePatcher"
         />
 
+        <!-- Resolves `<.button>` / `<MyAppWeb.CoreComponents.button>` component tags to the
+             `def`/`defp` they name, giving them navigation, find-usages and rename, and offers the
+             view module's arity-1 call definitions for tag-name completion. -->
+        <xml.elementDescriptorProvider
+            implementation="org.elixir_lang.heex.xml.HeexComponentDescriptorProvider"
+        />
+        <xml.tagNameProvider
+            implementation="org.elixir_lang.heex.xml.HeexComponentTagNameProvider"
+        />
+
         <!-- Disable some unhelpful HTML inspections that are false positives for HEEx components -->
         <lang.inspectionSuppressor
             language="HTML"

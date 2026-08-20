@@ -4,6 +4,7 @@ import com.intellij.extapi.psi.PsiFileBase
 import com.intellij.openapi.fileTypes.FileType
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.psi.FileViewProvider
+import com.intellij.psi.PsiDirectory
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.ResolveState
@@ -69,7 +70,36 @@ class ElixirFile(viewProvider: FileViewProvider) : PsiFileBase(viewProvider, Eli
                         directory.findFile(liveName) as? ElixirFile
                     }
                 }
+                org.elixir_lang.heex.file.Type.INSTANCE -> {
+                    containingFile.parent?.let { directory ->
+                        heexSiblingFile(directory) ?: heexEmbedTemplatesFile(directory) ?: heexTemplatesViewFile(directory)
+                    }
+                }
                 else -> null
+            }
+
+    // `foo_live.html.heex` -> `foo_live.ex` in the same directory (LiveView colocated convention).
+    private fun heexSiblingFile(directory: PsiDirectory): ElixirFile? {
+        val nameWithoutExtension = containingFile.name.removeSuffix(".html.heex")
+        return directory.findFile("${nameWithoutExtension}.ex") as? ElixirFile
+    }
+
+    // Phoenix 1.7+ `embed_templates` convention: `controllers/page_html/index.html.heex` ->
+    // `controllers/page_html.ex` (the template's parent directory name, in the grandparent directory).
+    private fun heexEmbedTemplatesFile(directory: PsiDirectory): ElixirFile? =
+            directory.parentDirectory?.findFile("${directory.name}.ex") as? ElixirFile
+
+    // Phoenix 1.6 `templates/` -> `views/` convention, same rule as the `.eex` branch above.
+    private fun heexTemplatesViewFile(directory: PsiDirectory): ElixirFile? =
+            directory.parentDirectory?.let { directoryDirectory ->
+                if (directoryDirectory.name == "templates") {
+                    directoryDirectory
+                            .parentDirectory
+                            ?.findSubdirectory("views")
+                            ?.findFile("${directory.name}_view.ex") as? ElixirFile
+                } else {
+                    null
+                }
             }
 
     private fun findUsesEExFile(files: Array<PsiFile>): ElixirFile? =
