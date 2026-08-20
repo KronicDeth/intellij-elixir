@@ -18,7 +18,8 @@ import java.util.Arrays;
  *
  * `<Script.component>`/`<Style.thing>` must NOT enter script/style
  * mode - START_SCRIPT_TAG/START_STYLE_TAG require the character after "script"/"style" to be
- * whitespace or `>`, so a `.` falls through to plain DATA.
+ * whitespace or `>`, so a `.` falls through to plain DATA - and a self-closing `<script .../>`/
+ * `<style .../>`, which has no body, must likewise never enter script/style mode.
  */
 @RunWith(Parameterized.class)
 public class ScriptStyleTest extends Test {
@@ -54,6 +55,17 @@ public class ScriptStyleTest extends Test {
             // <Style.thing> - same non-entry behaviour for style.
             {
                     new Lex("<Style.thing></Style.thing>", Types.DATA, Flex.YYINITIAL)
+            },
+            // <script src="x.js" /><div> - self-closing, so it never enters SCRIPT_TAG; the whole
+            // thing (including the following "<div>") stays one merged DATA run in YYINITIAL. If it
+            // wrongly entered SCRIPT_TAG, the un-terminated body would run past "<div>" looking for
+            // "</script>" instead.
+            {
+                    new Lex("<script src=\"x.js\" /><div>", Types.DATA, Flex.YYINITIAL)
+            },
+            // <style media="screen" /><div> - same non-entry behaviour for style.
+            {
+                    new Lex("<style media=\"screen\" /><div>", Types.DATA, Flex.YYINITIAL)
             },
             // <script>{a}<%= x %>{b}</script> - `{` stays inert both before AND after the embedded
             // tag, so `{b}` is literal script text rather than brace interpolation.

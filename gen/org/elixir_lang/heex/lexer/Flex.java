@@ -112,10 +112,10 @@ public class Flex implements com.intellij.lexer.FlexLexer {
     "\11\0\2\1\1\2\2\3\2\4\2\5\1\6\1\7"+
     "\1\10\1\11\1\12\1\13\1\5\1\14\1\15\2\1"+
     "\1\16\3\0\1\17\2\0\1\20\7\0\1\21\13\0"+
-    "\1\22\2\0\1\23\1\24";
+    "\2\22\2\0\2\23\2\0\1\24\2\0\1\25\1\26";
 
   private static int [] zzUnpackAction() {
-    int [] result = new int[61];
+    int [] result = new int[69];
     int offset = 0;
     offset = zzUnpackAction(ZZ_ACTION_PACKED_0, offset, result);
     return result;
@@ -147,10 +147,11 @@ public class Flex implements com.intellij.lexer.FlexLexer {
     "\0\u019e\0\317\0\u01b5\0\u01cc\0\317\0\u01e3\0\u01fa\0\u0211"+
     "\0\u0228\0\u023f\0\u0256\0\u026d\0\317\0\u0284\0\u029b\0\u02b2"+
     "\0\u02c9\0\u02e0\0\u02f7\0\u030e\0\u0325\0\u033c\0\u0353\0\u036a"+
-    "\0\317\0\u0381\0\u0398\0\317\0\317";
+    "\0\u0381\0\317\0\u0398\0\u03af\0\u03c6\0\317\0\u0381\0\u03dd"+
+    "\0\317\0\u03c6\0\u03f4\0\317\0\317";
 
   private static int [] zzUnpackRowMap() {
-    int [] result = new int[61];
+    int [] result = new int[69];
     int offset = 0;
     offset = zzUnpackRowMap(ZZ_ROWMAP_PACKED_0, offset, result);
     return result;
@@ -185,12 +186,15 @@ public class Flex implements com.intellij.lexer.FlexLexer {
     "\31\0\1\54\7\0\1\55\44\0\1\56\17\0\1\57"+
     "\30\0\1\60\27\0\1\61\33\0\1\62\23\0\1\63"+
     "\25\0\1\64\23\0\1\65\30\0\1\66\25\0\1\67"+
-    "\33\0\1\70\6\0\3\71\5\0\1\71\30\0\1\72"+
-    "\31\0\1\73\11\0\3\74\5\0\1\74\26\0\1\75"+
-    "\36\0\1\72\5\0";
+    "\33\0\1\70\6\0\3\71\5\0\1\72\30\0\1\73"+
+    "\31\0\1\74\11\0\3\75\5\0\1\76\15\0\6\77"+
+    "\1\100\1\0\1\77\1\0\15\77\11\0\1\101\36\0"+
+    "\1\73\5\0\6\102\1\103\1\0\1\102\1\0\15\102"+
+    "\6\77\1\100\1\0\1\77\1\104\15\77\6\102\1\103"+
+    "\1\0\1\102\1\105\15\102";
 
   private static int [] zzUnpacktrans() {
-    int [] result = new int[943];
+    int [] result = new int[1035];
     int offset = 0;
     offset = zzUnpacktrans(ZZ_TRANS_PACKED_0, offset, result);
     return result;
@@ -230,10 +234,11 @@ public class Flex implements com.intellij.lexer.FlexLexer {
   private static final String ZZ_ATTRIBUTE_PACKED_0 =
     "\11\0\1\11\1\1\2\11\1\1\1\11\1\1\1\11"+
     "\1\1\6\11\1\1\2\11\3\1\3\0\1\11\2\0"+
-    "\1\11\7\0\1\11\13\0\1\11\2\0\2\11";
+    "\1\11\7\0\1\11\13\0\1\1\1\11\2\0\1\1"+
+    "\1\11\2\0\1\11\2\0\2\11";
 
   private static int [] zzUnpackAttribute() {
-    int [] result = new int[61];
+    int [] result = new int[69];
     int offset = 0;
     offset = zzUnpackAttribute(ZZ_ATTRIBUTE_PACKED_0, offset, result);
     return result;
@@ -572,70 +577,70 @@ public class Flex implements com.intellij.lexer.FlexLexer {
             { return Types.DATA;
             }
           // fall through
-          case 21: break;
+          case 23: break;
           case 2:
             { yybegin(BEGIN_MATCHED_BRACES);
                       return Types.BRACE_OPENING;
             }
           // fall through
-          case 22: break;
+          case 24: break;
           case 3:
             { handleInState(tagReturnState);
             }
           // fall through
-          case 23: break;
+          case 25: break;
           case 4:
             { return Types.COMMENT;
             }
           // fall through
-          case 24: break;
+          case 26: break;
           case 5:
             { return Types.ELIXIR;
             }
           // fall through
-          case 25: break;
+          case 27: break;
           case 6:
             { handleInState(ELIXIR);
                            return Types.EMPTY_MARKER;
             }
           // fall through
-          case 26: break;
+          case 28: break;
           case 7:
             { yybegin(COMMENT);
                            return Types.COMMENT_MARKER;
             }
           // fall through
-          case 27: break;
+          case 29: break;
           case 8:
             { yybegin(ELIXIR);
                            return Types.FORWARD_SLASH_MARKER;
             }
           // fall through
-          case 28: break;
+          case 30: break;
           case 9:
             { yybegin(ELIXIR);
                            return Types.EQUALS_MARKER;
             }
           // fall through
-          case 29: break;
+          case 31: break;
           case 10:
             { yybegin(ELIXIR);
                            return Types.PIPE_MARKER;
             }
           // fall through
-          case 30: break;
+          case 32: break;
           case 11:
             { handleInState(MATCHED_BRACES);
                            return Types.EQUALS_MARKER;
             }
           // fall through
-          case 31: break;
+          case 33: break;
           case 12:
             { openBraceCount++;
                            return Types.ELIXIR;
             }
           // fall through
-          case 32: break;
+          case 34: break;
           case 13:
             { if (openBraceCount > 0) {
                              openBraceCount--;
@@ -646,25 +651,25 @@ public class Flex implements com.intellij.lexer.FlexLexer {
                            }
             }
           // fall through
-          case 33: break;
+          case 35: break;
           case 14:
             { tagReturnState = yystate();
                       yybegin(MARKER_MAYBE);
                       return Types.OPENING;
             }
           // fall through
-          case 34: break;
+          case 36: break;
           case 15:
             { yybegin(WHITESPACE_MAYBE);
               return Types.CLOSING;
             }
           // fall through
-          case 35: break;
+          case 37: break;
           case 16:
             { return Types.ESCAPED_OPENING;
             }
           // fall through
-          case 36: break;
+          case 38: break;
           case 17:
             // lookahead expression with fixed lookahead length
             zzMarkedPos = Character.offsetByCodePoints
@@ -673,22 +678,38 @@ public class Flex implements com.intellij.lexer.FlexLexer {
                                          return TokenType.WHITE_SPACE;
             }
           // fall through
-          case 37: break;
+          case 39: break;
           case 18:
             { yybegin(STYLE_TAG); return Types.DATA;
             }
           // fall through
-          case 38: break;
+          case 40: break;
           case 19:
             { yybegin(SCRIPT_TAG); return Types.DATA;
             }
           // fall through
-          case 39: break;
+          case 41: break;
           case 20:
             { yybegin(YYINITIAL); return Types.DATA;
             }
           // fall through
-          case 40: break;
+          case 42: break;
+          case 21:
+            // lookahead expression with fixed base length
+            zzMarkedPos = Character.offsetByCodePoints
+                (zzBufferL, zzStartRead, 6);
+            { return Types.DATA;
+            }
+          // fall through
+          case 43: break;
+          case 22:
+            // lookahead expression with fixed base length
+            zzMarkedPos = Character.offsetByCodePoints
+                (zzBufferL, zzStartRead, 7);
+            { return Types.DATA;
+            }
+          // fall through
+          case 44: break;
           default:
             zzScanError(ZZ_NO_MATCH);
           }

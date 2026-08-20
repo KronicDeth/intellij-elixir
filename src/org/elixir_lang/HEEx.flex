@@ -53,6 +53,11 @@ START_SCRIPT_TAG = <script[\s>]
 END_SCRIPT_TAG = "</script>"
 START_STYLE_TAG = <style[\s>]
 END_STYLE_TAG = "</style>"
+// A self-closing <script .../> or <style .../> never has a body, so it must not enter
+// SCRIPT_TAG/STYLE_TAG - only the whitespace-or-">" cases above do. The leading \s (rather than
+// [^<>]*) is what tells this apart from START_SCRIPT_TAG/START_STYLE_TAG: a bare "<script>" has no
+// attributes to require whitespace before ">/", so it still falls through to those rules.
+SELF_CLOSING_TAIL = \s [^<>]* "/>"
 
 %state WHITESPACE_MAYBE
 %state COMMENT
@@ -66,6 +71,8 @@ END_STYLE_TAG = "</style>"
 <YYINITIAL> {
   {BRACE_OPENING}   { yybegin(BEGIN_MATCHED_BRACES);
                       return Types.BRACE_OPENING; }
+  "<script" / {SELF_CLOSING_TAIL} { return Types.DATA; }
+  "<style"  / {SELF_CLOSING_TAIL} { return Types.DATA; }
   {START_SCRIPT_TAG} { yybegin(SCRIPT_TAG); return Types.DATA; }
   {START_STYLE_TAG} { yybegin(STYLE_TAG); return Types.DATA; }
 }
