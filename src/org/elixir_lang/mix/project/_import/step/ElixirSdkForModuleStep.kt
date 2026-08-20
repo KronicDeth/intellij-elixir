@@ -12,29 +12,67 @@ import com.intellij.openapi.project.ex.ProjectManagerEx
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.roots.ex.ProjectRootManagerEx
 import com.intellij.openapi.roots.ui.configuration.JdkComboBox
-import com.intellij.openapi.roots.ui.configuration.ProjectStructureConfigurable
 import com.intellij.openapi.roots.ui.configuration.projectRoot.ProjectSdksModel
 import com.intellij.openapi.ui.MultiLineLabelUI
+import com.intellij.platform.eel.EelDescriptor
 import com.intellij.util.ui.JBInsets
 import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.StartupUiUtil
 import org.elixir_lang.Elixir
-import org.elixir_lang.Elixir.elixirSdkHasErlangSdk
+import org.elixir_lang.mix.project._import.Builder
+import org.elixir_lang.sdk.SdkDetectionContext
+import org.elixir_lang.sdk.SdkEnvironment
 import org.elixir_lang.sdk.elixir.Type
+import org.jetbrains.annotations.VisibleForTesting
 import java.awt.Font
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
 import javax.swing.*
 
 // Ported from `ProjectJdkForModuleStep`
+
+@Suppress("UnstableApiUsage")
 class ElixirSdkForModuleStep(private val wizardContext: WizardContext) : ModuleWizardStep() {
     private val project: Project = wizardContext.project ?: ProjectManager.getInstance().defaultProject
-    private val projectSdksModel: ProjectSdksModel = ProjectStructureConfigurable.getInstance(project).projectJdksModel
+
+    /**
+     * See [SdkEnvironment.eelDescriptor]; kept as a member for test access.
+     */
+    @VisibleForTesting
+    internal fun eelDescriptor(path: String): EelDescriptor? = SdkEnvironment.eelDescriptor(path)
+
+    /**
+     * The [EelDescriptor] of the environment the project is being imported from, or null when
+     * the import directory cannot be parsed.
+     */
+    @VisibleForTesting
+    internal fun importTargetDescriptor(): EelDescriptor? = eelDescriptor(wizardContext.projectFileDirectory)
+
+    /**
+     * See [SdkEnvironment.sdkDescriptor]; kept as a member for test access.
+     */
+    @VisibleForTesting
+    internal fun sdkDescriptor(sdk: Sdk): EelDescriptor? = SdkEnvironment.sdkDescriptor(sdk)
+
+    /**
+     * See [SdkEnvironment.sdkVisibleFor], applied to the import target.
+     */
+    @VisibleForTesting
+    internal fun sdkVisibleForImportTarget(sdk: Sdk): Boolean =
+        SdkEnvironment.sdkVisibleFor(importTargetDescriptor(), sdk)
+
+    /**
+     * Create a new ProjectSdksModel instance rather than using ProjectStructureConfigurable's
+     * shared instance, so that import-target SDKs added by [SdkEnvironment.syncTargetSdks] stay
+     * local to this wizard step.
+     */
+    @get:VisibleForTesting
+    internal val projectSdksModel: ProjectSdksModel = ProjectSdksModel()
     private val jdkComboBox: JdkComboBox = JdkComboBox(
         this.project,
         projectSdksModel,
         { it == Type.instance },
-        { elixirSdkHasErlangSdk(it) },
+        { sdk -> Elixir.elixirSdkHasErlangSdk(sdk) && sdkVisibleForImportTarget(sdk) },
         null,
         null
     ).apply {
@@ -105,11 +143,16 @@ class ElixirSdkForModuleStep(private val wizardContext: WizardContext) : ModuleW
     override fun getComponent(): JComponent = panel
 
     override fun updateDataModel() {
-        wizardContext.projectJdk = jdk
+        (wizardContext.projectBuilder as? Builder)?.elixirSdk = jdk
     }
 
     override fun updateStep() {
+        // Publish the import directory so SDK detection (Type.suggestHomePaths) and the SDK home
+        // chooser scan/anchor to the import target environment instead of the local one -- the
+        // default project supplied to them during import carries no location.
+        SdkDetectionContext.set(wizardContext.projectFileDirectory)
         projectSdksModel.reset(project)
+        SdkEnvironment.syncTargetSdks(projectSdksModel, importTargetDescriptor())
         jdkComboBox.reloadModel()
         val defaultJdk = defaultJdk
 
@@ -118,6 +161,11 @@ class ElixirSdkForModuleStep(private val wizardContext: WizardContext) : ModuleW
         }
 
         setAsDefaultButton.isEnabled = defaultJdk != null
+    }
+
+    override fun disposeUIResources() {
+        SdkDetectionContext.clear()
+        super.disposeUIResources()
     }
 
     private val jdk: Sdk?
@@ -136,7 +184,7 @@ class ElixirSdkForModuleStep(private val wizardContext: WizardContext) : ModuleW
                 projectSdksModel.apply(null, true)
 
                 true
-            } catch (e: ConfigurationException) {
+            } catch (_: ConfigurationException) {
                 false
             }
         } else {

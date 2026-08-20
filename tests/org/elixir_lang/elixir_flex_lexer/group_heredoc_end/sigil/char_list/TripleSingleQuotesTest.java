@@ -10,7 +10,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 /**
- * Created by luke.imhoff on 9/8/14.
+ * Created by kadie.enheduanna.inanna on 9/8/14.
  */
 @RunWith(Parameterized.class)
 public class TripleSingleQuotesTest extends org.elixir_lang.elixir_flex_lexer.group_heredoc_end.sigil.char_list.Test {

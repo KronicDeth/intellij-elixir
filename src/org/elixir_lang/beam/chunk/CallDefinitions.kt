@@ -1,6 +1,5 @@
 package org.elixir_lang.beam.chunk
 
-import gnu.trove.THashSet
 import org.elixir_lang.call.Visibility
 import org.elixir_lang.beam.Beam
 import org.elixir_lang.beam.chunk.Chunk.Companion.unsignedInt
@@ -45,7 +44,7 @@ class CallDefinitions(private val typeID: TypeID, var callDefinitionCollection: 
 
         fun from(chunk: Chunk, typeID: TypeID, atoms: Atoms?): CallDefinitions? =
             if (chunk.typeID == typeID.toString() && chunk.data.size >= 4) {
-                val callDefinitionCollection: MutableCollection<CallDefinition> = THashSet()
+                val callDefinitionCollection: MutableCollection<CallDefinition> = HashSet()
                 var offset = 0
                 val exportCountByteCount = unsignedInt(chunk.data, 0)
                 val exportCount = exportCountByteCount.first

@@ -5,13 +5,13 @@ import com.intellij.ide.util.treeView.smartTree.TreeElement
 import com.intellij.navigation.ItemPresentation
 import com.intellij.navigation.NavigationItem
 import com.intellij.psi.ResolveState
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.call.Visibility
 import org.elixir_lang.navigation.item_presentation.NameArity
 import org.elixir_lang.navigation.item_presentation.Parent
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.structure_view.element.modular.Modular
-import java.util.*
 
 /**
  * A definition for a call: either a function or a macro
@@ -48,6 +48,7 @@ class CallDefinition(val modular: Modular, private val time: Timed.Time, private
      *
      * @param clause the new clause for the macro
      */
+    @RequiresReadLock
     fun clause(clause: Call): CallDefinitionClause {
         val nameArityInterval =
             org.elixir_lang.psi.CallDefinitionClause.nameArityInterval(clause, ResolveState.initial())!!
@@ -214,6 +215,7 @@ class CallDefinition(val modular: Modular, private val time: Timed.Time, private
         /**
          * @param call a def(macro)?p? call
          */
+        @RequiresReadLock
         fun fromCall(call: Call): CallDefinition? =
             CallDefinitionClause.enclosingModular(call)?.let { modular ->
                 org.elixir_lang.psi.CallDefinitionClause.nameArityInterval(call, ResolveState.initial())

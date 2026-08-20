@@ -11,6 +11,7 @@ import com.intellij.psi.impl.source.tree.TreeElement
 import com.intellij.psi.scope.PsiScopeProcessor
 import com.intellij.psi.stubs.IStubElementType
 import com.intellij.util.IncorrectOperationException
+import org.elixir_lang.beam.BulkDecompilationRunLogger
 import org.elixir_lang.beam.psi.Module
 import org.elixir_lang.beam.psi.stubs.ModuleStub
 import org.elixir_lang.beam.psi.stubs.ModuleStubElementTypes
@@ -43,9 +44,10 @@ class ModuleImpl<T : ModuleStub<*>?>(private val stub: T) : ModuleElementImpl(),
      *
      * @return the parent of the element, or null if the element has no parent.
      */
-    override fun getParent(): PsiElement = stub!!.getParentStub().psi
+    override fun getParent(): PsiElement = stub!!.parentStub.psi
 
-    override fun getElementType(): IStubElementType<*, *> = stub!!.getStubType()
+    @Deprecated("Deprecated in platform - use getIElementType()", replaceWith = ReplaceWith("getIElementType()"))
+    override fun getElementType(): IStubElementType<*, *> = stub!!.elementType as IStubElementType<*, *>
 
     override fun getStub(): T = stub
 
@@ -97,10 +99,18 @@ class ModuleImpl<T : ModuleStub<*>?>(private val stub: T) : ModuleElementImpl(),
                         )
                     )
                 } else if (callDefinitionStub.isExported) {
-                    LOGGER.error("No decompiled source function with name/arity (${moduleName(element)}.${name}/${arity})")
+                    val message = "No decompiled source function with name/arity (${moduleName(element)}.${name}/${arity})"
+
+                    if (BulkDecompilationRunLogger.shouldLogMissingFunctionError(project, message)) {
+                        LOGGER.warn(message)
+                    }
                 }
             } else if (callDefinitionStub.isExported) {
-                LOGGER.error("No decompiled source function with name (${moduleName(element)}.$name)")
+                val message = "No decompiled source function with name (${moduleName(element)}.$name)"
+
+                if (BulkDecompilationRunLogger.shouldLogMissingFunctionError(project, message)) {
+                    LOGGER.warn(message)
+                }
             }
         }
     }

@@ -1,38 +1,75 @@
-tasks.jar {
-    archiveFileName.set("jps-builder.jar")
+import org.jetbrains.intellij.platform.gradle.TestFrameworkType
+
+plugins {
+    id("java")
+    alias(libs.plugins.test.logger)
+    id("org.jetbrains.intellij.platform.base")
 }
 
-tasks.compileTestJava {
-    dependsOn(":jps-shared:composedJar")
+base {
+    archivesName.set("${rootProject.name}.${project.name}")
 }
 
-tasks.compileJava {
-    dependsOn(":jps-shared:composedJar")
+sourceSets {
+    test {
+        java.srcDir("tests")
+    }
 }
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
-}
-
-tasks.withType<JavaCompile>().configureEach {
-    options.encoding = "UTF-8"
-}
+// Java level (source/target compatibility, --release, encoding) is configured by the root
+// build script, derived from the target platform (Java 25 for build 262+, otherwise 21).
 
 // Ensuring the necessary tasks are executed before tests
 tasks.test {
-    dependsOn(":getElixir")
+    // Elixir stdlib ebin comes from the SDK resolved by the root `resolveElixirErlangSdks`
+    // (mise/PATH/env aware) - no from-source Elixir build. Resolved paths are known only at
+    // execution, so set env in a doFirst reading the resolver's output.
+    dependsOn(":resolveElixirErlangSdks")
 
-    val elixirPath: String by project
-    val elixirVersion: String by project
+    useJUnit()
+    jvmArgs(
+        "--add-opens=java.base/java.lang=ALL-UNNAMED",
+        "--add-opens=java.desktop/java.awt=ALL-UNNAMED",
+        "--add-opens=java.desktop/javax.swing=ALL-UNNAMED",
+        "--add-opens=java.desktop/sun.awt=ALL-UNNAMED",
+        "--add-opens=java.desktop/java.awt.event=ALL-UNNAMED",
+        "--add-exports=java.base/sun.nio.ch=ALL-UNNAMED",
+        "--add-exports=java.base/jdk.internal.ref=ALL-UNNAMED",
+        "--add-opens=java.base/java.nio=ALL-UNNAMED",
+    )
 
-    environment("ELIXIR_LANG_ELIXIR_PATH", elixirPath)
-    environment("ELIXIR_EBIN_DIRECTORY", "${elixirPath}/lib/elixir/ebin/")
-    environment("ELIXIR_VERSION", elixirVersion)
+    val sdkProps = rootProject.layout.buildDirectory.file("elixir-erlang-sdks.properties")
+    doFirst {
+        environment(sdk.elixirTestEnvironment(sdkProps.get().asFile))
+    }
+
+    // Same reason as the root `test` task: the versions arrive as environment variables set in that
+    // doFirst, so without declaring them a version switch leaves this task UP-TO-DATE (or restores the
+    // previous pair's results from the build cache) and reports the wrong pair's numbers.
+    inputs.property("elixirVersion", rootProject.extra["expectedElixirVersion"])
+    inputs.property("otpVersion", rootProject.extra["expectedOtpVersion"])
 
     include("**/*Test.class")
+
+    // Allow the task to succeed when a global --tests filter matches nothing in this subproject
+    // (e.g., when running `gradlew test --tests SomeTestInRootProject`)
+    filter.isFailOnNoMatchingTests = false
+}
+
+configurations {
+    named("testRuntimeClasspath") {
+        extendsFrom(
+            getByName("intellijPlatformTestClasspath"),
+            getByName("intellijPlatformTestRuntimeFixClasspath")
+        )
+    }
 }
 
 dependencies {
+    intellijPlatform {
+        testFramework(TestFrameworkType.Platform)
+        bundledPlugins("com.intellij.java")
+    }
     implementation(project(":jps-shared"))
+    testImplementation(libs.junit)
 }

@@ -1,7 +1,7 @@
 package org.elixir_lang.parser_definition;
 
 /**
- * Created by luke.imhoff on 8/8/14.
+ * Created by kadie.enheduanna.inanna on 8/8/14.
  */
 public class InterpolatedWordsHeredocParsingTestCase extends ParsingTestCase {
     public void testEmpty() {

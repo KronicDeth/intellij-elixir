@@ -1,7 +1,7 @@
 /*
  * Copyright 2012-2014 Sergey Ignatov
  * Copyright 2017 Jake Becker
- * Copyright 2017-2018 Luke Imhoff
+ * Copyright 2017-2018 Kadie Enheduanna Inanna
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ package org.elixir_lang.debugger
 
 import com.ericsson.otp.erlang.OtpErlangAtom
 import com.ericsson.otp.erlang.OtpErlangPid
+import com.intellij.execution.wsl.WSLDistribution
 import com.intellij.icons.AllIcons
 import com.intellij.ui.ColoredTextContainer
 import com.intellij.ui.SimpleTextAttributes
@@ -34,8 +35,13 @@ import org.elixir_lang.debugger.stack_frame.variable.Elixir
 import org.elixir_lang.debugger.stack_frame.variable.Erlang
 import org.elixir_lang.utils.ElixirModulesUtil
 
-class StackFrame(private val process: Process, private val pid: OtpErlangPid, private val traceElement: TraceElement) : XStackFrame() {
-    private val sourcePosition: SourcePosition? = SourcePosition.create(traceElement)
+class StackFrame(
+    private val process: Process,
+    private val pid: OtpErlangPid,
+    private val traceElement: TraceElement,
+    wslDistribution: WSLDistribution? = null
+) : XStackFrame() {
+    private val sourcePosition: SourcePosition? = SourcePosition.create(traceElement, wslDistribution)
 
     override fun getEvaluator(): XDebuggerEvaluator = Evaluator(
             process,

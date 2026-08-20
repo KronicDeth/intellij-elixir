@@ -3,6 +3,7 @@ package org.elixir_lang.run
 import com.intellij.execution.CommonProgramRunConfigurationParameters
 import com.intellij.execution.ExternalizablePath
 import com.intellij.execution.configurations.ConfigurationFactory
+import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.configurations.ModuleBasedConfiguration
 import com.intellij.execution.configurations.ParametersList
 import com.intellij.openapi.module.ModuleManager
@@ -12,9 +13,11 @@ import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.vfs.VfsUtil
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.debugger.settings.stepping.ModuleFilter
 import org.elixir_lang.mix.ensureMostSpecificSdk
 import org.elixir_lang.run.configuration.Module
+import org.elixir_lang.sdk.wsl.wslCompat
 import org.jdom.Element
 import java.io.File
 
@@ -40,10 +43,8 @@ fun ensureWorkingDirectory(module: com.intellij.openapi.module.Module): String =
 fun List<String>.toArguments(): String? {
     val joined = ParametersList.join(this)
 
-    return if (joined.isBlank()) {
+    return joined.ifBlank {
         null
-    } else {
-        joined
     }
 }
 
@@ -195,8 +196,10 @@ abstract class Configuration(name: String, project: Project, configurationFactor
         _envs.putAll(envs)
     }
 
+    abstract fun commandLine(): GeneralCommandLine
+
     fun ensureModule(): com.intellij.openapi.module.Module =
-            configurationModule.module ?: ensureWorkingDirectory().let { ensureModule(it, project) }
+            configurationModule.module ?: ensureModule(ensureWorkingDirectory(), project)
 
     override fun getWorkingDirectory(): String? = ExternalizablePath.localPathValue(workingDirectoryURL)
 
@@ -223,6 +226,7 @@ abstract class Configuration(name: String, project: Project, configurationFactor
     override fun getValidModules(): Collection<com.intellij.openapi.module.Module> =
             project.let { ModuleManager.getInstance(it) }.modules.asList()
 
+    @RequiresReadLock
     fun sdkPaths(): List<String> = ensureModule().sdkPaths()
 
     protected val _envs = mutableMapOf<String, String>()
@@ -243,6 +247,11 @@ private fun ensureModule(workingDirectory: String, project: Project): com.intell
 private fun workingDirectory(module: com.intellij.openapi.module.Module): String? =
         ModuleRootManager.getInstance(module).contentRoots.firstOrNull()?.path
 
+@RequiresReadLock
 private fun com.intellij.openapi.module.Module.sdkPaths(): List<String> = ensureMostSpecificSdk(this).paths()
 
-private fun Sdk.paths(): List<String> = rootProvider.getFiles(OrderRootType.CLASSES).map { it.canonicalPath!! }
+@RequiresReadLock
+private fun Sdk.paths(): List<String> =
+        rootProvider.getFiles(OrderRootType.CLASSES)
+            .mapNotNull { it.canonicalPath }
+            .map { wslCompat.maybeParseWindowsUncPath(it) }

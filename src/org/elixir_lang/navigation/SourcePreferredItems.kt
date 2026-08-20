@@ -163,7 +163,7 @@ class SourcePreferredItems {
 
     fun toTypedArray(): Array<NavigationItem> {
         val navigationItemList =
-            modularListByName.values.flatten() as List<NavigationItem> +
+            modularListByName.values.flatten().map { it as NavigationItem } +
                     moduleImplListByName.values.flatten() +
                     callDefinitionClauseListByArityByNameByModularName.values.flatMap { it.values.flatMap { it.values.flatten() } } +
                     callDefinitionListByArityByNameByModularName.values.flatMap { it.values.flatMap { it.values.flatten() } } +

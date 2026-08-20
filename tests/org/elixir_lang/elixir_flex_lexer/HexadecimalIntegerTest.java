@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 /**
- * Created by luke.imhoff on 11/28/14.
+ * Created by kadie.enheduanna.inanna on 11/28/14.
  */
 @RunWith(Parameterized.class)
 public class HexadecimalIntegerTest extends TokenTest {

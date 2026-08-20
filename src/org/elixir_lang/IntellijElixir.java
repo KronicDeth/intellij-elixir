@@ -5,7 +5,7 @@ import com.ericsson.otp.erlang.OtpNode;
 import java.io.IOException;
 
 /**
- * Created by luke.imhoff on 12/31/14.
+ * Created by kadie.enheduanna.inanna on 12/31/14.
  */
 public class IntellijElixir {
     private static OtpNode localNode = null;

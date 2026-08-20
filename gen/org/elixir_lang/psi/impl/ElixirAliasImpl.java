@@ -15,6 +15,7 @@ import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiPolyVariantReference;
 import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.PsiScopeProcessor;
+import com.intellij.util.concurrency.annotations.RequiresReadLock;
 
 public class ElixirAliasImpl extends ASTWrapperPsiElement implements ElixirAlias {
 
@@ -38,6 +39,7 @@ public class ElixirAliasImpl extends ASTWrapperPsiElement implements ElixirAlias
   }
 
   @Override
+  @RequiresReadLock
   public @NotNull String getName() {
     return ElixirPsiImplUtil.getName(this);
   }
@@ -48,7 +50,7 @@ public class ElixirAliasImpl extends ASTWrapperPsiElement implements ElixirAlias
   }
 
   @Override
-  public @Nullable ItemPresentation getPresentation() {
+  public @NotNull ItemPresentation getPresentation() {
     return ElixirPsiImplUtil.getPresentation(this);
   }
 

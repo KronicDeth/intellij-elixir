@@ -13,7 +13,7 @@ defmodule Prefix.MixedDeclaration do
 
   ## Private Functions
 
-  def private_function, do: :d
+  defp private_function, do: :d
 
   # Modules
 

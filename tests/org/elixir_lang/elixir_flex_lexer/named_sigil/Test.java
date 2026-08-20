@@ -12,7 +12,7 @@ import static org.elixir_lang.psi.ElixirTypes.HEREDOC_PROMOTER;
 import static org.elixir_lang.psi.ElixirTypes.LINE_PROMOTER;
 
 /**
- * Created by luke.imhoff on 9/4/14.
+ * Created by kadie.enheduanna.inanna on 9/4/14.
  */
 public abstract class Test extends TokenTest {
     /*

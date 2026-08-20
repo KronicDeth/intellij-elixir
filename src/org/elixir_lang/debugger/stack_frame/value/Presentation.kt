@@ -1,7 +1,7 @@
 /*
  * Copyright 2012-2014 Sergey Ignatov
  * Copyright 2017 Jake Becker
- * Copyright 2017 Luke Imhoff
+ * Copyright 2017 Kadie Enheduanna Inanna
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -174,7 +174,9 @@ class Presentation(private val myValue: Any) : XValuePresentation() {
                 renderer.renderValue(
                         str
                                 .stringValue()
-                                .replace("\\x", "\\\\x")
+                                // Escape backslash first so that subsequent replacements don't
+                                // double-escape already-escaped sequences.
+                                .replace("\\", "\\\\")
                                 .replace("'", "\\'")
                 )
                 renderer.renderSpecialSymbol("'")
@@ -186,7 +188,7 @@ class Presentation(private val myValue: Any) : XValuePresentation() {
         @JvmStatic
         fun toUtf8String(bitstr: OtpErlangBitstr): String? = if (bitstr.pad_bits() > 0) null else try {
             Charset.availableCharsets()["UTF-8"]!!.newDecoder().decode(ByteBuffer.wrap(bitstr.binaryValue())).toString()
-        } catch (e: CharacterCodingException) {
+        } catch (_: CharacterCodingException) {
             null
         }
 

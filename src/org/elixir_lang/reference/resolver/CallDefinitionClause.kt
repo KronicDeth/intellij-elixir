@@ -1,5 +1,6 @@
 package org.elixir_lang.reference.resolver
 
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.psi.PsiElementResolveResult
 import com.intellij.psi.ResolveResult
 import com.intellij.psi.ResolveState
@@ -18,20 +19,22 @@ import org.elixir_lang.structure_view.element.Delegation
 
 object CallDefinitionClause : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.CallDefinitionClause> {
     override fun resolve(callDefinitionClause: org.elixir_lang.reference.CallDefinitionClause,
-                         incompleteCode: Boolean): Array<ResolveResult> =
-            enclosingModularMacroCall(callDefinitionClause.moduleAttribute)?.macroChildCalls()?.let { siblings ->
-                if (siblings.isNotEmpty()) {
-                    val nameArity = typeNameArity(callDefinitionClause.element)
-                    val name = nameArity.name
-                    val arity = nameArity.arity
+                         incompleteCode: Boolean): Array<ResolveResult> {
+        ApplicationManager.getApplication().assertReadAccessAllowed()
+        return enclosingModularMacroCall(callDefinitionClause.moduleAttribute)?.macroChildCalls()?.let { siblings ->
+            if (siblings.isNotEmpty()) {
+                val nameArity = typeNameArity(callDefinitionClause.element)
+                val name = nameArity.name
+                val arity = nameArity.arity
 
-                    siblings
-                            .flatMap { call -> callToResolveResults(call, name, arity) }
-                            .toTypedArray()
-                } else {
-                    null
-                }
-            } ?: emptyArray()
+                siblings
+                    .flatMap { call -> callToResolveResults(call, name, arity) }
+                    .toTypedArray()
+            } else {
+                null
+            }
+        } ?: emptyArray()
+    }
 
     private fun callToResolveResults(call: Call, name: Name, arity: Arity): List<ResolveResult> =
             when {

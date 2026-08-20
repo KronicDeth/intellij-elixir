@@ -83,7 +83,7 @@ class Configuration(name: String, project: Project, configurationFactory: Config
 
     private var mixArgumentList: MutableList<String> = mutableListOf()
 
-    fun commandLine(): GeneralCommandLine {
+    override fun commandLine(): GeneralCommandLine {
         val workingDirectory = ensureWorkingDirectory()
         val module = ensureModule()
         val sdk = ensureMostSpecificSdk(module)
@@ -92,7 +92,8 @@ class Configuration(name: String, project: Project, configurationFactory: Config
                 workingDirectory = workingDirectory,
                 elixirSdk = sdk,
                 erlArgumentList = erlArgumentList,
-                iexArgumentList = iexArgumentList
+                iexArgumentList = iexArgumentList,
+                project = project,
         )
         commandLine.addParameters(mixArgumentList)
 

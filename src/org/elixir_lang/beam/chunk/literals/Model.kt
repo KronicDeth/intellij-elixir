@@ -7,7 +7,7 @@ import javax.swing.table.AbstractTableModel
 class Model(val literals: Literals?): AbstractTableModel() {
     override fun getColumnClass(columnIndex: Int): Class<*> =
             when (columnIndex) {
-                0 -> Integer::class.java
+                0 -> Int::class.javaObjectType
                 1 -> OtpErlangObject::class.java
                 else -> throw IllegalArgumentException("Column $columnIndex out of bounds")
             }

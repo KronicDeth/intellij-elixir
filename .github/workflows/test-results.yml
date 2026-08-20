@@ -1,0 +1,786 @@
+# Publishes the test results uploaded as artifacts by shared-test.yml.
+#
+# Publishing runs here, on workflow_run, instead of inside the test run itself
+# because the GITHUB_TOKEN of runs for fork and dependabot PRs is read-only,
+# making EnricoMi/publish-unit-test-result-action fail there with
+# "Resource not accessible by integration".
+# https://github.com/EnricoMi/publish-unit-test-result-action/tree/v2#support-fork-repositories-and-dependabot-branches
+#
+# This workflow must never check out or execute code from the triggering run
+# (see https://securitylab.github.com/research/github-actions-preventing-pwn-requests);
+# it only downloads the test-result XMLs, the per-leg status files and the event
+# payload.
+#
+# It also cannot be tested from a pull request: workflow_run always runs the copy
+# on the DEFAULT branch, so a change here is only exercised once it is on main.
+# Verify a renderer change against captured artifacts of a real run first.
+name: Test Results
+
+on:
+  workflow_run:
+    workflows: [ "Test", "Release", "Tag Release" ]
+    types:
+      - completed
+
+permissions: {}
+
+jobs:
+  # The publish matrix is derived from the triggering run's artifacts rather
+  # than duplicating the os/idea-version matrix from shared-test.yml, so the
+  # two can't drift apart. Runs without test results (e.g. Tag Release with
+  # skip_tests) produce an empty list and no publish jobs.
+  collect:
+    name: Collect Test Result Artifacts
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    if: github.event.workflow_run.conclusion == 'success' || github.event.workflow_run.conclusion == 'failure'
+    permissions:
+      actions: read
+    outputs:
+      artifacts: ${{ steps.list.outputs.result }}
+    steps:
+      - name: List Test Result Artifacts
+        id: list
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const artifacts = await github.paginate(github.rest.actions.listWorkflowRunArtifacts, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.payload.workflow_run.id,
+            });
+            return artifacts.map(a => a.name).filter(n => n.startsWith('Test Results ('));
+
+  publish:
+    name: Publish ${{ matrix.artifact }}
+    needs: collect
+    if: needs.collect.outputs.artifacts != '' && needs.collect.outputs.artifacts != '[]'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    permissions:
+      checks: write
+      # required to download artifacts from the triggering run
+      actions: read
+    strategy:
+      fail-fast: false
+      matrix:
+        artifact: ${{ fromJson(needs.collect.outputs.artifacts) }}
+
+    steps:
+      - name: Download Test Results
+        id: download-test-results
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ github.event.workflow_run.id }}
+          name: ${{ matrix.artifact }}
+          path: artifacts/test-results
+
+      - name: Download Event File
+        id: download-event-file
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ github.event.workflow_run.id }}
+          name: Event File
+          path: artifacts/event-file
+
+      - name: Publish Test Results
+        id: publish-test-results
+        uses: EnricoMi/publish-unit-test-result-action@d0a4676d0e0b938bc201470d88276b7c74c712b3 # v2.24.0
+        with:
+          commit: ${{ github.event.workflow_run.head_sha }}
+          event_file: artifacts/event-file/event.json
+          event_name: ${{ github.event.workflow_run.event }}
+          # Failing tests must not turn this check red: the Test workflow is the gate, and it already
+          # decides what blocks a merge (an informational leg such as Elixir 1.19 deliberately fails
+          # tests without failing the workflow). These checks exist to report numbers, not to judge.
+          # "errors" rather than "nothing" keeps one canary: Gradle records every test failure as
+          # <failure>, so this only goes red when the reporting itself breaks - unparseable result
+          # files, or a suite that could not run - which would otherwise silently undercount.
+          fail_on: errors
+          # artifact names double as check names, matching what shared-test.yml
+          # published inline before this workflow existed
+          check_name: ${{ matrix.artifact }}
+          # The PR comment is published once, by the comment job below, over all
+          # matrix cells at once. Commenting per cell would post one comment per
+          # os/idea-version pair, because the action finds its earlier comment by
+          # matching "## <comment_title>" and comment_title defaults to check_name.
+          comment_mode: off
+          files: 'artifacts/test-results/**/*.xml'
+          # Every annotation on this check should BE a test failure. The action annotates a failed
+          # test at `warning` level - that is fixed, not a consequence of fail_on above - so anything
+          # else it emits at the same level is indistinguishable from the failure at a glance, and the
+          # one line naming the broken test was arriving 1-of-22 on the Elixir 1.14 leg:
+          #
+          #   report_suite_logs: error    ->  10 x "Logging on stderr of test suite <suite>"
+          #   check_run_annotations       ->  11 x "6580 tests found (test 1 to 767)" notices
+          #
+          # `none` for both leaves exactly the failures. Suite-level stderr is still in the leg's job
+          # log and its test-reports-* artifact, and the readable list of failures is the `Failed
+          # tests` summary that shared-test.yml writes on the leg's own job.
+          #
+          # check_run_annotations has to be set explicitly: it defaults to "all tests, skipped tests",
+          # and while check_run_annotations_branch normally limits those to the default branch, this
+          # workflow RUNS on the default branch (workflow_run), so the action always considers itself
+          # in scope and every leg gets them.
+          #
+          # Failure annotations themselves are governed by `ignore_runs`, which must stay false.
+          check_run_annotations: none
+          report_suite_logs: none
+
+  # A single aggregate check over every matrix cell, per the action's "Use with
+  # matrix strategy" guidance, plus the pull request comment. The check_name is
+  # static so that bumping an idea-version doesn't change it, which would orphan
+  # the existing check and start its comparison history over.
+  comment:
+    name: Comment Test Results
+    # publish, not just collect, because the per-leg rows are read from the per-cell
+    # check runs it creates - unsequenced, this job races them and legs come out with
+    # no counts at random. always() so a publish leg going red (fail_on: errors) does
+    # not take the comment with it; collect.result is what actually gates.
+    needs: [ collect, publish ]
+    if: >-
+      always() && needs.collect.result == 'success'
+      && needs.collect.outputs.artifacts != '' && needs.collect.outputs.artifacts != '[]'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    permissions:
+      # the comment is backed by a check run holding the results digest
+      checks: write
+      pull-requests: write
+      # required to download artifacts from the triggering run
+      actions: read
+
+    steps:
+      # No merge-multiple, so each artifact keeps its own subdirectory and the
+      # per-cell XMLs don't overwrite each other.
+      - name: Download All Test Results
+        id: download-test-results
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ github.event.workflow_run.id }}
+          pattern: 'Test Results (*)'
+          path: artifacts/test-results
+
+      # Every leg's own verdict, written by shared-test.yml's `Record leg status` step while it still
+      # had access to the step `outcome`s. A run from before that step existed simply matches nothing:
+      # download-artifact only errors on a missing `name:`, never on a `pattern:` matching nothing, and
+      # the renderer degrades those legs to an explicit "unknown" row.
+      - name: Download All Leg Statuses
+        id: download-leg-statuses
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ github.event.workflow_run.id }}
+          pattern: 'Leg Status (*)'
+          path: artifacts/leg-status
+
+      - name: Download Event File
+        id: download-event-file
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ github.event.workflow_run.id }}
+          name: Event File
+          path: artifacts/event-file
+
+      - name: Comment Test Results
+        id: comment-test-results
+        uses: EnricoMi/publish-unit-test-result-action@d0a4676d0e0b938bc201470d88276b7c74c712b3 # v2.24.0
+        with:
+          commit: ${{ github.event.workflow_run.head_sha }}
+          event_file: artifacts/event-file/event.json
+          event_name: ${{ github.event.workflow_run.event }}
+          check_name: Test Results
+          # The action's own comment is off because its layout cannot be configured: the body contains
+          # no `|` at all, its "columns" are built from six different Unicode space characters
+          # (U+2002, U+2004, U+2006, U+2007, U+2008, U+200A) which cannot align in a proportional font,
+          # and the rows mix emoji whose advance widths differ from digits. None of the 40 inputs
+          # control format, layout, table, markdown, template, style or alignment, so the only route to
+          # a readable comment is to post our own - which the step below does, from this action's own
+          # numbers so the two cannot disagree.
+          #
+          # The CHECK RUN is untouched. Only the comment is replaced.
+          comment_mode: off
+          # Structured stats for that step. json_suite_details stays off: only the aggregate is needed
+          # here (the action warns suite details "can greatly increase the size of the output"), and
+          # the per-leg figures come from the per-cell check runs, which are published for free.
+          json_file: test-results.json
+          files: 'artifacts/test-results/**/*.xml'
+          # As in the per-cell publish job above, and for the same reason: an annotation on this check
+          # should mean a test failed. Here it also keeps the aggregate from repeating all 11 legs'
+          # worth of "N tests found" notices.
+          check_run_annotations: none
+          report_suite_logs: none
+          # See the per-cell publish job above: report the numbers, leave the pass/fail verdict to
+          # the Test workflow.
+          fail_on: errors
+
+      # github-script rather than the inline Python used elsewhere in these workflows: this needs four
+      # API calls - the triggering run's artifacts and its jobs, the per-cell check runs, and
+      # find-then-create-or-update on the comment - and github-script hands over a pre-authenticated
+      # Octokit with pagination built in. Node's zlib decodes the check runs' gzipped stats, so there
+      # is no dependency to install.
+      - name: Render Test Results Comment
+        id: render-comment
+        # always(), because a comment naming the leg that died is wanted most exactly when the action
+        # above has gone red. Its json_file may then be missing, which the renderer reports in the
+        # comment rather than failing on.
+        if: always()
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        env:
+          AGGREGATE_JSON: test-results.json
+          LEG_STATUS_DIR: artifacts/leg-status
+          EVENT_FILE: artifacts/event-file/event.json
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            const zlib = require('zlib');
+
+            // Editing this comment orphans every comment already posted, so the finder would post a
+            // second one instead of updating the first. It is not a version marker; leave it alone.
+            const MARKER = '<!-- test-results-table -->';
+            const RESULTS_PREFIX = 'Test Results (';
+            // The label is everything inside the parentheses, minus the marker Record leg status appends for a
+            // leg whose tests never ran. Non-greedy, so a label that itself contains ", " survives intact.
+            const RESULTS_NAME = /^Test Results \((.*?)(?:, INCOMPLETE - failed at (.+))?\)$/;
+            // Both the per-leg checks and the aggregate carry the action's own stats gzipped into the check
+            // summary - exact integers, already computed, and published for free. json_suite_details would be
+            // the alternative and the action warns it "can greatly increase the size of the output".
+            const DIGEST = /\[test-results\]:data:application\/gzip;base64,([A-Za-z0-9+/=]+)/;
+
+            const workflowRun = context.payload.workflow_run;
+            const { owner, repo } = context.repo;
+
+            // --- reading what the run left behind ------------------------------------------------------------
+
+            function readJson(file) {
+              try {
+                return JSON.parse(fs.readFileSync(file, 'utf8'));
+              } catch (error) {
+                core.warning(`could not read ${file}: ${error.message}`);
+                return null;
+              }
+            }
+
+            // download-artifact drops a lone matching artifact straight into the target directory and nests it
+            // under its own name only when there are several, so the depth is not fixed.
+            function findLegStatusFiles(dir) {
+              let entries;
+              try {
+                entries = fs.readdirSync(dir, { withFileTypes: true });
+              } catch {
+                return [];
+              }
+              return entries.flatMap((entry) => {
+                const child = path.join(dir, entry.name);
+                if (entry.isDirectory()) return findLegStatusFiles(child);
+                return entry.name === 'leg-status.json' ? [child] : [];
+              });
+            }
+
+            function decodeDigest(summary) {
+              const match = DIGEST.exec(summary || '');
+              if (!match) return null;
+              try {
+                return JSON.parse(zlib.gunzipSync(Buffer.from(match[1], 'base64')).toString('utf8'));
+              } catch (error) {
+                core.warning(`could not decode a results digest: ${error.message}`);
+                return null;
+              }
+            }
+
+            // Artifact names and status files come from the triggering run, which on a fork pull request is
+            // content the fork chose - and this job holds pull-requests: write, so anything interpolated into the
+            // comment is markdown a fork would get to write under the repository's own bot. Every value taken from
+            // there goes through this: an allowlist of what a leg coordinate can legitimately contain, which
+            // leaves no markdown or HTML metacharacter alive, plus a length cap. Not escaping, because escaping
+            // has to be right about every context the value lands in (table cell, link text, code span).
+            const UNSAFE = /[^\w .,+\-/:#@]/g;
+            const safe = (value, limit = 80) =>
+              String(value === undefined || value === null ? '' : value)
+                .replace(UNSAFE, '?')
+                .slice(0, limit);
+
+            const aggregate = readJson(process.env.AGGREGATE_JSON);
+
+            // A status file that is not the shape Record leg status writes is treated as absent rather than
+            // half-trusted: the leg then renders as "unknown", which claims nothing either way.
+            function validStatus(status) {
+              return (
+                status &&
+                typeof status.label === 'string' &&
+                status.label.length > 0 &&
+                typeof status.informational === 'boolean' &&
+                typeof status.tests_ran === 'boolean' &&
+                (status.failed_at === null || typeof status.failed_at === 'string')
+              );
+            }
+
+            const statuses = new Map();
+            for (const file of findLegStatusFiles(process.env.LEG_STATUS_DIR)) {
+              const status = readJson(file);
+              if (validStatus(status)) statuses.set(status.label, status);
+              else core.warning(`${file} is not a leg status file; ignoring it`);
+            }
+
+            const artifactNames = (
+              await github.paginate(github.rest.actions.listWorkflowRunArtifacts, {
+                owner,
+                repo,
+                run_id: workflowRun.id,
+                per_page: 100,
+              })
+            ).map((artifact) => artifact.name);
+
+            // filter defaults to `latest`, i.e. one check run per name, so a re-run does not produce two.
+            const checks = new Map();
+            for (const check of await github.paginate(github.rest.checks.listForRef, {
+              owner,
+              repo,
+              ref: workflowRun.head_sha,
+              per_page: 100,
+            })) {
+              if (check.name.startsWith(RESULTS_PREFIX)) checks.set(check.name, check);
+            }
+
+            // The action's `duration` is the sum of the `time` attributes in the JUnit XML, not elapsed time: for
+            // a complete leg it is ~40% of the job (the rest is setup-beam, compile, sandbox staging, the quoter
+            // build and Gradle startup), and for a leg that died before its tests it reported 9s against 7.6
+            // minutes of real runner time. The jobs API has the real thing and this job already holds
+            // `actions: read`.
+            const jobDurations = new Map();
+            for (const job of await github.paginate(github.rest.actions.listJobsForWorkflowRun, {
+              owner,
+              repo,
+              run_id: workflowRun.id,
+              per_page: 100,
+            })) {
+              if (!job.started_at || !job.completed_at) continue;
+              const seconds = (Date.parse(job.completed_at) - Date.parse(job.started_at)) / 1000;
+              if (Number.isFinite(seconds)) jobDurations.set(job.name, seconds);
+            }
+
+            // --- one row per leg ----------------------------------------------------------------------------
+
+            // Union of both sources, because either can exist without the other: a cancelled leg uploads its
+            // status (always()) but no results, and a leg from before the status file existed - or whose upload
+            // failed - has results and no status.
+            const legs = new Map();
+            function legFor(label) {
+              if (!legs.has(label)) {
+                legs.set(label, { label, status: null, counts: null, checkUrl: null, seconds: undefined });
+              }
+              return legs.get(label);
+            }
+
+            for (const [label, status] of statuses) legFor(label).status = status;
+
+            for (const name of artifactNames) {
+              const match = RESULTS_NAME.exec(name);
+              if (!match) continue;
+              const leg = legFor(match[1]);
+              leg.hasResults = true;
+              const check = checks.get(name);
+              if (check) {
+                const counts = decodeDigest(check.output && check.output.summary);
+                // The digest names the commit it was computed for. A check run for this sha published by an
+                // earlier run of the reporting workflow would otherwise contribute last time's numbers silently.
+                if (counts && counts.commit && counts.commit !== workflowRun.head_sha) {
+                  core.warning(`ignoring stale figures on "${name}" (digest is for ${counts.commit})`);
+                } else {
+                  leg.counts = counts;
+                }
+                leg.checkUrl = check.html_url;
+              }
+            }
+
+            for (const leg of legs.values()) {
+              leg.seconds = jobDurations.get(`test (${leg.label})`);
+            }
+
+            // The icon says whether the leg passed and whether that blocks a merge - nothing else. A required leg
+            // is red whether it failed tests or failed to compile; an informational leg is yellow either way,
+            // because both mean "this version is not supported yet". A green tick must never sit beside a
+            // non-zero failure count, which is the mistake that made the whole checks list read as passing.
+            function statusOf(leg) {
+              if (!leg.hasResults) return { icon: '⬜', text: 'produced no results' };
+              if (!leg.status) return { icon: '❔', text: 'unknown' };
+
+              const failures = leg.counts ? leg.counts.tests_fail + leg.counts.tests_error : 0;
+              const failedAt = leg.status.failed_at || (failures > 0 ? 'tests' : null);
+              if (!failedAt) return { icon: '✅', text: 'passed' };
+
+              const icon = leg.status.informational ? '⚠️' : '❌';
+              // The text carries the reason, so it does not repeat the count: "tests failed" with 291 in the ❌
+              // column, against "failed at compile" where the counts are partial and the number is
+              // meaningless.
+              return { icon, text: failedAt === 'tests' ? 'tests failed' : `failed at ${safe(failedAt, 40)}` };
+            }
+
+            for (const leg of legs.values()) leg.verdict = statusOf(leg);
+
+            const rows = [...legs.values()].sort((a, b) =>
+              a.label.localeCompare(b.label, 'en', { numeric: true }),
+            );
+
+            // `informational` alone decides the table, so promoting a version - deleting one flag in
+            // ci-versions.json - moves its row with nothing else to update. A leg with no status file goes in
+            // neither: claiming it does or does not block a merge would be inventing the answer.
+            const groups = [
+              {
+                heading: 'Required legs',
+                note: null,
+                rows: rows.filter((leg) => leg.status && leg.status.informational === false),
+              },
+              {
+                heading: 'Informational legs - cannot fail the build',
+                note:
+                  'An informational leg turning ✅ is the signal to promote it: delete its `continue-on-error`' +
+                  ' in `.github/ci-versions.json` and the version becomes supported, so any later regression' +
+                  ' fails the pipeline.',
+                rows: rows.filter((leg) => leg.status && leg.status.informational === true),
+              },
+              {
+                heading: 'Legs that did not report their status',
+                note:
+                  'No `Leg Status (…)` artifact, so whether these block a merge - and whether their tests ran' +
+                  ' at all - is unknown. Counts are whatever they published.',
+                rows: rows.filter((leg) => !leg.status),
+              },
+            ];
+
+            // --- formatting ---------------------------------------------------------------------------------
+
+            // A comma, not the action's default U+2008 punctuation space: invisible separators are part of what
+            // makes its own output impossible to read or copy.
+            const count = (value) => (Number.isFinite(value) ? value.toLocaleString('en-US') : '-');
+
+            function duration(seconds) {
+              if (!Number.isFinite(seconds)) return '-';
+              const whole = Math.round(seconds);
+              const minutes = Math.floor(whole / 60);
+              if (minutes === 0) return `${whole}s`;
+              if (minutes < 60) return `${minutes}m ${String(whole % 60).padStart(2, '0')}s`;
+              return `${Math.floor(minutes / 60)}h ${String(minutes % 60).padStart(2, '0')}m`;
+            }
+
+            // Coordinates are hoisted out of the rows, never written down: the whole point of ci-versions.json is
+            // that version facts live in one place. Within a table, a coordinate every row shares becomes a
+            // caption; one that varies gets a column only where the leg labels do not already spell it out (they
+            // are generated to carry exactly the axis their group varies, so usually they do).
+            const COORDINATES = [
+              { key: 'os', caption: (value) => value, column: 'os' },
+              { key: 'idea', caption: (value) => `IDEA ${value}`, column: 'IDEA' },
+              { key: 'elixir', caption: (value) => `Elixir ${value}`, column: 'Elixir' },
+              { key: 'otp', caption: (value) => `OTP ${value}`, column: 'OTP' },
+            ];
+
+            function coordinatesFor(groupRows) {
+              const captions = [];
+              const columns = [];
+              for (const coordinate of COORDINATES) {
+                const values = groupRows.map((leg) => leg.status && leg.status[coordinate.key]);
+                if (values.some((value) => !value)) continue;
+                if (new Set(values).size === 1) {
+                  captions.push(coordinate.caption(safe(values[0], 40)));
+                } else if (groupRows.some((leg, index) => !leg.label.includes(values[index]))) {
+                  columns.push(coordinate);
+                }
+              }
+              return { captions, columns };
+            }
+
+            function table(groupRows) {
+              const { captions, columns } = coordinatesFor(groupRows);
+              const headers = ['leg', ...columns.map((c) => c.column), 'status', 'tests', '✅', '❌', 'wall clock'];
+              const aligns = headers.map((_, index) =>
+                index >= headers.length - 4 && index !== headers.length - 1 ? '---:' : '---',
+              );
+              const lines = [`| ${headers.join(' | ')} |`, `|${aligns.map((a) => `${a}`).join('|')}|`];
+
+              for (const leg of groupRows) {
+                // check_url comes from the API, not from the run, so only the link TEXT needs sanitising.
+                const label = leg.checkUrl ? `[${safe(leg.label)}](${leg.checkUrl})` : safe(leg.label);
+                const counts = leg.counts;
+                const failures = counts ? counts.tests_fail + counts.tests_error : undefined;
+                lines.push(
+                  `| ${[
+                    label,
+                    ...columns.map((c) => safe(leg.status[c.key], 40)),
+                    `${leg.verdict.icon} ${leg.verdict.text}`,
+                    count(counts && counts.tests),
+                    count(counts && counts.tests_succ),
+                    failures ? `**${count(failures)}**` : count(failures),
+                    duration(leg.seconds),
+                  ].join(' | ')} |`,
+                );
+              }
+
+              if (captions.length) lines.push('', `*All on ${captions.join(', ')}.*`);
+              return lines;
+            }
+
+            // --- the comment --------------------------------------------------------------------------------
+
+            const incomplete = rows.filter((leg) => leg.status && leg.status.tests_ran === false);
+            const noResults = rows.filter((leg) => !leg.hasResults);
+            const unknown = groups[2].rows;
+
+            const body = [MARKER, '### Test Results', ''];
+
+            const headline = [
+              `Commit \`${workflowRun.head_sha.slice(0, 8)}\``,
+              `${rows.length} ${rows.length === 1 ? 'leg' : 'legs'}`,
+            ];
+            if (incomplete.length) headline.push(`**${incomplete.length} did not complete**`);
+            if (noResults.length) headline.push(`**${noResults.length} produced no results**`);
+            body.push(headline.join(' · '), '');
+
+            // Required legs are the only ones that can block a merge, so their verdict goes first - ahead of
+            // every other number here, all of which span both kinds of leg. On a matrix like this one the
+            // informational legs contribute ALL of the failures, so a pull request whose required legs are
+            // entirely green still led with "291 failed" and "1,251 failing runs", and the one figure that
+            // has to be zero for the pipeline to pass appeared nowhere. Computed from the same per-leg
+            // digests the tables below use, so the two cannot disagree.
+            const required = groups[0].rows;
+            const requiredIncomplete = required.filter(
+              (leg) => !leg.hasResults || leg.status.tests_ran === false,
+            );
+            // A required leg that published results but whose check carries no usable digest contributes an
+            // unknown number of failures, so the total is a floor, not the answer. Said, not hidden.
+            const requiredUncounted = required.filter((leg) => leg.hasResults && !leg.counts);
+            const requiredFailingLegs = required.filter(
+              (leg) => leg.counts && leg.counts.tests_fail + leg.counts.tests_error > 0,
+            );
+            // Summed across legs, so this counts runs rather than distinct tests - the same distinction the
+            // note under the aggregate table draws. A leg's digest cannot say which of its failures another
+            // leg also hit, and the number that matters here is zero either way.
+            const requiredFailingRuns = required.reduce(
+              (total, leg) => total + (leg.counts ? leg.counts.tests_fail + leg.counts.tests_error : 0),
+              0,
+            );
+
+            // The whole verdict is one bold span, so the clauses inside it carry no emphasis of their own:
+            // nesting `**` inside `**` does not reliably render as bold in GitHub-flavoured markdown.
+            const gate = [];
+            if (requiredFailingRuns) {
+              gate.push(
+                `${count(requiredFailingRuns)} failing test ${requiredFailingRuns === 1 ? 'run' : 'runs'}` +
+                  ` across ${requiredFailingLegs.length} of ${required.length}` +
+                  ` ${required.length === 1 ? 'leg' : 'legs'}`,
+              );
+            }
+            if (requiredIncomplete.length) {
+              gate.push(
+                requiredIncomplete.length === 1
+                  ? '1 leg did not run its tests'
+                  : `${requiredIncomplete.length} legs did not run their tests`,
+              );
+            }
+
+            if (!required.length) {
+              body.push(
+                '❔ **No leg reported itself as required**, so nothing here says whether this commit can' +
+                  ' merge.',
+                '',
+              );
+            } else if (gate.length) {
+              // A red gate stays red whatever the missing legs would have added; the caveat sits outside the
+              // verdict because it qualifies the number rather than the judgement.
+              const verdict = `❌ **Required legs: ${gate.join('; ')}.**`;
+              body.push(
+                requiredUncounted.length
+                  ? `${verdict} ${requiredUncounted.length} required` +
+                      ` ${requiredUncounted.length === 1 ? 'leg' : 'legs'} published no counts, so that is a` +
+                      ' lower bound.'
+                  : verdict,
+                '',
+              );
+            } else if (requiredUncounted.length) {
+              // Never ✅ here. A tick beside "and some of them did not report" is the same lie as a tick on a
+              // leg that never compiled: the gate is unknown, so it says unknown.
+              const counted = required.length - requiredUncounted.length;
+              body.push(
+                counted === 0
+                  ? '❔ **No required leg reported counts**, so whether anything blocks a merge is unknown.'
+                  : `❔ **Required legs: 0 failing tests among the ${counted} that reported counts**, but` +
+                      ` ${requiredUncounted.length} published none - so whether anything blocks a merge is` +
+                      ' unknown.',
+                '',
+              );
+            } else {
+              body.push(
+                `✅ **Required legs: 0 failing tests**, all ${required.length} ran to completion.`,
+                '',
+              );
+            }
+
+            const timed = rows.filter((leg) => Number.isFinite(leg.seconds)).map((leg) => leg.seconds);
+
+            if (aggregate && aggregate.stats) {
+              const stats = aggregate.stats;
+              // Undefined rather than 0 when no job timing was found: "0s" would assert that the run took no
+              // time, which is the same kind of lie as a green check on a leg that never compiled.
+              const wallClock = timed.length ? Math.max(...timed) : undefined;
+              const runnerTime = timed.length ? timed.reduce((total, seconds) => total + seconds, 0) : undefined;
+              const failures = stats.tests_fail + stats.tests_error;
+              const failingRuns = stats.runs_fail + stats.runs_error;
+              // stats.runs_succ rather than a subtraction, so passing runs stay the action's arithmetic like
+              // every other figure here. The fallback only covers the field being absent from a future schema.
+              const passingRuns = Number.isFinite(stats.runs_succ)
+                ? stats.runs_succ
+                : stats.runs - failingRuns - stats.runs_skip;
+
+              // The action's `tests` is the union of distinct (class, test name) pairs over EVERY leg's XMLs,
+              // and on this matrix that roughly doubles the real figure: `org.elixir_lang.beam.SdkBeamParseTest`
+              // names each case after a `.beam` path in the resolved SDK, and the Erlang half of those - about
+              // 1 400 of ~1 700 - carries the OTP application version in the path (`erlang/kernel-8.3.2.2/...`),
+              // so every OTP bump renames nearly all of them. Measured on run 31156815241: 4 897 ordinary tests
+              // identical on every leg, 8 016 distinct sweep cases across the matrix, 12 913 together against
+              // 6 560-6 659 that any single leg actually ran. Nobody can act on that union, so it is not shown;
+              // each leg's own count comes from the per-leg digests already decoded above.
+              // Legs that never got to their tests are excluded - their 6 would otherwise be the bottom of the
+              // range. If nothing reported a status, every leg counts and the ❔ note below says the totals are
+              // of unknown completeness.
+              const anyStatus = rows.some((leg) => leg.status);
+              const legTests = rows
+                .filter((leg) => leg.counts && (!anyStatus || (leg.status && leg.status.tests_ran === true)))
+                .map((leg) => leg.counts.tests);
+              const perLeg = legTests.length
+                ? Math.min(...legTests) === Math.max(...legTests)
+                  ? count(legTests[0])
+                  : `${count(Math.min(...legTests))} - ${count(Math.max(...legTests))}`
+                : '-';
+              // Named exactly for what was measured, so the row does not quietly speak for the legs it skipped.
+              const perLegLabel =
+                legTests.length && legTests.length < rows.length ? 'tests per completed leg' : 'tests per leg';
+
+              body.push(
+                '| | count |',
+                '|---|---:|',
+                `| ${perLegLabel} | ${perLeg} |`,
+                `| runs | ${count(stats.runs)} |`,
+                `| ✅ passing runs | ${count(passingRuns)} |`,
+                `| ❌ failing runs | ${failingRuns ? `**${count(failingRuns)}**` : count(failingRuns)} |`,
+                `| 💤 skipped runs | ${count(stats.runs_skip)} |`,
+                `| ❌ distinct tests failing somewhere | ${failures ? `**${count(failures)}**` : count(failures)} |`,
+                `| result files | ${count(stats.files)} |`,
+                `| wall clock (longest leg) | ${duration(wallClock)} |`,
+                `| runner time (all legs) | ${duration(runnerTime)} |`,
+                '',
+                // The action's own check title says "291 fail" while its body says "1,251 ❌", and both are
+                // right. Which one answers "how bad is this" depends on the matrix, so name both rather than
+                // picking - but say which is which, because "291" reads like a per-leg number and is not one.
+                '`runs` counts executions across the whole matrix, so a test present in every leg is one test' +
+                  ' and as many runs as there are legs - **that is the figure to read** for a matrix whose job' +
+                  ' is per-version validation. `distinct tests failing somewhere` collapses it back: a test that' +
+                  ' fails on four legs counts once. Every row spans required and informational legs alike; only' +
+                  ' the required-leg line above decides whether this commit can merge.',
+                '',
+              );
+
+              if (timed.length !== rows.length) {
+                body.push(
+                  timed.length === 0
+                    ? '⚠️ No `test (…)` job matched these legs, so neither clock figure could be measured.'
+                    : `⚠️ Job timings matched only ${timed.length} of ${rows.length} legs, so both clock` +
+                        ' figures cover just those.',
+                  '',
+                );
+              }
+              if (incomplete.length) {
+                body.push(
+                  `⚠️ ${incomplete.length} ${incomplete.length === 1 ? 'leg' : 'legs'} stopped before` +
+                    ' running tests, so these totals are partial.',
+                  '',
+                );
+              }
+              if (unknown.length) {
+                body.push(
+                  `❔ ${unknown.length} ${unknown.length === 1 ? 'leg' : 'legs'} did not report a status, so` +
+                    ' whether their totals are complete is unknown - and, since nothing says whether they are' +
+                    ' required, they are not in the required-leg line either.',
+                  '',
+                );
+              }
+            } else {
+              body.push(
+                '⚠️ The aggregate totals are unavailable for this run - the per-leg figures below still come' +
+                  ' straight from each leg’s own check.',
+                '',
+              );
+            }
+
+            for (const group of groups) {
+              if (!group.rows.length) continue;
+              body.push(`### ${group.heading}`, '', ...table(group.rows), '');
+              if (group.note) body.push(group.note, '');
+            }
+
+            if (incomplete.length || noResults.length) {
+              body.push(
+                'A leg that **failed at** a stage stopped before its tests ran: its counts cover only what' +
+                  ' executed and are not comparable with a leg that completed.',
+                '',
+              );
+            }
+
+            body.push(
+              'Counts only - for *which* tests failed, open a leg’s `Test Results (…)` check, or the' +
+                ' **Failed tests** summary on its `test (…)` job.',
+            );
+
+            const comment = body.join('\n');
+
+            // Written unconditionally: a push to main has no pull request to comment on, and the summary is then
+            // the only place this lands.
+            await core.summary.addRaw(comment).write();
+
+            // --- posting ------------------------------------------------------------------------------------
+
+            // Never from github.event: this workflow runs on workflow_run, whose payload describes the reporting
+            // run, not the pull request. The Test workflow uploads its own event payload for exactly this.
+            const event = readJson(process.env.EVENT_FILE) || {};
+            const pullNumber =
+              event.number ||
+              (event.pull_request && event.pull_request.number) ||
+              (workflowRun.pull_requests && workflowRun.pull_requests[0] && workflowRun.pull_requests[0].number);
+
+            if (workflowRun.event !== 'pull_request' || !pullNumber) {
+              core.info(`no pull request for a ${workflowRun.event} run; the summary is the only output`);
+            } else {
+              // A reporting step must not be what turns a job red - the same rule as `fail_on: errors` on the
+              // action above and `if-no-files-found: warn` in shared-test.yml. The rendered table is already in
+              // the job summary, so a failure here costs the comment and nothing else.
+              try {
+                const existing = (
+                  await github.paginate(github.rest.issues.listComments, {
+                    owner,
+                    repo,
+                    issue_number: pullNumber,
+                    per_page: 100,
+                  })
+                ).find((c) => c.body && c.body.includes(MARKER));
+
+                if (existing) {
+                  await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body: comment });
+                  core.info(`updated comment ${existing.id} on #${pullNumber}`);
+                } else {
+                  const created = await github.rest.issues.createComment({
+                    owner,
+                    repo,
+                    issue_number: pullNumber,
+                    body: comment,
+                  });
+                  core.info(`posted comment ${created.data.id} on #${pullNumber}`);
+                }
+              } catch (error) {
+                core.warning(
+                  `could not post the comment on #${pullNumber} (${comment.length} characters): ${error.message}`,
+                );
+              }
+            }

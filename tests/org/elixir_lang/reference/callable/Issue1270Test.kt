@@ -1,8 +1,8 @@
 package org.elixir_lang.reference.callable
 
-import com.intellij.codeInsight.completion.CompletionType
-import com.intellij.codeInsight.lookup.LookupElementBuilder
 import org.elixir_lang.PlatformTestCase
+import org.elixir_lang.code_insight.completeSoleCandidateAtCaret
+import org.elixir_lang.code_insight.completionStringsAtCaret
 
 /**
  * https://github.com/KronicDeth/intellij-elixir/issues/1270
@@ -13,21 +13,10 @@ class Issue1270Test : PlatformTestCase() {
      */
     fun testOuterModuleBareWords() {
         myFixture.configureByFile("outer_module_bare_words.ex")
-        val completions = myFixture.complete(CompletionType.BASIC, 1)
 
-        assertEquals(2, completions.size)
-
-        assertInstanceOf(completions[0], LookupElementBuilder::class.java)
-
-        val firstCompletion = completions[0] as LookupElementBuilder
-
-        assertEquals("test", firstCompletion.lookupString)
-
-        assertInstanceOf(completions[1], LookupElementBuilder::class.java)
-
-        val secondCompletion = completions[1] as LookupElementBuilder
-
-        assertEquals("internal_test", secondCompletion.lookupString)
+        // Bare word inside Autocomplete's own function: its public `test` and private `internal_test`
+        // are both reachable via a local unqualified call, so both are offered.
+        assertEquals(listOf("test", "internal_test"), myFixture.completionStringsAtCaret())
     }
 
     /**
@@ -35,15 +24,8 @@ class Issue1270Test : PlatformTestCase() {
      */
     fun testOuterModuleRelativeQualifier() {
         myFixture.configureByFile("outer_module_relative_qualifier.ex")
-        val completions = myFixture.complete(CompletionType.BASIC, 1)
 
-        assertEquals(1, completions.size)
-
-        assertInstanceOf(completions[0], LookupElementBuilder::class.java)
-
-        val firstCompletion = completions[0] as LookupElementBuilder
-
-        assertEquals("another_test", firstCompletion.lookupString)
+        assertEquals(listOf("another_test"), myFixture.completionStringsAtCaret())
     }
 
     /**
@@ -51,37 +33,23 @@ class Issue1270Test : PlatformTestCase() {
      */
     fun testNestedModuleBareWords() {
         myFixture.configureByFile("nested_module_bare_words.ex")
-        val completions = myFixture.complete(CompletionType.BASIC, 1)
 
-        assertEquals(1, completions.size)
-
-        assertInstanceOf(completions[0], LookupElementBuilder::class.java)
-
-        val firstCompletion = completions[0] as LookupElementBuilder
-
-        assertEquals("another_test", firstCompletion.lookupString)
+        assertEquals(listOf("another_test"), myFixture.completionStringsAtCaret())
     }
 
     /**
-     * The nested module can resolve outer module using fully-qualified name
+     * The nested module can resolve the outer module using its fully-qualified name. `Autocomplete.`
+     * is a **remote** call, so only the outer module's public functions are offered - the private
+     * `internal_test` (`defp`) is not reachable through qualification, even from a nested module. With
+     * `test` as the sole candidate for prefix `t`, it auto-inserts to `Autocomplete.test()`.
      */
     fun testNestedModuleFullQualifier() {
         myFixture.configureByFile("nested_module_full_qualifier.ex")
-        val completions = myFixture.complete(CompletionType.BASIC, 1)
 
-        assertEquals(2, completions.size)
+        // Sole candidate `test` auto-inserts (no popup); the insert handler appends `()`.
+        myFixture.completeSoleCandidateAtCaret()
 
-        assertInstanceOf(completions[0], LookupElementBuilder::class.java)
-
-        val firstCompletion = completions[0] as LookupElementBuilder
-
-        assertEquals("test", firstCompletion.lookupString)
-
-        assertInstanceOf(completions[1], LookupElementBuilder::class.java)
-
-        val secondCompletion = completions[1] as LookupElementBuilder
-
-        assertEquals("internal_test", secondCompletion.lookupString)
+        myFixture.checkResultByFile("nested_module_full_qualifier_completed.ex")
     }
 
     /**
@@ -89,15 +57,8 @@ class Issue1270Test : PlatformTestCase() {
      */
     fun testNestedModuleRelativeQualifier() {
         myFixture.configureByFile("nested_module_relative_qualifier.ex")
-        val completions = myFixture.complete(CompletionType.BASIC, 1)
 
-        assertEquals(1, completions.size)
-
-        assertInstanceOf(completions[0], LookupElementBuilder::class.java)
-
-        val firstCompletion = completions[0] as LookupElementBuilder
-
-        assertEquals("another_test", firstCompletion.lookupString)
+        assertEquals(listOf("another_test"), myFixture.completionStringsAtCaret())
     }
 
     override fun getTestDataPath(): String {

@@ -7,60 +7,13 @@ import org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.v1.definitions.compon
 import org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.v1.definitions.component3
 import org.elixir_lang.beam.term.inspect
 import org.elixir_lang.code.Identifier
+import org.elixir_lang.code.sanitizeErlangVariableName
 import kotlin.collections.List
-
-val binaryOps = arrayOf(
-    "===",
-    "!==",
-    "==",
-    "!=",
-    "<=",
-    ">=",
-    "&&",
-    "||",
-    "<>",
-    "++",
-    "--",
-    "\\",
-    "::",
-    "<-",
-    "..",
-    "|>",
-    "=~",
-    "<",
-    ">",
-    "->",
-    "+",
-    "-",
-    "*",
-    "/",
-    "=",
-    "|",
-    ".",
-    "and",
-    "or",
-    "when",
-    "in",
-    "~>>",
-    "<<~",
-    "~>",
-    "<~",
-    "<~>",
-    "<|>",
-    "<<<",
-    ">>>",
-    "|||",
-    "&&&",
-    "^^^",
-    "~~~"
-)
 
 fun otpErlangList(vararg elements: OtpErlangObject): OtpErlangList = OtpErlangList(elements)
 fun otpErlangList(elements: List<OtpErlangObject>): OtpErlangList = OtpErlangList(elements.toTypedArray())
 
 object Macro {
-    private const val MACRO_CALL_PREFIX = "MACRO-"
-
     val logger = Logger.getInstance(Macro.javaClass)
 
     fun block(expressions: List<OtpErlangObject>): OtpErlangTuple =
@@ -119,7 +72,7 @@ object Macro {
     }
 
     /**
-     * Return whether the macro is an Expr node: `expr :: {expr | atom, Keyword.t, atom | [t]}`.
+     * Return whether the macro is an Expr node: `expr :: {expr | atom, Keyword.t, atom | \[t\]}`.
      *
      * @param macro a quoted form from a `quote` method.
      * @return `true` if a tuple with 3 elements; `false` otherwise.
@@ -287,10 +240,32 @@ object Macro {
 
                         val leftCommaJoined = commaJoinOrEmptyParentheses(leftList, false)
 
+                        // A `cond`/`case`/`receive` clause's single condition needs parenthesizing
+                        // whenever its raw term is `case`-tagged, for two different reasons that both
+                        // end up checked here:
+                        //
+                        // - Still rendered as a literal `case ... do ... end` (or nested inside a
+                        //   match, `source = case ... do ... end`, e.g. from deinlining `&&`/`||`):
+                        //   the bare `end ->` is ambiguous - the parser reads `end` as closing the
+                        //   enclosing macro instead of the inner block - the same reason
+                        //   `operandToString` parenthesizes a binary operation's left operand.
+                        // - Deinlined to `and`/`or`/`&&`/`||` by `toString` (`ifDeinlineToString`):
+                        //   the rendered text no longer ends with `end` at all, but `and`/`or` bind
+                        //   looser than `->`, so it still needs parens - just for precedence instead
+                        //   of a dangling `end`.
+                        //
+                        // Checking the raw term's tag catches both `case`-shaped origins regardless of
+                        // how `toString` ends up rendering them; checking the rendered text separately
+                        // catches the match-wrapped form, whose raw term is `=`, not `case`.
                         val leftString = if (leftList.arity() == 1) {
-                            ifCaseTo(leftList.elementAt(0)) { _, _ ->
+                            val condition = leftList.elementAt(0)
+                            val isCaseTagged = ifCaseTo(condition) { _, _ -> true } ?: false
+
+                            if (isCaseTagged || leftCommaJoined.trimEnd().endsWith("end")) {
                                 "($leftCommaJoined)"
-                            } ?: leftCommaJoined
+                            } else {
+                                leftCommaJoined
+                            }
                         } else {
                             leftCommaJoined
                         }
@@ -799,7 +774,7 @@ object Macro {
                     val scope = tuple.elementAt(2)
 
                     if (scope is OtpErlangAtom || (scope is OtpErlangList && scope.arity() == 1 && scope.elementAt(0) == NIL)) {
-                        variable.atomValue()
+                        sanitizeErlangVariableName(variable)
                     } else {
                         null
                     }
@@ -846,13 +821,7 @@ object Macro {
         tag: String,
         crossinline taggedTupleTo: (OtpErlangTuple) -> T?
     ): T? =
-        ifTupleTo(macro, 3) { tuple: OtpErlangTuple ->
-            if (tuple.elementAt(0) == OtpErlangAtom(tag)) {
-                taggedTupleTo(tuple)
-            } else {
-                null
-            }
-        }
+        ifTaggedTuple(macro, arity = 3, predicate = { it == tag }, ifTrue = taggedTupleTo)
 
     // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex#L578-L582
     private fun ifTupleContainerToString(macro: OtpErlangObject): String? =
@@ -916,7 +885,7 @@ object Macro {
                     "[]"
                 IOLib.printableList(list) ->
                     "'${IOLib.printableListToString(list)}'"
-                org.elixir_lang.Inspect.List.isKeyword(list) ->
+                Inspect.List.isKeyword(list) ->
                     "[${keywordListToString(list)}]"
                 else ->
                     "[${list.joinToString(", ") { toString(it) }}]"
@@ -992,7 +961,31 @@ object Macro {
             ?: if (parentOperator == "->" && side == Identifier.Associativity.LEFT && expression is OtpErlangList && expression.arity() == 0) {
                 "()"
             } else {
-                toString(expression)
+                val rendered = toString(expression)
+
+                // Wrap do...end block expressions in parentheses when they appear as the
+                // LEFT operand of a binary operation AND the rendered output actually ends
+                // with `end`.  Example: `(case ... end) + title_padding` instead of
+                // `case ... end + title_padding` which causes the parser to treat `end`
+                // as closing the outer block.
+                //
+                // We check the rendered string rather than the raw AST structure because
+                // deinlining rewrites (e.g. `case` → `||` via ifSymbolicOrRewriteTo) may
+                // eliminate the do...end block entirely.  Right-side operands are safe
+                // because `end` comes last with no trailing operator token.
+                //
+                // Excluded: `::` (type annotation in binary segments) — inside `<<>>`,
+                // `case...end::binary()` is parsed correctly by Elixir.
+                //
+                // Analogous to `MacroString.group()` in the Erlang abstract code
+                // decompiler (see commit a5cbbaa2).
+                if (side == Identifier.Associativity.LEFT
+                    && parentOperator != "::"
+                    && rendered.trimEnd().endsWith("end")) {
+                    "($rendered)"
+                } else {
+                    rendered
+                }
             }
 
     // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex?utf8=%E2%9C%93#L960-L962
@@ -1156,7 +1149,7 @@ object Macro {
             }
         } ?:
         // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/macro.ex?utf8=%E2%9C%93#L760-L761
-        part is OtpErlangBinary
+        (part is OtpErlangBinary)
 
     fun adjustNewLines(textWithNewLines: String, newLineReplacement: String): String =
         Regex(Regex.escape("\n")).replace(textWithNewLines, Regex.escapeReplacement(newLineReplacement))
@@ -1166,16 +1159,12 @@ object Macro {
             orelseArguments.arity() == 2 &&
                     isCallingWithArguments(
                         orelseArguments.elementAt(0),
-                        "erlang",
-                        "=:=",
                         variable,
                         OtpErlangAtom("false")
                     )
                     &&
                     isCallingWithArguments(
                         orelseArguments.elementAt(1),
-                        "erlang",
-                        "=:=",
                         variable,
                         OtpErlangAtom("nil")
                     )
@@ -1183,11 +1172,9 @@ object Macro {
 
     private fun isCallingWithArguments(
         term: OtpErlangObject,
-        module: String,
-        name: String,
         vararg expected: OtpErlangObject
     ): Boolean =
-        ifCallConvertArgumentsTo(term, module, name) { actual ->
+        ifCallConvertArgumentsTo(term, "erlang", "=:=") { actual ->
             actual.elements()!!.contentEquals(expected)
         } ?: false
 
@@ -1691,8 +1678,7 @@ object Macro {
                     ) {
                         ifCaseClauseTo(clauses.elementAt(1)) { trueInput, trueOutput ->
                             if (trueInput.let { it as? OtpErlangList }?.singleOrNull() == OtpErlangAtom("true")) {
-                                if (clauseCount == 2 ||
-                                    (clauseCount == 3 && isBadBoolClause(clauses.elementAt(2)))
+                                if (clauseCount == 2 || isBadBoolClause(clauses.elementAt(2))
                                 ) {
                                     transformer(
                                         otpErlangTuple(
@@ -1960,7 +1946,7 @@ object Macro {
 
     // https://github.com/elixir-lang/elixir/blob/v1.6.0-rc.1/lib/elixir/lib/exception.ex#L302-L316
     fun rewriteGuard(guard: OtpErlangObject): OtpErlangObject =
-        Macro.prewalk(guard) { macro ->
+        prewalk(guard) { macro ->
             ifErlangElementRewriteTo(macro) { it } ?: ifErlangRewriteTo(macro) { it } ?: macro
         }
 
@@ -2174,12 +2160,6 @@ object Macro {
     private fun kernelToString(@Suppress("UNUSED_PARAMETER") term: OtpErlangObject): String {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
-
-    private fun ifAtomToString(term: OtpErlangObject): String? =
-        when (term) {
-            is OtpErlangAtom -> term.atomValue().removePrefix(MACRO_CALL_PREFIX)
-            else -> null
-        }
 
     val NIL = OtpErlangAtom("nil")
 

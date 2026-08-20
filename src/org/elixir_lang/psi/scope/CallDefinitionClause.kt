@@ -27,6 +27,7 @@ import org.elixir_lang.psi.impl.keywordValue
 import org.elixir_lang.psi.impl.siblingExpressions
 import org.elixir_lang.psi.scope.WhileIn.whileIn
 import org.elixir_lang.psi.stub.type.call.Stub.isModular
+import org.elixir_lang.reference.resolver.narrowedScope
 import org.elixir_lang.structure_view.element.Callback
 import org.elixir_lang.structure_view.element.Delegation
 
@@ -94,7 +95,7 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
     protected abstract fun executeOnException(element: Call, state: ResolveState): Boolean
 
     /**
-     * Called on every [Call] where [org.elixir_lang.mix.Generator.isEmbed] is `true`.
+     * Called on every [Call] where [org.elixir_lang.psi.mix.Generator.isEmbed] is `true`.
      *
      * @return `true` to keep searching up tree; `false` to stop searching.
      */
@@ -144,7 +145,7 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
                     Import.treeWalkUp(element, state) { call, accResolveState ->
                         execute(call, accResolveState)
                     }
-                } catch (stackOverflowError: StackOverflowError) {
+                } catch (_: StackOverflowError) {
                     Logger.error(
                         CallDefinitionClause::class.java,
                         "StackOverflowError while processing import",
@@ -279,51 +280,78 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
 
     private fun implicitImports(element: PsiElement, state: ResolveState): Boolean {
         val project = element.project
+        // Use the entrance element (the call being resolved) for narrowedScope so the search
+        // is limited to the SDK / libraries attached to the module that contains the reference.
+        // Falling back to `element` covers the ElixirFile case where ENTRANCE may be absent.
+        val entrance = state.get(ENTRANCE) ?: element
+        val scope = narrowedScope(entrance, project)
 
-        val keepProcessing = implicitImport(project, KERNEL, state)
+        val keepProcessing = implicitImport(project, scope, KERNEL, state)
 
         return if (keepProcessing) {
             val modularCanonicalNameState = state.put(MODULAR_CANONICAL_NAME, KERNEL_SPECIAL_FORMS)
 
-            implicitImport(project, KERNEL_SPECIAL_FORMS, modularCanonicalNameState)
+            implicitImport(project, scope, KERNEL_SPECIAL_FORMS, modularCanonicalNameState)
         } else {
             false
         }
     }
 
-    private fun implicitImport(project: Project, moduleName: String, state: ResolveState): Boolean =
+    private fun implicitImport(project: Project, scope: GlobalSearchScope, moduleName: String, state: ResolveState): Boolean =
         if (DumbService.isDumb(project)) {
             true
         } else {
-            StubIndex
-                .getInstance()
-                .processElements(
-                    org.elixir_lang.psi.stub.index.ModularName.KEY,
-                    moduleName,
-                    project,
-                    GlobalSearchScope.allScope(project),
-                    NamedElement::class.java
-                ) { namedElement ->
-                    when (namedElement) {
-                        is Call -> {
-                            val namedElementResolveState = state.putVisitedElement(namedElement)
+            whileIn(sourceFirstNamedElements(project, scope, moduleName)) { namedElement ->
+                when (namedElement) {
+                    is Call -> {
+                        val namedElementResolveState = state.putVisitedElement(namedElement)
 
-                            Modular.callDefinitionClauseCallWhile(
-                                namedElement, namedElementResolveState
-                            ) { callDefinitionClause, accResolveState ->
-                                executeOnCallDefinitionClause(
-                                    callDefinitionClause,
-                                    accResolveState
-                                )
-                            }
+                        Modular.callDefinitionClauseCallWhile(
+                            namedElement, namedElementResolveState
+                        ) { callDefinitionClause, accResolveState ->
+                            executeOnCallDefinitionClause(
+                                callDefinitionClause,
+                                accResolveState
+                            )
                         }
-                        is ModuleImpl<*> -> whileIn(namedElement.callDefinitions()) {
-                            execute(it, state)
-                        }
-                        else -> true
                     }
+                    is ModuleImpl<*> -> whileIn(namedElement.callDefinitions()) {
+                        execute(it, state)
+                    }
+                    else -> true
                 }
+            }
         }
+
+    /**
+     * Returns the [NamedElement]s for [moduleName] within [scope] to walk, preferring source [Call]s
+     * over decompiled [ModuleImpl] beam stubs: when the module is available as source, the beam stubs
+     * are dropped entirely so a module present in both forms is not visited twice.
+     *
+     * Dropping the beam stubs matters for Variants-style completion, where [keepProcessing] is always
+     * `true`, so a source [Call] and its [ModuleImpl] beam counterpart would otherwise both be visited
+     * and offer every definition twice (e.g. each `Kernel.SpecialForms` macro). For resolution, where
+     * [keepProcessing] stops after the first result, the surviving source [Call]s are still ordered
+     * first so the walk short-circuits on source before any beam stub (which are now only present when
+     * no source exists) is reached.
+     */
+    private fun sourceFirstNamedElements(project: Project, scope: GlobalSearchScope, moduleName: String): List<NamedElement> {
+        val namedElements = buildList {
+            StubIndex.getInstance().processElements(
+                org.elixir_lang.psi.stub.index.ModularName.KEY,
+                moduleName,
+                project,
+                scope,
+                NamedElement::class.java
+            ) { add(it); true }
+        }
+
+        return if (namedElements.any { it is Call }) {
+            namedElements.filter { it is Call }
+        } else {
+            namedElements
+        }
+    }
 
     companion object {
         val MODULAR_CANONICAL_NAME = Key<String>("MODULAR_CANONICAL_NAME")

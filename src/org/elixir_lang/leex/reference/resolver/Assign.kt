@@ -1,6 +1,5 @@
 package org.elixir_lang.leex.reference.resolver
 
-import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.roots.impl.LibraryScopeCache
 import com.intellij.psi.*
 import com.intellij.psi.impl.source.resolve.ResolveCache
@@ -18,8 +17,11 @@ import org.elixir_lang.psi.impl.childExpressionsFoldWhile
 import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.psi.operation.*
 import org.elixir_lang.psi.stub.index.AllName
+import org.elixir_lang.util.AccumulatorContinue
+import org.elixir_lang.util.foldWhile
+import org.elixir_lang.leex.reference.Assign as ReferenceAssign
 
-object Assign : ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.Assign> {
+object Assign : ResolveCache.PolyVariantResolver<ReferenceAssign> {
     override fun resolve(assign: Assign, incompleteCode: Boolean): Array<ResolveResult> {
         val containingFile = assign.element.containingFile
 
@@ -274,7 +276,7 @@ object Assign : ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.
                 if (stabBody != null) {
                     resolveInCallDefinitionClauseExpression(assign, incompleteCode, stabBody, initial)
                 } else {
-                    AccumulatorContinue.foldWhile(expression.stabOperationList, initial) { stabOperation, accumulator ->
+                    expression.stabOperationList.foldWhile(initial) { stabOperation, accumulator ->
                         resolveInCallDefinitionClauseExpression(
                             assign,
                             incompleteCode,
@@ -296,7 +298,7 @@ object Assign : ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.
             }
 
             is ElixirBlockList ->
-                AccumulatorContinue.foldWhile(expression.blockItemList, initial) { blockItem, accumulator ->
+                expression.blockItemList.foldWhile(initial) { blockItem, accumulator ->
                     resolveInCallDefinitionClauseExpression(assign, incompleteCode, blockItem, accumulator)
                 }
 
@@ -620,7 +622,7 @@ object Assign : ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.
                 "put_in" -> when (expression.resolvedFinalArity()) {
                     2 -> {
                         expression.finalArguments()?.let { arguments ->
-                            val path = arguments[0];
+                            val path = arguments[0]
 
                             if (path.textMatches("assigns[:${INNER_CONTENT}]")) {
                                 val validResult = INNER_CONTENT == assign.name
@@ -640,7 +642,7 @@ object Assign : ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.
                     val arguments = expression.finalArguments()
 
                     val argumentsAccumulatorContinue = if (arguments != null) {
-                        AccumulatorContinue.foldWhile(arguments, initial) { argument, accumulator ->
+                        arguments.foldWhile(initial) { argument, accumulator ->
                             resolveInToRendered(assign, incompleteCode, argument, accumulator)
                         }
                     } else {
@@ -667,7 +669,7 @@ object Assign : ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.
                 if (stabBody != null) {
                     resolveInToRendered(assign, incompleteCode, stabBody, initial)
                 } else {
-                    AccumulatorContinue.foldWhile(expression.stabOperationList, initial) { stabOperation, accumulator ->
+                    expression.stabOperationList.foldWhile(initial) { stabOperation, accumulator ->
                         resolveInToRendered(assign, incompleteCode, stabOperation, accumulator)
                     }
                 }
@@ -788,7 +790,7 @@ object Assign : ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.
                 val arguments = expression.finalArguments()
 
                 val argumentsAccumulatorContinue = if (arguments != null) {
-                    AccumulatorContinue.foldWhile(arguments, initial) { argument, accumulator ->
+                    arguments.foldWhile(initial) { argument, accumulator ->
                         resolveMyself(assign, incompleteCode, argument, accumulator)
                     }
                 } else {
@@ -820,7 +822,7 @@ object Assign : ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.
             }
 
             is ElixirMapConstructionArguments -> {
-                AccumulatorContinue.foldWhile(expression.arguments(), initial) { argument, accumulator ->
+                expression.arguments().foldWhile(initial) { argument, accumulator ->
                     resolveMyself(assign, incompleteCode, argument, accumulator)
                 }
             }
@@ -831,7 +833,7 @@ object Assign : ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.
                 if (stabBody != null) {
                     resolveMyself(assign, incompleteCode, stabBody, initial)
                 } else {
-                    AccumulatorContinue.foldWhile(expression.stabOperationList, initial) { stabOperation, accumulator ->
+                    expression.stabOperationList.foldWhile(initial) { stabOperation, accumulator ->
                         resolveMyself(assign, incompleteCode, stabOperation, accumulator)
                     }
                 }
@@ -848,10 +850,7 @@ object Assign : ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.
             }
 
             is QuotableKeywordList ->
-                AccumulatorContinue.foldWhile(
-                    expression.quotableKeywordPairList(),
-                    initial
-                ) { keywordPair, accumulator ->
+                expression.quotableKeywordPairList().foldWhile(initial) { keywordPair, accumulator ->
                     resolveMyself(assign, incompleteCode, keywordPair, accumulator)
                 }
 
@@ -906,13 +905,7 @@ object Assign : ResolveCache.PolyVariantResolver<org.elixir_lang.leex.reference.
 
         // MUST use `originalFile` to get the PsiFile with a VirtualFile for decompiled elements
         return element.containingFile.originalFile.virtualFile?.let { elementVirtualFile ->
-            val orderEntries =
-                ProjectRootManager
-                    .getInstance(project)
-                    .fileIndex
-                    .getOrderEntriesForFile(elementVirtualFile)
-
-            LibraryScopeCache.getInstance(project).getLibraryScope(orderEntries)
+            LibraryScopeCache.getInstance(project).getLibraryScope(elementVirtualFile)
         } ?: GlobalSearchScope.allScope(project)
     }
 

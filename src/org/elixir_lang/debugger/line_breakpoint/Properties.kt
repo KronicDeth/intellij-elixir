@@ -1,7 +1,7 @@
 /*
  * Copyright 2012-2014 Sergey Ignatov
  * Copyright 2017 Jake Becker
- * Copyright 2018 Luke Imhoff
+ * Copyright 2018 Kadie Enheduanna Inanna
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.

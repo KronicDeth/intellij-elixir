@@ -2,6 +2,7 @@ package org.elixir_lang.structure_view.element.modular
 
 import com.intellij.ide.util.treeView.smartTree.TreeElement
 import com.intellij.navigation.ItemPresentation
+import com.intellij.openapi.progress.ProgressManager
 import com.intellij.psi.ElementDescriptionLocation
 import com.intellij.psi.ElementDescriptionUtil
 import com.intellij.psi.PsiElement
@@ -9,6 +10,7 @@ import com.intellij.psi.ResolveState
 import com.intellij.usageView.UsageViewLongNameLocation
 import com.intellij.usageView.UsageViewShortNameLocation
 import com.intellij.usageView.UsageViewTypeLocation
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.NameArity
 import org.elixir_lang.navigation.item_presentation.Parent
 import org.elixir_lang.psi.ArityInterval
@@ -21,7 +23,6 @@ import org.elixir_lang.psi.impl.locationString
 import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.psi.operation.Or
 import org.elixir_lang.psi.putInitialVisitedElement
-import org.elixir_lang.psi.putVisitedElement
 import org.elixir_lang.structure_view.element.*
 import org.elixir_lang.structure_view.element.Quote
 import org.elixir_lang.structure_view.element.call_definition_by_name_arity.FunctionByNameArity
@@ -56,6 +57,7 @@ open class Module(protected val parent: Modular?, call: Call) : Element<Call>(ca
             parent?.presentation.let { it as? Parent }?.locatedPresentableText ?: navigationItem.locationString()
 
     companion object {
+        @RequiresReadLock
         fun addClausesToCallDefinition(
                 call: Call,
                 name: String,
@@ -66,14 +68,15 @@ open class Module(protected val parent: Modular?, call: Call) : Element<Call>(ca
                 callDefinitionInserter: (CallDefinition) -> Unit
         ) {
             for (arity in arityInterval.closed()) {
+                ProgressManager.checkCanceled()
                 val nameArity = NameArity(name, arity)
 
                 callDefinitionByNameArity.computeIfAbsent(nameArity) { (name, arity) ->
                     CallDefinition(
-                            modular,
-                            time,
-                            name,
-                            arity
+                        modular,
+                        time,
+                        name,
+                        arity
                     ).also {
                         callDefinitionInserter(it)
                     }
@@ -81,11 +84,13 @@ open class Module(protected val parent: Modular?, call: Call) : Element<Call>(ca
             }
         }
 
+        @RequiresReadLock
         fun callChildren(modular: Modular, call: Call): Array<TreeElement> {
             val childCalls = call.macroChildCalls()
             return childCallTreeElements(modular, childCalls, ResolveState.initial().put(ENTRANCE, call).putInitialVisitedElement(call))
         }
 
+        @RequiresReadLock
         @JvmStatic
         fun elementDescription(call: Call, location: ElementDescriptionLocation): String? =
                 when(location) {
@@ -214,4 +219,3 @@ private inline fun CallDefinition.also(block: (CallDefinition) -> Unit): CallDef
     block(this)
     return this
 }
-

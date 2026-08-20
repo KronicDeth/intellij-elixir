@@ -1,7 +1,7 @@
 package org.elixir_lang.parser_definition;
 
 /**
- * Created by luke.imhoff on 9/17/14.
+ * Created by kadie.enheduanna.inanna on 9/17/14.
  */
 public class MatchedAdditionOperationParsingTestCase extends ParsingTestCase {
     public void testAssociativity() {

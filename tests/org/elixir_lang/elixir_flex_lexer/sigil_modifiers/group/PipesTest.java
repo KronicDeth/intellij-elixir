@@ -1,7 +1,7 @@
 package org.elixir_lang.elixir_flex_lexer.sigil_modifiers.group;
 
 /**
- * Created by luke.imhoff on 10/23/14.
+ * Created by kadie.enheduanna.inanna on 10/23/14.
  */
 
 import com.intellij.psi.tree.IElementType;

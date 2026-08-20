@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 /**
- * Created by luke.imhoff on 9/4/14.
+ * Created by kadie.enheduanna.inanna on 9/4/14.
  */
 @RunWith(Parameterized.class)
 public class SigilTest extends TokenTest {

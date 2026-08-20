@@ -2,16 +2,16 @@ package org.elixir_lang.debugger
 
 import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.options.SimpleConfigurable
-import com.intellij.openapi.util.Getter
 import com.intellij.util.xmlb.XmlSerializerUtil
 import com.intellij.util.xmlb.annotations.Tag
 import com.intellij.xdebugger.settings.DebuggerSettingsCategory
 import com.intellij.xdebugger.settings.XDebuggerSettings
 import org.elixir_lang.debugger.settings.stepping.ModuleFilter
 import org.elixir_lang.debugger.settings.stepping.UI
+import java.util.function.Supplier
 
 class Settings(moduleFilters: List<ModuleFilter> = defaultModuleFilters()):
-        XDebuggerSettings<Settings>("elixir"), Getter<Settings> {
+        XDebuggerSettings<Settings>("elixir") {
     @Tag("module-filters")
     // `var` only for `XmlSerializerUtil.copyBean(state, this)`
     var moduleFilters: MutableList<ModuleFilter> = moduleFilters.toMutableList()
@@ -24,17 +24,14 @@ class Settings(moduleFilters: List<ModuleFilter> = defaultModuleFilters()):
                                     "elixir.debug.stepping.configurable",
                                     "Elixir",
                                     UI::class.java,
-                                    this
+                                    Supplier { this }
                             )
                     )
             else ->
                 emptyList()
         }
 
-    fun enabledModuleFilterPatternList()
-            = moduleFilters.filter(ModuleFilter::enabled).map(ModuleFilter::pattern)
-
-    override fun equals(other: Any?) =
+        override fun equals(other: Any?) =
             other is Settings && other.moduleFilters.let { otherModuleFilters ->
               moduleFilters.size == otherModuleFilters.size &&
                       moduleFilters
@@ -44,7 +41,6 @@ class Settings(moduleFilters: List<ModuleFilter> = defaultModuleFilters()):
                               }
             }
 
-    override fun get(): Settings = this
     override fun getState()= this
     override fun hashCode(): Int = moduleFilters.hashCode()
 
@@ -190,6 +186,6 @@ class Settings(moduleFilters: List<ModuleFilter> = defaultModuleFilters()):
                 ModuleFilter(pattern = ":re2")
         )
 
-        fun getInstance(): Settings = XDebuggerSettings.getInstance(Settings::class.java)
+        fun getInstance(): Settings = getInstance(Settings::class.java)
     }
 }

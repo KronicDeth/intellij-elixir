@@ -25,7 +25,10 @@ class References : LocalInspectionTool() {
                 alias.reference?.let { reference -> registerProblem(alias, reference) }
             }
 
-            override fun visitAtOperation(atOperation: AtOperation) {
+            override fun visitMatchedAtOperation(o: ElixirMatchedAtOperation) = visitAtOperation(o)
+            override fun visitUnmatchedAtOperation(o: ElixirUnmatchedAtOperation) = visitAtOperation(o)
+
+            private fun visitAtOperation(atOperation: AtOperation) {
                 atOperation.reference?.let { reference -> registerProblem(atOperation, reference) }
             }
 

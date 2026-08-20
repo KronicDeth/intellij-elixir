@@ -1,6 +1,5 @@
 package org.elixir_lang.templates
 
-import com.intellij.codeInsight.template.EverywhereContextType
 import com.intellij.codeInsight.template.TemplateActionContext
 import com.intellij.codeInsight.template.TemplateContextType
 import com.intellij.psi.PsiWhiteSpace
@@ -8,7 +7,7 @@ import com.intellij.psi.util.PsiUtilCore
 import org.elixir_lang.ElixirLanguage
 
 class ElixirContextType internal constructor() :
-    TemplateContextType("ELIXIR_CODE", "Elixir", EverywhereContextType::class.java) {
+    TemplateContextType("Elixir") {
 
     override fun isInContext(templateActionContext: TemplateActionContext): Boolean {
         val psiFile = templateActionContext.file

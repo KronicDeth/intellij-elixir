@@ -21,6 +21,23 @@ class Docs(private val documentedByArityByNameByKind: MutableMap<String, TreeMap
     fun documented(kind: String, name: String, arity: Int): Documented? =
             documentedByArityByNameByKind[kind]?.get(name)?.get(arity)
 
+    /**
+     * Falls back to finding documentation for [name] at any arity when exact arity lookup fails.
+     *
+     * In Elixir, default arguments generate lower-arity stubs (e.g. `info/1`) that delegate to the
+     * full-arity definition (e.g. `info/2`).  The `@doc` is only on the full-arity definition, so
+     * the BEAM documentation chunk only has an entry for that arity. When navigation resolves to the
+     * lower-arity stub, we need to find the docs at the higher arity.
+     *
+     * Returns the [Documented] with the smallest arity >= [arity], or the closest lower arity if none
+     * is >= [arity].
+     */
+    fun documentedByNameFallback(kind: String, name: String, arity: Int): Documented? {
+        val byArity = documentedByArityByNameByKind[kind]?.get(name) ?: return null
+        // Prefer the entry with the smallest arity >= requested (the full-arity definition)
+        return byArity.ceilingEntry(arity)?.value ?: byArity.floorEntry(arity)?.value
+    }
+
     fun signatures(macroNameArity: MacroNameArity): List<String>? = documented(macroNameArity)?.signatures
     fun typeDocumentedByArityByName(): Map<String, Map<Int, Documented>> =
             documentedByArityByNameByKind["type"] ?: emptyMap()

@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Created by luke.imhoff on 12/5/14.
+ * Created by kadie.enheduanna.inanna on 12/5/14.
  */
 public class NoParenthesesManyStrict extends LocalInspectionTool {
     @Nls

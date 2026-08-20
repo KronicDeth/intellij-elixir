@@ -2,6 +2,7 @@ package org.elixir_lang.structure_view.element
 
 import com.intellij.ide.util.treeView.smartTree.TreeElement
 import com.intellij.navigation.ItemPresentation
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.call.Visibility
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.navigation.item_presentation.NameArity
@@ -92,12 +93,14 @@ class CallDefinitionClause(val callDefinition: CallDefinition, call: Call) :
          * @param call a def(macro)?p?
          * @return `null` if gets to the enclosing file without finding a quote or module
          */
+        @RequiresReadLock
         @Contract(pure = true)
         fun enclosingModular(call: Call): Modular? =
             enclosingModularMacroCall(call)?.let {
                 modular(it)
             }
 
+        @RequiresReadLock
         @Contract(pure = true)
         fun modular(enclosingMacroCall: Call): Modular? {
             var modular: Modular? = null
@@ -155,6 +158,7 @@ class CallDefinitionClause(val callDefinition: CallDefinition, call: Call) :
          * @param call def(macro)?p?
          * @return [Timed.Time.COMPILE] for `defmacrop?`; [Timed.Time.RUN] for `defp?`
          */
+        @RequiresReadLock
         fun time(call: Call): Timed.Time =
             when {
                 isFunction(call) -> Timed.Time.RUN
@@ -172,6 +176,7 @@ class CallDefinitionClause(val callDefinition: CallDefinition, call: Call) :
          * @return `Visible.Visibility.PUBLIC` for `def` or `defmacro`; `Visible.Visibility.PRIVATE`
          * for `defp` and `defmacrop`; `null` only if `call` is unrecognized
          */
+        @RequiresReadLock
         fun visibility(call: Call): Visibility =
             if (isPublicFunction(call) || isPublicMacro(call) || isPublicGuard(call)) {
                 Visibility.PUBLIC
@@ -188,6 +193,7 @@ class CallDefinitionClause(val callDefinition: CallDefinition, call: Call) :
          *
          * @param call a def(macro)?p? call
          */
+        @RequiresReadLock
         fun fromCall(call: Call): CallDefinitionClause? =
             CallDefinition.fromCall(call)?.let {
                 CallDefinitionClause(it, call)
@@ -196,4 +202,3 @@ class CallDefinitionClause(val callDefinition: CallDefinition, call: Call) :
         private val logger by lazy { com.intellij.openapi.diagnostic.Logger.getInstance(CallDefinitionClause::class.java) }
     }
 }
-

@@ -8,18 +8,15 @@ import com.intellij.openapi.module.ModifiableModuleModel
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.options.ConfigurationException
-import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.projectRoots.ProjectJdkTable
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.projectRoots.SdkTypeId
 import com.intellij.openapi.roots.CompilerModuleExtension
-import com.intellij.openapi.roots.ex.ProjectRootManagerEx
 import com.intellij.openapi.roots.ui.configuration.ModulesProvider
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.openapi.vfs.newvfs.impl.VirtualDirectoryImpl
+import com.intellij.openapi.vfs.newvfs.NewVirtualFile
 import com.intellij.packaging.artifacts.ModifiableArtifactModel
 import com.intellij.projectImport.ProjectImportBuilder
 import org.elixir_lang.configuration.ElixirCompilerSettings
@@ -41,6 +38,9 @@ class Builder : ProjectImportBuilder<OtpApp>() {
     private var mySelectedOtpApps = emptyList<OtpApp>()
     private var myIsImportingProject: Boolean = false
     private var myNeedsScan: Boolean = false
+
+    /** Elixir SDK to assign to each created module. Set by ElixirSdkForModuleStep.updateDataModel(). */
+    var elixirSdk: Sdk? = null
 
     override fun getIcon(): Icon = Icons.PROJECT
     override fun getName(): String = "Mix"
@@ -76,24 +76,32 @@ class Builder : ProjectImportBuilder<OtpApp>() {
      *
      */
     override fun validate(currentProject: Project?, project: Project): Boolean {
-        if (!findIdeaModuleFiles(mySelectedOtpApps)) {
+        if (!findIdeaModuleFiles(mySelectedOtpApps, myProjectRoot)) {
             return true
         }
 
-        val resultCode =
-            Messages.showYesNoCancelDialog(ApplicationInfoEx.getInstanceEx().fullApplicationName + " module files found:\n\n" +
-                                                   StringUtil.join(myFoundOtpApps, { importedOtpApp ->
-                                                       val ideaModuleFile = importedOtpApp.ideaModuleFile
-                                                       if (ideaModuleFile != null) "    " + ideaModuleFile.path + "\n" else ""
-                                                   }, "") + "\nWould you like to reuse them?",
-                                           "Module files found",
-                                           Messages.getQuestionIcon()
+        val resultCodeRef = java.util.concurrent.atomic.AtomicInteger(Messages.CANCEL)
+        ApplicationManager.getApplication().invokeAndWait {
+            resultCodeRef.set(
+                Messages.showYesNoCancelDialog(
+                    ApplicationInfoEx.getInstanceEx().fullApplicationName + " module files found:\n\n" +
+                            StringUtil.join(myFoundOtpApps, { importedOtpApp ->
+                                val ideaModuleFile = importedOtpApp.ideaModuleFile
+                                if (ideaModuleFile != null) "    " + ideaModuleFile.path + "\n" else ""
+                            }, "") + "\nWould you like to reuse them?",
+                    "Module Files Found",
+                    Messages.getQuestionIcon()
+                )
             )
+        }
+        val resultCode = resultCodeRef.get()
 
         return when (resultCode) {
             Messages.YES -> true
             Messages.NO -> try {
-                deleteIdeaModuleFiles(mySelectedOtpApps)
+                ApplicationManager.getApplication().invokeAndWait {
+                    deleteIdeaModuleFiles(mySelectedOtpApps)
+                }
                 true
             } catch (e: IOException) {
                 LOG.error(e)
@@ -110,31 +118,34 @@ class Builder : ProjectImportBuilder<OtpApp>() {
         modulesProvider: ModulesProvider,
         artifactModel: ModifiableArtifactModel?
     ): List<Module> {
-        fixProjectSdk(project)
+        val sdk = elixirSdk
         val createModules = createModulesForOtpApps(
             project,
             mySelectedOtpApps,
             { moduleModel ?: ModuleManager.getInstance(project).getModifiableModel() },
             { otpApp, rootModel ->
+                if (sdk != null) {
+                    rootModel.sdk = sdk
+                }
                 val compilerModuleExt = rootModel.getModuleExtension(CompilerModuleExtension::class.java)
                 compilerModuleExt.inheritCompilerOutputPath(false)
                 val ideaModuleDir = otpApp.root
 
-                val _buildDir = if (myProjectRoot != null && myProjectRoot == ideaModuleDir) {
+                val buildDir = if (myProjectRoot != null && myProjectRoot == ideaModuleDir) {
                     ideaModuleDir
                 } else {
                     ideaModuleDir.parent.parent
                 }
 
                 compilerModuleExt.setCompilerOutputPath(
-                    _buildDir!!.toString() + StringUtil.replace(
+                    buildDir!!.toString() + StringUtil.replace(
                         "/_build/dev/lib/" + otpApp.name + "/ebin",
                         "/",
                         File.separator
                     )
                 )
                 compilerModuleExt.setCompilerOutputPathForTests(
-                    _buildDir.toString() + StringUtil.replace(
+                    buildDir.toString() + StringUtil.replace(
                         "/_build/test/lib/" + otpApp.name + "/ebin",
                         "/",
                         File.separator
@@ -142,7 +153,8 @@ class Builder : ProjectImportBuilder<OtpApp>() {
                 )
                 // output paths need to be included, so that they are indexed for Phoenix EEx Template Elixir Line Breakpoints
                 compilerModuleExt.isExcludeOutput = false
-            }
+            },
+            projectRoot = myProjectRoot
         )
 
         if (myIsImportingProject) {
@@ -153,32 +165,43 @@ class Builder : ProjectImportBuilder<OtpApp>() {
         return createModules
     }
 
-    fun setProjectRoot(projectRoot: VirtualFile): Boolean {
+    fun setProjectRoot(projectRoot: VirtualFile) {
         if (projectRoot == myProjectRoot) {
-            return true
+            return
         }
 
         myProjectRoot = projectRoot
-        myNeedsScan = true
+        // Only mark for scan if we don't already have pre-scanned results for this root
+        if (myFoundOtpApps.isEmpty()) {
+            myNeedsScan = true
+        }
+    }
 
-        // Return true to indicate the project root was set successfully
-        // Actual scanning is deferred until getList() is called
-        return true
+    /**
+     * Set pre-scanned OTP apps to avoid slow I/O on EDT.
+     * Called from OpenProcessor.openProjectAsync() which runs in background.
+     */
+    fun setPreScannedApps(projectRoot: VirtualFile, apps: List<OtpApp>) {
+        myProjectRoot = projectRoot
+        myFoundOtpApps = apps
+        mySelectedOtpApps = apps
+        myNeedsScan = false
     }
 
     private fun scanProjectRoot(projectRoot: VirtualFile) {
         val unitTestMode = ApplicationManager.getApplication().isUnitTestMode
 
-        if (!unitTestMode && projectRoot is VirtualDirectoryImpl) {
-            projectRoot.refreshAndFindChild("deps")
+        // Run the scanning in a modal task to avoid EDT slow operations
+        val task = object : com.intellij.openapi.progress.Task.Modal(null, "Scanning for Mix Projects", true) {
+            override fun run(indicator: com.intellij.openapi.progress.ProgressIndicator) {
+                if (!unitTestMode && projectRoot is NewVirtualFile) {
+                    projectRoot.refreshAndFindChild("deps")
+                }
+                myFoundOtpApps = org.elixir_lang.mix.Project.findOtpApps(projectRoot, indicator)
+                mySelectedOtpApps = myFoundOtpApps
+            }
         }
-
-        // Get the current progress indicator from the ambient coroutine context, or use a no-op indicator
-        // This works correctly whether called from EDT, background thread, or coroutine context
-        val indicator = ProgressManager.getInstance().progressIndicator ?: com.intellij.openapi.progress.EmptyProgressIndicator()
-        myFoundOtpApps = org.elixir_lang.mix.Project.findOtpApps(projectRoot, indicator)
-
-        mySelectedOtpApps = myFoundOtpApps
+        com.intellij.openapi.progress.ProgressManager.getInstance().run(task)
     }
 
     fun setIsImportingProject(isImportingProject: Boolean) {
@@ -187,21 +210,6 @@ class Builder : ProjectImportBuilder<OtpApp>() {
 
     companion object {
         private val LOG = Logger.getInstance(Builder::class.java)
-
-        private fun fixProjectSdk(project: Project): Sdk? {
-            val projectRootMgr = ProjectRootManagerEx.getInstanceEx(project)
-            val selectedSdk = projectRootMgr.projectSdk
-            val fixedProjectSdk: Sdk?
-
-            if (selectedSdk == null || selectedSdk.sdkType !== Type.instance) {
-                fixedProjectSdk = ProjectJdkTable.getInstance().findMostRecentSdkOfType(Type.instance)
-                ApplicationManager.getApplication().runWriteAction { projectRootMgr.projectSdk = fixedProjectSdk }
-            } else {
-                fixedProjectSdk = selectedSdk
-            }
-
-            return fixedProjectSdk
-        }
 
         @Throws(IOException::class)
         private fun deleteIdeaModuleFiles(otpApps: List<OtpApp>) {
@@ -229,11 +237,12 @@ class Builder : ProjectImportBuilder<OtpApp>() {
             }
         }
 
-        private fun findIdeaModuleFiles(otpApps: List<OtpApp>): Boolean {
+        private fun findIdeaModuleFiles(otpApps: List<OtpApp>, projectRoot: VirtualFile?): Boolean {
+            val moduleNames = org.elixir_lang.mix.Project.moduleNameForOtpApps(otpApps, projectRoot)
             var ideaModuleFileExists = false
             for (importedOtpApp in otpApps) {
                 val applicationRoot = importedOtpApp.root
-                val ideaModuleName = importedOtpApp.name
+                val ideaModuleName = moduleNames[importedOtpApp] ?: importedOtpApp.name
                 val imlFile = applicationRoot.findChild("$ideaModuleName.iml")
                 if (imlFile != null) {
                     ideaModuleFileExists = true

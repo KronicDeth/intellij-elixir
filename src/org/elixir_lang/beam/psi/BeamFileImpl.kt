@@ -1,6 +1,9 @@
 package org.elixir_lang.beam.psi
 
 import com.ericsson.otp.erlang.OtpErlangDecodeException
+import com.intellij.codeInsight.multiverse.CodeInsightContextManager
+import com.intellij.codeInsight.multiverse.CodeInsightContextManagerImpl
+import com.intellij.codeInsight.multiverse.isSharedSourceSupportEnabled
 import com.intellij.lang.FileASTNode
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.Logger
@@ -26,11 +29,11 @@ import com.intellij.util.IncorrectOperationException
 import org.elixir_lang.ElixirLanguage
 import org.elixir_lang.beam.Beam
 import org.elixir_lang.beam.Beam.Companion.from
-import org.elixir_lang.beam.Decompiler
 import org.elixir_lang.beam.MacroNameArity
 import org.elixir_lang.beam.chunk.Atoms
 import org.elixir_lang.beam.chunk.CallDefinitions
 import org.elixir_lang.beam.chunk.debug_info.TypeDefinitions
+import org.elixir_lang.beam.defmoduleArgument
 import org.elixir_lang.beam.psi.impl.*
 import org.elixir_lang.beam.psi.stubs.CallDefinitionStub
 import org.elixir_lang.beam.psi.stubs.ModuleStub
@@ -41,7 +44,7 @@ import org.elixir_lang.psi.stub.impl.ElixirFileStubImpl
 import org.elixir_lang.type.Visibility
 import org.jetbrains.annotations.NonNls
 import java.io.IOException
-import java.util.*
+import java.lang.ref.SoftReference as JavaSoftReference
 
 // See com.intellij.psi.impl.compiled.ClsFileImpl
 class BeamFileImpl private constructor(
@@ -56,11 +59,26 @@ class BeamFileImpl private constructor(
 
     @Volatile
     private var mirrorFileElement: TreeElement? = null
-    private var stub: SoftReference<StubTree>? = null
+    private var stub: JavaSoftReference<StubTree>? = null
 
-    constructor(fileViewProvider: FileViewProvider) : this(fileViewProvider, false) {}
+    constructor(fileViewProvider: FileViewProvider) : this(fileViewProvider, false)
 
     override fun getDecompiledPsiFile(): PsiFile = mirror as PsiFile
+
+    /**
+     * The mirror [getMirror] already built, without triggering decompilation.
+     *
+     * **Must stay overridden.** `DaemonCodeAnalyzerImpl.queuePassesCreation` swaps a `PsiCompiledFile` for
+     * this before scheduling highlighting passes. The inherited default returns `null`, which costs more
+     * than the highlighting: the daemon then falls back to `renewFile()`, which builds the mirror, returns
+     * non-null, and so triggers a restart - which asks for the cached mirror again. Measured on an idle
+     * editor with one decompiled file open, that loops every ~300 ms indefinitely.
+     *
+     * `@ApiStatus.Internal` with no public equivalent, and `getMirror()` is not a stand-in - the cached and
+     * building calls are what separate the EDT path from the background one -
+     * [IJPL-252078](https://youtrack.jetbrains.com/issue/IJPL-252078).
+     */
+    override fun getCachedMirror(): PsiFile? = mirrorFileElement?.psi as PsiFile?
 
     /**
      * Returns the virtual file corresponding to the PSI file.
@@ -109,8 +127,14 @@ class BeamFileImpl private constructor(
      */
     override fun getChildren(): Array<PsiElement> = arrayOf(module())
 
-    private fun module(): Module = moduleStub().psi
-    private fun moduleStub(): ModuleStub<Module> = getStub().childrenStubs.single() as ModuleStub<Module>
+    private fun module(): Module {
+        val stub = getStub().childrenStubs.singleOrNull()
+            ?: throw IllegalStateException("Expected single module stub for ${virtualFile.presentableUrl}")
+        val moduleStub = stub as? ModuleStub<*>
+            ?: throw IllegalStateException("Expected ModuleStub, got ${stub.javaClass.name}")
+        val psi = moduleStub.psi
+        return psi ?: throw IllegalStateException("Expected Module PSI, got null ${moduleStub.javaClass.name}")
+    }
 
     private fun getStub(): PsiFileStub<*> = stubTree.root
 
@@ -131,7 +155,16 @@ class BeamFileImpl private constructor(
                     LOGGER.debug("No stub for BEAM file in index: " + virtualFile.presentableUrl)
                 }
 
-                StubTree(ElixirFileStubImpl())
+                val rootStub = ElixirFileStubImpl()
+                val moduleName =
+                    from(virtualFile)
+                        ?.atoms()
+                        ?.moduleName()
+                        ?: virtualFile.nameWithoutExtension
+                val name = defmoduleArgument(moduleName)
+                LOGGER.warn("Building minimal stub tree for ${virtualFile.presentableUrl} (module $name)")
+                ModuleStubImpl<ModuleImpl<*>>(rootStub, name)
+                StubTree(rootStub)
             } else {
                 indexStubTree
             }
@@ -145,10 +178,12 @@ class BeamFileImpl private constructor(
                 } else {
                     newStubTree
                         .root
-                        .let { it as PsiFileStubImpl<PsiFile> }
-                        .setPsi(this)
+                        .let {
+                            @Suppress("UNCHECKED_CAST")
+                            it as PsiFileStubImpl<PsiFile>
+                        }.psi = this
 
-                    stub = SoftReference(newStubTree)
+                    stub = JavaSoftReference(newStubTree)
 
                     newStubTree
                 }
@@ -254,7 +289,7 @@ class BeamFileImpl private constructor(
      *
      *
      * @return true if the element is valid, false otherwise.
-     * @see PsiUtilCore.ensureValid
+     * @see com.intellij.psi.PsiElement.isValid
      */
     override fun isValid(): Boolean = isForDecompiling || virtualFile.isValid
 
@@ -287,8 +322,7 @@ class BeamFileImpl private constructor(
      * Returns the element which should be used as the parent of this element in a tree up
      * walk during a resolve operation. For most elements, this returns `getParent()`,
      * but the context can be overridden for some elements like code fragments (see
-     * [PsiElementFactory.createCodeBlockCodeFragment]).
-     *
+     * [com.intellij.psi.JavaCodeFragmentFactory.createCodeBlockCodeFragment] [com.intellij.psi.PsiElement.getContext]).
      * @return the resolve context element.
      */
     override fun getContext(): PsiElement? = FileContextUtil.getFileContext(this)
@@ -323,17 +357,29 @@ class BeamFileImpl private constructor(
     override fun getOriginalFile(): PsiFile = this
 
     /**
-     * Returns the file type for the file.
+     * The PSI file type. This is deliberately the **non-binary** [org.elixir_lang.ElixirFileType], NOT the
+     * binary [org.elixir_lang.beam.FileType] used by the VFS to drive decompilation.
      *
-     * @return [org.elixir_lang.beam.FileType.INSTANCE]
+     * The distinction matters for the Find Usages tool window. `UsageInfo2UsageAdapter` computes a usage's
+     * displayed line and navigation offset from `PsiDocumentManager.getDocument(usage.file)`, but it
+     * short-circuits to line `-1` / offset `0` whenever `usage.file.getFileType().isBinary()` is true. Because
+     * `BeamFileImpl` is a physical file whose decompiled document is fully reachable (via
+     * `FileDocumentManager.getCachedDocument(virtualFile)`), reporting a non-binary PSI file type lets the
+     * usage view map every within-`.beam` usage to its true decompiled line instead of collapsing them all onto
+     * line 1. The VFS-level type (and thus the `filetype.decompiler`/read-only binary handling) is unaffected:
+     * decompiler wiring keys off [VirtualFile.getFileType], and the beam editor keys off it in
+     * [org.elixir_lang.beam.file_editor.Provider].
+     *
+     * @return [org.elixir_lang.ElixirFileType.INSTANCE]
      */
-    override fun getFileType(): FileType = org.elixir_lang.beam.FileType.INSTANCE
+    override fun getFileType(): FileType = org.elixir_lang.ElixirFileType.INSTANCE
 
     /**
      * This file.
      *
      * @return a single-element array containing `this`
      */
+    @Deprecated("Use FileViewProvider#getAllFiles instead.")
     override fun getPsiRoots(): Array<PsiFile> = arrayOf(this)
 
     override fun getViewProvider(): FileViewProvider = fileViewProvider
@@ -379,17 +425,24 @@ class BeamFileImpl private constructor(
                         ElixirLanguage,
                         mirrorText,
                         false,
-                        false
+                        false,
+                        // noSizeLimit, as ClsFileImpl.getMirror does. PsiFileFactoryImpl discards the language
+                        // passed here (`language = viewProvider.getBaseLanguage()`), and calcBaseLanguage
+                        // answers PlainTextLanguage for text over `idea.max.intellisense.filesize`, which
+                        // makes setMirror below throw InvalidMirrorException. No fixture decompiles large
+                        // enough to cover it.
+                        true
                     )
+                    propagateCodeInsightContextTo(mirror)
                     mirrorTreeElement = SourceTreeToPsiMap.psiToTreeNotNull(mirror)
                     try {
-                        val finalMirrorTreeElement = mirrorTreeElement!!
-                        LOGGER.info("Setting mirror for $fileName")
-                        ProgressManager.getInstance().executeNonCancelableSection(Runnable {
+                        val finalMirrorTreeElement = mirrorTreeElement
+                        LOGGER.debug("Setting mirror for $fileName")
+                        ProgressManager.getInstance().executeNonCancelableSection {
                             setMirror(finalMirrorTreeElement)
                             putUserData(MODULE_DOCUMENT_LINK_KEY, document)
-                        })
-                        LOGGER.info("Mirror for $fileName")
+                        }
+                        LOGGER.debug("Mirror for $fileName")
                     } catch (e: InvalidMirrorException) {
                         LOGGER.error(file.url, e)
                     }
@@ -399,6 +452,36 @@ class BeamFileImpl private constructor(
             }
         }
         return mirrorTreeElement!!.psi
+    }
+
+    /**
+     * Copies this file's [com.intellij.codeInsight.multiverse.CodeInsightContext] onto [mirror]'s view
+     * provider, as [com.intellij.psi.impl.compiled.ClsFileImpl.getMirror] does.
+     *
+     * The platform never does this itself - a [PsiFileFactory]-built mirror always reports `DefaultContext` -
+     * so without it the daemon logs `PsiFile's context does not match the context of the editor` on every
+     * decompiled `.beam`, which reaches users as an error report. Shared-source support is on by default, so
+     * this is the normal path.
+     *
+     * Only the setter needs the `@ApiStatus.Internal` `CodeInsightContextManagerImpl`; the service, reading a
+     * context and [isSharedSourceSupportEnabled] are all public on `CodeInsightContextManager`, so they go
+     * through that. The cast is what `CodeInsightContextManagerImpl.getInstanceImpl` does internally, against
+     * the single registered implementation, and using it directly keeps the plugin verifier's internal-API
+     * findings to the two that are unavoidable - naming the type, and the call - instead of five. The whole
+     * core-api `codeInsight.multiverse` package is `@ApiStatus.Experimental` regardless -
+     * [IJPL-252078](https://youtrack.jetbrains.com/issue/IJPL-252078).
+     */
+    @Suppress("UnstableApiUsage")
+    private fun propagateCodeInsightContextTo(mirror: PsiFile) {
+        val project = manager.project
+
+        if (isSharedSourceSupportEnabled(project)) {
+            val contextManager = CodeInsightContextManager.getInstance(project)
+            // Read before the cast: a smart-cast `contextManager` would bind this to the impl instead.
+            val context = contextManager.getCodeInsightContext(viewProvider)
+
+            (contextManager as CodeInsightContextManagerImpl).setCodeInsightContext(mirror.viewProvider, context)
+        }
     }
 
     override fun setMirror(element: TreeElement) {
@@ -436,18 +519,18 @@ class BeamFileImpl private constructor(
                 atoms
                     .moduleName()
                     ?.let { moduleName ->
-                        val name = Decompiler.defmoduleArgument(moduleName)
+                        val name = defmoduleArgument(moduleName)
                         val parentStub = ElixirFileStubImpl()
                         val moduleStub: ModuleStub<*> = ModuleStubImpl<ModuleImpl<*>>(parentStub, name)
                         buildCallDefinitions(moduleStub, beam, atoms)
-                        buildTypeDefinitions(moduleStub, atoms)
+                        buildTypeDefinitions(moduleStub, beam, atoms)
 
                         moduleStub
                     }
             }
 
-        private fun buildTypeDefinitions(parentStub: ModuleStub<*>, atoms: Atoms) {
-            TypeDefinitions.visibilityNameAritySortedSetByVisibility(parentStub, atoms)
+        private fun buildTypeDefinitions(parentStub: ModuleStub<*>, beam: Beam, atoms: Atoms) {
+            TypeDefinitions.visibilityNameAritySortedSetByVisibility(parentStub, beam, atoms)
                 .forEach { (_, visibilityNameAritySortedSet) ->
                     visibilityNameAritySortedSet.forEach { visibilityNameArity ->
                         buildTypeDefinition(parentStub, visibilityNameArity)

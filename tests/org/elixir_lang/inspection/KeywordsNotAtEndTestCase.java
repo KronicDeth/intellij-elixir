@@ -3,7 +3,7 @@ package org.elixir_lang.inspection;
 import org.elixir_lang.PlatformTestCase;
 
 /**
- * Created by luke.imhoff on 12/5/14.
+ * Created by kadie.enheduanna.inanna on 12/5/14.
  */
 public class KeywordsNotAtEndTestCase extends PlatformTestCase {
     public void testBug195() {

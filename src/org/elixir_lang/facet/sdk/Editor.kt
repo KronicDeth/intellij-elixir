@@ -8,7 +8,7 @@ import com.intellij.openapi.options.ConfigurationException
 import com.intellij.openapi.project.ProjectBundle
 import com.intellij.openapi.projectRoots.*
 import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl
-import com.intellij.openapi.projectRoots.impl.SdkConfigurationUtil
+import org.elixir_lang.sdk.SdkHomeChooser
 import com.intellij.openapi.projectRoots.ui.PathEditor
 import com.intellij.openapi.projectRoots.ui.SdkPathEditor
 import com.intellij.openapi.roots.OrderRootType
@@ -27,6 +27,8 @@ import java.awt.BorderLayout
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
 import java.io.File
+import java.nio.file.InvalidPathException
+import java.nio.file.Path
 import java.util.*
 import javax.swing.JComponent
 import javax.swing.JLabel
@@ -69,7 +71,7 @@ class Editor(private val sdkModel: SdkModel, private val history: History, priva
 
     override fun getHelpTopic(): String? = null
 
-    override fun createComponent(): JComponent? {
+    override fun createComponent(): JComponent {
         return mainPanel
     }
 
@@ -84,7 +86,7 @@ class Editor(private val sdkModel: SdkModel, private val history: History, priva
                 pathEditor(orderRootType)?.let { pathEditor ->
                     pathEditor.setAddBaseDir(sdk.homeDirectory)
                     tabbedPane.addTab(pathEditor.displayName, pathEditor.createComponent())
-                    sdkPathEditorByOrderRootType.put(orderRootType, pathEditor)
+                    sdkPathEditorByOrderRootType[orderRootType] = pathEditor
                 }
             }
 
@@ -229,7 +231,7 @@ class Editor(private val sdkModel: SdkModel, private val history: History, priva
         homeComponent.apply {
             setText(absolutePath)
             textField.foreground =
-                if (absolutePath != null && !absolutePath.isEmpty()) {
+                if (!absolutePath.isNullOrEmpty()) {
                     val homeDir = File(absolutePath)
                     val homeMustBeDirectory = (sdk.sdkType as SdkType).homeChooserDescriptor.isChooseFolders
 
@@ -246,7 +248,20 @@ class Editor(private val sdkModel: SdkModel, private val history: History, priva
 
     private fun doSelectHomePath() {
         val sdkType = sdk.sdkType as SdkType
-        SdkConfigurationUtil.selectSdkHome(sdkType) { path -> doSetHomePath(path, sdkType) }
+        // Anchor the chooser at the SDK's current home so a WSL-hosted SDK opens in its distro;
+        // SdkHomeChooser also avoids the platform selectSdkHome's user.home-anchored environment
+        // check, which rejected every WSL pick with "Environment Mismatch".
+        val basePath = sdk.homePath
+            ?.takeUnless(String::isBlank)
+            ?.let { home ->
+                try {
+                    Path.of(home)
+                } catch (_: InvalidPathException) {
+                    null
+                }
+            }
+            ?: SdkHomeChooser.defaultBasePath()
+        SdkHomeChooser.selectSdkHome(sdkType, basePath) { path -> doSetHomePath(path, sdkType) }
     }
 
     private fun doSetHomePath(homePath: String?, sdkType: SdkType) {
@@ -318,7 +333,7 @@ class Editor(private val sdkModel: SdkModel, private val history: History, priva
 
             if (component == null) {
                 component = configurable.createComponent()
-                componentByAdditionalDataConfigurable.put(configurable, component)
+                componentByAdditionalDataConfigurable[configurable] = component
             }
 
             if (component != null) {
@@ -333,14 +348,14 @@ class Editor(private val sdkModel: SdkModel, private val history: History, priva
 
         if (configurables == null) {
             configurables = Lists.newArrayList()
-            additionalDataConfigurableListBySdkType.put(sdkType, configurables)
+            additionalDataConfigurableListBySdkType[sdkType] = configurables
 
             sdkType.createAdditionalDataConfigurable(sdkModel, editedSdkModificator)?.let {
-                configurables!!.add(it)
+                configurables.add(it)
             }
         }
 
-        return configurables!!
+        return configurables
     }
 
     override fun navigateTo(place: Place?, requestFocus: Boolean): ActionCallback {
@@ -382,7 +397,7 @@ class Editor(private val sdkModel: SdkModel, private val history: History, priva
 
         override fun getRoots(rootType: OrderRootType): Array<VirtualFile> =
             sdkPathEditorByOrderRootType[rootType]?.roots
-                ?: throw IllegalStateException("no editor for root type " + rootType)
+                ?: throw IllegalStateException("no editor for root type $rootType")
 
         override fun addRoot(root: VirtualFile, rootType: OrderRootType) =
             sdkPathEditorByOrderRootType[rootType]!!.addPaths(root)
@@ -402,6 +417,6 @@ class Editor(private val sdkModel: SdkModel, private val history: History, priva
 
     companion object {
         private val LOG = Logger.getInstance(Editor::class.java)
-        private val SDK_TAB = "sdkTab"
+        private const val SDK_TAB = "sdkTab"
     }
 }

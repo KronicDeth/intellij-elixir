@@ -6,9 +6,11 @@ import org.elixir_lang.psi.Implementation.forNameCollection
 import org.elixir_lang.psi.Module
 import org.elixir_lang.psi.Protocol
 import org.elixir_lang.psi.call.StubBased
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.psi.stub.type.call.Stub.isModular
 
 object CanonicallyNamedImpl {
+    @RequiresReadLock
     fun canonicalName(stubBased: StubBased<*>): String? =
         if (isModular(stubBased)) {
             val canonicalNameSuffix = when {
@@ -38,6 +40,7 @@ object CanonicallyNamedImpl {
         }
 
 
+    @RequiresReadLock
     fun canonicalNameSet(stubBased: StubBased<*>): Set<String> =
         if (isModular(stubBased)) {
             val canonicalNameSuffixSet: Set<String> = if (Implementation.`is`(stubBased)) {

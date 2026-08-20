@@ -1,0 +1,244 @@
+name: Tag Release
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag name for the release (e.g. v23.0.1)'
+        required: true
+        type: string
+      prerelease:
+        description: 'Mark as pre-release'
+        required: false
+        type: boolean
+        default: true
+      make_latest:
+        description: 'Mark as latest release'
+        required: false
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+          - 'legacy'
+        default: 'true'
+      skip_tests:
+        description: 'Skip test-and-verify (e.g. tests already passed on this commit)'
+        required: false
+        type: boolean
+        default: false
+jobs:
+  # Runs before anything else, so a bad dispatch costs seconds rather than the whole test matrix.
+  # Only gradle.properties is checked out, which keeps that true.
+  #
+  # Every tag malformation guarded here has actually reached this repository:
+  #   24.0.0                        missing v  - refs/tags/v* globs and git describe skip it
+  #   vv22.0.0-pre+20251212182751   doubled v  - as recently as December 2025
+  #   v                             no version at all
+  #   v3.0.1.20160520213720         four components, so not a version this project can compare
+  # Rejecting rather than auto-prefixing is deliberate: a prefix fixed up in place would still admit
+  # the doubled-v and bare-v cases, and a release tag is an immutable public identifier - quietly
+  # renaming what the operator typed is worse than making them retype it.
+  validate-tag:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout release metadata
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          # Non-cone mode with explicit file paths: enough for the two file-based checks below without
+          # materialising the tree, so this job stays seconds rather than a full checkout.
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            gradle.properties
+
+      # The tag shape and the prerelease flag have to agree. prerelease defaults to TRUE, so the easy
+      # slip is leaving it ticked for a stable release: that builds the release version on the canary
+      # channel, and the version then collides with the real stable tag. Both directions are enforced
+      # because the correlation has held for every release the project has cut.
+      - name: Validate tag format
+        env:
+          TAG: ${{ inputs.tag }}
+          PRERELEASE: ${{ inputs.prerelease }}
+        run: |
+          if [[ "$PRERELEASE" == "true" ]]; then
+            pattern='^v[0-9]+\.[0-9]+\.[0-9]+-pre-[0-9]+$'
+            expected="v<major>.<minor>.<patch>-pre-<n>, for example v24.0.0-pre-4"
+          else
+            pattern='^v[0-9]+\.[0-9]+\.[0-9]+$'
+            expected="v<major>.<minor>.<patch>, for example v24.0.0"
+          fi
+          if [[ ! "$TAG" =~ $pattern ]]; then
+            echo "::error title=Invalid release tag::\"${TAG}\" does not match the required format for prerelease=${PRERELEASE}. Expected ${expected}. If the version is right, check the prerelease checkbox instead - it defaults to ticked."
+            exit 1
+          fi
+          echo "Tag \"${TAG}\" matches the required format for prerelease=${PRERELEASE}."
+
+      # workflow_dispatch accepts any ref, and the release below sets target_commitish to github.sha,
+      # so a stable release cut from a topic branch would put the tag on that branch. Pre-releases stay
+      # free to come from anywhere, which is how a canary gets in front of someone before merge.
+      - name: Validate release branch
+        env:
+          PRERELEASE: ${{ inputs.prerelease }}
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          if [[ "$PRERELEASE" != "true" && "$REF_NAME" != "main" ]]; then
+            echo "::error title=Stable release off main::A stable release must be dispatched from main, not \"${REF_NAME}\". The release sets target_commitish to the dispatched commit, so the tag would live on that branch."
+            exit 1
+          fi
+          echo "Branch \"${REF_NAME}\" is allowed for prerelease=${PRERELEASE}."
+
+      # One ls-remote answers both questions below, and needs no local tags.
+      #
+      # Existing tag: the releases API IGNORES target_commitish when the tag already exists, so
+      # re-dispatching one attaches freshly built artifacts to a release whose tag points at a
+      # different commit, with nothing surfacing the mismatch.
+      #
+      # Ordering: a lower version builds and publishes fine but never reaches users, because the IDE
+      # and the Marketplace both compare versions. `sort -V` alone cannot judge this - it ranks
+      # 24.0.0-pre-2 ABOVE 24.0.0, which is backwards - so -pre- is rewritten to a tilde first, which
+      # GNU version sort treats as sorting before everything including end-of-string. A tilde cannot
+      # be used in the tag itself: git check-ref-format forbids it, since it is revision syntax.
+      #
+      # Comparing normalised versions rather than raw refs also catches re-releasing 24.0.0 as
+      # v24.0.0, which the existence check alone would miss because the two refs differ.
+      - name: Validate tag is new and increasing
+        env:
+          TAG: ${{ inputs.tag }}
+          REPO: ${{ github.repository }}
+        run: |
+          normalise() { sed -e 's/^v//' -e 's/-pre-/~pre-/'; }
+
+          # Peeled entries (refs/tags/X^{}) are dropped so annotated tags are not counted twice.
+          existing=$(git ls-remote --tags "https://github.com/${REPO}.git" \
+            | sed -E 's@.*refs/tags/@@' | grep -v '\^{}$' || true)
+
+          if printf '%s\n' "$existing" | grep -Fxq "$TAG"; then
+            echo "::error title=Tag already exists::\"${TAG}\" already exists. The releases API ignores target_commitish for an existing tag, so this release would carry artifacts built from a different commit than the tag points at. Pick a new version."
+            exit 1
+          fi
+
+          highest=$(printf '%s\n' "$existing" \
+            | grep -E '^v?[0-9]+\.[0-9]+\.[0-9]+(-pre-[0-9]+)?$' \
+            | normalise | sort -V | tail -1)
+          if [[ -z "$highest" ]]; then
+            echo "No comparable existing tags; skipping the ordering check."
+            exit 0
+          fi
+
+          candidate=$(printf '%s\n' "$TAG" | normalise)
+          if [[ "$candidate" == "$highest" ]]; then
+            echo "::error title=Tag not an increase::\"${TAG}\" is the same version as the highest existing tag. A release must increase the version or the IDE and Marketplace will never offer it."
+            exit 1
+          fi
+          if [[ "$(printf '%s\n%s\n' "$highest" "$candidate" | sort -V | tail -1)" != "$candidate" ]]; then
+            echo "::error title=Tag not an increase::\"${TAG}\" is lower than the highest existing tag (${highest//~pre-/-pre-}). A release must increase the version or the IDE and Marketplace will never offer it."
+            exit 1
+          fi
+          echo "Tag \"${TAG}\" is new and higher than ${highest//~pre-/-pre-}."
+
+      # pluginVersionOverride replaces pluginVersion entirely, so a stale gradle.properties ships with
+      # no complaint today even though RELEASING.md step 1 says to update it. Enforced on both channels
+      # because the invariant has held for every recent tag, pre-releases included: the tag base
+      # version equals pluginVersion, and a pre-release is the version being worked toward.
+      - name: Validate plugin version matches tag
+        env:
+          TAG: ${{ inputs.tag }}
+        run: |
+          base="${TAG#v}"
+          base="${base%%-*}"
+          plugin_version=$(grep -E '^pluginVersion=' gradle.properties | head -1 | cut -d= -f2 | tr -d '[:space:]')
+          if [[ "$base" != "$plugin_version" ]]; then
+            echo "::error title=Version mismatch::Tag \"${TAG}\" has base version ${base}, but gradle.properties has pluginVersion=${plugin_version}. Update gradle.properties (RELEASING.md step 1) or fix the tag."
+            exit 1
+          fi
+          echo "Tag base ${base} matches pluginVersion=${plugin_version}."
+
+      # No "What's New" check here any more. The plugin's changeNotes are rendered from CHANGELOG.md by
+      # the Gradle Changelog Plugin, falling back to the Unreleased section when no section matches the
+      # version being built, so there is no second file that can go stale against the tag. That a
+      # release has notes at all is enforced earlier, per pull request, by changelog.yml.
+
+  test-and-verify:
+    needs: [ validate-tag ]
+    if: ${{ !inputs.skip_tests }}
+    uses: ./.github/workflows/shared-test.yml
+
+  release:
+    needs: [ validate-tag, test-and-verify ]
+    # The validate-tag result must be checked explicitly. always() ignores its failure, and a failed
+    # validate-tag leaves test-and-verify *skipped* - which the clause below accepts - so without the
+    # first condition an invalid tag would still be released.
+    if: ${{ always() && needs.validate-tag.result == 'success' && (needs.test-and-verify.result == 'success' || needs.test-and-verify.result == 'skipped') }}
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup Build Environment
+        id: setup-env
+        uses: ./.github/actions/setup-env
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          skip-searchable-options: 'false'
+
+      - name: Build with Gradle (canary)
+        id: build-plugin-canary
+        if: ${{ inputs.prerelease }}
+        env:
+          TAG: ${{ inputs.tag }}
+        run: ./gradlew buildPlugin --no-scan -PpublishChannels=canary "-PpluginVersionOverride=${TAG#v}" --stacktrace
+
+      - name: Build with Gradle (release)
+        id: build-plugin-default
+        if: ${{ !inputs.prerelease }}
+        env:
+          TAG: ${{ inputs.tag }}
+        run: ./gradlew buildPlugin --no-scan -PpublishChannels=default "-PpluginVersionOverride=${TAG#v}" --stacktrace
+
+      # The release body comes from CHANGELOG.md rather than being pasted in by hand. Unlike the
+      # plugin's changeNotes this keeps EVERY group, including Threading / Platform Hygiene and
+      # Build / CI: the audience for a GitHub release is contributors as much as users, and the full
+      # record is what they want. --no-header because the release title is already the tag.
+      #
+      # A missing section fails the job (MissingVersionException), which is deliberate - it means the
+      # release was never promoted with patchChangelog, so there are no notes to publish.
+      - name: Render release notes from the changelog
+        env:
+          TAG: ${{ inputs.tag }}
+          PRERELEASE: ${{ inputs.prerelease }}
+        run: |
+          base="${TAG#v}"
+          base="${base%%-*}"
+          # A pre-release is cut before Unreleased is promoted, so its notes are still sitting there.
+          # A release has its own dated section by then. "Unreleased" is spelled without brackets here
+          # even though the heading has them - the task matches the bare term.
+          if [[ "$PRERELEASE" == "true" ]]; then version="Unreleased"; else version="$base"; fi
+          echo "Rendering release notes for ${version}."
+          ./gradlew getChangelog --quiet --no-header --no-links --no-empty-sections \
+            "--project-version=${version}" --output-file=build/release-notes.md
+          if [[ ! -s build/release-notes.md ]]; then
+            echo "::error title=Empty release notes::CHANGELOG.md produced no notes for ${version}. A release must not ship without them."
+            exit 1
+          fi
+          echo "::notice title=Release notes::$(wc -l < build/release-notes.md) lines rendered from CHANGELOG.md."
+
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@3d0d9888cb7fd7b750713d6e236d1fcb99157228 # v3.0.2
+        with:
+          tag_name: ${{ inputs.tag }}
+          target_commitish: ${{ github.sha }}
+          name: ${{ inputs.tag }}
+          body_path: build/release-notes.md
+          prerelease: ${{ inputs.prerelease }}
+          make_latest: ${{ inputs.make_latest }}
+          files: build/distributions/intellij-elixir-*.zip
+          fail_on_unmatched_files: true

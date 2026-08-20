@@ -3,57 +3,14 @@ package org.elixir_lang.code_insight.completion.provider
 import com.intellij.codeInsight.completion.CompletionParameters
 import com.intellij.codeInsight.completion.CompletionProvider
 import com.intellij.codeInsight.completion.CompletionResultSet
-import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiWhiteSpace
-import com.intellij.psi.ResolveState
 import com.intellij.util.ProcessingContext
-import org.elixir_lang.beam.psi.impl.ModuleImpl
-import org.elixir_lang.navigation.isDecompiled
-import org.elixir_lang.psi.CallDefinitionClause.nameArityInterval
+import org.elixir_lang.code_insight.completion.callDefinitionClauseLookupElements
 import org.elixir_lang.psi.ElixirTypes
-import org.elixir_lang.psi.call.Call
-import org.elixir_lang.psi.impl.call.macroChildCalls
 import org.elixir_lang.psi.impl.maybeModularNameToModulars
 
 class CallDefinitionClause : CompletionProvider<CompletionParameters>() {
-    private fun callDefinitionClauseLookupElements(scope: PsiElement): Iterable<LookupElement> = when (scope) {
-        is Call -> callDefinitionClauseLookupElements(scope)
-        is ModuleImpl<*> -> callDefinitionClauseLookupElements(scope)
-        else -> emptyList()
-    }
-
-    private fun callDefinitionClauseLookupElements(scope: Call): Iterable<LookupElement> {
-        val callDefinitionClauseList = scope
-            .macroChildCalls()
-            .filter { org.elixir_lang.psi.CallDefinitionClause.`is`(it) }
-
-        // decompiled private functions can't be made public, so exclude them
-        val callable = if (scope.isDecompiled()) {
-            callDefinitionClauseList.filter { org.elixir_lang.psi.CallDefinitionClause.isPublic(it) }
-        } else {
-            callDefinitionClauseList
-        }
-
-        return callable
-            .mapNotNull {
-                nameArityInterval(it, ResolveState.initial())?.let { (name, _) ->
-                    org.elixir_lang.code_insight.lookup.element.CallDefinitionClause.createWithSmartPointer(
-                        name,
-                        it
-                    )
-                }
-            }
-    }
-
-    private fun callDefinitionClauseLookupElements(moduleImpl: ModuleImpl<*>): Iterable<LookupElement> =
-        moduleImpl.callDefinitions().map { callDefinition ->
-            org.elixir_lang.code_insight.lookup.element.CallDefinitionClause.createWithSmartPointer(
-                callDefinition.exportedName(),
-                callDefinition
-            )
-        }
-
     private fun maybeModularName(parameters: CompletionParameters): PsiElement? =
         parameters.originalPosition?.let { originalPosition ->
             originalPosition.parent?.let { originalParent ->
@@ -100,11 +57,9 @@ class CallDefinitionClause : CompletionProvider<CompletionParameters>() {
                     resultSet
                 }
 
-                for (modular in modulars) {
-                    modularsResultSet.addAllElements(
-                        callDefinitionClauseLookupElements(modular)
-                    )
-                }
+                modularsResultSet.addAllElements(
+                    callDefinitionClauseLookupElements(modulars)
+                )
             }
         }
     }

@@ -13,6 +13,7 @@ import com.intellij.usageView.UsageViewLongNameLocation
 import com.intellij.usageView.UsageViewShortNameLocation
 import com.intellij.usageView.UsageViewTypeLocation
 import com.intellij.util.IncorrectOperationException
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.annotator.Parameter
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.*
@@ -33,7 +34,6 @@ import org.elixir_lang.psi.qualification.Unqualified
 import org.elixir_lang.psi.scope.variable.Variants
 import org.elixir_lang.structure_view.element.Delegation
 import org.jetbrains.annotations.Contract
-import java.util.*
 
 class Callable : PsiReferenceBase<Call>, PsiPolyVariantReference {
 
@@ -254,6 +254,7 @@ class Callable : PsiReferenceBase<Call>, PsiPolyVariantReference {
                 }
             } ?: false
 
+        @RequiresReadLock
         @JvmStatic
         @Contract(pure = true)
         fun isDefiner(call: Call): Boolean =
@@ -377,6 +378,7 @@ class Callable : PsiReferenceBase<Call>, PsiPolyVariantReference {
                 }
             }
 
+        @RequiresReadLock
         fun parameterElementDescription(call: Call, location: ElementDescriptionLocation): String? =
             if (location === UsageViewLongNameLocation.INSTANCE || location === UsageViewShortNameLocation.INSTANCE) {
                 call.name
@@ -480,8 +482,8 @@ class Callable : PsiReferenceBase<Call>, PsiPolyVariantReference {
                 }
                 // module attribute, so original may be a unqualified no argument type name
                 call is AtUnqualifiedNoParenthesesCall<*> -> false
-                call.isCalling(org.elixir_lang.psi.call.name.Module.KERNEL, Function.DESTRUCTURE) -> true
-                call.isCallingMacro(org.elixir_lang.psi.call.name.Module.KERNEL, Function.FOR) -> true
+                call.isCalling(Module.KERNEL, Function.DESTRUCTURE) -> true
+                call.isCallingMacro(Module.KERNEL, Function.FOR) -> true
                 call.isCalling(Module.KERNEL, Function.VAR_BANG) -> true
                 call is UnqualifiedParenthesesCall<*> -> false
                 else -> call.parent.let { isVariable(it) }
@@ -601,8 +603,9 @@ private class ResolveWithCachingComputable(
     val callable: Callable,
     val incompleteCode: Boolean
 ) : Computable<Array<ResolveResult>> {
-    override fun compute(): Array<ResolveResult> =
-        ResolveCache
+    override fun compute(): Array<ResolveResult> {
+        ApplicationManager.getApplication().assertReadAccessAllowed()
+        return ResolveCache
             .getInstance(project)
             .resolveWithCaching(
                 callable,
@@ -610,11 +613,15 @@ private class ResolveWithCachingComputable(
                 false,
                 incompleteCode
             )
+    }
 }
 
 private fun typeContext(element: PsiElement): Type? =
     ApplicationManager.getApplication().runReadAction(TypeContextComputable(element))
 
 private class TypeContextComputable(val element: PsiElement) : Computable<Type?> {
-    override fun compute(): Type? = PsiTreeUtil.getContextOfType(element, Type::class.java)
+    override fun compute(): Type? {
+        ApplicationManager.getApplication().assertReadAccessAllowed()
+        return PsiTreeUtil.getContextOfType(element, Type::class.java)
+    }
 }

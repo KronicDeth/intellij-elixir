@@ -25,7 +25,7 @@ data class Documented(val kind: String,
                 null
             }
 
-        private fun from(element: OtpErlangTuple): Documented? {
+        private fun from(element: OtpErlangTuple): Documented {
             val firstTuple = element.elementAt(0) as OtpErlangTuple
             val kind = firstTuple.elementAt(0).let { it as OtpErlangAtom }.atomValue()
             val name = firstTuple.elementAt(1).let { it as OtpErlangAtom }.atomValue()
@@ -41,7 +41,24 @@ data class Documented(val kind: String,
         private fun signaturesFrom(element: OtpErlangObject): List<String> =
                 element
                         .let { it as OtpErlangList }
-                        .map { String((it as OtpErlangBinary).binaryValue()) }
+                        .mapNotNull { erlangTermToString(it) }
+
+        private fun erlangTermToString(term: OtpErlangObject): String? =
+                when (term) {
+                    is OtpErlangBinary -> String(term.binaryValue(), Charsets.UTF_8)
+                    is OtpErlangList -> {
+                        try {
+                            term.stringValue()
+                        } catch (_: Exception) {
+                            logger.debug("Failed to decode Erlang charlist as string: ${inspect(term)}")
+                            null
+                        }
+                    }
+                    else -> {
+                        logger.error("Don't know how to decode string from ${inspect(term)}")
+                        null
+                    }
+                }
 
         private fun metadatumByNameFrom(element: OtpErlangObject): Map<String, OtpErlangObject> =
                 when (element) {
@@ -74,6 +91,3 @@ data class Documented(val kind: String,
                 }
     }
 }
-
-private fun OtpErlangObject.getBinaryValueString(): String =
-    String((this as OtpErlangBinary).binaryValue())

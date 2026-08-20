@@ -36,7 +36,8 @@ class CallDefinitionImpl<T : CallDefinitionStub<*>>(private val stub: T) : Modul
      */
     override fun getParent(): ModuleImpl<*> = stub.parentStub.psi as ModuleImpl<*>
 
-    override fun getElementType(): IStubElementType<*, *> = stub.stubType
+    @Deprecated("Deprecated in platform - use getIElementType()", replaceWith = ReplaceWith("getIElementType()"))
+    override fun getElementType(): IStubElementType<*, *> = stub.elementType as IStubElementType<*, *>
 
     override fun getStub(): T = stub
 

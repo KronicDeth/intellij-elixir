@@ -1063,9 +1063,9 @@ defmodule :diameter_gen_acct_rfc6733 do
     # body not decompiled
   end
 
-  def avp(t, data, name, opts, mod), do: mod.avp(t, data, name, %{opts | :module => mod})
+  defp avp(t, data, name, opts, mod), do: mod.avp(t, data, name, %{opts | :module => mod})
 
-  def empty(name, opts), do: :diameter_gen.empty(name, opts)
+  defp empty(name, opts), do: :diameter_gen.empty(name, opts)
 
-  def empty_group(name, opts), do: :diameter_gen.empty_group(name, opts)
+  defp empty_group(name, opts), do: :diameter_gen.empty_group(name, opts)
 end

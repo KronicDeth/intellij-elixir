@@ -1,7 +1,6 @@
 package org.elixir_lang
 
 import com.ericsson.otp.erlang.*
-import org.apache.commons.lang.NotImplementedException
 
 /**
  * Emulates behavior of the `gen` Module in Erlang
@@ -27,7 +26,7 @@ object Generic {
             unmonitoredCall(
                     localMbox,
                     localNode,
-                    Sender { message -> localMbox.send(remoteName, remoteNode, message) },
+                    { message -> localMbox.send(remoteName, remoteNode, message) },
                     label,
                     request,
                     timeout
@@ -45,7 +44,7 @@ object Generic {
             unmonitoredCall(
                     localMbox,
                     localNode,
-                    Sender { message -> localMbox.send(remotePid, message) },
+                    { message -> localMbox.send(remotePid, message) },
                     label,
                     request,
                     timeout
@@ -86,7 +85,7 @@ object Generic {
             val first = tuple.elementAt(0)
 
             if (first != ref) {
-                throw NotImplementedException("Expected ref $ref, but received $first")
+                throw UnsupportedOperationException("Expected ref $ref, but received $first")
             }
 
             response = tuple.elementAt(1)

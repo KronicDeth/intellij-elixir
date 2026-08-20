@@ -30,3 +30,10 @@ jps-shared/out
 libs/
 .intellijPlatform
 /.kotlin
+CLAUDE.md
+AGENTS.md
+/.claude
+/.ai
+/allure-results
+# The quoter daemon (an Erlang node) drops these in the project root if it terminates abnormally.
+erl_crash.dump

@@ -1,16 +1,18 @@
 package org.elixir_lang.psi.impl
 
-import com.intellij.openapi.application.runReadAction
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.module.ModuleUtilCore
+import com.intellij.openapi.progress.ProgressManager
 import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiNamedElement
 import com.intellij.psi.PsiWhiteSpace
 import com.intellij.psi.impl.source.tree.CompositeElement
 import com.intellij.psi.impl.source.tree.LeafPsiElement
 import com.intellij.psi.search.GlobalSearchScope
-import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.psi.util.findParentInFile
 import com.intellij.psi.util.siblings
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function.ALIAS
@@ -20,16 +22,17 @@ import org.elixir_lang.psi.impl.call.maybeModularNameToModulars
 import org.elixir_lang.psi.operation.Match
 import org.elixir_lang.psi.operation.Pipe
 import org.elixir_lang.psi.scope.WhileIn.whileIn
+import org.elixir_lang.util.AccumulatorContinue
+import org.elixir_lang.util.foldWhile
 import org.jetbrains.annotations.Contract
-import java.util.*
 
+@RequiresReadLock
 fun PsiElement.ancestorSequence() = generateSequence(this) { it.parent }
-fun PsiElement.document(): Document? = containingFile.viewProvider.let { viewProvider ->
-    runReadAction {
-        viewProvider.document
-    }
-}
 
+@RequiresReadLock
+fun PsiElement.document(): Document? = containingFile.viewProvider.document
+
+@RequiresReadLock
 tailrec fun PsiElement.selfOrEnclosingMacroCall(): Call? =
     when (this) {
         is ElixirDoBlock ->
@@ -111,17 +114,26 @@ tailrec fun PsiElement.selfOrEnclosingMacroCall(): Call? =
     }
 
 /**
- *
- * @param call
- * @return `null` if call is at top-level
+ * @return `null` if this element is at top-level
  */
+@RequiresReadLock
 @Contract(pure = true)
 fun PsiElement.enclosingMacroCall(): Call? = parent.selfOrEnclosingMacroCall()
 
-fun PsiElement.getModuleName(): String? {
-    val isModuleName = { c: PsiElement -> c is MaybeModuleName && c.isModuleName }
+private val isModuleName = { c: PsiElement -> c is MaybeModuleName && c.isModuleName }
 
-    return PsiTreeUtil.findFirstParent(this) { e ->
+/**
+ * Returns `true` if this element is inside a `defmodule` (or similar module definition).
+ * Unlike [getModuleName], this does not assemble the full module name string - it is a
+ * cheap boolean check suitable for hot paths like breakpoint availability.
+ */
+fun PsiElement.isInsideModule(): Boolean =
+    findParentInFile(withSelf = true) { e -> e.children.any(isModuleName) } != null
+
+@RequiresReadLock
+fun PsiElement.getModuleName(): String? {
+    // findParentInFile stops at PsiFile boundary, never touches PsiDirectory - avoids DiskQueryRelay VFS I/O
+    return findParentInFile(withSelf = true) { e ->
         e.children.any(isModuleName)
     }?.let { moduleDefinition ->
         moduleDefinition.children.firstOrNull(isModuleName)?.let { moduleName ->
@@ -165,6 +177,7 @@ fun <R> PsiElement.foldChildrenWhile(
             AccumulatorContinue(initial, true)
     }
 
+@RequiresReadLock
 fun PsiElement.macroChildCallList(): MutableList<Call> {
     val callList: MutableList<Call>
 
@@ -175,6 +188,7 @@ fun PsiElement.macroChildCallList(): MutableList<Call> {
 
         var child: PsiElement? = firstChild
         while (child != null) {
+            ProgressManager.checkCanceled()
             if (child is Call) {
                 callList.add(child)
             } else if (child is ElixirAccessExpression) {
@@ -193,12 +207,13 @@ fun PsiElement.macroChildCallList(): MutableList<Call> {
  * @return [Call] for the `defmodule`, `defimpl`, or `defprotocol` that defines
  * `maybeAlias` after it is resolved through any `alias`es or `use`.
  */
+@RequiresReadLock
 @Contract(pure = true)
 fun PsiElement.maybeModularNameToModulars(
     maxScope: PsiElement,
     useCall: Call?,
     incompleteCode: Boolean
-): Set<PsiElement> = when (val strippedMaybeModuleName = stripAccessExpression()) {
+): Set<PsiNamedElement> = when (val strippedMaybeModuleName = stripAccessExpression()) {
     is ElixirAtom -> strippedMaybeModuleName.maybeModularNameToModulars(incompleteCode)
     is QualifiableAlias -> strippedMaybeModuleName.maybeModularNameToModulars(maxScope)
     is Call -> strippedMaybeModuleName.maybeModularNameToModulars(useCall)
@@ -232,7 +247,7 @@ fun <R> PsiElement.childExpressionsFoldWhile(
         element: PsiElement, accumulator: R
     ) -> AccumulatorContinue<R>
 ): AccumulatorContinue<R> =
-    AccumulatorContinue.childExpressionsFoldWhile(this, forward, initial, folder)
+    childExpressions(forward).foldWhile(initial, folder)
 
 fun PsiElement.childExpressions(forward: Boolean = true): Sequence<PsiElement> {
     val seed = if (forward) {
@@ -254,11 +269,11 @@ fun PsiElement.isExpression(): Boolean =
     }
 
 @Contract(pure = true)
-fun PsiElement.siblingExpression(function: (PsiElement) -> PsiElement): PsiElement? {
-    var expression = this
+fun PsiElement.siblingExpression(function: (PsiElement) -> PsiElement?): PsiElement? {
+    var expression: PsiElement? = this
 
     do {
-        expression = function(expression)
+        expression = function(expression ?: return null)
     } while (expression is ElixirEndOfExpression ||
         expression is LeafPsiElement ||
         expression is PsiComment ||

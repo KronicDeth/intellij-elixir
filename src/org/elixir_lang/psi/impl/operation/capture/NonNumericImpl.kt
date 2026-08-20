@@ -4,6 +4,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReference
 import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager.getCachedValue
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.psi.ElixirDecimalWholeNumber
 import org.elixir_lang.psi.ElixirTypes
 import org.elixir_lang.psi.call.Call
@@ -60,6 +61,7 @@ fun getReference(nonNumeric: NonNumeric): PsiReference? =
             CachedValueProvider.Result.create(nonNumeric.computeReference(), nonNumeric)
         }
 
+@RequiresReadLock
 fun getNameIdentifier(nonNumeric: NonNumeric): PsiElement? =
         when (nonNumeric.reference) {
             is CaptureNameArity -> Normalized.operand(nonNumeric)

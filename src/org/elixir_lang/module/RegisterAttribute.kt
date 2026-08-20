@@ -1,6 +1,7 @@
 package org.elixir_lang.module
 
 import com.intellij.psi.PsiElement
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.psi.ElixirAtom
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.call.finalArguments
@@ -18,12 +19,14 @@ object RegisterAttribute {
                         call.resolvedModuleName() == "Module"
             } ?: false
 
+    @RequiresReadLock
     fun name(call: Call): String? =
             when (val nameIdentifier = nameIdentifier(call)) {
                 is ElixirAtom -> "@${nameIdentifier.name}"
                 else -> null
             }
 
+    @RequiresReadLock
     fun nameIdentifier(call: Call): PsiElement? =
             call
                     .finalArguments()

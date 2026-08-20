@@ -1,7 +1,11 @@
 package org.elixir_lang
 
 import com.ericsson.otp.erlang.*
-import com.intellij.openapi.application.ApplicationManager
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.launch
 import org.elixir_lang.mail_box.BADRPC
 import org.elixir_lang.mail_box.BadRPC
 import org.elixir_lang.mail_box.WaitingMatcher
@@ -17,17 +21,19 @@ fun otpErlangTuple(vararg elements: OtpErlangObject) = OtpErlangTuple(elements)
 /**
  * [OtpMbox] that supports selective receive.
  *
- * Messages are [OtpMbox.receive]d in a pooled thread and stored until [selectiveReceive]
+ * Messages are [OtpMbox.receive]d in a coroutine and stored until [selectiveReceive]
  */
-class MailBox(private val otpNode: OtpNode, private val otpMbox: OtpMbox) {
+class MailBox(private val otpNode: OtpNode, private val otpMbox: OtpMbox, private val scope: CoroutineScope) {
     init {
-        ApplicationManager.getApplication().executeOnPooledThread {
+        scope.launch(Dispatchers.IO) {
             try {
                 loop()
             } catch (exception: Exception) {
                 while (!waitingMatchers.isEmpty()) {
                     waitingMatchers.poll()?.completeExceptionally(exception)
                 }
+
+                throw exception
             }
         }
     }
@@ -215,26 +221,29 @@ class MailBox(private val otpNode: OtpNode, private val otpMbox: OtpMbox) {
 
     private val waitingMatchers = ConcurrentLinkedQueue<WaitingMatcher>()
 
-    private tailrec fun loop() {
-        val received = otpMbox.receive()
+    private suspend fun loop() {
+        while (true) {
+            val received = otpMbox.receive()
 
-        if (received != CLOSE) {
+            if (received == CLOSE) {
+                val exit = OtpErlangExit("normal")
+
+                while (!waitingMatchers.isEmpty()) {
+                    waitingMatchers.poll()?.completeExceptionally(exit)
+                }
+
+                otpMbox.close()
+                otpNode.close()
+                return
+            }
+
+            currentCoroutineContext().ensureActive()
+
             synchronized(receivedMessages) {
                 receivedMessages.add(received)
 
                 checkWaitingMatchers()
             }
-
-            loop()
-        } else {
-            val exit = OtpErlangExit("normal")
-
-            while (!waitingMatchers.isEmpty()) {
-                waitingMatchers.poll()?.completeExceptionally(exit)
-            }
-
-            otpMbox.close()
-            otpNode.close()
         }
     }
 

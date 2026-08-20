@@ -9,6 +9,7 @@ import org.elixir_lang.psi.operation.In;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.PsiScopeProcessor;
+import com.intellij.util.concurrency.annotations.RequiresReadLock;
 
 public interface ElixirMatchedInOperation extends ElixirMatchedExpression, Call, In {
 
@@ -18,8 +19,10 @@ public interface ElixirMatchedInOperation extends ElixirMatchedExpression, Call,
   @NotNull
   List<ElixirMatchedExpression> getMatchedExpressionList();
 
+  @RequiresReadLock
   @Nullable String functionName();
 
+  @RequiresReadLock
   @NotNull PsiElement functionNameElement();
 
   @Nullable ElixirDoBlock getDoBlock();
@@ -32,14 +35,19 @@ public interface ElixirMatchedInOperation extends ElixirMatchedExpression, Call,
   //matching getNameIdentifier(ElixirMatchedInOperation, ...)
   //methods are not found in ElixirPsiImplUtil
 
+  @RequiresReadLock
   boolean hasDoBlockOrKeyword();
 
+  @RequiresReadLock
   boolean isCalling(@NotNull String resolvedModuleName, @NotNull String functionName);
 
+  @RequiresReadLock
   boolean isCalling(@NotNull String resolvedModuleName, @NotNull String functionName, int resolvedFinalArity);
 
+  @RequiresReadLock
   boolean isCallingMacro(@NotNull String resolvedModuleName, @NotNull String functionName);
 
+  @RequiresReadLock
   boolean isCallingMacro(@NotNull String resolvedModuleName, @NotNull String functionName, int resolvedFinalArity);
 
   @Nullable Quotable leftOperand();
@@ -48,28 +56,36 @@ public interface ElixirMatchedInOperation extends ElixirMatchedExpression, Call,
 
   @NotNull Operator operator();
 
+  @RequiresReadLock
   @NotNull PsiElement[] primaryArguments();
 
+  @RequiresReadLock
   @Nullable Integer primaryArity();
 
+  @RequiresReadLock
   boolean processDeclarations(@NotNull PsiScopeProcessor processor, @NotNull ResolveState state, PsiElement lastParent, @NotNull PsiElement place);
 
   @NotNull OtpErlangObject quote();
 
+  @RequiresReadLock
   int resolvedFinalArity();
 
+  @RequiresReadLock
   @NotNull ArityInterval resolvedFinalArityInterval();
 
   @NotNull String resolvedModuleName();
 
+  @RequiresReadLock
   @Nullable Integer resolvedPrimaryArity();
 
+  @RequiresReadLock
   @Nullable Integer resolvedSecondaryArity();
 
   @Nullable Quotable rightOperand();
 
   @Nullable PsiElement[] secondaryArguments();
 
+  @RequiresReadLock
   @Nullable Integer secondaryArity();
 
   @NotNull PsiElement setName(@NotNull String newName);

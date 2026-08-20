@@ -1,5 +1,5 @@
 defmodule Unused do
-  def unused do
+  def run do
     _unused = 1
   end
 end

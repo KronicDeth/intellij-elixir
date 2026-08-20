@@ -2,6 +2,7 @@ package org.elixir_lang.facet.sdk
 
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.projectRoots.SdkModel
+import com.intellij.openapi.roots.ui.configuration.projectRoot.ProjectSdksModel
 import com.intellij.ui.CollectionListModel
 import org.elixir_lang.facet.SdksService
 import org.elixir_lang.sdk.elixir.Type
@@ -21,33 +22,56 @@ class Model :
         }
     }
 
+    /**
+     * The [ProjectSdksModel] this instance subscribed to. Kept so [detach] unsubscribes from the
+     * same instance that [listener] was added to, even if [SdksService] has since invalidated and
+     * rebuilt its cached model.
+     */
+    private val subscribedSdksModel: ProjectSdksModel? = SdksService.getInstance()?.getModel()
+
+    private val listener = object : SdkModel.Listener {
+        override fun beforeSdkRemove(sdk: Sdk) {
+            // ProjectSdksModel.removeSdk fires this with the ORIGINAL table SDK (the map key),
+            // while this model holds the editable clones (the map values), so remove(sdk) by
+            // identity would miss and leave a "ghost" entry in the chooser. Match by name.
+            val index = internalList.indexOfFirst { it?.name == sdk.name }
+            if (index >= 0) {
+                remove(index)
+            }
+        }
+
+        override fun sdkAdded(sdk: Sdk) {
+            if (sdk.sdkType is Type) {
+                add(sdk)
+            }
+        }
+
+        override fun sdkChanged(sdk: Sdk, previousName: String) {
+            val previousIndex = internalList.indexOfFirst { indexSdk ->
+                indexSdk?.name == previousName
+            }
+
+            if (previousIndex > 0) {
+                fireContentsChanged(this@Model, previousIndex, previousIndex)
+            }
+        }
+
+        override fun sdkHomeSelected(sdk: Sdk, newSdkHome: String) {}
+    }
+
     init {
         internalList.add(0, null)
-        SdksService.getInstance()?.apply {
-            getModel().addListener(object : SdkModel.Listener {
-                override fun beforeSdkRemove(sdk: Sdk) {
-                    remove(sdk)
-                }
+        subscribedSdksModel?.addListener(listener)
+    }
 
-                override fun sdkAdded(sdk: Sdk) {
-                    if (sdk.sdkType is Type) {
-                        add(sdk)
-                    }
-                }
-
-                override fun sdkChanged(sdk: Sdk, previousName: String) {
-                    val previousIndex = internalList.indexOfFirst { indexSdk ->
-                        indexSdk?.name == previousName
-                    }
-
-                    if (previousIndex > 0) {
-                        fireContentsChanged(this@Model, previousIndex, previousIndex)
-                    }
-                }
-
-                override fun sdkHomeSelected(sdk: Sdk, newSdkHome: String) {}
-            })
-        }
+    /**
+     * Unsubscribes [listener] from the shared [ProjectSdksModel]. Must be called when the owning
+     * UI is disposed (e.g. from a Configurable's `disposeUIResources`) - the shared model is an
+     * application-lifetime singleton, so an un-removed listener accumulates on every Settings
+     * open and pins this model (and its Swing combo box) forever.
+     */
+    fun detach() {
+        subscribedSdksModel?.removeListener(listener)
     }
 
     private var _selectedItem: Sdk? = items[0]

@@ -5,17 +5,20 @@ import com.intellij.execution.process.ProcessEvent
 import com.intellij.execution.process.ProcessHandlerFactory
 import com.intellij.execution.process.ProcessListener
 import com.intellij.execution.process.ProcessOutputType
+import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.Storage
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.module.Module
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.util.Key
-import org.elixir_lang.Elixir.elixirSdkHasErlangSdk
 import org.elixir_lang.Mix
-import org.elixir_lang.notification.setup_sdk.Notifier
+import org.elixir_lang.isElixirMixModule
+import org.elixir_lang.notification.setup_sdk.sdkOrNotify
 import org.elixir_lang.run.ensureWorkingDirectory
-import org.elixir_lang.sdk.elixir.Type.Companion.mostSpecificSdk
+import org.elixir_lang.sdk.elixir.ElixirSdkLookup
+import java.util.concurrent.Callable
 
 data class DialyzerWarn(
     val fileName: String,
@@ -28,7 +31,7 @@ class DialyzerException(message: String?, inner: Throwable?) : Exception(message
 
 @Service
 @com.intellij.openapi.components.State(name = "Dialyzer", storages = [Storage(value = "elixir_dialyzer.xml")])
-class DialyzerServiceImpl : DialyzerService {
+internal class DialyzerServiceImpl : DialyzerService {
     override var mixArguments = "dialyzer"
     override var elixirArguments = ""
     override var erlArguments = ""
@@ -36,49 +39,43 @@ class DialyzerServiceImpl : DialyzerService {
     private val log = Logger.getInstance(DialyzerServiceImpl::class.java)
 
     override fun dialyzerWarnings(module: Module): List<DialyzerWarn> {
-        val workingDirectory = ensureWorkingDirectory(module)
+        val (workingDirectory, sdk, project) = ReadAction.nonBlocking(Callable {
+            if (!module.isElixirMixModule()) return@Callable null
+            val sdk = ElixirSdkLookup.resolveWithErlang(module).sdkOrNotify(module) ?: return@Callable null
+            Triple(ensureWorkingDirectory(module), sdk, module.project)
+        }).executeSynchronously() ?: return emptyList()
 
-        val sdk = mostSpecificSdk(module)
-
-        return if (sdk != null) {
-            if (elixirSdkHasErlangSdk(sdk)) {
-                dialyzerWarnings(workingDirectory, sdk)
-            } else {
-                val project = module.project
-                Notifier.error(
-                    module,
-                    "Missing Internal Erlang SDK for module Elixir SDK",
-                    "The configured Elixir SDK for the module ${module.name} or its project ${project.name} does not " +
-                            "have an Internal Erlang SDK configured"
-                )
-
-                emptyList()
-            }
-        } else {
-            val project = module.project
-            Notifier.error(
-                module,
-                "Missing module Elixir SDK",
-                "There is no configured Elixir SDK for the module ${module.name} or its project ${project.name}"
-            )
-
-            emptyList()
-        }
+        return dialyzerWarnings(workingDirectory, sdk, project)
     }
 
-    private fun dialyzerWarnings(workingDirectory: String, elixirSdk: Sdk): List<DialyzerWarn> = try {
-        parseDialyzerOutput(run(workingDirectory, elixirSdk))
+    private fun dialyzerWarnings(workingDirectory: String, elixirSdk: Sdk, project: Project): List<DialyzerWarn> = try {
+        parseDialyzerOutput(run(workingDirectory, elixirSdk, project))
     } catch (ex: Exception) {
         throw DialyzerException("Error while running Dialyzer: ${ex.message}", ex)
     }
 
-    private fun run(workingDirectory: String, elixirSdk: Sdk): Pair<String, String> {
+    private fun run(workingDirectory: String, elixirSdk: Sdk, project: Project): Pair<String, String> {
         log.info("Dialyzer starting...")
         val erlArgumentList = ParametersList.parse(erlArguments).toList()
         val elixirArgumentList = ParametersList.parse(elixirArguments).toList()
         val mixArgumentList = ParametersList.parse(mixArguments).toList()
-        val commandLine = Mix.commandLine(emptyMap(), workingDirectory, elixirSdk, erlArgumentList, elixirArgumentList)
+        val commandLine =
+            Mix.commandLine(
+                emptyMap(),
+                workingDirectory,
+                elixirSdk,
+                erlArgumentList,
+                elixirArgumentList,
+                project = project,
+            )
         commandLine.addParameters(mixArgumentList)
+        // Note: add "--force-check" to the Mix arguments in the Dialyzer settings panel
+        // if you need dialyxir to re-analyse all callers after a type-contract-only change
+        // (@spec / @type / @opaque).  It is not added by default because it forces a full
+        // project re-analysis on every run, which can be significantly slower than the
+        // normal incremental mode.  The pre-run document save (in Global.runInspection)
+        // handles the common stale-results case by ensuring files are flushed to disk
+        // before the external process starts.
 
         val processHandler = ProcessHandlerFactory.getInstance().createColoredProcessHandler(commandLine)
         val stderrBuilder = StringBuilder()
@@ -126,4 +123,3 @@ class DialyzerServiceImpl : DialyzerService {
         erlArguments = state.erlArguments
     }
 }
-

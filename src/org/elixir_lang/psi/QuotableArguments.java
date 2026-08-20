@@ -4,7 +4,7 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.psi.PsiElement;
 
 /**
- * Created by luke.imhoff on 3/14/15.
+ * Created by kadie.enheduanna.inanna on 3/14/15.
  */
 public interface QuotableArguments extends PsiElement {
     OtpErlangObject[] quoteArguments();

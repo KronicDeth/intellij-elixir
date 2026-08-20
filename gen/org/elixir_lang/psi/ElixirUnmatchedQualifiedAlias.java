@@ -9,6 +9,7 @@ import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiPolyVariantReference;
 import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.PsiScopeProcessor;
+import com.intellij.util.concurrency.annotations.RequiresReadLock;
 
 public interface ElixirUnmatchedQualifiedAlias extends ElixirUnmatchedExpression, QualifiedAlias {
 
@@ -21,13 +22,14 @@ public interface ElixirUnmatchedQualifiedAlias extends ElixirUnmatchedExpression
   @NotNull
   ElixirUnmatchedExpression getUnmatchedExpression();
 
-  @Nullable String fullyQualifiedName();
+  @NotNull String fullyQualifiedName();
 
+  @RequiresReadLock
   @NotNull String getName();
 
   @Nullable PsiElement getNameIdentifier();
 
-  @Nullable ItemPresentation getPresentation();
+  @NotNull ItemPresentation getPresentation();
 
   @Nullable PsiPolyVariantReference getReference();
 

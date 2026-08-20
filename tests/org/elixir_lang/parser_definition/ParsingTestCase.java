@@ -7,13 +7,15 @@ import org.elixir_lang.ElixirLanguage;
 import org.elixir_lang.ElixirParserDefinition;
 import org.elixir_lang.intellij_elixir.Quoter;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
+import org.elixir_lang.psi.quoting.QuotingDialect;
+import org.elixir_lang.psi.quoting.QuotingDialectResolver;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Created by luke.imhoff on 8/7/14.
+ * Created by kadie.enheduanna.inanna on 8/7/14.
  */
 public abstract class ParsingTestCase extends com.intellij.testFramework.ParsingTestCase {
     public ParsingTestCase() {
@@ -22,6 +24,29 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
 
     protected ParsingTestCase(String extension, ParserDefinition... parserDefinitions) {
         super("", extension, parserDefinitions);
+    }
+
+    /**
+     * Quotes in the dialect of the Elixir the reference quoter is running, so both sides of
+     * {@link #assertQuotedCorrectly()} speak the same version.
+     *
+     * These are light fixtures with no Elixir SDK, so production resolution would reach
+     * {@link QuotingDialect#FALLBACK} on every CI leg and every leg would compare against the same
+     * dialect however old the Elixir it ran. {@code ELIXIR_VERSION} is exported to the test JVM by
+     * the build, from the SDK it resolved - the same SDK the quoter was built against.
+     *
+     * Absent (a bare {@code ./gradlew test} outside the build's environment), the override is not
+     * installed at all and resolution falls back as production would.
+     */
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+
+        String elixirVersion = System.getenv("ELIXIR_VERSION");
+
+        if (elixirVersion != null && !elixirVersion.isBlank()) {
+            QuotingDialectResolver.overrideDialect(getProject(), QuotingDialect.of(elixirVersion));
+        }
     }
 
     protected void assertParsedAndQuotedAroundError() {
@@ -43,6 +68,27 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
         assertQuotedCorrectly();
     }
 
+    /**
+     * For a construct the parser accepts in every version, but that the reference quoter started
+     * rejecting as invalid Elixir from {@code dialect} on - so only one side of the boundary can be
+     * asserted per run, chosen by the dialect the leg's real Elixir resolves to (set in
+     * {@link #setUp()}), not by which Elixir wrote the test.
+     */
+    protected void assertParsedAndQuotedCorrectlyBefore(QuotingDialect dialect) {
+        assertParsedAndQuotedCorrectlyBefore(dialect, true);
+    }
+
+    protected void assertParsedAndQuotedCorrectlyBefore(QuotingDialect dialect, boolean checkResult) {
+        doTest(checkResult);
+
+        if (QuotingDialectResolver.dialectFor(myFile).compareTo(dialect) >= 0) {
+            assertQuotedAroundError();
+        } else {
+            assertWithoutLocalError();
+            assertQuotedCorrectly();
+        }
+    }
+
     protected void assertParsedWithErrors() {
         assertParsedWithErrors(true);
     }
@@ -59,6 +105,7 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
         PsiFile root = fileViewProvider.getPsi(ElixirLanguage.INSTANCE);
         final List<PsiElement> errorElementList = new LinkedList<>();
 
+        assertNotNull(root);
         root.accept(
                 new PsiRecursiveElementWalkingVisitor() {
                     @Override

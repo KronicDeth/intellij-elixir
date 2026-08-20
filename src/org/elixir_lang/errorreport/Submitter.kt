@@ -1,6 +1,5 @@
 package org.elixir_lang.errorreport
 
-import com.intellij.diagnostic.DiagnosticBundle
 import com.intellij.ide.DataManager
 import com.intellij.notification.BrowseNotificationAction
 import com.intellij.notification.NotificationGroupManager
@@ -70,7 +69,7 @@ class Submitter : ErrorReportSubmitter() {
                     .getInstance()
                     .getNotificationGroup("Error Report")
                     .createNotification(
-                        DiagnosticBundle.message("error.report.title"),
+                        "Error Report",
                         message,
                         NotificationType.ERROR
                     )

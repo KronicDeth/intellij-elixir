@@ -1,16 +1,23 @@
 package org.elixir_lang.psi.call;
 
+import com.intellij.model.psi.PsiExternalReferenceHost;
 import com.intellij.psi.NavigatablePsiElement;
 import com.intellij.psi.PsiElement;
-import org.elixir_lang.psi.ElixirDoBlock;
 import org.elixir_lang.psi.ArityInterval;
+import org.elixir_lang.psi.ElixirDoBlock;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
  * A general function or macro call.
+ *
+ * <p>Implements {@link PsiExternalReferenceHost} (a no-method marker) so calls can host new-model
+ * {@link com.intellij.model.psi.PsiSymbolReference}s contributed via {@code psi.symbolReferenceProvider}
+ * (e.g. an implementing {@code def} → the {@code @callback} it implements). This does not change
+ * behavior on its own; providers that return no references leave navigation unchanged.
  */
-public interface Call extends NavigatablePsiElement {
+@SuppressWarnings("UnstableApiUsage")
+public interface Call extends NavigatablePsiElement, PsiExternalReferenceHost {
     /**
      *
      * @return name of the function/macro as given in the source
@@ -63,7 +70,7 @@ public interface Call extends NavigatablePsiElement {
 
     /**
      * Whether {@code call} is of the named macro.
-     *
+     * <p/>
      * Differs from {@link #isCallingMacro(String, String, int)} because no arity is necessary,
      * which is useful for special forms, which don't have a set arity.  (That's actually why they need to be special
      * forms since Erlang/Elixir doesn't support variable arity functions otherwise.)
@@ -77,7 +84,7 @@ public interface Call extends NavigatablePsiElement {
 
     /**
      * Whether {@code call} is of the named macro.
-     *
+     * <p/>
      * Differs from {@link #isCalling(String, String, int)} because this function ensures there is a {@code do}
      * block.  If the macro can be called without a {@code do} block, then
      * {@link #isCalling(String, String, int)} should be used instead.

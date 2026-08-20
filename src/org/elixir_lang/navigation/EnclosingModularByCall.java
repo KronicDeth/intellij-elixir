@@ -1,5 +1,6 @@
 package org.elixir_lang.navigation;
 
+import com.intellij.util.concurrency.annotations.RequiresReadLock;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.structure_view.element.CallDefinitionClause;
 import org.elixir_lang.structure_view.element.modular.Modular;
@@ -21,6 +22,7 @@ public class EnclosingModularByCall extends HashMap<Call, Modular> {
      * @param call
      * @return {@code null} if {@code call} is top-level and has no enclosing modular.
      */
+    @RequiresReadLock
     @Nullable
     public Modular putNew(@NotNull Call call) {
         Modular modular;

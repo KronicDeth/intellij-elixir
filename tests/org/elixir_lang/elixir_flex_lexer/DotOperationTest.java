@@ -10,7 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Created by luke.imhoff on 9/16/14.
+ * Created by kadie.enheduanna.inanna on 9/16/14.
  */
 public class DotOperationTest extends Test {
     /*

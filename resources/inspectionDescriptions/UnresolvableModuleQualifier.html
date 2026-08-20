@@ -1,0 +1,22 @@
+<html lang="en">
+<body>
+<p>Reports module qualifiers in qualified calls that cannot be resolved to any module definition in scope.</p>
+<!-- tooltip end -->
+<p>In Elixir, a qualified call like <code>Module.function(args)</code> requires that <code>Module</code>
+resolves to a module that is defined, aliased, or otherwise in scope. When the qualifier module cannot
+be resolved, the call will fail at runtime with <code>UndefinedFunctionError</code>.</p>
+<p>This inspection flags the qualifier (for example, <code>Unresolved</code> in
+<code>Unresolved.changeset()</code>) when it does not resolve through any alias directive, direct module
+definition, or import in the current scope.</p>
+<p>Dynamic qualifiers (variables, function call results, module attributes, map/struct field access)
+are excluded because they cannot be resolved statically.</p>
+<p>Fully-qualified Erlang-style module names with the <code>Elixir.</code> prefix (e.g.
+<code>Elixir.Enum</code>) are recognised: the prefix is stripped and the underlying module is
+checked for existence.</p>
+<p>This inspection only runs on files under Source or Test Source roots (e.g. <code>lib/</code>,
+<code>test/</code>). Files in unmarked directories like <code>config/</code> are not inspected.</p>
+<p>Files containing <code>use</code> calls whose macro expansion cannot be traced statically
+(e.g. <code>ExUnit.CaseTemplate</code>) are also excluded, since the <code>use</code> may inject
+aliases that are invisible to static analysis.</p>
+</body>
+</html>

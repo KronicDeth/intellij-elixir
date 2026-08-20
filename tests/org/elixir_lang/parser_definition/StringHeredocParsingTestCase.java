@@ -1,11 +1,17 @@
 package org.elixir_lang.parser_definition;
 
+import org.elixir_lang.psi.quoting.QuotingDialect;
+
 /**
- * Created by luke.imhoff on 8/8/14.
+ * Created by kadie.enheduanna.inanna on 8/8/14.
  */
 public class StringHeredocParsingTestCase extends ParsingTestCase {
     public void testEmpty() {
         assertParsedAndQuotedAroundError();
+    }
+
+    public void testEnclosedHexEscapeSequence() {
+        assertParsedAndQuotedCorrectlyBefore(QuotingDialect.V1_20);
     }
 
     public void testEscapeSequences() {

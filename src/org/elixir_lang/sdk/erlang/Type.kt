@@ -1,44 +1,53 @@
 package org.elixir_lang.sdk.erlang
 
-import com.intellij.execution.ExecutionException
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.application.edtWriteAction
-import com.intellij.openapi.application.writeAction
-import com.intellij.openapi.diagnostic.Logger
-import com.intellij.openapi.progress.runBlockingCancellable
+import com.intellij.openapi.fileChooser.FileChooserDescriptor
+import com.intellij.openapi.project.Project
+import org.elixir_lang.util.runWithEdtGuard
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.projectRoots.SdkModel
 import com.intellij.openapi.projectRoots.SdkModificator
 import com.intellij.openapi.projectRoots.SdkType
 import com.intellij.openapi.roots.OrderRootType
-import com.intellij.openapi.util.SystemInfo
-import com.intellij.openapi.util.Version
-import com.intellij.util.containers.ContainerUtil
-import org.elixir_lang.jps.HomePath
-import org.elixir_lang.jps.sdk_type.Erlang
+import com.intellij.openapi.vfs.VirtualFile
+import org.elixir_lang.cli.getExecutableFilepathWslSafe
+import org.elixir_lang.jps.shared.ErlangSdkTypeId
+import org.elixir_lang.jps.shared.cli.CliTool
+import org.elixir_lang.jps.shared.sdk.SdkPaths
+import org.elixir_lang.sdk.SdkDetectionContext
+import org.elixir_lang.sdk.SdkHomeKey
+import org.elixir_lang.sdk.SdkHomePaths
+import org.elixir_lang.sdk.SdkHomeScan
 import org.elixir_lang.sdk.erlang_dependent.AdditionalDataConfigurable
 import org.jdom.Element
 import java.io.File
+import java.nio.file.Path
 
-class Type : SdkType("Erlang SDK for Elixir SDK") {
-    private val releaseBySdkHome: MutableMap<String, Release> = ContainerUtil.createWeakMap()
-
+class Type : SdkType(ErlangSdkTypeId.ERLANG_SDK_TYPE_ID) {
     companion object {
-        private const val OTP_RELEASE_PREFIX_LINE = "org.elixir_lang.sdk.erlang.Type OTP_RELEASE:"
-        private const val ERTS_VERSION_PREFIX_LINE = "org.elixir_lang.sdk.erlang.Type ERTS_VERSION:"
-        private const val PRINT_VERSION_INFO_EXPRESSION =
-            "io:format(\"~n~s~n~s~n~s~n~s~n\",[" +
-                    "\"$OTP_RELEASE_PREFIX_LINE\"," +
-                    "erlang:system_info(otp_release)," +
-                    "\"$ERTS_VERSION_PREFIX_LINE\"," +
-                    "erlang:system_info(version)" +
-                    "]),erlang:halt()."
         private const val WINDOWS_DEFAULT_HOME_PATH = "C:\\Program Files\\erl9.0"
-        private val NIX_PATTERN = HomePath.nixPattern("erlang")
-        private const val LINUX_MINT_HOME_PATH = "${HomePath.LINUX_MINT_HOME_PATH}/erlang"
-        private const val LINUX_DEFAULT_HOME_PATH = "${HomePath.LINUX_DEFAULT_HOME_PATH}/erlang"
-        private val VERSION_PATH_TO_HOME_PATH: (File) -> File = { versionPath -> File(versionPath, "lib/erlang") }
-        private val LOGGER = Logger.getInstance(Type::class.java)
+        private val NIX_PATTERN = SdkHomePaths.nixPattern("erlang")
+        private const val LINUX_MINT_HOME_PATH = "${SdkHomePaths.LINUX_MINT_HOME_PATH}/erlang"
+        private const val LINUX_DEFAULT_HOME_PATH = "${SdkHomePaths.LINUX_DEFAULT_HOME_PATH}/erlang"
+
+        @JvmStatic
+        val instance: Type
+            get() = findInstance(Type::class.java)
+
+        @JvmStatic
+        private fun createConfig() = SdkHomeScan.Config(
+            toolName = "erlang",
+            nixPattern = NIX_PATTERN,
+            linuxDefaultPath = LINUX_DEFAULT_HOME_PATH,
+            linuxMintPath = LINUX_MINT_HOME_PATH,
+            windowsDefaultPath = WINDOWS_DEFAULT_HOME_PATH,
+            windows32BitPath = null,
+            elixirInstallScriptDirName = "otp",
+            homebrewTransform = { versionPath -> File(versionPath, "lib/erlang") },
+            nixTransform = { versionPath -> File(versionPath, "lib/erlang") },
+            kerlTransform = { it },
+            travisCIKerlTransform = { it }
+        )
 
         @JvmStatic
         fun getDefaultSdkName(
@@ -46,66 +55,81 @@ class Type : SdkType("Erlang SDK for Elixir SDK") {
             version: Release?,
         ): String =
             buildString {
+                val source = SdkPaths.detectSource(sdkHome)
+                if (source != null) {
+                    append(source).append(" ")
+                }
                 append("Erlang for Elixir ")
                 if (version != null) {
-                    append(version.otpRelease)
+                    // Use directory name for version if it's more specific (e.g., "28.3" vs "28")
+                    val dirVersion = File(sdkHome).name
+                    val displayVersion = if (dirVersion.startsWith(version.otpMajor)) dirVersion else version.otpVersion
+                    append(displayVersion)
                 } else {
-                    append(" at ").append(sdkHome)
+                    append("at ").append(sdkHome)
                 }
             }
 
-        private fun getVersionCacheKey(sdkHome: String?): String? = sdkHome?.let { File(it).absolutePath }
-
-        private fun parseSdkVersion(printVersionInfoOutput: List<String>): Release? {
-            var otpRelease: String? = null
-            var ertsVersion: String? = null
-
-            val iterator = printVersionInfoOutput.listIterator()
-            while (iterator.hasNext()) {
-                when (val line = iterator.next()) {
-                    OTP_RELEASE_PREFIX_LINE -> if (iterator.hasNext()) otpRelease = iterator.next()
-                    ERTS_VERSION_PREFIX_LINE -> if (iterator.hasNext()) ertsVersion = iterator.next()
+        @JvmStatic
+        internal fun suggestSdkNameForHome(
+            sdkHome: String,
+            resolvedVersion: String?,
+        ): String {
+            val normalizedVersion = resolvedVersion?.takeIf { it.isNotBlank() }
+            val baseName =
+                if (normalizedVersion == null) {
+                    getDefaultSdkName(
+                        sdkHome,
+                        runWithEdtGuard("Detecting Erlang SDK…") { ErlangVersionDetector.detectRelease(sdkHome) },
+                    )
+                } else {
+                    val source = SdkPaths.detectSource(sdkHome)
+                    val dirVersion = File(sdkHome).name
+                    val displayVersion =
+                        if (dirVersion.startsWith(normalizedVersion)) dirVersion else normalizedVersion
+                    buildString {
+                        if (source != null) {
+                            append(source).append(" ")
+                        }
+                        append("Erlang for Elixir ").append(displayVersion)
+                    }
                 }
-            }
 
-            return if (otpRelease != null && ertsVersion != null) Release(otpRelease, ertsVersion) else null
+            return org.elixir_lang.sdk.Type.appendWslSuffix(baseName, sdkHome)
         }
 
         @JvmStatic
-        fun homePathByVersion(): Map<Version, String> {
-            val homePathByVersion = HomePath.homePathByVersion().toMutableMap()
-
-            when {
-                SystemInfo.isMac -> {
-                    HomePath.mergeASDF(homePathByVersion, "erlang")
-                    HomePath.mergeHomebrew(homePathByVersion, "erlang", VERSION_PATH_TO_HOME_PATH)
-                    HomePath.mergeNixStore(homePathByVersion, NIX_PATTERN, VERSION_PATH_TO_HOME_PATH)
+        internal fun versionStringForHome(
+            sdkHome: String,
+            resolvedVersion: String?,
+        ): String? {
+            val normalizedVersion = resolvedVersion?.takeIf { it.isNotBlank() }
+            val version = normalizedVersion
+                ?: runWithEdtGuard("Detecting Erlang SDK…") { ErlangVersionDetector.detectRelease(sdkHome) }?.otpVersion
+                ?: return null
+            val displayVersion =
+                if (normalizedVersion == null) {
+                    val dirVersion = File(sdkHome).name
+                    if (dirVersion.startsWith(version)) dirVersion else version
+                } else {
+                    version
                 }
-
-                SystemInfo.isWindows -> {
-                    putIfDirectory(homePathByVersion, HomePath.UNKNOWN_VERSION, WINDOWS_DEFAULT_HOME_PATH)
-                }
-
-                SystemInfo.isLinux -> {
-                    putIfDirectory(homePathByVersion, HomePath.UNKNOWN_VERSION, LINUX_DEFAULT_HOME_PATH)
-                    putIfDirectory(homePathByVersion, HomePath.UNKNOWN_VERSION, LINUX_MINT_HOME_PATH)
-                    HomePath.mergeTravisCIKerl(homePathByVersion) { it }
-                    HomePath.mergeNixStore(homePathByVersion, NIX_PATTERN, VERSION_PATH_TO_HOME_PATH)
-                }
-            }
-
-            return homePathByVersion
+            return erlangDisplayString(SdkPaths.detectSource(sdkHome), displayVersion)
         }
 
-        private fun putIfDirectory(
-            homePathByVersion: MutableMap<Version, String>,
-            version: Version,
-            homePath: String,
-        ) {
-            val homeFile = File(homePath)
-            if (homeFile.isDirectory) {
-                homePathByVersion[version] = homePath
-            }
+        private fun erlangDisplayString(source: String?, version: String): String = buildString {
+            source?.let { append(it).append(" ") }
+            append("Erlang ").append(version)
+        }
+
+        @JvmStatic
+        fun homePathByVersion(): Map<SdkHomeKey, String> {
+            return SdkHomeScan.homePathByVersion(null, createConfig())
+        }
+
+        @JvmStatic
+        fun homePathByVersion(path: Path?): Map<SdkHomeKey, String> {
+            return SdkHomeScan.homePathByVersion(path, createConfig())
         }
     }
 
@@ -116,39 +140,93 @@ class Type : SdkType("Erlang SDK for Elixir SDK") {
                 org.elixir_lang.sdk.Type
                     .documentationRootType()
 
-    override fun setupSdkPaths(sdk: Sdk) {
+    override fun getHomeChooserDescriptor(): FileChooserDescriptor =
+        org.elixir_lang.sdk.Type.createHomeChooserDescriptor(presentableName, ::validateSdkHomePath)
+
+    private fun validateSdkHomePath(virtualFile: VirtualFile) {
+        val selectedPath = virtualFile.path
+        val valid = isValidSdkHome(selectedPath)
+
+        if (!valid) {
+            throw Exception("The selected directory is not a valid home for $presentableName")
+        }
+    }
+
+    // If called from inside a write action the modal progress dialog would deadlock, so skip
+    // it in that case and call setupSdkPathsImpl directly (see ElixirSdkPathConfigurator for
+    // the same pattern).
+    override fun setupSdkPaths(sdk: Sdk) =
+            runWithEdtGuard(
+                "Setting Up Erlang SDK Paths...",
+                skipModalIf = { ApplicationManager.getApplication().isWriteAccessAllowed },
+            ) { setupSdkPathsImpl(sdk) }
+
+    private fun setupSdkPathsImpl(sdk: Sdk) {
         val sdkModificator = sdk.sdkModificator
         org.elixir_lang.sdk.Type
             .addCodePaths(sdkModificator)
 
         // Check if we're already in a write action (called from Elixir SDK setup)
-        if (ApplicationManager.getApplication().isWriteAccessAllowed) {
+        val app = ApplicationManager.getApplication()
+        if (app.isWriteAccessAllowed) {
             // We're already in a write action, commit directly
             sdkModificator.commitChanges()
+            return
+        }
+
+        val runnable = Runnable { app.runWriteAction { sdkModificator.commitChanges() } }
+        if (app.isDispatchThread) {
+            runnable.run()
         } else {
-            // Use coroutine-based approach for IntelliJ 2025.2+ compatibility when called independently
-            runBlockingCancellable {
-                edtWriteAction {
-                    LOGGER.debug("Committing SDK changes for ${sdk.name}")
-                    sdkModificator.commitChanges()
-                    LOGGER.debug("Committed SDK changes for ${sdk.name}")
-                }
-            }
+            app.invokeAndWait(runnable)
         }
     }
 
+    @Suppress("DEPRECATION")
+    @Deprecated("Deprecated in Java")
     override fun suggestHomePath(): String? = suggestHomePaths().firstOrNull()
 
+    @Deprecated("Deprecated in Java")
     override fun suggestHomePaths(): Collection<String> = homePathByVersion().values
 
-    override fun isValidSdkHome(path: String): Boolean = Erlang.getByteCodeInterpreterExecutable(path).canExecute()
+    override fun suggestHomePath(path: Path): String? {
+        return homePathByVersion(path).values.firstOrNull()
+    }
+
+    override fun suggestHomePaths(project: Project?): Collection<String> {
+        // SdkDetectionContext falls back to the wizard's import/new-project directory when the
+        // platform supplies the default project (import wizard, New Project), so WSL locations
+        // are still scanned for suggestions.
+        return homePathByVersion(SdkDetectionContext.resolve(project)).values
+    }
+
+    override fun isValidSdkHome(path: String): Boolean {
+        val erlExe = File(CliTool.ERL.getExecutableFilepathWslSafe(path))
+        return erlExe.canExecute()
+    }
 
     override fun suggestSdkName(
         currentSdkName: String?,
         sdkHome: String,
-    ): String = getDefaultSdkName(sdkHome, detectSdkVersion(sdkHome))
+    ): String {
+        return suggestSdkNameForHome(sdkHome, null)
+    }
 
-    override fun getVersionString(sdkHome: String): String? = detectSdkVersion(sdkHome)?.otpRelease
+    /**
+     * Returns a display string for the Erlang/OTP version at [sdkHome], or `null` if the
+     * version cannot be detected.
+     *
+     * The platform calls this override from the EDT (e.g. in the SDK settings dialog).
+     * [runWithEdtGuard] ensures [ErlangVersionDetector.detectRelease] (which asserts a background
+     * thread) is never called directly on the EDT.
+     */
+    override fun getVersionString(sdkHome: String): String? {
+        val release = runWithEdtGuard("Detecting Erlang SDK…") { ErlangVersionDetector.detectRelease(sdkHome) }
+            ?: return null
+        val dirVersion = File(sdkHome).name
+        val displayVersion = if (dirVersion.startsWith(release.otpMajor)) dirVersion else release.otpVersion
+        return erlangDisplayString(SdkPaths.detectSource(sdkHome), displayVersion)
+    }
 
     override fun createAdditionalDataConfigurable(
         sdkModel: SdkModel,
@@ -162,54 +240,5 @@ class Type : SdkType("Erlang SDK for Elixir SDK") {
         additional: Element,
     ) {
         // Intentionally left blank
-    }
-
-    private fun detectSdkVersion(sdkHome: String): Release? {
-        val cachedRelease = getVersionCacheKey(sdkHome)?.let { releaseBySdkHome[it] }
-        if (cachedRelease != null) return cachedRelease
-
-        val erl = Erlang.getByteCodeInterpreterExecutable(sdkHome)
-        if (!erl.canExecute()) {
-            val message =
-                buildString {
-                    append("Can't detect Erlang version: ${erl.path}")
-                    if (erl.exists()) append(" is not executable.") else append(" is missing.")
-                }
-            LOGGER.warn(message)
-            return null
-        }
-
-        var release: Release? = null
-
-        ApplicationManager
-            .getApplication()
-            .executeOnPooledThread {
-                try {
-                    val output =
-                        org.elixir_lang.sdk.ProcessOutput.getProcessOutput(
-                            10 * 1000,
-                            sdkHome,
-                            erl.absolutePath,
-                            "-noshell",
-                            "-eval",
-                            PRINT_VERSION_INFO_EXPRESSION,
-                        )
-
-                    if (output.exitCode == 0 && !output.isCancelled && !output.isTimeout) {
-                        release =
-                            parseSdkVersion(output.stdoutLines)?.also { detectedRelease ->
-                                getVersionCacheKey(sdkHome)?.let { key ->
-                                    releaseBySdkHome[key] = detectedRelease
-                                }
-                            }
-                    } else {
-                        LOGGER.warn("Failed to detect Erlang version.\nStdOut: ${output.stdout}\nStdErr: ${output.stderr}")
-                    }
-                } catch (e: ExecutionException) {
-                    LOGGER.warn(e)
-                }
-            }.get() // Wait for the task to complete
-
-        return release
     }
 }

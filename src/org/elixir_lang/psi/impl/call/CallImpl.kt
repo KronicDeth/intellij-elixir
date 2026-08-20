@@ -1,14 +1,13 @@
 package org.elixir_lang.psi.impl.call
 
-import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.util.Computable
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiNamedElement
 import com.intellij.psi.PsiReference
 import com.intellij.psi.tree.TokenSet
 import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.errorreport.Logger
-import org.elixir_lang.mix.project.computeReadAction
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.StubBased
@@ -20,7 +19,8 @@ import org.elixir_lang.psi.call.name.Function.__MODULE__
 import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.call.name.Module.stripElixirPrefix
 import org.elixir_lang.psi.impl.*
-import org.elixir_lang.psi.impl.ElixirPsiImplUtil.*
+import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ARROW_OPERATOR_TOKEN_SET
+import org.elixir_lang.psi.impl.ElixirPsiImplUtil.moduleAttributeName
 import org.elixir_lang.psi.operation.*
 import org.elixir_lang.psi.qualification.Qualified
 import org.elixir_lang.psi.qualification.Unqualified
@@ -30,14 +30,23 @@ import org.elixir_lang.psi.scope.isTypeSpecPseudoFunction
 import org.elixir_lang.psi.stub.call.Stub
 import org.elixir_lang.reference.Callable
 import org.elixir_lang.reference.Callable.Companion.isBitStreamSegmentOption
+import org.elixir_lang.util.AccumulatorContinue
 import org.jetbrains.annotations.Contract
 import java.util.*
 import org.elixir_lang.psi.impl.macroChildCallList as psiElementToMacroChildCallList
+import org.elixir_lang.psi.operation.Normalized as OperationNormalized
+import org.elixir_lang.psi.operation.infix.Normalized as InfixNormalized
+import org.elixir_lang.psi.operation.not_in.Normalized as NotInNormalized
 
+@RequiresReadLock
 fun Call.computeReference(): PsiReference? =
     /* if the call is just the identifier for a module attribute reference, then don't return a Callable reference,
-           and instead let {@link #getReference(AtNonNumericOperation) handle it */
-    if (!this.isModuleAttributeNameElement() &&
+           and instead let the dedicated module-attribute reference path handle it */
+    // Any element in the head of a call-definition clause is a declaration name, not a call site.
+    // Protocol heads were already guarded this way; now the full CDC family is covered.
+    if (CallDefinitionClause.isHead(this)) {
+        null
+    } else if (!this.isModuleAttributeNameElement() &&
         // if a bitstring segment option then the option is a pseudo-function
         !isBitStreamSegmentOption(this) &&
         !this.isSlashInCaptureNameSlashArity() &&
@@ -96,12 +105,12 @@ private fun PsiElement.isSlashInCaptureNameSlashArity(): Boolean =
     if (this is Infix &&
         (this is ElixirMatchedMultiplicationOperation || this is ElixirUnmatchedMultiplicationOperation)
     ) {
-        val operator = org.elixir_lang.psi.operation.Normalized.operator(this)
+        val operator = OperationNormalized.operator(this)
         val divisionOperatorChildren = operator.node.getChildren(TokenSet.create(ElixirTypes.DIVISION_OPERATOR))
 
         if (divisionOperatorChildren.isNotEmpty()) {
             val rightOperand =
-                org.elixir_lang.psi.operation.infix.Normalized.rightOperand(this)?.stripAccessExpression()
+                InfixNormalized.rightOperand(this)?.stripAccessExpression()
 
             if (rightOperand is ElixirDecimalWholeNumber) {
                 val parent = this.parent
@@ -119,7 +128,13 @@ private fun PsiElement.isSlashInCaptureNameSlashArity(): Boolean =
 
 
 private fun Call.computeCallableReference(): PsiReference? =
-    if (Callable.isDefiner(this)) {
+    if (CallDefinitionClause.`is`(this)) {
+        // Function clause declarations are owned by FunctionSymbolDeclarationProvider.
+        // A legacy reference here would shadow the FunctionSymbol declaration.
+        null
+    } else if (Callable.isDefiner(this)) {
+        // Other definers (defmodule, defprotocol, defimpl, defdelegate) still use the legacy path
+        // until their respective Symbol API phases are complete.
         Callable.definer(this)
     } else if (isCalling(KERNEL, __MODULE__, 0)) {
         org.elixir_lang.psi.__MODULE__.reference(this)
@@ -130,7 +145,10 @@ private fun Call.computeCallableReference(): PsiReference? =
             if (this.isTypeSpecPseudoFunction()) {
                 null
             } else {
-                org.elixir_lang.reference.Type(ancestorTypeSpec, this)
+                // Type-spec references (`@type`/`@spec` usage sites) are owned by Symbol API providers:
+                // - TypeReferenceProvider for type names
+                // - SpecFunctionReferenceProvider for @spec function heads
+                null
             }
         } else {
             Callable(this)
@@ -142,14 +160,15 @@ private fun Call.computeCallableReference(): PsiReference? =
  *
  * @return [Call.primaryArguments]
  */
+@RequiresReadLock
 fun Call.finalArguments(): Array<PsiElement>? = try {
     (secondaryArguments() ?: primaryArguments())?.map { it!! }?.toTypedArray()
-} catch (e: NullPointerException) {
-    Logger.error(this.javaClass, "NullPointerException getting Call.finalArguments()", this);
+} catch (_: NullPointerException) {
+    Logger.error(this.javaClass, "NullPointerException getting Call.finalArguments()", this)
     null
 }
 
-fun Call.getReference(): PsiReference? =
+fun Call.cachedReference(): PsiReference? =
     CachedValuesManager.getCachedValue(this) {
         CachedValueProvider.Result.create(computeReference(), this)
     }
@@ -157,19 +176,21 @@ fun Call.getReference(): PsiReference? =
 /**
  * The value of the keyword argument with the given keywordKeyText.
  *
- * @param this@keywordArgument call to seach for the keyword argument.
+ * @receiver the call to search for the keyword argument.
  * @param keywordKeyText the text of the key, such as `"do"`
- * @return the keyword value `PsiElement` if `call` has [ElixirPsiImplUtil.keywordArguments]
- * and there is a [] for `keywordKeyText`.
+ * @return the keyword value `PsiElement` if `call` has [keywordArguments]
+ * and there is a value for `keywordKeyText`.
  */
+@RequiresReadLock
 fun Call.keywordArgument(keywordKeyText: String): PsiElement? = keywordArguments()?.keywordValue(keywordKeyText)
 
 /**
  * The keyword arguments for `call`.
- * @param this@keywordArguments call to search for keyword arguments.
- * @return the final element of the [ElixirPsiImplUtil.finalArguments] of `` if they are a
+ * @receiver the call to search for keyword arguments.
+ * @return the final element of the [finalArguments] if they are a
  * [QuotableKeywordList]; otherwise, `null`.
  */
+@RequiresReadLock
 fun Call.keywordArguments(): QuotableKeywordList? {
     val finalArguments = this.finalArguments()
     var keywordArguments: QuotableKeywordList? = null
@@ -203,12 +224,14 @@ fun Call.keywordArguments(): QuotableKeywordList? {
     return keywordArguments
 }
 
+@RequiresReadLock
 fun Call.macroChildCalls(): Array<Call> {
     val childCallList = macroChildCallList()
 
     return childCallList.toTypedArray()
 }
 
+@RequiresReadLock
 fun <R> Call.foldChildrenWhile(
     initial: R,
     operation: (PsiElement, acc: R) -> AccumulatorContinue<R>
@@ -254,6 +277,7 @@ fun <R> Call.foldChildrenWhile(
     } ?: AccumulatorContinue(initial, true)
 }
 
+@RequiresReadLock
 fun Call.macroChildCallList(): List<Call> {
     var childCallList: List<Call>? = null
     val doBlock = doBlock
@@ -302,8 +326,10 @@ fun Call.macroChildCallList(): List<Call> {
     return childCallList
 }
 
+@RequiresReadLock
 fun Call.macroChildCallSequence(): Sequence<Call> = this.macroChildCallList().asSequence()
 
+@RequiresReadLock
 @Contract(pure = true)
 fun Call.macroDefinitionClauseForArgument(): Call? {
     var macroDefinitionClause: Call? = null
@@ -326,7 +352,8 @@ fun Call.macroDefinitionClauseForArgument(): Call? {
     return macroDefinitionClause
 }
 
-fun Call.maybeModularNameToModulars(useCall: Call? = null): Set<Call> =
+@RequiresReadLock
+fun Call.maybeModularNameToModulars(useCall: Call? = null): Set<PsiNamedElement> =
     if (isCalling(KERNEL, __MODULE__, 0)) {
         org.elixir_lang.psi.__MODULE__
             .reference(__MODULE__Call = this, useCall = useCall)
@@ -335,6 +362,7 @@ fun Call.maybeModularNameToModulars(useCall: Call? = null): Set<Call> =
         emptySet()
     }
 
+@RequiresReadLock
 fun Call.whileInStabBodyChildExpressions(
     forward: Boolean = true,
     keepProcessing: (childExpression: PsiElement) -> Boolean
@@ -343,6 +371,7 @@ fun Call.whileInStabBodyChildExpressions(
         ?.let { whileIn(it, keepProcessing) }
         ?: true
 
+@RequiresReadLock
 fun Call.stabBodyChildExpressions(forward: Boolean = true): Sequence<PsiElement>? =
     doBlock
         ?.stab
@@ -350,12 +379,11 @@ fun Call.stabBodyChildExpressions(forward: Boolean = true): Sequence<PsiElement>
         ?.childExpressions(forward)
 
 object CallImpl {
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun functionName(call: Call): String? =
-        call.functionNameElement()?.let { element ->
-            computeReadAction(Computable<String> { element.text })
-        }
+        call.functionNameElement()?.text
 
     /**
      * @return `null` because the `IDENTIFIER`, `foo` in `@foo 1` is not the local name of a function, but the name of a
@@ -378,13 +406,16 @@ object CallImpl {
     @JvmStatic
     fun functionNameElement(@Suppress("UNUSED_PARAMETER") notIn: NotIn): PsiElement? = null
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun functionNameElement(operation: Operation): PsiElement = operation.operator()
 
+    @RequiresReadLock
     @JvmStatic
     fun functionNameElement(qualified: Qualified): PsiElement = qualified.relativeIdentifier
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun functionNameElement(unqualified: Unqualified): PsiElement = unqualified.firstChild
@@ -409,10 +440,12 @@ object CallImpl {
     @JvmStatic
     fun getDoBlock(@Suppress("UNUSED_PARAMETER") matchedCall: MatchedCall): ElixirDoBlock? = null
 
+    @RequiresReadLock
     @JvmStatic
     fun hasDoBlockOrKeyword(call: Call): Boolean =
         call.doBlock != null || call.keywordArgument("do") != null
 
+    @RequiresReadLock
     @JvmStatic
     fun hasDoBlockOrKeyword(stubBased: StubBased<Stub<*>>): Boolean =
         stubBased.stub?.hasDoBlockOrKeyword() ?: hasDoBlockOrKeyword(stubBased as Call)
@@ -427,6 +460,7 @@ object CallImpl {
      * `resolvedModuleName` and has non-`null` [Call.functionName] that equals
      * `functionName`; otherwise, `false`.
      */
+    @RequiresReadLock
     @JvmStatic
     fun isCalling(
         call: Call,
@@ -452,6 +486,7 @@ object CallImpl {
      * `resolvedModuleName` and has non-`null` [Call.functionName] that equals
      * `functionName` and the [Call.resolvedFinalArity]; otherwise, `false`.
      */
+    @RequiresReadLock
     @JvmStatic
     fun isCalling(
         call: Call,
@@ -474,6 +509,7 @@ object CallImpl {
      * @param functionName       the expected [Call.functionName]
      * @return `true` if all arguments match and [Call.getDoBlock] is not `null`; `false`.
      */
+    @RequiresReadLock
     @JvmStatic
     fun isCallingMacro(
         call: Call,
@@ -496,6 +532,7 @@ object CallImpl {
      * @param resolvedFinalArity the expected [Call.resolvedFinalArity]
      * @return `true` if all arguments match and [Call.getDoBlock] is not `null`; `false`.
      */
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun isCallingMacro(
@@ -535,21 +572,24 @@ object CallImpl {
     fun moduleName(@Suppress("UNUSED_PARAMETER") unqualified: Unqualified): String? = null
 
     // TODO handle more complex qualifiers besides Aliases
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
-    fun moduleName(qualified: Qualified): String = computeReadAction(Computable<String> { qualified.firstChild.text })
+    fun moduleName(qualified: Qualified): String = qualified.firstChild.text
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun primaryArguments(dotCall: DotCall<*>): Array<PsiElement> = dotCall.parenthesesArgumentsList[0].arguments()
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun primaryArguments(infix: Infix): Array<PsiElement> {
         val children = infix.children
-        val operatorIndex = Normalized.operatorIndex(children)
-        val leftOperand = org.elixir_lang.psi.operation.infix.Normalized.leftOperand(children, operatorIndex)
-        val rightOperand = org.elixir_lang.psi.operation.infix.Normalized.rightOperand(children, operatorIndex)
+        val operatorIndex = OperationNormalized.operatorIndex(children)
+        val leftOperand = InfixNormalized.leftOperand(children, operatorIndex)
+        val rightOperand = InfixNormalized.rightOperand(children, operatorIndex)
 
         return if (leftOperand != null) {
             if (rightOperand != null) {
@@ -566,6 +606,7 @@ object CallImpl {
         }
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun primaryArguments(unqualifiedNoParenthesesManyArgumentsCall: ElixirUnqualifiedNoParenthesesManyArgumentsCall): Array<PsiElement> {
@@ -589,14 +630,15 @@ object CallImpl {
     @JvmStatic
     fun primaryArguments(@Suppress("UNUSED_PARAMETER") none: None): Array<PsiElement>? = null
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun primaryArguments(notIn: NotIn): Array<PsiElement> {
         val children = notIn.children
-        val leftOperand = org.elixir_lang.psi.operation.not_in.Normalized.leftOperand(children)
+        val leftOperand = NotInNormalized.leftOperand(children)
 
         return if (leftOperand != null) {
-            val rightOperand = org.elixir_lang.psi.operation.not_in.Normalized.rightOperand(children)
+            val rightOperand = NotInNormalized.rightOperand(children)
 
             if (rightOperand != null) {
                 arrayOf(leftOperand, rightOperand)
@@ -608,11 +650,13 @@ object CallImpl {
         }
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun primaryArguments(noParenthesesOneArgument: NoParenthesesOneArgument): Array<PsiElement> =
         noParenthesesOneArgument.noParenthesesOneArgument.arguments()
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun primaryArguments(parentheses: Parentheses): Array<PsiElement> {
@@ -623,6 +667,7 @@ object CallImpl {
         return primaryParenthesesArguments.arguments()
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun primaryArguments(prefix: Prefix): Array<PsiElement> =
@@ -631,10 +676,12 @@ object CallImpl {
             ?.let { arrayOf(it) }
             ?: emptyArray()
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun primaryArity(call: Call): Int? = call.primaryArguments()?.size
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun secondaryArguments(dotCall: DotCall<*>): Array<PsiElement>? {
@@ -664,6 +711,7 @@ object CallImpl {
     @JvmStatic
     fun secondaryArguments(@Suppress("UNUSED_PARAMETER") noParentheses: NoParentheses): Array<PsiElement>? = null
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun secondaryArguments(parentheses: Parentheses): Array<PsiElement>? {
@@ -682,6 +730,7 @@ object CallImpl {
     @JvmStatic
     fun secondaryArguments(@Suppress("UNUSED_PARAMETER") prefix: Prefix): Array<PsiElement>? = null
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun secondaryArity(call: Call): Int? = call.secondaryArguments()?.size
@@ -712,6 +761,7 @@ object CallImpl {
     @JvmStatic
     fun resolvedModuleName(@Suppress("UNUSED_PARAMETER") prefix: Prefix): String = KERNEL
 
+    @RequiresReadLock
     @Suppress("UNCHECKED_CAST")
     @JvmStatic
     fun resolvedModuleName(qualified: org.elixir_lang.psi.call.qualification.Qualified): String =
@@ -720,11 +770,7 @@ object CallImpl {
     @Suppress("UNCHECKED_CAST")
     @JvmStatic
     fun resolvedModuleName(unqualified: Unqualified): String =
-        (unqualified as? StubBased<Stub<*>>)?.let { stubBased ->
-            ApplicationManager.getApplication().runReadAction(Computable {
-                stubBased.stub
-            })?.resolvedModuleName()
-        } ?: KERNEL
+        (unqualified as? StubBased<Stub<*>>)?.stub?.resolvedModuleName() ?: KERNEL
 
     // TODO handle `import`s and determine whether actually a local variable
     @Contract(pure = true)
@@ -733,6 +779,7 @@ object CallImpl {
         @Suppress("UNUSED_PARAMETER") unqualifiedNoArgumentsCall: UnqualifiedNoArgumentsCall<*>
     ): String = KERNEL
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun resolvedPrimaryArity(call: Call): Int? {
@@ -746,7 +793,7 @@ object CallImpl {
                 resolvedPrimaryArity = (resolvedPrimaryArity ?: 0) + 1
             }
 
-            val parent = computeReadAction(Computable<PsiElement> { call.parent })
+            val parent = call.parent
 
             if (parent.isPipe()) {
                 val parentPipeOperation = parent as Arrow
@@ -763,20 +810,24 @@ object CallImpl {
         return resolvedPrimaryArity
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun resolvedFinalArity(call: Call): Int = call.resolvedSecondaryArity() ?: call.resolvedPrimaryArity() ?: 0
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun resolvedFinalArity(stubBased: StubBased<Stub<*>>): Int =
         stubBased.stub?.resolvedFinalArity() ?: resolvedFinalArity(stubBased as Call)
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun resolvedFinalArityInterval(call: Call): ArityInterval =
         call.finalArguments().let { ArityInterval.fromArguments(it) }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun resolvedSecondaryArity(call: Call): Int? =
@@ -793,8 +844,8 @@ object CallImpl {
     /**
      * Whether the `arrow` is a pipe operation.
      *
-     * @param this@isPipe the parent (or futher ancestor of a [Call] that may be piped.
-     * @return `` true if `arrow` is using the `"|>"` operator token.
+     * @receiver the parent (or further ancestor) of a [Call] that may be piped.
+     * @return `true` if `arrow` is using the `"|>"` operator token.
      */
     private fun Arrow.isPipe(): Boolean =
         operator().node.getChildren(ARROW_OPERATOR_TOKEN_SET).let { arrowOperatorChildren ->
@@ -804,9 +855,8 @@ object CallImpl {
     /**
      * Whether the `callAncestor` is a pipe operation.
      *
-     * @param this@isPipe the parent (or further ancestor) of a [Call] that may be piped
-     * @return `` true if `callAncestor` is an [Arrow] using the `"|>"` operator token.
+     * @receiver the parent (or further ancestor) of a [Call] that may be piped
+     * @return `true` if `callAncestor` is an [Arrow] using the `"|>"` operator token.
      */
     private fun PsiElement.isPipe(): Boolean = (this as? Arrow)?.isPipe() ?: false
 }
-

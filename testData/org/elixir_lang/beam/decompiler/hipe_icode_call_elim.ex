@@ -95,12 +95,12 @@ defmodule :hipe_icode_call_elim do
   end
 
   @spec can_be_eliminated(mfa(), [:erl_types.erl_type()]) :: boolean()
-  def can_be_eliminated({:maps, :is_key, 2}, [_K, m]), do: :erl_types.t_is_map(m)
+  defp can_be_eliminated({:maps, :is_key, 2}, [_K, m]), do: :erl_types.t_is_map(m)
 
-  def can_be_eliminated(_, _), do: false
+  defp can_be_eliminated(_, _), do: false
 
   @spec elim_insn(icode_instr()) :: icode_instr()
-  def elim_insn(insn = icode_call(fun: {_, _, _} = mFA, args: args, type: :remote, dstlist: [dst = icode_variable(annotation: {:type_anno, retType, _})], continuation: [], fail_label: [])) do
+  defp elim_insn(insn = icode_call(fun: {_, _, _} = mFA, args: args, type: :remote, dstlist: [dst = icode_variable(annotation: {:type_anno, retType, _})], continuation: [], fail_label: [])) do
     opaques = :universe
     case :erl_types.t_is_singleton(retType, opaques) do
       true ->
@@ -124,5 +124,5 @@ defmodule :hipe_icode_call_elim do
     end
   end
 
-  def elim_insn(insn), do: insn
+  defp elim_insn(insn), do: insn
 end

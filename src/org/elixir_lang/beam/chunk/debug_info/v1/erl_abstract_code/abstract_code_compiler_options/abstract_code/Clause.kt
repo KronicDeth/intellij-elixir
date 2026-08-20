@@ -32,7 +32,17 @@ object Clause {
         val guardSequenceString = guardSequenceString(clause)
         val bodyString = bodyString(clause, patternSequenceDeclaredScope)
 
-        return "${patternSequenceMacroString.string}$guardSequenceString ->\n" +
+        // When the pattern sequence is empty, we always emit `()` because:
+        // 1. `fn when guard -> ...` is invalid - `when` is reserved and can't follow `fn` directly
+        // 2. In multi-clause fns, a bare `->` without a LHS is a syntax error
+        // `fn () -> ...` is valid Elixir (equivalent to `fn -> ...`), so this is always safe.
+        val patternsString = if (patternSequenceMacroString.string.isEmpty()) {
+            "()"
+        } else {
+            patternSequenceMacroString.string
+        }
+
+        return "${patternsString}$guardSequenceString ->\n" +
                 "  $bodyString"
     }
 

@@ -65,7 +65,7 @@ class Configuration(name: String, project: Project, configurationFactory: Config
 
     var elixirArgumentList: MutableList<String> = mutableListOf()
 
-    fun commandLine(): GeneralCommandLine {
+    override fun commandLine(): GeneralCommandLine {
         val workingDirectory = ensureWorkingDirectory()
         val module = ensureModule()
         val sdk = ensureMostSpecificSdk(module)
@@ -73,7 +73,8 @@ class Configuration(name: String, project: Project, configurationFactory: Config
                 environment = envs,
                 workingDirectory = workingDirectory,
                 elixirSdk = sdk,
-                erlArgumentList = erlArgumentList
+                erlArgumentList = erlArgumentList,
+                project = project,
         )
         commandLine.addParameters(elixirArgumentList)
 

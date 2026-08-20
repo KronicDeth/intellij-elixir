@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Created by luke.imhoff on 7/28/14.
+ * Created by kadie.enheduanna.inanna on 7/28/14.
  */
 public class ElixirTokenType extends IElementType {
     public ElixirTokenType(@NotNull @NonNls String debugName) {

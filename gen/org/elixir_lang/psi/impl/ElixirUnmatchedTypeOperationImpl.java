@@ -2,8 +2,6 @@
 package org.elixir_lang.psi.impl;
 
 import java.util.List;
-
-import org.elixir_lang.psi.operation.Type;
 import org.jetbrains.annotations.*;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
@@ -14,6 +12,7 @@ import org.elixir_lang.psi.*;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.PsiScopeProcessor;
+import com.intellij.util.concurrency.annotations.RequiresReadLock;
 
 public class ElixirUnmatchedTypeOperationImpl extends ElixirUnmatchedExpressionImpl implements ElixirUnmatchedTypeOperation {
 
@@ -45,11 +44,13 @@ public class ElixirUnmatchedTypeOperationImpl extends ElixirUnmatchedExpressionI
   }
 
   @Override
+  @RequiresReadLock
   public @Nullable String functionName() {
     return ElixirPsiImplUtil.functionName(this);
   }
 
   @Override
+  @RequiresReadLock
   public @NotNull PsiElement functionNameElement() {
     return ElixirPsiImplUtil.functionNameElement(this);
   }
@@ -60,36 +61,43 @@ public class ElixirUnmatchedTypeOperationImpl extends ElixirUnmatchedExpressionI
   }
 
   @Override
+  @RequiresReadLock
   public @Nullable String getName() {
     return ElixirPsiImplUtil.getName(this);
   }
 
   @Override
+  @RequiresReadLock
   public @Nullable PsiElement getNameIdentifier() {
     return ElixirPsiImplUtil.getNameIdentifier(this);
   }
 
   @Override
+  @RequiresReadLock
   public boolean hasDoBlockOrKeyword() {
     return ElixirPsiImplUtil.hasDoBlockOrKeyword(this);
   }
 
   @Override
+  @RequiresReadLock
   public boolean isCalling(@NotNull String resolvedModuleName, @NotNull String functionName) {
     return ElixirPsiImplUtil.isCalling(this, resolvedModuleName, functionName);
   }
 
   @Override
+  @RequiresReadLock
   public boolean isCalling(@NotNull String resolvedModuleName, @NotNull String functionName, int resolvedFinalArity) {
     return ElixirPsiImplUtil.isCalling(this, resolvedModuleName, functionName, resolvedFinalArity);
   }
 
   @Override
+  @RequiresReadLock
   public boolean isCallingMacro(@NotNull String resolvedModuleName, @NotNull String functionName) {
     return ElixirPsiImplUtil.isCallingMacro(this, resolvedModuleName, functionName);
   }
 
   @Override
+  @RequiresReadLock
   public boolean isCallingMacro(@NotNull String resolvedModuleName, @NotNull String functionName, int resolvedFinalArity) {
     return ElixirPsiImplUtil.isCallingMacro(this, resolvedModuleName, functionName, resolvedFinalArity);
   }
@@ -110,18 +118,21 @@ public class ElixirUnmatchedTypeOperationImpl extends ElixirUnmatchedExpressionI
   }
 
   @Override
+  @RequiresReadLock
   public @NotNull PsiElement[] primaryArguments() {
     return ElixirPsiImplUtil.primaryArguments(this);
   }
 
   @Override
+  @RequiresReadLock
   public @Nullable Integer primaryArity() {
     return ElixirPsiImplUtil.primaryArity(this);
   }
 
   @Override
+  @RequiresReadLock
   public boolean processDeclarations(@NotNull PsiScopeProcessor processor, @NotNull ResolveState state, PsiElement lastParent, @NotNull PsiElement place) {
-    return ElixirPsiImplUtil.processDeclarations((Type) this, processor, state, lastParent, place);
+    return ElixirPsiImplUtil.processDeclarations(this, processor, state, lastParent, place);
   }
 
   @Override
@@ -130,11 +141,13 @@ public class ElixirUnmatchedTypeOperationImpl extends ElixirUnmatchedExpressionI
   }
 
   @Override
+  @RequiresReadLock
   public int resolvedFinalArity() {
     return ElixirPsiImplUtil.resolvedFinalArity(this);
   }
 
   @Override
+  @RequiresReadLock
   public @NotNull ArityInterval resolvedFinalArityInterval() {
     return ElixirPsiImplUtil.resolvedFinalArityInterval(this);
   }
@@ -145,11 +158,13 @@ public class ElixirUnmatchedTypeOperationImpl extends ElixirUnmatchedExpressionI
   }
 
   @Override
+  @RequiresReadLock
   public @Nullable Integer resolvedPrimaryArity() {
     return ElixirPsiImplUtil.resolvedPrimaryArity(this);
   }
 
   @Override
+  @RequiresReadLock
   public @Nullable Integer resolvedSecondaryArity() {
     return ElixirPsiImplUtil.resolvedSecondaryArity(this);
   }
@@ -165,6 +180,7 @@ public class ElixirUnmatchedTypeOperationImpl extends ElixirUnmatchedExpressionI
   }
 
   @Override
+  @RequiresReadLock
   public @Nullable Integer secondaryArity() {
     return ElixirPsiImplUtil.secondaryArity(this);
   }

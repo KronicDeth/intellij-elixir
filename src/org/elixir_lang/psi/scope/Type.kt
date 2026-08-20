@@ -13,6 +13,7 @@ import org.elixir_lang.beam.psi.impl.TypeDefinitionImpl
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.Module
+import org.elixir_lang.psi.ModuleAttribute.isTypeSpecName
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.qualification.Qualified
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
@@ -26,8 +27,6 @@ import org.elixir_lang.psi.operation.When
 import org.elixir_lang.psi.scope.WhileIn.whileIn
 import org.elixir_lang.psi.stub.index.ModularName
 import org.elixir_lang.psi.stub.type.call.Stub.isModular
-import org.elixir_lang.reference.ModuleAttribute
-import org.elixir_lang.reference.ModuleAttribute.Companion.isTypeSpecName
 
 abstract class Type : PsiScopeProcessor {
     override fun execute(element: PsiElement, state: ResolveState): Boolean =
@@ -226,7 +225,7 @@ internal fun PsiElement.ancestorTypeSpec(): AtUnqualifiedNoParenthesesCall<*>? =
         is AtUnqualifiedNoParenthesesCall<*> -> {
             val identifierName = this.atIdentifier.identifierName()
 
-            if (ModuleAttribute.isTypeSpecName(identifierName)) {
+            if (isTypeSpecName(identifierName)) {
                 this
             } else {
                 null
@@ -244,13 +243,12 @@ internal fun PsiElement.ancestorTypeSpec(): AtUnqualifiedNoParenthesesCall<*>? =
         is QualifiedMultipleAliases,
             // <tuple> while typing after `<variable>.`
         is ElixirMultipleAliases,
-        is ElixirNoParenthesesOneArgument,
         is ElixirNoParenthesesArguments,
         is ElixirNoParenthesesKeywords,
         is ElixirNoParenthesesKeywordPair,
         is ElixirNoParenthesesManyStrictNoParenthesesExpression,
             // For function type
-        is ElixirParenthesesArguments, is ElixirParentheticalStab, is ElixirStab, is ElixirStabBody, is ElixirStabOperation, is ElixirStabNoParenthesesSignature, is ElixirStabParenthesesSignature,
+        is ElixirParentheticalStab, is ElixirStab, is ElixirStabBody, is ElixirStabOperation, is ElixirStabNoParenthesesSignature, is ElixirStabParenthesesSignature,
             // containers
         is ElixirList, is ElixirTuple,
             // maps
@@ -277,7 +275,6 @@ internal fun PsiElement.ancestorTypeSpec(): AtUnqualifiedNoParenthesesCall<*>? =
             // Map updates aren't used in type specifications unlike `ElixirMapConstructionArguments`
         is ElixirMapUpdateArguments,
             // `@{:__aliases__, _meta, _args}` in `defmacro @{:__aliases__, _meta, _args} do...`
-        is ElixirMatchedAtOperation,
             // types can't be defined at the file level and must be inside modules.
         is ElixirFile,
             // __MODULE__.* does not matter that it is in a type

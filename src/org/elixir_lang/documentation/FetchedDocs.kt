@@ -4,13 +4,12 @@ import com.ericsson.otp.erlang.OtpErlangBinary
 import com.ericsson.otp.erlang.OtpErlangObject
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.psi.PsiElement
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.beam.chunk.beam_documentation.docs.documented.Doc
 import org.elixir_lang.beam.chunk.beam_documentation.docs.documented.MarkdownByLanguage
 import org.elixir_lang.beam.term.inspect
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
 import org.elixir_lang.psi.CallDefinitionClause
-import org.elixir_lang.psi.ElixirLine
-import org.elixir_lang.psi.Heredoc
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.identifierName
@@ -113,18 +112,7 @@ private fun callDefinitionAttributeListByName(callDefinitionCall: Call): Map<Str
 private fun List<AtUnqualifiedNoParenthesesCall<*>>.joinModuleAttributeQuoteText(): String? =
     this
         .asSequence()
-        .flatMap<AtUnqualifiedNoParenthesesCall<*>, String> { moduleAttribute ->
-            moduleAttribute
-                .moduleAttributeValue()
-                ?.let { quote ->
-                    when (quote) {
-                        is Heredoc -> quote.children.asSequence().map(PsiElement::getText)
-                        is ElixirLine -> quote.body?.text?.let { text -> sequenceOf(text) }
-                        else -> null
-                    }
-                }
-                ?: emptySequence()
-        }
+        .mapNotNull { moduleAttribute -> moduleAttribute.moduleAttributeValue()?.documentationMarkdownText() }
         .toList()
         .takeIf(List<*>::isNotEmpty)
         ?.joinToString("")
@@ -134,6 +122,7 @@ private fun List<AtUnqualifiedNoParenthesesCall<*>>?.moduleAttributeValueTextLis
 
 private fun AtUnqualifiedNoParenthesesCall<*>.moduleAttributeValueText(): String? = this.moduleAttributeValue()?.text
 
+@RequiresReadLock
 fun AtUnqualifiedNoParenthesesCall<*>.moduleAttributeValue(): PsiElement? = this
     .finalArguments()
     ?.singleOrNull()

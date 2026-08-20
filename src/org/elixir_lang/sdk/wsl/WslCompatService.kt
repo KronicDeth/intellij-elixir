@@ -1,0 +1,424 @@
+package org.elixir_lang.sdk.wsl
+
+import com.intellij.execution.configurations.GeneralCommandLine
+import com.intellij.execution.wsl.WSLDistribution
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.util.io.FileUtil
+import com.intellij.util.system.OS
+import org.jetbrains.annotations.VisibleForTesting
+import java.io.IOException
+import java.nio.file.InvalidPathException
+import java.nio.file.Paths
+import java.util.concurrent.CancellationException
+import kotlin.io.path.absolutePathString
+
+const val MODERN_WSL_PREFIX = "\\\\wsl.localhost\\"
+const val LEGACY_WSL_PREFIX = "\\\\wsl$\\"
+private val envVarsToConvert = setOf("MIX_HOME", "MIX_ARCHIVES")
+/**
+ * Service wrapper for WSL (Windows Subsystem for Linux Integration).
+ *
+ * This service provides an abstraction layer over the IntelliJ Platform legacy WSL API
+ * (com.intellij.execution.wsl), enabling:
+ * 1. Detection of WSL paths (e.g., \\wsl$\Ubuntu\usr\bin\elixir)
+ * 2. Path conversion for command-line arguments and environment variables
+ * 3. Testability through mocking in CI environments without WSL
+ *
+ * ## Architecture
+ *
+ * WSL path conversion is automatically applied via the WslAwareCommandLine subclass.
+ * All command lines constructed through the plugin's factory methods (Mix.commandLine(),
+ * Elixir.commandLine(), IEx.commandLine()) use WslAwareCommandLine, which converts
+ * paths right before process creation.
+ *
+ * This ensures:
+ * - External tools (Credo, Dialyzer, Mix Format, New Project Wizard) get WSL support
+ * - Run Configurations (Mix, IEx, ExUnit, ESpec, Elixir, Distillery) get WSL support
+ * - Parameters added AFTER factory methods return are still converted
+ * - Conversion happens once, at the last possible moment
+ *
+ * ## Usage Example
+ *
+ * ```kotlin
+ * // Factory methods return WslAwareCommandLine instances:
+ * val commandLine = Mix.commandLine(env, workDir, sdk)
+ * commandLine.addParameters("--extra", "params")  // These will be converted too
+ * commandLine.createProcess()  // Conversion happens here
+ * ```
+ *
+ * Implementation uses the Legacy WSL API to avoid the large refactor required by the Targets API.
+ *
+ * @see org.elixir_lang.run.WslAwareCommandLine
+ */
+interface WslCompatService {
+    /**
+     * Logger for this service implementation.
+     * Each implementation should override this to use its own class name for better log tracing.
+     */
+    val log: Logger
+        get() = Logger.getInstance(WslCompatService::class.java)
+
+    /**
+     * Checks if the given path is a WSL path.
+     *
+     * @param path the path to check (e.g., \\wsl$\Ubuntu\usr\bin\elixir or /usr/bin/elixir from Windows)
+     * @return true if the path points to a WSL location, false otherwise
+     */
+    fun isWslUncPath(path: String?): Boolean
+
+    /**
+     * Canonicalizes path:
+     *  - Standardizes any WSL UNC prefix if needed so that it always uses the correct prefix for the current windows version
+     *  - Resolves any symlinks to the realpath
+     *  - Returns anything else unchanged.
+     *
+     *  This is needed for path comparison to identify duplicate SDK instances where package, managers like mise will
+     *  use a symlink of `latest` -> `1.19.1` or `1.19` -> `1.19.1`. It also helps to keep a standard WSL prefix for
+     *  things like class paths in SDK data avoiding having a mix of //wsl$/distro and //wsl.localhost/distro paths.
+     *
+     *  Performs filesystem I/O (boots WSL distros for `\\wsl.localhost` paths). Never call under
+     *  a read or write lock, and never in a loop over the SDK table - use [pathsEqualWslAware]
+     *  for comparison.
+     *
+     * @param path the path to canonicalize
+     * @return the canonicalized path,
+     */
+    fun canonicalizePath(path: String): String {
+        // Must stay outside the try/catch below: moving it inside would let an unresolvable-path
+        // fallback silently swallow a genuine read-lock violation.
+        check(!ApplicationManager.getApplication().holdsReadLock()) {
+            "canonicalizePath() resolves symlinks and must not be called under a read lock - " +
+                "filesystem I/O on a \\\\wsl.localhost path boots the WSL distro and can block indefinitely"
+        }
+        val maybeConvertedPath = path.canonicalizeWslPrefix()
+        // toRealPath can fail for reasons other than IOException - a dead IJent bridge can surface
+        // as e.g. ClassNotFoundException when the ijent module isn't fully wired up. Any such
+        // failure means the path can't be resolved, which is valid input: fall back lexically.
+        // Cancellation is not a resolution failure: ProcessCanceledException extends
+        // CancellationException, and both must reach the platform's cancellation machinery.
+        return try {
+            toRealPath(maybeConvertedPath)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (_: Exception) {
+            maybeConvertedPath
+        }
+    }
+
+    @VisibleForTesting
+    @Throws(IOException::class, InvalidPathException::class)
+    fun toRealPath(myPath: String) = Paths.get(myPath).toRealPath().absolutePathString()
+
+    /**
+     * Nullable version of [canonicalizePath]
+     */
+    fun canonicalizePathNullable(path: String?): String? {
+        if (path == null) {
+            return path
+        }
+        return canonicalizePath(path)
+    }
+
+    /**
+     * Decides how a WSL UNC prefix should be normalized for [currentOs], returning the
+     * `(fromPrefix, toPrefix)` pair to apply, or `null` when no conversion should happen
+     * (i.e. not on Windows).
+     *
+     * This is the single ambient-OS decision point, kept separate from the pure string
+     * rewrite in [canonicalizeWslPrefix] so the rewrite is testable without an OS dependency
+     * and this policy can be overridden deterministically in tests.
+     *
+     * - Windows 11+ normalizes the legacy `\\wsl$\` prefix to the modern `\\wsl.localhost\`.
+     * - Older Windows normalizes the modern prefix to the legacy one.
+     */
+    fun wslPrefixConversion(currentOs: OS = OS.CURRENT): Pair<String, String>? = when {
+        currentOs != OS.Windows -> null
+        currentOs.isAtLeast(11, 0) -> LEGACY_WSL_PREFIX to MODERN_WSL_PREFIX
+        else -> MODERN_WSL_PREFIX to LEGACY_WSL_PREFIX
+    }
+
+    /**
+     * Applies the [wslPrefixConversion] decision for the current OS to this path, leaving it
+     * unchanged when no conversion applies.
+     */
+    fun String.canonicalizeWslPrefix(): String =
+            wslPrefixConversion()?.let { (from, to) -> replacePrefix(from, to) } ?: this
+
+    fun String.replacePrefix(prefix: String, replacement: String) = if (startsWith(prefix, true))
+        replacement + substring(prefix.length)
+    else
+        this
+
+    /**
+     * Pure lexical normalization for path comparison: WSL UNC prefix rewrite
+     * ([canonicalizeWslPrefix]) plus system-independent separators. Performs NO filesystem
+     * access - safe to call under any lock.
+     */
+    fun normalizeForComparison(path: String): String =
+        FileUtil.toSystemIndependentName(path.canonicalizeWslPrefix())
+
+    /**
+     * Compares two SDK home paths lexically after WSL-prefix and separator normalization.
+     * Performs NO filesystem access, so it is safe to call inside read/write actions and in
+     * `ProjectJdkTable` scan predicates.
+     *
+     * Symlinks are NOT resolved here. Persisted SDK home paths are canonicalized once at
+     * registration (see [canonicalizePath]); callers comparing an external (user-supplied) path
+     * against persisted paths must canonicalize the external path once, off-lock, before
+     * comparing.
+     */
+    fun pathsEqualWslAware(first: String?, second: String?): Boolean =
+        if (first.isNullOrBlank() || second.isNullOrBlank()) {
+            false
+        } else {
+            FileUtil.pathsEqual(normalizeForComparison(first), normalizeForComparison(second))
+        }
+
+    /**
+     * Converts a single Windows path to WSL Linux format.
+     * This is the platform-specific method that implementations must provide.
+     *
+     * @param windowsPath the Windows path to convert (either UNC path like \\wsl$\Ubuntu\path or drive path like C:\path)
+     * @param distribution the WSL distribution to convert the path for
+     * @return the converted Linux path, or null if conversion fails
+     */
+    fun convertSingleWslPath(windowsPath: String, distribution: WSLDistribution): String?
+
+    /**
+     * Converts WSL UNC paths and Windows drive paths embedded in process builder arguments and environment
+     * variables to POSIX paths for WSL execution.
+     *
+     * When running commands in WSL, paths need to be converted so the WSL executable can understand them.
+     * This method detects WSL context from the process builder's working directory and performs conversions.
+     *
+     * Examples of conversions in arguments and environment variables:
+     * - `--path=\\wsl$\Ubuntu\home\user` → `--path=/home/user`
+     * - `--map=\\wsl$\Ubuntu\home\user\dir1:\\wsl$\Ubuntu\home\user\dir2` → `--map=/home/user/dir1:/home/user/dir2`
+     * - `\\wsl.localhost\Ubuntu\home\user\file.txt` → `/home/user/file.txt`
+     * - `C:/Users/user/file.txt` → `/mnt/c/Users/user/file.txt`
+     * - `D:\data\file.txt` → `/mnt/d/data/file.txt`
+     *
+     * @param processBuilder The process builder to convert (modified in place)
+     */
+    fun convertProcessBuilderArgumentsForWsl(processBuilder: ProcessBuilder, commandLine: GeneralCommandLine) {
+        val distribution = determineDistribution(commandLine) ?: return
+
+        // Modify ProcessBuilder commands in place
+        val commands = processBuilder.command()
+        processBuilder.command(commands.map { convertWslPathsInString(it, distribution) })
+
+        // Modify ProcessBuilder environment in place
+        val env = processBuilder.environment()
+        for (key in envVarsToConvert) {
+            env[key]?.let { value ->
+                env[key] = convertWslPathsInString(value, distribution)
+            }
+        }
+    }
+
+    /**
+     * Gets the WSL distribution for a given path.
+     *
+     * @param path the WSL path
+     * @return the WSL distribution, or null if the path is not a WSL path or distribution cannot be determined
+     */
+    fun getDistributionByWindowsUncPath(path: String?): WSLDistribution?
+
+    /**
+     * Converts a Windows UNC path (e.g., //wsl.localhost/Ubuntu/usr/lib) to a Linux path (e.g., /usr/lib).
+     *
+     * @param windowsUncPath the Windows UNC path to convert
+     * @return the Linux path, or null if the path cannot be converted
+     */
+    fun parseWindowsUncPath(windowsUncPath: String?): String?
+
+    /**
+     * Converts a Windows UNC path (e.g., //wsl.localhost/Ubuntu/usr/lib) to a Linux path (e.g., /usr/lib) or just returns the input string.
+     *
+     * @param possibleWindowsUncPath the Windows UNC path to convert
+     * @return the Linux path, or the input if the path is not a Windows UNC path.
+     */
+    fun maybeParseWindowsUncPath(possibleWindowsUncPath: String): String =
+            parseWindowsUncPath(possibleWindowsUncPath) ?: possibleWindowsUncPath
+
+    /**
+     * Gets a list of available WSL distributions installed on the system.
+     *
+     * @return list of available WSL distributions, empty list if none found or WSL not available
+     */
+    fun getInstalledDistributions(): List<WSLDistribution>
+
+    /**
+     * Gets the user home directory for a WSL distribution.
+     *
+     * @param distribution the WSL distribution
+     * @return the user home path (e.g., /home/username), or null if it cannot be determined
+     */
+    fun getWslUserHome(distribution: WSLDistribution): String?
+
+    /**
+     * Gets the WSL user home directory as a Windows UNC path.
+     * This is useful for accessing WSL files from Windows using the `\\wsl.localhost\` format.
+     *
+     * @param distribution the WSL distribution
+     * @return the Windows UNC path to the user home directory (e.g., `\\wsl.localhost\<distro>\<path>`),
+     *         or null if it cannot be determined
+     */
+    fun getWslUserHomeUncPath(distribution: WSLDistribution): String? {
+        val wslUserHome = getWslUserHome(distribution)
+        return convertLinuxPathToWindowsUnc(distribution, wslUserHome)
+    }
+
+    /**
+     * Converts a Linux path to a Windows UNC path for the given WSL distribution.
+     * This method converts paths in the format /path/to/file to the Windows UNC format.
+     *
+     * @param distribution the WSL distribution
+     * @param linuxPath the Linux path to convert (e.g., /home/username/.asdf)
+     * @return the Windows UNC path (e.g., `\\wsl.localhost\<distro>\<linux-path>`),
+     *         or null if linuxPath is null or empty
+     */
+    fun convertLinuxPathToWindowsUnc(distribution: WSLDistribution, linuxPath: String?): String?
+
+    /**
+     * Converts a Linux absolute path (for example `/home/user/.local/share/mise/...`) to a canonical Windows UNC path
+     * by inferring the WSL distribution from a known WSL UNC context path.
+     *
+     * Returns `null` when:
+     * - [contextWindowsUncPath] is empty or not a WSL UNC path,
+     * - [linuxPath] is not a Linux absolute path,
+     * - the WSL distribution cannot be inferred, or
+     * - conversion fails.
+     */
+    fun convertLinuxPathToWindowsUncFromContext(contextWindowsUncPath: String, linuxPath: String): String? {
+        if (!linuxPath.startsWith("/")) return null
+        if (!isWslUncPath(contextWindowsUncPath)) return null
+        val distribution = getDistributionByWindowsUncPath(contextWindowsUncPath) ?: return null
+        return convertLinuxPathToWindowsUnc(distribution, linuxPath)
+    }
+
+    /**
+     * Best-effort variant of [convertLinuxPathToWindowsUncFromContext].
+     *
+     * Returns [linuxPath] unchanged when conversion cannot be performed.
+     */
+    fun maybeConvertLinuxPathToWindowsUncFromContext(contextWindowsUncPath: String, linuxPath: String): String {
+        return convertLinuxPathToWindowsUncFromContext(contextWindowsUncPath, linuxPath) ?: linuxPath
+    }
+
+    /**
+     * Detects if the command line runs on WSL, caches the result, and returns the distribution.
+     */
+    private fun determineDistribution(commandLine: GeneralCommandLine): WSLDistribution? {
+        val workDirectory = commandLine.workDirectory.toString()
+        val workDirectoryDistribution = getDistributionByWindowsUncPath(workDirectory)
+
+        if (workDirectoryDistribution == null) {
+            log.debug("Cannot determine WSL distribution from workDirectory: $workDirectory")
+            return null
+        }
+
+        val exePath = commandLine.exePath
+        val exePathDistribution = getDistributionByWindowsUncPath(exePath)
+
+        if (exePathDistribution == null) {
+            log.debug("Skipping conversion: exePath is not WSL UNC: $exePath")
+            return null
+        }
+
+        if (exePathDistribution.msId != workDirectoryDistribution.msId) {
+            log.warn("Work directory distribution ($workDirectory = $workDirectoryDistribution) does not match exePath distribution ($exePath = $exePathDistribution)")
+            return null
+        }
+        return workDirectoryDistribution
+    }
+
+    /**
+     * Converts WSL UNC paths and Windows drive paths embedded in a string to POSIX paths.
+     *
+     * Examples of conversions:
+     * - \\wsl$\distro\path or //wsl$/distro/path -> /path
+     * - \\wsl.localhost\distro\path or //wsl.localhost/distro/path -> /path
+     * - C:/path or C:\path -> /mnt/c/path
+     *
+     * Paths are matched greedily until invalid Windows path characters (< > : " | ? *) are encountered.
+     * Uses convertSingleWslPath() for actual conversion to respect implementation-specific settings.
+     */
+    private fun convertWslPathsInString(input: String, distribution: WSLDistribution): String {
+        var result = input
+
+        // Convert Windows drive paths (C:/, D:\) to WSL mount paths (/mnt/c/, /mnt/d/)
+        // Matches drive letter followed by colon and path, stopping at whitespace or invalid chars
+        val drivePattern = Regex("""([A-Za-z]):([\\/][^\s<>:"|?*]*)""")
+        val driveMatches = drivePattern.findAll(result).toList()
+
+        // Process in reverse order to maintain string indices
+        for (match in driveMatches.reversed()) {
+            val windowsPath = match.value
+            try {
+                val wslPath = convertSingleWslPath(windowsPath, distribution)
+                if (wslPath != null) {
+                    result = result.substring(0, match.range.first) + wslPath + result.substring(match.range.last + 1)
+                } else {
+                    log.debug("convertSingleWslPath returned null for drive path: $windowsPath")
+                }
+            } catch (e: Exception) {
+                log.debug("Failed to convert Windows drive path: $windowsPath", e)
+            }
+        }
+
+        // Convert WSL UNC paths to POSIX paths
+        // Matches \\wsl$ or \\wsl.localhost (with forward or backslashes)
+        // followed by distro name and path, stopping at invalid Windows path characters
+        val pattern = Regex("""([\\/]{2}wsl(?:\$|\.localhost)[\\/][^\\/]+[\\/][^<>:"|?*]+)""", RegexOption.IGNORE_CASE)
+        val matches = pattern.findAll(result).toList()
+
+        // Process in reverse order to maintain string indices
+        for (match in matches.reversed()) {
+            val uncPath = match.groupValues[1]
+
+            // Only convert paths from the same distribution
+            val pathDistribution = getDistributionByWindowsUncPath(uncPath)
+            if (pathDistribution?.msId != distribution.msId) {
+                continue
+            }
+
+            try {
+                val posixPath = convertSingleWslPath(uncPath, distribution)
+                if (posixPath != null) {
+                    result = result.substring(0, match.range.first) + posixPath + result.substring(match.range.last + 1)
+                } else {
+                    log.warn("convertSingleWslPath returned null for WSL UNC path: $uncPath")
+                }
+            } catch (e: Exception) {
+                log.warn("Failed to convert WSL UNC path: $uncPath", e)
+            }
+        }
+
+        return result
+    }
+
+    companion object {
+        /**
+         * Gets the service instance.
+         *
+         * @return the WslCompatService instance
+         */
+        @JvmStatic
+        fun getInstance(): WslCompatService {
+            return ApplicationManager.getApplication().getService(WslCompatService::class.java)
+        }
+    }
+}
+
+/**
+ * Extension property for convenient access to WslCompatService.
+ *
+ * Usage: `wslCompat.maybeConvertPathForWsl(path, sdkHome)`
+ *
+ * Tests can still mock the service using IntelliJ's standard service replacement:
+ * `ApplicationManager.getApplication().replaceService(WslCompatService::class.java, mockService, testRootDisposable)`
+ */
+val wslCompat: WslCompatService
+    get() = ApplicationManager.getApplication().getService(WslCompatService::class.java)

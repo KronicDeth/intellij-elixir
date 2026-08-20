@@ -1,9 +1,16 @@
 package org.elixir_lang.code
 
 import junit.framework.TestCase
-import org.elixir_lang.string.Tokenizer
 
 class IdentifierTest : TestCase() {
+    fun testInspectAsFunctionEscapesBackslash() {
+        assertEquals("\"\\\\\"", Identifier.inspectAsFunction("\\"))
+    }
+
+    fun testInspectAsKeyEscapesBackslash() {
+        assertEquals("\"\\\\\":", Identifier.inspectAsKey("\\"))
+    }
+
     fun testInspectAsKeyWithStartsWithDigit() {
         assertEquals( "\"4k\":", Identifier.inspectAsKey("4k"))
     }

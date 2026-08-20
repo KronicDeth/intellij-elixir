@@ -9,6 +9,7 @@ class NewProjectWizard : LanguageGeneratorNewProjectWizard {
     override val name: String = "Elixir"
     override val icon: Icon = Icons.LANGUAGE
     override val ordinal: Int = Int.MAX_VALUE
+    override val icon: Icon = Icons.LANGUAGE
 
     override fun createStep(parent: NewProjectWizardStep): NewProjectWizardStep =
         Step(parent)

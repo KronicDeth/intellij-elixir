@@ -2,12 +2,14 @@ package org.elixir_lang.erl
 
 import com.intellij.execution.Executor
 import com.intellij.execution.configurations.ConfigurationFactory
+import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.configurations.RunConfiguration
 import com.intellij.execution.configurations.RunProfileState
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.project.Project
 import org.elixir_lang.erl.configuration.Editor
+import org.elixir_lang.run.WslAwareCommandLine
 import org.elixir_lang.run.fromArguments
 import org.elixir_lang.run.toArguments
 
@@ -17,6 +19,10 @@ class Configuration(name: String, project: Project, configurationFactory: Config
 
     override fun setProgramParameters(value: String?) {
         erlArguments = value
+    }
+
+    override fun commandLine(): GeneralCommandLine {
+        return WslAwareCommandLine()
     }
 
     private var erlArgumentList: MutableList<String> = mutableListOf()

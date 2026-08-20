@@ -4,9 +4,13 @@ import org.jetbrains.annotations.NotNull;
 
 public class NestedInitial extends RuntimeException {
     public NestedInitial(@NotNull Stack stack) {
-        super("Cannot return to initial state when stack is not empty - it will break highlighting as initial state assumes restartable.\n" +
-                "Add `stack.clear();` to `ElixirFlexLexer#reset`, the JFlex generator cannot be customized to do this automatically when regenerating.\n" +
-                "If `stack.clear();` is there, then there is a bug in `Elixir.flex` where a state enter YYINITIAL more than once.");
+        super("""
+            Cannot push YYINITIAL (state 0) onto a non-empty stack - YYINITIAL is not restartable \
+            and pushing it mid-lex would corrupt highlighting.
+            This is a bug in Elixir.flex: a rule is calling pushAndBegin(YYINITIAL) or \
+            returning to YYINITIAL via popAndBegin() while the stack still contains frames.
+            The stack is cleared automatically at the start of each document via \
+            ElixirFlexLexerAdapter.start(), so this exception indicates a genuine flex rule error.""");
         this.stack = stack;
     }
 

@@ -158,57 +158,19 @@ public abstract class ModuleElementImpl extends PsiElementBase implements PsiCom
     @Nullable
     @Override
     public PsiElement findElementAt(int offset) {
+        // Return the fine-grained decompiled *mirror* leaf (a real source-like PsiElement with a non-null
+        // getNode()), exactly as the platform's own com.intellij.psi.impl.compiled.ClsFileImpl does. The
+        // previous implementation mapped the mirror leaf BACK to the coarse stub element
+        // (Module/CallDefinition/TypeDefinition), which is a PsiCompiledElement whose getNode() returns null.
+        // Global GotoDeclarationHandlers from other installed plugins (JavaScript's JSGotoDeclarationHandler,
+        // LESS's LessDeclarationSearcher, ...) call sourceElement.getNode().getElementType() with no null
+        // check, so the coarse element made them throw NPE inside GotoDeclarationOrUsageHandler2 /
+        // fromGTDProviders, aborting the WHOLE Ctrl-Click gesture - navigation from anywhere inside a
+        // decompiled .beam editor did nothing. Returning the mirror leaf gives every reference/navigation
+        // provider (ours and third parties') a normal element, and Ctrl-Click / Find Usages flow through the
+        // mirror's ordinary Elixir symbol machinery, matching source files.
         PsiElement mirror = getMirror();
-        PsiElement elementAt = null;
-
-        if (mirror != null) {
-            PsiElement mirrorAt = mirror.findElementAt(offset);
-
-            while (true) {
-                if (mirrorAt == null || mirrorAt instanceof PsiFile) {
-                    break;
-                }
-
-                elementAt = mirrorToElement(mirrorAt);
-
-                if (elementAt != null) {
-                    break;
-                }
-
-                mirrorAt = mirrorAt.getParent();
-            }
-        }
-
-        return elementAt;
-    }
-
-    @Nullable
-    private PsiElement mirrorToElement(PsiElement mirror) {
-        final PsiElement ownMirror = getMirror();
-        PsiElement element = null;
-
-        if (ownMirror == mirror) {
-            element = this;
-        } else {
-            PsiElement[] children = getChildren();
-
-            if (children.length > 0) {
-                for (PsiElement child : children) {
-                    ModuleElementImpl moduleElement = (ModuleElementImpl) child;
-
-                    if (PsiTreeUtil.isAncestor(moduleElement.getMirror(), mirror, false)) {
-                        element = moduleElement.mirrorToElement(mirror);
-
-
-                        if (element != null) {
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-
-        return element;
+        return mirror != null ? mirror.findElementAt(offset) : null;
     }
 
     /**
@@ -220,23 +182,11 @@ public abstract class ModuleElementImpl extends PsiElementBase implements PsiCom
     @Nullable
     @Override
     public PsiReference findReferenceAt(int offset) {
+        // Delegate straight to the decompiled mirror (see findElementAt): the mirror's leaves carry the
+        // ordinary Elixir references, so Ctrl-Click resolves through the same path source files use, and
+        // no coarse getNode()==null element is ever handed to reference/navigation providers.
         PsiElement mirror = getMirror();
-        PsiReference referenceAt = null;
-
-        if (mirror != null) {
-            PsiReference mirrorRef = mirror.findReferenceAt(offset);
-
-            if (mirrorRef != null) {
-                PsiElement mirrorElement = mirrorRef.getElement();
-                PsiElement element = mirrorToElement(mirrorElement);
-
-                if (element != null) {
-                    referenceAt = element.getReference();
-                }
-            }
-        }
-
-        return referenceAt;
+        return mirror != null ? mirror.findReferenceAt(offset) : null;
     }
 
     /**

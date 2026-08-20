@@ -10,7 +10,7 @@ import com.intellij.lang.ASTNode;
 import com.intellij.psi.LiteralTextEscaper;
 import com.intellij.psi.PsiLanguageInjectionHost;
 
-public interface ElixirInterpolatedSigilHeredoc extends SigilHeredoc {
+public interface ElixirInterpolatedSigilHeredoc extends SigilHeredocLiteral {
 
   @Nullable
   ElixirHeredocPrefix getHeredocPrefix();
@@ -33,7 +33,7 @@ public interface ElixirInterpolatedSigilHeredoc extends SigilHeredoc {
 
   @NotNull LiteralTextEscaper<? extends PsiLanguageInjectionHost> createLiteralTextEscaper();
 
-  @NotNull List<? extends HeredocLine> getHeredocLineList();
+  @NotNull List<? extends HeredocLineable> getHeredocLineList();
 
   @NotNull Integer indentation();
 

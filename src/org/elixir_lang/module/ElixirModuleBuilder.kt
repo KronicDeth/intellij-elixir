@@ -8,8 +8,8 @@ import com.intellij.openapi.options.ConfigurationException
 import com.intellij.openapi.projectRoots.SdkTypeId
 import com.intellij.openapi.roots.ModifiableRootModel
 import com.intellij.openapi.util.Condition
-import com.intellij.openapi.util.Pair
 import org.elixir_lang.Icons
+import org.elixir_lang.mix.Project
 import org.elixir_lang.sdk.elixir.Type.Companion.instance
 import javax.swing.Icon
 
@@ -24,8 +24,9 @@ class ElixirModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener {
         super.setupRootModel(rootModel)
         val contentEntry = rootModel.contentEntries.single()
         val projectDirectory = contentEntry.file!!
-        contentEntry.addSourceFolder(projectDirectory.findChild("test")!!, true)
-        contentEntry.addExcludeFolder("${projectDirectory.url}/deps")
+
+        rootModel.removeContentEntry(contentEntry)
+        Project.addFolders(rootModel, projectDirectory)
     }
 
     override fun getModuleType(): ModuleType<*> = ElixirModuleType.getInstance()
@@ -40,14 +41,7 @@ class ElixirModuleBuilder : JavaModuleBuilder(), ModuleBuilderListener {
         return object : SdkSettingsStep(settingsStep, this, Condition { sdkTypeId -> isSuitableSdkType(sdkTypeId) }) {
             override fun updateDataModel() {
                 super.updateDataModel()
-                val path = contentEntryPath
-                if (path != null) {
-                    sourcePaths = listOf(
-                        Pair.create(
-                            "$path/lib", ""
-                        )
-                    )
-                }
+                sourcePaths = emptyList()
             }
         }
     }

@@ -3,7 +3,7 @@ package org.elixir_lang.beam.chunk.lines.file_names
 import javax.swing.table.AbstractTableModel
 
 class Model(private val fileNameList: List<String>): AbstractTableModel() {
-    override fun getColumnClass(columnIndex: Int): Class<*> = Integer::class.java
+    override fun getColumnClass(columnIndex: Int): Class<*> = Int::class.javaObjectType
     override fun getColumnCount(): Int = 2
 
     override fun getColumnName(columnIndex: Int): String =

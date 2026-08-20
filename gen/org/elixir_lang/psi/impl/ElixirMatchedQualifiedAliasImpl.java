@@ -14,6 +14,7 @@ import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiPolyVariantReference;
 import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.PsiScopeProcessor;
+import com.intellij.util.concurrency.annotations.RequiresReadLock;
 
 public class ElixirMatchedQualifiedAliasImpl extends ElixirMatchedExpressionImpl implements ElixirMatchedQualifiedAlias {
 
@@ -51,13 +52,14 @@ public class ElixirMatchedQualifiedAliasImpl extends ElixirMatchedExpressionImpl
   }
 
   @Override
-  public @Nullable String fullyQualifiedName() {
+  public @NotNull String fullyQualifiedName() {
     return ElixirPsiImplUtil.fullyQualifiedName(this);
   }
 
   @Override
+  @RequiresReadLock
   public @NotNull String getName() {
-    return ElixirPsiImplUtil.getName((QualifiedAlias) this);
+    return ElixirPsiImplUtil.getName(this);
   }
 
   @Override
@@ -66,7 +68,7 @@ public class ElixirMatchedQualifiedAliasImpl extends ElixirMatchedExpressionImpl
   }
 
   @Override
-  public @Nullable ItemPresentation getPresentation() {
+  public @NotNull ItemPresentation getPresentation() {
     return ElixirPsiImplUtil.getPresentation(this);
   }
 

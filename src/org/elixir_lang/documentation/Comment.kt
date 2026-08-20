@@ -9,12 +9,12 @@ import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
 import org.elixir_lang.psi.CallDefinitionClause
 import org.elixir_lang.psi.ElixirTypes
+import org.elixir_lang.psi.ModuleAttribute.isTypeName
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.enclosingMacroCall
 import org.elixir_lang.psi.impl.identifierName
 import org.elixir_lang.psi.impl.siblingExpressions
 import org.elixir_lang.psi.stub.type.call.Stub.isModular
-import org.elixir_lang.reference.ModuleAttribute.Companion.isTypeName
 
 class Comment(val moduleAttribute: AtUnqualifiedNoParenthesesCall<*>) : FakePsiElement(), PsiDocCommentBase {
     override fun getParent(): PsiElement = moduleAttribute
@@ -22,7 +22,7 @@ class Comment(val moduleAttribute: AtUnqualifiedNoParenthesesCall<*>) : FakePsiE
     override fun getTokenType(): IElementType = ElixirTypes.COMMENT
 
     override fun getOwner(): PsiElement? =
-        when (val identifierName = moduleAttribute.atIdentifier.identifierName()) {
+        when (moduleAttribute.atIdentifier.identifierName()) {
             "moduledoc" -> moduleAttribute.enclosingMacroCall().takeIf(::isModular)
             "doc" -> {
                 moduleAttribute.siblingExpressions(forward = true, withSelf = false).firstOrNull { expression ->

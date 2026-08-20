@@ -2,8 +2,10 @@ package org.elixir_lang.documentation
 
 import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveState
-import org.elixir_lang.psi.*
+import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
+import org.elixir_lang.psi.CallDefinitionClause
 import org.elixir_lang.psi.CallDefinitionClause.enclosingModularMacroCall
+import org.elixir_lang.psi.ElixirUnmatchedAtUnqualifiedNoParenthesesCall
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.CanonicallyNamed
 import org.elixir_lang.psi.impl.ElixirUnmatchedUnqualifiedNoParenthesesCallImpl
@@ -34,15 +36,8 @@ object SourceFileDocsHelper {
             .firstOrNull { previousModuleAttribute ->
                 previousModuleAttribute.atIdentifier.identifierName() == "typedoc"
             }
-            ?.lastChild
-            ?.firstChild
-            ?.firstChild
-            ?.let { documentation ->
-                when (documentation) {
-                    is Heredoc -> documentation.children.joinToString("") { it.text }
-                    else -> TODO()
-                }
-            }
+            ?.moduleAttributeValue()
+            ?.documentationMarkdownText()
 
         return if (!typeDoc.isNullOrEmpty()) {
             enclosingModularMacroCall(moduleAttribute)?.let { modular ->
@@ -62,15 +57,8 @@ object SourceFileDocsHelper {
             .firstOrNull { previousModuleAttribute ->
                 previousModuleAttribute.atIdentifier.identifierName() == "doc"
             }
-            ?.lastChild
-            ?.firstChild
-            ?.firstChild
-            ?.let { documentation ->
-                when (documentation) {
-                    is Heredoc -> documentation.children.joinToString("") { it.text }
-                    else -> TODO()
-                }
-            }
+            ?.moduleAttributeValue()
+            ?.documentationMarkdownText()
 
         return if (!typeDoc.isNullOrEmpty()) {
             enclosingModularMacroCall(moduleAttribute)?.let { modular ->
@@ -93,9 +81,10 @@ object SourceFileDocsHelper {
                 ?.asSequence()
                 ?.filterIsInstance<ElixirUnmatchedAtUnqualifiedNoParenthesesCall>()
                 ?.filter { it.atIdentifier.lastChild?.text == "moduledoc" }
-                ?.mapNotNull { (it.lastChild?.firstChild?.firstChild as? Heredoc)?.children?.toList() }
-                ?.flatten()
-                ?.joinToString("") { it.text }
+                ?.mapNotNull { moduleAttribute ->
+                    moduleAttribute.moduleAttributeValue()?.documentationMarkdownText()
+                }
+                ?.joinToString("")
 
             if (!moduleDoc.isNullOrEmpty()) {
                 FetchedDocs.ModuleDocumentation(call.canonicalName().orEmpty(), moduleDoc)
@@ -145,4 +134,3 @@ object SourceFileDocsHelper {
         else -> null
     }
 }
-

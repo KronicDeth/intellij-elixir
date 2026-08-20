@@ -12,7 +12,7 @@ import com.intellij.psi.tree.TokenSet
 import kotlin.collections.List
 
 /**
- * Created by luke.imhoff on 8/2/14.
+ * Created by kadie.enheduanna.inanna on 8/2/14.
  */
 class ElixirSyntaxHighlighter : SyntaxHighlighterBase() {
     override fun getHighlightingLexer(): Lexer = ElixirLexer()

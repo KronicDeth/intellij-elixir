@@ -1,5 +1,6 @@
 {
   parserClass="org.elixir_lang.parser.ElixirParser"
+  parserUtilClass="org.elixir_lang.parser.ElixirParserUtil"
 
   extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
   // direct children of matchedExpression
@@ -699,7 +700,7 @@ heredoc ::= HEREDOC_PROMOTER EOL
             heredocPrefix HEREDOC_TERMINATOR
             {
               implements = [
-                "org.elixir_lang.psi.Heredoc"
+                "org.elixir_lang.psi.HeredocLiteral"
                 "org.elixir_lang.psi.Quote"
               ]
               methods = [
@@ -726,7 +727,7 @@ heredoc ::= HEREDOC_PROMOTER EOL
 heredocLine ::= heredocLinePrefix heredocLineBody heredocLineEnd
                 {
                   implements = [
-                    "org.elixir_lang.psi.HeredocLine"
+                    "org.elixir_lang.psi.HeredocLineable"
                   ]
                   methods = [
                     getBody
@@ -748,7 +749,7 @@ interpolatedSigilHeredoc ::= TILDE INTERPOLATING_SIGIL_NAME HEREDOC_PROMOTER EOL
                              heredocPrefix HEREDOC_TERMINATOR sigilModifiers
                              {
                                implements = [
-                                 "org.elixir_lang.psi.SigilHeredoc"
+                                 "org.elixir_lang.psi.SigilHeredocLiteral"
                                ]
                                //noinspection BnfResolve
                                pin = HEREDOC_PROMOTER
@@ -756,7 +757,7 @@ interpolatedSigilHeredoc ::= TILDE INTERPOLATING_SIGIL_NAME HEREDOC_PROMOTER EOL
 interpolatedHeredocLine ::= heredocLinePrefix interpolatedHeredocLineBody heredocLineEnd
                             {
                               implements = [
-                                "org.elixir_lang.psi.HeredocLine"
+                                "org.elixir_lang.psi.HeredocLineable"
                               ]
                               methods = [
                                 getBody
@@ -778,7 +779,7 @@ literalSigilHeredoc ::= TILDE LITERAL_SIGIL_NAME HEREDOC_PROMOTER EOL
                         {
                           implements = [
                             "org.elixir_lang.psi.Literal"
-                            "org.elixir_lang.psi.SigilHeredoc"
+                            "org.elixir_lang.psi.SigilHeredocLiteral"
                           ]
                           //noinspection BnfResolve
                           pin = HEREDOC_PROMOTER
@@ -787,7 +788,7 @@ literalSigilHeredoc ::= TILDE LITERAL_SIGIL_NAME HEREDOC_PROMOTER EOL
 literalHeredocLine ::= heredocLinePrefix literalHeredocLineBody heredocLineEnd
                        {
                          implements = [
-                           "org.elixir_lang.psi.HeredocLine"
+                           "org.elixir_lang.psi.HeredocLineable"
                          ]
                          methods = [
                            getBody
@@ -943,7 +944,10 @@ matchedExpression ::= matchedInMatchOperation |
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L50
  */
 
-private nonNumeric ::= !numeric
+// Complement of `captureNumericOperation`: a number belongs to that rule only when joined to the `&`,
+// which is always below Elixir 1.15.0 and only without a space from 1.15.0 on.  Both rules must test
+// the same predicate, or a spaced `& 1` matches neither and parses as an error.
+private nonNumeric ::= !(<<captureArgument>> numeric)
 capturePrefixOperator ::= CAPTURE_OPERATOR
                           {
                             implements = "org.elixir_lang.psi.Operator"
@@ -1712,7 +1716,11 @@ matchedAccessExpression ::= accessExpression
  *
  */
 
-captureNumericOperation ::= capturePrefixOperator numeric
+/*
+ * `&1` is one capture argument; from Elixir 1.15.0 `& 1` is instead `&` applied to `1`.  See
+ * ElixirParserUtil.captureArgument, and `nonNumeric`, which negates the same predicate.
+ */
+captureNumericOperation ::= capturePrefixOperator <<captureArgument>> numeric
 
 /*
  *
@@ -2523,6 +2531,7 @@ doBlock ::= DO doStabSeparatorMaybe
             {
               implements = "org.elixir_lang.psi.QuotableArguments"
               methods = [quoteArguments]
+              //noinspection BnfResolve
               pin = DO
             }
 
@@ -2675,18 +2684,19 @@ unknownBaseWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX UNKNOWN_WHOLE_NUMBER_BASE un
 
 atom ::= COLON (ATOM_FRAGMENT | line)
          {
-           implements = [
-             "com.intellij.psi.NavigatablePsiElement"
-             "com.intellij.psi.PsiNamedElement"
-             "org.elixir_lang.psi.Quotable"
-           ]
-           methods = [
-             getReference
-             quote
-             getName
-             setName
-           ]
-         }
+            mixin = "org.elixir_lang.psi.impl.ElixirAtomMixin"
+            implements = [
+              "com.intellij.psi.NavigatablePsiElement"
+              "com.intellij.psi.PsiNamedElement"
+              "org.elixir_lang.psi.Quotable"
+            ]
+            methods = [
+              getReference
+              quote
+              getName
+              setName
+            ]
+          }
 
 private infixComma ::= COMMA eolStar
 private infixCommaMaybe ::= infixComma?

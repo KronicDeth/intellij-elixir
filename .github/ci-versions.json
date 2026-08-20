@@ -1,0 +1,61 @@
+{
+  "_comment": [
+    "Single source of truth for the versions CI builds, tests and verifies against. Read by the",
+    "test-matrix job in .github/workflows/shared-test.yml, which composes the test legs and the",
+    "plugin-verification legs, and by .github/actions/setup-env, which fills any version input left",
+    "empty so the release/tag/build-plugin jobs need not restate the minimum supported platform.",
+    "Find available IDE versions at https://www.jetbrains.com/idea/download/other/ and",
+    "https://www.jetbrains.com/ruby/download/other/",
+    "",
+    "Things you cannot tell from the values themselves:",
+    "  idea.minimumSupported.version must be the marketing version that gradle.properties'",
+    "    pluginSinceBuild pins.",
+    "  java must be the JBR level the platform's JARs are compiled for - build.gradle.kts derives the",
+    "    same value from the build number, and a wrong one fails the compile rather than the tests,",
+    "    because javac --release validates the class-file version of everything on the classpath.",
+    "  verify values are intellij-repository artifact ids, not marketing names: ideaIU, ideaIC,",
+    "    pycharmPC, pycharmPY, goland, clion, phpstorm, rubymine, webstorm, mps, riderRD, riderRS.",
+    "    RustRover is published but unusable - the verifier action derives the repository directory",
+    "    from the id's lowercase prefix, and that id starts with a capital. List a product only for",
+    "    versions JetBrains has published it for; they lag IDEA on new majors. This affects",
+    "    verification only: test legs always build against IntelliJ IDEA.",
+    "  Declaring anything twice is an error, not a second configuration: the generator fails naming",
+    "    the duplicate, because every leg name has to be unique within a run. A second entry for a",
+    "    version, or a product listed twice under one version, will stop the matrix before it runs.",
+    "  beam.baseline must match the mise.toml pin, and must stay green.",
+    "  beam.additional is a ratchet. continue-on-error means the version is NOT supported yet and its",
+    "    leg is expected to fail; the workflow tolerates failure at every phase of that leg, not just",
+    "    the tests, so an Elixir the toolchain or the quoter cannot handle still cannot block a merge.",
+    "    Delete the flag once the leg is green - the version is then supported, and any later change",
+    "    that breaks it fails the pipeline.",
+    "  Check OTP support against https://elixir.hexdocs.pm/compatibility-and-deprecations.html, which",
+    "    is patch-aware: 1.14 is '23 - 25 (and Erlang/OTP 26 from v1.14.5)'. Do NOT use otp_versions",
+    "    from elixir-lang.github.com's _data/elixir-versions.yml to decide the range - it is per-MINOR",
+    "    and misses OTP support added in a patch. Within the range prefer that file's recommended_otp.",
+    "  A pair may also exist to cover an OTP major no other pair covers - ~75% of the swept BEAM surface",
+    "    is Erlang and the chunk formats track OTP, not Elixir - so the same Elixir may appear twice with",
+    "    different OTPs. Read by OTP major the pairs below are {24, 25, 26, 27, 28}. Prefer the cleanest",
+    "    in-window Elixir for such a leg so it isolates the OTP surface instead of inheriting a quoting",
+    "    backlog."
+  ],
+  "idea": {
+    "minimumSupported": { "version": "2025.3.6", "java": "21", "verify": [ "ideaIU", "rubymine" ] },
+    "additionalToTest": [
+      { "version": "2026.2", "java": "25", "verify": [ "ideaIU", "rubymine" ] },
+      { "version": "2026.1.4", "java": "21", "verify": [ "ideaIU", "rubymine" ] }
+    ]
+  },
+  "beam": {
+    "baseline": { "elixir": "1.13.4", "otp": "24.3.4.6" },
+    "additional": [
+      { "elixir": "1.13.4", "otp": "25.3.2.21" },
+      { "elixir": "1.14.5", "otp": "26.2.5.21" },
+      { "elixir": "1.15.8", "otp": "26.2.5.21" },
+      { "elixir": "1.16.3", "otp": "26.2.5.21" },
+      { "elixir": "1.17.3", "otp": "27.1.2" },
+      { "elixir": "1.18.4", "otp": "27.3.4" },
+      { "elixir": "1.19.5", "otp": "28.4" },
+      { "elixir": "1.20.2", "otp": "29.0" }
+    ]
+  }
+}

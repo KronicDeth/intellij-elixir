@@ -32,7 +32,7 @@ class FileEditor(
     override fun getBackgroundHighlighter(): BackgroundEditorHighlighter? = null
     override fun getComponent(): JComponent {
         val descriptor = PrevNextActionsDescriptor(IdeActions.ACTION_NEXT_EDITOR_TAB, IdeActions.ACTION_PREVIOUS_EDITOR_TAB)
-        rootTabbedPane = TabbedPaneWrapper.AsJBTabs(project, SwingConstants.TOP, descriptor, this)
+        rootTabbedPane = TabbedPaneWrapper.createJbTabs(project, SwingConstants.TOP, descriptor, this)
 
         Cache.from(virtualFile)?.let { cache ->
             cache.chunkCollection().forEach { chunk ->
@@ -100,8 +100,11 @@ class FileEditor(
                 JBScrollPane(Table(org.elixir_lang.beam.chunk.literals.Model(cache.literals)))
             Chunk.TypeID.LOCT.toString() ->
                 JBScrollPane(Table(org.elixir_lang.beam.chunk.call_definitions.Model(cache.locals)))
-            Chunk.TypeID.STRT.toString() ->
-                JBScrollPane(Table(org.elixir_lang.beam.chunk.strings.Model(cache.strings)))
+            Chunk.TypeID.STRT.toString() -> {
+                val table = Table(org.elixir_lang.beam.chunk.strings.Model(cache.strings, cache.code))
+                table.emptyText.text = "String pool is empty"
+                JBScrollPane(table)
+            }
             else ->
                 JBScrollPane(JPanel())
         }

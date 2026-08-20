@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="LanguageInjectionConfiguration">
+    <injection language="RegExp" injector-id="elixir">
+        <display-name>Sigil: Regular Expression</display-name>
+        <place><![CDATA[sigilWithName("r")]]></place>
+    </injection>
+
+<!--    <injection language="HTML" injector-id="elixir">-->
+<!--        <display-name>Sigil: (Phoenix) HTML</display-name>-->
+<!--        <place><![CDATA[sigilWithName("H")]]></place>-->
+<!--    </injection>-->
+
+    <injection language="EEx" injector-id="elixir">
+        <display-name>Sigil: (Phoenix) EEX</display-name>
+        <place><![CDATA[sigilWithName("L")]]></place>
+    </injection>
+</component>

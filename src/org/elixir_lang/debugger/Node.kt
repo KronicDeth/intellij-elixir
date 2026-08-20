@@ -1,9 +1,12 @@
 package org.elixir_lang.debugger
 
 import com.ericsson.otp.erlang.*
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.util.concurrency.ThreadingAssertions
 import com.intellij.xdebugger.evaluation.XDebuggerEvaluator
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.elixir_lang.Clause
 import org.elixir_lang.Server
 import org.elixir_lang.beam.term.inspect
@@ -16,7 +19,9 @@ import org.elixir_lang.debugger.stack_frame.value.Factory
 import org.elixir_lang.generic_server.Behaviour
 import org.elixir_lang.generic_server.handleMessage
 import org.elixir_lang.run
+import org.elixir_lang.util.supervisedChildScope
 import java.nio.charset.Charset
+import kotlinx.coroutines.CancellationException
 
 fun otpErlangMapOf(vararg pairs: Pair<OtpErlangObject, OtpErlangObject>): OtpErlangMap {
     val map = OtpErlangMap()
@@ -37,7 +42,8 @@ class Node(
         debuggedNodeName: String,
         cookie: String,
         ensureAllStarted: (() -> Unit),
-        private val eventListener: Listener
+        private val eventListener: Listener,
+        private val scope: CoroutineScope
 ) : Behaviour {
     override fun handleCall(from: OtpErlangTuple, request: OtpErlangObject): OtpErlangObject {
         LOGGER.error("Unexpected ${javaClass.canonicalName}.handleCall(${inspect(from)}, ${inspect(request)})")
@@ -55,7 +61,7 @@ class Node(
     private val local = Server("Elixir.IntelliJElixir.Debugger.Client", debuggerNodeName)
     private val remote = Server("Elixir.IntelliJElixir.Debugger.Server", debuggedNodeName)
     private val mailBox by lazy {
-      local.mailBox(remote, cookie, ensureAllStarted)
+        local.mailBox(remote, cookie, ensureAllStarted, scope.supervisedChildScope("MailBox"))
     }
 
     init {
@@ -238,21 +244,26 @@ class Node(
             ))
 
     private fun runDebugger() {
-        ApplicationManager.getApplication().executeOnPooledThread { debugger() }
+        scope.launch(Dispatchers.IO) { debugger() }
     }
 
     private fun debugger() {
         try {
             loop()
-        } catch (otpErlangExit: OtpErlangExit) {
+        } catch (_: OtpErlangExit) {
+            eventListener.debuggerStopped()
+        } catch (_: CancellationException) {
             eventListener.debuggerStopped()
         } catch (exception: Exception) {
-            eventListener.unknownMessage(exception.message!!)
+            eventListener.unknownMessage(exception.message ?: exception.toString())
         }
     }
 
-    private fun callDebugged(request: OtpErlangObject): OtpErlangObject =
-            mailBox.genericServerCall(remote, request, TIMEOUT_IN_MILLISECONDS)
+    private fun callDebugged(request: OtpErlangObject): OtpErlangObject {
+        ThreadingAssertions.assertBackgroundThread()
+
+        return mailBox.genericServerCall(remote, request, TIMEOUT_IN_MILLISECONDS)
+    }
 
     private tailrec fun loop() {
         mailBox.receive { receivedMessage ->
@@ -316,4 +327,3 @@ private fun interpretedModuleFrom(index: Int, tuple: OtpErlangTuple): Interprete
         null
     }
 }
-

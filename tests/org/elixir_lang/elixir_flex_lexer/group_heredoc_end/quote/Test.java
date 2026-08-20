@@ -5,7 +5,7 @@ import org.elixir_lang.elixir_flex_lexer.TokenTest;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Created by luke.imhoff on 9/12/14.
+ * Created by kadie.enheduanna.inanna on 9/12/14.
  */
 public abstract class Test extends TokenTest {
     /*

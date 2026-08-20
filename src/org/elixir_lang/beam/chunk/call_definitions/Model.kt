@@ -8,7 +8,7 @@ class Model(callDefinitions: CallDefinitions?): AbstractTableModel() {
 
     override fun getColumnClass(columnIndex: Int): Class<*> =
             when (columnIndex) {
-                0, 2, 3 -> Integer::class.java
+                0, 2, 3 -> Int::class.javaObjectType
                 1 -> String::class.java
                 else -> throw IllegalArgumentException("Column $columnIndex out of bounds")
             }

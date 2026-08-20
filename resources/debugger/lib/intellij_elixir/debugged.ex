@@ -1,5 +1,22 @@
 defmodule IntelliJElixir.Debugged do
+  @doc false
+  def ensure_debugger_path do
+    case :code.lib_dir(:debugger) do
+      {:error, :bad_name} ->
+        root = :code.root_dir() |> to_string()
+        paths = Path.wildcard(Path.join([root, "lib", "debugger-*", "ebin"]))
+
+        Enum.each(paths, fn path ->
+          :code.add_patha(to_charlist(path))
+        end)
+
+      _ ->
+        :ok
+    end
+  end
+
   def start do
+    ensure_debugger_path()
     {:ok, pid} = Supervisor.start_link([IntelliJElixir.Debugger.Server], strategy: :one_for_one)
     Process.unlink(pid)
     Process.register(self(), __MODULE__)

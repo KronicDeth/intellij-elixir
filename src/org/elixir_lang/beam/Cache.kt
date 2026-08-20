@@ -25,7 +25,24 @@ class Cache private constructor(private val beam: Beam) {
     companion object {
         private val KEY = Key.create<Pair<Long, Cache?>>("beam.cache")
 
-        fun from(fileContent: FileContent) = from(fileContent.file)
+        fun from(fileContent: FileContent): Cache? {
+            val virtualFile = fileContent.file
+            val currentModificationCount = virtualFile.modificationCount
+
+            // FileBasedIndexExtension treats FileContent as the indexing input, and
+            // FileContent already provides normalized bytes for parsing.
+            // Avoid reopening VirtualFile.inputStream here: blocking I/O in read-action-
+            // sensitive indexing paths can stall pending write actions and freeze the EDT
+            // (for example via WSL/IJent fsBlocking/runBlocking).
+            val cache = virtualFile.getUserData(KEY)?.let { (cachedModificationCount, cachedCache) ->
+                if (cachedModificationCount == currentModificationCount) cachedCache else null
+            } ?: Beam.from(fileContent)?.let(::Cache)
+
+            virtualFile.putUserData(KEY, Pair(currentModificationCount, cache))
+
+            return cache
+        }
+
         fun from(virtualFile: VirtualFile): Cache? {
             val currentModificationCount = virtualFile.modificationCount
 

@@ -1,53 +1,36 @@
 package org.elixir_lang.sdk.elixir
 
-import com.intellij.facet.FacetManager
+import com.intellij.notification.NotificationAction
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.application.ReadAction
-import com.intellij.openapi.application.writeAction
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.fileChooser.FileChooserDescriptor
-import com.intellij.openapi.module.Module
-import com.intellij.openapi.module.ModuleUtilCore
-import com.intellij.openapi.progress.runBlockingCancellable
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.project.ProjectBundle
 import com.intellij.openapi.projectRoots.*
-import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl
-import com.intellij.openapi.roots.ModuleRootManager
-import com.intellij.openapi.roots.OrderRootType
-import com.intellij.openapi.roots.ProjectFileIndex
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.util.InvalidDataException
-import com.intellij.openapi.util.SystemInfo
-import com.intellij.openapi.util.Version
 import com.intellij.openapi.util.WriteExternalException
-import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.openapi.vfs.VirtualFileManager
-import com.intellij.psi.PsiElement
-import com.intellij.serviceContainer.AlreadyDisposedException
-import com.intellij.util.system.CpuArch
-import gnu.trove.THashSet
+import com.intellij.util.concurrency.annotations.RequiresBackgroundThread
 import org.apache.commons.io.FilenameUtils
-import org.elixir_lang.Facet
 import org.elixir_lang.Icons
-import org.elixir_lang.jps.HomePath
-import org.elixir_lang.jps.model.SerializerExtension
-import org.elixir_lang.jps.sdk_type.Elixir
-import org.elixir_lang.sdk.ProcessOutput
-import org.elixir_lang.sdk.Type.ebinPathChainVirtualFile
+import org.elixir_lang.cli.getExecutableFilepathWslSafe
+import org.elixir_lang.jps.shared.ElixirSdkTypeId
+import org.elixir_lang.jps.shared.cli.CliTool
+import org.elixir_lang.jps.shared.sdk.SdkPaths
+import org.elixir_lang.sdk.*
 import org.elixir_lang.sdk.erlang_dependent.AdditionalDataConfigurable
 import org.elixir_lang.sdk.erlang_dependent.SdkAdditionalData
+import org.elixir_lang.sdk.wsl.wslCompat
+import org.elixir_lang.util.WriteActions
+import org.elixir_lang.util.runWithEdtGuard
 import org.jdom.Element
-import org.jetbrains.annotations.Contract
-import org.jetbrains.annotations.TestOnly
+import org.jetbrains.annotations.Unmodifiable
 import java.io.File
 import java.nio.file.Path
-import java.nio.file.Paths
-import java.util.*
 import javax.swing.Icon
 
-class Type : org.elixir_lang.sdk.erlang_dependent.Type(SerializerExtension.ELIXIR_SDK_TYPE_ID) {
+
+class Type : org.elixir_lang.sdk.erlang_dependent.Type(ElixirSdkTypeId.ELIXIR_SDK_TYPE_ID) {
     /**
      * If a path selected in the file chooser is not a valid SDK home path, and the base name is one of the commonly
      * incorrectly selected subdirectories - bin, lib, or src - then return the parent path, so it can be checked for
@@ -83,69 +66,45 @@ class Type : org.elixir_lang.sdk.erlang_dependent.Type(SerializerExtension.ELIXI
         return adjustedSdkHome
     }
 
-    override fun getDefaultDocumentationUrl(sdk: Sdk): String? = getDefaultDocumentationUrl(getRelease(sdk))
+    override fun getDefaultDocumentationUrl(sdk: Sdk): String? =
+        getDefaultDocumentationUrl(sdk.getUserData(ElixirVersionDetector.ELIXIR_VERSION_KEY))
 
-    override fun getHomeChooserDescriptor(): FileChooserDescriptor {
-        val descriptor: FileChooserDescriptor =
-            object : FileChooserDescriptor(false, true, false, false, false, false) {
-                override fun validateSelectedFiles(files: Array<VirtualFile>) {
-                    files.firstOrNull()?.let { validateSdkHomePath(it) }
-                }
-            }
-        descriptor.title = ProjectBundle.message("sdk.configure.home.title", presentableName)
-        return descriptor
-    }
+    override fun getHomeChooserDescriptor(): FileChooserDescriptor =
+        org.elixir_lang.sdk.Type.createHomeChooserDescriptor(presentableName, ::validateSdkHomePath)
 
     override fun getIcon(): Icon = Icons.LANGUAGE
 
     override fun getPresentableName(): String = "Elixir SDK"
 
-    override fun getVersionString(sdkHome: String): String =
-        Release.fromString(File(sdkHome).name)?.version() ?: "Unknown"
+    override fun getVersionString(sdkHome: String): String {
+        return versionStringForHome(sdkHome, null)
+            ?: buildString {
+                SdkPaths.detectSource(sdkHome)?.let { append(it).append(" ") }
+                append("Elixir Unknown")
+            }
+    }
 
     /**
      * Map of home paths to versions in descending version order so that newer versions are favored.
      *
      * @return Map
      */
-    private fun homePathByVersion(): Map<Version, String> {
-        val homePathByVersion: MutableMap<Version, String> = TreeMap(Comparator.reverseOrder())
-        if (SystemInfo.isMac) {
-            HomePath.mergeASDF(homePathByVersion, "elixir")
-            HomePath.mergeHomebrew(
-                homePathByVersion,
-                "elixir",
-                java.util.function.Function
-                    .identity(),
+    private fun homePathByVersion(path: Path?): Map<SdkHomeKey, String> {
+        return SdkHomeScan.homePathByVersion(
+            path, SdkHomeScan.Config(
+                toolName = "elixir",
+                nixPattern = NIX_PATTERN,
+                linuxDefaultPath = LINUX_DEFAULT_HOME_PATH,
+                linuxMintPath = LINUX_MINT_HOME_PATH,
+                windowsDefaultPath = WINDOWS_64BIT_DEFAULT_HOME_PATH,
+                windows32BitPath = WINDOWS_32BIT_DEFAULT_HOME_PATH,
+                elixirInstallScriptDirName = "elixir",
+                homebrewTransform = null,  // identity
+                nixTransform = null,  // identity
+                kerlTransform = null,  // TODO: Investigate if Elixir supports kerl builds
+                travisCIKerlTransform = null  // TODO: Verify Travis CI kerl for Elixir
             )
-            HomePath.mergeNixStore(
-                homePathByVersion,
-                NIX_PATTERN,
-                java.util.function.Function
-                    .identity(),
-            )
-        } else {
-            val sdkPath: String
-            if (SystemInfo.isWindows) {
-                sdkPath =
-                    if (CpuArch.CURRENT.width == 32) {
-                        WINDOWS_32BIT_DEFAULT_HOME_PATH
-                    } else {
-                        WINDOWS_64BIT_DEFAULT_HOME_PATH
-                    }
-                homePathByVersion[HomePath.UNKNOWN_VERSION] = sdkPath
-            } else if (SystemInfo.isLinux) {
-                putIfDirectory(homePathByVersion, HomePath.UNKNOWN_VERSION, LINUX_DEFAULT_HOME_PATH)
-                putIfDirectory(homePathByVersion, HomePath.UNKNOWN_VERSION, LINUX_MINT_HOME_PATH)
-                HomePath.mergeNixStore(
-                    homePathByVersion,
-                    NIX_PATTERN,
-                    java.util.function.Function
-                        .identity(),
-                )
-            }
-        }
-        return homePathByVersion
+        )
     }
 
     private fun invalidSdkHomeException(virtualFile: VirtualFile): Exception =
@@ -174,53 +133,68 @@ ELIXIR_SDK_HOME
         }
 
     override fun isValidSdkHome(path: String): Boolean {
-        val elixir = Elixir.getScriptInterpreterExecutable(path)
-        val elixirc = Elixir.getByteCodeCompilerExecutable(path)
-        val iex = Elixir.getIExExecutable(path)
-        val mix = Elixir.mixFile(path)
+        val elixir = File(CliTool.ELIXIR.getExecutableFilepathWslSafe(path))
+        val elixirc = File(CliTool.ELIXIRC.getExecutableFilepathWslSafe(path))
+        val iex = File(CliTool.IEX.getExecutableFilepathWslSafe(path))
+        val mix = File(CliTool.MIX.getExecutableFilepathWslSafe(path))
         return elixir.canExecute() &&
                 elixirc.canExecute() &&
                 iex.canExecute() &&
                 mix.canRead() &&
-                HomePath.hasEbinPath(path)
+                SdkEbinPaths.hasEbinPath(path)
     }
 
     override fun setupSdkPaths(sdk: Sdk) {
-        configureSdkPaths(sdk)
+        ElixirSdkPathConfigurator.configure(sdk)
     }
 
-    override fun suggestHomePath(): String? {
-        val iterator = suggestHomePaths().iterator()
-        var suggestedHomePath: String? = null
-        if (iterator.hasNext()) {
-            suggestedHomePath = iterator.next()
-        }
-        return suggestedHomePath
+    override fun setupSdkPaths(sdk: Sdk, sdkModel: SdkModel): Boolean {
+        ElixirSdkPathConfigurator.configure(sdk, sdkModel)
+        return true
     }
 
-    override fun suggestHomePaths(): Collection<String> = homePathByVersion().values
+    @Deprecated("Deprecated in Java")
+    // IntelliJ SDKType still requires this deprecated override.
+    @Suppress("DEPRECATION")
+    override fun suggestHomePath(): String? = suggestHomePaths().firstOrNull()
+
+    override fun suggestHomePath(path: Path): String? {
+        return homePathByVersion(path).values.firstOrNull()
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun suggestHomePaths(): Collection<String> = homePathByVersion(null).values
+    override fun suggestHomePaths(project: Project?): @Unmodifiable Collection<String> =
+        // SdkDetectionContext falls back to the wizard's import/new-project directory when the
+        // platform supplies the default project (import wizard, New Project), so WSL locations
+        // are still scanned for suggestions.
+        homePathByVersion(SdkDetectionContext.resolve(project)).values
 
     override fun suggestSdkName(
         currentSdkName: String?,
         sdkHome: String,
-    ): String = Release.fromString(File(sdkHome).name)?.toString() ?: "Elixir at $sdkHome"
+    ): String {
+        val otpMajor = runWithEdtGuard("Detecting Elixir SDK...") {
+            ElixirBuildInfo.elixirOtpRelease(wslCompat.canonicalizePath(sdkHome))
+        }
+        return suggestSdkNameForHome(sdkHome, null, otpMajor, null)
+    }
 
     private fun validateSdkHomePath(virtualFile: VirtualFile) {
         val selectedPath = virtualFile.path
-        var valid = isValidSdkHome(selectedPath)
+
+        val valid = isValidSdkHome(selectedPath)
         if (!valid) {
-            valid = isValidSdkHome(adjustSelectedSdkHome(selectedPath))
-            if (!valid) {
-                throw invalidSdkHomeException(virtualFile)
-            }
+            throw invalidSdkHomeException(virtualFile)
         }
     }
 
     override fun createAdditionalDataConfigurable(
         sdkModel: SdkModel,
         sdkModificator: SdkModificator,
-    ): com.intellij.openapi.projectRoots.AdditionalDataConfigurable =
-        AdditionalDataConfigurable(sdkModel, sdkModificator)
+    ): com.intellij.openapi.projectRoots.AdditionalDataConfigurable {
+        return AdditionalDataConfigurable(sdkModel, sdkModificator)
+    }
 
     override fun saveAdditionalData(
         additionalData: com.intellij.openapi.projectRoots.SdkAdditionalData,
@@ -235,7 +209,6 @@ ELIXIR_SDK_HOME
         }
     }
 
-    @Suppress("SameParameterValue")
     override fun loadAdditionalData(
         elixirSdk: Sdk,
         additional: Element,
@@ -250,267 +223,202 @@ ELIXIR_SDK_HOME
     }
 
     companion object {
-        private const val LINUX_DEFAULT_HOME_PATH = HomePath.LINUX_DEFAULT_HOME_PATH + "/elixir"
-        private const val LINUX_MINT_HOME_PATH = HomePath.LINUX_MINT_HOME_PATH + "/elixir"
+        private const val LINUX_DEFAULT_HOME_PATH = SdkHomePaths.LINUX_DEFAULT_HOME_PATH + "/elixir"
+        private const val LINUX_MINT_HOME_PATH = SdkHomePaths.LINUX_MINT_HOME_PATH + "/elixir"
         private val LOG = Logger.getInstance(Type::class.java)
-        private val NIX_PATTERN = HomePath.nixPattern("elixir")
-        private val SDK_HOME_CHILD_BASE_NAME_SET: Set<String> = THashSet(listOf("lib", "src"))
+        private val NIX_PATTERN = SdkHomePaths.nixPattern("elixir")
+        private val SDK_HOME_CHILD_BASE_NAME_SET: Set<String> = setOf("lib", "src")
         private const val WINDOWS_32BIT_DEFAULT_HOME_PATH = "C:\\Program Files\\Elixir"
         private const val WINDOWS_64BIT_DEFAULT_HOME_PATH = "C:\\Program Files (x86)\\Elixir"
 
-        private fun releaseVersion(sdkModificator: SdkModificator): String? =
-            sdkModificator.versionString?.let { Release.fromString(it) }?.version()
-
-        private fun addDocumentationPath(
-            sdkModificator: SdkModificator,
-            releaseVersion: String?,
-            appName: String,
-        ) {
-            val hexdocUrlBuilder = StringBuilder("https://hexdoc.pm/").append(appName)
-            if (releaseVersion != null) {
-                hexdocUrlBuilder.append('/').append(releaseVersion)
+        @JvmStatic
+        internal fun versionStringForHome(sdkHome: String, resolvedVersion: String?): String? {
+            val version = ElixirVersionDetector.elixirVersion(sdkHome, resolvedVersion) ?: return null
+            val source = SdkPaths.detectSource(sdkHome)
+            val otpMajor = runWithEdtGuard("Detecting Elixir SDK...") {
+                ElixirBuildInfo.elixirOtpRelease(wslCompat.canonicalizePath(sdkHome))
             }
-            val hexdocUrlVirtualFile = VirtualFileManager.getInstance().findFileByUrl(hexdocUrlBuilder.toString())
-            if (hexdocUrlVirtualFile != null) {
-                val documentationRootType =
-                    org.elixir_lang.sdk.Type
-                        .documentationRootType()
-                if (documentationRootType != null) {
-                    sdkModificator.addRoot(hexdocUrlVirtualFile, documentationRootType)
+            return buildString {
+                if (source != null) {
+                    append(source).append(" ")
+                }
+                append("Elixir ").append(version)
+                if (otpMajor != null) {
+                    append(" (OTP ").append(otpMajor).append(")")
                 }
             }
-        }
-
-        private fun addDocumentationPath(
-            sdkModificator: SdkModificator,
-            releaseVersion: String?,
-            ebinPath: Path,
-        ) {
-            val appName = ebinPath.parent.fileName.toString()
-            addDocumentationPath(sdkModificator, releaseVersion, appName)
-        }
-
-        private fun addDocumentationPaths(sdkModificator: SdkModificator) {
-            val releaseVersion = releaseVersion(sdkModificator)
-            HomePath.eachEbinPath(
-                sdkModificator.homePath,
-            ) { ebinPath: Path -> addDocumentationPath(sdkModificator, releaseVersion, ebinPath) }
-        }
-
-        private fun addSourcePaths(sdkModificator: SdkModificator) {
-            HomePath.eachEbinPath(
-                sdkModificator.homePath,
-            ) { ebinPath: Path -> addSourcePath(sdkModificator, ebinPath) }
-        }
-
-        private fun addSourcePath(
-            sdkModificator: SdkModificator,
-            libFile: File,
-        ) {
-            val sourcePath = VfsUtil.findFileByIoFile(libFile, true)
-            if (sourcePath != null) {
-                sdkModificator.addRoot(sourcePath, OrderRootType.SOURCES)
-            }
-        }
-
-        private fun addSourcePath(
-            sdkModificator: SdkModificator,
-            ebinPath: Path,
-        ) {
-            val parentPath = ebinPath.parent
-            val libPath = Paths.get(parentPath.toString(), "lib")
-            val libFile = libPath.toFile()
-            if (libFile.exists()) {
-                addSourcePath(sdkModificator, libFile)
-            }
-        }
-
-        private fun configureSdkPaths(sdk: Sdk) {
-            val sdkModificator = sdk.sdkModificator
-
-            // Configure base paths
-            org.elixir_lang.sdk.Type.addCodePaths(sdkModificator)
-            addDocumentationPaths(sdkModificator)
-            addSourcePaths(sdkModificator)
-
-            // Configure internal Erlang SDK - this will now create and fully setup the Erlang SDK synchronously
-            configureInternalErlangSdk(sdk, sdkModificator)
-
-            // Use coroutine-based approach for final commit for IntelliJ 2025.2+ compatibility
-            runBlockingCancellable {
-                writeAction {
-                    sdkModificator.commitChanges()
-                }
-            }
-        }
-
-        private fun configureInternalErlangSdk(
-            elixirSdk: Sdk,
-            elixirSdkModificator: SdkModificator,
-        ): Sdk? {
-            val erlangSdk = defaultErlangSdk()
-            if (erlangSdk != null) {
-                val sdkAdditionData: com.intellij.openapi.projectRoots.SdkAdditionalData =
-                    SdkAdditionalData(erlangSdk, elixirSdk)
-                elixirSdkModificator.sdkAdditionalData = sdkAdditionData
-                addNewCodePathsFromInternErlangSdk(elixirSdk, erlangSdk, elixirSdkModificator)
-            }
-            return erlangSdk
         }
 
         @JvmStatic
-        fun addNewCodePathsFromInternErlangSdk(
-            elixirSdk: Sdk,
-            internalErlangSdk: Sdk,
-            elixirSdkModificator: SdkModificator,
-        ) {
-            codePathsFromInternalErlangSdk(
-                elixirSdk,
-                internalErlangSdk,
-                elixirSdkModificator,
-                { sdkModificator, configuredRoots, expandedInternalRoot, type ->
-                    if (expandedInternalRoot !in configuredRoots) {
-                        sdkModificator.addRoot(expandedInternalRoot, type)
-                    }
-                },
-            )
-        }
-
-        @JvmStatic
-        fun removeCodePathsFromInternalErlangSdk(
-            elixirSdk: Sdk,
-            internalErlangSdk: Sdk,
-            elixirSdkModificator: SdkModificator,
-        ) {
-            codePathsFromInternalErlangSdk(
-                elixirSdk,
-                internalErlangSdk,
-                elixirSdkModificator,
-                { sdkModificator, _, expandedInternalRoot, type ->
-                    sdkModificator.removeRoot(expandedInternalRoot, type)
-                },
-            )
-        }
-
-        private fun codePathsFromInternalErlangSdk(
-            elixirSdk: Sdk,
-            internalErlangSdk: Sdk,
-            elixirSdkModificator: SdkModificator,
-            sdkModificatorRootTypeConsumer: (SdkModificator, Array<VirtualFile>, VirtualFile, OrderRootType) -> Unit,
-        ) {
-            val internalSdkType = internalErlangSdk.sdkType as SdkType
-            val elixirSdkType = elixirSdk.sdkType as SdkType
-            for (type in OrderRootType.getAllTypes()) {
-                if (internalSdkType.isRootTypeApplicable(type) && elixirSdkType.isRootTypeApplicable(type)) {
-                    val internalRoots = internalErlangSdk.sdkModificator.getRoots(type)
-                    val configuredRoots = elixirSdkModificator.getRoots(type)
-                    for (internalRoot in internalRoots) {
-                        for (expandedInternalRoot in expandInternalErlangSdkRoot(internalRoot, type)) {
-                            sdkModificatorRootTypeConsumer(
-                                elixirSdkModificator,
-                                configuredRoots,
-                                expandedInternalRoot,
-                                type
-                            )
-                        }
-                    }
+        internal fun suggestSdkNameForHome(sdkHome: String, resolvedVersion: String?): String {
+            val source = SdkPaths.detectSource(sdkHome)
+            val version = ElixirVersionDetector.elixirVersion(sdkHome, resolvedVersion)
+            val base = buildString {
+                if (source != null) {
+                    append(source).append(" ")
                 }
-            }
-        }
-
-        private fun expandInternalErlangSdkRoot(
-            internalRoot: VirtualFile,
-            type: OrderRootType,
-        ): Iterable<VirtualFile> {
-            val expandedInternalRootList: List<VirtualFile>
-            if (type === OrderRootType.CLASSES) {
-                val path = internalRoot.path
-
-                /* Erlang SDK from intellij-erlang uses lib/erlang/lib as class path, but intellij-elixir needs the ebin
-               directories under lib/erlang/lib/APP-VERSION/ebin that works as a code path used by `-pa` argument to
-               `erl.exe`
-
-               For ASDF the path ends in erlang/VERSION/lib, in both cases, going to the parent directory will get the
-               right ebin paths from `eachEbinPath` */
-                if (path.endsWith("lib")) {
-                    expandedInternalRootList = ArrayList()
-                    val parentPath = Paths.get(path).parent.toString()
-                    HomePath.eachEbinPath(parentPath) { ebinPath: Path? ->
-                        ebinPathChainVirtualFile(
-                            ebinPath!!,
-                        ) { virtualFile: VirtualFile? ->
-                            virtualFile?.let { expandedInternalRootList.add(it) }
-                        }
-                    }
+                append("Elixir ")
+                if (version != null) {
+                    append(version)
                 } else {
-                    expandedInternalRootList = listOf(internalRoot)
+                    append("at ").append(sdkHome)
                 }
-            } else {
-                expandedInternalRootList = listOf(internalRoot)
             }
-            return expandedInternalRootList
+            return org.elixir_lang.sdk.Type.appendWslSuffix(base, sdkHome)
+        }
+
+        /**
+         * Produces a variant-qualified SDK name that includes the compiled-against OTP major and the
+         * full Erlang release version, so two Elixir SDKs with the same base version but different
+         * Erlang pairings get distinct names in the SDK table.
+         *
+         * Example: `"mise Elixir 1.13.4-otp-24 (Erlang 24.3.4.6)"`
+         *
+         * Falls back to [Type.suggestSdkNameForHome] when [otpMajor] is null (pre-Elixir-1.6 installs
+         * where BEAM parsing is unavailable).
+         */
+        @JvmStatic
+        internal fun suggestSdkNameForHome(
+            sdkHome: String,
+            resolvedVersion: String?,
+            otpMajor: String?,
+            erlangFullVersion: String?,
+        ): String {
+            if (otpMajor == null) return suggestSdkNameForHome(sdkHome, resolvedVersion)
+            val source = SdkPaths.detectSource(sdkHome)
+            val elixirVersion = ElixirVersionDetector.elixirVersion(sdkHome, resolvedVersion)
+            val base = buildString {
+                if (source != null) {
+                    append(source).append(" ")
+                }
+                append("Elixir ")
+                if (elixirVersion != null) {
+                    append(elixirVersion).append("-otp-").append(otpMajor)
+                } else {
+                    append("at ").append(sdkHome)
+                }
+                if (erlangFullVersion != null) {
+                    append(" (Erlang ").append(erlangFullVersion).append(")")
+                }
+            }
+            return org.elixir_lang.sdk.Type.appendWslSuffix(base, sdkHome)
         }
 
         @JvmStatic
-        @TestOnly
-        fun createMockSdk(
-            sdkHome: String,
-            release: Release,
-        ): Sdk {
-            val sdk: Sdk = ProjectJdkImpl(release.toString(), instance)
-            val sdkModificator = sdk.sdkModificator
-            sdkModificator.homePath = sdkHome
-            sdkModificator.versionString =
-                getVersionString(release) // must be set after home path, otherwise setting home path clears the version string
-            ApplicationManager.getApplication().runWriteAction { sdkModificator.commitChanges() }
-            configureSdkPaths(sdk)
-            return sdk
-        }
+        @RequiresBackgroundThread
+        fun canonicalVersion(sdk: Sdk): String? = ElixirVersionDetector.canonicalVersion(sdk)
 
-        private fun getDefaultDocumentationUrl(version: Release?): String? =
-            if (version == null) null else "http://elixir-lang.org/docs/stable/elixir/"
+        @JvmStatic
+        internal fun setupSdkTableListener() {
+            val messageBus = ApplicationManager.getApplication().messageBus
+            messageBus.connect().subscribe(ProjectJdkTable.JDK_TABLE_TOPIC, object : ProjectJdkTable.Listener {
+                override fun jdkRemoved(jdk: Sdk) {
+                    // When an Erlang SDK is removed, clean up any Elixir SDKs that reference it
+                    if (staticIsValidDependency(jdk)) {
+                        cleanupOrphanedElixirSdkReferences(jdk)
+                    }
 
-        private fun defaultErlangSdkHomePath(): String? =
-            // Will suggest newest version, unlike `intellij-erlang`
-            findInstance(org.elixir_lang.sdk.erlang.Type::class.java).suggestHomePath()
-
-        private fun createDefaultErlangSdk(
-            projectJdkTable: ProjectJdkTable,
-            erlangSdkType: SdkType,
-            homePath: String,
-        ): Sdk? {
-            val sdkName = erlangSdkType.suggestSdkName("Default " + erlangSdkType.name, homePath)
-            val projectJdkImpl = ProjectJdkImpl(sdkName, erlangSdkType)
-            var modificator = projectJdkImpl.sdkModificator
-            modificator.homePath = homePath
-
-            return if (projectJdkImpl.versionString != null) {
-                // First commit the basic SDK setup
-                modificator.commitChanges()
-
-                // Add to SDK table and setup paths using coroutine-based approach
-                runBlockingCancellable {
-                    writeAction {
-                        projectJdkTable.addJdk(projectJdkImpl)
-
-                        // Setup SDK paths - this will work properly within the write action
-                        erlangSdkType.setupSdkPaths(projectJdkImpl)
+                    // When an Elixir SDK is removed, clean up project references
+                    if (jdk.sdkType is Type) {
+                        cleanupProjectReferences(jdk)
                     }
                 }
 
-                projectJdkImpl
-            } else {
-                null
+                override fun jdkNameChanged(jdk: Sdk, previousName: String) {
+                    // When an Erlang SDK is renamed, update any Elixir SDKs that reference the old name
+                    if (staticIsValidDependency(jdk)) {
+                        updateElixirSdkReferencesAfterRename(jdk, previousName)
+                    }
+                }
+            })
+        }
+
+        private fun cleanupProjectReferences(deletedSdk: Sdk) {
+            LOG.info("Elixir SDK removed: ${deletedSdk.name}, cleaning up project references")
+            com.intellij.openapi.project.ProjectManager.getInstance().openProjects.forEach { project ->
+                val projectRootManager = ProjectRootManager.getInstance(project)
+                if (projectRootManager.projectSdk == deletedSdk) {
+                    WriteActions.runWriteActionLater {
+                        projectRootManager.projectSdk = null
+                        LOG.info("Cleared removed Elixir SDK '${deletedSdk.name}' from project '${project.name}'")
+                    }
+                }
             }
         }
 
-        private fun createDefaultErlangSdk(
-            projectJdkTable: ProjectJdkTable,
-            erlangSdkType: SdkType,
-        ): Sdk? =
-            defaultErlangSdkHomePath()?.let { homePath ->
-                createDefaultErlangSdk(projectJdkTable, erlangSdkType, homePath)
+        private fun cleanupOrphanedElixirSdkReferences(deletedErlangSdk: Sdk) {
+            val deletedName = deletedErlangSdk.name
+            LOG.info("Erlang SDK '$deletedName' removed, checking for orphaned Elixir SDK references")
+
+            val projectJdkTable = ProjectJdkTable.getInstance()
+            val elixirSdks = projectJdkTable.allJdks.filter { it.sdkType is Type }
+
+            // Use getErlangSdkName() to check stored reference without triggering auto-discovery
+            val orphanedElixirSdks = elixirSdks.filter { elixirSdk ->
+                val additionalData = elixirSdk.sdkAdditionalData as? SdkAdditionalData
+                additionalData?.getErlangSdkName() == deletedName
             }
+
+            if (orphanedElixirSdks.isEmpty()) {
+                return
+            }
+
+            LOG.warn("Erlang SDK '$deletedName' was deleted and is referenced by ${orphanedElixirSdks.size} Elixir SDK(s)")
+            orphanedElixirSdks.forEach {
+                LOG.warn("Elixir SDK '${it.name}' references deleted Erlang SDK '$deletedName'")
+            }
+
+            // Show warning notification instructing user to reconfigure
+            ApplicationManager.getApplication().invokeLater {
+                val notificationGroup = com.intellij.notification.NotificationGroupManager.getInstance()
+                    .getNotificationGroup("Elixir")
+
+                val dependentNames = orphanedElixirSdks.joinToString("<br>") { "  • <b>${it.name}</b>" }
+                val message = buildString {
+                    append("Erlang SDK '<b>$deletedName</b>' was deleted.<br><br>")
+                    append("The following Elixir SDKs reference it and must be reconfigured:<br>")
+                    append(dependentNames)
+                    append("<br><br>")
+                    val settingsTarget = SdkSettingsOpener.getInstance().targetName()
+                    append("Please configure the Elixir SDKs in $settingsTarget and select a different Erlang SDK<br>")
+                    append("for each of these Elixir SDKs.")
+                }
+
+                val notification = notificationGroup.createNotification(
+                    "Erlang SDK Deleted",
+                    message,
+                    com.intellij.notification.NotificationType.WARNING
+                )
+                notification.addAction(NotificationAction.create("Configure Elixir SDKs") { event, _ ->
+                    SdkSettingsOpener.getInstance().open(event)
+                })
+
+                notification.notify(null)
+            }
+        }
+
+        private fun updateElixirSdkReferencesAfterRename(renamedErlangSdk: Sdk, previousName: String) {
+            val newName = renamedErlangSdk.name
+            LOG.info("Erlang SDK renamed from '$previousName' to '$newName'")
+
+            val projectJdkTable = ProjectJdkTable.getInstance()
+            val elixirSdks = projectJdkTable.allJdks.filter { it.sdkType is Type }
+
+            for (elixirSdk in elixirSdks) {
+                val additionalData = elixirSdk.sdkAdditionalData as? SdkAdditionalData ?: continue
+
+                // Use getErlangSdkName() to check stored reference
+                if (additionalData.getErlangSdkName() != previousName) continue
+
+                LOG.info("Updating Elixir SDK '${elixirSdk.name}' reference from '$previousName' to '$newName'")
+                ApplicationManager.getApplication().runWriteAction {
+                    ElixirSdkMutation.applyDependencySelection(elixirSdk, renamedErlangSdk)
+                }
+            }
+        }
+
+        private fun getDefaultDocumentationUrl(version: String?): String? =
+            if (version == null) null else "https://elixir-lang.org/docs/stable/elixir/"
 
         @JvmStatic
         fun erlangSdkType(): SdkType =
@@ -522,95 +430,8 @@ ELIXIR_SDK_HOME
                 EP_NAME.extensionList.find { sdkType -> sdkType.name == "Erlang SDK" }
             } ?: findInstance(org.elixir_lang.sdk.erlang.Type::class.java)
 
-        private fun defaultErlangSdk(): Sdk? {
-            val projectJdkTable = ProjectJdkTable.getInstance()
-            val erlangSdkType = erlangSdkType()
-            val mostRecentErlangSdk = projectJdkTable.findMostRecentSdkOfType(erlangSdkType)
-            return mostRecentErlangSdk
-                ?: createDefaultErlangSdk(projectJdkTable, erlangSdkType)
-        }
-
         @JvmStatic
         val instance: Type
             get() = findInstance(Type::class.java)
-
-        fun getNonNullRelease(element: PsiElement): Release = getRelease(element) ?: Release.LATEST
-
-        private fun getRelease(element: PsiElement): Release? = getRelease(mostSpecificSdk(element))
-
-        @JvmStatic
-        @Contract("null -> null")
-        fun getRelease(sdk: Sdk?): Release? =
-            if (sdk != null && sdk.sdkType === instance) {
-                Release.fromString(sdk.versionString)
-                    ?: sdk.homePath?.let { Release.fromString(File(it).name) }
-            } else {
-                null
-            }
-
-        private fun getVersionString(version: Release?): String? = version?.toString()
-
-        private fun putIfDirectory(
-            homePathByVersion: MutableMap<Version, String>,
-            @Suppress("SameParameterValue") version: Version,
-            homePath: String,
-        ) {
-            val homeFile = File(homePath)
-            if (homeFile.isDirectory) {
-                homePathByVersion[version] = homePath
-            }
-        }
-
-        private fun moduleSdk(module: Module): Sdk? = sdk(ModuleRootManager.getInstance(module).sdk)
-
-        private fun projectSdk(project: Project): Sdk? = sdk(ProjectRootManager.getInstance(project).projectSdk)
-
-        private fun sdk(sdk: Sdk?): Sdk? =
-            if (sdk != null && sdk.sdkType === instance) {
-                sdk
-            } else {
-                null
-            }
-
-        @JvmStatic
-        fun mostSpecificSdk(module: Module): Sdk? =
-            FacetManager.getInstance(module).getFacetByType(Facet.ID)?.sdk
-                ?: moduleSdk(module)
-                ?: mostSpecificSdk(module.project)
-
-        fun mostSpecificSdk(psiElement: PsiElement): Sdk? {
-            val project = psiElement.project
-
-            return if (!project.isDisposed) {
-                if (ProjectFileIndex.SERVICE.getInstance(project) != null) {
-                    // Use a background thread to perform the ReadAction
-                    val module =
-                        ApplicationManager
-                            .getApplication()
-                            .executeOnPooledThread<Module?> {
-                                try {
-                                    ReadAction.compute<Module, Throwable> {
-                                        ModuleUtilCore.findModuleForPsiElement(psiElement)
-                                    }
-                                } catch (_: AlreadyDisposedException) {
-                                    null
-                                }
-                            }.get() // Wait for the result
-
-                    if (module != null) {
-                        mostSpecificSdk(module)
-                    } else {
-                        mostSpecificSdk(project)
-                    }
-                } else {
-                    mostSpecificSdk(project)
-                }
-            } else {
-                null
-            }
-        }
-
-        @JvmStatic
-        fun mostSpecificSdk(project: Project): Sdk? = projectSdk(project)
     }
 }

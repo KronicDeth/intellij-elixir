@@ -4,12 +4,12 @@ import com.ericsson.otp.erlang.OtpErlangList
 import com.ericsson.otp.erlang.OtpErlangObject
 import com.ericsson.otp.erlang.OtpErlangTuple
 import org.elixir_lang.NameArity
-import org.elixir_lang.beam.Decompiler
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode.ifTag
 import org.elixir_lang.beam.decompiler.InfixOperator
 import org.elixir_lang.beam.decompiler.PrefixOperator
 import org.elixir_lang.beam.decompiler.Unquoted
+import org.elixir_lang.beam.decompiler.decompiler
 import org.elixir_lang.beam.term.inspect
 import org.elixir_lang.code.Identifier.inspectAsFunction
 import org.elixir_lang.toOtpErlangList
@@ -40,6 +40,16 @@ object Call {
         return "(${nameString}).($argumentsString)"
     }
 
+    private fun inlineNamedFunctionCallToMacroString(name: OtpErlangTuple, term: OtpErlangTuple, scope: Scope): String {
+        // An immediately-invoked Erlang named fun `(fun F(...) -> ... end)(Args)`.  NamedFun already
+        // renders the target as a self-delimiting, parenthesized `(name = fn ... end)`, so no extra
+        // wrapping is needed - just append the anonymous call: `(name = fn ... end).(args)`.
+        val nameString = NamedFun.toMacroStringDeclaredScope(name, scope).macroString.string
+        val argumentsString = argumentsString(term)
+
+        return "${nameString}.($argumentsString)"
+    }
+
     private fun argumentsString(term: OtpErlangTuple): String =
             toArguments(term)
                     ?.let { argumentsToString(it) }
@@ -68,7 +78,7 @@ object Call {
                 if (argumentList != null) {
                     val nameArity = NameArity(atomValue, argumentList.arity())
 
-                    when (Decompiler.decompiler("erlang", nameArity)) {
+                    when (decompiler("erlang", nameArity)) {
                         is PrefixOperator, is InfixOperator, is Unquoted -> {
                             val function = inspect(elixirAtom)
 
@@ -134,6 +144,9 @@ object Call {
             } ?:
             Fun.ifTo(name) {
                 inlineAnonymousFunctionCallToMacroString(it, term, scope)
+            } ?:
+            NamedFun.ifTo(name) {
+                inlineNamedFunctionCallToMacroString(it, term, scope)
             } ?:
             namedFunctionCallToString(term)
         }

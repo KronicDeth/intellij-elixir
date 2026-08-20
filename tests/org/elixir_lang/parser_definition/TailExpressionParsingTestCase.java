@@ -1,7 +1,7 @@
 package org.elixir_lang.parser_definition;
 
 /**
- * Created by luke.imhoff on 12/26/14.
+ * Created by kadie.enheduanna.inanna on 12/26/14.
  */
 public class TailExpressionParsingTestCase extends ParsingTestCase {
     public void testEmptyParentheses() {

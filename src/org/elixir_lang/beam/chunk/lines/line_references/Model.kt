@@ -4,7 +4,7 @@ import org.elixir_lang.beam.chunk.lines.LineReference
 import javax.swing.table.AbstractTableModel
 
 class Model(private val lineReferenceList: List<LineReference>): AbstractTableModel() {
-    override fun getColumnClass(columnIndex: Int): Class<*> = Integer::class.java
+    override fun getColumnClass(columnIndex: Int): Class<*> = Int::class.javaObjectType
     override fun getColumnCount(): Int = 3
 
     override fun getColumnName(columnIndex: Int): String =

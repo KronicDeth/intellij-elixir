@@ -1,11 +1,11 @@
 package org.elixir_lang.psi.impl
 
 import com.intellij.navigation.ItemPresentation
-import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiFile
 import com.intellij.usageView.UsageViewUtil
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.annotator.Parameter
 import org.elixir_lang.beam.psi.BeamFileImpl
 import org.elixir_lang.navigation.item_presentation.KeywordKey
@@ -24,6 +24,7 @@ import java.io.File
 import javax.swing.Icon
 
 object PresentationImpl {
+    @RequiresReadLock
     @JvmStatic
     fun getPresentation(call: Call): ItemPresentation =
             when {

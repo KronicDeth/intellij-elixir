@@ -4,7 +4,8 @@ import com.ericsson.otp.erlang.OtpErlangBinary
 import com.ericsson.otp.erlang.OtpErlangObject
 import com.intellij.lang.documentation.DocumentationMarkup
 import com.intellij.lang.documentation.DocumentationProvider
-import com.intellij.psi.DummyBlockType.DummyBlock
+import com.intellij.lang.parser.GeneratedParserUtilBase.DummyBlock
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.TextRange
@@ -15,28 +16,28 @@ import org.elixir_lang.beam.chunk.beam_documentation.docs.documented.Hidden
 import org.elixir_lang.beam.chunk.beam_documentation.docs.documented.MarkdownByLanguage
 import org.elixir_lang.beam.chunk.beam_documentation.docs.documented.None
 import org.elixir_lang.beam.psi.BeamFileImpl
-import org.elixir_lang.errorreport.Logger
+import org.elixir_lang.beam.psi.impl.CallDefinitionImpl
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.CallDefinitionClause.enclosingModularMacroCall
+import org.elixir_lang.psi.ModuleAttribute.isDocumentationName
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.call.macroChildCallSequence
 import org.elixir_lang.psi.impl.childExpressions
 import org.elixir_lang.psi.impl.identifierName
 import org.elixir_lang.psi.impl.stripAccessExpression
-import org.elixir_lang.psi.stub.type.call.Stub
 import org.elixir_lang.psi.stub.type.call.Stub.isModular
-import org.elixir_lang.reference.ModuleAttribute.Companion.isDocumentationName
 import org.elixir_lang.reference.Resolver
 import org.elixir_lang.structure_view.element.Callback
 import org.intellij.markdown.html.HtmlGenerator
 import org.intellij.markdown.parser.MarkdownParser
-import java.lang.Integer.max
-import java.lang.Integer.min
 import java.util.function.Consumer
 import java.util.regex.Pattern
+import com.intellij.psi.DummyBlockType.DummyBlock as ExperimentalPsiDummyBlock
 
 
-class ElixirDocumentationProvider : DocumentationProvider {
+private val LOG = logger<ElixirDocumentationProvider>()
+
+internal class ElixirDocumentationProvider : DocumentationProvider {
     override fun generateDoc(element: PsiElement, originalElement: PsiElement?): String? =
         fetchDocs(element)?.let { formatDocs(element.project, it) }
 
@@ -50,27 +51,7 @@ class ElixirDocumentationProvider : DocumentationProvider {
 
     private fun markdown(comment: PsiDocCommentBase): String? =
         when (comment) {
-            is Comment -> {
-                comment.moduleAttribute.moduleAttributeValue()?.let { quote ->
-                    when (quote) {
-                        is Heredoc -> {
-                            val prefixLength = quote.heredocPrefix.textLength
-
-                            quote.heredocLineList.joinToString("") { heredocLine ->
-                                val text = heredocLine.text
-                                val textLengthWithoutNewline = text.length - 1
-                                val startIndex = min(max(textLengthWithoutNewline, 0), prefixLength)
-
-                                heredocLine.text.substring(startIndex)
-                            }
-                        }
-
-                        is ElixirLine -> quote.body?.text
-                        else -> null
-                    }
-                }
-            }
-
+            is Comment -> comment.moduleAttribute.moduleAttributeValue()?.documentationMarkdownText()
             else -> null
         }
 
@@ -84,6 +65,8 @@ class ElixirDocumentationProvider : DocumentationProvider {
     }
 
     private tailrec fun collectDocComments(element: PsiElement, sink: Consumer<in PsiDocCommentBase>) {
+        // ExperimentalPsiDummyBlock unstable, but used in 2026.1 so we need to handle it.
+        @Suppress("UnstableApiUsage")
         when (element) {
             is Call -> collectDocComments(element, sink)
             is ElixirAccessExpression -> collectDocComments(element.stripAccessExpression(), sink)
@@ -97,11 +80,13 @@ class ElixirDocumentationProvider : DocumentationProvider {
             is Parent,
                 // Aliases
             is QualifiableAlias,
-            is PsiErrorElement
-            -> Unit
+            is PsiErrorElement,
+                // Errors seen in 2026.1 with this type, so ignoring.
+            is ExperimentalPsiDummyBlock
+                -> Unit
 
             else -> {
-                Logger.error(javaClass, "Don't know how to collect doc comments", element)
+                LOG.warn("Don't know how to collect doc comments for ${element.javaClass.name}")
             }
         }
     }
@@ -191,10 +176,7 @@ class ElixirDocumentationProvider : DocumentationProvider {
                     }
 
                     resolveResults
-                        .let { Resolver.preferred(context, false, it) }
-                        .map { it.element }
-                        .let { Resolver.preferSource(it) }
-                        .firstOrNull()
+                        .let { Resolver.preferred(context, false, it) }.firstNotNullOfOrNull { it.element }
                 }
 
                 "c" -> {
@@ -238,10 +220,7 @@ class ElixirDocumentationProvider : DocumentationProvider {
                                 ?.let(Callback.Companion::`is`)
                                 ?: false
                         }
-                        .let { Resolver.preferred(context, false, it) }
-                        .map { it.element }
-                        .let { Resolver.preferSource(it) }
-                        .firstOrNull()
+                        .let { Resolver.preferred(context, false, it) }.firstNotNullOfOrNull { it.element }
                 }
 
                 "t" -> {
@@ -266,15 +245,11 @@ class ElixirDocumentationProvider : DocumentationProvider {
                     resolveResults
                         .let { Resolver.preferred(context, false, it) }
                         .mapNotNull { it.element }
-                        .let { Resolver.preferSource(it) }
                         .firstOrNull()
                 }
 
                 else -> {
-                    Logger.error(
-                        javaClass, "Don't know how to find element for link (${link}) of kind (${kind})",
-                        context
-                    )
+                    LOG.warn("Don't know how to find element for link ($link) of kind ($kind) for ${context.javaClass.name}")
 
                     null
                 }
@@ -284,8 +259,7 @@ class ElixirDocumentationProvider : DocumentationProvider {
 
             modulars
                 .toList()
-                .let { Resolver.preferUnderSameModule(context, it) }
-                .let { Resolver.preferSource(it) }
+                .let { Resolver.preferredElements(context, it) }
                 .firstOrNull()
         }
     }
@@ -299,37 +273,69 @@ class ElixirDocumentationProvider : DocumentationProvider {
         return contextElement?.let(::getCustomDocumentationElement)
     }
 
-    private tailrec fun getCustomDocumentationElement(contextElement: PsiElement): PsiElement? = when (contextElement) {
-        is LeafPsiElement, is ElixirIdentifier -> getCustomDocumentationElement(contextElement.parent)
-        is Call -> {
+    private tailrec fun getCustomDocumentationElement(contextElement: PsiElement): PsiElement? = when {
+        contextElement is LeafPsiElement || contextElement is ElixirIdentifier || contextElement is ElixirRelativeIdentifier ->
+            getCustomDocumentationElement(contextElement.parent)
+
+        contextElement is ElixirAtom -> {
+            contextElement.reference
+                ?.let { it as? PsiPolyVariantReference }
+                ?.multiResolve(false)
+                ?.filter(ResolveResult::isValidResult)
+                ?.mapNotNull(ResolveResult::getElement)
+                ?.filterIsInstance<PsiNamedElement>()
+                ?.let { Resolver.preferSource(it) }
+                ?.firstOrNull()
+        }
+
+        contextElement is Call -> {
             contextElement
                 .getReference()
                 ?.let { it as PsiPolyVariantReference }
                 ?.let { reference ->
-                    reference
-                        .multiResolve(false)
+                    val allResults = reference.multiResolve(false)
+
+                    val validElements = allResults
                         .filter(ResolveResult::isValidResult)
                         .mapNotNull(ResolveResult::getElement)
-                        .filterIsInstance<Call>()
-                        .singleOrNull { CallDefinitionClause.`is`(it) }
+
+                    // Prefer source Call elements (CallDefinitionClause), fall back to BEAM stubs (CallDefinitionImpl)
+                    fun bestMatch(elements: List<PsiElement>): PsiElement? =
+                        elements.filterIsInstance<Call>().firstOrNull { CallDefinitionClause.`is`(it) }
+                            ?: elements.filterIsInstance<CallDefinitionImpl<*>>().firstOrNull()
+
+                    // If no exact arity match (validResult), fall back to results with an exact name match
+                    // from the same module (e.g., Enum.map/2 when call site has wrong arity).
+                    // multiResolve uses startsWith for name matching (for completion), so we must
+                    // filter to exact name matches to avoid showing docs for map_size when hovering map.
+                    bestMatch(validElements) ?: run {
+                        val callName = contextElement.functionName()
+                        val exactNameElements = allResults
+                            .mapNotNull(ResolveResult::getElement)
+                            .filter { element ->
+                                when (element) {
+                                    is CallDefinitionImpl<*> -> element.exportedName() == callName
+                                    is Call -> CallDefinitionClause.nameArityInterval(element, ResolveState.initial())
+                                        ?.name == callName
+
+                                    else -> false
+                                }
+                            }
+                        bestMatch(exactNameElements)
+                    }
                 }
         }
 
-        is QualifiableAlias -> {
-            val reference = contextElement.getReference()
+        contextElement is QualifiableAlias && contextElement.getReference() != null ->
+            contextElement.getReference()!!
+                .let { it as PsiPolyVariantReference }
+                .multiResolve(false)
+                .filter(ResolveResult::isValidResult)
+                .mapNotNull(ResolveResult::getElement)
+                .filterIsInstance<Call>()
+                .singleOrNull { isModular(it) }
 
-            if (reference != null) {
-                reference
-                    .let { it as PsiPolyVariantReference }
-                    .multiResolve(false)
-                    .filter(ResolveResult::isValidResult)
-                    .mapNotNull(ResolveResult::getElement)
-                    .filterIsInstance<Call>()
-                    .singleOrNull { Stub.isModular(it) }
-            } else {
-                getCustomDocumentationElement(contextElement.parent)
-            }
-        }
+        contextElement is QualifiableAlias -> getCustomDocumentationElement(contextElement.parent)
 
         else -> null
     }
@@ -477,7 +483,7 @@ class ElixirDocumentationProvider : DocumentationProvider {
                     .let { html(project, it) }
 
             else -> {
-                Logger.error(javaClass, "Don't know how to render deprecated metadata", otpErlangObject)
+                LOG.warn("Don't know how to render deprecated metadata: $otpErlangObject")
 
                 ""
             }
@@ -492,9 +498,13 @@ class ElixirDocumentationProvider : DocumentationProvider {
     }
 
     private fun fetchDocs(element: PsiElement): FetchedDocs? =
-        // If resolves to .beam file then fetch docs from the decompiled docs
+    // For compiled Beam elements, prefer docs from the decompiled source mirror so hover uses
+        // the cached inline docs from decompilation.
         if (element.containingFile?.originalFile is BeamFileImpl) {
-            BeamDocsHelper.fetchDocs(element)
+            val sourceElement = (element as? PsiCompiledElement)?.mirror ?: element.navigationElement
+
+            SourceFileDocsHelper.fetchDocs(sourceElement)
+                ?: BeamDocsHelper.fetchDocs(element)
         } else {
             SourceFileDocsHelper.fetchDocs(element)
         }

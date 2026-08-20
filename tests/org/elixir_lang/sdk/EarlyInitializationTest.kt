@@ -1,6 +1,8 @@
 package org.elixir_lang.sdk
 
+import com.intellij.testFramework.TestLoggerFactory
 import org.junit.Assert.assertNotNull
+import org.junit.Rule
 import org.junit.Test
 
 /**
@@ -9,11 +11,13 @@ import org.junit.Test
  * This catches bugs where companion object init blocks access services
  * that aren't available during early plugin initialization (before COMPONENTS_LOADED state).
  *
- * Note: This test intentionally does NOT extend BasePlatformTestCase
+ * Note: This test intentionally does NOT extend PlatformTestCase
  * because we want to test class loading WITHOUT a full IDE context.
  */
 class EarlyInitializationTest {
-
+    @Rule
+    @JvmField
+    val testWatcher = TestLoggerFactory.createTestWatcher()
     /**
      * Verify that loading org.elixir_lang.sdk.elixir.Type does not throw.
      *

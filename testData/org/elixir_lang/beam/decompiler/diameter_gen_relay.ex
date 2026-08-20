@@ -67,5 +67,5 @@ defmodule :diameter_gen_relay do
 
   # Private Functions
 
-  def empty(name, opts), do: :diameter_gen.empty(name, opts)
+  defp empty(name, opts), do: :diameter_gen.empty(name, opts)
 end

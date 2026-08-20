@@ -4,12 +4,11 @@ package org.elixir_lang.psi.impl
 
 import com.ericsson.otp.erlang.*
 import com.intellij.lang.ASTNode
-import com.intellij.openapi.application.runReadAction
-import com.intellij.openapi.util.Computable
 import com.intellij.psi.*
 import com.intellij.psi.impl.source.tree.Factory
 import com.intellij.psi.tree.IElementType
 import com.intellij.psi.tree.TokenSet
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.ElixirLanguage
 import org.elixir_lang.Macro
 import org.elixir_lang.mix.project.computeReadAction
@@ -21,6 +20,8 @@ import org.elixir_lang.psi.impl.ParentImpl.addChildTextCodePoints
 import org.elixir_lang.psi.impl.ParentImpl.elixirCharList
 import org.elixir_lang.psi.impl.ParentImpl.elixirString
 import org.elixir_lang.psi.operation.*
+import org.elixir_lang.psi.quoting.QuotingDialect
+import org.elixir_lang.psi.quoting.QuotingDialectResolver.dialectFor
 import org.jetbrains.annotations.Contract
 import java.lang.Double
 import java.lang.Long
@@ -59,7 +60,14 @@ fun ElixirStabBody.quote(metadata: OtpErlangList): OtpErlangObject =
                 }
                 .map { it as Quotable }
                 .map { it.quote() }
-                .let { QuotableImpl.buildBlock(it.toList(), metadata) }
+                .let {
+                    QuotableImpl.buildBlock(
+                        it.toList(),
+                        metadata,
+                        QuotableImpl.rearrangesUnaryOperators(this),
+                        QuotableImpl.mergesEnclosingParenMetadataOntoBlock(this)
+                    )
+                }
 
 object QuotableImpl {
     private val AMBIGUOUS_OP = OtpErlangAtom("ambiguous_op")
@@ -91,9 +99,12 @@ object QuotableImpl {
         return OtpErlangTuple(children.map { it as Quotable }.map(Quotable::quote).toTypedArray())
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun quote(infix: Infix): OtpErlangObject {
+        ambiguousDualOperatorCall(infix)?.let { return it }
+
         val quotedLeftOperand = infix.leftOperand()!!.quote()
 
         val operator = infix.operator()
@@ -108,6 +119,63 @@ object QuotableImpl {
                 metadata(operator),
                 quotedLeftOperand,
                 quotedRightOperand
+        )
+    }
+
+    /**
+     * `one +(two)` quoted as the no-parentheses call `one(+two)` - what Elixir does from 1.17.0 - or
+     * `null` when this is not that shape or the dialect predates it, leaving the caller's
+     * binary-operation quoting correct.
+     *
+     * The plugin's lexer implements the pre-1.17.0 rule, so `one +two` already parses as a call and
+     * quotes through [quote] for `UnqualifiedNoParenthesesCall` instead. What arrives here as an
+     * operation is only the set 1.17.0 added - a container, `%` or the opposite sign after the sign -
+     * so this reshapes rather than re-lexes: `{op, [left, right]}` becomes
+     * `{leftIdentifier, [{op, [right]}]}`.
+     *
+     * Reshaping at quote time keeps one parse tree per file, which the shared `.txt` fixtures and the
+     * SDK-less lexer both require. The cost is that the PSI still reads as an operation on a 1.17
+     * project, so anything that walks the tree rather than the quoted form sees the older reading.
+     *
+     * FIXME This is interim, and belongs in the lexer. Deciding it here reconstructs from post-parse
+     * PSI what the lexer knew and discarded, so it only reaches the case where the ambiguous operator
+     * is the outermost node: `a + b +(c)` quotes as `(a + b) + c` where Elixir 1.17 gives `a + b(+c)`,
+     * and `one +(two) + three` as `one(+two) + three` where Elixir gives `one(+two + three)`. Both are
+     * out of reach because **association** was committed at lex time, and no reshape at a single node
+     * can move an operand across an operator that bound differently. The fix is `op_identifier`
+     * classification in `Elixir.flex` - keyed on the file's Elixir version, since the exclusion set
+     * changed at 1.17.0 - with an `Elixir.bnf` rule that produces this shape directly, at which point
+     * delete this function rather than leaving two mechanisms for one rule.
+     */
+    @RequiresReadLock
+    private fun ambiguousDualOperatorCall(infix: Infix): OtpErlangObject? {
+        val operator = infix.operator()
+        val sign = operator.text.singleOrNull()?.takeIf { it == '+' || it == '-' } ?: return null
+
+        // `?dual_op(Sign), not(?is_space(NotMarker))`: a space before the sign and none after is what
+        // makes the identifier a call rather than the operation's left operand.
+        if (operator.prevSibling !is PsiWhiteSpace) return null
+        val afterOperator = operator.nextSibling?.takeUnless { it is PsiWhiteSpace } ?: return null
+
+        // `NotMarker =/= Sign, NotMarker =/= $/, NotMarker =/= $>` - the three exclusions 1.17.0 kept.
+        val notMarker = afterOperator.text.firstOrNull() ?: return null
+        if (notMarker == sign || notMarker == '/' || notMarker == '>') return null
+
+        val call = infix.leftOperand() as? UnqualifiedNoArgumentsCall<*> ?: return null
+        // A `do` block makes it a call on its own terms, with the block as keyword arguments.
+        if (call.doBlock != null) return null
+
+        val identifier = call.identifier
+
+        if (!dialectFor(identifier).quotesAmbiguousDualOperatorAsCall) return null
+
+        val quotedRightOperand = infix.rightOperand()?.quote() ?: return null
+
+        return quotedFunctionCall(
+                identifier.text,
+                // `ambiguous_op` leads the keyword list, as Elixir's `meta_with_ambiguous_op` prepends it.
+                OtpErlangList(arrayOf(AMBIGUOUS_OP_KEYWORD_PAIR, metadata(identifier).elementAt(0))),
+                quotedFunctionCall(sign.toString(), metadata(operator), quotedRightOperand)
         )
     }
 
@@ -212,7 +280,7 @@ object QuotableImpl {
         return try {
             val value = Long.parseLong(text, base)
             OtpErlangLong(value)
-        } catch (exception: NumberFormatException) {
+        } catch (_: NumberFormatException) {
             val value = BigInteger(text, base)
             OtpErlangLong(value)
         }
@@ -224,7 +292,7 @@ object QuotableImpl {
         val children = accessExpression.children
 
         if (children.size != 1) {
-            throw TODO("Expecting 1 child in accessExpression")
+            TODO("Expecting 1 child in accessExpression")
         }
 
         return (children[0] as Quotable).quote()
@@ -286,7 +354,7 @@ object QuotableImpl {
         val children = charToken.node.getChildren(null)
 
         if (children.size != 2) {
-            throw TODO("CharToken expected to be ?(<character>|<escape sequence>)")
+            TODO("CharToken expected to be ?(<character>|<escape sequence>)")
         }
 
         val tokenized = children[1]
@@ -294,7 +362,7 @@ object QuotableImpl {
 
         val codePoint = if (tokenizedElementType === ElixirTypes.FRAGMENT) {
             if (tokenized.textLength != 1) {
-                throw TODO("Tokenized character expected to only be one character long")
+                TODO("Tokenized character expected to only be one character long")
             }
 
             tokenized.text.codePointAt(0)
@@ -335,10 +403,11 @@ object QuotableImpl {
         val bracketArguments = atUnqualifiedBracketOperation.bracketArguments
         val quotedBracketArguments = bracketArguments.quote()
 
+        // `@1[:a]` - Elixir's `bracket_at_expr -> at_op_eol access_expr bracket_arg`.
         return quotedFunctionCall(
                 "Elixir.Access",
                 "get",
-                metadata(bracketArguments),
+                bracketIdentifierMetadata(bracketArguments),
                 quotedContainer,
                 quotedBracketArguments
         )
@@ -485,10 +554,11 @@ object QuotableImpl {
         val bracketArguments = atUnqualifiedBracketOperation.bracketArguments
         val quotedBracketArguments = bracketArguments.quote()
 
+        // `@foo[:a]` - Elixir's `bracket_at_expr -> at_op_eol dot_bracket_identifier bracket_arg`.
         return quotedFunctionCall(
                 "Elixir.Access",
                 "get",
-                metadata(bracketArguments),
+                bracketIdentifierMetadata(bracketArguments),
                 quotedContainer,
                 quotedBracketArguments
         )
@@ -552,18 +622,34 @@ object QuotableImpl {
 
         assert(children.size == 2)
 
-        val quotedMatchedExpression = (children[0] as Quotable).quote()
+        val container = children[0]
+        val quotedMatchedExpression = (container as Quotable).quote()
         val bracketArguments = children[1] as Quotable
         val quotedBracketArguments = bracketArguments.quote()
+
+        // Two Elixir productions land here, and they gained `from_brackets` two minors apart:
+        // `bracket_expr -> access_expr bracket_arg` (`[1, 2][0]`) at 1.15.0, and
+        // `bracket_at_expr -> at_op_eol access_expr bracket_arg` (`@Alias[:a]`) at 1.16.2. There is
+        // dedicated PSI for `@1[...]` and `@foo[...]`, but every other `@`-prefixed operand - an
+        // alias, a string, a sigil, a list, `@&1` - reaches this generic operation, so the `@` is
+        // what tells the two apart.
+        val metadata = if (container.isAtPrefixed()) {
+            bracketIdentifierMetadata(bracketArguments)
+        } else {
+            bracketedExpressionMetadata(bracketArguments)
+        }
 
         return quotedFunctionCall(
                 "Elixir.Access",
                 "get",
-                metadata(bracketArguments),
+                metadata,
                 quotedMatchedExpression,
                 quotedBracketArguments
         )
     }
+
+    /** Whether [this] is an `@`-prefix operation, so bracket access on it is Elixir's `bracket_at_expr`. */
+    private fun PsiElement.isAtPrefixed(): Boolean = stripAccessExpression() is AtOperation
 
     @Contract(pure = true)
     @JvmStatic
@@ -633,7 +719,7 @@ object QuotableImpl {
         val children = `in`.children
 
         if (children.size != 3) {
-            throw TODO("BinaryOperation expected to have 3 children (left operand, operator, right operand")
+            TODO("BinaryOperation expected to have 3 children (left operand, operator, right operand")
         }
 
         val quotedLeftOperand = (children[0] as Quotable).quote()
@@ -661,7 +747,7 @@ object QuotableImpl {
                             OtpErlangLong(unaryOperatorArguments.stringValue().codePointAt(0).toLong())
                         }
                         is OtpErlangList -> unaryOperatorArguments.elementAt(0)
-                        else -> throw TODO("Expected REARRANGED_UNARY_OPERATORS operand to be quoted as an OtpErlangString or OtpErlangList")
+                        else -> TODO("Expected REARRANGED_UNARY_OPERATORS operand to be quoted as an OtpErlangString or OtpErlangList")
                     }
 
                     val operatorMetadata = metadata(operator)
@@ -785,10 +871,11 @@ object QuotableImpl {
         val bracketArguments = qualifiedBracketOperation.bracketArguments
         val quotedBracketArguments = bracketArguments.quote()
 
+        // `Foo.bar[:a]` - Elixir's `dot_bracket_identifier -> matched_expr dot_op bracket_identifier`.
         return quotedFunctionCall(
                 "Elixir.Access",
                 "get",
-                metadata(bracketArguments),
+                bracketIdentifierMetadata(bracketArguments),
                 quotedContainer,
                 quotedBracketArguments
         )
@@ -891,10 +978,11 @@ object QuotableImpl {
         val bracketArguments = unqualifiedBracketOperation.bracketArguments
         val quotedBracketArguments = bracketArguments.quote()
 
+        // `foo[:a]` - Elixir's `dot_bracket_identifier -> bracket_identifier`.
         return quotedFunctionCall(
                 "Elixir.Access",
                 "get",
-                metadata(bracketArguments),
+                bracketIdentifierMetadata(bracketArguments),
                 quotedContainer,
                 quotedBracketArguments
         )
@@ -948,6 +1036,7 @@ object QuotableImpl {
         )
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun quote(unqualifiedNoArgumentsCall: UnqualifiedNoArgumentsCall<*>): OtpErlangObject {
@@ -955,9 +1044,7 @@ object QuotableImpl {
         val quoted: OtpErlangObject
         val identifier = unqualifiedNoArgumentsCall.identifier
 
-        val identifierText = runReadAction {
-            identifier.text
-        }
+        val identifierText = identifier.text
         val callMetadata = metadata(identifier)
 
         // if a variable has a `do` block is no longer a variable because the do block acts as keyword arguments.
@@ -968,6 +1055,14 @@ object QuotableImpl {
                     identifierText,
                     callMetadata,
                     *quotedBlockArguments
+            )
+        } else if (identifierText == "..." && dialectFor(identifier).quotesEllipsisAsNullaryCall) {
+            // Elixir 1.17.0 gave the parser an `ellipsis_op` production built with
+            // `build_nullary_op`, so `...` - in a `@spec` or on its own - became a call with no
+            // arguments, `{:..., meta, []}`, where before it quoted as a variable, `{:..., meta, nil}`.
+            quoted = quotedFunctionCall(
+                identifierText,
+                callMetadata
             )
         } else {
             /* @note quotedFunctionCall cannot be used here because in the 3-tuple for function calls, the elements are
@@ -1001,12 +1096,39 @@ object QuotableImpl {
 
     @Contract(pure = true)
     @JvmStatic
-    fun quote(parentheticalStab: ElixirParentheticalStab): OtpErlangObject =
-        parentheticalStab.stab?.quote(emptyMetadata(parentheticalStab)) ?:
-        // @note CANNOT use quotedFunctionCall because it requires metadata and gives nil instead of [] when no
-        //   arguments are given while empty block is quoted as `{__block__, [], []}`
+    fun quote(parentheticalStab: ElixirParentheticalStab): OtpErlangObject {
+        val stab = parentheticalStab.stab
+            // @note CANNOT use quotedFunctionCall because it requires metadata and gives nil instead of [] when no
+            //   arguments are given while empty block is quoted as `{__block__, [], []}`
+            ?: return OtpErlangTuple(
+                    arrayOf(BLOCK, emptyMetadata(parentheticalStab), OtpErlangList())
+            )
+
+        val quoted = stab.quote(emptyMetadata(parentheticalStab))
+
+        // Elixir 1.15.0's `build_paren_stab` took over wrapping a solitary `not`/`!`, so from then
+        // on it happens here rather than in every block - and with empty metadata, because that
+        // clause returns before the one that adds the parentheses' own.
+        return if (!rearrangesUnaryOperators(parentheticalStab) && isRearrangedUnary(quoted)) {
+            blockFunctionCall(listOf(quoted), OtpErlangList())
+        } else {
+            quoted
+        }
+    }
+
+    /** A `not` or `!` call, the `?rearrange_uop` operators. */
+    private fun isRearrangedUnary(quoted: OtpErlangObject): Boolean =
+        Macro.isLocalCall(quoted) &&
+                (quoted as OtpErlangTuple).elementAt(0) in REARRANGED_UNARY_OPERATORS
+
+    /** [block]'s own metadata with [extra] appended, as `Meta ++ meta_from_token_with_closing(...)` does. */
+    private fun appendMetadata(block: OtpErlangTuple, extra: OtpErlangList): OtpErlangTuple =
         OtpErlangTuple(
-                arrayOf(BLOCK, emptyMetadata(parentheticalStab), OtpErlangList())
+            arrayOf(
+                block.elementAt(0),
+                otpErlangList((block.elementAt(1) as OtpErlangList).elements().toList() + extra.elements()),
+                block.elementAt(2)
+            )
         )
 
     private fun emptyMetadata(parentheticalStab: ElixirParentheticalStab): OtpErlangList = metadata(parentheticalStab)
@@ -1029,7 +1151,7 @@ object QuotableImpl {
         val children = prefix.children
 
         if (children.size != 2) {
-            throw TODO("Prefix expected to have 2 children (operator and operand")
+            TODO("Prefix expected to have 2 children (operator and operand")
         }
 
         val quotedOperator = (children[0] as Quotable).quote()
@@ -1046,7 +1168,7 @@ object QuotableImpl {
     @JvmStatic
     fun quote(children: Array<PsiElement>): OtpErlangObject =
         children.asSequence().filter { it !is Unquoted }.map {
-            it as? Quotable ?: throw TODO("Child, $it, must be Quotable or Unquoted")
+            it as? Quotable ?: TODO("Child, $it, must be Quotable or Unquoted")
         }.toList().toTypedArray().let { quote(it) }
 
     @Contract(pure = true)
@@ -1067,10 +1189,10 @@ object QuotableImpl {
 
     @Contract(pure = true)
     @JvmStatic
-    fun quote(sigilHeredoc: SigilHeredoc): OtpErlangObject {
-        val quotedHeredoc = quote(sigilHeredoc as Heredoc)
+    fun quote(sigilHeredoc: SigilHeredocLiteral): OtpErlangObject {
+        val quotedHeredocLiteral = quote(sigilHeredoc as HeredocLiteral)
 
-        return quote(sigilHeredoc, quotedHeredoc)
+        return quote(sigilHeredoc, quotedHeredocLiteral)
     }
 
     @Contract(pure = true)
@@ -1089,9 +1211,9 @@ object QuotableImpl {
 
     @Contract(pure = true)
     @JvmStatic
-    fun quote(heredocLine: HeredocLine, heredoc: Heredoc, prefixLength: Int): OtpErlangObject {
-        val excessWhitespace = heredocLine.heredocLinePrefix.excessWhitespace(ElixirTypes.FRAGMENT, prefixLength)
-        val directChildNodes = childNodes(heredocLine.body)
+    fun quote(heredocLineable: HeredocLineable, heredocLiteral: HeredocLiteral, prefixLength: Int): OtpErlangObject {
+        val excessWhitespace = heredocLineable.heredocLinePrefix.excessWhitespace(ElixirTypes.FRAGMENT, prefixLength)
+        val directChildNodes = childNodes(heredocLineable.body)
 
         val accumulatedChildNodes = if (excessWhitespace != null) {
             arrayOf(excessWhitespace) + directChildNodes
@@ -1100,18 +1222,18 @@ object QuotableImpl {
         }
 
         return quotedChildNodes(
-                heredoc,
-                metadata(heredocLine),
+                heredocLiteral,
+                metadata(heredocLineable),
                 *accumulatedChildNodes
         )
     }
 
     @Contract(pure = true)
     @JvmStatic
-    fun quote(heredoc: Heredoc): OtpErlangObject {
-        val prefixLength = heredoc.heredocPrefix.textLength
+    fun quote(heredocLiteral: HeredocLiteral): OtpErlangObject {
+        val prefixLength = heredocLiteral.heredocPrefix.textLength
         val alignedNodeQueue = LinkedList<ASTNode>()
-        val heredocLineList = heredoc.heredocLineList
+        val heredocLineList = heredocLiteral.heredocLineList
 
         for (line in heredocLineList) {
             queueChildNodes(line, ElixirTypes.FRAGMENT, prefixLength, alignedNodeQueue)
@@ -1120,10 +1242,10 @@ object QuotableImpl {
         val mergedNodeQueue = mergeFragments(
                 alignedNodeQueue,
                 ElixirTypes.FRAGMENT,
-                heredoc.manager
+                heredocLiteral.manager
         )
 
-        return quotedChildNodes(heredoc, *mergedNodeQueue.toTypedArray())
+        return quotedChildNodes(heredocLiteral, *mergedNodeQueue.toTypedArray())
     }
 
     @Contract(pure = true)
@@ -1330,7 +1452,7 @@ object QuotableImpl {
             )
 
             if (integralDigitsList.inBase() && fractionalDigitsList.inBase()) {
-                java.lang.Double.parseDouble(floatString).let(::OtpErlangDouble)
+                Double.parseDouble(floatString).let(::OtpErlangDouble)
             } else {
                 // Convert parser error to runtime ArgumentError
                 quotedFunctionCall(
@@ -1347,6 +1469,7 @@ object QuotableImpl {
     fun quote(@Suppress("UNUSED_PARAMETER") emptyParentheses: ElixirEmptyParentheses): OtpErlangObject =
          emptyBlock()
 
+    @RequiresReadLock
     @JvmStatic
     fun quote(file: ElixirFile): OtpErlangObject {
         val quotedChildren = LinkedList<OtpErlangObject>()
@@ -1357,7 +1480,7 @@ object QuotableImpl {
                         if (element is Quotable) {
                             visitQuotable((element as Quotable?)!!)
                         } else if (!element.isUnquoted()) {
-                            throw TODO("Don't know how to visit $element")
+                            TODO("Don't know how to visit $element")
                         }
 
                         super.visitElement(element)
@@ -1371,7 +1494,10 @@ object QuotableImpl {
         )
 
         // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L76-L79
-        return toBlock(quotedChildren)
+        // See QuotingDialect.V1_20.
+        val emptyMetadata =
+            if (dialectFor(file).emitsLineMetadataOnBlock) metadata(file) else OtpErlangList()
+        return toBlock(quotedChildren, rearrangesUnaryOperators(file), emptyMetadata)
     }
 
     @Contract(pure = true)
@@ -1478,9 +1604,6 @@ object QuotableImpl {
     /* Returns the 0-indexed line number for the element */
     private fun lineNumber(node: ASTNode): Int = node.psi.document()!!.getLineNumber(node.startOffset)
 
-    private fun lineNumberKeywordTuple(operator: Operator): OtpErlangTuple =
-            lineNumberKeywordTuple(operator.operatorTokenNode())
-
     private fun lineNumberKeywordTuple(node: ASTNode): OtpErlangTuple =
             keywordTuple(
                     "line",
@@ -1490,7 +1613,9 @@ object QuotableImpl {
     @Contract(pure = true)
     private fun quote(children: Array<Quotable>) =
         // Uses toBlock because this is for inside interpolation, which functions the same as an embedded file
-        children.map(Quotable::quote).let { toBlock(it) }
+        children.map(Quotable::quote).let {
+            toBlock(it, rearrangesUnaryOperators(children.firstOrNull()))
+        }
 
     @JvmStatic
     fun quotedFunctionCall(
@@ -1507,6 +1632,79 @@ object QuotableImpl {
     fun metadata(operator: Operator): OtpErlangList = metadata(operator.operatorTokenNode())
     @JvmStatic
     fun metadata(element: PsiElement): OtpErlangList = metadata(element.node)
+
+    /**
+     * `Access.get/2` metadata for bracket access on an expression - `[1, 2][0]`, Elixir's
+     * `bracket_expr -> access_expr bracket_arg`. Carries `from_brackets` from 1.15.0, two minors
+     * before the other four bracket forms do.
+     */
+    @RequiresReadLock
+    private fun bracketedExpressionMetadata(bracketArguments: PsiElement): OtpErlangList =
+        bracketMetadata(
+            bracketArguments,
+            dialectFor(bracketArguments).emitsFromBracketsOnBracketedExpression
+        )
+
+    /**
+     * `Access.get/2` metadata for the four bracket forms Elixir 1.16.2 brought in line with
+     * [bracketedExpressionMetadata]: `foo[:a]`, `Foo.bar[:a]`, `@foo[:a]` and `@1[:a]`.
+     */
+    @RequiresReadLock
+    private fun bracketIdentifierMetadata(bracketArguments: PsiElement): OtpErlangList =
+        bracketMetadata(
+            bracketArguments,
+            dialectFor(bracketArguments).emitsFromBracketsOnEveryBracketForm
+        )
+
+    /** `from_brackets` leads the keyword list, as `meta_with_from_brackets` prepends it. */
+    private fun bracketMetadata(bracketArguments: PsiElement, fromBrackets: Boolean): OtpErlangList =
+        if (fromBrackets) {
+            OtpErlangList(
+                arrayOf<OtpErlangObject>(
+                    keywordTuple("from_brackets", true),
+                    lineNumberKeywordTuple(bracketArguments.node)
+                )
+            )
+        } else {
+            metadata(bracketArguments)
+        }
+
+    /**
+     * The `Kernel.to_string/1` call that interpolation quotes to, tagged `from_interpolation` from
+     * Elixir 1.16.0 on.
+     *
+     * Only the outer call is tagged; the inner `.` call that names `Kernel.to_string` keeps the
+     * plain metadata, matching `{{:., [line: 1], [Kernel, :to_string]},
+     * [from_interpolation: true, line: 1], [...]}`.
+     */
+    @RequiresReadLock
+    @JvmStatic
+    fun quotedInterpolationCall(
+        interpolation: ElixirInterpolation,
+        module: String,
+        identifier: String,
+        metadata: OtpErlangList,
+        vararg arguments: OtpErlangObject
+    ): OtpErlangTuple {
+        if (!dialectFor(interpolation).emitsFromInterpolation) {
+            return quotedFunctionCall(module, identifier, metadata, *arguments)
+        }
+
+        val quotedQualifiedIdentifier = quotedFunctionCall(
+            ".",
+            metadata,
+            OtpErlangAtom(module),
+            OtpErlangAtom(identifier)
+        )
+
+        return quotedFunctionCall(
+            quotedQualifiedIdentifier,
+            OtpErlangList(
+                arrayOf(keywordTuple("from_interpolation", true), *metadata.elements())
+            ),
+            *arguments
+        )
+    }
 
     @JvmStatic
     fun quotedFunctionCall(
@@ -1593,7 +1791,7 @@ object QuotableImpl {
                         codePointList = null
                     }
 
-                    if (parent is Heredoc  &&  quotedParentList.isEmpty()) {
+                    if (parent is HeredocLiteral &&  quotedParentList.isEmpty()) {
                         quotedParentList.add(elixirString(""))
                     }
 
@@ -1602,7 +1800,7 @@ object QuotableImpl {
                 } else if (elementType === ElixirTypes.QUOTE_HEXADECIMAL_ESCAPE_SEQUENCE || elementType === ElixirTypes.SIGIL_HEXADECIMAL_ESCAPE_SEQUENCE) {
                     codePointList = parent.addHexadecimalEscapeSequenceCodePoints(codePointList, child)
                 } else {
-                    throw TODO("Can't quote " + child)
+                    TODO("Can't quote " + child)
                 }
             }
 
@@ -1645,10 +1843,10 @@ object QuotableImpl {
             )
 
     private fun queueChildNodes(
-            line: HeredocLine,
-            fragmentType: IElementType,
-            prefixLength: Int,
-            heredocDescendantNodes: Queue<ASTNode>
+        line: HeredocLineable,
+        fragmentType: IElementType,
+        prefixLength: Int,
+        heredocDescendantNodes: Queue<ASTNode>
     ) {
         val excessWhitespace = line.heredocLinePrefix.excessWhitespace(fragmentType, prefixLength)
 
@@ -1712,9 +1910,9 @@ object QuotableImpl {
     /**
      * Unwraps `when` from left end of noParenthesesArguments in stabNoParenthesesSignature so that the when acts as a guard for the signature instead of a guard on the last positional argument.
      *
-     * @see [`unwrap_when` in `stab_expr`](https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl.L276-L277)
-     *
-     * @see [`unwrap_when`](https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl.L716-L722)
+     * Based on Elixir's `unwrap_when`:
+     * - [`unwrap_when` in `stab_expr`](https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L276-L277)
+     * - [`unwrap_when`](https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L716-L722)
      */
     private fun unwrapWhen(quotedArguments: Array<OtpErlangObject>): Array<OtpErlangObject> {
         // https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L717
@@ -1775,12 +1973,45 @@ object QuotableImpl {
      * See https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L724-L725
      */
     @Contract(pure = true)
-    private fun toBlock(quotedChildren: List<OtpErlangObject>): OtpErlangObject =
+    private fun toBlock(
+        quotedChildren: List<OtpErlangObject>,
+        rearrangeUnaryOperators: Boolean,
+        emptyMetadata: OtpErlangList = OtpErlangList()
+    ): OtpErlangObject =
             when (quotedChildren.size) {
-                0 -> emptyBlock()
-                1 -> buildBlock(quotedChildren, OtpErlangList())
+                0 -> otpErlangTuple(BLOCK, emptyMetadata, OtpErlangList())
+                // A file's own metadata never reaches a single- or multi-expression body (only an
+                // empty one, above) - see quote(ElixirFile) - so there is nothing here for the merge
+                // below to accumulate; pass `false` rather than resolving a dialect for nothing.
+                1 -> buildBlock(quotedChildren, OtpErlangList(), rearrangeUnaryOperators, false)
                 else -> blockFunctionCall(quotedChildren, OtpErlangList())
             }
+
+    /**
+     * Whether a solitary `not`/`!` in a block built from [element] takes a `__block__` wrapper.
+     *
+     * Elixir 1.15.0 moved that wrapper out of `build_block` - which a file, a stab body and an
+     * interpolation all go through - and into `build_paren_stab`, so from then on only a
+     * parenthesised single unary expression carries it. `unquote_splicing` is unaffected.
+     */
+    @RequiresReadLock
+    internal fun rearrangesUnaryOperators(element: PsiElement?): Boolean =
+        (element?.let(::dialectFor) ?: QuotingDialect.FALLBACK).wrapsSolitaryUnaryNotInEveryBlock
+
+    /**
+     * Whether a solitary expression that already quotes to a `__block__` - from a nested
+     * parenthetical stab's own `rearrange_uop` wrap, `unquote_splicing`, or several expressions -
+     * picks up [element]'s own metadata too, rather than being passed through unchanged.
+     *
+     * Only [quote] for [ElixirParentheticalStab] ever calls [buildBlock] with non-empty metadata for
+     * a single-expression body - a file's is always empty (see [toBlock]) and a do-block's own
+     * metadata exists only from [QuotingDialect.V1_20], where this predicate is already `false` - so
+     * gating on it here is exactly the parenthetical-stab case `build_paren_stab` gates on, without
+     * needing to know the caller.
+     */
+    @RequiresReadLock
+    internal fun mergesEnclosingParenMetadataOntoBlock(element: PsiElement?): Boolean =
+        (element?.let(::dialectFor) ?: QuotingDialect.FALLBACK).mergesEnclosingParenMetadataOntoBlock
 
     private fun emptyBlock() =
              otpErlangTuple(
@@ -1802,7 +2033,12 @@ object QuotableImpl {
      * @param quotedChildren
      */
     @Contract(pure = true)
-    internal fun buildBlock(quotedChildren: List<OtpErlangObject>, metadata: OtpErlangList): OtpErlangObject =
+    internal fun buildBlock(
+        quotedChildren: List<OtpErlangObject>,
+        metadata: OtpErlangList,
+        rearrangeUnaryOperators: Boolean,
+        mergesEnclosingParenMetadataOntoBlock: Boolean = false
+    ): OtpErlangObject =
             when (quotedChildren.size) {
                 0 -> NIL
                 1 -> {
@@ -1812,8 +2048,28 @@ object QuotableImpl {
                     if (Macro.isLocalCall(quotedChild)) {
                         // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L547
                         when ((quotedChild as OtpErlangTuple).elementAt(0)) {
-                            EXCLAMATION_POINT, NOT, UNQUOTE_SPLICING ->
-                                QuotableImpl.blockFunctionCall(quotedChildren, metadata)
+                            // `unquote_splicing` wraps in every version; `not` and `!` stopped
+                            // wrapping here in 1.15.0 and wrap only inside parentheses from then on.
+                            EXCLAMATION_POINT, NOT ->
+                                if (rearrangeUnaryOperators) {
+                                    blockFunctionCall(quotedChildren, metadata)
+                                } else {
+                                    quotedChild
+                                }
+                            UNQUOTE_SPLICING ->
+                                blockFunctionCall(quotedChildren, metadata)
+                            // The sole child is already a `__block__` - typically a nested
+                            // parenthetical stab that rearranged a `not`/`!`, spliced an
+                            // `unquote_splicing`, or held several expressions itself. Below 1.17.0,
+                            // this level's own metadata is appended to what is already there rather
+                            // than discarded, so parentheses nested around the same block each add
+                            // one more entry - see QuotingDialect.V1_17.
+                            BLOCK ->
+                                if (mergesEnclosingParenMetadataOntoBlock) {
+                                    appendMetadata(quotedChild, metadata)
+                                } else {
+                                    quotedChild
+                                }
                             else ->
                                 quotedChild
                         }
@@ -1821,6 +2077,6 @@ object QuotableImpl {
                         quotedChild
                     }
                 }
-                else -> QuotableImpl.blockFunctionCall(quotedChildren, metadata)
+                else -> blockFunctionCall(quotedChildren, metadata)
             }
 }

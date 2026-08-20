@@ -43,10 +43,7 @@ abstract class MacroNameArity {
     companion object {
         @JvmStatic
         fun appendBody(decompiled: StringBuilder) {
-            decompiled
-                    .append(" do\n")
-                    .append("    # body not decompiled\n")
-                    .append("  end\n")
+            appendNotDecompiledBody(decompiled)
         }
     }
 }

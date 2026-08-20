@@ -26,6 +26,10 @@ public class ElixirModuleType extends ModuleType<ElixirModuleBuilder>{
     return (ElixirModuleType) ModuleTypeManager.getInstance().findByID(MODULE_TYPE_ID);
   }
 
+  public static Boolean isElixirModule(com.intellij.openapi.module.Module mod) {
+    return ModuleType.is(mod, getInstance());
+  }
+
   @NotNull
   @Override
   public ElixirModuleBuilder createModuleBuilder() {
@@ -50,7 +54,7 @@ public class ElixirModuleType extends ModuleType<ElixirModuleBuilder>{
   }
 
   @Override
-  public Icon getNodeIcon(@Deprecated boolean isOpened) {
+  public @NotNull Icon getNodeIcon(@Deprecated boolean isOpened) {
     return Icons.MODULE;
   }
 

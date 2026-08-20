@@ -1,5 +1,6 @@
 package org.elixir_lang.psi
 
+import com.intellij.model.psi.PsiExternalReferenceHost
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiNameIdentifierOwner
 import org.elixir_lang.psi.impl.stripAccessExpression
@@ -8,8 +9,14 @@ import org.elixir_lang.psi.operation.infix.Normalized
 
 /**
  * An alias that may or may not be qualified.
+ *
+ * Implements [PsiExternalReferenceHost] (a no-method marker) so aliases can host new-model
+ * [com.intellij.model.psi.PsiSymbolReference]s contributed via `psi.symbolReferenceProvider`
+ * (e.g. a module usage → the `defmodule` it names). This does not change behavior on its own;
+ * providers that return no references leave navigation unchanged.
  */
-interface QualifiableAlias : MaybeModuleName, PsiNameIdentifierOwner {
+@Suppress("UnstableApiUsage")
+interface QualifiableAlias : MaybeModuleName, PsiNameIdentifierOwner, PsiExternalReferenceHost {
     fun fullyQualifiedName(): String
 }
 

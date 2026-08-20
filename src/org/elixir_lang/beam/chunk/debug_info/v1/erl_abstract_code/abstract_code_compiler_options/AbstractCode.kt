@@ -7,21 +7,20 @@ import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Char
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Float
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Map
-import org.elixir_lang.errorreport.Logger
 
 
 object AbstractCode {
-    inline fun <T> ifTag(term: OtpErlangObject?, tag: String, ifTrue: (OtpErlangTuple) -> T?): T? =
+    inline fun <T> ifTag(term: OtpErlangObject?, tag: String, crossinline ifTrue: (OtpErlangTuple) -> T?): T? =
             ifTag(term, tag, { actualTag, expectedTag -> actualTag == expectedTag }, ifTrue)
 
-    inline fun <T> ifTag(term: OtpErlangObject?, tagSet: Set<String>, ifTrue: (OtpErlangTuple) -> T?): T? =
+    inline fun <T> ifTag(term: OtpErlangObject?, tagSet: Set<String>, crossinline ifTrue: (OtpErlangTuple) -> T?): T? =
             ifTag(term, tagSet, { actualTag, expectedTagSet -> expectedTagSet.contains(actualTag) }, ifTrue)
 
     inline fun <E, R> ifTag(
             term: OtpErlangObject?,
             tag: E,
-            test: (String, E) -> Boolean,
-            ifTrue: (OtpErlangTuple) -> R?
+            crossinline test: (String, E) -> Boolean,
+            crossinline ifTrue: (OtpErlangTuple) -> R?
     ): R? =
             when (term) {
                 is OtpErlangTuple -> ifTag(term, tag, test, ifTrue)
@@ -31,8 +30,8 @@ object AbstractCode {
     inline fun <E, R> ifTag(
             term: OtpErlangTuple,
             tag: E,
-            test: (String, E) -> Boolean,
-            ifTrue: (OtpErlangTuple) -> R?
+            crossinline test: (String, E) -> Boolean,
+            crossinline ifTrue: (OtpErlangTuple) -> R?
     ): R? =
             (term.elementAt(0) as? OtpErlangAtom)?.let { actualTag ->
                 if (test(actualTag.atomValue(), tag)) {
@@ -64,6 +63,7 @@ object AbstractCode {
             Integer.ifToMacroStringDeclaredScope(term) ?:
             Map.ifToMacroStringDeclaredScope(term, scope) ?:
             MapField.ifToMacroStringDeclaredScope(term, scope) ?:
+            Maybe.ifToMacroStringDeclaredScope(term, scope) ?:
             Match.ifToMacroStringDeclaredScope(term, scope) ?:
             NamedFun.ifToMacroStringDeclaredScope(term, scope) ?:
             Nil.ifToMacroStringDeclaredScope(term) ?:
@@ -88,14 +88,10 @@ object AbstractCode {
             error("unknown_$default", "$title is unknown", term)
 
     fun error(default: String, title: String, term: OtpErlangObject): String {
-        Logger.error(logger, "Erlang Abst $title", term)
+        logger.warn("Erlang Abst $title\n\n### Term\n\n$term\n")
 
         return default
     }
 
     private val logger by lazy { com.intellij.openapi.diagnostic.Logger.getInstance(AbstractCode::class.java) }
 }
-
-
-
-

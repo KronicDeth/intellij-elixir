@@ -1,391 +1,70 @@
 package org.elixir_lang.beam;
 
-import com.ericsson.otp.erlang.OtpErlangDecodeException;
 import com.google.common.io.Files;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.newvfs.impl.VfsRootAccess;
+import com.intellij.psi.PsiCompiledFile;
+import com.intellij.psi.PsiErrorElement;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiManager;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.PlatformTestCase;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 public class DecompilerTest extends PlatformTestCase {
     /*
      * Tests
      */
 
-    public void testIssue575() {
-        String ebinDirectory = ebinDirectory();
-
-        VfsRootAccess.allowRootAccess(getTestRootDisposable(), ebinDirectory);
-
-        VirtualFile virtualFile = LocalFileSystem
-                .getInstance()
-                .findFileByIoFile(
-                        new File(ebinDirectory + "Elixir.Bitwise.beam")
-                );
-
-        assertNotNull(virtualFile);
-
-        Decompiler decompiler = new Decompiler();
-        CharSequence decompiled = decompiler.decompile(virtualFile);
-
-        assertEquals("# Source code recreated from a .beam file by IntelliJ Elixir\n" +
-                        "defmodule Bitwise do\n" +
-                        "  @moduledoc ~S\"\"\"\n" +
-                        "  A set of functions that perform calculations on bits.\n" +
-                        "\n" +
-                        "  All bitwise functions work only on integers; otherwise an\n" +
-                        "  `ArithmeticError` is raised.\n" +
-                        "\n" +
-                        "  The functions in this module come in two flavors: named or\n" +
-                        "  operators. For example:\n" +
-                        "\n" +
-                        "      iex> use Bitwise\n" +
-                        "      iex> bnot(1) # named\n" +
-                        "      -2\n" +
-                        "      iex> 1 &&& 1 # operator\n" +
-                        "      1\n" +
-                        "\n" +
-                        "  If you prefer to use only operators or skip them, you can\n" +
-                        "  pass the following options:\n" +
-                        "\n" +
-                        "    * `:only_operators` - includes only operators\n" +
-                        "    * `:skip_operators` - skips operators\n" +
-                        "\n" +
-                        "  For example:\n" +
-                        "\n" +
-                        "      iex> use Bitwise, only_operators: true\n" +
-                        "      iex> 1 &&& 1\n" +
-                        "      1\n" +
-                        "\n" +
-                        "  When invoked with no options, `use Bitwise` is equivalent\n" +
-                        "  to `import Bitwise`.\n" +
-                        "\n" +
-                        "  All bitwise functions can be used in guards:\n" +
-                        "\n" +
-                        "      iex> odd? = fn\n" +
-                        "      ...>   int when Bitwise.band(int, 1) == 1 -> true\n" +
-                        "      ...>   _ -> false\n" +
-                        "      ...> end\n" +
-                        "      iex> odd?.(1)\n" +
-                        "      true\n" +
-                        "\n" +
-                        "  All functions in this module are inlined by the compiler.\n" +
-                        "\n" +
-                        "  \"\"\"\n" +
-                        "\n" +
-                        "  # Macros\n" +
-                        "\n" +
-                        "  @doc false\n" +
-                        "  defmacro __using__(options) do\n" +
-                        "    (\n" +
-                        "      except = cond() do\n" +
-                        "        Keyword.get(options, :only_operators) ->\n" +
-                        "          [bnot: 1, band: 2, bor: 2, bxor: 2, bsl: 2, bsr: 2]\n" +
-                        "        Keyword.get(options, :skip_operators) ->\n" +
-                        "          [~~~: 1, &&&: 2, |||: 2, ^^^: 2, <<<: 2, >>>: 2]\n" +
-                        "        true ->\n" +
-                        "          []\n" +
-                        "      end\n" +
-                        "      {:import, [context: Bitwise], [{:__aliases__, [alias: false], [:\"Bitwise\"]}, [except: except]]}\n" +
-                        "    )\n" +
-                        "  end\n" +
-                        "\n" +
-                        "  # Functions\n" +
-                        "\n" +
-                        "  @doc ~S\"\"\"\n" +
-                        "  Bitwise AND operator.\n" +
-                        "\n" +
-                        "  Calculates the bitwise AND of its arguments.\n" +
-                        "\n" +
-                        "  Allowed in guard tests. Inlined by the compiler.\n" +
-                        "\n" +
-                        "  ## Examples\n" +
-                        "\n" +
-                        "      iex> 9 &&& 3\n" +
-                        "      1\n" +
-                        "\n" +
-                        "\n" +
-                        "  \"\"\"\n" +
-                        "  def left &&& right do\n" +
-                        "    Bitwise.band(left, right)\n" +
-                        "  end\n" +
-                        "\n" +
-                        "  @doc ~S\"\"\"\n" +
-                        "  Arithmetic left bitshift operator.\n" +
-                        "\n" +
-                        "  Calculates the result of an arithmetic left bitshift.\n" +
-                        "\n" +
-                        "  Allowed in guard tests. Inlined by the compiler.\n" +
-                        "\n" +
-                        "  ## Examples\n" +
-                        "\n" +
-                        "      iex> 1 <<< 2\n" +
-                        "      4\n" +
-                        "\n" +
-                        "      iex> 1 <<< -2\n" +
-                        "      0\n" +
-                        "\n" +
-                        "      iex> -1 <<< 2\n" +
-                        "      -4\n" +
-                        "\n" +
-                        "      iex> -1 <<< -2\n" +
-                        "      -1\n" +
-                        "\n" +
-                        "\n" +
-                        "  \"\"\"\n" +
-                        "  def left <<< right do\n" +
-                        "    Bitwise.bsl(left, right)\n" +
-                        "  end\n" +
-                        "\n" +
-                        "  @doc ~S\"\"\"\n" +
-                        "  Arithmetic right bitshift operator.\n" +
-                        "\n" +
-                        "  Calculates the result of an arithmetic right bitshift.\n" +
-                        "\n" +
-                        "  Allowed in guard tests. Inlined by the compiler.\n" +
-                        "\n" +
-                        "  ## Examples\n" +
-                        "\n" +
-                        "      iex> 1 >>> 2\n" +
-                        "      0\n" +
-                        "\n" +
-                        "      iex> 1 >>> -2\n" +
-                        "      4\n" +
-                        "\n" +
-                        "      iex> -1 >>> 2\n" +
-                        "      -1\n" +
-                        "\n" +
-                        "      iex> -1 >>> -2\n" +
-                        "      -4\n" +
-                        "\n" +
-                        "\n" +
-                        "  \"\"\"\n" +
-                        "  def left >>> right do\n" +
-                        "    Bitwise.bsr(left, right)\n" +
-                        "  end\n" +
-                        "\n" +
-                        "  @doc false\n" +
-                        "  def left ^^^ right do\n" +
-                        "    Bitwise.bxor(left, right)\n" +
-                        "  end\n" +
-                        "\n" +
-                        "  def __info__(p0) do\n" +
-                        "    # body not decompiled\n" +
-                        "  end\n" +
-                        "\n" +
-                        "  @doc ~S\"\"\"\n" +
-                        "  Calculates the bitwise AND of its arguments.\n" +
-                        "\n" +
-                        "  Allowed in guard tests. Inlined by the compiler.\n" +
-                        "\n" +
-                        "  ## Examples\n" +
-                        "\n" +
-                        "      iex> band(9, 3)\n" +
-                        "      1\n" +
-                        "\n" +
-                        "\n" +
-                        "  \"\"\"\n" +
-                        "  def band(left, right) do\n" +
-                        "    Bitwise.band(left, right)\n" +
-                        "  end\n" +
-                        "\n" +
-                        "  @doc ~S\"\"\"\n" +
-                        "  Calculates the bitwise NOT of the argument.\n" +
-                        "\n" +
-                        "  Allowed in guard tests. Inlined by the compiler.\n" +
-                        "\n" +
-                        "  ## Examples\n" +
-                        "\n" +
-                        "      iex> bnot(2)\n" +
-                        "      -3\n" +
-                        "\n" +
-                        "      iex> bnot(2) &&& 3\n" +
-                        "      1\n" +
-                        "\n" +
-                        "\n" +
-                        "  \"\"\"\n" +
-                        "  def bnot(expr) do\n" +
-                        "    :erlang.bnot(expr)\n" +
-                        "  end\n" +
-                        "\n" +
-                        "  @doc ~S\"\"\"\n" +
-                        "  Calculates the bitwise OR of its arguments.\n" +
-                        "\n" +
-                        "  Allowed in guard tests. Inlined by the compiler.\n" +
-                        "\n" +
-                        "  ## Examples\n" +
-                        "\n" +
-                        "      iex> bor(9, 3)\n" +
-                        "      11\n" +
-                        "\n" +
-                        "\n" +
-                        "  \"\"\"\n" +
-                        "  def bor(left, right) do\n" +
-                        "    Bitwise.bor(left, right)\n" +
-                        "  end\n" +
-                        "\n" +
-                        "  @doc ~S\"\"\"\n" +
-                        "  Calculates the result of an arithmetic left bitshift.\n" +
-                        "\n" +
-                        "  Allowed in guard tests. Inlined by the compiler.\n" +
-                        "\n" +
-                        "  ## Examples\n" +
-                        "\n" +
-                        "      iex> bsl(1, 2)\n" +
-                        "      4\n" +
-                        "\n" +
-                        "      iex> bsl(1, -2)\n" +
-                        "      0\n" +
-                        "\n" +
-                        "      iex> bsl(-1, 2)\n" +
-                        "      -4\n" +
-                        "\n" +
-                        "      iex> bsl(-1, -2)\n" +
-                        "      -1\n" +
-                        "\n" +
-                        "\n" +
-                        "  \"\"\"\n" +
-                        "  def bsl(left, right) do\n" +
-                        "    Bitwise.bsl(left, right)\n" +
-                        "  end\n" +
-                        "\n" +
-                        "  @doc ~S\"\"\"\n" +
-                        "  Calculates the result of an arithmetic right bitshift.\n" +
-                        "\n" +
-                        "  Allowed in guard tests. Inlined by the compiler.\n" +
-                        "\n" +
-                        "  ## Examples\n" +
-                        "\n" +
-                        "      iex> bsr(1, 2)\n" +
-                        "      0\n" +
-                        "\n" +
-                        "      iex> bsr(1, -2)\n" +
-                        "      4\n" +
-                        "\n" +
-                        "      iex> bsr(-1, 2)\n" +
-                        "      -1\n" +
-                        "\n" +
-                        "      iex> bsr(-1, -2)\n" +
-                        "      -4\n" +
-                        "\n" +
-                        "\n" +
-                        "  \"\"\"\n" +
-                        "  def bsr(left, right) do\n" +
-                        "    Bitwise.bsr(left, right)\n" +
-                        "  end\n" +
-                        "\n" +
-                        "  @doc ~S\"\"\"\n" +
-                        "  Calculates the bitwise XOR of its arguments.\n" +
-                        "\n" +
-                        "  Allowed in guard tests. Inlined by the compiler.\n" +
-                        "\n" +
-                        "  ## Examples\n" +
-                        "\n" +
-                        "      iex> bxor(9, 3)\n" +
-                        "      10\n" +
-                        "\n" +
-                        "\n" +
-                        "  \"\"\"\n" +
-                        "  def bxor(left, right) do\n" +
-                        "    Bitwise.bxor(left, right)\n" +
-                        "  end\n" +
-                        "\n" +
-                        "  def module_info() do\n" +
-                        "    # body not decompiled\n" +
-                        "  end\n" +
-                        "\n" +
-                        "  def module_info(p0) do\n" +
-                        "    # body not decompiled\n" +
-                        "  end\n" +
-                        "\n" +
-                        "  @doc ~S\"\"\"\n" +
-                        "  Bitwise OR operator.\n" +
-                        "\n" +
-                        "  Calculates the bitwise OR of its arguments.\n" +
-                        "\n" +
-                        "  Allowed in guard tests. Inlined by the compiler.\n" +
-                        "\n" +
-                        "  ## Examples\n" +
-                        "\n" +
-                        "      iex> 9 ||| 3\n" +
-                        "      11\n" +
-                        "\n" +
-                        "\n" +
-                        "  \"\"\"\n" +
-                        "  def left ||| right do\n" +
-                        "    Bitwise.bor(left, right)\n" +
-                        "  end\n" +
-                        "\n" +
-                        "  @doc ~S\"\"\"\n" +
-                        "  Bitwise NOT unary operator.\n" +
-                        "\n" +
-                        "  Calculates the bitwise NOT of the argument.\n" +
-                        "\n" +
-                        "  Allowed in guard tests. Inlined by the compiler.\n" +
-                        "\n" +
-                        "  ## Examples\n" +
-                        "\n" +
-                        "      iex> ~~~2\n" +
-                        "      -3\n" +
-                        "\n" +
-                        "      iex> ~~~2 &&& 3\n" +
-                        "      1\n" +
-                        "\n" +
-                        "\n" +
-                        "  \"\"\"\n" +
-                        "  def ~~~(expr) do\n" +
-                        "    :erlang.bnot(expr)\n" +
-                        "  end\n" +
-                        "end\n",
-                decompiled.toString()
-        );
+    public void testIssue575() throws IOException {
+        assertDecompiled("Issue575");
     }
 
-    public void testIssue672() throws IOException, OtpErlangDecodeException {
+    public void testIssue672() throws IOException {
         assertDecompiled("rebar3_hex_config");
     }
 
-    public void testIssue683() throws IOException, OtpErlangDecodeException {
+    public void testIssue683() throws IOException {
         assertDecompiled("orber_ifr");
     }
 
-    public void testIssue703() throws IOException, OtpErlangDecodeException {
+    public void testIssue703() throws IOException {
         assertDecompiled("Elixir.LDAPEx.ELDAPv3");
     }
 
-    public void testIssue772() throws IOException, OtpErlangDecodeException {
+    public void testIssue772() throws IOException {
         assertDecompiled("OTP20/Elixir.Kernel");
     }
 
-    public void testIssue803() throws IOException, OtpErlangDecodeException {
+    public void testIssue803() throws IOException {
         assertDecompiled("certifi_cacerts");
     }
 
-    public void testIssue833() throws IOException, OtpErlangDecodeException {
+    public void testIssue833() throws IOException {
         assertDecompiled("docgen_xmerl_xml_cb");
     }
 
-    public void testIssue859() throws IOException, OtpErlangDecodeException {
+    public void testIssue859() throws IOException {
         assertDecompiled("erl_syntax");
     }
 
-    public void testIssue860() throws IOException, OtpErlangDecodeException {
+    public void testIssue860() throws IOException {
         assertDecompiled("OTP-PUB-KEY");
     }
 
-    public void testIssue878() throws IOException, OtpErlangDecodeException {
+    public void testIssue878() throws IOException {
         assertDecompiled("gl");
     }
 
-    public void testIssue883() throws IOException, OtpErlangDecodeException {
+    public void testIssue883() throws IOException {
         assertDecompiled("fprof");
     }
 
-    public void testElixir_1_5_0() throws IOException, OtpErlangDecodeException {
+    public void testElixir_1_5_0() throws IOException {
         assertDecompiled("OTP20/Elixir.AtU8Test");
     }
 
@@ -491,6 +170,51 @@ public class DecompilerTest extends PlatformTestCase {
         assertDecompiled("inet_db");
     }
 
+    // Map comprehension (`mc`, `#{K => V || ...}`): must render `into: %{}` with a `{key, value}` body.
+    public void testMapComprehension() throws IOException {
+        assertDecompiled("map_comprehension");
+    }
+
+    // OTP-28 zip generator (`zip`, `A <- As && B <- Bs`): must render via `Enum.zip/1`.
+    public void testZipGenerator() throws IOException {
+        assertDecompiled("zip_generator");
+    }
+
+    // Both together, mirroring the `asn1ct_check.create_map_value/2` SDK-sweep failure.
+    public void testZipMapComprehension() throws IOException {
+        assertDecompiled("zip_map_comprehension");
+    }
+
+    // A map generator INSIDE a zip (`K := V <- M && X <- L`). Distinct from the three cases above:
+    // the zipped generator's pattern is a map_field_exact, not an ordinary pattern, so rendering it
+    // verbatim produces `{k => v, x}`, which is only valid inside a `%{}` literal and does not parse
+    // in the zip's tuple pattern.
+    public void testZipMapGenerator() throws IOException {
+        assertDecompiled("zip_map_generator");
+    }
+
+    // OTP-28 strict generators (`<:-` / `<:=`): list, bitstring, and map variants must render as `<-`.
+    public void testStrictGenerators() throws IOException {
+        assertDecompiled("strict_generators");
+    }
+
+    // OTP-25 `maybe ... [else ...] end` (EEP 49): must render as Elixir `with`.
+    public void testMaybeExpr() throws IOException {
+        assertDecompiled("maybe_expr");
+    }
+
+    // Erlang types whose names are reserved Elixir words (e.g. `-type nil()`) have no valid Elixir
+    // `@type`; they must be preserved as comments so the source stays parseable.
+    public void testReservedTypeName() throws IOException {
+        assertDecompiled("reserved_type");
+    }
+
+    // Erlang named funs (`fun F(...) -> ... end`): render as a plain `fn` (with a caveat comment),
+    // both when bound to a variable and when immediately invoked.
+    public void testNamedFun() throws IOException {
+        assertDecompiled("named_fun");
+    }
+
     /*
      * Instance Methods
      */
@@ -513,7 +237,7 @@ public class DecompilerTest extends PlatformTestCase {
         String prefix = testDataPath + "/" + name + ".";
 
         File expectedFile = new File(prefix + "ex");
-        String expected = Files.toString(expectedFile, Charset.forName("UTF-8"));
+        String expected = Files.asCharSource(expectedFile, StandardCharsets.UTF_8).read();
 
         VfsRootAccess.allowRootAccess(getTestRootDisposable(), testDataPath);
 
@@ -526,16 +250,189 @@ public class DecompilerTest extends PlatformTestCase {
         assertNotNull(virtualFile);
 
         Decompiler decompiler = new Decompiler();
-        CharSequence decompiled = decompiler.decompile(virtualFile);
+        String actual = decompiler.decompile(virtualFile).toString();
 
-        assertEquals(expected, decompiled.toString());
+        assertParseable(name, virtualFile, actual);
+
+        if (!expected.equals(actual)) {
+            fail(buildCompactDiffMessage(name, expected, actual));
+        }
     }
 
-    private String ebinDirectory() {
-        String ebinDirectory = System.getenv("ELIXIR_EBIN_DIRECTORY");
+    private void assertParseable(String name, VirtualFile virtualFile, String decompiledText) {
+        PsiFile compiledPsiFile = PsiManager.getInstance(getProject()).findFile(virtualFile);
+        assertNotNull("Compiled PSI file is null for " + name, compiledPsiFile);
+        assertTrue("PSI file is not compiled for " + name, compiledPsiFile instanceof PsiCompiledFile);
 
-        assertNotNull("ELIXIR_EBIN_DIRECTORY is not set", ebinDirectory);
+        PsiFile decompiledPsiFile = ((PsiCompiledFile) compiledPsiFile).getDecompiledPsiFile();
+        assertNotNull("Decompiled PSI file is null for " + name, decompiledPsiFile);
 
-        return ebinDirectory;
+        PsiErrorElement firstParseError = PsiTreeUtil.findChildOfType(decompiledPsiFile, PsiErrorElement.class);
+
+        if (firstParseError != null) {
+            int errorOffset = firstParseError.getTextRange().getStartOffset();
+            String failingLine = parseErrorLine(decompiledText, errorOffset);
+            String description = firstParseError.getErrorDescription();
+            String context = parseErrorContext(decompiledText, errorOffset);
+
+            fail(
+                    "DECOMPILATION PARSE ERROR: " + name +
+                            (description.isBlank() ? "" : "\nDescription: " + description) +
+                    (failingLine == null || failingLine.isBlank() ? "" : "\nLine: " + failingLine) +
+                    "\nError offset: " + errorOffset +
+                    "\n\n--- Context (20 lines before/after error) ---\n" + context +
+                    "\n--- End context ---"
+            );
+        }
+    }
+
+    private String parseErrorLine(String text, int offset) {
+        if (text.isEmpty() || offset < 0 || offset > text.length()) {
+            return null;
+        }
+
+        int lineStart = text.lastIndexOf('\n', Math.max(offset - 1, 0));
+        lineStart = lineStart < 0 ? 0 : lineStart + 1;
+
+        int lineEnd = text.indexOf('\n', offset);
+        lineEnd = lineEnd < 0 ? text.length() : lineEnd;
+
+        return text.substring(lineStart, lineEnd);
+    }
+
+    private String parseErrorContext(String text, int offset) {
+        int surroundingLines = 20;
+        if (text.isEmpty() || offset < 0 || offset > text.length()) {
+            return "(no context available)";
+        }
+
+        String[] lines = text.split("\n", -1);
+        // Find which line the offset is on
+        int charCount = 0;
+        int errorLine = 0;
+        for (int i = 0; i < lines.length; i++) {
+            int lineLen = lines[i].length() + 1; // +1 for the \n
+            if (charCount + lineLen > offset) {
+                errorLine = i;
+                break;
+            }
+            charCount += lineLen;
+        }
+
+        int startLine = Math.max(0, errorLine - surroundingLines);
+        int endLine = Math.min(lines.length - 1, errorLine + surroundingLines);
+
+        StringBuilder sb = new StringBuilder();
+        for (int i = startLine; i <= endLine; i++) {
+            String marker = (i == errorLine) ? ">>> " : "    ";
+            sb.append(String.format("%s%4d | %s%n", marker, i + 1, lines[i]));
+        }
+        return sb.toString();
+    }
+
+    private String buildCompactDiffMessage(String name, String expected, String actual) {
+        int expectedLen = expected.length();
+        int actualLen = actual.length();
+        int minLen = Math.min(expectedLen, actualLen);
+
+        // Find first difference
+        int diffPos = 0;
+        while (diffPos < minLen && expected.charAt(diffPos) == actual.charAt(diffPos)) {
+            diffPos++;
+        }
+
+        // Calculate line and column
+        int line = 1;
+        int col = 1;
+        int lineStart = 0;
+        for (int i = 0; i < diffPos && i < expectedLen; i++) {
+            if (expected.charAt(i) == '\n') {
+                line++;
+                col = 1;
+                lineStart = i + 1;
+            } else {
+                col++;
+            }
+        }
+
+        // Get the line containing the difference
+        int lineEnd = expected.indexOf('\n', diffPos);
+        if (lineEnd == -1) lineEnd = expectedLen;
+
+        String expectedLine = expected.substring(lineStart, Math.min(lineEnd, expectedLen));
+
+        lineEnd = actual.indexOf('\n', diffPos);
+        if (lineEnd == -1) lineEnd = actualLen;
+        String actualLine = actual.substring(lineStart, Math.min(lineEnd, actualLen));
+
+        // Truncate lines if they're too long
+        int maxLineLen = 120;
+        String expectedLineDisplay = expectedLine.length() > maxLineLen
+            ? expectedLine.substring(0, maxLineLen) + "..."
+            : expectedLine;
+        String actualLineDisplay = actualLine.length() > maxLineLen
+            ? actualLine.substring(0, maxLineLen) + "..."
+            : actualLine;
+
+        // Get a few characters around the diff point for context
+        int contextSize = 40;
+        int contextStart = Math.max(0, diffPos - contextSize);
+        int expectedEnd = Math.min(expectedLen, diffPos + contextSize);
+        int actualEnd = Math.min(actualLen, diffPos + contextSize);
+
+        String expectedSnippet = expected.substring(contextStart, expectedEnd);
+        String actualSnippet = actual.substring(contextStart, actualEnd);
+
+        // Show the exact character that differs
+        char expectedChar = diffPos < expectedLen ? expected.charAt(diffPos) : '�';
+        char actualChar = diffPos < actualLen ? actual.charAt(diffPos) : '�';
+
+        return String.format(
+            "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━%n" +
+            "DECOMPILATION MISMATCH: %s%n" +
+            "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━%n" +
+            "Position: char %d, line %d, col %d%n" +
+            "Length:   expected=%d, actual=%d (diff: %d)%n" +
+            "%n" +
+            "Character at difference:%n" +
+            "  Expected: '%s' (0x%04x)%n" +
+            "  Actual:   '%s' (0x%04x)%n" +
+            "%n" +
+            "Line %d context:%n" +
+            "  Expected: %s%n" +
+            "  Actual:   %s%n" +
+            "%n" +
+            "Snippet (40 chars before/after):%n" +
+            "  Expected: %s%n" +
+            "  Actual:   %s%n" +
+            "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
+            name,
+            diffPos, line, col,
+            expectedLen, actualLen, (expectedLen - actualLen),
+            escapeChar(expectedChar), (int) expectedChar,
+            escapeChar(actualChar), (int) actualChar,
+            line,
+            expectedLineDisplay,
+            actualLineDisplay,
+            escapeForDisplay(expectedSnippet),
+            escapeForDisplay(actualSnippet)
+        );
+    }
+
+    private String escapeChar(char c) {
+        return switch (c) {
+            case '\n' -> "\\n";
+            case '\r' -> "\\r";
+            case '\t' -> "\\t";
+            case ' ' -> "SPACE";
+            case '�' -> "EOF";
+            default -> String.valueOf(c);
+        };
+    }
+
+    private String escapeForDisplay(String s) {
+        return s.replace("\n", "⏎\n")
+                .replace("\r", "␍")
+                .replace("\t", "→   ");
     }
 }

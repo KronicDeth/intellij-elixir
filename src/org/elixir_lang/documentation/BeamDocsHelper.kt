@@ -1,12 +1,20 @@
 package org.elixir_lang.documentation
 
+import com.ericsson.otp.erlang.OtpErlangList
+import com.ericsson.otp.erlang.OtpErlangObject
+import com.ericsson.otp.erlang.OtpErlangTuple
 import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveState
 import org.elixir_lang.beam.Beam
 import org.elixir_lang.beam.psi.Module
+import org.elixir_lang.beam.psi.impl.CallDefinitionImpl
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
+import org.elixir_lang.psi.Definition
 import org.elixir_lang.psi.call.MaybeExported
+import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Attribute
+import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.attribute.Spec
+import org.elixir_lang.beam.decompiler.Options
 import org.elixir_lang.utils.ElixirModulesUtil.erlangModuleNameToElixir
 
 object BeamDocsHelper {
@@ -14,29 +22,44 @@ object BeamDocsHelper {
         .from(element.containingFile.originalFile.virtualFile)
         ?.let { beam ->
             beam.atoms()?.moduleName()?.let { erlangModuleNameToElixir(it) }?.let { module ->
+                val documentation = beam.documentation()
+
                 when (element) {
-                    is Module -> beam.documentation()?.moduleDocs?.englishDocs?.let { moduleDoc ->
+                    is Module -> documentation?.moduleDocs?.englishDocs?.let { moduleDoc ->
                         FetchedDocs.ModuleDocumentation(module, moduleDoc)
                     }
                     is MaybeExported -> {
                         element.exportedName()?.let { name ->
                             val arity = element.exportedArity(ResolveState.initial())
+                            val kind = kindForElement(element)
 
-                            beam.documentation()?.docs?.let { docs ->
-                                docs.documented("function", name, arity)?.let { documented ->
+                            documentation?.docs?.let { docs ->
+                                // Try exact arity first, then fall back to other arities for the same name.
+                                // In Elixir, default-argument stubs (e.g. info/1) delegate to the full-arity
+                                // definition (e.g. info/2) which is where the @doc lives.
+                                val documented = kind.firstNotNullOfOrNull { k -> docs.documented(k, name, arity) }
+                                    ?: kind.firstNotNullOfOrNull { k -> docs.documentedByNameFallback(k, name, arity) }
 
-                                    val signatures = documented.signatures
-                                    val deprecated = documented.deprecated()
-                                    val doc = documented.doc
+                                documented?.let {
+                                    val signatures = it.signatures
+                                    val deprecated = it.deprecated()
+                                    val doc = it.doc
+                                    val specs = specsFromMetadata(it.metadatumByName)
 
-                                    if (deprecated != null || doc != null) {
+                                    // Use specs as heads when available -- they contain the full
+                                    // typed signature (e.g. "@spec any(pred, list) :: boolean() when ...")
+                                    // which is more informative than the EEP-48 signatures field
+                                    // (which is often just "any/2" for Erlang modules).
+                                    val heads = specs.ifEmpty { signatures }
+
+                                    if (deprecated != null || doc != null || heads.isNotEmpty()) {
                                         FetchedDocs.FunctionOrMacroDocumentation(
                                             module,
                                             deprecated,
                                             doc,
                                             impls = emptyList(),
                                             specs = emptyList(),
-                                            heads = signatures
+                                            heads = heads
                                         )
                                     } else {
                                         null
@@ -54,5 +77,41 @@ object BeamDocsHelper {
                     }
                 }
             }
+        }
+
+    /**
+     * Extracts `@spec` strings from the EEP-48 metadata `signature` key.
+     *
+     * The `signature` metadata contains a list of Erlang abstract form attribute tuples like
+     * `{attribute, Line, spec, {{Name, Arity}, [Definition, ...]}}`. These are parsed using
+     * the existing [Attribute] → [Spec] pipeline and rendered via [Spec.toMacroString].
+     */
+    private fun specsFromMetadata(metadata: Map<String, OtpErlangObject>): List<String> {
+        val signatureTerms = metadata["signature"] as? OtpErlangList ?: return emptyList()
+        return signatureTerms.elements().mapNotNull { term ->
+            (term as? OtpErlangTuple)?.let { tuple ->
+                Attribute.from(tuple)?.let { attribute ->
+                    Spec.from(attribute)?.toMacroString(Options())
+                }
+            }
+        }
+    }
+
+    /**
+     * Returns the list of BEAM documentation "kind" strings to try when looking up docs for [element].
+     *
+     * For [CallDefinitionImpl] elements, the stub's [Definition] tells us whether this is a function or macro.
+     * The preferred kind is tried first, but we fall back to the other kind in case the BEAM docs
+     * use a different categorization than expected (e.g. guards stored as macros).
+     */
+    private fun kindForElement(element: MaybeExported): List<String> =
+        when (element) {
+            is CallDefinitionImpl<*> -> when (element.stub.definition) {
+                Definition.PUBLIC_MACRO, Definition.PRIVATE_MACRO -> listOf("macro", "function")
+                Definition.PUBLIC_FUNCTION, Definition.PRIVATE_FUNCTION -> listOf("function", "macro")
+                Definition.PUBLIC_GUARD, Definition.PRIVATE_GUARD -> listOf("macro", "function")
+                else -> listOf("function", "macro")
+            }
+            else -> listOf("function", "macro")
         }
 }

@@ -7,7 +7,6 @@ import com.ericsson.otp.erlang.OtpErlangTuple
 import org.elixir_lang.Macro
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.AbstractCode.ifTag
-import org.elixir_lang.code.Identifier.inspectAsFunction
 
 object NamedFun {
     fun <T> ifTo(term: OtpErlangObject?, ifTrue: (OtpErlangTuple) -> T?): T? = ifTag(term, TAG, ifTrue)
@@ -25,12 +24,23 @@ object NamedFun {
         val nameString = nameString(term)
         val clausesString = clausesString(term, scope)
 
-        // this is a fake macro.  Elixir does not support named anonymous function like Erlang does
-        val string = "named_anonymous_function $nameString do\n" +
+        // Erlang's `fun Name(...) -> ... end` binds `Name` inside the body so it can recurse.  Elixir
+        // has no named anonymous function - an intentional design choice (recursion goes through
+        // module `def`s; see the `.()` call syntax rationale in Elixir's anonymous-functions guide).
+        // We bind the fn to `Name` in the enclosing scope (`(name = fn ... end)`) so a self-reference
+        // in the body has a visible antecedent instead of appearing from nowhere.  This still will NOT
+        // compile when the body calls itself, because Elixir cannot see `name` inside its own
+        // definition - the comment records that caveat.  The wrapping parens keep the whole thing a
+        // single self-delimiting expression, safe as a match RHS, a call target, or an argument.
+        val string = "($nameString = fn\n" +
+                "  # Decompiled from an Erlang named fun. Elixir has no named anonymous functions, so\n" +
+                "  # `$nameString` is bound to the fn here to keep self-references readable; it will still\n" +
+                "  # NOT compile if the body recurses, as Elixir cannot see `$nameString` inside its own\n" +
+                "  # definition (recursion must go through a module function).\n" +
                 "  $clausesString\n" +
-                "end"
+                "end)"
 
-        return MacroString(string, doBlock = true)
+        return MacroString(string, doBlock = false)
     }
 
     private fun nameString(term: OtpErlangTuple): String =

@@ -2,20 +2,19 @@ package org.elixir_lang.beam.chunk
 
 import com.ericsson.otp.erlang.OtpErlangObject
 import com.intellij.ui.table.JBTable
-import javax.swing.JTable
 import javax.swing.table.TableCellRenderer
 import javax.swing.table.TableColumn
 import javax.swing.table.TableColumnModel
 import javax.swing.table.TableModel
 
 const val DEFAULT_MIN_COLUMN_WIDTH = 15
+private const val MAX_COLUMN_WIDTH = 500
 
 open class Table(model: TableModel): JBTable(model) {
     init {
-        autoResizeMode = JTable.AUTO_RESIZE_OFF
+        autoResizeMode = AUTO_RESIZE_OFF
         setDefaultRenderer(OtpErlangObject::class.java, OtpErlangObjectTableCellRenderer())
         packColumns()
-        invalidate()
     }
 
     private fun packColumns() {
@@ -30,13 +29,11 @@ open class Table(model: TableModel): JBTable(model) {
         val column = columnModel.getColumn(columnToPack)
         val expandedWidth = getExpandedColumnWidth(columnToPack)
         val headerWidth = preferredHeaderWidth(column, columnToPack)
-        val newWidth = getColumnModel().columnMargin + Math.max(expandedWidth, headerWidth)
+        val contentWidth = getColumnModel().columnMargin + Math.max(expandedWidth, headerWidth)
+        val newWidth = contentWidth.coerceAtMost(MAX_COLUMN_WIDTH)
 
+        column.preferredWidth = newWidth
         column.width = newWidth
-
-        val tableSize = size
-        tableSize.width += newWidth - column.width
-        size = tableSize
     }
 
     private fun preferredHeaderWidth(column: TableColumn, columnIdx: Int): Int {

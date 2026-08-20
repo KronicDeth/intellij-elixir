@@ -13,7 +13,7 @@ import java.util.Collection;
 import static org.elixir_lang.ElixirFlexLexer.MULTILINE_WHITE_SPACE_MAYBE;
 
 /**
- * Created by luke.imhoff on 9/1/14.
+ * Created by kadie.enheduanna.inanna on 9/1/14.
  */
 @RunWith(Parameterized.class)
 public class YYInitialTest extends TokenTest {

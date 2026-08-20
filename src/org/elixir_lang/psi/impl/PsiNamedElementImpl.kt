@@ -1,9 +1,9 @@
 package org.elixir_lang.psi.impl
 
-import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.application.runReadAction
-import com.intellij.openapi.util.Computable
 import com.intellij.psi.PsiElement
+import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.util.IncorrectOperationException
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.Name
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.module.PutAttribute
@@ -14,14 +14,17 @@ import org.elixir_lang.psi.call.name.Function.UNQUOTE
 import org.jetbrains.annotations.Contract
 
 object PsiNamedElementImpl {
+    @RequiresReadLock
     @JvmStatic
     fun getName(alias: ElixirAlias): String {
         return alias.text
     }
 
+    @RequiresReadLock
     @JvmStatic
-    fun getName(qualifiedAlias: QualifiedAlias): String = runReadAction { qualifiedAlias.text }
+    fun getName(qualifiedAlias: QualifiedAlias): String = qualifiedAlias.text
 
+    @RequiresReadLock
     @JvmStatic
     fun getName(atom: ElixirAtom): String? =
         if (atom.line == null) {
@@ -30,6 +33,7 @@ object PsiNamedElementImpl {
             null
         }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun getName(namedElement: NamedElement): String? =
@@ -41,8 +45,7 @@ object PsiNamedElementImpl {
             val nameIdentifier = namedElement.nameIdentifier
 
             if (nameIdentifier != null) {
-                val text = ApplicationManager.getApplication().runReadAction(Computable { nameIdentifier.text })
-                unquoteName(namedElement, text)
+                unquoteName(namedElement, nameIdentifier.text)
             } else {
                 if (namedElement is Call) {
                     val call = namedElement as Call
@@ -100,12 +103,21 @@ object PsiNamedElementImpl {
         TODO("Rename not implemented")
     }
 
+    @RequiresReadLock
     @JvmStatic
     fun setName(
         named: org.elixir_lang.psi.call.Named,
         newName: String
     ): PsiElement {
-        if (CallDefinitionClause.`is`(named)) {
+        if (Module.`is`(named)) {
+            val moduleNameElement = org.elixir_lang.model.psi.module.ModuleSymbol.moduleNameElement(named)
+                ?: throw IncorrectOperationException("Cannot rename module declaration without a module name element")
+            val replacementAlias = PsiTreeUtil.findChildOfType(
+                ElementFactory.createFile(named.project, newName),
+                QualifiableAlias::class.java
+            ) ?: throw IncorrectOperationException("Unable to parse module alias name: $newName")
+            moduleNameElement.replace(replacementAlias)
+        } else if (CallDefinitionClause.`is`(named)) {
             CallDefinitionClause.head(named)?.let { it as? org.elixir_lang.psi.call.Named }?.setName(newName)
         } else {
             val functionNameElement = named.functionNameElement()

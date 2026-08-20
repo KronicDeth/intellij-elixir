@@ -16,7 +16,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 /**
- * Created by luke.imhoff on 9/1/14.
+ * Created by kadie.enheduanna.inanna on 9/1/14.
  */
 @RunWith(Parameterized.class)
 public class InterpolationTest extends Test {

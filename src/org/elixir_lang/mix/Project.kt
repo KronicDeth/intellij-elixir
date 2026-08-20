@@ -1,13 +1,11 @@
 package org.elixir_lang.mix
 
-import com.intellij.openapi.application.edtWriteAction
+import com.intellij.openapi.application.WriteAction
+import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.module.ModifiableModuleModel
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.progress.ProgressIndicator
-import com.intellij.openapi.progress.ProgressManager
-import com.intellij.openapi.progress.Task
-import com.intellij.openapi.progress.runBlockingCancellable
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ContentEntry
 import com.intellij.openapi.roots.ModifiableRootModel
@@ -15,8 +13,12 @@ import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileVisitor
-import org.elixir_lang.DepsWatcher
+import com.intellij.util.concurrency.annotations.RequiresEdt
+import org.elixir_lang.mix.project.CANONICAL_FOLDER_MARKS
+import org.elixir_lang.mix.project.FolderMark
 import org.elixir_lang.mix.project.OtpApp
+import org.elixir_lang.mix.sync.MixDepsSyncService
+import org.elixir_lang.mix.sync.SyncRequest
 import org.elixir_lang.module.ElixirModuleType
 import java.io.EOFException
 import java.io.File
@@ -67,39 +69,72 @@ object Project {
             val nameCompareResult = String.CASE_INSENSITIVE_ORDER.compare(o1.name, o2.name)
 
             if (nameCompareResult == 0) {
-                String.CASE_INSENSITIVE_ORDER.compare(o1.root.path, o1.root.path)
+                String.CASE_INSENSITIVE_ORDER.compare(o1.root.path, o2.root.path)
             } else {
                 nameCompareResult
             }
         })
     }
 
+    /**
+     * Computes unique IntelliJ module names for a list of OTP apps, disambiguating when
+     * multiple apps share the same name (e.g., umbrella root and child app both named "emqx").
+     *
+     * Apps with unique names keep their original name. For collisions, the app at [projectRoot]
+     * keeps its name and others get a suffix derived from their relative path.
+     */
+    fun moduleNameForOtpApps(otpApps: List<OtpApp>, projectRoot: VirtualFile? = null): Map<OtpApp, String> {
+        val result = mutableMapOf<OtpApp, String>()
+        val byName = otpApps.groupBy { it.name.lowercase() }
+
+        for ((_, apps) in byName) {
+            if (apps.size == 1) {
+                result[apps.first()] = apps.first().name
+            } else {
+                for (app in apps) {
+                    val isRoot = projectRoot != null && app.root.path == projectRoot.path
+                    if (isRoot) {
+                        result[app] = app.name
+                    } else if (projectRoot != null) {
+                        val relativePath = app.root.path
+                            .removePrefix(projectRoot.path)
+                            .trimStart('/')
+                            .replace('/', '-')
+                        result[app] = "${app.name}-${relativePath}"
+                    } else {
+                        result[app] = "${app.name}-${app.root.name}"
+                    }
+                }
+            }
+        }
+
+        return result
+    }
+
+    @RequiresEdt
     fun createModulesForOtpApps(
         project: Project,
         otpApps: List<OtpApp>,
         modifiableModuleModelFactory: () -> ModifiableModuleModel,
-        rootModelModifier: (OtpApp, ModifiableRootModel) -> Unit = { _, _ -> }
+        rootModelModifier: (OtpApp, ModifiableRootModel) -> Unit = { _, _ -> },
+        projectRoot: VirtualFile? = null
     ): List<Module> =
         if (otpApps.isNotEmpty()) {
             val moduleModel = modifiableModuleModelFactory()
-            val createdRootModels = otpApps.mapNotNull { createModuleForOtpApp(it, moduleModel, rootModelModifier) }
+            val moduleNames = moduleNameForOtpApps(otpApps, projectRoot)
+            val createdRootModels = otpApps.mapNotNull { createModuleForOtpApp(it, moduleModel, rootModelModifier, moduleNames[it] ?: it.name) }
 
             if (createdRootModels.isNotEmpty()) {
-                runBlockingCancellable {
-                    edtWriteAction {
-                        for (rootModel in createdRootModels) {
-                            rootModel.commit()
-                        }
-
-                        moduleModel.commit()
+                // Use WriteAction.run since this is called from EDT via importToProject
+                // runBlockingCancellable is forbidden on EDT as it doesn't pump the event queue
+                WriteAction.run<Throwable> {
+                    for (rootModel in createdRootModels) {
+                        rootModel.commit()
                     }
+
+                    moduleModel.commit()
                 }
-                ProgressManager.getInstance()
-                    .run(object : Task.Modal(project, "Scanning dependencies for Libraries", true) {
-                        override fun run(indicator: ProgressIndicator) {
-                            DepsWatcher(project).syncLibraries(indicator)
-                        }
-                    })
+                project.service<MixDepsSyncService>().enqueue(SyncRequest.All)
             }
 
             createdRootModels.map { it.module }
@@ -110,10 +145,11 @@ object Project {
     private fun createModuleForOtpApp(
         otpApp: OtpApp,
         moduleModel: ModifiableModuleModel,
-        rootModelModifier: (OtpApp, ModifiableRootModel) -> Unit
+        rootModelModifier: (OtpApp, ModifiableRootModel) -> Unit,
+        moduleName: String
     ): ModifiableRootModel? {
         val ideaModuleDir = otpApp.root
-        val ideaModuleFile = "${ideaModuleDir.canonicalPath}${File.separator}/${otpApp.name}.iml"
+        val ideaModuleFile = "${ideaModuleDir.canonicalPath}${File.separator}/${moduleName}.iml"
         val module = moduleModel.newModule(ideaModuleFile, ElixirModuleType.MODULE_TYPE_ID)
         otpApp.module = module
 
@@ -132,23 +168,13 @@ object Project {
     fun addFolders(modifiableRootModel: ModifiableRootModel, root: VirtualFile) {
         val content = modifiableRootModel.addContentEntry(root)
 
-        addSourceDirToContent(content, root, "lib", false)
-        addSourceDirToContent(content, root, "spec", true)
-        addSourceDirToContent(content, root, "test", true)
-
-        // Directory added by Elixir Language Server
-        excludeDirFromContent(content, root, ".elixir_ls")
-        // Weird symlink phoenix and phoenix_html make to themselves in deps
-        excludeDirFromContent(content, root, "assets/node_modules/phoenix")
-        excludeDirFromContent(content, root, "assets/node_modules/phoenix_html")
-        // Test coverage
-        excludeDirFromContent(content, root, "cover")
-        // Dependencies (added as Libraries)
-        excludeDirFromContent(content, root, "deps")
-        // Documentation generated by `ex_doc`
-        excludeDirFromContent(content, root, "doc")
-        // Conventional logs directory
-        excludeDirFromContent(content, root, "logs")
+        for (canonicalFolder in CANONICAL_FOLDER_MARKS) {
+            when (canonicalFolder.folderMark) {
+                FolderMark.SOURCES -> addSourceDirToContent(content, root, canonicalFolder.relativePath, false)
+                FolderMark.TEST_SOURCES -> addSourceDirToContent(content, root, canonicalFolder.relativePath, true)
+                FolderMark.EXCLUDED -> excludeDirFromContent(content, root, canonicalFolder.relativePath)
+            }
+        }
     }
 
     private fun createImportedOtpApp(appRoot: VirtualFile): OtpApp? =

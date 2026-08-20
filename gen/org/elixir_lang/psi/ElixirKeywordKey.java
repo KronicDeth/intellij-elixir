@@ -6,12 +6,14 @@ import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.navigation.ItemPresentation;
+import com.intellij.util.concurrency.annotations.RequiresReadLock;
 
 public interface ElixirKeywordKey extends NamedElement, Quotable {
 
   @Nullable
   ElixirLine getLine();
 
+  @RequiresReadLock
   @Nullable String getName();
 
   @Nullable PsiElement getNameIdentifier();

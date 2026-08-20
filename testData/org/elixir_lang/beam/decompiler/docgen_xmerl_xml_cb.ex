@@ -40,7 +40,7 @@ defmodule :docgen_xmerl_xml_cb do
     # body not decompiled
   end
 
-  def convert_tag(:a, [attr]) do
+  defp convert_tag(:a, [attr]) do
     case xmlAttribute(attr, :name) do
       :href ->
         val = xmlAttribute(attr, :value)
@@ -55,41 +55,41 @@ defmodule :docgen_xmerl_xml_cb do
     end
   end
 
-  def convert_tag(:b, attrs), do: {:em, attrs}
+  defp convert_tag(:b, attrs), do: {:em, attrs}
 
-  def convert_tag(:blockquote, attrs), do: {:quote, attrs}
+  defp convert_tag(:blockquote, attrs), do: {:quote, attrs}
 
-  def convert_tag(:code, attrs), do: {:c, attrs}
+  defp convert_tag(:code, attrs), do: {:c, attrs}
 
-  def convert_tag(:dd, attrs), do: {:item, attrs}
+  defp convert_tag(:dd, attrs), do: {:item, attrs}
 
-  def convert_tag(:dl, attrs), do: {:taglist, attrs}
+  defp convert_tag(:dl, attrs), do: {:taglist, attrs}
 
-  def convert_tag(:dt, attrs), do: {:tag, attrs}
+  defp convert_tag(:dt, attrs), do: {:tag, attrs}
 
-  def convert_tag(:li, attrs), do: {:item, attrs}
+  defp convert_tag(:li, attrs), do: {:item, attrs}
 
-  def convert_tag(:ol, attrs), do: {:list, attrs}
+  defp convert_tag(:ol, attrs), do: {:list, attrs}
 
-  def convert_tag(:strong, attrs), do: {:em, attrs}
+  defp convert_tag(:strong, attrs), do: {:em, attrs}
 
-  def convert_tag(:td, attrs), do: {:cell, attrs}
+  defp convert_tag(:td, attrs), do: {:cell, attrs}
 
-  def convert_tag(:tr, attrs), do: {:row, attrs}
+  defp convert_tag(:tr, attrs), do: {:row, attrs}
 
-  def convert_tag(:tt, attrs), do: {:c, attrs}
+  defp convert_tag(:tt, attrs), do: {:c, attrs}
 
-  def convert_tag(:ul, attrs), do: {:list, attrs}
+  defp convert_tag(:ul, attrs), do: {:list, attrs}
 
-  def convert_tag(:underline, attrs), do: {:em, attrs}
+  defp convert_tag(:underline, attrs), do: {:em, attrs}
 
-  def convert_tag(tag, attrs), do: {tag, attrs}
+  defp convert_tag(tag, attrs), do: {tag, attrs}
 
-  def is_url('http:' ++ _), do: true
+  defp is_url('http:' ++ _), do: true
 
-  def is_url('../' ++ _), do: true
+  defp is_url('../' ++ _), do: true
 
-  def is_url(fileRef) do
+  defp is_url(fileRef) do
     case :filename.extension(fileRef) do
       "" ->
         false

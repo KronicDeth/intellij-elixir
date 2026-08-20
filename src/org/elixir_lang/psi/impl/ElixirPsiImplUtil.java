@@ -11,6 +11,7 @@ import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.psi.search.SearchScope;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
+import com.intellij.util.concurrency.annotations.RequiresReadLock;
 import kotlin.NotImplementedError;
 import kotlin.jvm.functions.Function1;
 import org.elixir_lang.psi.*;
@@ -34,7 +35,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -42,6 +43,8 @@ import java.util.Set;
 import static org.elixir_lang.psi.impl.PsiElementImplKt.siblingExpression;
 import static org.elixir_lang.psi.impl.PsiElementImplKt.stripAccessExpression;
 
+// The rawtypes and unused paramteters are needed to confirm to the generated parser codes API.
+@SuppressWarnings({"rawtypes", "unused"})
 public class ElixirPsiImplUtil {
     public static final String DEFAULT_OPERATOR = "\\\\";
     public static final Key<PsiElement> ENTRANCE = new Key<>("ENTRANCE");
@@ -159,14 +162,16 @@ public class ElixirPsiImplUtil {
     @NotNull
     public static String javaString(@NotNull OtpErlangBinary elixirString) {
         byte[] bytes = elixirString.binaryValue();
-        return new String(bytes, Charset.forName("UTF-8"));
+        return new String(bytes, StandardCharsets.UTF_8);
     }
 
+    @RequiresReadLock
     @Nullable
     public static String canonicalName(@NotNull StubBased stubBased) {
         return CanonicallyNamedImpl.INSTANCE.canonicalName(stubBased);
     }
 
+    @RequiresReadLock
     @NotNull
     public static Set<String> canonicalNameSet(@NotNull StubBased stubBased) {
         return CanonicallyNamedImpl.INSTANCE.canonicalNameSet(stubBased);
@@ -225,12 +230,14 @@ public class ElixirPsiImplUtil {
         return DigitsImpl.inBase(digits);
     }
 
+    @RequiresReadLock
     public static boolean isCalling(@NotNull final Call call,
                                     @NotNull final String resolvedModuleName,
                                     @NotNull final String functionName) {
         return CallImpl.isCalling(call, resolvedModuleName, functionName);
     }
 
+    @RequiresReadLock
     public static boolean isCalling(@NotNull final Call call,
                                     @NotNull final String resolvedModuleName,
                                     @NotNull final String functionName,
@@ -238,12 +245,14 @@ public class ElixirPsiImplUtil {
         return CallImpl.isCalling(call, resolvedModuleName, functionName, resolvedFinalArity);
     }
 
+    @RequiresReadLock
     public static boolean isCallingMacro(@NotNull final Call call,
                                          @NotNull final String resolvedModuleName,
                                          @NotNull final String functionName) {
         return CallImpl.isCallingMacro(call, resolvedModuleName, functionName);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     public static boolean isCallingMacro(@NotNull final Call call,
                                          @NotNull final String resolvedModuleName,
@@ -260,6 +269,7 @@ public class ElixirPsiImplUtil {
         return elixirHeredoc.getNode().getFirstChildNode().getText().equals("'''");
     }
 
+    @RequiresReadLock
     public static boolean isExported(@NotNull final UnqualifiedNoParenthesesCall unqualifiedNoParenthesesCall) {
         return CallDefinitionClause.isPublicFunction(unqualifiedNoParenthesesCall) ||
                 CallDefinitionClause.isPublicMacro(unqualifiedNoParenthesesCall);
@@ -355,6 +365,7 @@ public class ElixirPsiImplUtil {
         return CallImpl.moduleName(unqualified);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static String moduleName(@NotNull final Qualified qualified) {
@@ -535,18 +546,21 @@ public class ElixirPsiImplUtil {
         return siblingExpression(element, PREVIOUS_SIBLING);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static PsiElement[] primaryArguments(@NotNull final DotCall dotCall) {
         return CallImpl.primaryArguments(dotCall);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static PsiElement[] primaryArguments(@NotNull final Infix infix) {
         return CallImpl.primaryArguments(infix);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static PsiElement[] primaryArguments(
@@ -561,44 +575,42 @@ public class ElixirPsiImplUtil {
         return CallImpl.primaryArguments(none);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static PsiElement[] primaryArguments(@NotNull final NotIn notIn) {
         return CallImpl.primaryArguments(notIn);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static PsiElement[] primaryArguments(@NotNull final NoParenthesesOneArgument noParenthesesOneArgument) {
         return CallImpl.primaryArguments(noParenthesesOneArgument);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static PsiElement[] primaryArguments(@NotNull final Parentheses parentheses) {
         return CallImpl.primaryArguments(parentheses);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static PsiElement[] primaryArguments(@NotNull final Prefix prefix) {
         return CallImpl.primaryArguments(prefix);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @Nullable
     public static Integer primaryArity(@NotNull final Call call) {
         return CallImpl.primaryArity(call);
     }
 
-    public static boolean processDeclarations(@NotNull final And and,
-                                              @NotNull PsiScopeProcessor processor,
-                                              @NotNull ResolveState state,
-                                              PsiElement lastParent,
-                                              @NotNull PsiElement place) {
-        return ProcessDeclarationsImpl.processDeclarations(and, processor, state, lastParent, place);
-    }
-
+    @RequiresReadLock
     public static boolean processDeclarations(@NotNull final ElixirUnmatchedAtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall,
                                               @NotNull PsiScopeProcessor processor,
                                               @NotNull ResolveState state,
@@ -607,12 +619,18 @@ public class ElixirPsiImplUtil {
         return ProcessDeclarationsImpl.processDeclarations(atUnqualifiedNoParenthesesCall, processor, state, lastParent, place);
     }
 
+    @RequiresReadLock
     public static boolean processDeclarations(@NotNull final Call call,
                                               @NotNull PsiScopeProcessor processor,
                                               @NotNull ResolveState state,
                                               PsiElement lastParent,
                                               @NotNull PsiElement place) {
-        return ProcessDeclarationsImpl.processDeclarations(call, processor, state, lastParent, place);
+        return switch (call) {
+            case And and -> ProcessDeclarationsImpl.processDeclarations(and, processor, state, lastParent, place);
+            case Match match -> ProcessDeclarationsImpl.processDeclarations(match, processor, state, lastParent, place);
+            case Type type -> ProcessDeclarationsImpl.processDeclarations(type, processor, state);
+            default -> ProcessDeclarationsImpl.processDeclarations(call, processor, state, lastParent, place);
+        };
     }
 
     public static boolean processDeclarations(@NotNull final ElixirAlias alias,
@@ -661,22 +679,6 @@ public class ElixirPsiImplUtil {
                                               PsiElement lastParent,
                                               @NotNull PsiElement place) {
         return ProcessDeclarationsImpl.processDeclarations(stabOperation, processor, state, lastParent, place);
-    }
-
-    public static boolean processDeclarations(@NotNull final Match match,
-                                              @NotNull PsiScopeProcessor processor,
-                                              @NotNull ResolveState state,
-                                              PsiElement lastParent,
-                                              @NotNull PsiElement place) {
-        return ProcessDeclarationsImpl.processDeclarations(match, processor, state, lastParent, place);
-    }
-
-    public static boolean processDeclarations(@NotNull final Type type,
-                                              @NotNull PsiScopeProcessor processor,
-                                              @NotNull ResolveState state,
-                                              PsiElement lastParent,
-                                              @NotNull PsiElement place) {
-        return ProcessDeclarationsImpl.processDeclarations(type, processor, state);
     }
 
     public static boolean processDeclarations(@NotNull final QualifiedAlias qualifiedAlias,
@@ -810,16 +812,18 @@ public class ElixirPsiImplUtil {
         return ElixirHeredocLinePrefixImplKt.excessWhitespace(heredocLinePrefix, fragmentType, prefixLength);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     public static int exportedArity(@NotNull final UnqualifiedNoParenthesesCall unqualifiedNoParenthesesCall,
                                     @NotNull ResolveState state) {
         return UnqualifiedNoParenthesesCallImplKt.exportedArity(unqualifiedNoParenthesesCall, state);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @Nullable
     public static String exportedName(@NotNull final UnqualifiedNoParenthesesCall unqualifiedNoParenthesesCall) {
-        return UnqualifiedNoParenthesesCallImplKt.exportedName(unqualifiedNoParenthesesCall);
+        return UnqualifiedNoParenthesesCallImplKt.cachedExportedName(unqualifiedNoParenthesesCall);
     }
 
     @Contract(pure = true)
@@ -829,11 +833,11 @@ public class ElixirPsiImplUtil {
     }
 
     @Contract(pure = true)
-    @Nullable
-    public static String fullyQualifiedName(@NotNull final QualifiableAlias qualifiableAlias) {
+    public static @NotNull String fullyQualifiedName(@NotNull final QualifiableAlias qualifiableAlias) {
         return QualifiableAliasImpl.fullyQualifiedName(qualifiableAlias);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @Nullable
     public static String functionName(@NotNull final Call call) {
@@ -860,18 +864,21 @@ public class ElixirPsiImplUtil {
         return CallImpl.functionNameElement(notIn);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static PsiElement functionNameElement(@NotNull final Operation operation) {
         return CallImpl.functionNameElement(operation);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static PsiElement functionNameElement(@NotNull final Qualified qualified) {
         return CallImpl.functionNameElement(qualified);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static PsiElement functionNameElement(@NotNull final Unqualified unqualified) {
@@ -941,12 +948,12 @@ public class ElixirPsiImplUtil {
     }
 
     @NotNull
-    public static List<? extends HeredocLine> getHeredocLineList(ElixirInterpolatedSigilHeredoc interpolatedSigilHeredoc) {
+    public static List<? extends HeredocLineable> getHeredocLineList(ElixirInterpolatedSigilHeredoc interpolatedSigilHeredoc) {
         return interpolatedSigilHeredoc.getInterpolatedHeredocLineList();
     }
 
     @NotNull
-    public static List<? extends HeredocLine> getHeredocLineList(ElixirLiteralSigilHeredoc literalSigilHeredoc) {
+    public static List<? extends HeredocLineable> getHeredocLineList(ElixirLiteralSigilHeredoc literalSigilHeredoc) {
         return literalSigilHeredoc.getLiteralHeredocLineList();
     }
 
@@ -960,21 +967,25 @@ public class ElixirPsiImplUtil {
         return QuotableKeywordPairImpl.getKeywordValue(noParenthesesKeywordPair);
     }
 
+    @RequiresReadLock
     @NotNull
     public static String getName(@NotNull ElixirAlias alias) {
         return PsiNamedElementImpl.getName(alias);
     }
 
+    @RequiresReadLock
     @NotNull
     public static String getName(@NotNull QualifiedAlias qualifiedAlias) {
         return PsiNamedElementImpl.getName(qualifiedAlias);
     }
 
+    @RequiresReadLock
     @Nullable
     public static String getName(@NotNull ElixirAtom atom) {
         return PsiNamedElementImpl.getName(atom);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @Nullable
     public static String getName(@NotNull NamedElement namedElement) {
@@ -997,14 +1008,13 @@ public class ElixirPsiImplUtil {
         return PsiNameIdentifierOwnerImpl.getNameIdentifier(variable);
     }
 
+    @RequiresReadLock
     @Nullable
     public static PsiElement getNameIdentifier(@NotNull org.elixir_lang.psi.call.Named named) {
+        if (named instanceof NonNumeric nonNumeric) {
+            return NonNumericImplKt.getNameIdentifier(nonNumeric);
+        }
         return PsiNameIdentifierOwnerImpl.getNameIdentifier(named);
-    }
-
-    @Nullable
-    public static PsiElement getNameIdentifier(@NotNull NonNumeric nonNumeric) {
-        return NonNumericImplKt.getNameIdentifier(nonNumeric);
     }
 
     @Nullable
@@ -1012,6 +1022,7 @@ public class ElixirPsiImplUtil {
         return PsiNameIdentifierOwnerImpl.getNameIdentifier(qualifiableAlias);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static ItemPresentation getPresentation(@NotNull final Call call) {
@@ -1030,11 +1041,11 @@ public class ElixirPsiImplUtil {
         return PresentationImpl.getPresentation(keywordKey);
     }
 
-    @Nullable
-    public static ItemPresentation getPresentation(@NotNull final QualifiableAlias qualifiableAlias) {
+    public static @NotNull ItemPresentation getPresentation(@NotNull final QualifiableAlias qualifiableAlias) {
         return PresentationImpl.getPresentation(qualifiableAlias);
     }
 
+    @RequiresReadLock
     public static @Nullable String implementedProtocolName(@NotNull final Call call) {
         String protocolName;
 
@@ -1049,7 +1060,7 @@ public class ElixirPsiImplUtil {
 
     @Nullable
     public static PsiReference getReference(@NotNull AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
-        return AtUnqualifiedNoParenthesesCallImplKt.getReference(atUnqualifiedNoParenthesesCall);
+        return null;
     }
 
     @Nullable
@@ -1060,7 +1071,10 @@ public class ElixirPsiImplUtil {
 
     @Nullable
     public static PsiReference getReference(@NotNull Call call) {
-        return CallImplKt.getReference(call);
+        if (call instanceof NonNumeric nonNumeric) {
+            return NonNumericImplKt.getReference(nonNumeric);
+        }
+        return CallImplKt.cachedReference(call);
     }
 
     @Nullable
@@ -1070,34 +1084,32 @@ public class ElixirPsiImplUtil {
 
     @Nullable
     public static PsiReference getReference(@NotNull ElixirIdentifier identifier) {
-        return ElixirIdentifierImplKt.getReference(identifier);
-    }
-
-    @Nullable
-    public static PsiReference getReference(@NotNull NonNumeric nonNumeric) {
-        return NonNumericImplKt.getReference(nonNumeric);
+        // migrated to Symbol API
+        return null;
     }
 
     @Nullable
     public static PsiPolyVariantReference getReference(@NotNull QualifiableAlias qualifiableAlias) {
-        return QualifiableAliasImplKt.getReference(qualifiableAlias);
+        return QualifiableAliasImplKt.cachedReference(qualifiableAlias);
     }
 
     @Contract(pure = true)
     @Nullable
     public static PsiReference getReference(@NotNull final ElixirAtIdentifier atIdentifier) {
-        return ElixirAtIdentifierImplKt.getReference(atIdentifier);
+        return null;
     }
 
     @Nullable
     public static PsiReference getReference(@NotNull final AtOperation atNonNumericOperation) {
-        return AtNonNumericOperationImplKt.getReference(atNonNumericOperation);
+        return AtNonNumericOperationImplKt.cachedReference(atNonNumericOperation);
     }
 
+    @RequiresReadLock
     public static boolean hasDoBlockOrKeyword(@NotNull final Call call) {
         return CallImpl.hasDoBlockOrKeyword(call);
     }
 
+    @RequiresReadLock
     public static boolean hasDoBlockOrKeyword(@NotNull final StubBased<Stub> stubBased) {
         return CallImpl.hasDoBlockOrKeyword(stubBased);
     }
@@ -1140,7 +1152,7 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quoteAsAtom(@NotNull final ElixirLine line) {
-        return AtomableImplKt.quoteAsAtom(line);
+        return AtomableImplKt.quoteLineAsAtom(line);
     }
 
     @Contract(pure = true)
@@ -1205,14 +1217,14 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject quote(@NotNull final Heredoc heredoc) {
-        return QuotableImpl.quote(heredoc);
+    public static OtpErlangObject quote(@NotNull final HeredocLiteral heredocLiteral) {
+        return QuotableImpl.quote(heredocLiteral);
     }
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject quote(@NotNull final HeredocLine heredocLine, @NotNull final Heredoc heredoc, int prefixLength) {
-        return QuotableImpl.quote(heredocLine, heredoc, prefixLength);
+    public static OtpErlangObject quote(@NotNull final HeredocLineable heredocLineable, @NotNull final HeredocLiteral heredocLiteral, int prefixLength) {
+        return QuotableImpl.quote(heredocLineable, heredocLiteral, prefixLength);
     }
 
     @Contract(pure = true)
@@ -1358,6 +1370,7 @@ public class ElixirPsiImplUtil {
         return QuotableImpl.quote(unqualifiedNoParenthesesCall);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final UnqualifiedNoArgumentsCall unqualifiedNoArgumentsCall) {
@@ -1411,7 +1424,7 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject quote(SigilHeredoc sigilHeredoc) {
+    public static OtpErlangObject quote(SigilHeredocLiteral sigilHeredoc) {
         return QuotableImpl.quote(sigilHeredoc);
     }
 
@@ -1521,16 +1534,19 @@ public class ElixirPsiImplUtil {
         return ParentImpl.quoteLiteral(codePointList);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     public static int resolvedFinalArity(@NotNull Call call) {
         return CallImpl.resolvedFinalArity(call);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     public static int resolvedFinalArity(@NotNull org.elixir_lang.psi.call.StubBased<Stub> stubBased) {
         return CallImpl.resolvedFinalArity(stubBased);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static ArityInterval resolvedFinalArityInterval(@NotNull Call call) {
@@ -1567,6 +1583,7 @@ public class ElixirPsiImplUtil {
         return CallImpl.resolvedModuleName(prefix);
     }
 
+    @RequiresReadLock
     @NotNull
     public static String resolvedModuleName(@NotNull org.elixir_lang.psi.call.qualification.Qualified qualified) {
         return CallImpl.resolvedModuleName(qualified);
@@ -1583,12 +1600,14 @@ public class ElixirPsiImplUtil {
         return CallImpl.resolvedModuleName(unqualifiedNoArgumentsCall);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @Nullable
     public static Integer resolvedPrimaryArity(@NotNull Call call) {
         return CallImpl.resolvedPrimaryArity(call);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @Nullable
     public static Integer resolvedSecondaryArity(@NotNull Call call) {
@@ -1613,6 +1632,7 @@ public class ElixirPsiImplUtil {
         return org.elixir_lang.psi.operation.not_in.Normalized.rightOperand(notIn);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @Nullable
     public static PsiElement[] secondaryArguments(@NotNull DotCall dotCall) {
@@ -1643,6 +1663,7 @@ public class ElixirPsiImplUtil {
         return CallImpl.secondaryArguments(noParentheses);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @Nullable
     public static PsiElement[] secondaryArguments(@NotNull Parentheses parentheses) {
@@ -1655,6 +1676,7 @@ public class ElixirPsiImplUtil {
         return CallImpl.secondaryArguments(prefix);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @Nullable
     public static Integer secondaryArity(@NotNull Call call) {
@@ -1677,6 +1699,7 @@ public class ElixirPsiImplUtil {
         return PsiNamedElementImpl.setName(variable, newName);
     }
 
+    @RequiresReadLock
     @NotNull
     public static PsiElement setName(@NotNull final org.elixir_lang.psi.call.Named named,
                                      @NotNull final String newName) {
@@ -1689,7 +1712,7 @@ public class ElixirPsiImplUtil {
     }
 
     @NotNull
-    public static Integer indentation(@NotNull org.elixir_lang.psi.SigilHeredoc sigilHeredoc) {
+    public static Integer indentation(@NotNull SigilHeredocLiteral sigilHeredoc) {
         return SigilHeredocImpl.indentation(sigilHeredoc);
     }
 

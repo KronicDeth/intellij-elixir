@@ -1,7 +1,7 @@
 /*
  * Copyright 2012-2014 Sergey Ignatov
  * Copyright 2017 Jake Becker
- * Copyright 2018 Luke Imhoff
+ * Copyright 2018 Kadie Enheduanna Inanna
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,8 @@ class Runner : GenericProgramRunner<RunnerSettings>() {
     override fun doExecute(state: RunProfileState, environment: ExecutionEnvironment): RunContentDescriptor =
             XDebuggerManager
                     .getInstance(environment.project)
+                    // Keep startSession() for 253 compatibility; XDebugSessionBuilder is not
+                    // available across our supported baseline yet.
                     .startSession(
                             environment,
                             object : XDebugProcessStarter() {

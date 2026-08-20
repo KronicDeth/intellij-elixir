@@ -1,11 +1,32 @@
 package org.elixir_lang.notification.setup_sdk
 
 import com.intellij.execution.ExecutionException
+import com.intellij.notification.Notification
+import com.intellij.notification.NotificationAction
 import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.module.Module
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.projectRoots.Sdk
+import com.intellij.openapi.vfs.VirtualFile
+import org.elixir_lang.sdk.elixir.ElixirSdkResolution
+import org.elixir_lang.sdk.erlang_dependent.ErlangSdkResult
+import org.elixir_lang.sdk.erlang_dependent.MissingErlangSdkReason
+import org.elixir_lang.sdk.elixir.SdkSettingsOpener
+import org.jetbrains.annotations.TestOnly
+import java.util.Collections
+import java.util.WeakHashMap
 
 object Notifier {
+    private data class ActiveMixDeps(val rootUrl: String, val notification: Notification)
+
+    const val MIX_DEPS_OUTDATED_TITLE: String = "Mix deps outdated"
+    private const val MIX_DEPS_GROUP_ID: String = "Elixir Mix Deps"
+    private val mixDepsNotifications: MutableMap<Project, ActiveMixDeps> =
+        Collections.synchronizedMap(WeakHashMap())
+    private val missingErlangSdkNotifications: MutableMap<Project, Notification> =
+        Collections.synchronizedMap(WeakHashMap())
+
     fun mixSettings(module: Module, executionException: ExecutionException) {
         val message = executionException.message
         val isEmpty = "Executable is not specified" == message
@@ -37,6 +58,277 @@ object Notifier {
                 NotificationType.ERROR
             )
             .addAction(Action(project, module))
-            .notify(project);
+            .notify(project)
+    }
+
+
+    // SDK Refresh notification methods
+    fun sdkRefreshSuccess(
+        project: Project,
+        refreshedElixirCount: Int,
+        totalElixirCount: Int,
+        refreshedErlangCount: Int,
+        totalErlangCount: Int
+    ) {
+        val parts = mutableListOf<String>()
+
+        if (totalElixirCount > 0) {
+            if (refreshedElixirCount == totalElixirCount) {
+                parts.add("$refreshedElixirCount Elixir SDK${if (refreshedElixirCount != 1) "s" else ""}")
+            } else {
+                parts.add("$refreshedElixirCount of $totalElixirCount Elixir SDK${if (totalElixirCount != 1) "s" else ""}")
+            }
+        }
+
+        if (totalErlangCount > 0) {
+            if (refreshedErlangCount == totalErlangCount) {
+                parts.add("$refreshedErlangCount Erlang SDK${if (refreshedErlangCount != 1) "s" else ""}")
+            } else {
+                parts.add("$refreshedErlangCount of $totalErlangCount Erlang SDK${if (totalErlangCount != 1) "s" else ""}")
+            }
+        }
+
+        val message = "Successfully refreshed " + when (parts.size) {
+            1 -> parts[0]
+            2 -> "${parts[0]} and ${parts[1]}"
+            else -> "SDKs"
+        } + "."
+
+        NotificationGroupManager
+            .getInstance()
+            .getNotificationGroup("Elixir")
+            .createNotification(
+                "Elixir SDK paths refreshed",
+                message,
+                NotificationType.INFORMATION
+            )
+            .notify(project)
+    }
+
+    fun sdkRefreshWarning(project: Project, message: String) {
+        NotificationGroupManager
+            .getInstance()
+            .getNotificationGroup("Elixir")
+            .createNotification(
+                "Elixir SDK Refresh",
+                message,
+                NotificationType.WARNING
+            )
+            .notify(project)
+    }
+
+    fun sdkRefreshError(project: Project, errorMessage: String) {
+        NotificationGroupManager
+            .getInstance()
+            .getNotificationGroup("Elixir")
+            .createNotification(
+                "Elixir SDK refresh failed",
+                "Failed to refresh SDK paths: $errorMessage",
+                NotificationType.ERROR
+            )
+            .notify(project)
+    }
+
+    // Mix Dependencies notification methods
+    fun mixDepsOutdated(project: Project, root: VirtualFile) {
+        val oldNotification = synchronized(mixDepsNotifications) {
+            val existing = mixDepsNotifications[project] ?: return@synchronized null
+
+            if (existing.rootUrl == root.url) {
+                return
+            }
+
+            mixDepsNotifications.remove(project)
+            existing.notification
+        }
+        oldNotification?.expire()
+
+        lateinit var notification: Notification
+        notification = NotificationGroupManager
+            .getInstance()
+            .getNotificationGroup(MIX_DEPS_GROUP_ID)
+            .createNotification(
+                "$MIX_DEPS_OUTDATED_TITLE (${root.name})",
+                "Mix deps reported missing, outdated, or uncompiled deps",
+                NotificationType.WARNING
+            )
+            .addAction(org.elixir_lang.notification.mix_deps.InstallAction(root))
+            .addAction(org.elixir_lang.notification.mix_deps.ShowStatusAction(root))
+            .whenExpired {
+                synchronized(mixDepsNotifications) {
+                    if (mixDepsNotifications[project]?.notification === notification) {
+                        mixDepsNotifications.remove(project)
+                    }
+                }
+            }
+        synchronized(mixDepsNotifications) {
+            mixDepsNotifications[project] = ActiveMixDeps(root.url, notification)
+        }
+        notification.notify(project)
+    }
+
+    fun mixDepsCheckFailed(project: Project, moduleName: String, message: String) {
+        NotificationGroupManager
+            .getInstance()
+            .getNotificationGroup("Elixir")
+            .createNotification(
+                "Mix deps check failed ($moduleName)",
+                message,
+                NotificationType.INFORMATION
+            )
+            .notify(project)
+    }
+
+    fun clearMixDepsOutdated(project: Project) {
+        val notification = synchronized(mixDepsNotifications) {
+            mixDepsNotifications.remove(project)?.notification
+        }
+        notification?.expire()
+    }
+
+    /**
+     * Returns `true` when a "Mix deps outdated" notification is currently active (shown and not
+     * yet expired) for [project].
+     *
+     * Exposes the private [mixDepsNotifications] map as a read-only boolean so tests can assert
+     * notification state without reflection.
+     */
+    @TestOnly
+    fun hasActiveMixDepsOutdatedNotification(project: Project): Boolean =
+        mixDepsNotifications.containsKey(project)
+
+    /** Test seam: root URL currently bound to the active "Mix deps outdated" notification. */
+    @TestOnly
+    fun activeMixDepsOutdatedRootUrl(project: Project): String? =
+        mixDepsNotifications[project]?.rootUrl
+
+    fun mixDepsInstallSuccess(project: Project, moduleName: String) {
+        NotificationGroupManager
+            .getInstance()
+            .getNotificationGroup("Elixir")
+            .createNotification(
+                "Mix deps installed ($moduleName)",
+                "Successfully installed hex, rebar, fetched deps, and compiled",
+                NotificationType.INFORMATION
+            )
+            .notify(project)
+    }
+
+    fun mixDepsInstallError(project: Project, moduleName: String, errorMessage: String) {
+        NotificationGroupManager
+            .getInstance()
+            .getNotificationGroup("Elixir")
+            .createNotification(
+                "Mix deps installation failed ($moduleName)",
+                "Failed during local.hex, local.rebar, deps.get, or compilation. See Run Window for details: $errorMessage",
+                NotificationType.ERROR
+            )
+            .notify(project)
+    }
+
+    fun mixDepsNoSdk(project: Project, moduleName: String) {
+        NotificationGroupManager
+            .getInstance()
+            .getNotificationGroup("Elixir")
+            .createNotification(
+                "No Elixir SDK found ($moduleName)",
+                "Please configure an Elixir SDK for this project before installing deps",
+                NotificationType.ERROR
+            )
+            .notify(project)
+    }
+
+    fun mixDepsError(project: Project, moduleName: String, errorMessage: String) {
+        NotificationGroupManager
+            .getInstance()
+            .getNotificationGroup("Elixir")
+            .createNotification(
+                "Mix deps error ($moduleName)",
+                errorMessage,
+                NotificationType.ERROR
+            )
+            .notify(project)
+    }
+
+    fun elixirSdkMissingErlangDependency(project: Project?, missing: ErlangSdkResult.Missing) {
+        if (project != null && missingErlangSdkNotifications.containsKey(project)) {
+            return
+        }
+
+        val settingsTarget = SdkSettingsOpener.getInstance().targetName()
+        val details = when (missing.reason) {
+            MissingErlangSdkReason.NOT_CONFIGURED ->
+                "Elixir SDK '<b>${missing.elixirSdkName}</b>' does not have an Erlang SDK configured."
+
+            MissingErlangSdkReason.NOT_FOUND ->
+                if (missing.erlangSdkName.isNullOrBlank()) {
+                    "Elixir SDK '<b>${missing.elixirSdkName}</b>' references an Erlang SDK that cannot be found."
+                } else {
+                    "Elixir SDK '<b>${missing.elixirSdkName}</b>' references Erlang SDK '<b>${missing.erlangSdkName}</b>' which cannot be found."
+                }
+
+            MissingErlangSdkReason.INVALID_TYPE ->
+                if (missing.erlangSdkName.isNullOrBlank()) {
+                    "Elixir SDK '<b>${missing.elixirSdkName}</b>' references an SDK that is not an Erlang SDK."
+                } else {
+                    "Elixir SDK '<b>${missing.elixirSdkName}</b>' references SDK '<b>${missing.erlangSdkName}</b>' which is not an Erlang SDK."
+                }
+
+            MissingErlangSdkReason.MISSING_HOME_PATH ->
+                if (missing.erlangSdkName.isNullOrBlank()) {
+                    "Elixir SDK '<b>${missing.elixirSdkName}</b>' references an Erlang SDK with no home path."
+                } else {
+                    "Elixir SDK '<b>${missing.elixirSdkName}</b>' references Erlang SDK '<b>${missing.erlangSdkName}</b>' with no home path."
+                }
+        }
+        val notification =
+            NotificationGroupManager
+                .getInstance()
+                .getNotificationGroup("Elixir")
+                .createNotification(
+                    "Elixir SDK missing Erlang SDK",
+                    "$details Configure it in $settingsTarget.",
+                    NotificationType.WARNING
+                )
+                .addAction(NotificationAction.create("Configure SDKs") { event, _ ->
+                    SdkSettingsOpener.getInstance().open(event)
+                })
+                .whenExpired {
+                    if (project != null) {
+                        missingErlangSdkNotifications.remove(project)
+                    }
+                }
+
+        if (project != null) {
+            missingErlangSdkNotifications[project] = notification
+        }
+        notification.notify(project)
+    }
+}
+
+/**
+ * Fires the appropriate setup-SDK notification and returns the [Sdk] or null.
+ *
+ * - [ElixirSdkResolution.Ready] → returns the SDK, no notification.
+ * - [ElixirSdkResolution.MissingElixirSdk] → fires [Notifier.error] "Missing module Elixir SDK".
+ * - [ElixirSdkResolution.MissingErlangSdk] → delegates to [Notifier.elixirSdkMissingErlangDependency]
+ *   (deduplicated per-project, rich reason details).
+ *
+ * Callers that want custom failure handling (e.g. a different return type) should `when`-match
+ * the [ElixirSdkResolution] directly and avoid calling this function.
+ */
+fun ElixirSdkResolution.sdkOrNotify(module: Module): Sdk? = when (this) {
+    is ElixirSdkResolution.Ready -> sdk
+    is ElixirSdkResolution.MissingElixirSdk -> {
+        Notifier.error(
+            module,
+            "Missing module Elixir SDK",
+            "There is no configured Elixir SDK for the module ${module.name} or its project ${module.project.name}"
+        )
+        null
+    }
+    is ElixirSdkResolution.MissingErlangSdk -> {
+        Notifier.elixirSdkMissingErlangDependency(module.project, detail)
+        null
     }
 }

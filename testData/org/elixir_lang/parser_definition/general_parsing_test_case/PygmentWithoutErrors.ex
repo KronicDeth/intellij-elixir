@@ -20,8 +20,8 @@
 
 # Strings
 "Hello world"
-"Interspersed \x{ff} codes \7 \8 \65 \016 and \t\s\\s\z\+ \\ escapes"
-"Quotes ' inside \" \123 the \"\" \xF \\xF string \\\" end"
+"Interspersed \x41 codes \7 \8 \65 \016 and \t\s\\s\z\+ \\ escapes"
+"Quotes ' inside \" \123 the \"\" \x0F \\xF string \\\" end"
 "Multiline
    string"
 

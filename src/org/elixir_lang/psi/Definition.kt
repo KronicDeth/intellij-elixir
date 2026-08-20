@@ -1,5 +1,6 @@
 package org.elixir_lang.psi
 
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function.*
 import org.elixir_lang.psi.call.name.Module.KERNEL
@@ -27,6 +28,7 @@ enum class Definition(val type: Type) {
 /**
  * What kind of definition is defined by the [call]
  */
+@RequiresReadLock
 fun definition(call: Call): Definition? =
         definition(call.resolvedModuleName(), call.functionName(), call.resolvedFinalArity(), call.hasDoBlockOrKeyword())
 

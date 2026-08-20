@@ -1,7 +1,9 @@
 package org.elixir_lang.parser_definition;
 
+import org.elixir_lang.psi.quoting.QuotingDialect;
+
 /**
- * Created by luke.imhoff on 8/7/14.
+ * Created by kadie.enheduanna.inanna on 8/7/14.
  */
 public class CharListLineParsingTestCase extends ParsingTestCase {
     public void testEmpty() {
@@ -10,6 +12,10 @@ public class CharListLineParsingTestCase extends ParsingTestCase {
 
     public void testEmptyUnicodeEscapeSequence() {
         assertParsedAndQuotedAroundError();
+    }
+
+    public void testEnclosedHexEscapeSequence() {
+        assertParsedAndQuotedCorrectlyBefore(QuotingDialect.V1_20);
     }
 
     public void testEscapeSequences() {

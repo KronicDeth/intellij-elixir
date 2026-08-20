@@ -6,7 +6,7 @@ import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 import com.ericsson.otp.erlang.OtpErlangObject;
 
-public interface ElixirInterpolatedHeredocLine extends HeredocLine {
+public interface ElixirInterpolatedHeredocLine extends HeredocLineable {
 
   @Nullable
   ElixirEscapedEOL getEscapedEOL();
@@ -19,6 +19,6 @@ public interface ElixirInterpolatedHeredocLine extends HeredocLine {
 
   Body getBody();
 
-  @NotNull OtpErlangObject quote(@NotNull Heredoc heredoc, int prefixLength);
+  @NotNull OtpErlangObject quote(@NotNull HeredocLiteral heredocLiteral, int prefixLength);
 
 }

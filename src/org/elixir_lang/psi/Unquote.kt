@@ -4,6 +4,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiPolyVariantReference
 import com.intellij.psi.ResolveResult
 import com.intellij.psi.ResolveState
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function.UNQUOTE
@@ -14,6 +15,7 @@ import org.elixir_lang.psi.operation.Match
 import org.elixir_lang.psi.scope.WhileIn.whileIn
 
 object Unquote {
+    @RequiresReadLock
     fun treeWalkUp(unquoteCall: Call, resolveState: ResolveState, keepProcessing: (PsiElement, ResolveState) -> Boolean): Boolean {
         val unquoteCallResolveState = resolveState.putVisitedElement(unquoteCall)
 
@@ -30,9 +32,11 @@ object Unquote {
 
     fun `is`(call: Call): Boolean = call.isCalling(KERNEL, UNQUOTE)
 
+    @RequiresReadLock
     fun isQualified(qualified: Qualified): Boolean =
             isQualified(qualified, qualified.functionName())
 
+    @RequiresReadLock
     fun isQualified(qualified: Qualified, name: String?): Boolean =
             name == UNQUOTE &&
                     qualified.resolvedPrimaryArity() == 1 &&
@@ -49,16 +53,19 @@ object Unquote {
                     .filter(ResolveResult::isValidResult)
                     .mapNotNull(ResolveResult::getElement)
                     .filterIsInstance<Call>()
+                    .filter { !resolveState.hasBeenVisited(it) }
                     .let { resolveds -> treeWalkUpUnquoted(resolveds, resolveState, keepProcessing) }
 
     private fun treeWalkUpUnquoted(unquotedList: List<Call>,
                                    resolveState: ResolveState,
                                    keepProcessing: (PsiElement, ResolveState) -> Boolean): Boolean =
             whileIn(unquotedList) { unquoted ->
+                val unquotedResolveState = resolveState.putVisitedElement(unquoted)
+
                 if (CallDefinitionClause.`is`(unquoted)) {
-                    Using.treeWalkUp(unquoted, null, resolveState, keepProcessing)
+                    Using.treeWalkUp(unquoted, null, unquotedResolveState, keepProcessing)
                 } else {
-                    treeWalkUpUnquotedVariable(unquoted, resolveState, keepProcessing)
+                    treeWalkUpUnquotedVariable(unquoted, unquotedResolveState, keepProcessing)
                     // a variable
 
                     true

@@ -1,6 +1,8 @@
 package org.elixir_lang.beam.chunk.beam_documentation
 
 import com.ericsson.otp.erlang.*
+import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.vfs.VirtualFile
 import org.elixir_lang.beam.binaryToTerm
 import org.elixir_lang.beam.chunk.Chunk
 
@@ -13,7 +15,17 @@ class Documentation(private val docsList: OtpErlangList) {
     val beamLanguage: String by lazy { (docsList.elementAt(2) as OtpErlangAtom).atomValue() }
 
     /** format the docs are stored in i.e. 'text/markdown' */
-    val format: String? by lazy { (docsList.elementAt(3) as? OtpErlangBinary)?.let{ String(it.binaryValue())} }
+    val format: String? by lazy {
+        when (val element = docsList.elementAt(3)) {
+            is OtpErlangBinary -> String(element.binaryValue(), Charsets.UTF_8)
+            is OtpErlangList -> {
+                try {
+                    element.stringValue()
+                } catch (_: Exception) { null }
+            }
+            else -> null
+        }
+    }
 
     /**  List of documentation for other entities (such as functions and types) in the module.*/
     val docs: Docs? by lazy { (docsList.elementAt(6) as? OtpErlangList)?.let { Docs.from(it)} }
@@ -21,24 +33,65 @@ class Documentation(private val docsList: OtpErlangList) {
     val moduleDocs: ModuleDocs? by lazy { (docsList.elementAt(4) as? OtpErlangMap)?. let { ModuleDocs(it) } }
 
     companion object {
-        fun from(chunk: Chunk): Documentation? {
-            val data = chunk.data
-            var offset = 0
+        private val LOGGER = Logger.getInstance(Documentation::class.java)
 
-            val (term, termByteCount) = binaryToTerm(data, offset)
-            offset += termByteCount
+        fun from(chunk: Chunk): Documentation? = from(chunk.data)
 
-            if (term is OtpErlangTuple) {
-                val firstAtom = term.elements().firstOrNull() as? OtpErlangAtom ?: return null
-                if (firstAtom.atomValue() != "docs_v1"){
-                    return null
+        /**
+         * Parses a `docs_v1` EEP-48 term from raw Erlang External Term Format bytes.
+         *
+         * This handles both embedded BEAM `Docs` chunk data and external `.chunk` files
+         * (e.g. `<app>/doc/chunks/<module>.chunk`) which use the same ETF encoding.
+         */
+        fun from(data: ByteArray): Documentation? {
+            return try {
+                val (term, _) = binaryToTerm(data, 0)
+
+                if (term is OtpErlangTuple) {
+                    val firstAtom = term.elements().firstOrNull() as? OtpErlangAtom ?: return null
+                    if (firstAtom.atomValue() != "docs_v1") {
+                        return null
+                    }
+
+                    val list = OtpErlangList(term.elements())
+                    Documentation(list)
+                } else {
+                    null
                 }
-
-                val list = OtpErlangList(term.elements())
-                return Documentation(list)
+            } catch (e: Exception) {
+                LOGGER.debug("Failed to parse EEP-48 documentation from byte data", e)
+                null
             }
-            return null
         }
 
+        /**
+         * Resolves EEP-48 documentation from an external `.chunk` file for the given `.beam` file.
+         *
+         * Erlang OTP stores documentation as external files at `<app>/doc/chunks/<module>.chunk`
+         * when the `Docs` chunk is not embedded in the `.beam` file (common in OTP 23–26 and
+         * many mise/asdf-built installations). The `.chunk` file contains a `docs_v1` tuple in
+         * Erlang External Term Format.
+         *
+         * @param beamFile the `.beam` [VirtualFile], typically located in `<app>/ebin/`
+         * @return parsed [Documentation], or `null` if no external chunk file is found or parsing fails
+         */
+        fun fromExternalChunk(beamFile: VirtualFile): Documentation? {
+            val moduleName = beamFile.nameWithoutExtension
+            // Navigate from <app>/ebin/<module>.beam to <app>/doc/chunks/<module>.chunk
+            val ebinDir = beamFile.parent ?: return null
+            val appDir = ebinDir.parent ?: return null
+            val chunkFile = appDir
+                .findChild("doc")
+                ?.findChild("chunks")
+                ?.findChild("$moduleName.chunk")
+                ?: return null
+
+            return try {
+                from(chunkFile.contentsToByteArray())
+            } catch (e: Exception) {
+                LOGGER.debug("Failed to read external doc chunk file: ${chunkFile.path}", e)
+                null
+            }
+        }
     }
 }

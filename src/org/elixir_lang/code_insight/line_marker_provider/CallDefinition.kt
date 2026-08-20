@@ -6,10 +6,12 @@ import com.intellij.codeInsight.daemon.LineMarkerProvider
 import com.intellij.openapi.editor.colors.CodeInsightColors
 import com.intellij.openapi.editor.colors.EditorColorsManager
 import com.intellij.openapi.editor.markup.SeparatorPlacement
+import com.intellij.model.psi.PsiSymbolReferenceService
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiPolyVariantReference
 import com.intellij.psi.ResolveState
 import com.intellij.psi.impl.source.tree.LeafPsiElement
+import org.elixir_lang.model.psi.function.FunctionSymbol
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
 import org.elixir_lang.psi.CallDefinitionClause
 import org.elixir_lang.psi.CallDefinitionClause.nameArityInterval
@@ -21,36 +23,58 @@ import org.elixir_lang.structure_view.element.CallDefinitionSpecification.Compan
 import org.elixir_lang.structure_view.element.CallDefinitionSpecification.Companion.specification
 import org.elixir_lang.structure_view.element.CallDefinitionSpecification.Companion.specificationType
 
-class CallDefinition : LineMarkerProvider {
-    override fun getLineMarkerInfo(element: PsiElement): LineMarkerInfo<*>? =
-        if (daemonCodeAnalyzerSettings.SHOW_METHOD_SEPARATORS) {
-            when (element) {
-                is AtUnqualifiedNoParenthesesCall<*> -> getLineMarkerInfo(element)
-                is Call -> getLineMarkerInfo(element)
-                else -> null
+internal class CallDefinition : LineMarkerProvider {
+    override fun getLineMarkerInfo(element: PsiElement): LineMarkerInfo<*>? {
+        // LineMarkerProvider contract: only return info for leaf elements
+        if (element.firstChild != null) return null
+        if (!daemonCodeAnalyzerSettings.SHOW_METHOD_SEPARATORS) return null
+
+        val parent = element.parent
+
+        // Leaf is IDENTIFIER_TOKEN inside an @-attribute's atIdentifier
+        if (parent != null && element.node.elementType == ElixirTypes.IDENTIFIER_TOKEN) {
+            val grandparent = parent.parent
+            if (grandparent is AtUnqualifiedNoParenthesesCall<*>) {
+                // Verify this is the expected leaf anchor for the attribute
+                val expectedLeaf = grandparent.atIdentifier.node
+                    .findChildByType(ElixirTypes.IDENTIFIER_TOKEN) as? LeafPsiElement
+                if (element == expectedLeaf) {
+                    return getLineMarkerInfo(grandparent)
+                }
             }
-        } else {
-            null
         }
+
+        // Leaf is the marker anchor of a Call (function name identifier).
+        // markerAnchor(call) places the leaf at most 2 levels below the Call
+        // (Call → functionNameElement → IDENTIFIER_TOKEN), so we bound the search.
+        val call = generateSequence(parent) { it.parent }
+            .take(2)
+            .filterIsInstance<Call>()
+            .firstOrNull()
+
+        if (call != null && CallDefinitionClause.`is`(call) && element == markerAnchor(call)) {
+            return getLineMarkerInfo(call)
+        }
+
+        return null
+    }
 
     private val daemonCodeAnalyzerSettings: DaemonCodeAnalyzerSettings = DaemonCodeAnalyzerSettings.getInstance()
     private val editorColorsManager: EditorColorsManager = EditorColorsManager.getInstance()
 
     private fun callDefinitionSeparator(
         atUnqualifiedNoParenthesesCall: AtUnqualifiedNoParenthesesCall<*>
-    ): LineMarkerInfo<*> {
+    ): LineMarkerInfo<*>? {
         val leafPsiElement = atUnqualifiedNoParenthesesCall
             .atIdentifier
             .node
-            .findChildByType(ElixirTypes.IDENTIFIER_TOKEN) as LeafPsiElement?
-            ?: error(
-                "AtUnqualifiedNoParenthesesCall (" +
-                        atUnqualifiedNoParenthesesCall.text +
-                        ") does not have an Tokenizer token"
-            )
+            .findChildByType(ElixirTypes.IDENTIFIER_TOKEN) as? LeafPsiElement
 
-        return callDefinitionSeparator(leafPsiElement)
+        return leafPsiElement?.let(::callDefinitionSeparator)
     }
+
+    private fun callDefinitionSeparator(call: Call): LineMarkerInfo<*>? =
+        markerAnchor(call)?.let(::callDefinitionSeparator)
 
     private fun callDefinitionSeparator(psiElement: PsiElement): LineMarkerInfo<*> =
         LineMarkerInfo(
@@ -120,7 +144,7 @@ class CallDefinition : LineMarkerProvider {
                     if (moduleAttributeNameArity != null) {
                         moduleAttributeNameArity(previousModuleAttribute)?.let { previousModuleAttributeNameArity ->
                             // name match, now check if the arities match.
-                            if (moduleAttributeNameArity.arity == previousModuleAttributeNameArity.arity) {
+                            if (moduleAttributeNameArity.name == previousModuleAttributeNameArity.name) {
                                 val moduleAttributeArity = moduleAttributeNameArity.arity
                                 val previousModuleAttributeArity = previousModuleAttributeNameArity.arity
 
@@ -131,27 +155,11 @@ class CallDefinition : LineMarkerProvider {
                                 } else {
                                     /* same name, but different arity needs to determine if the call definition has an
                                        arity range. */
-                                    specification(atUnqualifiedNoParenthesesCall)?.let { specificationType(it) }?.reference?.let { reference ->
-                                        val resolvedList = if (reference is PsiPolyVariantReference) {
-                                            val resolveResults = reference.multiResolve(false)
+                                    specification(atUnqualifiedNoParenthesesCall)?.let { specificationType(it) }?.let { type ->
+                                        val resolvedCalls = resolvedSpecificationCallDefinitionClauses(type)
 
-                                            if (resolveResults.isNotEmpty()) {
-                                                resolveResults.map { it.element!! }
-                                            } else {
-                                                null
-                                            }
-                                        } else {
-                                            val resolved = reference.resolve()
-
-                                            if (resolved != null) {
-                                                listOf(resolved)
-                                            } else {
-                                                null
-                                            }
-                                        }
-
-                                        if (resolvedList != null && resolvedList.isNotEmpty()) {
-                                            firstInGroup = resolvedList.filterIsInstance<Call>().none { resolved ->
+                                        if (resolvedCalls.isNotEmpty()) {
+                                            firstInGroup = resolvedCalls.none { resolved ->
                                                 nameArityInterval(
                                                     resolved,
                                                     ResolveState.initial()
@@ -261,5 +269,29 @@ class CallDefinition : LineMarkerProvider {
         }
 
         return siblingCallDefinitionClause
+    }
+
+    @Suppress("UnstableApiUsage")
+    private fun resolvedSpecificationCallDefinitionClauses(type: Call): List<Call> {
+        val bySymbol = PsiSymbolReferenceService.getService()
+            .getReferences(type)
+            .flatMap { it.resolveReference() }
+            .filterIsInstance<FunctionSymbol>()
+            .mapNotNull { symbol ->
+                val elementAtRange = symbol.file.findElementAt(symbol.range.startOffset) ?: return@mapNotNull null
+                generateSequence(elementAtRange) { it.parent }
+                    .filterIsInstance<Call>()
+                    .firstOrNull { CallDefinitionClause.`is`(it) }
+            }
+
+        if (bySymbol.isNotEmpty()) return bySymbol.distinct()
+
+        // Keep legacy fallback while line-marker grouping remains partially legacy.
+        val reference = type.reference ?: return emptyList()
+        return if (reference is PsiPolyVariantReference) {
+            reference.multiResolve(false).mapNotNull { it.element as? Call }
+        } else {
+            listOfNotNull(reference.resolve() as? Call)
+        }
     }
 }

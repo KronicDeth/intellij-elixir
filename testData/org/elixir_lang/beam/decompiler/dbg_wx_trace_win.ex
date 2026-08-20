@@ -253,7 +253,7 @@ defmodule :dbg_wx_trace_win do
   end
 
   def configure(wi0 = winInfo(window: win, m_szr: {panel, sizer}), windows) do
-    :wx.batch(fn  ->
+    :wx.batch(fn () ->
         wi = enable_windows(wi0, windows)
         _ = show_windows(wi)
         :wxSizer.layout(sizer)
@@ -719,14 +719,14 @@ defmodule :dbg_wx_trace_win do
     # body not decompiled
   end
 
-  def add_break_to_menu(winInfo, menu, {point, [status | _Options] = options}) do
+  defp add_break_to_menu(winInfo, menu, {point, [status | _Options] = options}) do
     break = :dbg_wx_win.add_break(winInfo(winInfo, :window), menu, point)
     :dbg_wx_win.update_break(break, options)
     breakInfo = breakInfo(point: point, status: status, break: break)
     winInfo(winInfo, breaks: [breakInfo | winInfo(winInfo, :breaks)])
   end
 
-  def bind_area(parent) do
+  defp bind_area(parent) do
     style = {:style, 64 ||| 128 ||| 4194304}
     win = :wxSashWindow.new(parent, [{:id, 426}, style])
     :wxSashWindow.setSashVisible(win, 3, true)
@@ -745,7 +745,7 @@ defmodule :dbg_wx_trace_win do
     sub(name: :"Bindings Area", win: win, out: bA)
   end
 
-  def button_area(parent) do
+  defp button_area(parent) do
     sz = :wxBoxSizer.new(4)
     :wx.foreach(fn {name, button} ->
         b = :wxButton.new(parent, button, [{:label, :dbg_wx_win.to_string(name)}])
@@ -756,9 +756,9 @@ defmodule :dbg_wx_trace_win do
     sub(name: :"Button Area", win: sz)
   end
 
-  def buttons(), do: [{:"Step", 401}, {:"Next", 402}, {:"Continue", 403}, {:"Finish", 404}, {:"Where", 405}, {:"Up", 406}, {:"Down", 407}]
+  defp buttons(), do: [{:"Step", 401}, {:"Next", 402}, {:"Continue", 403}, {:"Finish", 404}, {:"Where", 405}, {:"Up", 406}, {:"Down", 407}]
 
-  def code_area(win) do
+  defp code_area(win) do
     codeWin = :wxSashWindow.new(win, [{:id, 425}, {:size, {700, 400}}, {:style, 64 ||| 128}])
     code = :dbg_wx_code.code_area(codeWin)
     :wxSashWindow.setSashVisible(codeWin, 2, true)
@@ -766,8 +766,8 @@ defmodule :dbg_wx_trace_win do
     sub(name: :"Code Area", enable: true, win: codeWin, out: code)
   end
 
-  def configure(wi = winInfo(window: win, m_szr: {panel, sizer})) do
-    :wx.batch(fn  ->
+  defp configure(wi = winInfo(window: win, m_szr: {panel, sizer})) do
+    :wx.batch(fn () ->
         _ = show_windows(wi)
         :wxSizer.layout(sizer)
         :wxWindow.setSizer(panel, sizer)
@@ -777,13 +777,13 @@ defmodule :dbg_wx_trace_win do
     end)
   end
 
-  def delete_break_from_menu(winInfo, point) do
+  defp delete_break_from_menu(winInfo, point) do
     {:value, breakInfo} = :lists.keysearch(point, breakInfo(:point), winInfo(winInfo, :breaks))
     :dbg_wx_win.delete_break(breakInfo(breakInfo, :break))
     winInfo(winInfo, breaks: :lists.keydelete(point, breakInfo(:point), winInfo(winInfo, :breaks)))
   end
 
-  def enable_windows(wi = winInfo(e_szr: {_, infoArea}, bs: bs0, sg: sG0, eval: eval0, trace: trace0, bind: bind0), windows) do
+  defp enable_windows(wi = winInfo(e_szr: {_, infoArea}, bs: bs0, sg: sG0, eval: eval0, trace: trace0, bind: bind0), windows) do
     subs = for window <- [sG0, bs0, eval0, trace0, bind0] do
       sub(window, enable: :lists.member(sub(window, :name), windows))
     end
@@ -792,7 +792,7 @@ defmodule :dbg_wx_trace_win do
     winInfo(wi, e_szr: {eSzr, infoArea}, sg: sG, bs: bs, eval: eval, trace: trace, bind: bind)
   end
 
-  def eval_area(parent) do
+  defp eval_area(parent) do
     vSz = :wxBoxSizer.new(8)
     hSz = :wxBoxSizer.new(4)
     _ = :wxSizer.add(hSz, :wxStaticText.new(parent, -1, 'Evaluator:'), [{:flag, 2048}])
@@ -805,7 +805,7 @@ defmodule :dbg_wx_trace_win do
     sub(name: :"Evaluator Area", win: vSz, in: tC, out: tL)
   end
 
-  def is_button(name) do
+  defp is_button(name) do
     case :lists.keyfind(name, 1, buttons()) do
       {name, button} ->
         {true, button}
@@ -814,7 +814,7 @@ defmodule :dbg_wx_trace_win do
     end
   end
 
-  def resize(winInfo(bind: bind)) do
+  defp resize(winInfo(bind: bind)) do
     cond do
       sub(bind, :enable) === false ->
         :ok
@@ -826,11 +826,11 @@ defmodule :dbg_wx_trace_win do
     end
   end
 
-  def search_area(parent), do: ...
+  defp search_area(parent), do: ...
 
-  def show_windows(wi = winInfo(m_szr: {_, sizer}, e_szr: {_, infoArea}, bs: bs, sg: sG, eval: eval, trace: trace, bind: bind)), do: ...
+  defp show_windows(wi = winInfo(m_szr: {_, sizer}, e_szr: {_, infoArea}, bs: bs, sg: sG, eval: eval, trace: trace, bind: bind)), do: ...
 
-  def trace_area(parent) do
+  defp trace_area(parent) do
     style = {:style, 64 ||| 128 ||| 4194304}
     win = :wxSashWindow.new(parent, [{:id, 427}, {:size, {700, 100}}, style])
     :wxSashWindow.setSashVisible(win, 0, true)
@@ -839,7 +839,7 @@ defmodule :dbg_wx_trace_win do
     sub(name: :"Trace Area", win: win, out: tC)
   end
 
-  def update_break_in_menu(winInfo, {point, [status | _Options] = options}) do
+  defp update_break_in_menu(winInfo, {point, [status | _Options] = options}) do
     {:value, breakInfo} = :lists.keysearch(point, breakInfo(:point), winInfo(winInfo, :breaks))
     :dbg_wx_win.update_break(breakInfo(breakInfo, :break), options)
     breakInfo2 = breakInfo(breakInfo, status: status)

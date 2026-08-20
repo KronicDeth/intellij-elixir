@@ -4,6 +4,7 @@ import com.ericsson.otp.erlang.OtpMbox
 import com.ericsson.otp.erlang.OtpNode
 import com.intellij.util.TimeoutUtil.sleep
 import java.io.IOException
+import kotlinx.coroutines.CoroutineScope
 
 /**
  * `{atom(), node()}` `t:GenServer.server/0` that works with JInterface, so both the `atom()` and `node()` are
@@ -13,11 +14,11 @@ data class Server(val registeredNamed: String, val nodeName: String) {
     /**
      * @param ensureAllStarted ensures that `epmd -d` and the [remoteNodeName] and [remoteRegisteredName] is started.
      */
-    fun mailBox(remote: Server, cookie: String, ensureAllStarted: () -> Unit): MailBox  {
+    fun mailBox(remote: Server, cookie: String, ensureAllStarted: () -> Unit, scope: CoroutineScope): MailBox  {
         val localNode = localNode(remote, cookie, ensureAllStarted)
         val localRegisteredMbox = mbox(localNode)
 
-        return MailBox(localNode, localRegisteredMbox).apply {
+        return MailBox(localNode, localRegisteredMbox, scope).apply {
             waitFor(remote)
         }
     }

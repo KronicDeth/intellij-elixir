@@ -10,7 +10,7 @@ import java.io.IOException;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Created by luke.imhoff on 9/27/14.
+ * Created by kadie.enheduanna.inanna on 9/27/14.
  */
 public class EndTest extends TokenTest {
     /*

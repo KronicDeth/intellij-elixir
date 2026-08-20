@@ -16,6 +16,7 @@ import com.intellij.psi.PsiReference;
 import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.psi.search.SearchScope;
+import com.intellij.util.concurrency.annotations.RequiresReadLock;
 import java.util.Set;
 import com.intellij.psi.stubs.IStubElementType;
 
@@ -52,16 +53,19 @@ public class ElixirMatchedAtUnqualifiedNoParenthesesCallImpl extends NamedStubbe
   }
 
   @Override
+  @RequiresReadLock
   public @Nullable String canonicalName() {
     return ElixirPsiImplUtil.canonicalName(this);
   }
 
   @Override
+  @RequiresReadLock
   public @NotNull Set<String> canonicalNameSet() {
     return ElixirPsiImplUtil.canonicalNameSet(this);
   }
 
   @Override
+  @RequiresReadLock
   public @Nullable String functionName() {
     return ElixirPsiImplUtil.functionName(this);
   }
@@ -77,21 +81,25 @@ public class ElixirMatchedAtUnqualifiedNoParenthesesCallImpl extends NamedStubbe
   }
 
   @Override
+  @RequiresReadLock
   public boolean hasDoBlockOrKeyword() {
     return ElixirPsiImplUtil.hasDoBlockOrKeyword(this);
   }
 
   @Override
+  @RequiresReadLock
   public @Nullable String getName() {
     return ElixirPsiImplUtil.getName(this);
   }
 
   @Override
+  @RequiresReadLock
   public @Nullable PsiElement getNameIdentifier() {
     return ElixirPsiImplUtil.getNameIdentifier(this);
   }
 
   @Override
+  @RequiresReadLock
   public @NotNull ItemPresentation getPresentation() {
     return ElixirPsiImplUtil.getPresentation(this);
   }
@@ -107,26 +115,31 @@ public class ElixirMatchedAtUnqualifiedNoParenthesesCallImpl extends NamedStubbe
   }
 
   @Override
+  @RequiresReadLock
   public boolean isCalling(@NotNull String resolvedModuleName, @NotNull String functionName) {
     return ElixirPsiImplUtil.isCalling(this, resolvedModuleName, functionName);
   }
 
   @Override
+  @RequiresReadLock
   public boolean isCalling(@NotNull String resolvedModuleName, @NotNull String functionName, int resolvedFinalArity) {
     return ElixirPsiImplUtil.isCalling(this, resolvedModuleName, functionName, resolvedFinalArity);
   }
 
   @Override
+  @RequiresReadLock
   public boolean isCallingMacro(@NotNull String resolvedModuleName, @NotNull String functionName) {
     return ElixirPsiImplUtil.isCallingMacro(this, resolvedModuleName, functionName);
   }
 
   @Override
+  @RequiresReadLock
   public boolean isCallingMacro(@NotNull String resolvedModuleName, @NotNull String functionName, int resolvedFinalArity) {
     return ElixirPsiImplUtil.isCallingMacro(this, resolvedModuleName, functionName, resolvedFinalArity);
   }
 
   @Override
+  @RequiresReadLock
   public @Nullable String implementedProtocolName() {
     return ElixirPsiImplUtil.implementedProtocolName(this);
   }
@@ -137,16 +150,19 @@ public class ElixirMatchedAtUnqualifiedNoParenthesesCallImpl extends NamedStubbe
   }
 
   @Override
+  @RequiresReadLock
   public @NotNull PsiElement[] primaryArguments() {
     return ElixirPsiImplUtil.primaryArguments(this);
   }
 
   @Override
+  @RequiresReadLock
   public @Nullable Integer primaryArity() {
     return ElixirPsiImplUtil.primaryArity(this);
   }
 
   @Override
+  @RequiresReadLock
   public boolean processDeclarations(@NotNull PsiScopeProcessor processor, @NotNull ResolveState state, PsiElement lastParent, @NotNull PsiElement place) {
     return ElixirPsiImplUtil.processDeclarations(this, processor, state, lastParent, place);
   }
@@ -157,11 +173,13 @@ public class ElixirMatchedAtUnqualifiedNoParenthesesCallImpl extends NamedStubbe
   }
 
   @Override
+  @RequiresReadLock
   public int resolvedFinalArity() {
     return ElixirPsiImplUtil.resolvedFinalArity(this);
   }
 
   @Override
+  @RequiresReadLock
   public @NotNull ArityInterval resolvedFinalArityInterval() {
     return ElixirPsiImplUtil.resolvedFinalArityInterval(this);
   }
@@ -172,11 +190,13 @@ public class ElixirMatchedAtUnqualifiedNoParenthesesCallImpl extends NamedStubbe
   }
 
   @Override
+  @RequiresReadLock
   public @Nullable Integer resolvedPrimaryArity() {
     return ElixirPsiImplUtil.resolvedPrimaryArity(this);
   }
 
   @Override
+  @RequiresReadLock
   public @Nullable Integer resolvedSecondaryArity() {
     return ElixirPsiImplUtil.resolvedSecondaryArity(this);
   }
@@ -187,6 +207,7 @@ public class ElixirMatchedAtUnqualifiedNoParenthesesCallImpl extends NamedStubbe
   }
 
   @Override
+  @RequiresReadLock
   public @Nullable Integer secondaryArity() {
     return ElixirPsiImplUtil.secondaryArity(this);
   }

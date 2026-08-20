@@ -1,7 +1,6 @@
 package org.elixir_lang.beam.chunk.code.operation.code
 
 import org.elixir_lang.beam.Cache
-import org.elixir_lang.beam.chunk.Code
 import org.elixir_lang.beam.chunk.Code.Options
 import org.elixir_lang.beam.chunk.Code.Options.Companion.UNAMBIGUOUS
 import org.elixir_lang.beam.chunk.Code.Options.Inline
@@ -11,22 +10,22 @@ import org.elixir_lang.beam.term.List
 import org.elixir_lang.code.Identifier.inspectAsFunction
 import org.elixir_lang.utils.ElixirModulesUtil
 
-data class Argument(val name: String, val supportedOptions: Code.Options = Code.Options()) {
-    fun assembly(term: Term, cache: Cache, configuredOptions: Code.Options): String {
+data class Argument(val name: String, val supportedOptions: Options = Options()) {
+    fun assembly(term: Term, cache: Cache, configuredOptions: Options): String {
         val nameAssembly = nameAssembly(configuredOptions)
         val valueAssembly = valueAssembly(term, cache, configuredOptions)
 
         return "$nameAssembly$valueAssembly"
     }
 
-    private fun nameAssembly(configuredOptions: Code.Options) =
+    private fun nameAssembly(configuredOptions: Options) =
             if (supportedOptions.showArgumentNames && configuredOptions.showArgumentNames) {
                 "$name: "
             } else {
                 ""
             }
 
-    private fun valueAssembly(term: Term, cache: Cache, configuredOptions: Code.Options): String {
+    private fun valueAssembly(term: Term, cache: Cache, configuredOptions: Options): String {
         return when (term) {
             is AllocationList -> {
                 val allocationList = term.allocationList
@@ -115,6 +114,8 @@ data class Argument(val name: String, val supportedOptions: Code.Options = Code.
                     else -> "literal($index)"
                 }
             }
+            is TypedRegister ->
+                "{tr, ${valueAssembly(term.register, cache, configuredOptions)}, ${valueAssembly(term.type, cache, configuredOptions)}}"
             is XRegister ->
                 "x(${term.index})"
             is YRegister ->

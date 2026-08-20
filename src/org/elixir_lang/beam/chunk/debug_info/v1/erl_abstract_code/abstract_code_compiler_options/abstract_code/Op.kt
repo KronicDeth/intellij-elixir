@@ -89,7 +89,10 @@ object Op {
         val (operandMacroString, operandDeclaredScope) = AbstractCode.toMacroStringDeclaredScope(operand, scope)
         val operandString = operandMacroString.string
 
-        if (operandString == "not") {
+        // Always add a space after word-based unary operators (e.g. `not`) to prevent
+        // keyword syntax ambiguity when the operand starts with ':' — without the space,
+        // `not:erlang.is_tuple(x)` is parsed as keyword argument `not:` followed by `erlang`.
+        if (operatorString.first().isLetter()) {
             stringBuilder.append(' ')
         }
 

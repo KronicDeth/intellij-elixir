@@ -4,7 +4,7 @@ import com.intellij.openapi.fileTypes.LanguageFileType
 import javax.swing.Icon
 
 /**
- * Created by luke.imhoff on 7/27/14.
+ * Created by kadie.enheduanna.inanna on 7/27/14.
  */
 open class ElixirFileType protected constructor() : LanguageFileType(ElixirLanguage) {
     override fun getName(): String = "Elixir"

@@ -12,6 +12,7 @@ import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.psi.*;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.navigation.ItemPresentation;
+import com.intellij.util.concurrency.annotations.RequiresReadLock;
 
 public class ElixirKeywordKeyImpl extends ASTWrapperPsiElement implements ElixirKeywordKey {
 
@@ -36,6 +37,7 @@ public class ElixirKeywordKeyImpl extends ASTWrapperPsiElement implements Elixir
   }
 
   @Override
+  @RequiresReadLock
   public @Nullable String getName() {
     return ElixirPsiImplUtil.getName(this);
   }

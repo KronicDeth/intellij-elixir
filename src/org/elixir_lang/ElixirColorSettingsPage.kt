@@ -13,7 +13,7 @@ import org.elixir_lang.ElixirSyntaxHighlighter.Companion.sigilNames
 import javax.swing.Icon
 
 /**
- * Created by luke.imhoff on 8/3/14.
+ * Created by kadie.enheduanna.inanna on 8/3/14.
  */
 class ElixirColorSettingsPage : ColorSettingsPage {
     override fun getIcon(): Icon? = Icons.LANGUAGE

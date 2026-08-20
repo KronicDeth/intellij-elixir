@@ -1,8 +1,8 @@
 package org.elixir_lang.psi
 
-import com.intellij.testFramework.fixtures.BasePlatformTestCase
+import org.elixir_lang.PlatformTestCase
 
-class ElixirVisitorTest : BasePlatformTestCase() {
+class ElixirVisitorTest : PlatformTestCase() {
     fun testvisitLiteralSigilLine() {
         myFixture.configureByFile("autogenerate_test.exs")
         val elementAtCaret = myFixture.file.findElementAt(myFixture.caretOffset)
