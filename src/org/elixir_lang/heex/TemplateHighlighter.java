@@ -17,8 +17,6 @@ import org.elixir_lang.heex.psi.Types;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static org.elixir_lang.heex.file.Type.onlyTemplateDataFileType;
-
 // See https://github.com/JetBrains/intellij-plugins/blob/500f42337a87f463e0340f43e2411266fcfa9c5f/handlebars/src/com/dmarcotte/handlebars/HbTemplateHighlighter.java
 public class TemplateHighlighter extends LayeredLexerEditorHighlighter {
     public TemplateHighlighter(@Nullable Project project,
@@ -38,10 +36,6 @@ public class TemplateHighlighter extends LayeredLexerEditorHighlighter {
 
             if (language != null) {
                 type = language.getAssociatedFileType();
-            }
-
-            if (type == null) {
-                type = onlyTemplateDataFileType(virtualFile).orElse(null);
             }
 
             if (type == null) {

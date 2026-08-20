@@ -7,8 +7,6 @@ import com.intellij.lang.xml.XMLLanguage
 import com.intellij.lang.xml.XmlASTFactory
 import com.intellij.lang.xml.XmlTemplateTreePatcher
 import com.intellij.lexer.EmbeddedTokenTypesProvider
-import com.intellij.openapi.fileTypes.ExtensionFileNameMatcher
-import com.intellij.openapi.fileTypes.impl.FileTypeAssocTableUtil
 import com.intellij.psi.LanguageFileViewProviders
 import com.intellij.psi.templateLanguages.TemplateDataElementType
 import com.intellij.psi.templateLanguages.TemplateDataLanguageMappings
@@ -50,24 +48,11 @@ abstract class HeexParsingTestCase : ParsingTestCase(
         project.registerService(TemplateDataLanguageMappings::class.java, TemplateDataLanguageMappings(project))
         // TemplateDataLanguageMappings.getMapping falls through to
         // TemplateDataLanguagePatterns.getInstance() (an application-level service) when there is no
-        // per-file override - same registration gap as above, one level up. Its own assoc table is
-        // empty by default (it is normally populated from a persisted user Settings choice), and
-        // ViewProvider.templateDataLanguage's remaining fallback - the FileTypeManager-based
-        // double-extension heuristic in heex/file/Type.kt's onlyTemplateDataFileType - depends on
-        // FileTypeManager knowing the real ".html" -> HTML association, which the bare
-        // MockFileTypeManager a ParsingTestCase installs does not (it only knows the one
-        // MockLanguageFileType registered for "html.heex"). So without an explicit pattern here, HEEx's
-        // template data language silently resolves to HeexLanguage.defaultTemplateLanguageFileType()
-        // = plain text, and the HTML root simply does not exist. Register the pattern this plugin's own
-        // convention actually uses, so the data root is deterministically HTML regardless of that gap.
-        // FileTypeAssocTable.addAssociation stores an ExtensionFileNameMatcher by its bare extension
-        // and looks it up later via FileUtilRt.getExtension(fileName), which returns only the LAST
-        // dot-suffix ("heex", not "html.heex") - so the matcher must be registered for "heex", not
-        // the full double extension our fixtures use for readability.
-        val htmlAssocTable = FileTypeAssocTableUtil.newScalableFileTypeAssocTable<com.intellij.lang.Language>()
-        htmlAssocTable.addAssociation(ExtensionFileNameMatcher("heex"), HTMLLanguage.INSTANCE)
+        // per-file override - same registration gap as above, one level up. Its assoc table is empty
+        // by default (it is normally populated from a persisted user Settings choice), so this need
+        // not be populated: an empty lookup is exactly what makes ViewProvider.templateDataLanguage
+        // fall through to its final default, HeexLanguage.defaultTemplateLanguageFileType() = HTML.
         application.registerService(TemplateDataLanguagePatterns::class.java, TemplateDataLanguagePatterns())
-        TemplateDataLanguagePatterns.getInstance().setAssocTable(htmlAssocTable)
         registerExtensionPoint(EmbeddedTokenTypesProvider.EXTENSION_POINT_NAME, EmbeddedTokenTypesProvider::class.java)
         registerExtensionPoint(StartTagEndTokenProvider.EP_NAME, StartTagEndTokenProvider::class.java)
         addExplicitExtension(LanguageFileViewProviders.INSTANCE, HeexLanguage.INSTANCE, Factory())

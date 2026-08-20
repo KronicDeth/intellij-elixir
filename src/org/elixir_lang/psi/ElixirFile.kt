@@ -31,13 +31,20 @@ class ElixirFile(viewProvider: FileViewProvider) : PsiFileBase(viewProvider, Eli
                                      place: PsiElement): Boolean =
             ProcessDeclarationsImpl.processDeclarations(this, processor, state, lastParent!!, place)
 
-    override fun getContext(): PsiElement? = viewFile()?.modulars()?.singleOrNull()
+    // With no view module of its own, an injected Elixir root (e.g. inside a ~H sigil) uses the
+    // platform's context - the injection host - so resolution reaches the surrounding module.
+    override fun getContext(): PsiElement? = viewFile()?.modulars()?.singleOrNull() ?: super.getContext()
 
     /**
      * If this file is a LEEx template (`*.html.leex`), then this is the file that should contain the view module.
      */
     fun viewFile(): ElixirFile? =
-            when (virtualFile?.fileType) {
+            // An injected fragment (e.g. the HTML/Elixir roots inside a ~H sigil) is a light window
+            // file with no real directory to search - the branches below would run directory lookups
+            // against it and either NPE or return nonsense.
+            if (virtualFile is com.intellij.injected.editor.VirtualFileWindow) {
+                null
+            } else when (virtualFile?.fileType) {
                 org.elixir_lang.eex.file.Type.INSTANCE -> {
                     containingFile.parent?.let { directory ->
                         directory.parentDirectory?.let { directoryDirectory ->

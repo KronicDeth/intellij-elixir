@@ -1,6 +1,6 @@
 package org.elixir_lang.heex;
 
-import com.intellij.openapi.fileTypes.FileTypes;
+import com.intellij.ide.highlighter.HtmlFileType;
 import com.intellij.openapi.fileTypes.LanguageFileType;
 import com.intellij.psi.templateLanguages.TemplateLanguage;
 import org.jetbrains.annotations.Contract;
@@ -21,8 +21,10 @@ public class HeexLanguage extends com.intellij.lang.Language implements Template
         super("HEEx");
     }
 
+    // HEEx's data language is HTML by definition (Phoenix.LiveView.HTMLEngine), unlike EEx's
+    // engine-agnostic PLAIN_TEXT default.
     @Contract(pure = true)
     public static LanguageFileType defaultTemplateLanguageFileType() {
-        return FileTypes.PLAIN_TEXT;
+        return HtmlFileType.INSTANCE;
     }
 }

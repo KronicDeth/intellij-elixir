@@ -2,7 +2,6 @@ package org.elixir_lang.heex.file;
 
 import com.intellij.lang.LanguageParserDefinitions;
 import com.intellij.lang.ParserDefinition;
-import com.intellij.openapi.fileTypes.LanguageFileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.LanguageSubstitutors;
@@ -20,11 +19,11 @@ import org.elixir_lang.heex.file.psi.TemplateData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-
-import static org.elixir_lang.heex.file.Type.onlyTemplateDataFileType;
 
 // See https://github.com/JetBrains/intellij-plugins/blob/500f42337a87f463e0340f43e2411266fcfa9c5f/handlebars/src/com/dmarcotte/handlebars/file/HbFileViewProvider.java
 public class ViewProvider extends MultiplePsiFilesPerDocumentFileViewProvider
@@ -71,14 +70,7 @@ public class ViewProvider extends MultiplePsiFilesPerDocumentFileViewProvider
         com.intellij.lang.Language templateDataLanguage =
                 TemplateDataLanguageMappings.getInstance(project).getMapping(virtualFile);
 
-        if (templateDataLanguage == null) {
-            templateDataLanguage = onlyTemplateDataFileType(virtualFile)
-                    .filter(LanguageFileType.class::isInstance)
-                    .map(LanguageFileType.class::cast)
-                    .map(LanguageFileType::getLanguage)
-                    .orElse(null);
-        }
-
+        // HEEx's data language is HTML by definition (Phoenix.LiveView.HTMLEngine).
         if (templateDataLanguage == null) {
             templateDataLanguage = HeexLanguage.defaultTemplateLanguageFileType().getLanguage();
         }
@@ -114,6 +106,17 @@ public class ViewProvider extends MultiplePsiFilesPerDocumentFileViewProvider
         return psiFileImpl;
     }
 
+    // @ApiStatus.Experimental on TemplateLanguageFileViewProvider. Called by the platform's
+    // InjectionRegistrarImpl (via MultipleRootsInjectedFileViewProvider.Template) for injected
+    // fragments such as a ~H sigil, which never calls createFile - without this override the
+    // injected data and Elixir roots parse raw text with no outer-element stripping and no
+    // chameleon.
+    @Nullable
+    @Override
+    public IElementType getContentElementType(@NotNull com.intellij.lang.Language language) {
+        return language.isKindOf(getBaseLanguage()) ? null : elementType(language);
+    }
+
     @Nullable
     private ParserDefinition getDefinition(@NotNull com.intellij.lang.Language language) {
         com.intellij.lang.Language baseLanguage = getBaseLanguage();
@@ -134,7 +137,10 @@ public class ViewProvider extends MultiplePsiFilesPerDocumentFileViewProvider
     @NotNull
     @Override
     public Set<com.intellij.lang.Language> getLanguages() {
-        return Set.of(getTemplateDataLanguage(), getBaseLanguage(), ElixirLanguage.INSTANCE);
+        // LinkedHashSet, not Set.of: the template data language can be reconfigured to Elixir via
+        // Settings (Template Data Language), which would otherwise duplicate ElixirLanguage.INSTANCE
+        // and make Set.of throw IllegalArgumentException on every parse of the file.
+        return new LinkedHashSet<>(Arrays.asList(getTemplateDataLanguage(), getBaseLanguage(), ElixirLanguage.INSTANCE));
     }
 
     @NotNull
