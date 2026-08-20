@@ -71,6 +71,17 @@
     1.20.2 parses without spurious errors, including syntax whose meaning changed between releases.
   - **`.beam` files compiled by OTP 24 through 29 decompile to valid Elixir.**
 
+- [#3696](https://github.com/KronicDeth/intellij-elixir/pull/3696) [@mwnciau](https://github.com/mwnciau), [@sh41](https://github.com/sh41)
+  - **`.heex` files are now recognized as HEEx**, with dedicated syntax highlighting for `{@assigns}`/
+    `{expressions}`, `<% %>`/`<%= %>` tags, and `<%!-- ... --%>` HEEx comments.
+  - **`~H` sigils now use the same HEEx language as `.heex` files**, with separate HTML and Elixir
+    PSI roots, instead of being treated as plain HTML text. Opt-in via Settings → Languages &
+    Frameworks → Elixir → Experimental → "Enable ~H Sigil HEEx language injection".
+  - **`<.component>` and `<Module.component>` tags now resolve** to their `def`/`defp` definition -
+    local components, components brought in via an explicit `import`, and components brought in via
+    `use MyAppWeb, :html` all navigate to their definition. A tag that doesn't resolve is now flagged
+    by `HtmlUnknownTagInspection` like any other unknown tag, instead of always being suppressed.
+
 ### Bug Fixes
 
 - [#3925](https://github.com/KronicDeth/intellij-elixir/pull/3925) [@sh41](https://github.com/sh41)
@@ -90,6 +101,19 @@
     home path after the Homebrew layout adjustment had been applied, so every Homebrew Erlang was
     keyed on the literal string `erlang` instead of its version, leaving them unsorted and
     unlabelled in the SDK list.
+
+- [#3696](https://github.com/KronicDeth/intellij-elixir/pull/3696) [@mwnciau](https://github.com/mwnciau), [@sh41](https://github.com/sh41)
+  - **`\{` and `\}` in HEEx are now literal braces** instead of affecting `{...}` expression nesting.
+  - **A component tag's attribute after a `{...}`-valued one no longer gets swallowed into that
+    value**, e.g. `<.tag one={""} class=""/>` now parses `class` as its own attribute.
+  - **`{` inside `<script>`/`<style>` stays literal after an embedded `<% %>` tag**, and
+    `</script>`/`</style>` still close the tag.
+  - **A self-closing `<script .../>` or `<style .../>` no longer swallows the rest of the file** as
+    script or style content.
+  - **`<% %>` tags that produce no output (comments, `<% if %>`) no longer inject placeholder text**
+    into the HTML tree.
+  - **Other HTML-based template languages are no longer affected by HEEx's outer-language patcher**,
+    which ran for every HTML-data template language in the IDE.
 
 - [#3914](https://github.com/KronicDeth/intellij-elixir/pull/3914) [@sh41](https://github.com/sh41)
   - **Reformat Code no longer changes what a capture expression means.** Since Elixir 1.15,

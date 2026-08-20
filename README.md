@@ -92,6 +92,8 @@ Table of Contents[![Backers on Open Collective](https://opencollective.com/intel
             * [Advanced configuration](#advanced-configuration)
          * [Live Embedded Elixir (LEEx) Templates <a target="_blank" rel="noopener noreferrer" href="/resources/icons/file/eex.svg"><img src="/resources/icons/file/eex.svg" alt="" style="max-width: 100%;"></a>](/resources/icons/file/eex.svg)
             * [Advanced configuration](#advanced-configuration-1)
+         * [HEEx Templates](#heex-templates)
+            * [Component navigation](#component-navigation)
          * [Building/Compiling](#buildingcompiling)
             * [Settings](#settings)
             * [Build Messages](#build-messages)
@@ -253,10 +255,10 @@ Table of Contents[![Backers on Open Collective](https://opencollective.com/intel
                   * [Visibility](#visibility)
                * [Call to Element](#call-to-element)
       * [Experimental Features](#experimental-features)
-         * [~H Sigil HTML Injection Support](#h-sigil-html-injection-support)
+         * [~H Sigil HEEx Language Injection Support](#h-sigil-heex-language-injection-support)
             * [IntelliLang Plugin Requirement](#intellilang-plugin-requirement)
-            * [How to Enable ~H Sigil HTML Injection](#how-to-enable-h-sigil-html-injection)
-            * [Providing feedback and reporting issues for the ~H Sigil HTML Injection Experimental Feature](#providing-feedback-and-reporting-issues-for-the-h-sigil-html-injection-experimental-feature)
+            * [How to Enable ~H Sigil HEEx Language Injection](#how-to-enable-h-sigil-heex-language-injection)
+            * [Providing feedback and reporting issues for the ~H Sigil HEEx Language Injection Experimental Feature](#providing-feedback-and-reporting-issues-for-the-h-sigil-heex-language-injection-experimental-feature)
             * [Removing the Green Background for Injected Language Fragments](#removing-the-green-background-for-injected-language-fragments)
       * [Installation](#installation)
          * [Stable releases](#stable-releases)
@@ -342,6 +344,7 @@ Once you have your IDE of choice installed, you can [install this plugin](#insta
 | Go To Test Subject                          | Yes           | Yes            |                                                       |
 | Find Usage                                  | Yes           | Yes            |                                                       |
 | Live Embedded Elixir (LEEx) Templates       | Yes           | Yes            |                                                       |
+| HEEx Templates                              | Yes           | Yes            |                                                       |
 | Refactor                                    | Yes           | Yes            |                                                       |
 | SDK                                         | Yes           | Yes            |                                                       |
 | Structure                                   | Yes           | Yes            |                                                       |
@@ -2310,6 +2313,16 @@ If you need more file-by-file configuration of the Template Data Language than c
 1. Preferences > Languages and Frameworks > Template Data Languages
 
 See [JetBrains Documentation](https://www.jetbrains.com/help/idea/template-data-languages.html) for more details.
+
+### HEEx Templates
+
+Any file with `.heex` as the final extension will be treated as [HEEx](https://hexdocs.pm/phoenix_live_view/Phoenix.Component.html#sigil_H/2) - Phoenix LiveView's HTML-aware, component-friendly template language. Unlike EEx/LEEx, the Template Data Language is always HTML; it isn't guessed from the rest of the file name, since HEEx's own compiler (`Phoenix.LiveView.HTMLEngine`) always renders to HTML.
+
+`~H` sigils in `.ex` files use the same HEEx language, with separate HTML and Elixir PSI for the sigil's contents, once enabled - see [~H Sigil HEEx Language Injection Support](#h-sigil-heex-language-injection-support) below.
+
+#### Component navigation
+
+`<.component>` and `<Module.component>` tags navigate (Go To Declaration) to the `def`/`defp` that defines them, whether the component is defined in the same view module, brought in with an explicit `import`, or brought in via `use MyAppWeb, :html`. A tag that doesn't resolve is flagged the same way an unknown HTML tag is.
 
 ### Building/Compiling
 
@@ -5921,21 +5934,21 @@ You can view the currently available Experimental Features by navigating to `Lan
 
 ![Elixir Experimental Settings UI](/screenshots/experimental/elixir-experimental-settings-ui.png)
 
-### ~H Sigil HTML Injection Support
+### ~H Sigil HEEx Language Injection Support
 
 **Experimental Feature – available from version 2024.3+ (243.21565.180) and later**
 
 When working with Phoenix Live View templates within the IntelliJ Elixir plugin, you'll notice that sigils such as `~H` are rendered as strings, which means that out of the box there is no HTML syntax highlighting or autocomplete when working with Phoenix Live View, which is used for writing HEEx templates inside source files. `HEEx` is a HTML-aware and component-friendly extension of Elixir Embedded language, this can make editing templates tedious.
 
-This Experimental Feature introduces preliminary HTML injection support within `~H` sigils, enabling HTML syntax highlighting and autocomplete.
+This Experimental Feature injects the same HEEx language used by `.heex` files into `~H` sigils, with separate HTML and Elixir PSI for the sigil's contents - HTML syntax highlighting, and component tag navigation, same as a `.heex` file.
 
 **Before, you would see this rendered as a string:**
 
 ![~H shows as a string](/screenshots/experimental/h-sigil-html-before.png?raw=true "Shown as a string")
 
-**After enabling ~H Sigil HTML Injection:**
+**After enabling ~H Sigil HEEx Language Injection:**
 
-![~H now shows with HTML injection](/screenshots/experimental/h-sigil-html.png?raw=true "HTML injection for autocomplete and syntax highlighting for the ~H sigil")
+![~H now shows with HEEx language injection](/screenshots/experimental/h-sigil-html.png?raw=true "HEEx language injection for syntax highlighting and component navigation in the ~H sigil")
 
 > [!TIP]
 > The [Phoenix LiveView Documentation on sigil_H](https://hexdocs.pm/phoenix_live_view/1.0.3/Phoenix.Component.html#sigil_H/2) is a fantastic resource for understanding how the `~H` sigil works.
@@ -5952,20 +5965,20 @@ However this is marked as an optional dependency for the plugin, and does not ne
 
 More information about [Language Injections](https://www.jetbrains.com/help/idea/using-language-injections.html) is available in the IntelliJ IDEA documentation.
 
-#### How to Enable ~H Sigil HTML Injection
+#### How to Enable ~H Sigil HEEx Language Injection
 
-To enable support for HTML syntax highlighting and autocomplete:
+To enable support for HTML syntax highlighting and component navigation:
 
 1. Open [Settings](https://www.jetbrains.com/help/idea/configure-project-settings.html).
 2. Navigate to [Settings | Languages & Frameworks | Elixir | Experimental Settings](jetbrains://Idea/settings?name=Languages+%26+Frameworks--Elixir--Experimental+Settings).
-3. Enable the **~H Sigil HTML Injection** feature.
+3. Enable the **~H Sigil HEEx language injection** feature.
 
 ![Settings | Languages & Frameworks | Elixir | Experimental Settings](/screenshots/experimental/elixir-experimental-settings-ui.png?raw=true "Elixir Experimental Settings UI")
 
 > [!NOTE]
 > This Experimental Feature is currently enabled on a **per-project** basis. We are considering adding application-level support or enabling it by default in future versions based on feedback
 
-#### Providing feedback and reporting issues for the ~H Sigil HTML Injection Experimental Feature
+#### Providing feedback and reporting issues for the ~H Sigil HEEx Language Injection Experimental Feature
 
 Have feedback or encountered issues? Please share your thoughts, Exception Stacktraces on the dedicated [**\[Experimental Feature\] ~H Sigil HTML Injection #3678**](https://github.com/KronicDeth/intellij-elixir/issues/3678).
 

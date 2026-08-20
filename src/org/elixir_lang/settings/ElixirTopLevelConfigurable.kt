@@ -26,7 +26,7 @@ class ElixirTopLevelConfigurable : Configurable, Configurable.NoScroll {
             group("HEEx Injection in ~H Sigils code blocks") {
                 row {
                     checkBox("Enable ~H Sigil HEEx language injection")
-                        .comment("Provides HEEx (HTML + Elixir) syntax highlighting and code completion within <a href='https://hexdocs.pm/phoenix_live_view/1.0.3/Phoenix.Component.html#sigil_H/2'>~H Sigils code blocks</a>, when working with Phoenix Live View HEEx templates, otherwise you'll see this as a string.<br/><br/><a href='https://github.com/joshuataylor/intellij-elixir/tree/sigil-injected-languages-poke?tab=readme-ov-file#h-sigil-html-injection-support'>Documentation for ~H Sigil HTML Injection Support.</a>")
+                        .comment("Provides HEEx (HTML + Elixir) syntax highlighting and code completion within <a href='https://hexdocs.pm/phoenix_live_view/1.0.3/Phoenix.Component.html#sigil_H/2'>~H Sigils code blocks</a>, when working with Phoenix Live View HEEx templates, otherwise you'll see this as a string.<br/><br/><a href='https://github.com/KronicDeth/intellij-elixir#h-sigil-heex-language-injection-support'>Documentation for ~H Sigil HEEx Language Injection Support.</a>")
                         .bindSelected(
                             getter = { settings.state.enableHtmlInjection },
                             setter = { settings.state.enableHtmlInjection = it }
