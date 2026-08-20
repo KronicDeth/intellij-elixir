@@ -99,6 +99,9 @@ END_STYLE_TAG = "</style>"
 }
 
 <MATCHED_BRACES> {
+  // `\{` and `\}` are opaque two-character escapes: they do not open or close nesting.
+  // See https://github.com/phoenixframework/phoenix_live_view/blob/main/lib/phoenix_live_view/tag_engine/tokenizer.ex
+  "\\" [{}]              { return Types.ELIXIR; }
   {BRACE_OPENING}        { openBraceCount++;
                            return Types.ELIXIR; }
   {BRACE_CLOSING}        {
