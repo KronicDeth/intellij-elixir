@@ -5,7 +5,7 @@ package org.elixir_lang.heex.lexer;
 
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
-import kotlinx.html.SCRIPT;import org.elixir_lang.heex.psi.Types;
+import org.elixir_lang.heex.psi.Types;
 
 
 public class Flex implements com.intellij.lexer.FlexLexer {

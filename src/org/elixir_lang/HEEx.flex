@@ -2,7 +2,7 @@ package org.elixir_lang.heex.lexer;
 
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
-import kotlinx.html.SCRIPT;import org.elixir_lang.heex.psi.Types;
+import org.elixir_lang.heex.psi.Types;
 
 %%
 
@@ -132,4 +132,3 @@ END_STYLE_TAG = "</style>"
                                          return TokenType.WHITE_SPACE; }
   {ANY}                                { handleInState(YYINITIAL); }
 }
-
