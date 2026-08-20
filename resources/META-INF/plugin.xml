@@ -104,7 +104,8 @@
             implementationClass="org.elixir_lang.heex.ParserDefinition"
         />
 
-        <!-- Replaces  injected outer element types with a dummy string, ensuring the injections don't break the HTML lexer -->
+        <!-- Registered per data language, so it runs for every HTML-data template language; the
+             patcher itself ignores ranges that are not HEEx's. -->
         <outerLanguageRangePatcher
             language="HTML"
             implementationClass="org.elixir_lang.heex.html.HeexHTMLOuterLanguageRangePatcher"
