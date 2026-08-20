@@ -39,6 +39,10 @@ public class RestartabilityTest extends LexerTestCase {
         checkCorrectRestart("before <%# a comment %> after");
     }
 
+    public void testLongComment() {
+        checkCorrectRestart("before <%!-- a %> comment --%> after");
+    }
+
     public void testEscapedOpening() {
         checkCorrectRestart("before <%% literal %> after");
     }

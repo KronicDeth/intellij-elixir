@@ -62,4 +62,12 @@ class HeexParsingTest : HeexParsingTestCase() {
     fun testNonOutputTagBetweenTags() {
         doTest(true)
     }
+
+    /**
+     * `<%!-- a comment --%>` between two tags: same shape as [testNonOutputTagBetweenTags], but with
+     * the long-comment marker (`!--`/`--%>`) rather than the short one (`#`).
+     */
+    fun testLongComment() {
+        doTest(true)
+    }
 }

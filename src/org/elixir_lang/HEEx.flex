@@ -34,6 +34,8 @@ import org.elixir_lang.heex.psi.Types;
 
 OPENING = "<%"
 CLOSING = "%>"
+LONG_COMMENT_OPENING = "<%!--"
+LONG_COMMENT_CLOSING = "--%>"
 
 BRACE_OPENING = "{"
 BRACE_CLOSING = "}"
@@ -65,6 +67,7 @@ SELF_CLOSING_TAIL = \s [^<>]* "/>"
 %state MARKER_MAYBE
 %state BEGIN_MATCHED_BRACES, MATCHED_BRACES
 %state STYLE_TAG,SCRIPT_TAG
+%state LONG_COMMENT_MARKER, LONG_COMMENT
 
 %%
 
@@ -86,11 +89,26 @@ SELF_CLOSING_TAIL = \s [^<>]* "/>"
 }
 
 <YYINITIAL,SCRIPT_TAG,STYLE_TAG> {
-  {ESCAPED_OPENING} { return Types.ESCAPED_OPENING; }
-  {OPENING}         { tagReturnState = yystate();
-                      yybegin(MARKER_MAYBE);
-                      return Types.OPENING; }
-  {ANY}             { return Types.DATA; }
+  {ESCAPED_OPENING}      { return Types.ESCAPED_OPENING; }
+  {LONG_COMMENT_OPENING} { tagReturnState = yystate();
+                           yypushback(3);
+                           yybegin(LONG_COMMENT_MARKER);
+                           return Types.OPENING; }
+  {OPENING}              { tagReturnState = yystate();
+                           yybegin(MARKER_MAYBE);
+                           return Types.OPENING; }
+  {ANY}                  { return Types.DATA; }
+}
+
+<LONG_COMMENT_MARKER> {
+  "!--" { yybegin(LONG_COMMENT);
+          return Types.COMMENT_MARKER; }
+}
+
+<LONG_COMMENT> {
+  {LONG_COMMENT_CLOSING} { yybegin(WHITESPACE_MAYBE);
+                            return Types.CLOSING; }
+  {ANY}                  { return Types.COMMENT; }
 }
 
 <MARKER_MAYBE> {
