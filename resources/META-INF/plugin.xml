@@ -99,9 +99,6 @@
             language="HEEx"
             implementationClass="org.elixir_lang.heex.file.view_provider.Factory"
         />
-        <lang.fileViewProviderFactory
-            language="HEEx"
-            implementationClass="org.elixir_lang.heex.file.view_provider.Factory"/>
         <lang.parserDefinition
             language="HEEx"
             implementationClass="org.elixir_lang.heex.ParserDefinition"
