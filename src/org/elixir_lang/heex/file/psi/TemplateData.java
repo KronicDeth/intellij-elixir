@@ -32,7 +32,14 @@ public class TemplateData extends TemplateDataElementType {
 
     @Override
     protected boolean isInsertionToken(@Nullable IElementType tokenType, @NotNull CharSequence tokenSequence) {
-        return true;
+        // `{expr}` and `<%= expr %>` produce output; `<% %>`, `<%# %>` and `<%!-- --%>` do not, so
+        // they must not get placeholder text spliced into the HTML data text either.
+        //
+        // BRACE_OPENING carries `{expr}`: the flex lexer synthesizes a zero-length EQUALS_MARKER
+        // for the `{`, and RangeCollectorImpl.addOuterRange drops empty ranges - adjacent outer
+        // ranges are joined, and a join stays an insertion if either side is, so flagging
+        // BRACE_OPENING is what makes the join (and so the whole `{expr}`) count as an insertion.
+        return tokenType == Types.BRACE_OPENING || tokenType == Types.EQUALS_MARKER;
     }
 
     @Override

@@ -52,4 +52,14 @@ class HeexParsingTest : HeexParsingTestCase() {
     fun testAttributeFollowingBraceAttribute() {
         doTest(true)
     }
+
+    /**
+     * `<%# a comment %>` between two tags produces no output, so `TemplateData.isInsertionToken`
+     * does not flag it as an insertion - unlike `testEexExpression`'s `<%= @x %>`, no placeholder
+     * text is spliced into the HTML source before the HTML parser runs; the comment tag's outer
+     * element is reinserted from the original source afterward, same as any other outer range.
+     */
+    fun testNonOutputTagBetweenTags() {
+        doTest(true)
+    }
 }

@@ -1,25 +1,23 @@
-HtmlFile:eexBlockSpanningTags.html.heex
+HtmlFile:nonOutputTagBetweenTags.html.heex
   PsiElement(HTML_DOCUMENT)
     PsiElement(XML_PROLOG)
       <empty list>
-    PsiElement(HEEx)('<%= if @ok do %>')
     HtmlTag:p
       XmlToken:XML_START_TAG_START('<')
       XmlToken:XML_NAME('p')
       XmlToken:XML_TAG_END('>')
       XmlText
-        XmlToken:XML_DATA_CHARACTERS('yes')
+        XmlToken:XML_DATA_CHARACTERS('a')
       XmlToken:XML_END_TAG_START('</')
       XmlToken:XML_NAME('p')
       XmlToken:XML_TAG_END('>')
-    PsiElement(HEEx)('<% else %>')
+    PsiElement(HEEx)('<%# a comment %>')
     HtmlTag:p
       XmlToken:XML_START_TAG_START('<')
       XmlToken:XML_NAME('p')
       XmlToken:XML_TAG_END('>')
       XmlText
-        XmlToken:XML_DATA_CHARACTERS('no')
+        XmlToken:XML_DATA_CHARACTERS('b')
       XmlToken:XML_END_TAG_START('</')
       XmlToken:XML_NAME('p')
       XmlToken:XML_TAG_END('>')
-  PsiElement(HEEx)('<% end %>')
