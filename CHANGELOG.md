@@ -116,6 +116,7 @@
     which ran for every HTML-data template language in the IDE.
   - **Rename and Find Usages on a component tag could miss the tag**, varying between IDE sessions:
     at a tag's offset the Elixir root of a `.heex` file or `~H` sigil could win over the HTML root.
+  - **An unqualified call inside a `~H` sigil now resolves to a `def` in the surrounding module.**
 
 - [#3914](https://github.com/KronicDeth/intellij-elixir/pull/3914) [@sh41](https://github.com/sh41)
   - **Reformat Code no longer changes what a capture expression means.** Since Elixir 1.15,
