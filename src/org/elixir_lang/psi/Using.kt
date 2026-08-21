@@ -17,6 +17,8 @@ import org.elixir_lang.psi.impl.call.macroChildCallSequence
 import org.elixir_lang.psi.impl.call.stabBodyChildExpressions
 import org.elixir_lang.psi.impl.maybeModularNameToModulars
 import org.elixir_lang.psi.impl.stripAccessExpression
+import org.elixir_lang.psi.operation.Match
+import org.elixir_lang.psi.scope.WhileIn.whileIn
 import org.elixir_lang.psi.stub.index.ModularName
 import org.elixir_lang.structure_view.element.Timed
 import org.elixir_lang.util.AccumulatorContinue
@@ -39,16 +41,59 @@ object Using {
         use: Call?,
         resolveState: ResolveState,
         keepProcessing: (PsiElement, ResolveState) -> Boolean
-    ): Boolean =
-        using
-            .stabBodyChildExpressions(forward = false)
-            ?.filterIsInstance<Call>()
-            // Because `forward = false`, `firstOrNull` gets the last Call in the `do` block
-            ?.firstOrNull()
-            ?.takeUnlessHasBeenVisited(resolveState)
-            ?.let { lastChildCall -> treeWalkUpFromLastChildCall(lastChildCall, use, resolveState, keepProcessing) }
-            ?: true
+    ): Boolean {
+        // `forward = false`: the first element is the last statement of the `do` block.
+        val statements = using.stabBodyChildExpressions(forward = false)?.toList() ?: return true
 
+        return when (val last = statements.firstOrNull()?.stripAccessExpression()) {
+            // `[conditional, imports]` - the fragments a `__using__` splices into the caller
+            // (Phoenix.Component.__using__/1), usually variables bound earlier in the body.
+            is ElixirList ->
+                whileIn(last.unmatchedExpressionList) { element ->
+                    treeWalkUpListElement(element, use, resolveState, keepProcessing)
+                }
+            is Match -> treeWalkUpValue(last.rightOperand(), use, resolveState, keepProcessing)
+            else ->
+                statements
+                    .filterIsInstance<Call>()
+                    .firstOrNull()
+                    ?.let { treeWalkUpValue(it, use, resolveState, keepProcessing) }
+                    ?: true
+        }
+    }
+
+    /** A variable element resolves to its `variable = value` bindings; anything else is walked as is. */
+    private fun treeWalkUpListElement(
+        element: PsiElement,
+        use: Call?,
+        resolveState: ResolveState,
+        keepProcessing: (PsiElement, ResolveState) -> Boolean
+    ): Boolean {
+        val boundValues = ((element as? Call)?.reference as? PsiPolyVariantReference)
+            ?.multiResolve(false)
+            ?.filter { it.isValidResult }
+            ?.mapNotNull { it.element }
+            ?.mapNotNull { declaration -> (declaration.parent as? Match)?.takeIf { it.leftOperand() == declaration } }
+            ?.mapNotNull { binding -> binding.rightOperand() }
+            .orEmpty()
+
+        return if (boundValues.isEmpty()) {
+            treeWalkUpValue(element, use, resolveState, keepProcessing)
+        } else {
+            whileIn(boundValues) { value -> treeWalkUpValue(value, use, resolveState, keepProcessing) }
+        }
+    }
+
+    private fun treeWalkUpValue(
+        value: PsiElement?,
+        use: Call?,
+        resolveState: ResolveState,
+        keepProcessing: (PsiElement, ResolveState) -> Boolean
+    ): Boolean =
+        (value?.stripAccessExpression() as? Call)
+            ?.takeUnlessHasBeenVisited(resolveState)
+            ?.let { call -> treeWalkUpFromLastChildCall(call, use, resolveState, keepProcessing) }
+            ?: true
     private fun treeWalkUpFromLastChildCall(
         lastChildCall: Call,
         useCall: Call?,

@@ -114,6 +114,10 @@
     into the HTML tree.
   - **Other HTML-based template languages are no longer affected by HEEx's outer-language patcher**,
     which ran for every HTML-data template language in the IDE.
+  - **Components brought into scope by a `use` nested inside `use MyAppWeb, :html` now resolve**,
+    such as `Phoenix.Component`'s `<.link>` and `<.live_title>`: `use` resolution now follows a
+    `__using__` whose body ends in a list of fragments, a `quote` bound to a variable, or another
+    `use`.
   - **Rename and Find Usages on a component tag could miss the tag**, varying between IDE sessions:
     at a tag's offset the Elixir root of a `.heex` file or `~H` sigil could win over the HTML root.
   - **An unqualified call inside a `~H` sigil now resolves to a `def` in the surrounding module.**
