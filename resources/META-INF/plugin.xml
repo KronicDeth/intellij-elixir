@@ -404,6 +404,8 @@
                                   implementationClass="org.elixir_lang.exunit.ExUnitLineMarkerProvider"/>
 
         <lang.parserDefinition language="Elixir" implementationClass="org.elixir_lang.ElixirParserDefinition"/>
+        <!-- EEx Data leaves are OuterLanguageElements; see EexDataAstFactory. -->
+        <lang.ast.factory language="Elixir" implementationClass="org.elixir_lang.psi.EexDataAstFactory"/>
         <lang.psiStructureViewFactory language="Elixir" implementationClass="org.elixir_lang.structure_view.Factory"/>
         <!-- Breadcrumbs (path shown at the bottom of the editor) and Sticky Lines (declarations pinned to the top of
              the editor while scrolling) are both derived from this provider; the platform has no separate sticky-lines

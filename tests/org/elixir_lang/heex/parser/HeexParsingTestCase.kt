@@ -14,11 +14,13 @@ import com.intellij.psi.templateLanguages.TemplateDataLanguagePatterns
 import com.intellij.psi.xml.StartTagEndTokenProvider
 import com.intellij.testFramework.ParsingTestCase
 import com.intellij.xml.testFramework.XmlElementTypeServiceHelper.registerXmlElementTypeServices
+import org.elixir_lang.ElixirLanguage
 import org.elixir_lang.ElixirParserDefinition
 import org.elixir_lang.heex.HeexLanguage
 import org.elixir_lang.heex.ParserDefinition
 import org.elixir_lang.heex.file.view_provider.Factory
 import org.elixir_lang.heex.html.HeexHTMLOuterLanguageRangePatcher
+import org.elixir_lang.psi.EexDataAstFactory
 
 /**
  * Multi-root parsing tests for HEEx (`.html.heex`, three PSI roots: HEEx, HTML, Elixir).
@@ -57,6 +59,11 @@ abstract class HeexParsingTestCase : ParsingTestCase(
         registerExtensionPoint(StartTagEndTokenProvider.EP_NAME, StartTagEndTokenProvider::class.java)
         addExplicitExtension(LanguageFileViewProviders.INSTANCE, HeexLanguage.INSTANCE, Factory())
         addExplicitExtension(LanguageASTFactory.INSTANCE, XMLLanguage.INSTANCE, XmlASTFactory())
+        // Not part of the Markdown recipe either: production registers this via plugin.xml
+        // (lang.ast.factory for "Elixir"), which this bare ParsingTestCase never loads - without it,
+        // the Elixir root's EEx Data leaf would build a plain LeafPsiElement here instead of the real
+        // OuterLanguageElementImpl production uses, silently testing a different tree shape.
+        addExplicitExtension(LanguageASTFactory.INSTANCE, ElixirLanguage, EexDataAstFactory())
         addExplicitExtension(TemplateDataElementType.TREE_PATCHER, XMLLanguage.INSTANCE, XmlTemplateTreePatcher())
         // A bare ParsingTestCase never loads plugin.xml; without the production patcher the outer
         // ranges get a different default replacement and the HTML trees differ.
