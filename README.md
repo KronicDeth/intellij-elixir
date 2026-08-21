@@ -2322,7 +2322,9 @@ Any file with `.heex` as the final extension will be treated as [HEEx](https://h
 
 #### Component navigation
 
-`<.component>` and `<Module.component>` tags navigate (Go To Declaration) to the `def`/`defp` that defines them, whether the component is defined in the same view module, brought in with an explicit `import`, or brought in via `use MyAppWeb, :html`. A tag that doesn't resolve is flagged the same way an unknown HTML tag is.
+`<.component>` and `<Module.component>` tags navigate (Go To Declaration) to the `def`/`defp` that defines them, whether the component is defined in the same view module, brought in with an explicit `import`, or brought in via `use MyAppWeb, :html` (including a `use` nested inside it, such as `use Phoenix.Component`). Find Usages and Rename on the `def`/`defp` include its tags, Rename also works with the caret on the tag, and Quick Docs on a tag shows the function's documentation. All of this applies in `.heex` files and inside `~H` sigils. A dotted name that is not valid component syntax is flagged the same way an unknown HTML tag is.
+
+HEEx's special attributes (`:let`, `:if`, `:for`, `:key`, `:type`) and `phx-*` bindings are recognized on HTML tags, and `<:slot>` tags are not validated as HTML elements.
 
 ### Building/Compiling
 
