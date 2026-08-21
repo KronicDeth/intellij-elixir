@@ -14,9 +14,13 @@ public class HeexHTMLLexer extends HtmlLexer {
 
     @Override
     public void start(@NotNull CharSequence buffer, int startOffset, int endOffset, int initialState) {
-        CharSequence maskedBuffer = maskRelativeComponentDots(buffer, startOffset, endOffset);
+        // Mask over the whole buffer, not just startOffset..endOffset: masking is length-preserving
+        // (only `.` -> 'C' substitutions, never an insertion or deletion), so masking the full buffer
+        // keeps every index valid and lets startOffset/endOffset pass through unchanged, so token
+        // offsets stay in the original buffer's coordinate space for an incremental re-lex.
+        CharSequence maskedBuffer = maskRelativeComponentDots(buffer, 0, buffer.length());
 
-        super.start(maskedBuffer, 0, endOffset - startOffset, initialState);
+        super.start(maskedBuffer, startOffset, endOffset, initialState);
     }
 
     /**
