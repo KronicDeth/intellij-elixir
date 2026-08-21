@@ -53,6 +53,8 @@ object HeexComponentResolver {
         return when (component) {
             is ComponentTagName.Local -> resolveLocal(component.functionName, localEntrance(elixirRoot))
             is ComponentTagName.Remote -> resolveRemote(component.aliasChain, component.functionName, elixirRoot)
+            // A slot is declared by the `slot` macro, not a def/defp.
+            is ComponentTagName.Slot -> null
         }
     }
 

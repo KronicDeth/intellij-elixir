@@ -79,8 +79,8 @@
     Frameworks → Elixir → Experimental → "Enable ~H Sigil HEEx language injection".
   - **`<.component>` and `<Module.component>` tags now resolve** to their `def`/`defp` definition -
     local components, components brought in via an explicit `import`, and components brought in via
-    `use MyAppWeb, :html` all navigate to their definition. A tag that doesn't resolve is now flagged
-    by `HtmlUnknownTagInspection` like any other unknown tag, instead of always being suppressed.
+    `use MyAppWeb, :html` all navigate to their definition. A dotted name that is not valid component
+    syntax is flagged by `HtmlUnknownTagInspection` like any other unknown tag.
 
 ### Bug Fixes
 
@@ -114,6 +114,11 @@
     into the HTML tree.
   - **Other HTML-based template languages are no longer affected by HEEx's outer-language patcher**,
     which ran for every HTML-data template language in the IDE.
+  - **HEEx's special attributes and `phx-` bindings are no longer reported as "not allowed here"
+    on HTML tags**: `:let`, `:if`, `:for`, `:key`, `:type` and every `phx-*` binding.
+  - **`<:slot>` tags are no longer validated as HTML elements.** `<:col>` was checked against HTML's
+    `<col>` and `<:action>` reported as an unknown tag.
+  - **A component tag that doesn't resolve no longer shows "Cannot resolve symbol".**
   - **Components brought into scope by a `use` nested inside `use MyAppWeb, :html` now resolve**,
     such as `Phoenix.Component`'s `<.link>` and `<.live_title>`: `use` resolution now follows a
     `__using__` whose body ends in a list of fragments, a `quote` bound to a variable, or another

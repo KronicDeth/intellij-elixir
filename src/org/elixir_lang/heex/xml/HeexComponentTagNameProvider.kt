@@ -4,7 +4,7 @@ import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.psi.xml.XmlTag
 import com.intellij.xml.XmlTagNameProvider
-import org.elixir_lang.heex.HeexLanguage
+import org.elixir_lang.heex.isInHeex
 import org.elixir_lang.psi.CallDefinitionClause
 
 /**
@@ -15,7 +15,7 @@ import org.elixir_lang.psi.CallDefinitionClause
  */
 class HeexComponentTagNameProvider : XmlTagNameProvider {
     override fun addTagNameVariants(elements: MutableList<LookupElement>, tag: XmlTag, prefix: String) {
-        if (!tag.containingFile.viewProvider.hasLanguage(HeexLanguage.INSTANCE)) {
+        if (!tag.isInHeex()) {
             return
         }
 

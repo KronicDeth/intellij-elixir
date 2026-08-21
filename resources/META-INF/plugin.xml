@@ -121,6 +121,11 @@
             implementation="org.elixir_lang.heex.xml.HeexComponentTagNameProvider"
         />
 
+        <!-- HEEx special attributes (:let, :if, :for, :key, :type) and phx-* bindings on HTML tags. -->
+        <xml.attributeDescriptorsProvider
+            implementation="org.elixir_lang.heex.xml.HeexAttributeDescriptorsProvider"
+        />
+
         <!-- Disable some unhelpful HTML inspections that are false positives for HEEx components -->
         <lang.inspectionSuppressor
             language="HTML"
