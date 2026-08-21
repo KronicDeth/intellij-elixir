@@ -121,6 +121,12 @@
             implementation="org.elixir_lang.heex.xml.HeexComponentTagNameProvider"
         />
 
+        <!-- Component tag name -> FunctionSymbol, so Rename works from the tag. -->
+        <psi.symbolReferenceProvider hostElementClass="com.intellij.psi.xml.XmlTag"
+                                     hostLanguage="HTML"
+                                     implementationClass="org.elixir_lang.heex.xml.HeexComponentSymbolReferenceProvider"
+                                     targetClass="org.elixir_lang.model.psi.function.FunctionSymbol"/>
+
         <!-- HEEx special attributes (:let, :if, :for, :key, :type) and phx-* bindings on HTML tags. -->
         <xml.attributeDescriptorsProvider
             implementation="org.elixir_lang.heex.xml.HeexAttributeDescriptorsProvider"
