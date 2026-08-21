@@ -1,0 +1,20 @@
+HtmlFile:slot.html.heex
+  PsiElement(HTML_DOCUMENT)
+    PsiElement(XML_PROLOG)
+      <empty list>
+    HtmlTag:.card
+      XmlToken:XML_START_TAG_START('<')
+      XmlToken:XML_NAME('.card')
+      XmlToken:XML_TAG_END('>')
+      HtmlTag::header
+        XmlToken:XML_START_TAG_START('<')
+        XmlToken:XML_NAME(':header')
+        XmlToken:XML_TAG_END('>')
+        XmlText
+          XmlToken:XML_DATA_CHARACTERS('Title')
+        XmlToken:XML_END_TAG_START('</')
+        XmlToken:XML_NAME(':header')
+        XmlToken:XML_TAG_END('>')
+      XmlToken:XML_END_TAG_START('</')
+      XmlToken:XML_NAME('.card')
+      XmlToken:XML_TAG_END('>')

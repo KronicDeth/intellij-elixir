@@ -647,6 +647,10 @@ dependencies {
         zipSigner()
         testFramework(TestFrameworkType.Platform)
         testFramework(TestFrameworkType.Plugin.Java)
+        // com.intellij.xml.testFramework.XmlElementTypeServiceHelper - needed by HeexParsingTestCase
+        // to register the XML PSI services a multi-root (HEEx + HTML) ParsingTestCase requires. Not
+        // part of the IDE distribution's own jars, unlike the rest of the XML platform modules.
+        testFramework(TestFrameworkType.Plugin.XML)
         // UI Test framework dependencies
         testFramework(TestFrameworkType.Starter, configurationName = "testUIImplementation")
         testFramework(TestFrameworkType.JUnit5, configurationName = "testUIImplementation")

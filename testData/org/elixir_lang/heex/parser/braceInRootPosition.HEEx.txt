@@ -1,0 +1,7 @@
+HTML Embedded Elixir File
+  PsiElement(Data)('<div ')
+  HEExBracesImpl(BRACES)
+    PsiElement(BRACE_OPENING)('{')
+    PsiElement(Elixir)('@attrs')
+    PsiElement(BRACE_CLOSING)('}')
+  PsiElement(Data)('>hi</div>')

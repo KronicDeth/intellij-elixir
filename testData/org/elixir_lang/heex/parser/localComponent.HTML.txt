@@ -1,0 +1,13 @@
+HtmlFile:localComponent.html.heex
+  PsiElement(HTML_DOCUMENT)
+    PsiElement(XML_PROLOG)
+      <empty list>
+    HtmlTag:.button
+      XmlToken:XML_START_TAG_START('<')
+      XmlToken:XML_NAME('.button')
+      XmlToken:XML_TAG_END('>')
+      XmlText
+        XmlToken:XML_DATA_CHARACTERS('Click')
+      XmlToken:XML_END_TAG_START('</')
+      XmlToken:XML_NAME('.button')
+      XmlToken:XML_TAG_END('>')

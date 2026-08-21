@@ -1,0 +1,2 @@
+HTML Embedded Elixir File
+  PsiElement(Data)('<!-- a comment --><p>after</p>')
