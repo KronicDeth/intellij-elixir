@@ -84,6 +84,8 @@
   - **Find Usages and Rename on a `def`/`defp` include its HEEx component tags**, in `.heex` files
     and inside `~H` sigils; a renamed tag keeps its `.`/module-alias prefix.
   - **Rename works with the caret on a component tag**, not only on the `def`/`defp`.
+  - **Quick Docs and hover on a component tag show the function's documentation**, including inside
+    a `~H` sigil.
   - **Find Usages finds a plain Elixir call embedded in a `~H` sigil**, e.g. `{some_function()}`.
 
 ### Bug Fixes
