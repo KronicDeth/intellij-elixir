@@ -2,6 +2,7 @@ package org.elixir_lang.model.psi
 
 import com.intellij.find.usages.api.PsiUsage
 import com.intellij.find.usages.api.Usage
+import com.intellij.injected.editor.VirtualFileWindow
 import com.intellij.lang.html.HTMLLanguage
 import com.intellij.model.Pointer
 import com.intellij.model.psi.PsiSymbolReferenceService
@@ -29,6 +30,7 @@ import com.intellij.util.AbstractQuery
 import com.intellij.util.Processor
 import com.intellij.util.Query
 import com.intellij.util.concurrency.annotations.RequiresReadLock
+import org.elixir_lang.ElixirLanguage
 import org.elixir_lang.heex.HeexLanguage
 import org.elixir_lang.heex.isInHeex
 import org.elixir_lang.heex.xml.ComponentTagName
@@ -689,6 +691,8 @@ internal object ElixirUsageQueries {
 
             heexComponentTagUsage(leaf, offsetInLeaf, symbol)?.let { return listOf(it) }
 
+            embeddedCallUsage(leaf, offsetInLeaf, symbol)?.let { return listOf(it) }
+
             val call = leaf.enclosingCalls().firstOrNull() ?: return emptyList()
             // Skip definition heads/clauses - they are declarations, not call sites.
             if (CallDefinitionClause.isHead(call) || CallDefinitionClause.`is`(call)) return emptyList()
@@ -726,6 +730,41 @@ internal object ElixirUsageQueries {
                     .flatMap { FunctionSymbol.fromClause(it) }
                     .any { it == symbol }
             }
+
+        /**
+         * A plain Elixir call (`{some_function()}`) embedded in an *injected* `~H` fragment that
+         * resolves to [symbol], else `null`. The word search hands back a leaf from the fragment's
+         * HEEx root, which has no [Call] structure, so the call is found by offset in the Elixir
+         * root instead. A top-level `.heex` file is excluded: its Elixir-root occurrence already
+         * reaches the ordinary walk in [mapOccurrence], and its other roots' occurrences would
+         * duplicate it.
+         */
+        @RequiresReadLock
+        private fun embeddedCallUsage(leaf: PsiElement, offsetInLeaf: Int, symbol: FunctionSymbol): PsiUsage? {
+            val leafFile = leaf.containingFile ?: return null
+            if (leafFile.virtualFile !is VirtualFileWindow || !leafFile.isInHeex()) return null
+            if (leaf.language.isKindOf(ElixirLanguage)) return null
+
+            val elixirRoot = leafFile.viewProvider.getPsi(ElixirLanguage) ?: return null
+            val absoluteOffset = leaf.textRange.startOffset + offsetInLeaf
+            // findChildrenOfType expands the lazily parsed Elixir root; a raw findElementAt can
+            // return the unexpanded chameleon node.
+            val call = PsiTreeUtil.findChildrenOfType(elixirRoot, Call::class.java)
+                .filterNot { CallDefinitionClause.isHead(it) || CallDefinitionClause.`is`(it) }
+                .firstOrNull { candidate ->
+                    candidate.functionNameElement()?.textRange?.contains(absoluteOffset) == true
+                } ?: return null
+
+            val nameElement = call.functionNameElement() ?: return null
+            if (!matchesCallSite(call, symbol)) return null
+
+            return ElixirPsiUsage.create(
+                nameElement,
+                TextRange(0, nameElement.textLength),
+                declaration = false,
+                usageType = CALL
+            )
+        }
 
         /**
          * A HEEx component tag name (`<.button>`, `<MyAppWeb.CoreComponents.button>`) at

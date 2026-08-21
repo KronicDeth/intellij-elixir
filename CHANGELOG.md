@@ -83,6 +83,7 @@
     syntax is flagged by `HtmlUnknownTagInspection` like any other unknown tag.
   - **Find Usages and Rename on a `def`/`defp` include its HEEx component tags**, in `.heex` files
     and inside `~H` sigils; a renamed tag keeps its `.`/module-alias prefix.
+  - **Find Usages finds a plain Elixir call embedded in a `~H` sigil**, e.g. `{some_function()}`.
 
 ### Bug Fixes
 
