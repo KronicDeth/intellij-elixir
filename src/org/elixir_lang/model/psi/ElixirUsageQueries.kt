@@ -2,6 +2,7 @@ package org.elixir_lang.model.psi
 
 import com.intellij.find.usages.api.PsiUsage
 import com.intellij.find.usages.api.Usage
+import com.intellij.lang.html.HTMLLanguage
 import com.intellij.model.Pointer
 import com.intellij.model.psi.PsiSymbolReferenceService
 import com.intellij.model.search.LeafOccurrence
@@ -20,11 +21,18 @@ import com.intellij.psi.ResolveState
 import com.intellij.psi.search.LocalSearchScope
 import com.intellij.psi.search.SearchScope
 import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.psi.xml.XmlTag
+import com.intellij.psi.xml.XmlToken
+import com.intellij.psi.xml.XmlTokenType
 import com.intellij.usages.impl.rules.UsageType
 import com.intellij.util.AbstractQuery
 import com.intellij.util.Processor
 import com.intellij.util.Query
 import com.intellij.util.concurrency.annotations.RequiresReadLock
+import org.elixir_lang.heex.HeexLanguage
+import org.elixir_lang.heex.isInHeex
+import org.elixir_lang.heex.xml.ComponentTagName
+import org.elixir_lang.heex.xml.HeexComponentResolver
 import org.elixir_lang.model.psi.atom.AtomReference
 import org.elixir_lang.model.psi.atom.AtomSymbol
 import org.elixir_lang.model.psi.callback.BehaviourMembership
@@ -412,7 +420,9 @@ internal object ElixirUsageQueries {
 
     /**
      * Builds a word-index query that finds every source token whose text matches the function name,
-     * then hands each occurrence to [FunctionCallSiteMapper].
+     * then hands each occurrence to [FunctionCallSiteMapper]. `includeInjections()` is required for
+     * [FunctionCallSiteMapper.heexComponentTagUsage] to see a `~H` sigil's injected HTML PSI - an
+     * injected fragment is a separate file from its host `.ex`, invisible to a plain word search.
      */
     private fun functionCallSiteQuery(
         project: Project,
@@ -424,6 +434,7 @@ internal object ElixirUsageQueries {
                 .caseSensitive(true)
                 .inContexts(SearchContext.inCode())
                 .inScope(searchScope)
+                .includeInjections()
                 .buildQuery(FunctionCallSiteMapper(symbol.createPointer()))
 
     private fun typeUsageQuery(
@@ -668,13 +679,15 @@ internal object ElixirUsageQueries {
         @RequiresReadLock
         override fun mapOccurrence(occurrence: LeafOccurrence): Collection<PsiUsage> {
             val symbol = symbolPointer.dereference() ?: return emptyList()
-            val (_, leaf, _) = occurrence
+            val (_, leaf, offsetInLeaf) = occurrence
 
             atomUsage(leaf, symbol)?.let { return listOf(it) }
 
             keywordKeyUsage(leaf, symbol)?.let { return listOf(it) }
 
             captureUsage(leaf, symbol)?.let { return listOf(it) }
+
+            heexComponentTagUsage(leaf, offsetInLeaf, symbol)?.let { return listOf(it) }
 
             val call = leaf.enclosingCalls().firstOrNull() ?: return emptyList()
             // Skip definition heads/clauses - they are declarations, not call sites.
@@ -685,20 +698,7 @@ internal object ElixirUsageQueries {
 
             specUsage(call, symbol)?.let { return listOf(it) }
 
-            // Fast path: qualified call (`ModuleName.functionName/arity`).
-            val matched = if (call.isCalling(symbol.moduleName, symbol.name, symbol.arity)) {
-                true
-            } else {
-                // Unqualified call: resolve via legacy scope-walker and check against this symbol.
-                val resolved = Callable(call).multiResolve(false)
-                    .filter { it.isValidResult }
-                    .mapNotNull { it.element as? Call }
-                    .filter { CallDefinitionClause.`is`(it) }
-                    .flatMap { FunctionSymbol.fromClause(it) }
-                resolved.any { it == symbol }
-            }
-
-            if (!matched) return emptyList()
+            if (!matchesCallSite(call, symbol)) return emptyList()
 
             return listOf(
                 ElixirPsiUsage.create(
@@ -710,6 +710,66 @@ internal object ElixirUsageQueries {
             )
         }
 
+        /**
+         * Whether [call] is a call site for [symbol]: a qualified call (`Module.name/arity`) or an
+         * unqualified call resolved via the legacy [Callable] scope-walker.
+         */
+        @RequiresReadLock
+        private fun matchesCallSite(call: Call, symbol: FunctionSymbol): Boolean =
+            if (call.isCalling(symbol.moduleName, symbol.name, symbol.arity)) {
+                true
+            } else {
+                Callable(call).multiResolve(false)
+                    .filter { it.isValidResult }
+                    .mapNotNull { it.element as? Call }
+                    .filter { CallDefinitionClause.`is`(it) }
+                    .flatMap { FunctionSymbol.fromClause(it) }
+                    .any { it == symbol }
+            }
+
+        /**
+         * A HEEx component tag name (`<.button>`, `<MyAppWeb.CoreComponents.button>`) at
+         * [offsetInLeaf] that resolves to [symbol], else `null`. A tag has no enclosing [Call], so
+         * the ordinary walk never reaches it; resolution is [HeexComponentResolver]'s, the same as
+         * Go To Declaration. A `<:slot>` tag is never a usage.
+         *
+         * Only the HEEx root's occurrence is accepted: it is the one root every host delivers (an
+         * injected `~H` fragment yields nothing from its nested template data root), and accepting
+         * other roots' occurrences would report the same tag once per root. The tag itself is found
+         * by absolute offset in the HTML root.
+         */
+        @RequiresReadLock
+        private fun heexComponentTagUsage(leaf: PsiElement, offsetInLeaf: Int, symbol: FunctionSymbol): PsiUsage? {
+            val leafFile = leaf.containingFile ?: return null
+            if (!leafFile.isInHeex()) return null
+            if (!leaf.language.isKindOf(HeexLanguage.INSTANCE)) return null
+
+            val htmlRoot = leafFile.viewProvider.getPsi(HTMLLanguage.INSTANCE) ?: return null
+            val absoluteOffset = leaf.textRange.startOffset + offsetInLeaf
+            // findChildrenOfType expands the lazily parsed HTML root; a raw findElementAt can
+            // return the unexpanded chameleon node.
+            val htmlLeaf = PsiTreeUtil.findChildrenOfType(htmlRoot, XmlToken::class.java)
+                .firstOrNull { it.node.elementType == XmlTokenType.XML_NAME && it.textRange.contains(absoluteOffset) }
+                ?: return null
+            val tag = htmlLeaf.parent as? XmlTag ?: return null
+
+            val prefix = when (val component = ComponentTagName.parse(tag.name)) {
+                is ComponentTagName.Local -> "."
+                is ComponentTagName.Remote -> "${component.aliasChain}."
+                is ComponentTagName.Slot, null -> return null
+            }
+
+            if (symbol !in HeexComponentResolver.resolveFunctionSymbols(tag)) return null
+
+            return ElixirPsiUsage.create(
+                htmlLeaf,
+                TextRange(0, htmlLeaf.textLength),
+                declaration = false,
+                usageType = CALL,
+                // Keep the `.`/alias prefix on rename: `<.button>` becomes `<.newName>`.
+                usageTextByName = { newName -> "$prefix$newName" }
+            )
+        }
         /**
          * If [leaf] is the captured NAME of a `&name/arity` or `&Mod.name/arity` capture that
          * resolves to [symbol], the name occurrence, else `null`. The bare name inside a capture

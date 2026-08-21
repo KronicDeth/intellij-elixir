@@ -81,6 +81,8 @@
     local components, components brought in via an explicit `import`, and components brought in via
     `use MyAppWeb, :html` all navigate to their definition. A dotted name that is not valid component
     syntax is flagged by `HtmlUnknownTagInspection` like any other unknown tag.
+  - **Find Usages and Rename on a `def`/`defp` include its HEEx component tags**, in `.heex` files
+    and inside `~H` sigils; a renamed tag keeps its `.`/module-alias prefix.
 
 ### Bug Fixes
 
