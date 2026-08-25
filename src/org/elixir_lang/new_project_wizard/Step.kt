@@ -15,6 +15,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.observable.properties.ObservableMutableProperty
 import com.intellij.openapi.observable.properties.ObservableProperty
+import com.intellij.openapi.observable.util.not
 import com.intellij.openapi.options.ConfigurationException
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
@@ -117,6 +118,8 @@ class Step(parent: NewProjectWizardStep) : AbstractNewProjectWizardStep(parent),
                 row {
                     checkBox("--sup")
                         .bindSelected(mixNewSupProperty)
+                        .enabledIf(!mixNewUmbrellaProperty)
+                        .comment("Not available for umbrella projects: an umbrella root has no application to supervise.")
                 }.bottomGap(BottomGap.SMALL)
                 row {
                     checkBox("--umbrella")
@@ -155,23 +158,9 @@ class Step(parent: NewProjectWizardStep) : AbstractNewProjectWizardStep(parent),
             val commandLine = ReadAction.nonBlocking(Callable {
                 Mix.commandLine(emptyMap(), workingDirectory, sdk, project = project)
             }).executeSynchronously()
-            commandLine.addParameters("new", projectDirectory)
-
-            if (mixNewApp.isNotBlank()) {
-                commandLine.addParameters("--app", mixNewApp)
-            }
-
-            if (mixNewModule.isNotBlank()) {
-                commandLine.addParameters("--module", mixNewModule)
-            }
-
-            if (mixNewSup) {
-                commandLine.addParameter("--sup")
-            }
-
-            if (mixNewUmbrella) {
-                commandLine.addParameter("--umbrella")
-            }
+            commandLine.addParameters(
+                MixNewOptions.parameters(projectDirectory, mixNewApp, mixNewModule, mixNewSup, mixNewUmbrella)
+            )
 
             // delete the caller's created empty directory so that `mix new` can create it.
             if (!context.projectDirectory.toFile().deleteRecursively()) {
@@ -219,23 +208,17 @@ class Step(parent: NewProjectWizardStep) : AbstractNewProjectWizardStep(parent),
             // The project SDK belongs to the host language (Java, Python, etc.) and is not required for Elixir functionality.
             builder.moduleJdk = sdk
 
-            builder.addSourcePath(
-                com.intellij.openapi.util.Pair(
-                    Paths.get(projectDirectory, "lib").toString(),
-                    ""
-                )
-            )
+            // Set the source paths even when there are none: JavaModuleBuilder.getSourcePaths()
+            // creates and returns <contentRoot>/src when they were never set at all, which would
+            // leave a stray empty src/ in an umbrella root.
+            builder.sourcePaths = MixNewOptions
+                .sourcePath(projectDirectory, mixNewUmbrella)
+                ?.let { listOf(com.intellij.openapi.util.Pair(it, "")) }
+                .orEmpty()
 
-            builder.setCompilerOutputPath(
-                Paths.get(
-                    context.projectDirectory.toString(),
-                    "_build",
-                    "dev",
-                    "lib",
-                    mixNewApp,
-                    "ebin"
-                ).toString()
-            )
+            MixNewOptions
+                .compilerOutputPath(projectDirectory, name, mixNewApp, mixNewUmbrella)
+                ?.let(builder::setCompilerOutputPath)
 
             builder.commit(project)
         } catch (e: ExecutionException) {
