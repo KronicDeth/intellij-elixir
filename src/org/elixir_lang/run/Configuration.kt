@@ -138,20 +138,29 @@ fun Element.readModuleFilters(
     }
 }
 
+/**
+ * [ModuleBasedConfiguration.writeExternal] already serializes the module name as a `module` element, so this reuses
+ * that element instead of adding a second one: the platform's own [com.intellij.execution.configurations.RunConfigurationModule.readExternal]
+ * warns that the module was "serialized more than one time" when a scheme carries two.
+ */
 fun Element.writeExternalModule(configuration: Configuration) {
     val moduleName = configuration.configurationModule.moduleName
 
     if (!moduleName.isBlank()) {
-        val moduleElement = Element(MODULE)
-        moduleElement.setAttribute(NAME, moduleName)
-        addContent(moduleElement)
+        ensureChild(MODULE).setAttribute(NAME, moduleName)
     }
 }
 
+/**
+ * Only overrides what [ModuleBasedConfiguration.readExternal] already restored when the module can actually be
+ * resolved: a configuration read before its module is loaded keeps the platform's pointer, which resolves later,
+ * rather than being reset to no module at all.
+ */
 fun Element.readExternalModule(configuration: Configuration) {
-    getChild(MODULE)?.getAttributeValue(NAME)?.let { moduleName ->
-        configuration.configurationModule.module = configuration.configurationModule.findModule(moduleName)
-    }
+    getChild(MODULE)
+            ?.getAttributeValue(NAME)
+            ?.let { moduleName -> configuration.configurationModule.findModule(moduleName) }
+            ?.let { module -> configuration.configurationModule.module = module }
 }
 
 fun Element.writeExternalWorkingDirectory(workingDirectoryURL: String?) {
@@ -183,6 +192,7 @@ const val ERL = "erl"
 const val MIX = "mix"
 private const val MODULE = "module"
 private const val NAME = "name"
+private const val PASS_PARENT_ENVS = "pass-parent-envs"
 private const val URL = "url"
 private const val WORKING_DIRECTORY = "working-directory"
 
@@ -221,6 +231,24 @@ abstract class Configuration(name: String, project: Project, configurationFactor
 
     override fun setPassParentEnvs(passParentEnvs: Boolean) {
         _passParentEnvs = passParentEnvs
+    }
+
+    /**
+     * [com.intellij.execution.configuration.EnvironmentVariablesComponent.readExternal] restores only the variables
+     * map, so the flag deciding whether the parent environment is inherited is read here. Subclasses get it through
+     * their `super.readExternal` call.
+     */
+    override fun readExternal(element: Element) {
+        super.readExternal(element)
+        _passParentEnvs = element.getAttributeValue(PASS_PARENT_ENVS)?.toBoolean() ?: false
+    }
+
+    override fun writeExternal(element: Element) {
+        super.writeExternal(element)
+
+        if (_passParentEnvs) {
+            element.setAttribute(PASS_PARENT_ENVS, true.toString())
+        }
     }
 
     override fun getValidModules(): Collection<com.intellij.openapi.module.Module> =
