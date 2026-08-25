@@ -7,6 +7,7 @@ import com.intellij.openapi.module.ModifiableModuleModel
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.roots.CompilerModuleExtension
 import com.intellij.openapi.roots.ContentEntry
 import com.intellij.openapi.roots.ModifiableRootModel
 import com.intellij.openapi.roots.ModuleRootManager
@@ -167,6 +168,8 @@ object Project {
     }
 
     fun addFolders(modifiableRootModel: ModifiableRootModel, root: VirtualFile) {
+        clearExcludeOutput(modifiableRootModel)
+
         val content = modifiableRootModel.addContentEntry(root)
 
         for (canonicalFolder in CANONICAL_FOLDER_MARKS) {
@@ -176,6 +179,31 @@ object Project {
                 FolderMark.EXCLUDED -> excludeDirFromContent(content, root, canonicalFolder.relativePath)
             }
         }
+    }
+
+    /**
+     * Turns off "exclude compiler output" for an Elixir module.
+     *
+     * Elixir compiles to `_build`, never to IntelliJ's compiler output, so excluding that output
+     * buys nothing - and the plugin ships a project converter whose only job is to strip the
+     * resulting `<exclude-output/>` from `ELIXIR_MODULE`s. Any module keeping the flag is therefore
+     * offered for "conversion" the next time its project is opened.
+     *
+     * Setting it explicitly matters even though `false` is the value we want. `JavaSettingsSerializer`
+     * writes `<exclude-output/>` for a module with **no** Java settings at all, and
+     * `JpsJavaModuleExtensionBridge.isExcludeOutput()` defaults to `true` for the same reason, so
+     * leaving the flag untouched produces the tag rather than omitting it. `JavaModuleBuilder`
+     * additionally sets it to `true` outright.
+     *
+     * Called from [addFolders], which every path that configures an Elixir module root goes
+     * through: the New Project wizard and the New Module wizard via
+     * [org.elixir_lang.module.ElixirModuleBuilder], and the import wizard and project-open
+     * processor via [createModulesForOtpApps].
+     */
+    private fun clearExcludeOutput(modifiableRootModel: ModifiableRootModel) {
+        modifiableRootModel
+            .getModuleExtension(CompilerModuleExtension::class.java)
+            .setExcludeOutput(false)
     }
 
     /**
