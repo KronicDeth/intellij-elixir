@@ -27,6 +27,15 @@
     ends in `end`**. This fixes decompilation of `Mix.Project`, `Mix.Release`, and `Mix.Task` on
     Elixir 1.20+.
 
+- [#3918](https://github.com/KronicDeth/intellij-elixir/pull/3918) [@sh41](https://github.com/sh41)
+  - **Saved run configurations no longer record the module twice.** Every Elixir run configuration
+    wrote a second `module` element on top of the one the IDE already writes, which the platform
+    logs as "Module serialized more than one time".
+  - **"Include system environment variables" is now remembered.** The setting was accepted in the
+    run configuration editor but silently discarded when the configuration was saved.
+  - **A run configuration whose module is not loaded yet keeps it.** Reading a saved configuration
+    before its module exists no longer clears the module instead of leaving the IDE to resolve it.
+
 - [#3915](https://github.com/KronicDeth/intellij-elixir/pull/3915) [@sh41](https://github.com/sh41)
   - **The IDE no longer starts every WSL distro that hosts a registered Erlang or Elixir SDK, and
     will no longer freeze if WSL is slow or hangs while starting.** Checking whether two WSL-hosted
