@@ -370,6 +370,65 @@ class ReconfigureModuleSetupActionTest : PlatformTestCase() {
         assertFalse("web/ should be Sources (not Test Sources)", webFolder!!.isTestSource)
     }
 
+    /**
+     * Reproduces a single-module umbrella whose child app was added after the module was
+     * configured: the umbrella root already carries every canonical mark, and `apps/c1` has a
+     * `mix.exs`, `lib/` and `test/` but no content entry of its own.
+     *
+     * The action must mark `apps/c1/lib` and `apps/c1/test`, because the umbrella root's own marks
+     * say nothing about its children.
+     */
+    @RequiresReadLock
+    fun testAddsMarksForAnUmbrellaSubAppAddedAfterTheRootWasConfigured() {
+        myFixture.tempDirFixture.findOrCreateDir("umbrella_root/apps/c1/lib")
+        myFixture.tempDirFixture.findOrCreateDir("umbrella_root/apps/c1/test")
+        myFixture.tempDirFixture.createFile("umbrella_root/apps/c1/mix.exs", "")
+
+        // The umbrella root as the New Project wizard leaves it: every canonical mark applied by
+        // URL, whether or not the directory exists.
+        addMixContentEntry("umbrella_root") { content, rootUrl ->
+            content.addSourceFolder("$rootUrl/lib", false)
+            content.addSourceFolder("$rootUrl/web", false)
+            content.addSourceFolder("$rootUrl/spec", true)
+            content.addSourceFolder("$rootUrl/test", true)
+            content.addExcludeFolder("$rootUrl/deps")
+            content.addExcludeFolder("$rootUrl/.elixir_ls")
+            content.addExcludeFolder("$rootUrl/assets/node_modules/phoenix")
+            content.addExcludeFolder("$rootUrl/assets/node_modules/phoenix_html")
+            content.addExcludeFolder("$rootUrl/cover")
+            content.addExcludeFolder("$rootUrl/doc")
+            content.addExcludeFolder("$rootUrl/logs")
+        }
+
+        val issuesBefore = detectIssuesOnBgThread().filter { it.folderRelativePath.startsWith("apps/c1") }
+        assertTrue(
+            "The validator should report the unmarked sub-app before the action runs",
+            issuesBefore.isNotEmpty()
+        )
+
+        runAction()
+
+        val entry = ModuleRootManager.getInstance(module).contentEntries
+            .find { it.file?.name == "umbrella_root" }!!
+        val sourceUrls = entry.sourceFolders.associate { it.url to it.isTestSource }
+
+        assertTrue(
+            "apps/c1/lib should be Sources, got: ${sourceUrls.keys}",
+            sourceUrls.any { it.key.endsWith("/apps/c1/lib") && !it.value }
+        )
+        assertTrue(
+            "apps/c1/test should be Test Sources, got: ${sourceUrls.keys}",
+            sourceUrls.any { it.key.endsWith("/apps/c1/test") && it.value }
+        )
+
+        val issuesAfter = detectIssuesOnBgThread().filter { it.folderRelativePath.startsWith("apps/c1") }
+        assertEquals(
+            "The sub-app should have no remaining folder mark issues, got: $issuesAfter",
+            0,
+            issuesAfter.size
+        )
+    }
+
     // -------------------------------------------------------------------------
     // Scenario 4: Project SDK = Java, Reconfigure action invoked
     // → folder marks applied; module SDK left untouched (Step 1 guard)

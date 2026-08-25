@@ -10,6 +10,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ContentEntry
 import com.intellij.openapi.roots.ModifiableRootModel
 import com.intellij.openapi.roots.ModuleRootManager
+import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileVisitor
@@ -175,6 +176,29 @@ object Project {
                 FolderMark.EXCLUDED -> excludeDirFromContent(content, root, canonicalFolder.relativePath)
             }
         }
+    }
+
+    /**
+     * Refreshes the umbrella sub-app directories under [root] so their `mix.exs` is visible to
+     * [VirtualFile.findChild].
+     *
+     * `mix new` writes a sub-app from an external process, so VFS can hold a child list for it
+     * containing only the entries the IDE itself touched - no `mix.exs` - and `findChild` answers
+     * from that list without going to disk. [findOtpApps] avoids this by refreshing its own root
+     * before scanning; the folder-mark scans need the same.
+     *
+     * Refreshes `apps/` and its immediate sub-directories rather than recursing, so the cost stays
+     * bounded on umbrellas whose children carry `deps/` and `_build/`. A sub-app that appears after
+     * `apps/` was last refreshed is therefore picked up on the following scan.
+     *
+     * @param async when false this blocks until the refresh completes, so it must not be called
+     *   under a read or write lock - a synchronous refresh is not permitted inside one.
+     */
+    fun refreshUmbrellaSubApps(root: VirtualFile, async: Boolean) {
+        val appsDir = root.findChild("apps") ?: return
+        val targets = (listOf(appsDir) + appsDir.children.filter(VirtualFile::isDirectory)).toTypedArray()
+
+        VfsUtil.markDirtyAndRefresh(async, false, true, *targets)
     }
 
     private fun createImportedOtpApp(appRoot: VirtualFile): OtpApp? =

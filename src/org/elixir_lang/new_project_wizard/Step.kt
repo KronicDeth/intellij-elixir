@@ -31,6 +31,8 @@ import com.intellij.openapi.roots.ui.configuration.projectRoot.ProjectSdksModel
 import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.NlsContexts
+import com.intellij.openapi.vfs.LocalFileSystem
+import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.ui.dsl.builder.*
 import com.intellij.ui.layout.ValidationInfoBuilder
 import kotlinx.coroutines.CancellationException
@@ -199,6 +201,15 @@ class Step(parent: NewProjectWizardStep) : AbstractNewProjectWizardStep(parent),
 
                 throw IOException("mix new failed: $stderrWithoutColorCodes")
             }
+
+            // mix new wrote the whole project from an external process, so none of it is in VFS.
+            // Refresh before configuring the module: the folder-mark scans that run later use
+            // findChild, which answers from the cached child list rather than going to disk, and
+            // would otherwise never see this project's mix.exs.
+            LocalFileSystem
+                .getInstance()
+                .refreshAndFindFileByNioFile(context.projectDirectory)
+                ?.let { VfsUtil.markDirtyAndRefresh(false, true, true, it) }
 
             super.setupProject(project)
 

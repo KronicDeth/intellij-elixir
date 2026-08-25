@@ -39,6 +39,8 @@ import org.elixir_lang.Icons
 import org.elixir_lang.isElixirModule
 import org.elixir_lang.mix.project.ProjectModuleSetupValidator
 import org.elixir_lang.mix.project.ProjectModuleSetupValidator.FolderMarkIssue
+import org.elixir_lang.mixContentRoots
+import org.elixir_lang.mix.Project as MixProject
 import org.elixir_lang.sdk.SdkEbinPaths
 import org.elixir_lang.sdk.elixir.ElixirSdkLookup
 import org.elixir_lang.sdk.elixir.ElixirSdkMutation
@@ -217,6 +219,15 @@ class ElixirEditorBasedSdkWidget(
                 // a partially-complete scan and restart, wasting work - safe but inefficient since
                 // the notification outcome is idempotent (duplicate issueKeys are suppressed).
                 .collect {
+                    // Schedule a refresh of any umbrella sub-apps before scanning: `mix new`
+                    // writes them from an external process, so VFS can hold a child list without
+                    // their mix.exs and the folder-mark scan would skip them. Asynchronous, and
+                    // outside the readAction below, so no I/O happens under the lock - the
+                    // refreshed state is picked up by the next scan.
+                    readAction {
+                        ModuleManager.getInstance(project).modules.flatMap { it.mixContentRoots() }
+                    }.forEach { MixProject.refreshUmbrellaSubApps(it.root, async = true) }
+
                     val modelData = readAction { collectNotificationScanModelData() }
                     val ioData = withContext(Dispatchers.IO) { collectNotificationScanIoData(modelData) }
                     val tmAnalysis = latestTmAnalysis

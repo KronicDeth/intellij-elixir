@@ -15,6 +15,8 @@ import com.intellij.openapi.vfs.VirtualFile
 import org.elixir_lang.mix.project.CANONICAL_FOLDER_MARKS
 import org.elixir_lang.mix.project.FolderMark
 import org.elixir_lang.isElixirMixModule
+import org.elixir_lang.mixContentRoots
+import org.elixir_lang.mix.Project as MixProject
 import org.elixir_lang.sdk.elixir.ElixirSdkLookup
 import org.elixir_lang.sdk.elixir.Type as ElixirSdkType
 
@@ -58,6 +60,16 @@ class ReconfigureModuleSetupAction : AnAction() {
         val hasRootMixExs = project.basePath?.let { basePath ->
             LocalFileSystem.getInstance().findFileByPath(basePath)?.findChild("mix.exs")
         } != null
+
+        // Umbrella sub-apps created by `mix new` are written by an external process, so VFS can
+        // hold a stale child list that omits their mix.exs - which would make the scan below skip
+        // them silently. Refresh first: this is deliberately outside the write action, where a
+        // synchronous refresh is not permitted.
+        for (module in ModuleManager.getInstance(project).modules) {
+            for (mixContentRoot in module.mixContentRoots()) {
+                MixProject.refreshUmbrellaSubApps(mixContentRoot.root, async = false)
+            }
+        }
 
         var modulesReconfigured = 0
         var foldersAdded = 0
