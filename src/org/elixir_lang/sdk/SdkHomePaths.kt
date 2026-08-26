@@ -125,6 +125,25 @@ object SdkHomePaths {
     }
 
     /**
+     * The SDK home for [toolName] at or under [candidate].
+     *
+     * An install prefix is not itself a home: `make install PREFIX=<prefix>` puts the home in
+     * `<prefix>/lib/<toolName>` and leaves only symlinks in `<prefix>/bin`. Homebrew version
+     * prefixes, kiex version directories, `/usr` and `/usr/local` are all this shape, while an
+     * already-correct home is not, so the two are told apart by whether the nested directory has a
+     * `bin` of its own - a home always does, and a bare OTP application directory never does.
+     *
+     * Homebrew is the reason both shapes are live at once: it switched Elixir to the Makefile's
+     * `install` target on 2024-09-22, so anything installed before that keeps the flat layout.
+     */
+    @JvmStatic
+    fun toolHomePath(candidate: File, toolName: String): File {
+        val nested = File(candidate, "lib/$toolName")
+
+        return if (File(nested, "bin").isDirectory) nested else candidate
+    }
+
+    /**
      * Every Cellar root reachable through [toLocalPath].
      *
      * The native scan and a WSL scan reach the same roots by different routes, so both ask here

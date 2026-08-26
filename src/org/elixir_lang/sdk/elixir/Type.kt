@@ -97,8 +97,6 @@ class Type : org.elixir_lang.sdk.erlang_dependent.Type(ElixirSdkTypeId.ELIXIR_SD
                 windowsDefaultPath = WINDOWS_64BIT_DEFAULT_HOME_PATH,
                 windows32BitPath = WINDOWS_32BIT_DEFAULT_HOME_PATH,
                 elixirInstallScriptDirName = "elixir",
-                homebrewTransform = null,  // identity
-                nixTransform = null,  // identity
                 kerlTransform = null,  // TODO: Investigate if Elixir supports kerl builds
                 travisCIKerlTransform = null  // TODO: Verify Travis CI kerl for Elixir
             )

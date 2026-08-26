@@ -39,8 +39,6 @@ class Type : SdkType(ErlangSdkTypeId.ERLANG_SDK_TYPE_ID) {
             windowsDefaultPath = WINDOWS_DEFAULT_HOME_PATH,
             windows32BitPath = null,
             elixirInstallScriptDirName = "otp",
-            homebrewTransform = { versionPath -> File(versionPath, "lib/erlang") },
-            nixTransform = { versionPath -> File(versionPath, "lib/erlang") },
             kerlTransform = { it },
             travisCIKerlTransform = { it }
         )

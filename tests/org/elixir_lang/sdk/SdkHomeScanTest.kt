@@ -114,42 +114,65 @@ class SdkHomeScanTest : PlatformTestCase() {
 
     // ========== Transform Behavior Tests ==========
 
-    fun `test null homebrewTransform uses identity`() {
-        val config = createElixirConfig()
-        // Kotlin lambdas use invoke(), not apply()
-        val transform: (File) -> File = config.homebrewTransform ?: { it }
-        val testFile = File("/test")
-        assertSame(testFile, transform(testFile))
+    fun `test both tools resolve a prefix with the same rule`() {
+        withTempRoot { root ->
+            val elixirPrefix = File(root, "elixir/1.20.3")
+            val erlangPrefix = File(root, "erlang/29.0.5")
+            assertTrue(File(elixirPrefix, "lib/elixir/bin").mkdirs())
+            assertTrue(File(erlangPrefix, "lib/erlang/bin").mkdirs())
+
+            assertEquals(
+                File(elixirPrefix, "lib/elixir"),
+                createElixirConfig().toolHome(elixirPrefix)
+            )
+            assertEquals(
+                File(erlangPrefix, "lib/erlang"),
+                createErlangConfig().toolHome(erlangPrefix)
+            )
+        }
     }
 
-    fun `test null nixTransform uses identity`() {
-        val config = createElixirConfig()
-        // Kotlin lambdas use invoke(), not apply()
-        val transform: (File) -> File = config.nixTransform ?: { it }
-        val testFile = File("/nix/store/test")
-        assertSame(testFile, transform(testFile))
+    fun `test toolHomePath descends into the nested home`() {
+        withTempRoot { root ->
+            // make install PREFIX=<prefix>, the layout Homebrew has produced since 2024-09-22
+            val prefix = File(root, "elixir/1.18.0")
+            assertTrue(File(prefix, "lib/elixir/bin").mkdirs())
+            assertTrue(File(prefix, "lib/elixir/lib/elixir/ebin").mkdirs())
+            assertTrue(File(prefix, "bin").mkdirs())
+
+            assertEquals(
+                FileUtil.toSystemIndependentName(File(prefix, "lib/elixir").absolutePath),
+                FileUtil.toSystemIndependentName(SdkHomePaths.toolHomePath(prefix, "elixir").absolutePath)
+            )
+        }
     }
 
-    fun `test erlang homebrewTransform adds lib slash erlang`() {
-        val config = createErlangConfig()
-        assertNotNull(config.homebrewTransform)
+    fun `test toolHomePath keeps the prefix for the pre-2024 layout`() {
+        withTempRoot { root ->
+            // bin.install plus per-app lib/<app>/ebin: lib/elixir exists but has no bin of its own
+            val prefix = File(root, "elixir/1.17.3")
+            assertTrue(File(prefix, "bin").mkdirs())
+            assertTrue(File(prefix, "lib/elixir/ebin").mkdirs())
+            assertTrue(File(prefix, "lib/eex/ebin").mkdirs())
 
-        val versionPath = File("/usr/local/Cellar/erlang/27.0")
-        val expected = File("/usr/local/Cellar/erlang/27.0/lib/erlang")
-        val result = config.homebrewTransform!!(versionPath)
-
-        assertEquals(expected, result)
+            assertEquals(
+                "the prefix is already the home; descending would break installs predating 2024-09-22",
+                FileUtil.toSystemIndependentName(prefix.absolutePath),
+                FileUtil.toSystemIndependentName(SdkHomePaths.toolHomePath(prefix, "elixir").absolutePath)
+            )
+        }
     }
 
-    fun `test erlang nixTransform adds lib slash erlang`() {
-        val config = createErlangConfig()
-        assertNotNull(config.nixTransform)
+    fun `test toolHomePath keeps the prefix when there is no lib at all`() {
+        withTempRoot { root ->
+            val prefix = File(root, "elixir/1.18.0")
+            assertTrue(File(prefix, "bin").mkdirs())
 
-        val versionPath = File("/nix/store/xyz-erlang-27")
-        val expected = File("/nix/store/xyz-erlang-27/lib/erlang")
-        val result = config.nixTransform!!(versionPath)
-
-        assertEquals(expected, result)
+            assertEquals(
+                FileUtil.toSystemIndependentName(prefix.absolutePath),
+                FileUtil.toSystemIndependentName(SdkHomePaths.toolHomePath(prefix, "elixir").absolutePath)
+            )
+        }
     }
 
     fun `test erlang kerlTransform is identity`() {
@@ -215,16 +238,12 @@ class SdkHomeScanTest : PlatformTestCase() {
             nixPattern = SdkHomePaths.nixPattern("test"),
             windowsDefaultPath = null,
             windows32BitPath = null,
-            homebrewTransform = null,
-            nixTransform = null,
             kerlTransform = null,
             travisCIKerlTransform = null,
             elixirInstallScriptDirName = "test"
         )
 
         assertEquals("test", config.toolName)
-        assertNull(config.homebrewTransform)
-        assertNull(config.nixTransform)
         assertNull(config.kerlTransform)
         assertNull(config.travisCIKerlTransform)
     }
@@ -237,15 +256,11 @@ class SdkHomeScanTest : PlatformTestCase() {
             nixPattern = SdkHomePaths.nixPattern("test"),
             windowsDefaultPath = "C:\\test",
             windows32BitPath = "C:\\test32",
-            homebrewTransform = testTransform,
-            nixTransform = testTransform,
             kerlTransform = testTransform,
             travisCIKerlTransform = testTransform,
             elixirInstallScriptDirName = "test"
         )
 
-        assertNotNull(config.homebrewTransform)
-        assertNotNull(config.nixTransform)
         assertNotNull(config.kerlTransform)
         assertNotNull(config.travisCIKerlTransform)
     }
@@ -302,8 +317,6 @@ class SdkHomeScanTest : PlatformTestCase() {
         nixPattern = SdkHomePaths.nixPattern("elixir"),
         windowsDefaultPath = "C:\\Program Files (x86)\\Elixir",
         windows32BitPath = "C:\\Program Files\\Elixir",
-        homebrewTransform = null,
-        nixTransform = null,
         kerlTransform = null,
         travisCIKerlTransform = null,
         elixirInstallScriptDirName = "elixir"
@@ -314,8 +327,6 @@ class SdkHomeScanTest : PlatformTestCase() {
         nixPattern = SdkHomePaths.nixPattern("erlang"),
         windowsDefaultPath = "C:\\Program Files\\erl9.0",
         windows32BitPath = null,
-        homebrewTransform = { File(it, "lib/erlang") },
-        nixTransform = { File(it, "lib/erlang") },
         kerlTransform = { it },
         travisCIKerlTransform = { it },
         elixirInstallScriptDirName = "otp"

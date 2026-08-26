@@ -25,8 +25,6 @@ object SdkHomeScan {
      *
      * @property toolName The tool name used by version managers (e.g., "elixir", "erlang")
      * @property nixPattern Regex pattern for matching Nix store packages
-     * @property homebrewTransform Path transform for Homebrew (null = identity)
-     * @property nixTransform Path transform for Nix Store (null = identity)
      * @property windowsDefaultPath Primary Windows install path (null if no default)
      * @property windows32BitPath 32-bit Windows install path (null if same as default)
      * @property kerlTransform Path transform for kerl (null = skip kerl scanning)
@@ -39,12 +37,17 @@ object SdkHomeScan {
         val windows32BitPath: String? = null,
         val elixirInstallScriptDirName: String,
 
-        // Path transformations (null = identity for homebrew/nix, skip for kerl)
-        val homebrewTransform: ((File) -> File)? = null,
-        val nixTransform: ((File) -> File)? = null,
+        // Path transformation (null = skip kerl)
         val kerlTransform: ((File) -> File)? = null,
         val travisCIKerlTransform: ((File) -> File)? = null
-    )
+    ) {
+        /**
+         * Resolves an install prefix to the home inside it. Every source that hands back a prefix
+         * rather than a home - Homebrew, Nix, kiex - goes through this, so none of them needs a
+         * transform of its own.
+         */
+        val toolHome: (File) -> File get() = { SdkHomePaths.toolHomePath(it, toolName) }
+    }
 
     /**
      * Scans for SDK installations across all platforms.
@@ -127,14 +130,12 @@ object SdkHomeScan {
         }
 
         SdkHomePaths.mergeHomebrew(
-            homePathByVersion, config.toolName, config.homebrewTransform ?: { it },
+            homePathByVersion, config.toolName, config.toolHome,
             SdkHomePaths.homebrewCellarPaths(userHome, toLocalPath)
         )
 
         toLocalPath(SdkPaths.NIX_STORE_PATH)?.let {
-            SdkHomePaths.mergeNixStore(
-                homePathByVersion, config.nixPattern, config.nixTransform ?: { it }, it
-            )
+            SdkHomePaths.mergeNixStore(homePathByVersion, config.nixPattern, config.toolHome, it)
         }
     }
 
