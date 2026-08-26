@@ -45,6 +45,13 @@
     `mix.exs` - and every folder-mark scan skipped the app in silence because of it. The New Project
     wizard, *Reconfigure Elixir Module Setup* and the module-setup check now refresh first.
 
+- [#3921](https://github.com/KronicDeth/intellij-elixir/pull/3921) [@sh41](https://github.com/sh41)
+  - **Variables bound by a macro call in a match now resolve.** `session(id, user) = raw` binds all
+    of the macro's arguments, but every use of them was reported as unresolved: only three `Kernel`
+    names were recognised as binding, and any other parenthesised call was assumed to be a function,
+    whose arguments are values. The call is now resolved to decide whether it is a macro. Calls that
+    resolve to a function are unaffected, as are macros that cannot be resolved at all.
+
 - [#3918](https://github.com/KronicDeth/intellij-elixir/pull/3918) [@sh41](https://github.com/sh41)
   - **Saved run configurations no longer record the module twice.** Every Elixir run configuration
     wrote a second `module` element on top of the one the IDE already writes, which the platform
