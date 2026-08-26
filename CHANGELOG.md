@@ -27,6 +27,24 @@
     ends in `end`**. This fixes decompilation of `Mix.Project`, `Mix.Release`, and `Mix.Task` on
     Elixir 1.20+.
 
+- [#3919](https://github.com/KronicDeth/intellij-elixir/pull/3919) [@sh41](https://github.com/sh41)
+  - **New Elixir projects get the right compiler output directory.** Leaving `--app` blank in the
+    New Project wizard - which is allowed, and is what most people do - configured the module with
+    `_build/dev/lib/ebin` instead of `_build/dev/lib/<app>/ebin`. It now falls back to the project
+    name, which is what `mix new` itself uses.
+  - **`--sup` is no longer offered for umbrella projects.** `mix new` ignores it at an umbrella root
+    without reporting anything, so ticking it appeared to work and silently did nothing.
+  - **New umbrella projects no longer get a stray empty `lib/` or a compiler output directory that
+    never exists.** An umbrella root has no application of its own, so neither applies to it.
+  - **New Elixir projects and modules are no longer reported as having "an outdated format".** Every
+    project the plugin created was offered for conversion the next time it was opened, because the
+    module was written with compiler-output exclusion switched on - the exact setting the plugin's
+    converter exists to remove. Elixir compiles to `_build`, so the setting never applied.
+  - **Umbrella sub-apps now get their `lib/` and `test/` marked.** `mix new` writes an app from an
+    external process, so the IDE could hold a stale view of the directory that did not include its
+    `mix.exs` - and every folder-mark scan skipped the app in silence because of it. The New Project
+    wizard, *Reconfigure Elixir Module Setup* and the module-setup check now refresh first.
+
 - [#3918](https://github.com/KronicDeth/intellij-elixir/pull/3918) [@sh41](https://github.com/sh41)
   - **Saved run configurations no longer record the module twice.** Every Elixir run configuration
     wrote a second `module` element on top of the one the IDE already writes, which the platform
