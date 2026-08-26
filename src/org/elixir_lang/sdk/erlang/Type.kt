@@ -27,8 +27,6 @@ class Type : SdkType(ErlangSdkTypeId.ERLANG_SDK_TYPE_ID) {
     companion object {
         private const val WINDOWS_DEFAULT_HOME_PATH = "C:\\Program Files\\erl9.0"
         private val NIX_PATTERN = SdkHomePaths.nixPattern("erlang")
-        private const val LINUX_MINT_HOME_PATH = "${SdkHomePaths.LINUX_MINT_HOME_PATH}/erlang"
-        private const val LINUX_DEFAULT_HOME_PATH = "${SdkHomePaths.LINUX_DEFAULT_HOME_PATH}/erlang"
 
         @JvmStatic
         val instance: Type
@@ -38,8 +36,6 @@ class Type : SdkType(ErlangSdkTypeId.ERLANG_SDK_TYPE_ID) {
         private fun createConfig() = SdkHomeScan.Config(
             toolName = "erlang",
             nixPattern = NIX_PATTERN,
-            linuxDefaultPath = LINUX_DEFAULT_HOME_PATH,
-            linuxMintPath = LINUX_MINT_HOME_PATH,
             windowsDefaultPath = WINDOWS_DEFAULT_HOME_PATH,
             windows32BitPath = null,
             elixirInstallScriptDirName = "otp",

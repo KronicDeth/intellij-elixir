@@ -14,9 +14,24 @@ import java.util.regex.Pattern
 
 object SdkHomePaths {
     private const val HEAD_PREFIX = "HEAD-"
-    const val LINUX_MINT_HOME_PATH = "/usr/lib"
-    const val LINUX_DEFAULT_HOME_PATH = "/usr/local/lib"
+
+    /** `make install` with the Makefile's default `PREFIX`, i.e. a build from source. */
+    private const val LINUX_SOURCE_ROOT_PATH = "/usr/local/lib"
+
+    /**
+     * `PREFIX=/usr` with the default `LIBDIR`, i.e. a distribution package. Debian, Ubuntu, Mint,
+     * Arch, Alpine and openSUSE all land here; it is not specific to Mint.
+     */
+    private const val LINUX_DISTRO_ROOT_PATH = "/usr/lib"
+
     const val NIX_STORE_PATH = "/nix/store"
+
+    /**
+     * Roots a source build or a distribution package installs a tool under, in scan order.
+     * [linuxSystemHomePaths] suffixes the tool name onto each; a new distro layout is added here and
+     * nowhere else.
+     */
+    private val LINUX_SYSTEM_ROOT_PATHS = listOf(LINUX_SOURCE_ROOT_PATH, LINUX_DISTRO_ROOT_PATH)
 
     @JvmField
     val UNKNOWN_VERSION = Version(0, 0, 0)
@@ -28,6 +43,43 @@ object SdkHomePaths {
     @JvmStatic
     fun nixPattern(name: String): Pattern {
         return Pattern.compile(".+-$name-(\\d+)\\.(\\d+)\\.(\\d+)")
+    }
+
+    /**
+     * Every hardcoded Linux home path for [toolName], in scan order.
+     */
+    @JvmStatic
+    fun linuxSystemHomePaths(toolName: String): List<String> =
+        LINUX_SYSTEM_ROOT_PATHS.map { "$it/$toolName" }
+
+    /**
+     * Adds each of [linuxSystemHomePaths] that exists as a directory.
+     *
+     * The native Linux scan and the WSL scan differ only by [toLocalPath], which maps a Linux path
+     * to how this machine reaches it - identity when running on Linux, a UNC path when reaching into
+     * a WSL distribution, and null when it cannot be reached at all. Both therefore go through this
+     * one call, so the WSL scan cannot be left without a path the native scan gained.
+     */
+    @JvmStatic
+    fun mergeLinuxSystemHomePaths(
+        homePathByVersion: MutableMap<SdkHomeKey, String>,
+        toolName: String,
+        toLocalPath: (String) -> String? = { it },
+    ) {
+        for (candidate in linuxSystemHomePaths(toolName)) {
+            val homePath = toLocalPath(candidate)
+
+            if (homePath == null) {
+                LOGGER.trace { "$candidate: Not reachable" }
+                continue
+            }
+
+            if (File(homePath).isDirectory) {
+                homePathByVersion[unknownVersionKey(homePath)] = homePath
+            } else {
+                LOGGER.trace { "$homePath: Not a directory" }
+            }
+        }
     }
 
     @JvmStatic

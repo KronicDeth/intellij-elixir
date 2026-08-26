@@ -24,8 +24,6 @@ object SdkHomeScan {
      *
      * @property toolName The tool name used by version managers (e.g., "elixir", "erlang")
      * @property nixPattern Regex pattern for matching Nix store packages
-     * @property linuxDefaultPath System install path on Linux (e.g., "/usr/local/lib/elixir")
-     * @property linuxMintPath Linux Mint install path (e.g., "/usr/lib/elixir")
      * @property windowsDefaultPath Primary Windows install path (null if no default)
      * @property windows32BitPath 32-bit Windows install path (null if same as default)
      * @property homebrewTransform Path transform for Homebrew (null = identity)
@@ -36,8 +34,6 @@ object SdkHomeScan {
     data class Config(
         val toolName: String,
         val nixPattern: java.util.regex.Pattern,
-        val linuxDefaultPath: String,
-        val linuxMintPath: String,
         val windowsDefaultPath: String?,
         val windows32BitPath: String? = null,
         val elixirInstallScriptDirName: String,
@@ -143,8 +139,7 @@ object SdkHomeScan {
         homePathByVersion: MutableMap<SdkHomeKey, String>,
         config: Config
     ): Map<SdkHomeKey, String> {
-        putIfDirectory(homePathByVersion, SdkHomePaths.unknownVersionKey(config.linuxDefaultPath), config.linuxDefaultPath)
-        putIfDirectory(homePathByVersion, SdkHomePaths.unknownVersionKey(config.linuxMintPath), config.linuxMintPath)
+        SdkHomePaths.mergeLinuxSystemHomePaths(homePathByVersion, config.toolName)
 
         SdkHomePaths.mergeASDF(homePathByVersion, config.toolName)
         SdkHomePaths.mergeMise(homePathByVersion, config.toolName)
@@ -223,11 +218,8 @@ object SdkHomeScan {
             }
         }
 
-        wslCompat.convertLinuxPathToWindowsUnc(distribution, config.linuxDefaultPath)?.let {
-            putIfDirectory(homePathByVersion, SdkHomePaths.unknownVersionKey(it), it)
-        }
-        wslCompat.convertLinuxPathToWindowsUnc(distribution, config.linuxMintPath)?.let {
-            putIfDirectory(homePathByVersion, SdkHomePaths.unknownVersionKey(it), it)
+        SdkHomePaths.mergeLinuxSystemHomePaths(homePathByVersion, config.toolName) {
+            wslCompat.convertLinuxPathToWindowsUnc(distribution, it)
         }
 
         wslCompat.convertLinuxPathToWindowsUnc(distribution, SdkHomePaths.NIX_STORE_PATH)?.let { wslNixStore ->

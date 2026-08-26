@@ -94,8 +94,6 @@ class Type : org.elixir_lang.sdk.erlang_dependent.Type(ElixirSdkTypeId.ELIXIR_SD
             path, SdkHomeScan.Config(
                 toolName = "elixir",
                 nixPattern = NIX_PATTERN,
-                linuxDefaultPath = LINUX_DEFAULT_HOME_PATH,
-                linuxMintPath = LINUX_MINT_HOME_PATH,
                 windowsDefaultPath = WINDOWS_64BIT_DEFAULT_HOME_PATH,
                 windows32BitPath = WINDOWS_32BIT_DEFAULT_HOME_PATH,
                 elixirInstallScriptDirName = "elixir",
@@ -223,8 +221,6 @@ ELIXIR_SDK_HOME
     }
 
     companion object {
-        private const val LINUX_DEFAULT_HOME_PATH = SdkHomePaths.LINUX_DEFAULT_HOME_PATH + "/elixir"
-        private const val LINUX_MINT_HOME_PATH = SdkHomePaths.LINUX_MINT_HOME_PATH + "/elixir"
         private val LOG = Logger.getInstance(Type::class.java)
         private val NIX_PATTERN = SdkHomePaths.nixPattern("elixir")
         private val SDK_HOME_CHILD_BASE_NAME_SET: Set<String> = setOf("lib", "src")

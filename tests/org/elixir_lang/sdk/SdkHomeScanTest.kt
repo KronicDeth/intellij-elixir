@@ -1,5 +1,6 @@
 package org.elixir_lang.sdk
 
+import com.intellij.openapi.util.io.FileUtil
 import org.elixir_lang.PlatformTestCase
 import java.io.File
 import java.nio.file.Paths
@@ -51,16 +52,72 @@ class SdkHomeScanTest : PlatformTestCase() {
         assertNull("Erlang uses same path for 32-bit", config.windows32BitPath)
     }
 
-    fun `test elixir config linux paths`() {
-        val config = createElixirConfig()
-        assertEquals("/usr/local/lib/elixir", config.linuxDefaultPath)
-        assertEquals("/usr/lib/elixir", config.linuxMintPath)
+    fun `test elixir linux system home paths`() {
+        assertEquals(
+            listOf("/usr/local/lib/elixir", "/usr/lib/elixir"),
+            SdkHomePaths.linuxSystemHomePaths("elixir")
+        )
     }
 
-    fun `test erlang config linux paths`() {
-        val config = createErlangConfig()
-        assertEquals("/usr/local/lib/erlang", config.linuxDefaultPath)
-        assertEquals("/usr/lib/erlang", config.linuxMintPath)
+    fun `test erlang linux system home paths`() {
+        assertEquals(
+            listOf("/usr/local/lib/erlang", "/usr/lib/erlang"),
+            SdkHomePaths.linuxSystemHomePaths("erlang")
+        )
+    }
+
+    fun `test mergeLinuxSystemHomePaths adds only directories that exist`() {
+        withTempRoot { root ->
+            val present = File(root, "usr/lib/elixir")
+            assertTrue("could not create $present", present.mkdirs())
+
+            val homePathByVersion = mutableMapOf<SdkHomeKey, String>()
+            SdkHomePaths.mergeLinuxSystemHomePaths(homePathByVersion, "elixir") { File(root, it).path }
+
+            // /usr/local/lib/elixir was a candidate too, but was never created.
+            assertEquals(
+                setOf(FileUtil.toSystemIndependentName(present.absolutePath)),
+                homePathByVersion.values.map { FileUtil.toSystemIndependentName(it) }.toSet()
+            )
+        }
+    }
+
+    fun `test mergeLinuxSystemHomePaths covers every candidate`() {
+        withTempRoot { root ->
+            val candidates = SdkHomePaths.linuxSystemHomePaths("elixir")
+            candidates.forEach { assertTrue(File(root, it).mkdirs()) }
+
+            val homePathByVersion = mutableMapOf<SdkHomeKey, String>()
+            SdkHomePaths.mergeLinuxSystemHomePaths(homePathByVersion, "elixir") { File(root, it).path }
+
+            assertEquals(
+                "every path linuxSystemHomePaths names must be scanned",
+                candidates.map { FileUtil.toSystemIndependentName(File(root, it).absolutePath) }.toSet(),
+                homePathByVersion.values.map { FileUtil.toSystemIndependentName(it) }.toSet()
+            )
+        }
+    }
+
+    fun `test mergeLinuxSystemHomePaths skips an unreachable path`() {
+        withTempRoot { root ->
+            assertTrue(File(root, "usr/lib/elixir").mkdirs())
+
+            val homePathByVersion = mutableMapOf<SdkHomeKey, String>()
+            // A WSL distribution that cannot map the path returns null, as convertLinuxPathToWindowsUnc does.
+            SdkHomePaths.mergeLinuxSystemHomePaths(homePathByVersion, "elixir") { null }
+
+            assertEmpty(homePathByVersion.values)
+        }
+    }
+
+    private fun withTempRoot(body: (File) -> Unit) {
+        val root = FileUtil.createTempDirectory("sdkHome", null)
+
+        try {
+            body(root)
+        } finally {
+            FileUtil.delete(root)
+        }
     }
 
     // ========== Transform Behavior Tests ==========
@@ -164,8 +221,6 @@ class SdkHomeScanTest : PlatformTestCase() {
         val config = SdkHomeScan.Config(
             toolName = "test",
             nixPattern = SdkHomePaths.nixPattern("test"),
-            linuxDefaultPath = "/test",
-            linuxMintPath = "/test",
             windowsDefaultPath = null,
             windows32BitPath = null,
             homebrewTransform = null,
@@ -188,8 +243,6 @@ class SdkHomeScanTest : PlatformTestCase() {
         val config = SdkHomeScan.Config(
             toolName = "test",
             nixPattern = SdkHomePaths.nixPattern("test"),
-            linuxDefaultPath = "/test",
-            linuxMintPath = "/test",
             windowsDefaultPath = "C:\\test",
             windows32BitPath = "C:\\test32",
             homebrewTransform = testTransform,
@@ -210,8 +263,6 @@ class SdkHomeScanTest : PlatformTestCase() {
     private fun createElixirConfig() = SdkHomeScan.Config(
         toolName = "elixir",
         nixPattern = SdkHomePaths.nixPattern("elixir"),
-        linuxDefaultPath = "/usr/local/lib/elixir",
-        linuxMintPath = "/usr/lib/elixir",
         windowsDefaultPath = "C:\\Program Files (x86)\\Elixir",
         windows32BitPath = "C:\\Program Files\\Elixir",
         homebrewTransform = null,
@@ -224,8 +275,6 @@ class SdkHomeScanTest : PlatformTestCase() {
     private fun createErlangConfig() = SdkHomeScan.Config(
         toolName = "erlang",
         nixPattern = SdkHomePaths.nixPattern("erlang"),
-        linuxDefaultPath = "/usr/local/lib/erlang",
-        linuxMintPath = "/usr/lib/erlang",
         windowsDefaultPath = "C:\\Program Files\\erl9.0",
         windows32BitPath = null,
         homebrewTransform = { File(it, "lib/erlang") },
