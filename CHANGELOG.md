@@ -43,6 +43,12 @@
 
 ### Bug Fixes
 
+- [#3924](https://github.com/KronicDeth/intellij-elixir/pull/3924) [@sh41](https://github.com/sh41)
+  - **Variable completion no longer shows a parameter's name twice.** A parameter that is not bound
+    by a match is its own enclosing match, so the match appended after the name only repeated it.
+    Variables bound by a match still show that match, which is what makes the tail text useful.
+    Fixes [#496](https://github.com/KronicDeth/intellij-elixir/issues/496).
+
 - [#3923](https://github.com/KronicDeth/intellij-elixir/pull/3923) [@sh41](https://github.com/sh41)
   - **Homebrew Erlang SDKs no longer report an unknown version.** The version was read from the
     home path after the Homebrew layout adjustment had been applied, so every Homebrew Erlang was
