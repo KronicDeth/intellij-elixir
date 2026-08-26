@@ -24,8 +24,6 @@ object SdkHomePaths {
      */
     private const val LINUX_DISTRO_ROOT_PATH = "/usr/lib"
 
-    const val NIX_STORE_PATH = "/nix/store"
-
     /**
      * Roots a source build or a distribution package installs a tool under, in scan order.
      * [linuxSystemHomePaths] suffixes the tool name onto each; a new distro layout is added here and
@@ -36,8 +34,8 @@ object SdkHomePaths {
     @JvmField
     val UNKNOWN_VERSION = Version(0, 0, 0)
 
-    private val HOMEBREW_ROOT = File("/usr/local/Cellar")
-    private val NIX_STORE = File(NIX_STORE_PATH)
+    private val HOMEBREW_ROOT = File(SdkPaths.HOMEBREW_INTEL_CELLAR_PATH)
+    private val NIX_STORE = File(SdkPaths.NIX_STORE_PATH)
     private val LOGGER = Logger.getInstance(SdkHomePaths::class.java)
 
     @JvmStatic
@@ -91,7 +89,7 @@ object SdkHomePaths {
     fun mergeASDF(homePathByVersion: MutableMap<SdkHomeKey, String>, name: String, userHome: String) {
         mergeNameSubdirectories(
             homePathByVersion,
-            Path.of(userHome, ".asdf", "installs").toFile(),
+            Path.of(userHome, SdkPaths.ASDF_INSTALLS_PATH_FROM_HOME).toFile(),
             name, SdkPaths.SOURCE_NAME_ASDF
         )
     }
@@ -121,7 +119,7 @@ object SdkHomePaths {
     fun mergeElixirInstallScript(homePathByVersion: MutableMap<SdkHomeKey, String>, name: String, userHome: String) {
         mergeNameSubdirectories(
             homePathByVersion,
-            Path.of(userHome, ".elixir-install", "installs").toFile(),
+            Path.of(userHome, SdkPaths.ELIXIR_INSTALL_INSTALLS_PATH_FROM_HOME).toFile(),
             name, SdkPaths.SOURCE_NAME_ELIXIR_INSTALL
         )
     }
@@ -197,7 +195,7 @@ object SdkHomePaths {
         mergeNameSubdirectories(
             homePathByVersion,
             File(userHome),
-            "otp",
+            SdkPaths.TRAVIS_CI_KERL_DIR_NAME,
             SdkPaths.SOURCE_NAME_KERL,
             versionPathToHomePath
         )

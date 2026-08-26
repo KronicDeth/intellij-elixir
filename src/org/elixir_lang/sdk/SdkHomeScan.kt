@@ -4,6 +4,7 @@ import com.intellij.execution.wsl.WSLDistribution
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.util.system.CpuArch
 import com.intellij.util.system.OS
+import org.elixir_lang.jps.shared.sdk.SdkPaths
 import org.elixir_lang.sdk.wsl.wslCompat
 import java.io.File
 import java.nio.file.Path
@@ -222,7 +223,7 @@ object SdkHomeScan {
             wslCompat.convertLinuxPathToWindowsUnc(distribution, it)
         }
 
-        wslCompat.convertLinuxPathToWindowsUnc(distribution, SdkHomePaths.NIX_STORE_PATH)?.let { wslNixStore ->
+        wslCompat.convertLinuxPathToWindowsUnc(distribution, SdkPaths.NIX_STORE_PATH)?.let { wslNixStore ->
             val nixTransform = config.nixTransform ?: { it }
             SdkHomePaths.mergeNixStore(homePathByVersion, config.nixPattern, nixTransform, wslNixStore)
         }

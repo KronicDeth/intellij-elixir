@@ -23,10 +23,38 @@ class SdkPathsTest : PlatformTestCase() {
         assertEquals("asdf", SdkPaths.detectSource("/home/user/.asdf/installs/elixir/1.14.0"))
     }
 
+    fun testDetectSource_elixirInstall() {
+        assertEquals(
+            "elixir-install",
+            SdkPaths.detectSource("/home/user/.elixir-install/installs/elixir/1.18.4")
+        )
+        assertEquals(
+            "elixir-install",
+            SdkPaths.detectSource("/home/user/.elixir-install/installs/otp/27.2")
+        )
+        // The installer only ever writes under installs/, so the segment is matched at the same
+        // depth as asdf's rather than on the .elixir-install directory alone.
+        assertNull(SdkPaths.detectSource("/home/user/.elixir-install/cache/elixir"))
+    }
+
     fun testDetectSource_homebrew() {
         assertEquals("Homebrew", SdkPaths.detectSource("/usr/local/Cellar/elixir/1.15.0"))
         assertEquals("Homebrew", SdkPaths.detectSource("/opt/homebrew/Cellar/erlang/26.0"))
+        assertEquals(
+            "Homebrew",
+            SdkPaths.detectSource("/home/linuxbrew/.linuxbrew/Cellar/elixir/1.18.4/lib/elixir")
+        )
+        // the constants keep their real casing; the matcher lowercases them, not the caller
+        assertEquals("Homebrew", SdkPaths.detectSource("/opt/homebrew/Cellar/ERLANG/28.0"))
         assertEquals("Homebrew", SdkPaths.detectSource("/opt/homebrew/Cellar/elixir/1.14.0/libexec"))
+        // A home inside a WSL distribution is a UNC path that no Linux root is a prefix of, so the
+        // segment has to match mid-path. This is why FileUtil.isAncestor is not used here.
+        assertEquals(
+            "Homebrew",
+            SdkPaths.detectSource(
+                """\\wsl.localhost\Ubuntu-24.04\home\linuxbrew\.linuxbrew\Cellar\erlang\29.0.5\lib\erlang"""
+            )
+        )
     }
 
     fun testDetectSource_nix() {
