@@ -21,32 +21,68 @@ object SdkPaths {
 
     private val IS_WINDOWS =
         System.getProperty("os.name").lowercase(Locale.ROOT).contains("windows")
+
+    // Installer roots, named once for both halves of the plugin: SdkHomePaths scans them and
+    // detectSource recognises what a scan or a user produced. Adding one here is the whole change.
     const val MISE_POSIX_PATH_FROM_HOME = ".local/share/mise/installs"
     const val MISE_WINDOWS_PATH_FROM_HOME = "appdata/local/mise/installs"
-    private const val ASDF_INSTALLS_PREFIX = "/.asdf/installs/"
-    private const val ELIXIR_INSTALL_INSTALLS_PREFIX = "/.elixir-install/installs/"
-    private const val ELIXIR_INSTALL_PATH_SEGMENT = "/.elixir-install/"
+    const val ASDF_INSTALLS_PATH_FROM_HOME = ".asdf/installs"
+    const val ELIXIR_INSTALL_INSTALLS_PATH_FROM_HOME = ".elixir-install/installs"
+    const val HOMEBREW_INTEL_CELLAR_PATH = "/usr/local/Cellar"
+    const val HOMEBREW_APPLE_SILICON_CELLAR_PATH = "/opt/homebrew/Cellar"
+    const val LINUXBREW_CELLAR_PATH = "/home/linuxbrew/.linuxbrew/Cellar"
+    const val LINUXBREW_CELLAR_PATH_FROM_HOME = ".linuxbrew/Cellar"
+    const val NIX_STORE_PATH = "/nix/store"
+
+    /** kerl installs wherever it is told, so only Travis CI's `~/otp/<version>` is a known layout. */
+    const val TRAVIS_CI_KERL_DIR_NAME = "otp"
+
+    /**
+     * Whether any of [segments] appears anywhere in this already-lowercased path.
+     *
+     * Deliberately a substring test rather than [FileUtil.isAncestor] or [FileUtil.startsWith]:
+     * those anchor at the start of the path, and a home reached inside a WSL distribution is a UNC
+     * path (`//wsl.localhost/<distro>/home/linuxbrew/...`) that no Linux root is a prefix of. The
+     * roots above are absolute only on the machine that owns them, and the home-relative ones
+     * belong to the distribution's user rather than this JVM's, so both are matched as segments.
+     *
+     * Matching is case-insensitive on every platform for the same reason - the case sensitivity of
+     * the filesystem actually holding the path is not the host's. Lowercasing the needle here is
+     * what lets the constants above keep their real casing; comparing against `"/usr/local/Cellar/"`
+     * by hand silently never matches.
+     */
+    private fun String.containsAnyPath(vararg segments: String): Boolean =
+        segments.any { contains(it.lowercase(Locale.ROOT)) }
 
     fun detectSource(homePath: String): String? {
         val posixPath = FileUtil.toSystemIndependentName(homePath)
         val matchPath = posixPath.lowercase(Locale.ROOT)
 
-        if (matchPath.contains(MISE_POSIX_PATH_FROM_HOME) || matchPath.contains(MISE_WINDOWS_PATH_FROM_HOME)) {
+        if (matchPath.containsAnyPath(MISE_POSIX_PATH_FROM_HOME, MISE_WINDOWS_PATH_FROM_HOME)) {
             return SOURCE_NAME_MISE
         }
-        if (matchPath.contains(ASDF_INSTALLS_PREFIX)) {
+        if (matchPath.containsAnyPath("/$ASDF_INSTALLS_PATH_FROM_HOME/")) {
             return SOURCE_NAME_ASDF
         }
-        if (matchPath.contains(ELIXIR_INSTALL_PATH_SEGMENT)) {
+        if (matchPath.containsAnyPath("/$ELIXIR_INSTALL_INSTALLS_PATH_FROM_HOME/")) {
             return SOURCE_NAME_ELIXIR_INSTALL
         }
-        if (matchPath.contains("/usr/local/cellar/") || matchPath.contains("/opt/homebrew/cellar/")) {
+        if (matchPath.containsAnyPath(
+                "$HOMEBREW_INTEL_CELLAR_PATH/",
+                "$HOMEBREW_APPLE_SILICON_CELLAR_PATH/",
+                "/$LINUXBREW_CELLAR_PATH_FROM_HOME/"
+            )
+        ) {
             return SOURCE_NAME_HOMEBREW
         }
-        if (matchPath.contains("/nix/store/")) {
+        if (matchPath.containsAnyPath("$NIX_STORE_PATH/")) {
             return SOURCE_NAME_NIX
         }
-        if (matchPath.contains("/otp/") || File(homePath, ".kerl_config").exists()) {
+        // Unlike the rest, the second test touches the filesystem - see TRAVIS_CI_KERL_DIR_NAME for
+        // why there is no installer root to match instead.
+        if (matchPath.containsAnyPath("/$TRAVIS_CI_KERL_DIR_NAME/") ||
+            File(homePath, ".kerl_config").exists()
+        ) {
             return SOURCE_NAME_KERL
         }
 
@@ -71,8 +107,8 @@ object SdkPaths {
 
     private fun expectedMixHomePrefix(source: String?, homePath: String?): String? = when (source) {
         SOURCE_NAME_MISE -> expectedMisePrefix(homePath)
-        SOURCE_NAME_ASDF -> ASDF_INSTALLS_PREFIX
-        SOURCE_NAME_ELIXIR_INSTALL -> ELIXIR_INSTALL_INSTALLS_PREFIX
+        SOURCE_NAME_ASDF -> "/$ASDF_INSTALLS_PATH_FROM_HOME/"
+        SOURCE_NAME_ELIXIR_INSTALL -> "/$ELIXIR_INSTALL_INSTALLS_PATH_FROM_HOME/"
         else -> null
     }
 

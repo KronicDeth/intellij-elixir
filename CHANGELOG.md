@@ -6,12 +6,48 @@
 
 ### Enhancements
 
+- [#3923](https://github.com/KronicDeth/intellij-elixir/pull/3923) [@sh41](https://github.com/sh41)
+  - **Elixir and Erlang SDKs under `/usr/lib64` are now detected automatically.** Gentoo builds both
+    with the multilib libdir, and Fedora does for Erlang, so the SDK had to be selected by hand on
+    those distributions even though the path was valid. Refs
+    [#312](https://github.com/KronicDeth/intellij-elixir/issues/312).
+  - **Elixir SDKs under `/usr/share/elixir/<version>` are now detected automatically.** Fedora and
+    RHEL package Elixir there rather than under a libdir; the version is read from the directory
+    name, so several installed versions are offered separately.
+  - **Homebrew Elixir installed since 2024-09-22 is now detected and accepted.** Homebrew changed to
+    the Makefile's `install` target, which nests the SDK home in `lib/elixir` instead of placing it
+    directly in the version directory. Installs predating the change keep working. Refs
+    [#3670](https://github.com/KronicDeth/intellij-elixir/issues/3670).
+  - **Homebrew SDKs on Apple Silicon are now detected.** Only the Intel `/usr/local/Cellar` prefix
+    was scanned, never `/opt/homebrew/Cellar`.
+  - **Selecting an install prefix in the SDK chooser now finds the home inside it.** A prefix such
+    as a Homebrew version directory, `/usr` or `/usr/local` holds the SDK in `lib/<tool>` and only
+    symlinks in `bin`, so picking the directory a user naturally lands on was rejected as an invalid
+    home with no hint of where the real one was. Erlang had no adjustment at all. Refs
+    [#3670](https://github.com/KronicDeth/intellij-elixir/issues/3670),
+    [#312](https://github.com/KronicDeth/intellij-elixir/issues/312).
+  - **Version-pinned Homebrew formulae are now detected.** `erlang@25` through `erlang@28` live
+    under their own Cellar directory rather than beside the unpinned versions, so a pinned OTP
+    release - the usual way to hold an OTP version for a given Elixir - was never offered.
+  - **macOS now detects SDKs installed by the `elixir-install` script.** Every platform now scans
+    the same set of sources, so a source can no longer be present on one platform and missing on
+    another.
+  - **Homebrew SDKs on Linux and WSL are now detected.** Homebrew's Linux prefix
+    (`/home/linuxbrew/.linuxbrew`) was never scanned on any platform, and a Homebrew home there is
+    now labelled as such in the SDK list.
+
 - [#3914](https://github.com/KronicDeth/intellij-elixir/pull/3914) [@sh41](https://github.com/sh41)
   - **Elixir 1.13 through 1.20 are now fully supported.** Code written for any Elixir from 1.13.4 to
     1.20.2 parses without spurious errors, including syntax whose meaning changed between releases.
   - **`.beam` files compiled by OTP 24 through 29 decompile to valid Elixir.**
 
 ### Bug Fixes
+
+- [#3923](https://github.com/KronicDeth/intellij-elixir/pull/3923) [@sh41](https://github.com/sh41)
+  - **Homebrew Erlang SDKs no longer report an unknown version.** The version was read from the
+    home path after the Homebrew layout adjustment had been applied, so every Homebrew Erlang was
+    keyed on the literal string `erlang` instead of its version, leaving them unsorted and
+    unlabelled in the SDK list.
 
 - [#3914](https://github.com/KronicDeth/intellij-elixir/pull/3914) [@sh41](https://github.com/sh41)
   - **Reformat Code no longer changes what a capture expression means.** Since Elixir 1.15,

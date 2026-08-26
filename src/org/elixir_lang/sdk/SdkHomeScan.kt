@@ -4,6 +4,7 @@ import com.intellij.execution.wsl.WSLDistribution
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.util.system.CpuArch
 import com.intellij.util.system.OS
+import org.elixir_lang.jps.shared.sdk.SdkPaths
 import org.elixir_lang.sdk.wsl.wslCompat
 import java.io.File
 import java.nio.file.Path
@@ -24,30 +25,29 @@ object SdkHomeScan {
      *
      * @property toolName The tool name used by version managers (e.g., "elixir", "erlang")
      * @property nixPattern Regex pattern for matching Nix store packages
-     * @property linuxDefaultPath System install path on Linux (e.g., "/usr/local/lib/elixir")
-     * @property linuxMintPath Linux Mint install path (e.g., "/usr/lib/elixir")
      * @property windowsDefaultPath Primary Windows install path (null if no default)
      * @property windows32BitPath 32-bit Windows install path (null if same as default)
-     * @property homebrewTransform Path transform for Homebrew (null = identity)
-     * @property nixTransform Path transform for Nix Store (null = identity)
      * @property kerlTransform Path transform for kerl (null = skip kerl scanning)
      * @property travisCIKerlTransform Path transform for Travis CI kerl (null = skip)
      */
     data class Config(
         val toolName: String,
         val nixPattern: java.util.regex.Pattern,
-        val linuxDefaultPath: String,
-        val linuxMintPath: String,
         val windowsDefaultPath: String?,
         val windows32BitPath: String? = null,
         val elixirInstallScriptDirName: String,
 
-        // Path transformations (null = identity for homebrew/nix, skip for kerl)
-        val homebrewTransform: ((File) -> File)? = null,
-        val nixTransform: ((File) -> File)? = null,
+        // Path transformation (null = skip kerl)
         val kerlTransform: ((File) -> File)? = null,
         val travisCIKerlTransform: ((File) -> File)? = null
-    )
+    ) {
+        /**
+         * Resolves an install prefix to the home inside it. Every source that hands back a prefix
+         * rather than a home - Homebrew, Nix, kiex - goes through this, so none of them needs a
+         * transform of its own.
+         */
+        val toolHome: (File) -> File get() = { SdkHomePaths.toolHomePath(it, toolName) }
+    }
 
     /**
      * Scans for SDK installations across all platforms.
@@ -59,181 +59,120 @@ object SdkHomeScan {
     fun homePathByVersion(path: Path?, config: Config): Map<SdkHomeKey, String> {
         LOG.debug("Scanning for ${config.toolName} SDKs (path: $path, platform: ${OS.CURRENT})")
         val homePathByVersion: MutableMap<SdkHomeKey, String> = TreeMap()
+        // A project inside a distribution can only use that distribution's SDKs, and conversely a
+        // host project is not offered a distribution's: enumerating distributions deploys an ijent
+        // agent and boots stopped ones, which is too costly to do for every scan.
+        if (path != null && wslCompat.isWslUncPath(path.toString())) {
+            homePathByVersionWSLs(path, homePathByVersion, config)
+        } else {
+            mergePosixSources(homePathByVersion, config, System.getProperty("user.home")) { it }
+            mergeWindowsInstallerPath(homePathByVersion, config)
 
-        val result = when (OS.CURRENT) {
-            OS.macOS ->
-                homePathByVersionMac(homePathByVersion, config)
-
-            OS.Windows ->
-                homePathByVersionWindows(path, homePathByVersion, config)
-
-            OS.Linux ->
-                homePathByVersionLinux(homePathByVersion, config)
-
-            else -> {
-                LOG.debug("Unsupported platform: ${OS.CURRENT}")
-                homePathByVersion
-            }
+            // The only source located by running a command rather than by looking at a path, so it
+            // is the only one worth skipping when its transform says the tool does not use it.
+            config.kerlTransform?.let { SdkHomePaths.mergeKerl(homePathByVersion, it) }
         }
 
-        LOG.debug("Found ${result.size} ${config.toolName} SDK(s): ${result.values.take(3).joinToString(", ")}${if (result.size > 3) "..." else ""}")
-        return result
-    }
-
-    /**
-     * Scans macOS for SDK installations via ASDF, Mise, kerl, Homebrew, and Nix.
-     * Note: path parameter not used on macOS (no distribution filtering needed).
-     */
-    private fun homePathByVersionMac(
-        homePathByVersion: MutableMap<SdkHomeKey, String>,
-        config: Config
-    ): Map<SdkHomeKey, String> {
-        SdkHomePaths.mergeASDF(homePathByVersion, config.toolName)
-        SdkHomePaths.mergeMise(homePathByVersion, config.toolName)
-
-        if (config.kerlTransform != null) {
-            SdkHomePaths.mergeKerl(homePathByVersion, config.kerlTransform)
-        }
-
-        val homebrewTransform = config.homebrewTransform ?: { it }
-        SdkHomePaths.mergeHomebrew(homePathByVersion, config.toolName, homebrewTransform)
-
-        val nixTransform = config.nixTransform ?: { it }
-        SdkHomePaths.mergeNixStore(homePathByVersion, config.nixPattern, nixTransform)
+        LOG.debug(
+            "Found ${homePathByVersion.size} ${config.toolName} SDK(s): " +
+                homePathByVersion.values.take(3).joinToString(", ") +
+                if (homePathByVersion.size > 3) "..." else ""
+        )
 
         return homePathByVersion
     }
 
     /**
-     * Scans Windows for SDK installations via native paths and WSL distributions.
+     * The installer path that only means anything with a drive letter, so it has no POSIX
+     * equivalent. Scanned everywhere regardless: off Windows it names a directory that cannot exist.
      */
-    private fun homePathByVersionWindows(
-        path: Path?,
+    private fun mergeWindowsInstallerPath(
         homePathByVersion: MutableMap<SdkHomeKey, String>,
         config: Config
-    ): Map<SdkHomeKey, String> {
-        if (wslCompat.isWslUncPath(path.toString())) {
-            // WSL distributions
-            homePathByVersionWSLs(path, homePathByVersion, config)
-            return homePathByVersion
-        }
-
-        // Native Windows paths - select based on CPU architecture
+    ) {
         val windowsPath = if (CpuArch.CURRENT.width == 32) {
             config.windows32BitPath ?: config.windowsDefaultPath
         } else {
             config.windowsDefaultPath
         }
 
-        windowsPath?.let {
-            putIfDirectory(homePathByVersion, SdkHomePaths.unknownVersionKey(it), it)
-        }
-
-        SdkHomePaths.mergeElixirInstallScript(homePathByVersion, config.elixirInstallScriptDirName)
-        SdkHomePaths.mergeMise(homePathByVersion, config.toolName)
-
-        return homePathByVersion
+        windowsPath?.let { putIfDirectory(homePathByVersion, SdkHomePaths.unknownVersionKey(it), it) }
     }
 
     /**
-     * Scans Linux for SDK installations via system paths, ASDF, Mise, kerl, Travis CI kerl, and Nix.
-     * Note: path parameter not used on Linux (no distribution filtering needed).
+     * Every source installed on a POSIX filesystem, for one reached via [toLocalPath] and owning
+     * [userHome].
+     *
+     * Running on Linux passes identity and this JVM's home; scanning a WSL distribution passes its
+     * UNC mapping and the distribution's own home. Adding a source here reaches both, which is the
+     * point - the WSL scan used to restate the Linux one by hand and could silently fall behind it.
+     *
+     * [toLocalPath] returns null for a path this machine cannot reach, and [userHome] is null when
+     * it cannot be determined; both mean "skip that source" rather than "scan nothing".
      */
-    private fun homePathByVersionLinux(
+    private fun mergePosixSources(
         homePathByVersion: MutableMap<SdkHomeKey, String>,
-        config: Config
-    ): Map<SdkHomeKey, String> {
-        putIfDirectory(homePathByVersion, SdkHomePaths.unknownVersionKey(config.linuxDefaultPath), config.linuxDefaultPath)
-        putIfDirectory(homePathByVersion, SdkHomePaths.unknownVersionKey(config.linuxMintPath), config.linuxMintPath)
+        config: Config,
+        userHome: String?,
+        toLocalPath: (String) -> String?,
+    ) {
+        SdkHomePaths.mergeLinuxSystemHomePaths(homePathByVersion, config.toolName, toLocalPath)
 
-        SdkHomePaths.mergeASDF(homePathByVersion, config.toolName)
-        SdkHomePaths.mergeMise(homePathByVersion, config.toolName)
-        SdkHomePaths.mergeElixirInstallScript(homePathByVersion, config.elixirInstallScriptDirName)
-
-        if (config.kerlTransform != null) {
-            SdkHomePaths.mergeKerl(homePathByVersion, config.kerlTransform)
+        toLocalPath(SdkHomePaths.LINUX_SHARE_ROOT_PATH)?.let {
+            SdkHomePaths.mergeSystemShare(homePathByVersion, config.toolName, it)
         }
 
-        if (config.travisCIKerlTransform != null) {
-            SdkHomePaths.mergeTravisCIKerl(homePathByVersion, config.travisCIKerlTransform)
+        if (userHome != null) {
+            SdkHomePaths.mergeASDF(homePathByVersion, config.toolName, userHome)
+            SdkHomePaths.mergeMise(homePathByVersion, config.toolName, userHome)
+            SdkHomePaths.mergeElixirInstallScript(
+                homePathByVersion, config.elixirInstallScriptDirName, userHome
+            )
+            config.travisCIKerlTransform?.let {
+                SdkHomePaths.mergeTravisCIKerl(homePathByVersion, it, userHome)
+            }
         }
 
-        val nixTransform = config.nixTransform ?: { it }
-        SdkHomePaths.mergeNixStore(homePathByVersion, config.nixPattern, nixTransform)
+        SdkHomePaths.mergeHomebrew(
+            homePathByVersion, config.toolName, config.toolHome,
+            SdkHomePaths.homebrewCellarPaths(userHome, toLocalPath)
+        )
 
-        return homePathByVersion
+        toLocalPath(SdkPaths.NIX_STORE_PATH)?.let {
+            SdkHomePaths.mergeNixStore(homePathByVersion, config.nixPattern, config.toolHome, it)
+        }
     }
 
     /**
-     * Determines which WSL distributions to scan based on the project path.
-     * - If path is in a WSL distribution, only scan that distribution
-     * - If path is Windows or null, scan all distributions
+     * Scans the distribution the project lives in, which is the only caller's case - a host project
+     * is never offered a distribution's SDKs, so there is no "scan them all" path here.
      */
     private fun homePathByVersionWSLs(
-        path: Path?,
+        path: Path,
         homePathByVersion: MutableMap<SdkHomeKey, String>,
         config: Config
     ) {
-        val distributionsToScan = when {
-            path == null -> {
-                LOG.debug("No project path, scanning all WSL distributions")
-                wslCompat.getInstalledDistributions()
-            }
+        val distribution = wslCompat.getDistributionByWindowsUncPath(path.toString())
 
-            wslCompat.isWslUncPath(path.toString()) -> {
-                val distribution = wslCompat.getDistributionByWindowsUncPath(path.toString())
-                if (distribution != null) {
-                    LOG.debug("Project in WSL (${distribution.msId}), scanning only that distribution")
-                    listOf(distribution)
-                } else {
-                    LOG.debug("Couldn't determine WSL distribution, scanning all")
-                    wslCompat.getInstalledDistributions()
-                }
-            }
-
-            else -> {
-                LOG.debug("Windows project path, scanning all WSL distributions")
-                wslCompat.getInstalledDistributions()
-            }
+        val distributionsToScan = if (distribution != null) {
+            LOG.debug("Project in WSL (${distribution.msId}), scanning only that distribution")
+            listOf(distribution)
+        } else {
+            LOG.debug("Couldn't determine WSL distribution from $path, scanning all")
+            wslCompat.getInstalledDistributions()
         }
 
-        distributionsToScan.forEach { distribution ->
-            homePathByVersionWSL(distribution, homePathByVersion, config)
-        }
+        distributionsToScan.forEach { homePathByVersionWSL(it, homePathByVersion, config) }
     }
 
-    /**
-     * Scans a single WSL distribution for SDK installations.
-     * Mirrors the Linux scanning logic but converts paths to Windows UNC format.
-     */
     private fun homePathByVersionWSL(
         distribution: WSLDistribution,
         homePathByVersion: MutableMap<SdkHomeKey, String>,
         config: Config
     ) {
-        val wslUserHome = wslCompat.getWslUserHomeUncPath(distribution)
-
-        if (wslUserHome != null) {
-            SdkHomePaths.mergeASDF(homePathByVersion, config.toolName, wslUserHome)
-            SdkHomePaths.mergeMise(homePathByVersion, config.toolName, wslUserHome)
-            SdkHomePaths.mergeElixirInstallScript(homePathByVersion, config.elixirInstallScriptDirName, wslUserHome)
-
-            if (config.travisCIKerlTransform != null) {
-                SdkHomePaths.mergeTravisCIKerl(homePathByVersion, config.travisCIKerlTransform, wslUserHome)
-            }
-        }
-
-        wslCompat.convertLinuxPathToWindowsUnc(distribution, config.linuxDefaultPath)?.let {
-            putIfDirectory(homePathByVersion, SdkHomePaths.unknownVersionKey(it), it)
-        }
-        wslCompat.convertLinuxPathToWindowsUnc(distribution, config.linuxMintPath)?.let {
-            putIfDirectory(homePathByVersion, SdkHomePaths.unknownVersionKey(it), it)
-        }
-
-        wslCompat.convertLinuxPathToWindowsUnc(distribution, SdkHomePaths.NIX_STORE_PATH)?.let { wslNixStore ->
-            val nixTransform = config.nixTransform ?: { it }
-            SdkHomePaths.mergeNixStore(homePathByVersion, config.nixPattern, nixTransform, wslNixStore)
-        }
+        mergePosixSources(
+            homePathByVersion, config, wslCompat.getWslUserHomeUncPath(distribution)
+        ) { wslCompat.convertLinuxPathToWindowsUnc(distribution, it) }
     }
 
     /**
