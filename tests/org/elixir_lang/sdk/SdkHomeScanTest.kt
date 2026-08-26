@@ -1,7 +1,9 @@
 package org.elixir_lang.sdk
 
 import com.intellij.openapi.util.io.FileUtil
+import com.intellij.openapi.util.Version
 import org.elixir_lang.PlatformTestCase
+import org.elixir_lang.jps.shared.sdk.SdkPaths
 import java.io.File
 import java.nio.file.Paths
 
@@ -107,16 +109,6 @@ class SdkHomeScanTest : PlatformTestCase() {
             SdkHomePaths.mergeLinuxSystemHomePaths(homePathByVersion, "elixir") { null }
 
             assertEmpty(homePathByVersion.values)
-        }
-    }
-
-    private fun withTempRoot(body: (File) -> Unit) {
-        val root = FileUtil.createTempDirectory("sdkHome", null)
-
-        try {
-            body(root)
-        } finally {
-            FileUtil.delete(root)
         }
     }
 
@@ -256,6 +248,51 @@ class SdkHomeScanTest : PlatformTestCase() {
         assertNotNull(config.nixTransform)
         assertNotNull(config.kerlTransform)
         assertNotNull(config.travisCIKerlTransform)
+    }
+
+    // ========== Dispatch ==========
+
+    fun `test homePathByVersion wires the version managers into the scan`() {
+        withTempRoot { home ->
+            assertTrue(File(home, "${SdkPaths.ASDF_INSTALLS_PATH_FROM_HOME}/elixir/1.20.3").mkdirs())
+            assertTrue(File(home, "${SdkPaths.MISE_POSIX_PATH_FROM_HOME}/elixir/1.19.5").mkdirs())
+            assertTrue(
+                File(home, "${SdkPaths.ELIXIR_INSTALL_INSTALLS_PATH_FROM_HOME}/elixir/1.18.4").mkdirs()
+            )
+
+            val found = withUserHome(home.path) {
+                SdkHomeScan.homePathByVersion(null, createElixirConfig())
+            }
+
+            // One scan, one source list: a source that stops being wired in fails here rather than
+            // going missing on whichever platform nobody checked.
+            assertTrue(
+                "expected asdf, mise and elixir-install homes, got ${found.values}",
+                found.keys.map { it.version }
+                    .containsAll(listOf(Version(1, 20, 3), Version(1, 19, 5), Version(1, 18, 4)))
+            )
+        }
+    }
+
+    private fun withTempRoot(body: (File) -> Unit) {
+        val root = FileUtil.createTempDirectory("sdkHome", null)
+
+        try {
+            body(root)
+        } finally {
+            FileUtil.delete(root)
+        }
+    }
+
+    private fun <T> withUserHome(userHome: String, body: () -> T): T {
+        val previous = System.getProperty("user.home")
+        System.setProperty("user.home", userHome)
+
+        try {
+            return body()
+        } finally {
+            if (previous != null) System.setProperty("user.home", previous)
+        }
     }
 
     // ========== Helper Methods ==========

@@ -34,7 +34,7 @@ object SdkHomePaths {
     @JvmField
     val UNKNOWN_VERSION = Version(0, 0, 0)
 
-    private val HOMEBREW_ROOT = File(SdkPaths.HOMEBREW_INTEL_CELLAR_PATH)
+    private val HOMEBREW_CELLAR_PATHS = listOf(SdkPaths.HOMEBREW_INTEL_CELLAR_PATH)
     private val NIX_STORE = File(SdkPaths.NIX_STORE_PATH)
     private val LOGGER = Logger.getInstance(SdkHomePaths::class.java)
 
@@ -124,19 +124,32 @@ object SdkHomePaths {
         )
     }
 
+    /**
+     * Every Cellar root reachable through [toLocalPath].
+     *
+     * The native scan and a WSL scan reach the same roots by different routes, so both ask here
+     * rather than each naming them.
+     */
+    @JvmStatic
+    fun homebrewCellarPaths(userHome: String?, toLocalPath: (String) -> String?): List<String> =
+        HOMEBREW_CELLAR_PATHS.mapNotNull(toLocalPath)
+
     @JvmStatic
     fun mergeHomebrew(
         homePathByVersion: MutableMap<SdkHomeKey, String>,
         name: String,
         versionPathToHomePath: (File) -> File,
+        cellarPaths: List<String>,
     ) {
-        mergeNameSubdirectories(
-            homePathByVersion,
-            HOMEBREW_ROOT,
-            name,
-            SdkPaths.SOURCE_NAME_HOMEBREW,
-            versionPathToHomePath
-        )
+        for (cellar in cellarPaths.map { File(it) }) {
+            mergeNameSubdirectories(
+                homePathByVersion,
+                cellar,
+                name,
+                SdkPaths.SOURCE_NAME_HOMEBREW,
+                versionPathToHomePath
+            )
+        }
     }
 
     @JvmStatic
