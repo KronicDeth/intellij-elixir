@@ -192,6 +192,39 @@ object SdkHomePaths {
     }
 
     /**
+     * Children of a home a chooser selection can land on instead of the home itself.
+     *
+     * `releases` is one an Erlang home has and an Elixir home does not, so listing it costs Elixir
+     * nothing. `usr` is deliberately absent even though an Erlang home has one: treating it as a
+     * child would step `/usr` up to the filesystem root and break selecting a distribution install.
+     */
+    private val SDK_HOME_CHILD_BASE_NAMES = setOf("bin", "lib", "src", "releases")
+
+    /**
+     * The home for [toolName] implied by a path chosen in the SDK file chooser.
+     *
+     * A selection lands on the home, on a child of it, or on an install prefix holding it, so step
+     * up out of a known child and then down into a prefix. Both steps are no-ops for a path that is
+     * already a home, and neither invents a path that does not exist.
+     *
+     * The scan applies [toolHomePath] to what it discovers; this is the same rule for what a user
+     * picks, so the two agree on which directory is the home.
+     */
+    @JvmStatic
+    fun adjustSelectedSdkHome(homePath: String, toolName: String): String {
+        val homePathFile = File(homePath)
+        if (!homePathFile.isDirectory) return homePath
+
+        val candidate = if (homePathFile.name in SDK_HOME_CHILD_BASE_NAMES) {
+            homePathFile.parentFile ?: homePathFile
+        } else {
+            homePathFile
+        }
+
+        return toolHomePath(candidate, toolName).path
+    }
+
+    /**
      * Every Cellar root reachable through [toLocalPath], plus the one under [userHome].
      *
      * Homebrew's prefix differs by platform, but a prefix that belongs to another platform simply

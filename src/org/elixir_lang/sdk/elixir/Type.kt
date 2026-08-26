@@ -32,39 +32,11 @@ import javax.swing.Icon
 
 class Type : org.elixir_lang.sdk.erlang_dependent.Type(ElixirSdkTypeId.ELIXIR_SDK_TYPE_ID) {
     /**
-     * If a path selected in the file chooser is not a valid SDK home path, and the base name is one of the commonly
-     * incorrectly selected subdirectories - bin, lib, or src - then return the parent path, so it can be checked for
-     * validity.
-     *
      * @param homePath the path selected in the file chooser.
      * @return the path to be used as the SDK home.
      */
-    override fun adjustSelectedSdkHome(homePath: String): String {
-        val homePathFile = File(homePath)
-        var adjustedSdkHome = homePath
-        if (homePathFile.isDirectory) {
-            val baseName = FilenameUtils.getBaseName(homePath)
-            if (baseName == "bin") {
-                adjustedSdkHome = homePathFile.parent
-
-                // adjustSelectedSdkHome is only called once, but `bin` could either be the correct `bin` OR in `kiex` a false `bin`.
-                if (!isValidSdkHome(adjustedSdkHome)) {
-                    val libSibling = File(adjustedSdkHome, "lib")
-
-                    // `kiex` has `lib/elixir` and the false `bin` as the same level
-                    if (libSibling.exists()) {
-                        adjustedSdkHome = File(libSibling, "elixir").path
-                    }
-                }
-            } else if (SDK_HOME_CHILD_BASE_NAME_SET.contains(baseName)) {
-                adjustedSdkHome = homePathFile.parent
-            } else if (baseName.startsWith("elixir-") && FilenameUtils.getBaseName(homePathFile.parent) == "elixirs") {
-                // `kiex` versioned directory like `~/.kiex/elixirs/elixir-VERSION`.
-                adjustedSdkHome = File(File(homePathFile, "lib"), "elixir").path
-            }
-        }
-        return adjustedSdkHome
-    }
+    override fun adjustSelectedSdkHome(homePath: String): String =
+        SdkHomePaths.adjustSelectedSdkHome(homePath, "elixir")
 
     override fun getDefaultDocumentationUrl(sdk: Sdk): String? =
         getDefaultDocumentationUrl(sdk.getUserData(ElixirVersionDetector.ELIXIR_VERSION_KEY))
@@ -221,7 +193,7 @@ ELIXIR_SDK_HOME
     companion object {
         private val LOG = Logger.getInstance(Type::class.java)
         private val NIX_PATTERN = SdkHomePaths.nixPattern("elixir")
-        private val SDK_HOME_CHILD_BASE_NAME_SET: Set<String> = setOf("lib", "src")
+
         private const val WINDOWS_32BIT_DEFAULT_HOME_PATH = "C:\\Program Files\\Elixir"
         private const val WINDOWS_64BIT_DEFAULT_HOME_PATH = "C:\\Program Files (x86)\\Elixir"
 

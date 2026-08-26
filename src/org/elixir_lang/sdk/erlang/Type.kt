@@ -194,6 +194,13 @@ class Type : SdkType(ErlangSdkTypeId.ERLANG_SDK_TYPE_ID) {
         return homePathByVersion(SdkDetectionContext.resolve(project)).values
     }
 
+    /**
+     * @param homePath the path selected in the file chooser.
+     * @return the path to be used as the SDK home.
+     */
+    override fun adjustSelectedSdkHome(homePath: String): String =
+        SdkHomePaths.adjustSelectedSdkHome(homePath, "erlang")
+
     override fun isValidSdkHome(path: String): Boolean {
         val erlExe = File(CliTool.ERL.getExecutableFilepathWslSafe(path))
         return erlExe.canExecute()

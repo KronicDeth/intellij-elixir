@@ -20,6 +20,12 @@
     [#3670](https://github.com/KronicDeth/intellij-elixir/issues/3670).
   - **Homebrew SDKs on Apple Silicon are now detected.** Only the Intel `/usr/local/Cellar` prefix
     was scanned, never `/opt/homebrew/Cellar`.
+  - **Selecting an install prefix in the SDK chooser now finds the home inside it.** A prefix such
+    as a Homebrew version directory, `/usr` or `/usr/local` holds the SDK in `lib/<tool>` and only
+    symlinks in `bin`, so picking the directory a user naturally lands on was rejected as an invalid
+    home with no hint of where the real one was. Erlang had no adjustment at all. Refs
+    [#3670](https://github.com/KronicDeth/intellij-elixir/issues/3670),
+    [#312](https://github.com/KronicDeth/intellij-elixir/issues/312).
   - **Version-pinned Homebrew formulae are now detected.** `erlang@25` through `erlang@28` live
     under their own Cellar directory rather than beside the unpinned versions, so a pinned OTP
     release - the usual way to hold an OTP version for a given Elixir - was never offered.

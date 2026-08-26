@@ -474,6 +474,156 @@ class SdkHomeScanTest : PlatformTestCase() {
         }
     }
 
+    // ========== Chooser selection (adjustSelectedSdkHome) ==========
+
+    /** Layout of `make install PREFIX=<prefix>`: home in lib/<tool>, symlinks in <prefix>/bin. */
+    private fun installedUnderPrefix(prefix: File, toolName: String): File {
+        val home = File(prefix, "lib/$toolName")
+        assertTrue(File(home, "bin").mkdirs())
+        assertTrue(File(home, "lib/$toolName/ebin").mkdirs())
+        assertTrue(File(prefix, "bin").mkdirs())
+
+        return home
+    }
+
+    fun `test choosing a Homebrew version prefix resolves to the home`() {
+        withTempRoot { root ->
+            val prefix = File(root, "Cellar/elixir/1.20.3")
+            val home = installedUnderPrefix(prefix, "elixir")
+
+            assertEquals(home.path, SdkHomePaths.adjustSelectedSdkHome(prefix.path, "elixir"))
+        }
+    }
+
+    fun `test choosing bare usr resolves to the distro home`() {
+        withTempRoot { root ->
+            val usr = File(root, "usr")
+            val home = installedUnderPrefix(usr, "elixir")
+
+            assertEquals(home.path, SdkHomePaths.adjustSelectedSdkHome(usr.path, "elixir"))
+        }
+    }
+
+    fun `test choosing a prefix resolves for erlang too`() {
+        withTempRoot { root ->
+            val prefix = File(root, "Cellar/erlang/29.0.5")
+            val home = installedUnderPrefix(prefix, "erlang")
+
+            assertEquals(home.path, SdkHomePaths.adjustSelectedSdkHome(prefix.path, "erlang"))
+        }
+    }
+
+    fun `test choosing bin lib or src steps up to the home`() {
+        withTempRoot { root ->
+            // a home selected by one of its own children, not a prefix
+            val home = File(root, "elixir")
+            assertTrue(File(home, "bin").mkdirs())
+            assertTrue(File(home, "lib/elixir/ebin").mkdirs())
+            assertTrue(File(home, "src").mkdirs())
+
+            for (child in listOf("bin", "lib", "src")) {
+                assertEquals(
+                    "selecting $child should resolve to its parent",
+                    home.path,
+                    SdkHomePaths.adjustSelectedSdkHome(File(home, child).path, "elixir")
+                )
+            }
+        }
+    }
+
+    fun `test choosing a home leaves it alone`() {
+        withTempRoot { root ->
+            val home = File(root, "elixir")
+            assertTrue(File(home, "bin").mkdirs())
+            assertTrue(File(home, "lib/elixir/ebin").mkdirs())
+
+            assertEquals(home.path, SdkHomePaths.adjustSelectedSdkHome(home.path, "elixir"))
+        }
+    }
+
+    fun `test choosing a kiex version directory resolves to the home`() {
+        withTempRoot { root ->
+            // kiex keeps a false bin beside lib/elixir; the general rule covers it
+            val versionDir = File(root, "elixirs/elixir-1.9.1")
+            val home = installedUnderPrefix(versionDir, "elixir")
+
+            assertEquals(home.path, SdkHomePaths.adjustSelectedSdkHome(versionDir.path, "elixir"))
+            assertEquals(
+                home.path,
+                SdkHomePaths.adjustSelectedSdkHome(File(versionDir, "bin").path, "elixir")
+            )
+        }
+    }
+
+    fun `test choosing an erlang home child steps up`() {
+        withTempRoot { root ->
+            // an Erlang home keeps releases and usr beside bin and lib
+            val home = File(root, "erlang")
+            assertTrue(File(home, "bin").mkdirs())
+            assertTrue(File(home, "lib/stdlib-7.0/ebin").mkdirs())
+            assertTrue(File(home, "releases/29").mkdirs())
+            assertTrue(File(home, "usr/include").mkdirs())
+
+            for (child in listOf("bin", "lib", "releases")) {
+                assertEquals(
+                    "selecting $child should resolve to its parent",
+                    home.path,
+                    SdkHomePaths.adjustSelectedSdkHome(File(home, child).path, "erlang")
+                )
+            }
+        }
+    }
+
+    fun `test usr is not treated as a home child`() {
+        withTempRoot { root ->
+            // /usr is an install prefix in its own right; stepping up from it would reach the
+            // filesystem root and lose the distribution install underneath it
+            val usr = File(root, "usr")
+            val home = installedUnderPrefix(usr, "elixir")
+
+            assertEquals(home.path, SdkHomePaths.adjustSelectedSdkHome(usr.path, "elixir"))
+        }
+    }
+
+    fun `test choosing an unrelated bin or src still steps up`() {
+        withTempRoot { root ->
+            // documents the cost of matching on name alone: an unrelated child resolves to its
+            // parent, which the chooser then rejects as an invalid home
+            val unrelated = File(root, "some/project/src")
+            assertTrue(unrelated.mkdirs())
+
+            assertEquals(
+                File(root, "some/project").path,
+                SdkHomePaths.adjustSelectedSdkHome(unrelated.path, "elixir")
+            )
+        }
+    }
+
+    fun `test choosing a file is left alone`() {
+        withTempRoot { root ->
+            val file = File(root, "elixir.txt")
+            assertTrue(file.createNewFile())
+
+            assertEquals(file.path, SdkHomePaths.adjustSelectedSdkHome(file.path, "elixir"))
+        }
+    }
+
+    fun `test choosing a missing path is left alone`() {
+        withTempRoot { root ->
+            val missing = File(root, "absent")
+            assertEquals(missing.path, SdkHomePaths.adjustSelectedSdkHome(missing.path, "elixir"))
+        }
+    }
+
+    fun `test choosing a filesystem root is left alone`() {
+        val root = File(File("/").absolutePath)
+        // parentFile is null here; the fallback must return the selection rather than throw
+        assertEquals(
+            SdkHomePaths.toolHomePath(root, "elixir").path,
+            SdkHomePaths.adjustSelectedSdkHome(root.path, "elixir")
+        )
+    }
+
     // ========== Version managers ==========
 
     private fun assertFindsVersionedHome(
