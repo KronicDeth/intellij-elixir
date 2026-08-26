@@ -32,6 +32,7 @@ import org.elixir_lang.psi.operation.Match
 import org.elixir_lang.psi.operation.Type
 import org.elixir_lang.psi.qualification.Unqualified
 import org.elixir_lang.psi.scope.variable.Variants
+import org.elixir_lang.resolvesToMacro
 import org.elixir_lang.structure_view.element.Delegation
 import org.jetbrains.annotations.Contract
 
@@ -485,7 +486,11 @@ class Callable : PsiReferenceBase<Call>, PsiPolyVariantReference {
                 call.isCalling(Module.KERNEL, Function.DESTRUCTURE) -> true
                 call.isCallingMacro(Module.KERNEL, Function.FOR) -> true
                 call.isCalling(Module.KERNEL, Function.VAR_BANG) -> true
-                call is UnqualifiedParenthesesCall<*> -> false
+                /* A `def`'s arguments are values, so they cannot be declarations; a `defmacro`'s
+                   are quoted and may well be bound - the three `Kernel` names above are the built-in
+                   cases of exactly that. Which kind this is cannot be told from the syntax, so
+                   resolve it. */
+                call is UnqualifiedParenthesesCall<*> -> resolvesToMacro(call)
                 else -> call.parent.let { isVariable(it) }
             }
 
