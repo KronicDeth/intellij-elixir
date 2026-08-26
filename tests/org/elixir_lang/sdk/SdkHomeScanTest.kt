@@ -265,6 +265,122 @@ class SdkHomeScanTest : PlatformTestCase() {
         assertNotNull(config.travisCIKerlTransform)
     }
 
+    // ========== Version managers ==========
+
+    private fun assertFindsVersionedHome(
+        installsFromHome: String,
+        merge: (MutableMap<SdkHomeKey, String>, String) -> Unit,
+    ) {
+        withTempRoot { home ->
+            val installed = File(home, "$installsFromHome/elixir/1.20.3")
+            assertTrue("could not create $installed", installed.mkdirs())
+            // a sibling tool must not be picked up for elixir
+            assertTrue(File(home, "$installsFromHome/erlang/29.0.5").mkdirs())
+
+            val homePathByVersion = mutableMapOf<SdkHomeKey, String>()
+            merge(homePathByVersion, home.path)
+
+            assertEquals(
+                setOf(FileUtil.toSystemIndependentName(installed.absolutePath)),
+                homePathByVersion.values.map { FileUtil.toSystemIndependentName(it) }.toSet()
+            )
+            assertEquals(Version(1, 20, 3), homePathByVersion.keys.single().version)
+        }
+    }
+
+    fun `test mergeASDF finds an installed version`() {
+        assertFindsVersionedHome(SdkPaths.ASDF_INSTALLS_PATH_FROM_HOME) { map, home ->
+            SdkHomePaths.mergeASDF(map, "elixir", home)
+        }
+    }
+
+    fun `test mergeMise finds an installed version`() {
+        assertFindsVersionedHome(SdkPaths.MISE_POSIX_PATH_FROM_HOME) { map, home ->
+            SdkHomePaths.mergeMise(map, "elixir", home)
+        }
+    }
+
+    fun `test mergeMise finds a Windows-layout install`() {
+        assertFindsVersionedHome(SdkPaths.MISE_WINDOWS_PATH_FROM_HOME) { map, home ->
+            SdkHomePaths.mergeMise(map, "elixir", home)
+        }
+    }
+
+    fun `test mergeElixirInstallScript finds an installed version`() {
+        assertFindsVersionedHome(SdkPaths.ELIXIR_INSTALL_INSTALLS_PATH_FROM_HOME) { map, home ->
+            SdkHomePaths.mergeElixirInstallScript(map, "elixir", home)
+        }
+    }
+
+    fun `test a version manager attributes the source it came from`() {
+        withTempRoot { home ->
+            assertTrue(File(home, "${SdkPaths.ASDF_INSTALLS_PATH_FROM_HOME}/elixir/1.20.3").mkdirs())
+
+            val homePathByVersion = mutableMapOf<SdkHomeKey, String>()
+            SdkHomePaths.mergeASDF(homePathByVersion, "elixir", home.path)
+
+            assertEquals(SdkPaths.SOURCE_NAME_ASDF, homePathByVersion.keys.single().source)
+        }
+    }
+
+    fun `test a version manager tolerates a missing install root`() {
+        withTempRoot { home ->
+            val homePathByVersion = mutableMapOf<SdkHomeKey, String>()
+            SdkHomePaths.mergeASDF(homePathByVersion, "elixir", File(home, "absent").path)
+
+            assertEmpty(homePathByVersion.values)
+        }
+    }
+
+    // ========== Nix store ==========
+
+    fun `test mergeNixStore finds a derivation and reads its version`() {
+        withTempRoot { store ->
+            assertTrue(File(store, "abc123-elixir-1.20.3").mkdirs())
+            assertTrue(File(store, "def456-erlang-29.0.5").mkdirs())
+            assertTrue(File(store, "ghi789-elixir-nodots").mkdirs())
+
+            val homePathByVersion = mutableMapOf<SdkHomeKey, String>()
+            SdkHomePaths.mergeNixStore(
+                homePathByVersion, SdkHomePaths.nixPattern("elixir"), { it }, store.path
+            )
+
+            val key = homePathByVersion.keys.single()
+            assertEquals(Version(1, 20, 3), key.version)
+            assertEquals(SdkPaths.SOURCE_NAME_NIX, key.source)
+        }
+    }
+
+    fun `test mergeNixStore applies the prefix rule to a derivation`() {
+        withTempRoot { store ->
+            val derivation = File(store, "abc123-erlang-29.0.5")
+            assertTrue(File(derivation, "lib/erlang/bin").mkdirs())
+
+            val homePathByVersion = mutableMapOf<SdkHomeKey, String>()
+            SdkHomePaths.mergeNixStore(
+                homePathByVersion, SdkHomePaths.nixPattern("erlang"),
+                { SdkHomePaths.toolHomePath(it, "erlang") }, store.path
+            )
+
+            assertEquals(
+                setOf(FileUtil.toSystemIndependentName(File(derivation, "lib/erlang").absolutePath)),
+                homePathByVersion.values.map { FileUtil.toSystemIndependentName(it) }.toSet()
+            )
+        }
+    }
+
+    fun `test mergeNixStore tolerates a missing store`() {
+        withTempRoot { root ->
+            val homePathByVersion = mutableMapOf<SdkHomeKey, String>()
+            SdkHomePaths.mergeNixStore(
+                homePathByVersion, SdkHomePaths.nixPattern("elixir"), { it },
+                File(root, "absent").path
+            )
+
+            assertEmpty(homePathByVersion.values)
+        }
+    }
+
     // ========== Dispatch ==========
 
     fun `test homePathByVersion wires the version managers into the scan`() {
