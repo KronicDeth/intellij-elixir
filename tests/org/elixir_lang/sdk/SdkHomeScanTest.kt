@@ -56,14 +56,14 @@ class SdkHomeScanTest : PlatformTestCase() {
 
     fun `test elixir linux system home paths`() {
         assertEquals(
-            listOf("/usr/local/lib/elixir", "/usr/lib/elixir"),
+            listOf("/usr/local/lib/elixir", "/usr/lib/elixir", "/usr/lib64/elixir"),
             SdkHomePaths.linuxSystemHomePaths("elixir")
         )
     }
 
     fun `test erlang linux system home paths`() {
         assertEquals(
-            listOf("/usr/local/lib/erlang", "/usr/lib/erlang"),
+            listOf("/usr/local/lib/erlang", "/usr/lib/erlang", "/usr/lib64/erlang"),
             SdkHomePaths.linuxSystemHomePaths("erlang")
         )
     }
@@ -112,6 +112,16 @@ class SdkHomeScanTest : PlatformTestCase() {
         }
     }
 
+    private fun withTempRoot(body: (File) -> Unit) {
+        val root = FileUtil.createTempDirectory("sdkHome", null)
+
+        try {
+            body(root)
+        } finally {
+            FileUtil.delete(root)
+        }
+    }
+
     // ========== Transform Behavior Tests ==========
 
     fun `test both tools resolve a prefix with the same rule`() {
@@ -128,49 +138,6 @@ class SdkHomeScanTest : PlatformTestCase() {
             assertEquals(
                 File(erlangPrefix, "lib/erlang"),
                 createErlangConfig().toolHome(erlangPrefix)
-            )
-        }
-    }
-
-    fun `test toolHomePath descends into the nested home`() {
-        withTempRoot { root ->
-            // make install PREFIX=<prefix>, the layout Homebrew has produced since 2024-09-22
-            val prefix = File(root, "elixir/1.18.0")
-            assertTrue(File(prefix, "lib/elixir/bin").mkdirs())
-            assertTrue(File(prefix, "lib/elixir/lib/elixir/ebin").mkdirs())
-            assertTrue(File(prefix, "bin").mkdirs())
-
-            assertEquals(
-                FileUtil.toSystemIndependentName(File(prefix, "lib/elixir").absolutePath),
-                FileUtil.toSystemIndependentName(SdkHomePaths.toolHomePath(prefix, "elixir").absolutePath)
-            )
-        }
-    }
-
-    fun `test toolHomePath keeps the prefix for the pre-2024 layout`() {
-        withTempRoot { root ->
-            // bin.install plus per-app lib/<app>/ebin: lib/elixir exists but has no bin of its own
-            val prefix = File(root, "elixir/1.17.3")
-            assertTrue(File(prefix, "bin").mkdirs())
-            assertTrue(File(prefix, "lib/elixir/ebin").mkdirs())
-            assertTrue(File(prefix, "lib/eex/ebin").mkdirs())
-
-            assertEquals(
-                "the prefix is already the home; descending would break installs predating 2024-09-22",
-                FileUtil.toSystemIndependentName(prefix.absolutePath),
-                FileUtil.toSystemIndependentName(SdkHomePaths.toolHomePath(prefix, "elixir").absolutePath)
-            )
-        }
-    }
-
-    fun `test toolHomePath keeps the prefix when there is no lib at all`() {
-        withTempRoot { root ->
-            val prefix = File(root, "elixir/1.18.0")
-            assertTrue(File(prefix, "bin").mkdirs())
-
-            assertEquals(
-                FileUtil.toSystemIndependentName(prefix.absolutePath),
-                FileUtil.toSystemIndependentName(SdkHomePaths.toolHomePath(prefix, "elixir").absolutePath)
             )
         }
     }
@@ -263,6 +230,248 @@ class SdkHomeScanTest : PlatformTestCase() {
 
         assertNotNull(config.kerlTransform)
         assertNotNull(config.travisCIKerlTransform)
+    }
+
+    // ========== /usr/share, version-scoped (Fedora, RHEL) ==========
+
+    fun `test mergeSystemShare discovers a versioned home`() {
+        withTempRoot { root ->
+            val home = File(root, "elixir/1.20.3")
+            assertTrue("could not create $home", home.mkdirs())
+
+            val homePathByVersion = mutableMapOf<SdkHomeKey, String>()
+            SdkHomePaths.mergeSystemShare(homePathByVersion, "elixir", root.absolutePath)
+
+            val key = homePathByVersion.keys.single()
+            assertEquals(Version(1, 20, 3), key.version)
+            assertEquals("1.20.3", key.qualifier)
+            assertNull("a system install is not attributed to an installer", key.source)
+            assertEquals(
+                FileUtil.toSystemIndependentName(home.absolutePath),
+                FileUtil.toSystemIndependentName(homePathByVersion.getValue(key))
+            )
+        }
+    }
+
+    fun `test mergeSystemShare finds every version side by side`() {
+        withTempRoot { root ->
+            assertTrue(File(root, "elixir/1.19.5").mkdirs())
+            assertTrue(File(root, "elixir/1.20.3").mkdirs())
+
+            val homePathByVersion = mutableMapOf<SdkHomeKey, String>()
+            SdkHomePaths.mergeSystemShare(homePathByVersion, "elixir", root.absolutePath)
+
+            assertEquals(
+                setOf(Version(1, 19, 5), Version(1, 20, 3)),
+                homePathByVersion.keys.map { it.version }.toSet()
+            )
+        }
+    }
+
+    fun `test mergeSystemShare ignores a non-version directory`() {
+        withTempRoot { root ->
+            // Fedora puts Erlang's ERL_LIBS at /usr/share/erlang/lib, which is not an SDK home.
+            assertTrue(File(root, "erlang/lib").mkdirs())
+            assertTrue(File(root, "erlang/28.1").mkdirs())
+
+            val homePathByVersion = mutableMapOf<SdkHomeKey, String>()
+            SdkHomePaths.mergeSystemShare(homePathByVersion, "erlang", root.absolutePath)
+
+            assertEquals(
+                setOf(FileUtil.toSystemIndependentName(File(root, "erlang/28.1").absolutePath)),
+                homePathByVersion.values.map { FileUtil.toSystemIndependentName(it) }.toSet()
+            )
+        }
+    }
+
+    fun `test mergeSystemShare ignores another tool`() {
+        withTempRoot { root ->
+            assertTrue(File(root, "erlang/28.1").mkdirs())
+
+            val homePathByVersion = mutableMapOf<SdkHomeKey, String>()
+            SdkHomePaths.mergeSystemShare(homePathByVersion, "elixir", root.absolutePath)
+
+            assertEmpty(homePathByVersion.values)
+        }
+    }
+
+    fun `test mergeSystemShare tolerates a missing share root`() {
+        withTempRoot { root ->
+            val homePathByVersion = mutableMapOf<SdkHomeKey, String>()
+            SdkHomePaths.mergeSystemShare(homePathByVersion, "elixir", File(root, "absent").absolutePath)
+
+            assertEmpty(homePathByVersion.values)
+        }
+    }
+
+    // ========== Homebrew version prefix ==========
+
+    fun `test toolHomePath descends into the nested home`() {
+        withTempRoot { root ->
+            // make install PREFIX=<prefix>, the layout Homebrew has produced since 2024-09-22
+            val prefix = File(root, "elixir/1.18.0")
+            assertTrue(File(prefix, "lib/elixir/bin").mkdirs())
+            assertTrue(File(prefix, "lib/elixir/lib/elixir/ebin").mkdirs())
+            assertTrue(File(prefix, "bin").mkdirs())
+
+            assertEquals(
+                FileUtil.toSystemIndependentName(File(prefix, "lib/elixir").absolutePath),
+                FileUtil.toSystemIndependentName(SdkHomePaths.toolHomePath(prefix, "elixir").absolutePath)
+            )
+        }
+    }
+
+    fun `test toolHomePath keeps the prefix for the pre-2024 layout`() {
+        withTempRoot { root ->
+            // bin.install plus per-app lib/<app>/ebin: lib/elixir exists but has no bin of its own
+            val prefix = File(root, "elixir/1.17.3")
+            assertTrue(File(prefix, "bin").mkdirs())
+            assertTrue(File(prefix, "lib/elixir/ebin").mkdirs())
+            assertTrue(File(prefix, "lib/eex/ebin").mkdirs())
+
+            assertEquals(
+                "the prefix is already the home; descending would break installs predating 2024-09-22",
+                FileUtil.toSystemIndependentName(prefix.absolutePath),
+                FileUtil.toSystemIndependentName(SdkHomePaths.toolHomePath(prefix, "elixir").absolutePath)
+            )
+        }
+    }
+
+    fun `test toolHomePath keeps the prefix when there is no lib at all`() {
+        withTempRoot { root ->
+            val prefix = File(root, "elixir/1.18.0")
+            assertTrue(File(prefix, "bin").mkdirs())
+
+            assertEquals(
+                FileUtil.toSystemIndependentName(prefix.absolutePath),
+                FileUtil.toSystemIndependentName(SdkHomePaths.toolHomePath(prefix, "elixir").absolutePath)
+            )
+        }
+    }
+
+    fun `test homebrewCellarPaths names every prefix Homebrew uses`() {
+        val cellars = SdkHomePaths.homebrewCellarPaths("/home/me") { it }
+
+        // Nothing else asserts which roots the scan reaches, so dropping one here is invisible.
+        assertEquals(
+            listOf(
+                "/usr/local/Cellar",
+                "/opt/homebrew/Cellar",
+                "/home/linuxbrew/.linuxbrew/Cellar",
+                "/home/me/.linuxbrew/Cellar"
+            ).map { FileUtil.toSystemIndependentName(it) },
+            cellars.map { FileUtil.toSystemIndependentName(it) }
+        )
+    }
+
+    fun `test homebrewCellarPaths maps every root through the reader`() {
+        // A distribution root, not a UNC path: `File` keeps a leading `//` only on Windows, so a
+        // UNC-shaped root would assert the home-derived Cellar differently on each OS.
+        val cellars = SdkHomePaths.homebrewCellarPaths("/mnt/distro/home/me") { "/mnt/distro$it" }
+
+        assertEquals(
+            "a WSL scan must reach the same roots through its own mapping",
+            listOf(
+                "/mnt/distro/usr/local/Cellar",
+                "/mnt/distro/opt/homebrew/Cellar",
+                "/mnt/distro/home/linuxbrew/.linuxbrew/Cellar",
+                "/mnt/distro/home/me/.linuxbrew/Cellar"
+            ),
+            cellars.map { FileUtil.toSystemIndependentName(it) }
+        )
+    }
+
+    fun `test homebrewCellarPaths drops roots the reader cannot reach`() {
+        val cellars = SdkHomePaths.homebrewCellarPaths(null) { null }
+
+        assertEmpty(cellars)
+    }
+
+    fun `test mergeHomebrew scans every explicit cellar`() {
+        withTempRoot { root ->
+            val intel = File(root, "usr/local/Cellar")
+            val linuxbrew = File(root, "home/linuxbrew/.linuxbrew/Cellar")
+            assertTrue(File(intel, "elixir/1.17.3/bin").mkdirs())
+            assertTrue(File(linuxbrew, "elixir/1.18.4/bin").mkdirs())
+
+            val homePathByVersion = mutableMapOf<SdkHomeKey, String>()
+            SdkHomePaths.mergeHomebrew(
+                homePathByVersion, "elixir", { SdkHomePaths.toolHomePath(it, "elixir") },
+                listOf(intel.path, linuxbrew.path)
+            )
+
+            assertEquals(
+                "Homebrew on Linux and WSL uses a .linuxbrew prefix, not a macOS one",
+                setOf(Version(1, 17, 3), Version(1, 18, 4)),
+                homePathByVersion.keys.map { it.version }.toSet()
+            )
+        }
+    }
+
+    fun `test mergeHomebrew tolerates a cellar that does not exist`() {
+        withTempRoot { root ->
+            val homePathByVersion = mutableMapOf<SdkHomeKey, String>()
+            SdkHomePaths.mergeHomebrew(
+                homePathByVersion, "elixir", { it }, listOf(File(root, "absent").path)
+            )
+
+            assertEmpty(homePathByVersion.values)
+        }
+    }
+
+    fun `test mergeHomebrew finds version-pinned formulae`() {
+        withTempRoot { root ->
+            val cellar = File(root, "Cellar")
+            // erlang@25..28 are real homebrew-core formulae and live beside the unpinned one
+            assertTrue(File(cellar, "erlang/28.1.2/lib/erlang/bin").mkdirs())
+            assertTrue(File(cellar, "erlang@26/26.2.5/lib/erlang/bin").mkdirs())
+            assertTrue(File(cellar, "erlang@27/27.3.4/lib/erlang/bin").mkdirs())
+
+            val homePathByVersion = mutableMapOf<SdkHomeKey, String>()
+            SdkHomePaths.mergeHomebrew(
+                homePathByVersion, "erlang", { File(it, "lib/erlang") }, listOf(cellar.path)
+            )
+
+            assertEquals(
+                "a pinned Erlang is how an OTP release is held for a given Elixir",
+                setOf(Version(28, 1, 2), Version(26, 2, 5), Version(27, 3, 4)),
+                homePathByVersion.keys.map { it.version }.toSet()
+            )
+        }
+    }
+
+    fun `test mergeHomebrew keeps every version of one formula`() {
+        withTempRoot { root ->
+            val cellar = File(root, "Cellar")
+            // Homebrew keeps superseded versions until brew cleanup runs
+            assertTrue(File(cellar, "elixir/1.18.4/lib/elixir/bin").mkdirs())
+            assertTrue(File(cellar, "elixir/1.19.5/lib/elixir/bin").mkdirs())
+
+            val homePathByVersion = mutableMapOf<SdkHomeKey, String>()
+            SdkHomePaths.mergeHomebrew(
+                homePathByVersion, "elixir", { SdkHomePaths.toolHomePath(it, "elixir") },
+                listOf(cellar.path)
+            )
+
+            assertEquals(
+                setOf(Version(1, 18, 4), Version(1, 19, 5)),
+                homePathByVersion.keys.map { it.version }.toSet()
+            )
+        }
+    }
+
+    fun `test mergeHomebrew does not confuse another tool with a pinned prefix`() {
+        withTempRoot { root ->
+            val cellar = File(root, "Cellar")
+            assertTrue(File(cellar, "erlang@27/27.3.4/lib/erlang/bin").mkdirs())
+
+            val homePathByVersion = mutableMapOf<SdkHomeKey, String>()
+            SdkHomePaths.mergeHomebrew(
+                homePathByVersion, "elixir", { it }, listOf(cellar.path)
+            )
+
+            assertEmpty(homePathByVersion.values)
+        }
     }
 
     // ========== Version managers ==========
@@ -402,16 +611,6 @@ class SdkHomeScanTest : PlatformTestCase() {
                 found.keys.map { it.version }
                     .containsAll(listOf(Version(1, 20, 3), Version(1, 19, 5), Version(1, 18, 4)))
             )
-        }
-    }
-
-    private fun withTempRoot(body: (File) -> Unit) {
-        val root = FileUtil.createTempDirectory("sdkHome", null)
-
-        try {
-            body(root)
-        } finally {
-            FileUtil.delete(root)
         }
     }
 

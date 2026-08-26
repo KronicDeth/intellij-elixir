@@ -25,16 +25,32 @@ object SdkHomePaths {
     private const val LINUX_DISTRO_ROOT_PATH = "/usr/lib"
 
     /**
+     * `PREFIX=/usr` with a multilib `LIBDIR`. Gentoo builds both tools with it, and Fedora uses it
+     * for Erlang.
+     */
+    private const val LINUX_MULTILIB_ROOT_PATH = "/usr/lib64"
+
+    /** Version-scoped homes for packages installed outside a libdir, as Fedora does for Elixir. */
+    const val LINUX_SHARE_ROOT_PATH = "/usr/share"
+
+
+    /**
      * Roots a source build or a distribution package installs a tool under, in scan order.
      * [linuxSystemHomePaths] suffixes the tool name onto each; a new distro layout is added here and
      * nowhere else.
      */
-    private val LINUX_SYSTEM_ROOT_PATHS = listOf(LINUX_SOURCE_ROOT_PATH, LINUX_DISTRO_ROOT_PATH)
+    private val LINUX_SYSTEM_ROOT_PATHS =
+        listOf(LINUX_SOURCE_ROOT_PATH, LINUX_DISTRO_ROOT_PATH, LINUX_MULTILIB_ROOT_PATH)
 
     @JvmField
     val UNKNOWN_VERSION = Version(0, 0, 0)
 
-    private val HOMEBREW_CELLAR_PATHS = listOf(SdkPaths.HOMEBREW_INTEL_CELLAR_PATH)
+    /** Intel macOS, Apple Silicon macOS, and Homebrew on Linux, whose prefix is `.linuxbrew`. */
+    private val HOMEBREW_CELLAR_PATHS = listOf(
+        SdkPaths.HOMEBREW_INTEL_CELLAR_PATH,
+        SdkPaths.HOMEBREW_APPLE_SILICON_CELLAR_PATH,
+        SdkPaths.LINUXBREW_CELLAR_PATH
+    )
     private val NIX_STORE = File(SdkPaths.NIX_STORE_PATH)
     private val LOGGER = Logger.getInstance(SdkHomePaths::class.java)
 
@@ -52,6 +68,10 @@ object SdkHomePaths {
 
     /**
      * Adds each of [linuxSystemHomePaths] that exists as a directory.
+     *
+     * These keep [unknownVersionKey], so they sort below every version-manager install. That is
+     * intended: a system install declares no version in its path, and a version manager's is
+     * preferred whenever both are present.
      *
      * The native Linux scan and the WSL scan differ only by [toLocalPath], which maps a Linux path
      * to how this machine reaches it - identity when running on Linux, a UNC path when reaching into
@@ -125,6 +145,34 @@ object SdkHomePaths {
     }
 
     /**
+     * Scans `/usr/share/<name>/<version>` for packages installing version-scoped homes outside a
+     * libdir, as Fedora and RHEL do for Elixir. Same `<root>/<name>/<version>` shape as the version
+     * managers, so the version is parsed from the directory name.
+     *
+     * Only subdirectories naming a parseable version are taken. `/usr/share/<name>` also holds
+     * directories that are not homes - Fedora puts Erlang's `ERL_LIBS` at `/usr/share/erlang/lib` -
+     * and suggesting those would offer the user a path that cannot validate.
+     */
+    @JvmStatic
+    @JvmOverloads
+    fun mergeSystemShare(
+        homePathByVersion: MutableMap<SdkHomeKey, String>,
+        name: String,
+        shareRoot: String = LINUX_SHARE_ROOT_PATH,
+    ) {
+        val versioned = mutableMapOf<SdkHomeKey, String>()
+        mergeNameSubdirectories(versioned, File(shareRoot), name, source = null)
+
+        for ((key, homePath) in versioned) {
+            if (key.version != UNKNOWN_VERSION) {
+                homePathByVersion[key] = homePath
+            } else {
+                LOGGER.trace { "$homePath: Not a version directory" }
+            }
+        }
+    }
+
+    /**
      * The SDK home for [toolName] at or under [candidate].
      *
      * An install prefix is not itself a home: `make install PREFIX=<prefix>` puts the home in
@@ -144,15 +192,35 @@ object SdkHomePaths {
     }
 
     /**
-     * Every Cellar root reachable through [toLocalPath].
+     * Every Cellar root reachable through [toLocalPath], plus the one under [userHome].
      *
-     * The native scan and a WSL scan reach the same roots by different routes, so both ask here
-     * rather than each naming them.
+     * Homebrew's prefix differs by platform, but a prefix that belongs to another platform simply
+     * does not exist, so all of them are offered rather than chosen by OS - and a Homebrew on Linux
+     * installed to a macOS-looking custom prefix is then found too.
      */
     @JvmStatic
     fun homebrewCellarPaths(userHome: String?, toLocalPath: (String) -> String?): List<String> =
-        HOMEBREW_CELLAR_PATHS.mapNotNull(toLocalPath)
+        HOMEBREW_CELLAR_PATHS.mapNotNull(toLocalPath) +
+            listOfNotNull(userHome?.let { File(it, SdkPaths.LINUXBREW_CELLAR_PATH_FROM_HOME).path })
 
+    @JvmStatic
+    fun mergeHomebrew(
+        homePathByVersion: MutableMap<SdkHomeKey, String>,
+        name: String,
+        versionPathToHomePath: (File) -> File,
+    ) {
+        mergeHomebrew(
+            homePathByVersion, name, versionPathToHomePath,
+            HOMEBREW_CELLAR_PATHS + File(
+                System.getProperty("user.home"), SdkPaths.LINUXBREW_CELLAR_PATH_FROM_HOME
+            ).path
+        )
+    }
+
+    /**
+     * Scans explicit Cellar roots. Homebrew does not run natively on Windows, so the only Windows
+     * users with one are reaching into a WSL distribution, whose roots are UNC paths.
+     */
     @JvmStatic
     fun mergeHomebrew(
         homePathByVersion: MutableMap<SdkHomeKey, String>,
@@ -161,14 +229,36 @@ object SdkHomePaths {
         cellarPaths: List<String>,
     ) {
         for (cellar in cellarPaths.map { File(it) }) {
-            mergeNameSubdirectories(
-                homePathByVersion,
-                cellar,
-                name,
-                SdkPaths.SOURCE_NAME_HOMEBREW,
-                versionPathToHomePath
-            )
+            for (formula in homebrewFormulaNames(cellar, name)) {
+                mergeNameSubdirectories(
+                    homePathByVersion,
+                    cellar,
+                    formula,
+                    SdkPaths.SOURCE_NAME_HOMEBREW,
+                    versionPathToHomePath
+                )
+            }
         }
+    }
+
+    /**
+     * Cellar directory names holding [toolName], newest-pinned last.
+     *
+     * Homebrew keeps every installed version of a formula in its own Cellar directory until
+     * `brew cleanup` runs, and it also ships version-pinned formulae - `erlang@25` through
+     * `erlang@28` - which live under their own name rather than beside the unpinned versions. Both
+     * have to be scanned or a pinned Erlang, the usual way to hold an OTP release for a given
+     * Elixir, is invisible.
+     */
+    private fun homebrewFormulaNames(cellar: File, toolName: String): List<String> {
+        val pinnedPrefix = "$toolName@"
+        val names = cellar
+            .listFiles { file -> file.isDirectory && file.name.startsWith(pinnedPrefix) }
+            ?.map { it.name }
+            ?.sorted()
+            .orEmpty()
+
+        return listOf(toolName) + names
     }
 
     @JvmStatic
@@ -280,7 +370,7 @@ object SdkHomePaths {
         homePathByVersion: MutableMap<SdkHomeKey, String>,
         parent: File,
         name: String,
-        source: String,
+        source: String?,
         versionPathToHomePath: (File) -> File = { it },
     ) {
         LOGGER.trace { "$parent: Scanning for SDK Home Paths" }
@@ -301,7 +391,9 @@ object SdkHomePaths {
                 LOGGER.trace { "$child: Scanning" }
             if (child.isDirectory) {
                 val homePath = wslCompat.canonicalizePath(versionPathToHomePath(child).absolutePath)
-                val versionString = File(homePath).name
+                // The version names the directory scanned, not the home inside it: a transform that
+                // descends (Homebrew's `lib/<tool>`) would otherwise read the tool name as a version.
+                val versionString = child.name
                 val version = parseVersion(versionString)
                 val key = SdkHomeKey(version, versionString, source, homePath)
                 LOGGER.trace { "$child: Adding $key" }

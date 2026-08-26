@@ -118,6 +118,10 @@ object SdkHomeScan {
     ) {
         SdkHomePaths.mergeLinuxSystemHomePaths(homePathByVersion, config.toolName, toLocalPath)
 
+        toLocalPath(SdkHomePaths.LINUX_SHARE_ROOT_PATH)?.let {
+            SdkHomePaths.mergeSystemShare(homePathByVersion, config.toolName, it)
+        }
+
         if (userHome != null) {
             SdkHomePaths.mergeASDF(homePathByVersion, config.toolName, userHome)
             SdkHomePaths.mergeMise(homePathByVersion, config.toolName, userHome)
