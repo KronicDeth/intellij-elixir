@@ -30,6 +30,11 @@
     `lib/<app>-<version>/src`, but only the `ebin` directories were registered, so an OTP frame in a
     stack trace named a file nothing indexed could find and `gen_server.erl` was not navigable.
     Existing SDKs pick the roots up on the next refresh.
+  - **External Libraries now shows an SDK application's source beside its beams.** A tree node for an
+    application that ships both is now the application itself, holding `ebin` and the `lib` or `src`
+    next to it; one shipping only beams is unchanged. An SDK node's children are its class roots
+    alone, so the source directory has to be put there deliberately - registering it as a source root
+    makes it searchable, not visible.
 
 - [#3923](https://github.com/KronicDeth/intellij-elixir/pull/3923) [@sh41](https://github.com/sh41)
   - **Elixir and Erlang SDKs under `/usr/lib64` are now detected automatically.** Gentoo builds both
