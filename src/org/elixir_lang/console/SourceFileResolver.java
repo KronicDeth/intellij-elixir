@@ -28,7 +28,19 @@ import java.util.regex.Pattern;
  * both, so it lives here rather than in either of them.
  */
 final class SourceFileResolver {
-    private static final Pattern PATTERN_FILENAME = Pattern.compile("[/\\\\]?([^/\\\\]*?\\.e(ex|x|xs))$");
+    /**
+     * The extensions a console path may name. Elixir's own sources and templates, plus Erlang,
+     * since a stack trace mixes them freely - an OTP frame reports {@code gen_server.erl} beside
+     * Elixir frames, and both are the same kind of thing to a reader following a trace.
+     *
+     * <p>Accepting an extension is not the same as resolving it - that depends on what is indexed.
+     * An Erlang dependency's {@code src} is ordinary project content and resolves like any other
+     * file, while OTP's own sources live under an Erlang SDK's {@code src} directories, which are
+     * not registered as source roots today, so {@code gen_server.erl} is accepted here and then
+     * finds nothing.
+     */
+    private static final Pattern PATTERN_FILENAME =
+            Pattern.compile("[/\\\\]?([^/\\\\]*?\\.(?:heex|leex|eex|exs|erl|ex))$");
 
     private SourceFileResolver() {
     }
@@ -38,8 +50,8 @@ final class SourceFileResolver {
      * path taken as project-relative, then any project file whose name matches and whose own path
      * ends with {@code path}, then the same search widened to libraries.
      *
-     * <p>Empty when nothing matches - a path outside the project, or an Erlang {@code .erl} source,
-     * which {@link #PATTERN_FILENAME} deliberately does not accept.
+     * <p>Empty when nothing matches - a path naming a file nothing indexed can be found for, or one
+     * whose extension {@link #PATTERN_FILENAME} does not accept.
      *
      * <p>Requires a read action for the {@link FilenameIndex} lookup, and indexes to be built. Both
      * are the platform's to provide: it runs console filters inside

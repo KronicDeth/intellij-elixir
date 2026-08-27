@@ -98,6 +98,22 @@ class LiteralStackTraceFilterTest : PlatformTestCase() {
         assertEmpty(applyFilter("    (gald) lib/gald/turn.ex:38: Gald.Turn.handle_cast/2"))
     }
 
+    /**
+     * A trace mixes Elixir with the templates and Erlang beside it, so the accepted extensions
+     * cover all of them. Whether a path then resolves is a separate matter - these files exist.
+     */
+    fun testLinksEveryAcceptedExtension() {
+        for (extension in listOf("ex", "exs", "eex", "heex", "leex", "erl")) {
+            val name = "lib/gald/phase.$extension"
+            val file = myFixture.addFileToProject(name, "")
+
+            val items = applyFilter("{Gald.Phase, :init, 1, [file: '$name', line: 54]}")
+
+            assertEquals("Expected $name to link, got: $items", 1, items.size)
+            assertEquals(file.virtualFile, items.single().descriptor().file)
+        }
+    }
+
     /** An OTP frame names a file that is not in the project, so there is nothing to open. */
     fun testIgnoresAnUnresolvablePath() {
         assertEmpty(applyFilter("{:gen_server, :init_it, 6, [file: 'gen_server.erl', line: 328]}"))

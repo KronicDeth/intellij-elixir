@@ -22,6 +22,11 @@
     contributed to every console the IDE builds for a project with an Elixir module or SDK, and on
     the reworked terminal engine a wrapped entry links to its exact line rather than to the top of
     the file.
+  - **Erlang, HEEx and LEEx locations in a trace are now linked too.** A stack trace mixes them with
+    Elixir freely, but only `.ex`, `.exs` and `.eex` were recognised, so an Erlang dependency's frame
+    stayed plain text beside the Elixir frames around it. Whether a path then opens still depends on
+    the file being indexed: an OTP frame such as `gen_server.erl` lives under the Erlang SDK, whose
+    `src` directories are not source roots.
 
 - [#3923](https://github.com/KronicDeth/intellij-elixir/pull/3923) [@sh41](https://github.com/sh41)
   - **Elixir and Erlang SDKs under `/usr/lib64` are now detected automatically.** Gentoo builds both
