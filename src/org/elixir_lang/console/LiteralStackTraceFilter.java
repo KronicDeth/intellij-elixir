@@ -1,7 +1,10 @@
 package org.elixir_lang.console;
 
 import com.intellij.execution.filters.Filter;
+import com.intellij.execution.filters.HyperlinkInfo;
 import com.intellij.execution.filters.HyperlinkInfoFactory;
+import com.intellij.execution.filters.OpenFileHyperlinkInfo;
+import com.intellij.openapi.editor.markup.HighlighterLayer;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
@@ -230,20 +233,68 @@ final class LiteralStackTraceFilter implements Filter {
         // Only the quoted path is highlighted: the number navigates, but underlining it would
         // extend the link across the `, line: ` between the two - or across a newline.
         resultItems.add(
-                new ResultItem(
+                new AboveGenericFileLinks(
                         highlightStartOffset,
                         highlightEndOffset,
-                        HyperlinkInfoFactory
-                                .getInstance()
-                                .createMultipleFilesHyperlinkInfo(
-                                        new ArrayList<>(virtualFiles),
-                                        zeroBasedLine,
-                                        project
-                                )
+                        hyperlinkInfo(virtualFiles, zeroBasedLine)
                 )
         );
 
         return resultItems;
+    }
+
+    /**
+     * A link that outranks the terminal's own bare-path link over the same text.
+     *
+     * <p>The reworked terminal registers {@code TerminalGenericFileFilter} ahead of every plugin's
+     * filters and builds the composite with {@code setForceUseAllFilters(true)}, so both run and both
+     * mark up the same path. Its link is an invisible one - Ctrl to follow - and opens the file at
+     * line 1, because all it sees is a path with no {@code :line} after it. Ours knows the number
+     * from the keyword list beside it.
+     *
+     * <p>Both default to {@link HighlighterLayer#HYPERLINK}, and an exact-range tie goes to whichever
+     * was added first, which is the terminal's. {@link FileReferenceFilter} never notices because its
+     * match covers {@code path:line} and so is a wider range than the bare path. One layer up is
+     * enough.
+     *
+     * <p>It applies to every link this filter makes, including a wrapped path linked to the top of
+     * the file, where the terminal's own link would have gone to the same place. Distinguishing the
+     * two would buy nothing and would make the layer depend on which branch produced the link.
+     */
+    private static final class AboveGenericFileLinks extends ResultItem {
+        private AboveGenericFileLinks(int highlightStartOffset,
+                                      int highlightEndOffset,
+                                      @NotNull HyperlinkInfo hyperlinkInfo) {
+            super(highlightStartOffset, highlightEndOffset, hyperlinkInfo);
+        }
+
+        @Override
+        public int getHighlighterLayer() {
+            return HighlighterLayer.HYPERLINK + 1;
+        }
+    }
+
+    /**
+     * A plain {@link OpenFileHyperlinkInfo} for the ordinary single-candidate case, and the chooser
+     * only where a path really does name several files.
+     *
+     * <p>Not just brevity: the reworked terminal navigates by type, taking the line from the
+     * descriptor for a {@code FileHyperlinkInfoBase} and falling back to a generic path for anything
+     * else. {@code MultipleFilesHyperlinkInfo} implements {@code FileHyperlinkInfo} but does not
+     * extend that base, so a single-file link built through the factory opened at line 1 there while
+     * the same file linked by {@link FileReferenceFilter} - which uses {@code OpenFileHyperlinkInfo}
+     * - opened at the right line. Every other console navigates through the info's own
+     * {@code navigate} and cannot tell the two apart.
+     */
+    @NotNull
+    private HyperlinkInfo hyperlinkInfo(@NotNull Collection<VirtualFile> virtualFiles, int zeroBasedLine) {
+        if (virtualFiles.size() == 1) {
+            return new OpenFileHyperlinkInfo(project, virtualFiles.iterator().next(), zeroBasedLine);
+        }
+
+        return HyperlinkInfoFactory
+                .getInstance()
+                .createMultipleFilesHyperlinkInfo(new ArrayList<>(virtualFiles), zeroBasedLine, project);
     }
 
     /**

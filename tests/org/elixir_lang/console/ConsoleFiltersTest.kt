@@ -1,7 +1,9 @@
 package org.elixir_lang.console
 
 import com.intellij.execution.filters.FileHyperlinkInfo
+import com.intellij.execution.filters.FileHyperlinkInfoBase
 import com.intellij.execution.impl.ConsoleViewImpl
+import com.intellij.execution.impl.ConsoleViewUtil
 import com.intellij.execution.process.NopProcessHandler
 import com.intellij.execution.ui.ConsoleViewContentType
 import com.intellij.openapi.fileEditor.OpenFileDescriptor
@@ -11,15 +13,16 @@ import com.intellij.psi.search.GlobalSearchScope
 import org.elixir_lang.PlatformTestCase
 
 /**
- * Drives a real [ConsoleViewImpl] through [ElixirConsoleUtil.attachFilters] and asserts the
- * hyperlinks the console ends up holding.
+ * Drives a real [ConsoleViewImpl] through the filters [ElixirConsoleFilterProvider] contributes and
+ * asserts the hyperlinks the console ends up holding.
  *
  * The per-filter tests call `applyFilter` directly and have to state what the console would pass.
  * Twice that guess was wrong in a way every one of them still passed: `inspect` wraps a wide entry
  * across lines, and offsets mean different things in different consoles. Both were only caught by
- * running the plugin. This closes that gap - it goes through the same registration a run
- * configuration uses, the real `AsyncFilterRunner`, and the real offsets - so a wrong assumption
- * about the console fails here rather than in a sandbox two days later.
+ * running the plugin. This closes that gap - it goes through the same extension point a run
+ * configuration and the Terminal tool window both go through, the real `AsyncFilterRunner`, and the
+ * real offsets - so a wrong assumption about the console fails here rather than in a sandbox two
+ * days later.
  */
 class ConsoleFiltersTest : PlatformTestCase() {
     fun testLinksAWholeEntry() {
@@ -173,12 +176,47 @@ class ConsoleFiltersTest : PlatformTestCase() {
         assertEmpty(console.hyperlinksOnLine(1))
     }
 
+    /**
+     * Both filters are contributed to every console, with no check on the project having Elixir in
+     * it. A terminal computes its filter set once and keeps it, so a gate would answer for the whole
+     * session from whatever the project looked like when its first line arrived - and a tab restored
+     * before the Mix import finished would get no linking until it was closed. This fixture has no
+     * Elixir module, facet or SDK, which is exactly the project a gate would have refused.
+     */
+    fun testContributesBothFiltersWhateverTheProject() {
+        val filters = elixirConsoleFilters()
+
+        assertNotNull("No LiteralStackTraceFilter in $filters", filters.find { it is LiteralStackTraceFilter })
+        assertNotNull("No FileReferenceFilter in $filters", filters.find { it is FileReferenceFilter })
+    }
+
+    /**
+     * The reworked terminal navigates by the hyperlink's type: it reads the line off the descriptor
+     * for a [com.intellij.execution.filters.FileHyperlinkInfoBase] and falls back to a generic path
+     * for anything else. `MultipleFilesHyperlinkInfo` implements `FileHyperlinkInfo` without
+     * extending that base, so building one for a single file opened the file at line 1 there while
+     * every other console navigated correctly and no test noticed.
+     */
+    fun testLinksASingleCandidateWithAFileHyperlinkInfoBase() {
+        myFixture.addFileToProject("lib/gald/phase.ex", "defmodule Gald.Phase do\nend\n")
+
+        val console = printToConsole("{Gald.Phase, :init, 1, [file: 'lib/gald/phase.ex', line: 54]}\n")
+
+        val info = console.getHyperlinks()!!.getHyperlinkAt(
+            console.hyperlinkHighlightersOnLine(0).single().startOffset
+        )
+        assertInstanceOf(info, FileHyperlinkInfoBase::class.java)
+    }
+
     private fun printToConsole(text: String): ConsoleViewImpl {
         val console = ConsoleViewImpl(project, GlobalSearchScope.allScope(project), false, false)
         Disposer.register(testRootDisposable, console)
         console.component // forces initConsoleEditor()
         console.attachToProcess(NopProcessHandler().also { it.startNotify() })
-        ElixirConsoleUtil.attachFilters(project, console)
+        // The console's own `usePredefinedMessageFilter` computes these asynchronously and finishes
+        // on the UI thread; asking the extension point directly exercises the same registration
+        // without a wait, and keeps the console's filter set deterministic.
+        elixirConsoleFilters().forEach { console.addMessageFilter(it) }
 
         console.print(text, ConsoleViewContentType.NORMAL_OUTPUT)
         console.flushDeferredText()
@@ -187,6 +225,9 @@ class ConsoleFiltersTest : PlatformTestCase() {
 
         return console
     }
+
+    private fun ConsoleViewImpl.hyperlinkHighlightersOnLine(line: Int) =
+        getHyperlinks()!!.findAllHyperlinksOnLine(line)
 
     /** Every hyperlink on [line] as (highlighted text, where it navigates). */
     private fun ConsoleViewImpl.hyperlinksOnLine(line: Int): List<Pair<String, OpenFileDescriptor>> {
@@ -208,6 +249,10 @@ class ConsoleFiltersTest : PlatformTestCase() {
         hyperlinksOnLine(line).also {
             assertEquals("Expected exactly one hyperlink, got: $it", 1, it.size)
         }.single()
+
+    /** What `com.intellij.consoleFilterProvider` yields for this project, filters of ours included. */
+    private fun elixirConsoleFilters() =
+        ConsoleViewUtil.computeConsoleFilters(project, null, GlobalSearchScope.allScope(project))
 
     companion object {
         /** Filtering is asynchronous; generous because a slow CI box failing here would say nothing. */

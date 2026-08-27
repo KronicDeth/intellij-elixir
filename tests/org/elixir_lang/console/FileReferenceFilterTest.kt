@@ -67,7 +67,7 @@ class FileReferenceFilterTest : PlatformTestCase() {
     private fun applyFilter(line: String): List<Filter.ResultItem> =
         ReadAction.nonBlocking(
             Callable {
-                FileReferenceFilter(project, ElixirConsoleUtil.COMPILATION_ERROR_PATH)
+                FileReferenceFilter(project, FileReferenceFilter.COMPILATION_ERROR_PATH)
                     .applyFilter(line, line.length)
             }
         ).executeSynchronously()?.resultItems.orEmpty()

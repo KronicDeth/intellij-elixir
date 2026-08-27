@@ -55,6 +55,9 @@
         <notificationGroup displayType="STICKY_BALLOON" id="Elixir SDK"/>
         <notificationGroup displayType="STICKY_BALLOON" id="Elixir Mix Deps"/>
 
+        <!-- Stack-trace linking in every console of an Elixir project, the Terminal tool window included -->
+        <consoleFilterProvider implementation="org.elixir_lang.console.ElixirConsoleFilterProvider"/>
+
         <!-- Distillery -->
         <configurationType implementation="org.elixir_lang.distillery.configuration.Type"/>
 

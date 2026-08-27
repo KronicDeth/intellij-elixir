@@ -20,6 +20,8 @@ import java.util.regex.Pattern;
 public final class FileReferenceFilter implements Filter {
     static final String LINE_MACROS = "$LINE$";
     static final String PATH_MACROS = "$FILE_PATH$";
+    /** The expression a formatted frame's {@code path:line} is read with. */
+    static final String COMPILATION_ERROR_PATH = PATH_MACROS + ":" + LINE_MACROS;
     private static final String COLUMN_MACROS = "$COLUMN$";
     private static final String FILE_PATH_REGEXP = "\\s*([0-9 a-z_A-Z\\-\\\\./]+)";
     private static final String NUMBER_REGEXP = "([0-9]+)";

@@ -16,6 +16,12 @@
     navigates to that line in the Mix, Elixir, Distillery and test-runner consoles; in the IEx
     consoles it opens the file, because a filter there is given one line at a time with no way to
     reach the next. Refs [#510](https://github.com/KronicDeth/intellij-elixir/issues/510).
+  - **Stack traces are now linked in the Terminal tool window as well.** `iex -S mix`, `mix test`
+    and `mix phx.server` run from the Terminal had no Elixir linking at all, because the filters
+    were only ever attached to consoles the plugin's own run configurations built. They are now
+    contributed to every console the IDE builds for a project with an Elixir module or SDK, and on
+    the reworked terminal engine a wrapped entry links to its exact line rather than to the top of
+    the file.
 
 - [#3923](https://github.com/KronicDeth/intellij-elixir/pull/3923) [@sh41](https://github.com/sh41)
   - **Elixir and Erlang SDKs under `/usr/lib64` are now detected automatically.** Gentoo builds both

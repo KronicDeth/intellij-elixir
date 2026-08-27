@@ -3,6 +3,7 @@ package org.elixir_lang.console
 import com.intellij.execution.filters.FileHyperlinkInfo
 import com.intellij.execution.filters.Filter
 import com.intellij.openapi.application.ReadAction
+import com.intellij.openapi.editor.markup.HighlighterLayer
 import org.elixir_lang.PlatformTestCase
 import java.util.concurrent.Callable
 
@@ -26,6 +27,27 @@ class LiteralStackTraceFilterTest : PlatformTestCase() {
         val descriptor = items.single().descriptor()
         assertEquals(file.virtualFile, descriptor.file)
         assertEquals("`line: 75` is 1-based; the descriptor is 0-based", 74, descriptor.line)
+    }
+
+    /**
+     * The reworked terminal registers its own `TerminalGenericFileFilter` ahead of every plugin's
+     * filters and builds the composite with `setForceUseAllFilters(true)`, so it marks up the same
+     * bare path this filter does. Its link is invisible - Ctrl to follow - and opens the file at line
+     * 1, because a bare path carries no line number. An exact-range tie at the same layer goes to
+     * whichever was added first, which is the terminal's, so ours has to outrank it.
+     *
+     * [FileReferenceFilter] needs no such thing: its match covers `path:line`, a wider range than
+     * the bare path, so it never ties.
+     */
+    fun testOutranksTheTerminalsOwnBarePathLink() {
+        myFixture.addFileToProject("lib/gald/phase.ex", "defmodule Gald.Phase do\nend\n")
+
+        val item = applyFilter("{Gald.Phase, :init, 1, [file: 'lib/gald/phase.ex', line: 54]}").single()
+
+        assertTrue(
+            "A link over the same text as the terminal's own must outrank it, was ${item.highlighterLayer}",
+            item.highlighterLayer > HighlighterLayer.HYPERLINK
+        )
     }
 
     /** Elixir 1.15 and later inspect a charlist as a `~c` sigil, so the same frame reads differently. */
@@ -188,8 +210,16 @@ class LiteralStackTraceFilterTest : PlatformTestCase() {
 
         val item = filter.feed(PATH_LINE, NO_DOCUMENT)!!.resultItems.single()
 
-        assertEquals(file.virtualFile, item.descriptor().file)
-        assertEquals("Nothing may be carried, so the number is out of reach", 0, item.descriptor().line)
+        val descriptor = item.descriptor()
+
+        assertEquals(file.virtualFile, descriptor.file)
+        // The top of the file, however the descriptor chose to say so: FileHyperlinkInfoBase resolves
+        // the line to an offset when the document has one, and an offset-built descriptor reports
+        // line -1, while a line-built one reports offset -1.
+        assertTrue(
+            "Nothing may be carried, so the number is out of reach: $descriptor",
+            descriptor.offset == 0 || descriptor.line == 0
+        )
         assertNull("Nothing was carried, so nothing continues it", filter.feed(NUMBER_LINE, NO_DOCUMENT))
     }
 
@@ -201,14 +231,12 @@ class LiteralStackTraceFilterTest : PlatformTestCase() {
     }
 
     /**
-     * The other document-backed pipeline, `Filter.applyToLineRange`, reports a line's end *before*
-     * its terminator rather than after, so the next line starts one past it rather than exactly on
-     * it. Both count as adjacent; getting this wrong loses every wrapped link in that console while
-     * every fixture still passes.
-     *
-     * That pipeline belongs to the Reworked terminal, which this plugin does not register filters
-     * with, so nothing exercises this today. It is here so `MAX_GAP` cannot be tightened to nothing
-     * by someone who has only seen the one console it is currently used in.
+     * The other document-backed pipeline, `Filter.applyToLineRange`, drives the Reworked terminal,
+     * which this plugin does register filters with. It includes the terminator too, so consecutive
+     * lines abut there as well - except on the last line of a batch, where it appends a synthetic
+     * `"
+"` and the next line starts one past the end. Both count as adjacent; getting this wrong
+     * loses every wrapped link in that console while every fixture still passes.
      */
     fun testTreatsALineTerminatorGapAsAdjacent() {
         myFixture.addFileToProject("lib/gald/phase.ex", "defmodule Gald.Phase do\nend\n")
