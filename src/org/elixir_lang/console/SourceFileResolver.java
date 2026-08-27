@@ -1,6 +1,7 @@
 package org.elixir_lang.console;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.search.FilenameIndex;
@@ -63,7 +64,13 @@ final class SourceFileResolver {
     static Collection<VirtualFile> resolve(@NotNull Project project, @NotNull String path) {
         ThreadingAssertions.assertReadAccess();
 
-        VirtualFile asIsFile = pathToVirtualFile(path);
+        // Every comparison below is between a path from console output and a path from the project
+        // model or the VFS, which are separate sources, so both sides are normalised first. A
+        // compile error printed as `lib\my_app\foo.ex` otherwise matches nothing: the VFS holds
+        // `/` and neither `startsWith` nor `endsWith` knows a separator from any other character.
+        String systemIndependentPath = FileUtil.toSystemIndependentName(path);
+
+        VirtualFile asIsFile = pathToVirtualFile(systemIndependentPath);
 
         if (asIsFile != null) {
             return Collections.singleton(asIsFile);
@@ -73,12 +80,15 @@ final class SourceFileResolver {
         VirtualFile projectBasedFile = null;
 
         if (basePath != null) {
+            String systemIndependentBasePath = FileUtil.toSystemIndependentName(basePath);
             String projectBasedPath;
 
-            if (path.startsWith(basePath)) {
-                projectBasedPath = path;
+            if (systemIndependentPath.startsWith(systemIndependentBasePath)) {
+                projectBasedPath = systemIndependentPath;
             } else {
-                projectBasedPath = new File(basePath, path).getAbsolutePath();
+                projectBasedPath = FileUtil.toSystemIndependentName(
+                        new File(basePath, systemIndependentPath).getAbsolutePath()
+                );
             }
 
             projectBasedFile = pathToVirtualFile(projectBasedPath);
@@ -89,17 +99,17 @@ final class SourceFileResolver {
         if (projectBasedFile != null) {
             virtualFileCollection = Collections.singleton(projectBasedFile);
         } else {
-            Matcher filenameMatcher = PATTERN_FILENAME.matcher(path);
+            Matcher filenameMatcher = PATTERN_FILENAME.matcher(systemIndependentPath);
 
             if (filenameMatcher.find()) {
                 String filename = filenameMatcher.group(1);
                 GlobalSearchScope projectScope = ProjectScope.getProjectScope(project);
-                virtualFileCollection = suffixMatches(project, path, filename, projectScope);
+                virtualFileCollection = suffixMatches(project, systemIndependentPath, filename, projectScope);
 
                 if (virtualFileCollection.isEmpty()) {
                     GlobalSearchScope libraryScope = ProjectScope.getLibrariesScope(project);
 
-                    virtualFileCollection = suffixMatches(project, path, filename, libraryScope);
+                    virtualFileCollection = suffixMatches(project, systemIndependentPath, filename, libraryScope);
                 }
             }
         }
@@ -113,9 +123,7 @@ final class SourceFileResolver {
 
     @Nullable
     private static VirtualFile pathToVirtualFile(@NotNull String path) {
-        String normalizedPath = path.replace(File.separatorChar, '/');
-
-        return LocalFileSystem.getInstance().findFileByPath(normalizedPath);
+        return LocalFileSystem.getInstance().findFileByPath(FileUtil.toSystemIndependentName(path));
     }
 
     @NotNull
@@ -127,7 +135,9 @@ final class SourceFileResolver {
         Collection<VirtualFile> projectFilesWithBaseName = FilenameIndex.getVirtualFilesByName(basename, scope);
 
         for (VirtualFile projectFileWithBaseName : projectFilesWithBaseName) {
-            String virtualFilePath = projectFileWithBaseName.getPath();
+            // The caller normalised `path`; a VirtualFile's own path is system-independent already,
+            // but saying so costs nothing and survives someone passing a raw path in.
+            String virtualFilePath = FileUtil.toSystemIndependentName(projectFileWithBaseName.getPath());
 
             if (virtualFilePath.endsWith(path)) {
                 suffixedVirtualFiles.add(projectFileWithBaseName);

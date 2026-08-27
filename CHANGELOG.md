@@ -73,6 +73,12 @@
 
 ### Bug Fixes
 
+- [#3925](https://github.com/KronicDeth/intellij-elixir/pull/3925) [@sh41](https://github.com/sh41)
+  - **A console path written with backslashes now links on Windows.** A compile error prints the
+    path the way the platform writes it, while the virtual file system holds forward slashes, and
+    the two were compared without normalising either - so on the one platform where every console
+    path looks like that, the frame resolved to nothing.
+
 - [#3924](https://github.com/KronicDeth/intellij-elixir/pull/3924) [@sh41](https://github.com/sh41)
   - **Variable completion no longer shows a parameter's name twice.** A parameter that is not bound
     by a match is its own enclosing match, so the match appended after the name only repeated it.

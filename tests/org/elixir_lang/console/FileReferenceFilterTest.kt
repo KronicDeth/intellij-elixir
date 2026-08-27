@@ -49,6 +49,21 @@ class FileReferenceFilterTest : PlatformTestCase() {
         assertEquals(file.virtualFile, (items.single().hyperlinkInfo as FileHyperlinkInfo).descriptor!!.file)
     }
 
+    /**
+     * A compile error on Windows prints the path with backslashes, while the VFS holds forward ones.
+     * Neither `startsWith` nor `endsWith` knows a separator from any other character, so without
+     * normalising both sides the frame resolves to nothing - on the platform where every path in
+     * console output looks like this.
+     */
+    fun testLinksAPathWrittenWithBackslashes() {
+        val file = myFixture.addFileToProject("lib/gald/turn.ex", "defmodule Gald.Turn do\nend\n")
+
+        val items = applyFilter("    (gald) lib\\gald\\turn.ex:38: Gald.Turn.handle_cast/2")
+
+        assertEquals("Expected the backslash path to link, got: $items", 1, items.size)
+        assertEquals(file.virtualFile, (items.single().hyperlinkInfo as FileHyperlinkInfo).descriptor!!.file)
+    }
+
     fun testIgnoresAPathOutsideTheProject() {
         assertEmpty(applyFilter("    (stdlib) gen_server.erl:615: :gen_server.try_dispatch/4"))
     }
