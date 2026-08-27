@@ -5,16 +5,11 @@ import com.intellij.execution.filters.InvalidExpressionException;
 import com.intellij.execution.filters.OpenFileHyperlinkInfo;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.search.FilenameIndex;
-import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.psi.search.ProjectScope;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -29,7 +24,6 @@ public final class FileReferenceFilter implements Filter {
     private static final String FILE_PATH_REGEXP = "\\s*([0-9 a-z_A-Z\\-\\\\./]+)";
     private static final String NUMBER_REGEXP = "([0-9]+)";
 
-    private static final Pattern PATTERN_FILENAME = Pattern.compile("[/\\\\]?([^/\\\\]*?\\.e(ex|x|xs))$");
     private final int myColumnMatchGroup;
     private final int myFileMatchGroup;
     private final int myLineMatchGroup;
@@ -99,13 +93,6 @@ public final class FileReferenceFilter implements Filter {
     }
 
     @Nullable
-    private static VirtualFile pathToVirtualFile(@NotNull String path) {
-        String normalizedPath = path.replace(File.separatorChar, '/');
-
-        return LocalFileSystem.getInstance().findFileByPath(normalizedPath);
-    }
-
-    @Nullable
     @Override
     public Result applyFilter(@NotNull String line, int entireLength) {
         Matcher matcher = myPattern.matcher(line);
@@ -113,7 +100,7 @@ public final class FileReferenceFilter implements Filter {
 
         if (matcher.find()) {
             String filePath = matcher.group(myFileMatchGroup);
-            Collection<VirtualFile> virtualFileCollection = resolveVirtualFileCollection(filePath);
+            Collection<VirtualFile> virtualFileCollection = SourceFileResolver.resolve(myProject, filePath);
 
             if (virtualFileCollection.size() > 0) {
                 List<ResultItem> resultItemList = new ArrayList<>(virtualFileCollection.size());
@@ -137,73 +124,5 @@ public final class FileReferenceFilter implements Filter {
         }
 
         return result;
-    }
-
-    @NotNull
-    private Collection<VirtualFile> resolveVirtualFileCollection(@NotNull String path) {
-        VirtualFile asIsFile = pathToVirtualFile(path);
-
-        if (asIsFile != null) {
-            return Collections.singleton(asIsFile);
-        }
-
-        String basePath = myProject.getBasePath();
-        VirtualFile projectBasedFile = null;
-
-        if (basePath != null) {
-            String projectBasedPath;
-
-            if (path.startsWith(basePath)) {
-                projectBasedPath = path;
-            } else {
-                projectBasedPath = new File(basePath, path).getAbsolutePath();
-            }
-
-            projectBasedFile = pathToVirtualFile(projectBasedPath);
-        }
-
-        Collection<VirtualFile> virtualFileCollection = null;
-
-        if (projectBasedFile != null) {
-            virtualFileCollection = Collections.singleton(projectBasedFile);
-        } else {
-            Matcher filenameMatcher = PATTERN_FILENAME.matcher(path);
-
-            if (filenameMatcher.find()) {
-                String filename = filenameMatcher.group(1);
-                GlobalSearchScope projectScope = ProjectScope.getProjectScope(myProject);
-                virtualFileCollection = resolveVirtualFileCollection(path, filename, projectScope);
-
-                if (virtualFileCollection.size() < 1) {
-                    GlobalSearchScope libraryScope = ProjectScope.getLibrariesScope(myProject);
-
-                    virtualFileCollection = resolveVirtualFileCollection(path, filename, libraryScope);
-                }
-            }
-        }
-
-        if (virtualFileCollection == null) {
-            virtualFileCollection = Collections.emptySet();
-        }
-
-        return virtualFileCollection;
-    }
-
-    @NotNull
-    private Collection<VirtualFile> resolveVirtualFileCollection(@NotNull String path,
-                                                                 @NotNull String basename,
-                                                                 @NotNull GlobalSearchScope scope) {
-        List<VirtualFile> suffixedVirtualFiles = new ArrayList<>();
-        Collection<VirtualFile> projectFilesWithBaseName = FilenameIndex.getVirtualFilesByName(basename, scope);
-
-        for (VirtualFile projectFileWithBaseName : projectFilesWithBaseName) {
-            String virtualFilePath = projectFileWithBaseName.getPath();
-
-            if (virtualFilePath.endsWith(path)) {
-                suffixedVirtualFiles.add(projectFileWithBaseName);
-            }
-        }
-
-        return suffixedVirtualFiles;
     }
 }

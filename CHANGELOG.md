@@ -6,6 +6,17 @@
 
 ### Enhancements
 
+- [#3925](https://github.com/KronicDeth/intellij-elixir/pull/3925) [@sh41](https://github.com/sh41)
+  - **File and line are now linked inside an inspected stack trace.** A crash report often carries
+    its trace as a term rather than a formatted trace, putting each frame's location in a keyword
+    list - `[file: 'lib/gald/phase.ex', line: 75]`. Only the formatted `(app) path:line:` frames
+    were clickable, so the frame that named the failing call had to be found by hand. Every location
+    on the line is linked now, and a path inspected as a `~c` sigil is read the same as a plain
+    charlist. Where `inspect` wrapped the entry so the number sits on its own line, the path still
+    navigates to that line in the Mix, Elixir, Distillery and test-runner consoles; in the IEx
+    consoles it opens the file, because a filter there is given one line at a time with no way to
+    reach the next. Refs [#510](https://github.com/KronicDeth/intellij-elixir/issues/510).
+
 - [#3923](https://github.com/KronicDeth/intellij-elixir/pull/3923) [@sh41](https://github.com/sh41)
   - **Elixir and Erlang SDKs under `/usr/lib64` are now detected automatically.** Gentoo builds both
     with the multilib libdir, and Fedora does for Erlang, so the SDK had to be selected by hand on
