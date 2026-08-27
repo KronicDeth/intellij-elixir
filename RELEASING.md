@@ -20,7 +20,12 @@ The panel shows the version being built plus the five before it, and publishes o
 Hygiene` and `### Build / CI` are recorded for contributors and filtered out. All three settings live in
 `gradle.properties`: `changelogGroups`, `changelogPublishedGroups` and `changelogPublishedVersions`.
 
-**Do this before `buildPlugin`** - the built zip embeds the rendered notes.
+**Do this before dispatching Tag Release** - the zip that workflow builds embeds the rendered
+notes, and it renders the release body from the same file.
+
+Only a release is promoted. A pre-release is cut before promotion: set `pluginVersion` to the
+version being worked toward, leave `## [Unreleased]` where it is, and both the canary's
+`changeNotes` and the GitHub release body come from it.
 
 1. Set `pluginVersion` in `gradle.properties` to the release version.
 2. Promote `## [Unreleased]` into a dated section for it:
@@ -39,32 +44,23 @@ Hygiene` and `### Build / CI` are recorded for contributors and filtered out. Al
 If `## [Unreleased]` is empty the task skips with `missing release note in the 'Unreleased'` and
 changes nothing - which means the release has no notes, so check why before continuing.
 
-## Build Release
-
-1. `pluginVersion` in `gradle.properties` was already set in the previous step. Do **not** edit
-   `resources/META-INF/plugin.xml` - Gradle patches its `<version>` and `<change-notes>` during
-   `patchPluginXml`, so any value committed there is overwritten.
-2. Run the `buildPlugin` gradle task.
-
-The **Tag Release** workflow checks that the tag's version matches `pluginVersion`, so a forgotten
-bump fails before anything is built rather than shipping a mislabelled artifact.
-
-## Smoke Test Built Release
-
-1. Install the build plugin from disk
-  1. Preferences > Plugins
-  2. Click "Install plugin from disk..."
-  3. Select the `build/distributions/intellij-elixir-VERSION.zip`
-  4. Click Open
-  5. Click Apply
-  6. Click Restart
-3. Ensure no errors are raised during re-indexing and reparsing of any previously open files.
-4. Try out new features for this release
-
 ## Tag release
 
-Prefer the **Tag Release** workflow (`.github/workflows/tag.yml`). Its `validate-tag` job runs before
-anything is built, so a mistake costs seconds instead of the whole test matrix, and it checks:
+The **Tag Release** workflow (`.github/workflows/tag.yml`) is what builds a release. Dispatching it
+validates the tag, runs the test matrix, builds the plugin zip, creates the GitHub release, renders
+its body from `CHANGELOG.md` and attaches the artifact. Every step below works from what it
+produced, so there is no local `buildPlugin` step in a release: an unqualified local build stamps a
+`-dev+<timestamp>` version and compiles against whatever `gradle.properties` currently pins, which
+is not what users install.
+
+Do **not** edit `resources/META-INF/plugin.xml` - Gradle patches its `<version>` and
+`<change-notes>` during `patchPluginXml`, so any value committed there is overwritten. The version
+in the zip comes from `-PpluginVersionOverride=<tag without the v>` and the channel from the
+`prerelease` input - canary for a pre-release, default for a release - both of which the workflow
+passes for you.
+
+Its `validate-tag` job runs before anything is built, so a mistake costs seconds instead of the
+whole test matrix, and it checks:
 
 | Check | Applies to |
 |---|---|
@@ -86,35 +82,49 @@ The leading `v` is not decoration: `refs/tags/v*` globs and `git describe` both 
 repository carries tags that got this wrong four different ways (a missing `v`, a doubled `vv`, one
 that is just `v`, and four-component versions).
 
-Tagging by hand **bypasses every check above** - get it right yourself, or use the workflow.
+Tagging by hand **bypasses every check above and builds nothing** - creating the release, rendering
+its notes and attaching a correctly versioned zip all become yours to get right. Use the workflow.
 
 1. `git tag -a vVERSION -m "Version VERSION"`
 2. `git push`
 3. `git push --tags`
 
+## Smoke Test the Released Build
+
+The zip attached to the release is the artifact users install, so smoke test that one rather than a
+local build.
+
+1. Download `intellij-elixir-VERSION.zip` from the release the workflow created.
+2. Install it from disk
+  1. Preferences > Plugins
+  2. Click "Install plugin from disk..."
+  3. Select the downloaded zip
+  4. Click Open
+  5. Click Apply
+  6. Click Restart
+3. Ensure no errors are raised during re-indexing and reparsing of any previously open files.
+4. Try out new features for this release
+
 ## Release Notes
 
-To create release notes for the new tag
+The workflow already published the release: titled with the tag, body rendered from `CHANGELOG.md`,
+zip attached, pre-release flag set. Unlike the plugin's "What's New", that body keeps every group,
+including `### Threading / Platform Hygiene` and `### Build / CI`. What is left is what the
+changelog does not carry.
 
-1. Open [https://github.com/KronicDeth/intellij-elixir](https://github.com/KronicDeth/intellij-elixir)
-2. Click [releases](https://github.com/KronicDeth/intellij-elixir/releases)
-3. Click [Tags](https://github.com/KronicDeth/intellij-elixir/tags)
-4. Click "Add release notes" for tag you pushed
-5. Set the "Release title" to `vVERSION`
-6. Add the release notes
-1. Thanks for bug reporters for the release (use the Milestone filter to find issues fixed for the release version)
-2. The changes for the release - **already filled in** if you used the Tag Release workflow, which
-   renders the body from `CHANGELOG.md`. Unlike the plugin's "What's New", it keeps every group,
-   including `### Threading / Platform Hygiene` and `### Build / CI`.
-3. README updates (copy directly from `README.md`)
-7. Attach the `build/distributions/intellij-elixir-VERSION.zip` binary.
-8. Click Publish Release
+1. Open [releases](https://github.com/KronicDeth/intellij-elixir/releases) and edit the new release
+2. Add thanks for the bug reporters for the release (use the Milestone filter to find issues fixed
+   for the release version)
+3. Add the README updates (copy directly from `README.md`)
+4. Click "Update release"
 
 ## Publish to JetBrains Repository
 
+No workflow runs `publishPlugin`, so this upload is by hand.
+
 1. Go to https://plugins.jetbrains.com/plugin/7522
 2. Click Update Plugin
-3. Click "Choose File" and select `build/distributions/intellij-elixir-VERSION.zip`
+3. Click "Choose File" and select the `intellij-elixir-VERSION.zip` downloaded from the GitHub release
 4. Add a brief summary of important enhancements or bug fixes for the RSS feed
 5. Click "Upload New Build"
 
