@@ -35,18 +35,21 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
      * dialect however old the Elixir it ran. {@code ELIXIR_VERSION} is exported to the test JVM by
      * the build, from the SDK it resolved - the same SDK the quoter was built against.
      *
-     * Absent (a bare {@code ./gradlew test} outside the build's environment), the override is not
-     * installed at all and resolution falls back as production would.
+     * Absent - running a test straight from the IDE, outside the build's environment -
+     * {@link QuotingDialect#of} answers {@link QuotingDialect#FALLBACK}, which is what production
+     * resolves to when no Elixir SDK is configured.
+     *
+     * <p>The override is installed either way, and has to be: skipping it sends
+     * {@code QuotingDialectResolver.dialectFor} into the module model, and this fixture's mock
+     * project has no {@code ProjectFileIndex} for {@code ModuleUtilCore.findModuleForPsiElement} to
+     * find, so every test in this hierarchy dies on a {@code @NotNull} assertion naming neither
+     * Elixir nor the dialect.
      */
     @Override
     protected void setUp() throws Exception {
         super.setUp();
 
-        String elixirVersion = System.getenv("ELIXIR_VERSION");
-
-        if (elixirVersion != null && !elixirVersion.isBlank()) {
-            QuotingDialectResolver.overrideDialect(getProject(), QuotingDialect.of(elixirVersion));
-        }
+        QuotingDialectResolver.overrideDialect(getProject(), QuotingDialect.of(System.getenv("ELIXIR_VERSION")));
     }
 
     protected void assertParsedAndQuotedAroundError() {

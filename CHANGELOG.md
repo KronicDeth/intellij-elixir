@@ -6,6 +6,36 @@
 
 ### Enhancements
 
+- [#3925](https://github.com/KronicDeth/intellij-elixir/pull/3925) [@sh41](https://github.com/sh41)
+  - **File and line are now linked inside an inspected stack trace.** A crash report often carries
+    its trace as a term rather than a formatted trace, putting each frame's location in a keyword
+    list - `[file: 'lib/gald/phase.ex', line: 75]`. Only the formatted `(app) path:line:` frames
+    were clickable, so the frame that named the failing call had to be found by hand. Every location
+    on the line is linked now, and a path inspected as a `~c` sigil is read the same as a plain
+    charlist. Where `inspect` wrapped the entry so the number sits on its own line, the path still
+    navigates to that line in the Mix, Elixir, Distillery and test-runner consoles; in the IEx
+    consoles it opens the file, because a filter there is given one line at a time with no way to
+    reach the next. Refs [#510](https://github.com/KronicDeth/intellij-elixir/issues/510).
+  - **Stack traces are now linked in the Terminal tool window as well.** `iex -S mix`, `mix test`
+    and `mix phx.server` run from the Terminal had no Elixir linking at all, because the filters
+    were only ever attached to consoles the plugin's own run configurations built. They are now
+    contributed to every console the IDE builds for a project with an Elixir module or SDK, and on
+    the reworked terminal engine a wrapped entry links to its exact line rather than to the top of
+    the file.
+  - **Erlang, HEEx and LEEx locations in a trace are now linked too.** A stack trace mixes them with
+    Elixir freely, but only `.ex`, `.exs` and `.eex` were recognised, so an Erlang dependency's frame
+    stayed plain text beside the Elixir frames around it. Whether a path then opens still depends on
+    the file being indexed - see the Erlang SDK source roots below.
+  - **An Erlang SDK now exposes its own sources.** OTP ships them beside the compiled beams, in
+    `lib/<app>-<version>/src`, but only the `ebin` directories were registered, so an OTP frame in a
+    stack trace named a file nothing indexed could find and `gen_server.erl` was not navigable.
+    Existing SDKs pick the roots up on the next refresh.
+  - **External Libraries now shows an SDK application's source beside its beams.** A tree node for an
+    application that ships both is now the application itself, holding `ebin` and the `lib` or `src`
+    next to it; one shipping only beams is unchanged. An SDK node's children are its class roots
+    alone, so the source directory has to be put there deliberately - registering it as a source root
+    makes it searchable, not visible.
+
 - [#3923](https://github.com/KronicDeth/intellij-elixir/pull/3923) [@sh41](https://github.com/sh41)
   - **Elixir and Erlang SDKs under `/usr/lib64` are now detected automatically.** Gentoo builds both
     with the multilib libdir, and Fedora does for Erlang, so the SDK had to be selected by hand on
@@ -42,6 +72,12 @@
   - **`.beam` files compiled by OTP 24 through 29 decompile to valid Elixir.**
 
 ### Bug Fixes
+
+- [#3925](https://github.com/KronicDeth/intellij-elixir/pull/3925) [@sh41](https://github.com/sh41)
+  - **A console path written with backslashes now links on Windows.** A compile error prints the
+    path the way the platform writes it, while the virtual file system holds forward slashes, and
+    the two were compared without normalising either - so on the one platform where every console
+    path looks like that, the frame resolved to nothing.
 
 - [#3924](https://github.com/KronicDeth/intellij-elixir/pull/3924) [@sh41](https://github.com/sh41)
   - **Variable completion no longer shows a parameter's name twice.** A parameter that is not bound

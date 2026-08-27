@@ -1,5 +1,6 @@
 package org.elixir_lang.code_insight.highlighting.brace_matcher;
 
+import com.intellij.codeInsight.highlighting.BraceMatcher;
 import com.intellij.codeInsight.highlighting.BraceMatchingUtil;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.highlighter.HighlighterIterator;
@@ -48,6 +49,14 @@ public class Issue443Test extends PlatformTestCase {
         CharSequence text = editor.getDocument().getCharsSequence();
         FileType fileType = ElixirFileType.INSTANCE;
         HighlighterIterator iterator = editor.getHighlighter().createIterator(offset);
+
+        // Which matcher answered, before what it answered. The platform resolves it from the token's
+        // language, and a lookup that misses silently yields the default matcher - which knows only
+        // `(`, `[` and `{` and so returns false to everything. That would leave the two tests
+        // expecting false passing for the wrong reason while only testDoBlock failed, pointing at
+        // `do` rather than at the matcher that was never consulted.
+        BraceMatcher braceMatcher = BraceMatchingUtil.getBraceMatcher(fileType, iterator);
+        assertInstanceOf(braceMatcher, NonTrivial.class);
 
         return BraceMatchingUtil.isLBraceToken(iterator, text, fileType);
     }

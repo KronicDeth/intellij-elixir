@@ -43,10 +43,17 @@ class DoBlockMatchBraceMatcherTest : PlatformTestCase() {
         val fileType = ElixirFileType.INSTANCE
         assertNotNull("File type should not be null", fileType)
 
-        // Step 6: Get the brace matcher
+        // Step 6: Get the brace matcher.
+        //
+        // Assert which one, not just that there is one. The platform resolves it from the token's
+        // language, and when that lookup misses it silently answers the default matcher - which
+        // knows only `(`, `[` and `{`, so every question below it becomes false. Every recovery
+        // branch in BraceMatchingUtil.getBraceMatcher misses for Elixir: the plugin registers only
+        // `lang.braceMatcher`, no `braceMatcher filetype=`, and ElixirLanguage has no base language.
+        // Without this line that shows up as `do` simply not matching `end`, which says nothing
+        // about why.
         val braceMatcher = BraceMatchingUtil.getBraceMatcher(fileType, iterator)
-        assertNotNull("Brace matcher should not be null", braceMatcher)
-        println("Brace matcher class: ${braceMatcher.javaClass.simpleName}")
+        assertInstanceOf(braceMatcher, NonTrivial::class.java)
 
         // Step 7: Check if it's a left brace token
         val isBrace = BraceMatchingUtil.isLBraceToken(iterator, document.charsSequence, fileType)

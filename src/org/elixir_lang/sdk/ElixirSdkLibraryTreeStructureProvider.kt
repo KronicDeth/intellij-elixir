@@ -20,22 +20,24 @@ import org.elixir_lang.jps.shared.ErlangSdkTypeId
 import org.elixir_lang.mix.library.CONSOLIDATED_LIBRARY_SUFFIX
 
 /**
- * Replaces Elixir/Erlang SDK "ebin" class root nodes in External Libraries with the sibling "lib" source
- * directory node when one exists.
+ * Lifts an Elixir/Erlang SDK "ebin" class root node in External Libraries to the application
+ * directory that holds it, so the beams and the source beside them are both reachable.
  *
- * For OTP applications written in Elixir (e.g., `iex`, `elixir`, `logger`, `mix`, `ex_unit`), the
- * SDK path layout is:
+ * An OTP application keeps its source beside its beams, under a name that depends on the language it
+ * is written in:
  * ```
- * lib/<app>/ebin/  ← beam files (CLASSES root)
- * lib/<app>/lib/   ← .ex source files (SOURCES root)
+ * lib/<app>/ebin/         ← beam files (CLASSES root)
+ * lib/<app>/lib/          ← .ex source, for an application written in Elixir (SOURCES root)
+ * lib/<app>-<version>/src ← .erl source, for one written in Erlang (SOURCES root)
  * ```
  *
- * Without this provider, External Libraries shows only beam files (from the CLASSES roots).
- * With this provider, External Libraries shows the .ex source directory instead - which is far more
- * useful for code browsing.
+ * Without this provider, External Libraries lists each root separately, every one of them labelled
+ * by its own generic directory name. With it, an application that has both appears once, and
+ * expanding it gives `ebin` and `lib`/`src`.
  *
- * For Erlang-only OTP apps (no `lib/` sibling), the original `ebin` node is kept so beam files
- * remain visible.
+ * An application shipping only beams has no source sibling, so there is nothing to choose between
+ * and that level is skipped: its `ebin` node stands as it is, named after the application by
+ * [ElixirSdkLibraryNodeDecorator].
  *
  * Works in tandem with [ElixirSdkLibraryNodeDecorator] which renames the resulting "lib" (and
  * remaining "ebin") nodes from their generic directory name to the parent application name.
@@ -82,9 +84,10 @@ internal class ElixirSdkLibraryTreeStructureProvider : TreeStructureProvider, Du
         if (parent !is NamedLibraryElementNode) return children
         val project = parent.project ?: return children
 
-        // Apply ebin→lib replacement for SDK roots first, so replaced nodes get the right env detected.
+        // Pair each SDK application's beams with its source first, so the grouped node gets the
+        // right env detected below.
         val processed = children.map { child ->
-            tryReplaceEbinWithLib(child, project, settings) ?: child
+            tryGroupEbinWithSource(child, project, settings) ?: child
         }
 
         // Group Mix build roots by their _build environment (e.g. "dev", "test").
@@ -107,7 +110,28 @@ internal class ElixirSdkLibraryTreeStructureProvider : TreeStructureProvider, Du
         return result
     }
 
-    private fun tryReplaceEbinWithLib(
+    private companion object {
+        /**
+         * Siblings of an `ebin` that hold source, in the order they are preferred. An application
+         * written in Elixir keeps its `.ex` under `lib`; OTP's own applications keep their `.erl`
+         * under `src`.
+         */
+        private val SOURCE_DIRECTORY_NAMES = listOf("lib", "src")
+    }
+
+    /**
+     * Presents one SDK application as a single node holding both its beams and its source.
+     *
+     * An SDK node's children are its `CLASSES` roots and nothing else -
+     * `LibraryGroupNode.addLibraryChildren` calls `getRootFiles(OrderRootType.CLASSES)` for a
+     * `JdkOrderEntry`, unlike a library entry, which contributes its source roots too. So the `src`
+     * or `lib` beside an `ebin` never arrives as a sibling here and has to be built.
+     *
+     * An application shipping only beams has no source sibling; there is nothing to tell apart, so
+     * that level is skipped and its `ebin` node stands as it is, named after the application by
+     * [ElixirSdkLibraryNodeDecorator].
+     */
+    private fun tryGroupEbinWithSource(
         node: AbstractTreeNode<*>,
         project: Project,
         settings: ViewSettings,
@@ -119,11 +143,40 @@ internal class ElixirSdkLibraryTreeStructureProvider : TreeStructureProvider, Du
         // O(1) set lookup - avoids scanning all SDKs per child
         if (ebinVFile !in ElixirSdkRootsCache.classRoots()) return null
 
-        // Replace ebin with the sibling lib directory when it exists (Elixir apps have .ex source there)
-        val libVFile = ebinVFile.parent?.findChild("lib")?.takeIf { it.isDirectory } ?: return null
-        val psiLibDir = PsiManager.getInstance(project).findDirectory(libVFile) ?: return null
-        return PsiDirectoryNode(project, psiLibDir, settings)
+        val applicationVFile = ebinVFile.parent ?: return null
+        val sourceVFile = SOURCE_DIRECTORY_NAMES
+            .firstNotNullOfOrNull { name -> applicationVFile.findChild(name)?.takeIf { it.isDirectory } }
+            ?: return null
+        val psiSourceDir = PsiManager.getInstance(project).findDirectory(sourceVFile) ?: return null
+
+        return ApplicationGroupNode(
+            project,
+            applicationVFile.name,
+            listOf(node, PsiDirectoryNode(project, psiSourceDir, settings)),
+            settings,
+        )
     }
+}
+
+/**
+ * A virtual (non-PSI) tree node representing one SDK application (e.g. `stdlib-7.1`, `iex`).
+ *
+ * Groups that application's `ebin` with the `lib` or `src` beside it, which would otherwise appear
+ * as separate roots each named after the same application.
+ */
+private class ApplicationGroupNode(
+    project: Project,
+    applicationName: String,
+    private val applicationChildren: List<AbstractTreeNode<*>>,
+    settings: ViewSettings,
+) : ProjectViewNode<String>(project, applicationName, settings) {
+    override fun getChildren(): Collection<AbstractTreeNode<*>> = applicationChildren
+    override fun update(presentation: PresentationData) {
+        presentation.presentableText = value
+        presentation.setIcon(AllIcons.Nodes.Folder)
+    }
+    override fun contains(file: VirtualFile): Boolean =
+        applicationChildren.any { (it as? ProjectViewNode<*>)?.contains(file) == true }
 }
 
 /**

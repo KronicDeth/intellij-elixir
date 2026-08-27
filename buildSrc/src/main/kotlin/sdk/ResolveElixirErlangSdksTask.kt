@@ -93,6 +93,7 @@ abstract class ResolveElixirErlangSdksTask : DefaultTask() {
             elixirInstaller = installer
         )
         val resolved = resolver.resolve()
+        requireDetectedVersions(resolved)
 
         val output = outputFile.get().asFile
         output.parentFile.mkdirs()
@@ -104,5 +105,33 @@ abstract class ResolveElixirErlangSdksTask : DefaultTask() {
                 "version=${resolved.elixir.actualVersion ?: "unknown"})."
         )
         logger.lifecycle("Wrote SDK properties to ${output.absolutePath}")
+    }
+
+    /**
+     * Fails rather than recording a version the resolver could not read off the SDK.
+     *
+     * [ElixirErlangSdkResolver] warns and carries on with a null version, which used to be written
+     * out as an empty field. Nothing downstream treats that as an error: `elixirTestEnvironment`
+     * maps it to a blank `ELIXIR_VERSION`, and the parser tests read that to decide the quoting
+     * dialect, so a blank silently changes what they assert. Worse, this task is `@OutputFile`-based
+     * and its inputs are the *expected* versions - so one bad resolution stays UP-TO-DATE and is
+     * served to every later run until an input happens to change.
+     */
+    private fun requireDetectedVersions(resolved: ResolvedSdks) {
+        val undetected = listOf(resolved.erlang, resolved.elixir).filter { it.actualVersion.isNullOrBlank() }
+        if (undetected.isEmpty()) return
+
+        throw GradleException(
+            buildString {
+                appendLine("Resolved an SDK whose version could not be read:")
+                undetected.forEach {
+                    appendLine("    ${it.name}: expected ${it.expectedVersion ?: "unknown"}, found at ${it.homePath} (source=${it.source})")
+                }
+                appendLine("The version is not cosmetic - it selects the quoting dialect the parser tests")
+                appendLine("assert against, so recording a blank would change what they test.")
+                appendLine("Check that the SDK above runs, or name the versions explicitly:")
+                append("    -PelixirVersion=<version> -PotpVersion=<version>")
+            }
+        )
     }
 }

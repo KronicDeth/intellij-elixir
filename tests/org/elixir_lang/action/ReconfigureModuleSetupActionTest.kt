@@ -46,6 +46,8 @@ class ReconfigureModuleSetupActionTest : PlatformTestCase() {
 
     override fun tearDown() {
         try {
+            removeElixirFacetIfPresent()
+
             if (addedContentRootUrls.isNotEmpty()) {
                 ModuleRootModificationUtil.updateModel(module) { model ->
                     for (entry in model.contentEntries.toList()) {

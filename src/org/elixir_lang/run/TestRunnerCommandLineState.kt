@@ -11,7 +11,6 @@ import com.intellij.execution.runners.ProgramRunner
 import com.intellij.execution.testframework.autotest.ToggleAutoTestAction
 import com.intellij.execution.testframework.sm.SMTestRunnerConnectionUtil
 import com.intellij.execution.testframework.sm.runner.SMTRunnerConsoleProperties
-import org.elixir_lang.console.ElixirConsoleUtil
 
 
 abstract class TestRunnerCommandLineState<T>(environment: ExecutionEnvironment, configuration: T) :
@@ -32,7 +31,6 @@ abstract class TestRunnerCommandLineState<T>(environment: ExecutionEnvironment, 
 
         val properties = createTestConsoleProperties(executor)
         val console = SMTestRunnerConnectionUtil.createAndAttachConsole(TEST_FRAMEWORK_NAME, processHandler, properties)
-        ElixirConsoleUtil.attachFilters(configuration.project, console)
 
         val executionResult = DefaultExecutionResult(console, processHandler, *createActions(console, processHandler))
         executionResult.setRestartActions(ToggleAutoTestAction())
