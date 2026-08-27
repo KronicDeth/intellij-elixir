@@ -1,0 +1,3 @@
+Elixir File
+  ElixirEexImpl(EEX)
+    PsiElement(EEx Data)('<MyAppWeb.CoreComponents.button>Click</MyAppWeb.CoreComponents.button>')

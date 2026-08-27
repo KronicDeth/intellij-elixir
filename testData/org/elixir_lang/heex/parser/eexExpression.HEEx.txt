@@ -1,0 +1,8 @@
+HTML Embedded Elixir File
+  PsiElement(Data)('<p>')
+  HEExTagImpl(TAG)
+    PsiElement(<%)('<%')
+    PsiElement(=)('=')
+    PsiElement(Elixir)(' @x ')
+    PsiElement(%>)('%>')
+  PsiElement(Data)('</p>')

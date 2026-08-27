@@ -84,6 +84,65 @@
         <lang.parserDefinition language="EEx" implementationClass="org.elixir_lang.eex.ParserDefinition"/>
         <!--<lang.psiStructureViewFactory language="EEx" implementationClass="org.elixir_lang.eex.PsiStructureViewFactory"/>-->
 
+        <!-- HEEx -->
+        <fileType.fileViewProviderFactory
+            filetype="HEEx"
+            implementationClass="org.elixir_lang.heex.file.view_provider.Factory"
+        />
+        <fileType name="HTML Embedded Elixir"
+            implementationClass="org.elixir_lang.heex.file.Type"
+            fieldName="INSTANCE"
+            language="HEEx"
+            extensions="heex"
+        />
+        <lang.fileViewProviderFactory
+            language="HEEx"
+            implementationClass="org.elixir_lang.heex.file.view_provider.Factory"
+        />
+        <lang.parserDefinition
+            language="HEEx"
+            implementationClass="org.elixir_lang.heex.ParserDefinition"
+        />
+
+        <!-- Registered per data language, so it runs for every HTML-data template language; the
+             patcher itself ignores ranges that are not HEEx's. -->
+        <outerLanguageRangePatcher
+            language="HTML"
+            implementationClass="org.elixir_lang.heex.html.HeexHTMLOuterLanguageRangePatcher"
+        />
+
+        <!-- Resolves `<.button>` / `<MyAppWeb.CoreComponents.button>` component tags to the
+             `def`/`defp` they name, giving them navigation, find-usages and rename, and offers the
+             view module's arity-1 call definitions for tag-name completion. -->
+        <xml.elementDescriptorProvider
+            implementation="org.elixir_lang.heex.xml.HeexComponentDescriptorProvider"
+        />
+        <xml.tagNameProvider
+            implementation="org.elixir_lang.heex.xml.HeexComponentTagNameProvider"
+        />
+
+        <!-- Component tag name -> FunctionSymbol, so Rename works from the tag. -->
+        <psi.symbolReferenceProvider hostElementClass="com.intellij.psi.xml.XmlTag"
+                                     hostLanguage="HTML"
+                                     implementationClass="org.elixir_lang.heex.xml.HeexComponentSymbolReferenceProvider"
+                                     targetClass="org.elixir_lang.model.psi.function.FunctionSymbol"/>
+
+        <!-- HEEx special attributes (:let, :if, :for, :key, :type) and phx-* bindings on HTML tags. -->
+        <xml.attributeDescriptorsProvider
+            implementation="org.elixir_lang.heex.xml.HeexAttributeDescriptorsProvider"
+        />
+
+        <!-- Disable some unhelpful HTML inspections that are false positives for HEEx components -->
+        <lang.inspectionSuppressor
+            language="HTML"
+            implementationClass="org.elixir_lang.heex.inspections.HTMLInspectionSuppressor"
+        />
+
+        <!-- Quick Docs on a component tag: widens the resolved name identifier to its def/defp. -->
+        <platform.backend.documentation.psiTargetProvider
+            implementation="org.elixir_lang.heex.documentation.HeexComponentDocumentationTargetProvider"
+        />
+
         <!-- Mix related extensions -->
         <configurationType implementation="org.elixir_lang.mix.configuration.Type"/>
 
@@ -361,6 +420,8 @@
                                   implementationClass="org.elixir_lang.exunit.ExUnitLineMarkerProvider"/>
 
         <lang.parserDefinition language="Elixir" implementationClass="org.elixir_lang.ElixirParserDefinition"/>
+        <!-- EEx Data leaves are OuterLanguageElements; see EexDataAstFactory. -->
+        <lang.ast.factory language="Elixir" implementationClass="org.elixir_lang.psi.EexDataAstFactory"/>
         <lang.psiStructureViewFactory language="Elixir" implementationClass="org.elixir_lang.structure_view.Factory"/>
         <!-- Breadcrumbs (path shown at the bottom of the editor) and Sticky Lines (declarations pinned to the top of
              the editor while scrolling) are both derived from this provider; the platform has no separate sticky-lines

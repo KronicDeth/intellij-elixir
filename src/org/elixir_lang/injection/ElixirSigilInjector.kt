@@ -1,13 +1,13 @@
 package org.elixir_lang.injection
 
 import com.intellij.lang.Language
-import com.intellij.lang.html.HTMLLanguage
 import com.intellij.lang.injection.MultiHostInjector
 import com.intellij.lang.injection.MultiHostRegistrar
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
+import org.elixir_lang.heex.HeexLanguage
 import org.elixir_lang.psi.ElixirInterpolation
 import org.elixir_lang.psi.HeredocLineable
 import org.elixir_lang.psi.SigilHeredocLiteral
@@ -98,7 +98,7 @@ internal class ElixirSigilInjector : MultiHostInjector {
         LOG.debug("languageForSigil: sigilName='$sigilName'")
 
         return when (sigilName) {
-            'H' -> HTMLLanguage.INSTANCE
+            'H' -> HeexLanguage.INSTANCE
             'L' -> EexLanguage.INSTANCE
             'r' -> RegExpLanguage.INSTANCE
             else -> null

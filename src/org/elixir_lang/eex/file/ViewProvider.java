@@ -118,6 +118,17 @@ public class ViewProvider extends MultiplePsiFilesPerDocumentFileViewProvider
         return psiFileImpl;
     }
 
+    // @ApiStatus.Experimental on TemplateLanguageFileViewProvider. Called by the platform's
+    // InjectionRegistrarImpl (via MultipleRootsInjectedFileViewProvider.Template) for injected
+    // fragments such as a ~L sigil, which never calls createFile - without this override the
+    // injected data and Elixir roots parse raw text with no outer-element stripping and no
+    // chameleon.
+    @Nullable
+    @Override
+    public IElementType getContentElementType(@NotNull com.intellij.lang.Language language) {
+        return language.isKindOf(getBaseLanguage()) ? null : elementType(language);
+    }
+
     @Nullable
     private ParserDefinition getDefinition(@NotNull com.intellij.lang.Language language) {
         com.intellij.lang.Language baseLanguage = getBaseLanguage();

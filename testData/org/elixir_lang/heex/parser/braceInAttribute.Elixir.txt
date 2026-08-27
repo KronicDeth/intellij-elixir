@@ -1,0 +1,13 @@
+Elixir File
+  ElixirEexImpl(EEX)
+    PsiElement(EEx Data)('<div class=')
+    ElixirEexTagImpl(EEX_TAG)
+      PsiElement(<%)('{')
+      ElixirUnmatchedAtOperationImpl(UNMATCHED_AT_OPERATION)
+        ElixirAtPrefixOperatorImpl(AT_PREFIX_OPERATOR)
+          PsiElement(@)('@')
+        UNMATCHED_UNQUALIFIED_NO_ARGUMENTS_CALL
+          ElixirIdentifierImpl(IDENTIFIER)
+            PsiElement(identifier)('class')
+      PsiElement(%>)('}')
+    PsiElement(EEx Data)('>hi</div>')

@@ -1,0 +1,13 @@
+Elixir File
+  ElixirEexImpl(EEX)
+    PsiElement(EEx Data)('<.tag one=')
+    ElixirEexTagImpl(EEX_TAG)
+      PsiElement(<%)('{')
+      ElixirAccessExpressionImpl(ACCESS_EXPRESSION)
+        ElixirLineImpl(LINE)
+          PsiElement({, [, <, ", /, (, |, ')('"')
+          ElixirLineBodyImpl(LINE_BODY)
+            <empty list>
+          PsiElement(}, ], >, ", /, ), |, ')('"')
+      PsiElement(%>)('}')
+    PsiElement(EEx Data)(' class=""/>')

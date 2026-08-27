@@ -1,0 +1,3 @@
+Elixir File
+  ElixirEexImpl(EEX)
+    PsiElement(EEx Data)('<!-- a comment --><p>after</p>')

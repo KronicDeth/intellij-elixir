@@ -1,0 +1,8 @@
+HTML Embedded Elixir File
+  PsiElement(Data)('<p>a</p>')
+  HEExTagImpl(TAG)
+    PsiElement(<%)('<%')
+    PsiElement(#)('!--')
+    PsiComment(Comment)(' a comment ')
+    PsiElement(%>)('--%>')
+  PsiElement(Data)('<p>b</p>')

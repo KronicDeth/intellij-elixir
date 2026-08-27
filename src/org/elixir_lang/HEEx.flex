@@ -1,0 +1,169 @@
+package org.elixir_lang.heex.lexer;
+
+import com.intellij.psi.TokenType;
+import com.intellij.psi.tree.IElementType;
+import org.elixir_lang.heex.psi.Types;
+
+%%
+
+// public instead of package-local to make testing easier.
+%public
+%class Flex
+%implements com.intellij.lexer.FlexLexer
+%unicode
+%ignorecase
+%function advance
+%type IElementType
+%eof{  return;
+%eof}
+
+%{
+  private int openBraceCount = 0;
+
+  // The lexical state to return to once an embedded <% %>/<%= %> tag closes - YYINITIAL, or
+  // SCRIPT_TAG/STYLE_TAG if the tag was encountered while inside a <script>/<style> body. Not part
+  // of getState(): every {OPENING} match writes it before WHITESPACE_MAYBE reads it, and
+  // WHITESPACE_MAYBE is never entered at state 0, so restarting the lexer cannot observe a stale value.
+  private int tagReturnState = YYINITIAL;
+
+  private void handleInState(int nextLexicalState) {
+    yypushback(yylength());
+    yybegin(nextLexicalState);
+  }
+%}
+
+OPENING = "<%"
+CLOSING = "%>"
+LONG_COMMENT_OPENING = "<%!--"
+LONG_COMMENT_CLOSING = "--%>"
+
+BRACE_OPENING = "{"
+BRACE_CLOSING = "}"
+
+COMMENT_MARKER = "#"
+EQUALS_MARKER = "="
+// See https://github.com/elixir-lang/elixir/pull/6281
+FORWARD_SLASH_MARKER = "/"
+PIPE_MARKER = "|"
+ESCAPED_OPENING = "<%%"
+PROCEDURAL_OPENING = {OPENING} " "
+
+WHITE_SPACE = [\ \t\f\r\n]+
+ANY = [^]
+
+START_SCRIPT_TAG = <script[\s>]
+END_SCRIPT_TAG = "</script>"
+START_STYLE_TAG = <style[\s>]
+END_STYLE_TAG = "</style>"
+// A self-closing <script .../> or <style .../> never has a body, so it must not enter
+// SCRIPT_TAG/STYLE_TAG - only the whitespace-or-">" cases above do. The leading \s (rather than
+// [^<>]*) is what tells this apart from START_SCRIPT_TAG/START_STYLE_TAG: a bare "<script>" has no
+// attributes to require whitespace before ">/", so it still falls through to those rules.
+SELF_CLOSING_TAIL = \s [^<>]* "/>"
+
+%state WHITESPACE_MAYBE
+%state COMMENT
+%state ELIXIR
+%state MARKER_MAYBE
+%state BEGIN_MATCHED_BRACES, MATCHED_BRACES
+%state STYLE_TAG,SCRIPT_TAG
+%state LONG_COMMENT_MARKER, LONG_COMMENT
+
+%%
+
+<YYINITIAL> {
+  {BRACE_OPENING}   { yybegin(BEGIN_MATCHED_BRACES);
+                      return Types.BRACE_OPENING; }
+  "<script" / {SELF_CLOSING_TAIL} { return Types.DATA; }
+  "<style"  / {SELF_CLOSING_TAIL} { return Types.DATA; }
+  {START_SCRIPT_TAG} { yybegin(SCRIPT_TAG); return Types.DATA; }
+  {START_STYLE_TAG} { yybegin(STYLE_TAG); return Types.DATA; }
+}
+
+<SCRIPT_TAG> {
+  {END_SCRIPT_TAG}  { yybegin(YYINITIAL); return Types.DATA; }
+}
+
+<STYLE_TAG> {
+  {END_STYLE_TAG}  { yybegin(YYINITIAL); return Types.DATA; }
+}
+
+<YYINITIAL,SCRIPT_TAG,STYLE_TAG> {
+  {ESCAPED_OPENING}      { return Types.ESCAPED_OPENING; }
+  {LONG_COMMENT_OPENING} { tagReturnState = yystate();
+                           yypushback(3);
+                           yybegin(LONG_COMMENT_MARKER);
+                           return Types.OPENING; }
+  {OPENING}              { tagReturnState = yystate();
+                           yybegin(MARKER_MAYBE);
+                           return Types.OPENING; }
+  {ANY}                  { return Types.DATA; }
+}
+
+<LONG_COMMENT_MARKER> {
+  "!--" { yybegin(LONG_COMMENT);
+          return Types.COMMENT_MARKER; }
+}
+
+<LONG_COMMENT> {
+  {LONG_COMMENT_CLOSING} { yybegin(WHITESPACE_MAYBE);
+                            return Types.CLOSING; }
+  {ANY}                  { return Types.COMMENT; }
+}
+
+<MARKER_MAYBE> {
+  {COMMENT_MARKER}       { yybegin(COMMENT);
+                           return Types.COMMENT_MARKER; }
+  {EQUALS_MARKER}        { yybegin(ELIXIR);
+                           return Types.EQUALS_MARKER; }
+  {FORWARD_SLASH_MARKER} { yybegin(ELIXIR);
+                           return Types.FORWARD_SLASH_MARKER; }
+  {PIPE_MARKER}          { yybegin(ELIXIR);
+                           return Types.PIPE_MARKER; }
+  {ANY}                  { handleInState(ELIXIR);
+                           return Types.EMPTY_MARKER; }
+}
+
+<BEGIN_MATCHED_BRACES> {
+  // We pretend there is an equals marker so it looks like a <%= tag to the Elixir parser
+  {ANY}                  { handleInState(MATCHED_BRACES);
+                           return Types.EQUALS_MARKER; }
+}
+
+<MATCHED_BRACES> {
+  // `\{` and `\}` are opaque two-character escapes: they do not open or close nesting.
+  // See https://github.com/phoenixframework/phoenix_live_view/blob/main/lib/phoenix_live_view/tag_engine/tokenizer.ex
+  "\\" [{}]              { return Types.ELIXIR; }
+  {BRACE_OPENING}        { openBraceCount++;
+                           return Types.ELIXIR; }
+  {BRACE_CLOSING}        {
+                           if (openBraceCount > 0) {
+                             openBraceCount--;
+                             return Types.ELIXIR;
+                           } else {
+                             yybegin(YYINITIAL);
+                             return Types.BRACE_CLOSING;
+                           }
+                         }
+  {ANY}                  { return Types.ELIXIR; }
+}
+
+<COMMENT, ELIXIR> {
+  {CLOSING} { yybegin(WHITESPACE_MAYBE);
+              return Types.CLOSING; }
+}
+
+<COMMENT> {
+  {ANY} { return Types.COMMENT; }
+}
+
+<ELIXIR> {
+  {ANY} { return Types.ELIXIR; }
+}
+
+<WHITESPACE_MAYBE> {
+  // Only completely whitespace before a procedural tag counts as whitespace
+  {WHITE_SPACE} / {PROCEDURAL_OPENING} { yybegin(tagReturnState);
+                                         return TokenType.WHITE_SPACE; }
+  {ANY}                                { handleInState(tagReturnState); }
+}

@@ -1,0 +1,9 @@
+Elixir File
+  ElixirEexImpl(EEX)
+    PsiElement(EEx Data)('<p>a</p>')
+    ElixirEexTagImpl(EEX_TAG)
+      PsiElement(<%)('<%')
+      PsiElement(EEx Comment Marker (#))('!--')
+      PsiElement(EEx Comment)(' a comment ')
+      PsiElement(%>)('--%>')
+    PsiElement(EEx Data)('<p>b</p>')

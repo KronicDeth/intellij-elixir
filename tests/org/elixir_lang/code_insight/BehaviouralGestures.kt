@@ -20,6 +20,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
 import com.intellij.psi.search.GlobalSearchScope
+import com.intellij.psi.util.PsiUtilBase
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import junit.framework.TestCase.assertNull
 import junit.framework.TestCase.assertTrue
@@ -331,7 +332,7 @@ private fun CodeInsightTestFixture.psiUsagesAtCaret(
     project: Project,
     selectTarget: (List<SearchTarget>) -> SearchTarget?
 ): List<PsiUsage> {
-    val targetFile = file
+    val targetFile = symbolResolutionFile(project)
     val offset = caretOffset
     val allOptions = AllSearchOptions(
         UsageOptions.createOptions(GlobalSearchScope.allScope(project)),
@@ -351,7 +352,8 @@ fun CodeInsightTestFixture.nonDeclarationUsageCountAtCaret(project: Project): In
 
 /** Number of Find Usages search targets resolved at the caret. */
 @Suppress("UnstableApiUsage")
-fun CodeInsightTestFixture.searchTargetCountAtCaret(): Int = searchTargets(file, caretOffset).size
+fun CodeInsightTestFixture.searchTargetCountAtCaret(): Int =
+    searchTargets(symbolResolutionFile(project), caretOffset).size
 
 /**
  * Renames the symbol at the caret the way the user-facing Rename refactoring (Shift+F6) does.
@@ -367,8 +369,31 @@ fun CodeInsightTestFixture.searchTargetCountAtCaret(): Int = searchTargets(file,
  */
 @Suppress("UnstableApiUsage")
 fun CodeInsightTestFixture.renameTargetAtCaret(newName: String) {
-    val targets = targetSymbols(file, caretOffset).filterIsInstance<RenameTarget>().distinct()
+    val targets = renameTargetsAtCaret()
     val target = targets.singleOrNull()
         ?: throw AssertionError("Expected exactly one rename target at the caret, got ${targets.size}: $targets")
     renameTarget(target, newName)
 }
+
+/**
+ * The distinct [RenameTarget]s [targetSymbols] resolves at the caret, without asserting there is
+ * exactly one - for callers (like negative-case tests) that want to inspect the count/contents
+ * themselves rather than drive an actual rename.
+ */
+@Suppress("UnstableApiUsage")
+fun CodeInsightTestFixture.renameTargetsAtCaret(): List<RenameTarget> =
+    targetSymbols(symbolResolutionFile(project), caretOffset).filterIsInstance<RenameTarget>().distinct()
+
+/**
+ * The `PsiFile` production actually resolves a caret's `targetSymbols`/`searchTargets` lookup
+ * against: `PsiUtilBase.getPsiFileInEditor(editor, project)`, the same call
+ * `com.intellij.find.usages.ide.actions.targetsFromEditor` and
+ * `com.intellij.lang.documentation.ide.actions.targetsFromEditor` make from the real `EDITOR` data
+ * key. For a single-language file this is [file] itself (a no-op). For a HEEx multi-root view
+ * provider it is not: [file] is the base-language (HEEx) root, whose leaves are coarse `Data` tokens
+ * with no `XmlTag` ancestor, so a caret on a component tag would falsely report no target if [file]
+ * were used directly here - `targetSymbols`/`searchTargets` never leave the `PsiFile` they are given.
+ */
+@Suppress("UnstableApiUsage")
+private fun CodeInsightTestFixture.symbolResolutionFile(project: Project): PsiFile =
+    PsiUtilBase.getPsiFileInEditor(editor, project) ?: file

@@ -1,0 +1,2 @@
+HTML Embedded Elixir File
+  PsiElement(Data)('<MyAppWeb.CoreComponents.button>Click</MyAppWeb.CoreComponents.button>')

@@ -71,6 +71,23 @@
     1.20.2 parses without spurious errors, including syntax whose meaning changed between releases.
   - **`.beam` files compiled by OTP 24 through 29 decompile to valid Elixir.**
 
+- [#3696](https://github.com/KronicDeth/intellij-elixir/pull/3696) [@mwnciau](https://github.com/mwnciau), [@sh41](https://github.com/sh41)
+  - **`.heex` files are now recognized as HEEx**, with dedicated syntax highlighting for `{@assigns}`/
+    `{expressions}`, `<% %>`/`<%= %>` tags, and `<%!-- ... --%>` HEEx comments.
+  - **`~H` sigils now use the same HEEx language as `.heex` files**, with separate HTML and Elixir
+    PSI roots, instead of being treated as plain HTML text. Opt-in via Settings → Languages &
+    Frameworks → Elixir → Experimental → "Enable ~H Sigil HEEx language injection".
+  - **`<.component>` and `<Module.component>` tags now resolve** to their `def`/`defp` definition -
+    local components, components brought in via an explicit `import`, and components brought in via
+    `use MyAppWeb, :html` all navigate to their definition. A dotted name that is not valid component
+    syntax is flagged by `HtmlUnknownTagInspection` like any other unknown tag.
+  - **Find Usages and Rename on a `def`/`defp` include its HEEx component tags**, in `.heex` files
+    and inside `~H` sigils; a renamed tag keeps its `.`/module-alias prefix.
+  - **Rename works with the caret on a component tag**, not only on the `def`/`defp`.
+  - **Quick Docs and hover on a component tag show the function's documentation**, including inside
+    a `~H` sigil.
+  - **Find Usages finds a plain Elixir call embedded in a `~H` sigil**, e.g. `{some_function()}`.
+
 ### Bug Fixes
 
 - [#3925](https://github.com/KronicDeth/intellij-elixir/pull/3925) [@sh41](https://github.com/sh41)
@@ -90,6 +107,31 @@
     home path after the Homebrew layout adjustment had been applied, so every Homebrew Erlang was
     keyed on the literal string `erlang` instead of its version, leaving them unsorted and
     unlabelled in the SDK list.
+
+- [#3696](https://github.com/KronicDeth/intellij-elixir/pull/3696) [@mwnciau](https://github.com/mwnciau), [@sh41](https://github.com/sh41)
+  - **`\{` and `\}` in HEEx are now literal braces** instead of affecting `{...}` expression nesting.
+  - **A component tag's attribute after a `{...}`-valued one no longer gets swallowed into that
+    value**, e.g. `<.tag one={""} class=""/>` now parses `class` as its own attribute.
+  - **`{` inside `<script>`/`<style>` stays literal after an embedded `<% %>` tag**, and
+    `</script>`/`</style>` still close the tag.
+  - **A self-closing `<script .../>` or `<style .../>` no longer swallows the rest of the file** as
+    script or style content.
+  - **`<% %>` tags that produce no output (comments, `<% if %>`) no longer inject placeholder text**
+    into the HTML tree.
+  - **Other HTML-based template languages are no longer affected by HEEx's outer-language patcher**,
+    which ran for every HTML-data template language in the IDE.
+  - **HEEx's special attributes and `phx-` bindings are no longer reported as "not allowed here"
+    on HTML tags**: `:let`, `:if`, `:for`, `:key`, `:type` and every `phx-*` binding.
+  - **`<:slot>` tags are no longer validated as HTML elements.** `<:col>` was checked against HTML's
+    `<col>` and `<:action>` reported as an unknown tag.
+  - **A component tag that doesn't resolve no longer shows "Cannot resolve symbol".**
+  - **Components brought into scope by a `use` nested inside `use MyAppWeb, :html` now resolve**,
+    such as `Phoenix.Component`'s `<.link>` and `<.live_title>`: `use` resolution now follows a
+    `__using__` whose body ends in a list of fragments, a `quote` bound to a variable, or another
+    `use`.
+  - **Rename and Find Usages on a component tag could miss the tag**, varying between IDE sessions:
+    at a tag's offset the Elixir root of a `.heex` file or `~H` sigil could win over the HTML root.
+  - **An unqualified call inside a `~H` sigil now resolves to a `def` in the surrounding module.**
 
 - [#3914](https://github.com/KronicDeth/intellij-elixir/pull/3914) [@sh41](https://github.com/sh41)
   - **Reformat Code no longer changes what a capture expression means.** Since Elixir 1.15,
