@@ -51,12 +51,19 @@ public class Variable extends com.intellij.codeInsight.lookup.LookupElementRende
         presentation.setIcon(icon(psiElement));
         presentation.setItemTextForeground(color(psiElement));
 
+        PsiElement enclosingMatch = enclosingMatch(psiElement);
+
+        /* A bare parameter is its own enclosing match, so the tail would only repeat the item text.
+           See https://github.com/KronicDeth/intellij-elixir/issues/496 */
+        if (enclosingMatch == psiElement) {
+            return;
+        }
+
         /* Add a space between variable name and match.
            See https://github.com/KronicDeth/intellij-elixir/issues/506 */
         presentation.appendTailText(" ", false);
 
         TextRange psiElementTextRange = psiElement.getTextRange();
-        PsiElement enclosingMatch = enclosingMatch(psiElement);
         TextRange enclosingMatchTextRange = enclosingMatch.getTextRange();
         String enclosingMatchText = enclosingMatch.getText();
 
