@@ -223,6 +223,9 @@
     maintained `io.github.ben-manes.versions` id at 0.61.0. Dropped the unused `qodana` version
     catalog entry (`qodana.yml`'s linter tag is the only declaration now, bumped to 2026.2).
 
+- [#3887](https://github.com/KronicDeth/intellij-elixir/pull/3887), [#3917](https://github.com/KronicDeth/intellij-elixir/pull/3917) [@dependabot](https://github.com/dependabot)
+  - Bumped `kodein-di-jvm` to 7.33.0 and `gradle-wrapper` to 9.7.1.
+
 ## [24.0.1] - 2026-08-09
 
 ### Enhancements
