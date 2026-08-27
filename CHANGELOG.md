@@ -25,8 +25,11 @@
   - **Erlang, HEEx and LEEx locations in a trace are now linked too.** A stack trace mixes them with
     Elixir freely, but only `.ex`, `.exs` and `.eex` were recognised, so an Erlang dependency's frame
     stayed plain text beside the Elixir frames around it. Whether a path then opens still depends on
-    the file being indexed: an OTP frame such as `gen_server.erl` lives under the Erlang SDK, whose
-    `src` directories are not source roots.
+    the file being indexed - see the Erlang SDK source roots below.
+  - **An Erlang SDK now exposes its own sources.** OTP ships them beside the compiled beams, in
+    `lib/<app>-<version>/src`, but only the `ebin` directories were registered, so an OTP frame in a
+    stack trace named a file nothing indexed could find and `gen_server.erl` was not navigable.
+    Existing SDKs pick the roots up on the next refresh.
 
 - [#3923](https://github.com/KronicDeth/intellij-elixir/pull/3923) [@sh41](https://github.com/sh41)
   - **Elixir and Erlang SDKs under `/usr/lib64` are now detected automatically.** Gentoo builds both

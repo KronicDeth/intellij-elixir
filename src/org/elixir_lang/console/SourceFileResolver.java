@@ -34,10 +34,10 @@ final class SourceFileResolver {
      * Elixir frames, and both are the same kind of thing to a reader following a trace.
      *
      * <p>Accepting an extension is not the same as resolving it - that depends on what is indexed.
-     * An Erlang dependency's {@code src} is ordinary project content and resolves like any other
-     * file, while OTP's own sources live under an Erlang SDK's {@code src} directories, which are
-     * not registered as source roots today, so {@code gen_server.erl} is accepted here and then
-     * finds nothing.
+     * An Erlang dependency's {@code src} is ordinary project content; OTP's own sources come from an
+     * Erlang SDK's {@code src} directories, which it registers as source roots. An install that
+     * ships no sources at all resolves neither: Elixir's own {@code src/elixir.erl} and friends are
+     * paths recorded when the release was built, with no file on disk to open.
      */
     private static final Pattern PATTERN_FILENAME =
             Pattern.compile("[/\\\\]?([^/\\\\]*?\\.(?:heex|leex|eex|exs|erl|ex))$");

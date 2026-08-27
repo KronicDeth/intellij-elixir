@@ -14,7 +14,9 @@ import org.elixir_lang.cli.getExecutableFilepathWslSafe
 import org.elixir_lang.jps.shared.ErlangSdkTypeId
 import org.elixir_lang.jps.shared.cli.CliTool
 import org.elixir_lang.jps.shared.sdk.SdkPaths
+import com.intellij.openapi.vfs.VfsUtil
 import org.elixir_lang.sdk.SdkDetectionContext
+import org.elixir_lang.sdk.SdkEbinPaths
 import org.elixir_lang.sdk.SdkHomeKey
 import org.elixir_lang.sdk.SdkHomePaths
 import org.elixir_lang.sdk.SdkHomeScan
@@ -25,6 +27,23 @@ import java.nio.file.Path
 
 class Type : SdkType(ErlangSdkTypeId.ERLANG_SDK_TYPE_ID) {
     companion object {
+        /**
+         * Every application's `src` directory under [homePath], in whatever order
+         * [SdkEbinPaths.eachEbinPath] walks the applications.
+         *
+         * Separated from [addSourcePaths] so it can be exercised without an SDK: this is the whole
+         * decision, and everything around it is the platform's root bookkeeping.
+         */
+        internal fun sourcePaths(homePath: String): List<Path> {
+            val sourcePaths = mutableListOf<Path>()
+
+            SdkEbinPaths.eachEbinPath(homePath) { ebinPath ->
+                ebinPath.parent?.resolve("src")?.takeIf { it.toFile().isDirectory }?.let(sourcePaths::add)
+            }
+
+            return sourcePaths
+        }
+
         private const val WINDOWS_DEFAULT_HOME_PATH = "C:\\Program Files\\erl9.0"
         private val NIX_PATTERN = SdkHomePaths.nixPattern("erlang")
 
@@ -159,6 +178,7 @@ class Type : SdkType(ErlangSdkTypeId.ERLANG_SDK_TYPE_ID) {
         val sdkModificator = sdk.sdkModificator
         org.elixir_lang.sdk.Type
             .addCodePaths(sdkModificator)
+        addSourcePaths(sdkModificator)
 
         // Check if we're already in a write action (called from Elixir SDK setup)
         val app = ApplicationManager.getApplication()
@@ -173,6 +193,30 @@ class Type : SdkType(ErlangSdkTypeId.ERLANG_SDK_TYPE_ID) {
             runnable.run()
         } else {
             app.invokeAndWait(runnable)
+        }
+    }
+
+    /**
+     * Registers each application's `src` directory as a [OrderRootType.SOURCES] root.
+     *
+     * OTP ships its own sources beside the compiled beams - `lib/<app>-<version>/{ebin,src}` - so
+     * the sibling of every ebin is the source for what that ebin holds. Without these an Erlang
+     * frame in a stack trace names a file nothing indexed can find, and `gen_server.erl` is not
+     * navigable.
+     *
+     * Mirrors `ElixirSdkPathConfigurator.addSourcePaths`, which does the same for Elixir's
+     * `lib/<app>/lib`. Existing roots are removed first so a refresh does not accumulate
+     * duplicates, matching that configurator.
+     */
+    private fun addSourcePaths(sdkModificator: SdkModificator) {
+        val homePath = sdkModificator.homePath ?: return
+
+        sdkModificator.removeRoots(OrderRootType.SOURCES)
+
+        for (srcPath in sourcePaths(homePath)) {
+            VfsUtil.findFileByIoFile(srcPath.toFile(), true)?.let { srcVirtualFile ->
+                sdkModificator.addRoot(srcVirtualFile, OrderRootType.SOURCES)
+            }
         }
     }
 

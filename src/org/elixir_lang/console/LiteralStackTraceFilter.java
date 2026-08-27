@@ -208,8 +208,9 @@ final class LiteralStackTraceFilter implements Filter {
 
     /**
      * Appends a link for {@code path} over the given offsets, or returns {@code resultItems}
-     * untouched when the path names nothing that is indexed - an OTP {@code .erl} source, whose
-     * Erlang SDK {@code src} directories are not registered as source roots.
+     * untouched when the path names nothing that is indexed - a dependency the project model never
+     * attached, or a path an install records but does not ship, such as Elixir's own
+     * {@code src/elixir.erl}.
      *
      * <p>Several candidates for one path become a single link offering the choice, rather than
      * stacked links over the same text.
