@@ -90,6 +90,13 @@
 
 ### Bug Fixes
 
+- [#3934](https://github.com/KronicDeth/intellij-elixir/pull/3934) [@sh41](https://github.com/sh41)
+  - **Pressing Enter inside empty parentheses now indents the caret where an argument goes.** With an
+    argument already present the caret lined up under the argument column, but with the parentheses
+    empty there was no argument block to indent against, so it fell back to the enclosing statement
+    and landed at the start of the line. Refs
+    [#799](https://github.com/KronicDeth/intellij-elixir/issues/799).
+
 - [#3925](https://github.com/KronicDeth/intellij-elixir/pull/3925) [@sh41](https://github.com/sh41)
   - **A console path written with backslashes now links on Windows.** A compile error prints the
     path the way the platform writes it, while the virtual file system holds forward slashes, and

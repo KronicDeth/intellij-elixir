@@ -2189,10 +2189,16 @@ public class Block extends AbstractBlock implements BlockEx {
     @Override
     public ChildAttributes getChildAttributes(int newChildIndex) {
         ChildAttributes childAttributes;
+        IElementType elementType = myNode.getElementType();
 
         if (newChildIndex > 0) {
-           childAttributes = DELEGATE_TO_PREV_CHILD;
-        } else if (myNode.getElementType() == DO) {
+           childAttributes = precededByOpeningParenthesis(newChildIndex) ?
+                   /* Delegating would hand the platform the opening parenthesis as the block to indent against,
+                      because empty parentheses have no argument block to delegate to. Indent against this call
+                      instead, so the caret lands where an argument would. */
+                   new ChildAttributes(Indent.getNormalIndent(true), null) :
+                   DELEGATE_TO_PREV_CHILD;
+        } else if (elementType == DO) {
             boolean indentRelativeToDirectParent =
                     codeStyleSettings(myNode).ALIGN_UNMATCHED_CALL_DO_BLOCKS ==
                             CodeStyleSettings.UnmatchedCallDoBlockAlignment.CALL.value;
@@ -2208,6 +2214,19 @@ public class Block extends AbstractBlock implements BlockEx {
         }
 
         return childAttributes;
+    }
+
+    private boolean precededByOpeningParenthesis(int newChildIndex) {
+        List<com.intellij.formatting.Block> subBlocks = getSubBlocks();
+
+        if (newChildIndex > subBlocks.size()) {
+            return false;
+        }
+
+        com.intellij.formatting.Block previousChild = subBlocks.get(newChildIndex - 1);
+
+        return previousChild instanceof Block &&
+                ((Block) previousChild).myNode.getElementType() == OPENING_PARENTHESIS;
     }
 
     /**
