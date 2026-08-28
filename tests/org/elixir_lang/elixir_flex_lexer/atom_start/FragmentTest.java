@@ -88,7 +88,13 @@ public class FragmentTest extends TokenTest {
                         { "true", ElixirTypes.ATOM_FRAGMENT, ElixirFlexLexer.ADDITION_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE },
                         { "truest", ElixirTypes.ATOM_FRAGMENT, ElixirFlexLexer.ADDITION_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE },
                         { "when", ElixirTypes.ATOM_FRAGMENT, ElixirFlexLexer.ADDITION_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE },
-                        { "whenever", ElixirTypes.ATOM_FRAGMENT, ElixirFlexLexer.ADDITION_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE }
+                        { "whenever", ElixirTypes.ATOM_FRAGMENT, ElixirFlexLexer.ADDITION_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE },
+                        // Unicode atoms (Elixir 1.5+); unlike identifiers, an uppercase start is allowed
+                        { "こんにちは世界", ElixirTypes.ATOM_FRAGMENT, ElixirFlexLexer.ADDITION_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE },
+                        { "ólá", ElixirTypes.ATOM_FRAGMENT, ElixirFlexLexer.ADDITION_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE },
+                        { "Ólá", ElixirTypes.ATOM_FRAGMENT, ElixirFlexLexer.ADDITION_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE },
+                        { "ÓLÁ", ElixirTypes.ATOM_FRAGMENT, ElixirFlexLexer.ADDITION_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE },
+                        { "переменная", ElixirTypes.ATOM_FRAGMENT, ElixirFlexLexer.ADDITION_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE }
                 }
         );
     }
