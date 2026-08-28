@@ -94,12 +94,10 @@
   - **A trailing comma in a call's argument list no longer breaks the rest of the file.** Typing
     `foo(a,)` on the way to the next argument used to discard the enclosing definition and everything
     after it, taking parameter hints with it. Applies to `foo(a,)`, `Mod.fun(a,)` and `fun.(a,)`.
-  - **Pressing Enter after a comma now indents to the argument column** rather than back to the
-    enclosing statement, matching `mix format`.
-  - **Pressing Enter inside empty parentheses now indents the caret where an argument goes.** With an
-    argument already present the caret lined up under the argument column, but with the parentheses
-    empty there was no argument block to indent against, so it fell back to the enclosing statement
-    and landed at the start of the line. Refs
+  - **Pressing Enter after a delimiter now indents the caret where an element goes** rather than back
+    to the enclosing statement: after `[`, `{`, `%{`, `%S{`, `<<` and `Foo.{`, after a comma, after
+    `->` in a clause, after the `rescue`, `after`, `else` and `catch` keywords, and inside empty
+    parentheses. Every column is the one `mix format` produces. Refs
     [#799](https://github.com/KronicDeth/intellij-elixir/issues/799).
 
 - [#3925](https://github.com/KronicDeth/intellij-elixir/pull/3925) [@sh41](https://github.com/sh41)

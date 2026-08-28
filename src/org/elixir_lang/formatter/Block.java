@@ -62,6 +62,25 @@ public class Block extends AbstractBlock implements BlockEx {
             MATCHED_COMPARISON_OPERATION,
             UNMATCHED_COMPARISON_OPERATION
     );
+    /** The rules a delimiter's container is reached through: a container groups its pairs under a node of its own. */
+    private static final TokenSet DELIMITER_GROUPING_TOKEN_SET = TokenSet.create(
+            ASSOCIATIONS,
+            ASSOCIATIONS_BASE,
+            KEYWORDS,
+            MAP_CONSTRUCTION_ARGUMENTS
+    );
+    /**
+     * The tokens that punctuate a container: the delimiter it opens with, and the commas and {@code ->} between its
+     * elements.
+     */
+    private static final TokenSet DELIMITER_TOKEN_SET = TokenSet.create(
+            COMMA,
+            OPENING_BIT,
+            OPENING_BRACKET,
+            OPENING_CURLY,
+            OPENING_PARENTHESIS,
+            STAB_OPERATOR
+    );
     private static final TokenSet HEREDOC_LINE_TOKEN_SET = TokenSet.create(
             HEREDOC_LINE,
             INTERPOLATED_HEREDOC_LINE,
@@ -124,6 +143,16 @@ public class Block extends AbstractBlock implements BlockEx {
             UNMATCHED_UNQUALIFIED_NO_ARGUMENTS_CALL
     );
     private static final TokenSet NO_PARENTHESES_KEYWORD_PAIR_TOKEN_SET = TokenSet.create(NO_PARENTHESES_KEYWORD_PAIR);
+    /** The containers whose elements sit one indent in from the line the container starts on. */
+    private static final TokenSet NORMAL_INDENT_CONTAINER_TOKEN_SET = TokenSet.create(
+            BIT_STRING,
+            BLOCK_IDENTIFIER,
+            LIST,
+            MAP_ARGUMENTS,
+            MULTIPLE_ALIASES,
+            STAB_INFIX_OPERATOR,
+            TUPLE
+    );
     private static final TokenSet OPERATION_TOKEN_SET = TokenSet.orSet(
             TokenSet.create(
                     MATCHED_ADDITION_OPERATION,
@@ -2192,13 +2221,11 @@ public class Block extends AbstractBlock implements BlockEx {
         IElementType elementType = myNode.getElementType();
 
         if (newChildIndex > 0) {
-           childAttributes = precededByArgumentDelimiter(newChildIndex) ?
-                   /* Delegating would hand the platform a delimiter as the block to indent against, and both the
-                      opening parenthesis and the commas are built without an indent of their own, so it would fall
-                      back to the enclosing statement. Indent against this call instead, so the caret lands where an
-                      argument would. */
-                   new ChildAttributes(Indent.getNormalIndent(true), null) :
-                   DELEGATE_TO_PREV_CHILD;
+            Indent afterDelimiterIndent = indentAfterDelimiter(newChildIndex);
+
+            childAttributes = afterDelimiterIndent != null ?
+                    new ChildAttributes(afterDelimiterIndent, null) :
+                    DELEGATE_TO_PREV_CHILD;
         } else if (elementType == DO) {
             boolean indentRelativeToDirectParent =
                     codeStyleSettings(myNode).ALIGN_UNMATCHED_CALL_DO_BLOCKS ==
@@ -2218,36 +2245,93 @@ public class Block extends AbstractBlock implements BlockEx {
     }
 
     /**
-     * Whether the caret follows one of the tokens punctuating a parenthesised argument list, which
-     * {@link #buildParenthesesArgumentsChildren} builds without an indent of their own because they sit beside the
-     * argument they punctuate rather than starting a line.
+     * The indent to put the caret at when it follows one of the tokens that punctuate a container - the delimiter it
+     * opens with, a comma between its elements, {@code ->} or a block identifier. All of these are built without an
+     * indent of their own, because they sit beside the element they punctuate rather than starting a line, so
+     * delegating to one indents against nothing and the caret falls back to the enclosing statement.
      *
-     * <p>The comma is recognised by its own parent rather than by this block's element type, because an argument
-     * list's children are flattened into the enclosing call's sub-blocks, so the block being asked is the call.
+     * <p>The delimiter is recognised by its own ancestry rather than by this block's element type, because a
+     * container's children are flattened into the enclosing block's sub-blocks: the block being asked after a comma
+     * in an argument list is the call, not the argument list.
+     *
+     * <p>Every column this produces is the one {@code mix format} puts an element at for the same construct.
+     *
+     * @return the indent to answer the delegation with, or {@code null} to keep delegating. A comma in a call written
+     * without parentheses keeps delegating: {@code mix format} aligns what follows it under the first argument in
+     * {@code with a <- one(),} but indents it in {@code import Foo,}, and which of the two applies is decided by the
+     * argument that has not been typed yet.
      */
-    private boolean precededByArgumentDelimiter(int newChildIndex) {
+    @Nullable
+    private Indent indentAfterDelimiter(int newChildIndex) {
         List<com.intellij.formatting.Block> subBlocks = getSubBlocks();
 
         if (newChildIndex > subBlocks.size()) {
-            return false;
+            return null;
         }
 
         com.intellij.formatting.Block previousChild = subBlocks.get(newChildIndex - 1);
 
         if (!(previousChild instanceof Block)) {
-            return false;
+            return null;
         }
 
         ASTNode previousNode = ((Block) previousChild).myNode;
-        IElementType previousElementType = previousNode.getElementType();
+        ASTNode container = previousNode.getTreeParent();
 
-        if (previousElementType == OPENING_PARENTHESIS) {
-            return true;
+        if (container == null) {
+            return null;
         }
 
-        return previousElementType == COMMA &&
-                previousNode.getTreeParent() != null &&
-                previousNode.getTreeParent().getElementType() == PARENTHESES_ARGUMENTS;
+        // a block identifier is a rule rather than a token, so its keyword is the leaf the caret follows
+        boolean afterDelimiter = DELIMITER_TOKEN_SET.contains(previousNode.getElementType()) ||
+                container.getElementType() == BLOCK_IDENTIFIER;
+
+        if (!afterDelimiter) {
+            return null;
+        }
+
+        while (DELIMITER_GROUPING_TOKEN_SET.contains(container.getElementType())) {
+            container = container.getTreeParent();
+
+            if (container == null) {
+                return null;
+            }
+        }
+
+        return indentInContainer(container.getElementType());
+    }
+
+    /**
+     * The indent an element of {@code containerElementType} written on its own line takes.
+     *
+     * @return {@code null} when the container is not one whose elements indent, such as the argument list of a call
+     * written without parentheses.
+     */
+    @Nullable
+    private Indent indentInContainer(@NotNull IElementType containerElementType) {
+        Indent indent;
+
+        if (containerElementType == PARENTHESES_ARGUMENTS) {
+            /* An argument list wraps to the column of the call it belongs to plus one indent, which is where the
+               answering block starts - except in a dot call, where the argument list is the answering block and
+               already starts at the parenthesis. */
+            indent = myNode.getElementType() == PARENTHESES_ARGUMENTS ?
+                    Indent.getNormalIndent() :
+                    Indent.getNormalIndent(true);
+        } else if (containerElementType == MAP_UPDATE_ARGUMENTS) {
+            // the pipe takes the first indent and the pairs written after it take a second
+            indent = Indent.getSpaceIndent(2 * indentSize());
+        } else if (NORMAL_INDENT_CONTAINER_TOKEN_SET.contains(containerElementType)) {
+            indent = Indent.getNormalIndent();
+        } else {
+            indent = null;
+        }
+
+        return indent;
+    }
+
+    private int indentSize() {
+        return CodeStyle.getIndentOptions(myNode.getPsi().getContainingFile()).INDENT_SIZE;
     }
 
     /**

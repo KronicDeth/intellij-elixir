@@ -64,4 +64,34 @@ class ParenthesesArgumentsIndentTest : PlatformTestCase() {
             6
         )
     }
+
+    fun testAfterKeywordPairComma() {
+        assertCaretColumnAfterEnter(
+            "defmodule M do\n  def run do\n    some_call(\n      key: 1,<caret>\n    )\n  end\nend\n",
+            6
+        )
+    }
+
+    /** A call that does not start its own line still wraps its arguments to the call's column plus one indent. */
+    fun testCallThatDoesNotStartItsLine() {
+        assertCaretColumnAfterEnter(
+            "defmodule M do\n  def run do\n    _x =\n      some_call(<caret>\n        one\n      )\n  end\nend\n",
+            8
+        )
+    }
+
+    /**
+     * A dot call's argument list is a block of its own rather than being flattened into the call, so it is already the
+     * block answering the delegation and its arguments indent from the line rather than from the parenthesis.
+     */
+    fun testEmptyParenthesesOfDotCall() {
+        assertCaretColumnAfterEnter("defmodule M do\n  def run do\n    fun.(<caret>)\n  end\nend\n", 6)
+    }
+
+    fun testAfterTrailingCommaInDotCall() {
+        assertCaretColumnAfterEnter(
+            "defmodule M do\n  def run do\n    fun.(\n      one,<caret>\n    )\n  end\nend\n",
+            6
+        )
+    }
 }
