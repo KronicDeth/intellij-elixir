@@ -91,6 +91,9 @@
 ### Bug Fixes
 
 - [#3934](https://github.com/KronicDeth/intellij-elixir/pull/3934) [@sh41](https://github.com/sh41)
+  - **A trailing comma in a call's argument list no longer breaks the rest of the file.** Typing
+    `foo(a,)` on the way to the next argument used to discard the enclosing definition and everything
+    after it, taking parameter hints with it. Applies to `foo(a,)`, `Mod.fun(a,)` and `fun.(a,)`.
   - **Pressing Enter inside empty parentheses now indents the caret where an argument goes.** With an
     argument already present the caret lined up under the argument column, but with the parentheses
     empty there was no argument block to indent against, so it fell back to the enclosing statement

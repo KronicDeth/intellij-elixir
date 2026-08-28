@@ -99,6 +99,30 @@ public class ParameterInfoTest extends PlatformTestCase {
     }
 
     /**
+     * Parameter hints are wanted exactly after the comma that begins the next argument, and that is
+     * the moment the source is momentarily invalid.  The malformed argument list used to take the
+     * enclosing definition with it, leaving no Arguments ancestor for the caret to sit in.
+     */
+    public void testTrailingCommaKeepsHint() {
+        myFixture.configureByFile("trailing_comma_local_call.ex");
+
+        ParameterInfo handler = new ParameterInfo();
+        CreateParameterInfoContext context = new MockCreateParameterInfoContext(myFixture.getEditor(), myFixture.getFile());
+        Arguments args = handler.findElementForParameterInfo(context);
+
+        assertNotNull("Should find Arguments element at caret after a trailing comma", args);
+
+        handler.showParameterInfo(args, context);
+        Object[] items = context.getItemsToShow();
+
+        assertNotNull("Should have parameter info items", items);
+
+        List<String> paramTexts = renderedParameterTexts(handler, args, items);
+        assertEquals("A trailing comma should not change which signature is shown, got: " + paramTexts,
+                List.of("augend, addend"), paramTexts);
+    }
+
+    /**
      * Renders every parameter-info item as its user-visible parameter text (as {@code updateUI}
      * would present in the popup) with the caret on the first parameter.
      *
