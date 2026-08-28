@@ -2192,10 +2192,11 @@ public class Block extends AbstractBlock implements BlockEx {
         IElementType elementType = myNode.getElementType();
 
         if (newChildIndex > 0) {
-           childAttributes = precededByOpeningParenthesis(newChildIndex) ?
-                   /* Delegating would hand the platform the opening parenthesis as the block to indent against,
-                      because empty parentheses have no argument block to delegate to. Indent against this call
-                      instead, so the caret lands where an argument would. */
+           childAttributes = precededByArgumentDelimiter(newChildIndex) ?
+                   /* Delegating would hand the platform a delimiter as the block to indent against, and both the
+                      opening parenthesis and the commas are built without an indent of their own, so it would fall
+                      back to the enclosing statement. Indent against this call instead, so the caret lands where an
+                      argument would. */
                    new ChildAttributes(Indent.getNormalIndent(true), null) :
                    DELEGATE_TO_PREV_CHILD;
         } else if (elementType == DO) {
@@ -2216,7 +2217,15 @@ public class Block extends AbstractBlock implements BlockEx {
         return childAttributes;
     }
 
-    private boolean precededByOpeningParenthesis(int newChildIndex) {
+    /**
+     * Whether the caret follows one of the tokens punctuating a parenthesised argument list, which
+     * {@link #buildParenthesesArgumentsChildren} builds without an indent of their own because they sit beside the
+     * argument they punctuate rather than starting a line.
+     *
+     * <p>The comma is recognised by its own parent rather than by this block's element type, because an argument
+     * list's children are flattened into the enclosing call's sub-blocks, so the block being asked is the call.
+     */
+    private boolean precededByArgumentDelimiter(int newChildIndex) {
         List<com.intellij.formatting.Block> subBlocks = getSubBlocks();
 
         if (newChildIndex > subBlocks.size()) {
@@ -2225,8 +2234,20 @@ public class Block extends AbstractBlock implements BlockEx {
 
         com.intellij.formatting.Block previousChild = subBlocks.get(newChildIndex - 1);
 
-        return previousChild instanceof Block &&
-                ((Block) previousChild).myNode.getElementType() == OPENING_PARENTHESIS;
+        if (!(previousChild instanceof Block)) {
+            return false;
+        }
+
+        ASTNode previousNode = ((Block) previousChild).myNode;
+        IElementType previousElementType = previousNode.getElementType();
+
+        if (previousElementType == OPENING_PARENTHESIS) {
+            return true;
+        }
+
+        return previousElementType == COMMA &&
+                previousNode.getTreeParent() != null &&
+                previousNode.getTreeParent().getElementType() == PARENTHESES_ARGUMENTS;
     }
 
     /**

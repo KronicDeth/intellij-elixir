@@ -41,4 +41,27 @@ class ParenthesesArgumentsIndentTest : PlatformTestCase() {
     fun testAfterLastArgument() {
         assertCaretColumnAfterEnter("defp visit_file(path<caret>) do\nend\n", 5)
     }
+
+    /**
+     * A comma is built without an indent of its own, so delegating to it dropped the caret back to the enclosing
+     * statement. The expected columns are the ones `mix format` produces for the same argument lists: an argument list
+     * broken over lines puts its arguments at the call's own column plus two.
+     */
+    fun testAfterTrailingCommaOnItsOwnLineInACallDefinitionHead() {
+        assertCaretColumnAfterEnter("defmodule M do\n  def foo(\n        path,<caret>\n      ) do\n  end\nend\n", 8)
+    }
+
+    fun testAfterTrailingCommaOnItsOwnLineInACall() {
+        assertCaretColumnAfterEnter(
+            "defmodule M do\n  def run do\n    some_call(\n      path,<caret>\n    )\n  end\nend\n",
+            6
+        )
+    }
+
+    fun testBetweenArgumentsOnTheirOwnLines() {
+        assertCaretColumnAfterEnter(
+            "defmodule M do\n  def run do\n    some_call(\n      path,<caret>\n      acc\n    )\n  end\nend\n",
+            6
+        )
+    }
 }
