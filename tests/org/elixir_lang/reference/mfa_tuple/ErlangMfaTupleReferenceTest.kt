@@ -1,38 +1,24 @@
 package org.elixir_lang.reference.mfa_tuple
 
 import com.intellij.model.psi.PsiSymbolReferenceService
-import com.intellij.openapi.vfs.LocalFileSystem
-import com.intellij.openapi.vfs.newvfs.impl.VfsRootAccess
 import com.intellij.psi.util.PsiTreeUtil
-import org.elixir_lang.PlatformTestCase
-import org.elixir_lang.beam.BeamLibraryFixture
+import org.elixir_lang.beam.BeamLibraryTestCase
 import org.elixir_lang.beam.psi.impl.CallDefinitionImpl
 import org.elixir_lang.model.psi.atom.AtomReference
 import org.elixir_lang.psi.ElixirAtom
 import java.io.File
 
 /**
- * Tests that Erlang-style MFA tuples (`{:math, :sqrt, 1}`) resolve the function atom
- * to the corresponding BEAM module function definition.
+ * Tests that Erlang-style MFA tuples (`{:math, :sqrt, 1}`) resolve the function atom to the
+ * corresponding BEAM module function definition.
  *
- * Validates Gap #6 of the MFA tuple resolution plan: Erlang modules referenced via atom
- * syntax in MFA tuples (`:module` as element[0]) resolve correctly when the module comes
- * from a BEAM file.
+ * The module is an atom (`:module` as element[0]) rather than an alias, so it resolves to a
+ * BEAM-decompiled module rather than Elixir source.
  */
-class ErlangMfaTupleReferenceTest : PlatformTestCase() {
+class ErlangMfaTupleReferenceTest : BeamLibraryTestCase() {
+    override val ebinDirectory: File = ERLANG_STDLIB_EBIN
 
-    override fun setUp() {
-        super.setUp()
-        addBeamLibrary()
-    }
-
-    override fun tearDown() {
-        try {
-            removeBeamLibrary()
-        } finally {
-            super.tearDown()
-        }
-    }
+    override fun getTestDataPath(): String = "testData/org/elixir_lang/reference/mfa_tuple"
 
     /**
      * `:sqrt` in `{:math, :sqrt, 1}` should resolve to the `sqrt/1` function
@@ -100,26 +86,4 @@ class ErlangMfaTupleReferenceTest : PlatformTestCase() {
             ?: error("Expected AtomReference at caret in $fileName")
     }
 
-    private fun addBeamLibrary() {
-        val beamFile = File(testDataPath, "math.beam")
-        assertTrue("math.beam not found at ${beamFile.absolutePath}", beamFile.exists())
-
-        val beamDir = beamFile.parentFile.absolutePath
-        VfsRootAccess.allowRootAccess(myFixture.testRootDisposable, beamDir)
-
-        val beamDirVf = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(File(beamDir))
-        assertNotNull("Could not find beam test data directory: $beamDir", beamDirVf)
-
-        BeamLibraryFixture.addLibrary(project, myFixture.module, LIBRARY_NAME, listOf(beamDirVf!!))
-    }
-
-    private fun removeBeamLibrary() {
-        BeamLibraryFixture.removeLibrary(project, myFixture.module, LIBRARY_NAME)
-    }
-
-    override fun getTestDataPath(): String = "testData/org/elixir_lang/reference/mfa_tuple"
-
-    companion object {
-        private const val LIBRARY_NAME = "erlang_mfa_test_lib"
-    }
 }

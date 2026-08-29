@@ -1,10 +1,7 @@
 package org.elixir_lang.reference.callable
 
-import com.intellij.openapi.vfs.LocalFileSystem
-import com.intellij.openapi.vfs.newvfs.impl.VfsRootAccess
 import com.intellij.psi.PsiPolyVariantReference
-import org.elixir_lang.PlatformTestCase
-import org.elixir_lang.beam.BeamLibraryFixture
+import org.elixir_lang.beam.BeamLibraryTestCase
 import java.io.File
 
 /**
@@ -17,20 +14,11 @@ import java.io.File
  * The BEAM-decompiled `ModuleImpl` must not be filtered out by the `as? Call` cast
  * in `PsiReference.maybeModularNameToModulars()`.
  */
-class ErlangAtomQualifierTest : PlatformTestCase() {
+class ErlangAtomQualifierTest : BeamLibraryTestCase() {
+    override val ebinDirectory: File = ERLANG_STDLIB_EBIN
 
-    override fun setUp() {
-        super.setUp()
-        addBeamLibrary()
-    }
-
-    override fun tearDown() {
-        try {
-            removeBeamLibrary()
-        } finally {
-            super.tearDown()
-        }
-    }
+    override fun getTestDataPath(): String =
+        "testData/org/elixir_lang/reference/callable/erlang_atom_qualifier"
 
     /**
      * `:math.sqrt(2)` - the reference on `sqrt` should resolve to the `sqrt` function
@@ -111,23 +99,4 @@ class ErlangAtomQualifierTest : PlatformTestCase() {
         )
     }
 
-    private fun addBeamLibrary() {
-        val beamFile = File(testDataPath, "math.beam")
-        assertTrue("math.beam not found at ${beamFile.absolutePath}", beamFile.exists())
-
-        val beamDir = beamFile.parentFile.absolutePath
-        VfsRootAccess.allowRootAccess(myFixture.testRootDisposable, beamDir)
-
-        val beamDirVf = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(File(beamDir))
-        assertNotNull("Could not find beam test data directory: $beamDir", beamDirVf)
-
-        BeamLibraryFixture.addLibrary(project, myFixture.module, "erlang_test_lib", listOf(beamDirVf!!))
-    }
-
-    private fun removeBeamLibrary() {
-        BeamLibraryFixture.removeLibrary(project, myFixture.module, "erlang_test_lib")
-    }
-
-    override fun getTestDataPath(): String =
-        "testData/org/elixir_lang/reference/callable/erlang_atom_qualifier"
 }

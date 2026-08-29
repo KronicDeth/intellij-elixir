@@ -14,10 +14,6 @@ import org.elixir_lang.psi.call.Call
 class Reference(call: Call, val useCall: Call?) : PsiReferenceBase<Call>(call), PsiPolyVariantReference {
     override fun calculateDefaultRangeInElement(): TextRange = TextRange.create(0, element.textLength)
 
-    override fun getVariants(): Array<Any> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
     /**
      * Returns the results of resolving the reference.
      *
