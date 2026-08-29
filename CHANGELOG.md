@@ -214,6 +214,12 @@
 
 ### Threading / Platform Hygiene
 
+- [#3950](https://github.com/KronicDeth/intellij-elixir/pull/3950) [@sh41](https://github.com/sh41)
+  - **The formatter's `Block` is clean under IntelliJ's inspections** - 18 warnings down to 3. Four
+    nullable-node dereferences now state the `AbstractBlock` non-null invariant,
+    `ContainerBlockListReducer` stops declaring an `Indent` non-null that callers pass as null, and the
+    interpolation overload no longer takes two parameters that were always the same constants.
+
 ### Build / CI
 
 - [#3913](https://github.com/KronicDeth/intellij-elixir/pull/3913) [@sh41](https://github.com/sh41)

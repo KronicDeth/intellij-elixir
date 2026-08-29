@@ -23,6 +23,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 
 import static com.intellij.formatting.ChildAttributes.DELEGATE_TO_PREV_CHILD;
@@ -301,10 +302,9 @@ public class Block extends AbstractBlock implements BlockEx {
         assert elementType != ACCESS_EXPRESSION : "accessExpressions should be flattened with " +
                 "buildAccessExpressionChildren";
 
-        if (elementType == STAB_OPERATION) {
-            assert childrenWrap != null : "stabOperation must have a non-null childrenWrap, so that sibling " +
-                    "stabOperations and their children are wrapped consistently";
-        }
+        assert elementType != STAB_OPERATION || childrenWrap != null :
+                "stabOperation must have a non-null childrenWrap, so that sibling stabOperations and their " +
+                        "children are wrapped consistently";
     }
 
     @NotNull
@@ -739,13 +739,13 @@ public class Block extends AbstractBlock implements BlockEx {
         if (flattenedBlockList.size() == 3) {
             ASTBlock operatorBlock = (ASTBlock) flattenedBlockList.get(1);
 
-            if (operatorBlock.getNode().getElementType() == DIVISION_OPERATOR) {
+            if (Objects.requireNonNull(operatorBlock.getNode()).getElementType() == DIVISION_OPERATOR) {
                 ASTBlock rightOperandBlock = (ASTBlock) flattenedBlockList.get(2);
 
                 // `/ARITY` confirmed
-                if (rightOperandBlock.getNode().getElementType() == DECIMAL_WHOLE_NUMBER) {
-                    ASTBlock leftOperandBlock = (ASTBlock) flattenedBlockList.get(0);
-                    ASTNode leftOperand = leftOperandBlock.getNode();
+                if (Objects.requireNonNull(rightOperandBlock.getNode()).getElementType() == DECIMAL_WHOLE_NUMBER) {
+                    ASTBlock leftOperandBlock = (ASTBlock) flattenedBlockList.getFirst();
+                    ASTNode leftOperand = Objects.requireNonNull(leftOperandBlock.getNode());
                     IElementType leftOperandElementType = leftOperand.getElementType();
 
                     // `NAME/ARITY` confirmed
@@ -991,17 +991,15 @@ public class Block extends AbstractBlock implements BlockEx {
     }
 
     @NotNull
-    private List<com.intellij.formatting.Block> buildContainerChildren(@NotNull ASTNode container,
-                                                                       @NotNull IElementType openingElementType,
-                                                                       @Nullable Wrap openingWrap,
-                                                                       @NotNull IElementType closingElementType) {
+    private List<com.intellij.formatting.Block> buildInterpolationContainerChildren(@NotNull ASTNode container,
+                                                                                   @Nullable Wrap openingWrap) {
         return buildContainerChildren(
                 container,
-                openingElementType,
+                INTERPOLATION_START,
                 openingWrap,
                 null,
                 null,
-                closingElementType,
+                INTERPOLATION_END,
                 null
         );
     }
@@ -1052,11 +1050,10 @@ public class Block extends AbstractBlock implements BlockEx {
     ) {
         Wrap nonEmptyTailWrap;
 
-        if (givenTailWrap != null) {
-            nonEmptyTailWrap = givenTailWrap;
-        } else {
-            nonEmptyTailWrap = tailWrap(container, openingElementType, closingElementType);
-        }
+        nonEmptyTailWrap = Objects.requireNonNullElseGet(
+                givenTailWrap,
+                () -> tailWrap(container, openingElementType, closingElementType)
+        );
 
         // empty tailWrap
         final Wrap[] tailWrap = {Wrap.createWrap(WrapType.NORMAL, true)};
@@ -1285,11 +1282,9 @@ public class Block extends AbstractBlock implements BlockEx {
 
     @NotNull
     private List<com.intellij.formatting.Block> buildInterpolationChildren(@NotNull ASTNode interpolation) {
-        return buildContainerChildren(
+        return buildInterpolationContainerChildren(
                 interpolation,
-                INTERPOLATION_START,
-                Wrap.createWrap(WrapType.NONE, false),
-                INTERPOLATION_END
+                Wrap.createWrap(WrapType.NONE, false)
         );
     }
 
@@ -1667,7 +1662,7 @@ public class Block extends AbstractBlock implements BlockEx {
         );
 
         if (blockList.size() == 1) {
-            Block block = (Block) blockList.get(0);
+            Block block = (Block) blockList.getFirst();
             ASTNode blockNode = block.myNode;
 
             if (UNINDENTED_ONLY_ARGUMENT_TOKEN_SET.contains(blockNode.getElementType())) {
@@ -2478,21 +2473,17 @@ public class Block extends AbstractBlock implements BlockEx {
            `&& 1` */
         // Prevent `_ && &1` from becoming `_ &&& 1`
         // Prevent `_ &&& &2` from becoming ` _ &&&& 2`, which has no meaning
-        if (child1 instanceof ASTBlock && child2 instanceof ASTBlock) {
-            ASTBlock child1ASTBlock = (ASTBlock) child1;
+        if (child1 instanceof ASTBlock child1ASTBlock && child2 instanceof ASTBlock child2ASTBlock) {
             ASTNode child1Node = child1ASTBlock.getNode();
 
-            if (child1Node instanceof LeafPsiElement) {
-                LeafPsiElement child1LeafPsiElement = (LeafPsiElement) child1Node;
-
+            if (child1Node instanceof LeafPsiElement child1LeafPsiElement) {
                 // capture (`&`) or and symbol operators (`&&` or `&&&`)
                 if (child1LeafPsiElement.charAt(child1LeafPsiElement.getTextLength() - 1) == '&') {
-                    ASTBlock child2ASTBlock = (ASTBlock) child2;
-                    ASTNode firstLeafElementASTNode = child2ASTBlock.getNode().findLeafElementAt(0);
+                    ASTNode firstLeafElementASTNode =
+                            Objects.requireNonNull(child2ASTBlock.getNode()).findLeafElementAt(0);
 
-                    if (firstLeafElementASTNode != null &&
-                            firstLeafElementASTNode instanceof LeafPsiElement &&
-                            ((LeafPsiElement) firstLeafElementASTNode).charAt(0) == '&') {
+                    if (firstLeafElementASTNode instanceof LeafPsiElement firstLeaf &&
+                            firstLeaf.charAt(0) == '&') {
                         spacing = Spacing.createSpacing(1, 1, 0, true, 0);
                     }
                 }
