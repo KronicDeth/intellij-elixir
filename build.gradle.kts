@@ -187,6 +187,16 @@ val quoterAvailabilityFile: RegularFile = quoterUnzippedPath.file("quoter-availa
 // Opts back in to a hard failure at releaseQuoter, for debugging the quoter itself.
 val quoterRequired: Boolean = providers.gradleProperty("quoterRequired").getOrElse("false").toBoolean()
 val quoterTmpPath: Directory = cachePath.dir("quoter_tmp_$quoterRefSlug")
+// Distributed Erlang node names for the quoter daemon and for the test JVM that talks to it. Erlang
+// registers a node by name with the machine-wide epmd, and epmd allows exactly one node per name - so
+// with a fixed name a second checkout starting its own quoter gets "the name intellij_elixir@127.0.0.1
+// seems to be in use by another Erlang node" and exits 0, which `startQuoter` reports as the daemon
+// dying immediately. Deriving both names from the checkout path lets worktrees run tests concurrently.
+// Unset (a plain `java -jar` of the plugin, or any non-test use) the plugin falls back to the original
+// literals, so nothing outside the build changes.
+val quoterNodeToken: String = rootDir.absolutePath.lowercase().hashCode().toUInt().toString(16)
+val quoterNodeName: String = "intellij_elixir_$quoterNodeToken@127.0.0.1"
+val quoterClientNodeName: String = "intellij_elixir_client_$quoterNodeToken@127.0.0.1"
 // hex/rebar + fetched deps are cached under the project (used by the quoter mix build).
 val mixHomePath: Directory = cachePath.dir("mix_home")
 val mixArchivesPath: Directory = cachePath.dir("mix_archives")
@@ -884,6 +894,7 @@ val quoterService = gradle.sharedServices.registerIfAbsent("quoter", QuoterServi
     parameters {
         executable.set(quoterExe)
         tmpDir.set(quoterTmpPath)
+        nodeName.set(quoterNodeName)
     }
 }
 
@@ -963,6 +974,14 @@ tasks.named<Test>("test") {
     // 28 s with 1.13.4/OTP-25's results.
     inputs.property("elixirVersion", expectedElixirVersion)
     inputs.property("otpVersion", expectedOtpVersion)
+
+    // The test JVM has to dial the same node the daemon registered, and register its own node under a
+    // name no other checkout is using either - two test JVMs collide exactly as two daemons do.
+    // Declared as inputs so a rename invalidates the task rather than reporting the old run's results.
+    systemProperty("elixir.quoter.remoteNode", quoterNodeName)
+    systemProperty("elixir.quoter.localNode", quoterClientNodeName)
+    inputs.property("quoterNodeName", quoterNodeName)
+    inputs.property("quoterClientNodeName", quoterClientNodeName)
 
     // The parsing tests are JUnit 3 (com.intellij.testFramework.ParsingTestCase -> TestCase),
     // discovered by the JUnit 4 runner.
