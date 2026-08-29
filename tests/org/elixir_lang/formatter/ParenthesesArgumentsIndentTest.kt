@@ -94,4 +94,17 @@ class ParenthesesArgumentsIndentTest : PlatformTestCase() {
             6
         )
     }
+
+    /**
+     * A definition head wraps its arguments to the defined function's own column plus one indent, and that
+     * column is fixed by the `defp ` before it rather than by how long the name is. Confirmed by running
+     * `mix format` over both widths.
+     */
+    fun testArgumentColumnDoesNotVaryWithTheFunctionNameLength() {
+        assertCaretColumnAfterEnter("defmodule M do\n  defp a(<caret>) do\n  end\nend\n", 9)
+        assertCaretColumnAfterEnter(
+            "defmodule M do\n  defp a_much_longer_function_name(<caret>) do\n  end\nend\n",
+            9
+        )
+    }
 }

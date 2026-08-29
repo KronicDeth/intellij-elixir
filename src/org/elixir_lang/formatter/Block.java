@@ -2298,17 +2298,18 @@ public class Block extends AbstractBlock implements BlockEx {
             }
         }
 
-        return indentInContainer(container.getElementType());
+        return indentInContainer(container);
     }
 
     /**
-     * The indent an element of {@code containerElementType} written on its own line takes.
+     * The indent an element of {@code container} written on its own line takes.
      *
      * @return {@code null} when the container is not one whose elements indent, such as the argument list of a call
      * written without parentheses.
      */
     @Nullable
-    private Indent indentInContainer(@NotNull IElementType containerElementType) {
+    private Indent indentInContainer(@NotNull ASTNode container) {
+        IElementType containerElementType = container.getElementType();
         Indent indent;
 
         if (containerElementType == PARENTHESES_ARGUMENTS) {
@@ -2319,8 +2320,7 @@ public class Block extends AbstractBlock implements BlockEx {
                     Indent.getNormalIndent() :
                     Indent.getNormalIndent(true);
         } else if (containerElementType == MAP_UPDATE_ARGUMENTS) {
-            // the pipe takes the first indent and the pairs written after it take a second
-            indent = Indent.getSpaceIndent(2 * indentSize());
+            indent = mapUpdatePairIndent(container);
         } else if (NORMAL_INDENT_CONTAINER_TOKEN_SET.contains(containerElementType)) {
             indent = Indent.getNormalIndent();
         } else {
@@ -2330,8 +2330,113 @@ public class Block extends AbstractBlock implements BlockEx {
         return indent;
     }
 
+    /**
+     * The indent a map update's pairs take: one indent in from the pipe, wherever the pipe sits.
+     *
+     * <p>That is two indents in from the line the map starts on while the map starts a line of its own, but not when
+     * it is written as the value of an enclosing update, because it then begins on that update's continuation line and
+     * its pipe is further right than the line's own indent. Anchoring to the pipe covers both, so the columns follow
+     * {@code mix format} at any nesting depth.
+     *
+     * <p>A space indent is resolved against the indent of the line the answering block starts on, so the pipe's column
+     * has to be re-expressed as a distance from there. It cannot be anchored to the block itself: a map update's block
+     * starts at the {@code %{}, which is to the right of its own pipe, and an indent can never place the caret left of
+     * the block it is relative to.
+     *
+     * @return {@code null} when the pipe or either column cannot be read, so that the caret keeps delegating rather
+     * than landing on a column that was guessed.
+     */
+    @Nullable
+    private Indent mapUpdatePairIndent(@NotNull ASTNode mapUpdateArguments) {
+        ASTNode pipe = mapUpdateArguments.findChildByType(PIPE_INFIX_OPERATOR);
+
+        if (pipe == null) {
+            return null;
+        }
+
+        Integer pipeColumn = column(pipe);
+        Integer lineIndent = lineIndent(myNode);
+
+        if (pipeColumn == null || lineIndent == null) {
+            return null;
+        }
+
+        int spaces = pipeColumn + indentSize() - lineIndent;
+
+        return spaces >= 0 ? Indent.getSpaceIndent(spaces) : null;
+    }
+
+    /** The column {@code node} starts at, or {@code null} when there is no document to measure against. */
+    @Nullable
+    private Integer column(@NotNull ASTNode node) {
+        Document document = document(node.getPsi());
+
+        if (document == null) {
+            return null;
+        }
+
+        int startOffset = node.getStartOffset();
+        int lineStartOffset = document.getLineStartOffset(document.getLineNumber(startOffset));
+
+        return column(document.getCharsSequence(), lineStartOffset, startOffset);
+    }
+
+    /**
+     * The indent of the line {@code node} starts on - the column the whitespace before its first non-blank character
+     * ends at.
+     */
+    @Nullable
+    private Integer lineIndent(@NotNull ASTNode node) {
+        Document document = document(node.getPsi());
+
+        if (document == null) {
+            return null;
+        }
+
+        int lineNumber = document.getLineNumber(node.getStartOffset());
+        int lineStartOffset = document.getLineStartOffset(lineNumber);
+        int lineEndOffset = document.getLineEndOffset(lineNumber);
+        CharSequence text = document.getCharsSequence();
+        int indentEndOffset = lineStartOffset;
+
+        while (indentEndOffset < lineEndOffset && Character.isWhitespace(text.charAt(indentEndOffset))) {
+            indentEndOffset++;
+        }
+
+        return column(text, lineStartOffset, indentEndOffset);
+    }
+
+    /**
+     * The column {@code offset} sits at on the line starting at {@code lineStartOffset}.
+     *
+     * <p>Counting characters would do for a file indented with spaces, but {@link Indent#getSpaceIndent(int)} takes
+     * columns and a tab is worth however many columns it takes to reach the next tab stop, so a file indented with
+     * tabs would place the caret short of where the block it is measured against sits. This is
+     * {@link com.intellij.openapi.editor.ex.util.EditorUtil#calcColumnNumber}'s arithmetic, which there is no editor
+     * to ask for here.
+     */
+    private int column(@NotNull CharSequence text, int lineStartOffset, int offset) {
+        int tabSize = Math.max(tabSize(), 1);
+        int column = 0;
+
+        for (int charOffset = lineStartOffset; charOffset < offset; charOffset++) {
+            column += text.charAt(charOffset) == '\t' ? tabSize - column % tabSize : 1;
+        }
+
+        return column;
+    }
+
     private int indentSize() {
-        return CodeStyle.getIndentOptions(myNode.getPsi().getContainingFile()).INDENT_SIZE;
+        return indentOptions().INDENT_SIZE;
+    }
+
+    private int tabSize() {
+        return indentOptions().TAB_SIZE;
+    }
+
+    @NotNull
+    private CommonCodeStyleSettings.IndentOptions indentOptions() {
+        return CodeStyle.getIndentOptions(myNode.getPsi().getContainingFile());
     }
 
     /**
