@@ -184,6 +184,9 @@ val quoterExe: RegularFile = quoterUnzippedPath.file(quoterReleaseExecutablePath
 // tasks. Beside the release it describes, so it is keyed on the Elixir/OTP pair like the rest of that
 // tree; in the shared cache root it would describe whichever pair built last.
 val quoterAvailabilityFile: RegularFile = quoterUnzippedPath.file("quoter-availability.properties")
+// Written by `startQuoter` rather than `releaseQuoter`: whether the daemon actually came up, which is
+// a different question from whether it compiled, and the one the tests care about.
+val quoterStartedFile: RegularFile = quoterUnzippedPath.file("quoter-started.properties")
 // Opts back in to a hard failure at releaseQuoter, for debugging the quoter itself.
 val quoterRequired: Boolean = providers.gradleProperty("quoterRequired").getOrElse("false").toBoolean()
 val quoterTmpPath: Directory = cachePath.dir("quoter_tmp_$quoterRefSlug")
@@ -922,6 +925,8 @@ val startQuoter = tasks.register<StartQuoterTask>("startQuoter") {
     dependsOn(releaseQuoter)
 
     availabilityFile.set(quoterAvailabilityFile)
+    startedFile.set(quoterStartedFile)
+    required.set(quoterRequired)
 }
 
 registerResolveExternalDependenciesTasksForAllProjects()
@@ -954,8 +959,13 @@ tasks.named<Test>("test") {
 
     val sdkProps = sdkPropertiesFile
     val quoterAvailability = quoterAvailabilityFile.asFile
+    val quoterStarted = quoterStartedFile.asFile
     doFirst {
-        environment(elixirTestEnvironment(sdkProps.get().asFile, quoterAvailability))
+        // `startQuoter` writes the start marker every run and copies the build marker's reason when it
+        // skips, so where it exists it is the later and more complete answer. Falling back to the build
+        // marker keeps `-x startQuoter` working.
+        val effective = if (quoterStarted.isFile) quoterStarted else quoterAvailability
+        environment(elixirTestEnvironment(sdkProps.get().asFile, effective))
     }
 
     // QUOTER_AVAILABLE reaches the test JVM through that doFirst, so - as with the versions below -
@@ -963,6 +973,11 @@ tasks.named<Test>("test") {
     // reports the other run's results. Optional: `-x releaseQuoter` leaves no marker.
     inputs.file(quoterAvailability)
         .withPropertyName("quoterAvailability")
+        .withPathSensitivity(PathSensitivity.NONE)
+        .optional(true)
+
+    inputs.file(quoterStarted)
+        .withPropertyName("quoterStarted")
         .withPathSensitivity(PathSensitivity.NONE)
         .optional(true)
 
