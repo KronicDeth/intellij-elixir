@@ -90,6 +90,15 @@
 
 ### Bug Fixes
 
+- [#3951](https://github.com/KronicDeth/intellij-elixir/pull/3951) [@sh41](https://github.com/sh41)
+  - **`defstruct do ... end` and `defexception do ... end` no longer crash the structure view.** Both
+    were gated on the arity Elixir resolves, which counts a `do` block as an argument even though
+    nothing is actually written inside the call - so the structure view then asserted on an argument
+    list that was empty. Fixes [#2107](https://github.com/KronicDeth/intellij-elixir/issues/2107) and
+    [#1095](https://github.com/KronicDeth/intellij-elixir/issues/1095).
+  - **A piped `defdelegate` with a `do` block no longer throws while resolving variables.** Same
+    resolved-arity-vs-written-arity mismatch as above, reached through `defdelegate`'s own gate.
+
 - [#3948](https://github.com/KronicDeth/intellij-elixir/pull/3948) [@sh41](https://github.com/sh41)
   - **Auto-Indent Lines and paste no longer throw on a map update with a literal on the left**, such
     as `%{%{a} | k: 1}`.

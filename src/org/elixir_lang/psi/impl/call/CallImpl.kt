@@ -160,6 +160,16 @@ private fun Call.computeCallableReference(): PsiReference? =
  *
  * @return [Call.primaryArguments]
  */
+/**
+ * How many arguments are written inside this call, unlike [CallImpl.resolvedFinalArity] which also
+ * counts a `do` block and a piped-in value. Gate on this before reading [finalArguments].
+ *
+ * An extension, matching [finalArguments]'s style, not because it must be - a default method would
+ * work fine here too.
+ */
+@RequiresReadLock
+fun Call.finalArity(): Int? = secondaryArity() ?: primaryArity()
+
 @RequiresReadLock
 fun Call.finalArguments(): Array<PsiElement>? = try {
     (secondaryArguments() ?: primaryArguments())?.map { it!! }?.toTypedArray()
@@ -814,6 +824,7 @@ object CallImpl {
     @Contract(pure = true)
     @JvmStatic
     fun resolvedFinalArity(call: Call): Int = call.resolvedSecondaryArity() ?: call.resolvedPrimaryArity() ?: 0
+
 
     @RequiresReadLock
     @Contract(pure = true)

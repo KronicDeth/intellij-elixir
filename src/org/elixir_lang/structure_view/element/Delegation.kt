@@ -14,6 +14,7 @@ import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function
 import org.elixir_lang.psi.call.name.Module
 import org.elixir_lang.psi.impl.call.finalArguments
+import org.elixir_lang.psi.impl.call.finalArity
 import org.elixir_lang.psi.impl.call.keywordArgument
 import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.structure_view.element.CallDefinitionClause.Companion.enclosingModular
@@ -125,7 +126,10 @@ class Delegation(private val modular: Modular, call: Call) : Element<Call?>(call
             }
 
         @JvmStatic
-        fun `is`(call: Call): Boolean = call.isCalling(Module.KERNEL, Function.DEFDELEGATE, 2)
+        // finalArity, not resolvedFinalArity via isCalling(..., 2) - callDefinitionHeadCallList() reads
+        // finalArguments() and indexes it.
+        fun `is`(call: Call): Boolean =
+            call.isCalling(Module.KERNEL, Function.DEFDELEGATE) && call.finalArity() == 2
 
         @RequiresReadLock
         fun fromCall(call: Call): org.elixir_lang.structure_view.element.Delegation? =

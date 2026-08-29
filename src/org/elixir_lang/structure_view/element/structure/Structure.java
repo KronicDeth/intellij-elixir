@@ -19,6 +19,7 @@ import static org.elixir_lang.psi.call.name.Function.DEFSTRUCT;
 import static org.elixir_lang.psi.call.name.Module.KERNEL;
 import static org.elixir_lang.psi.impl.PsiElementImplKt.stripAccessExpression;
 import static org.elixir_lang.psi.impl.call.CallImplKt.finalArguments;
+import static org.elixir_lang.psi.impl.call.CallImplKt.finalArity;
 
 public class Structure extends Element<Call> {
     /*
@@ -42,8 +43,9 @@ public class Structure extends Element<Call> {
         return elementDescription;
     }
 
+    // finalArity, not resolvedFinalArity via isCalling(..., 1) - getChildren() reads finalArguments().
     public static boolean is(Call call) {
-        return call.isCalling(KERNEL, DEFSTRUCT, 1);
+        return call.isCalling(KERNEL, DEFSTRUCT) && Integer.valueOf(1).equals(finalArity(call));
     }
 
     /*
