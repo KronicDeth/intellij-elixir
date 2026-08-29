@@ -42,10 +42,16 @@ class ParameterInfo : ParameterInfoHandler<Arguments, Any> {
                 }
             }
 
-            // Deduplicate by (name, arity), preferring bare function heads (no do block)
-            // over implementation clauses.  Uses arity-aware grouping so that
-            // genuinely different arities (e.g. foo/1 vs foo/2) each get their own hint.
-            val itemToShowList = preferFunctionHeadsByArity(allClauses)
+            /* Deduplicate by (name, arity), preferring bare function heads (no do block) over
+               implementation clauses, and keep only the function actually being called - resolution also
+               returns functions the name is a prefix of, so `reduce` would otherwise be described by
+               `reduce_while` as well.
+
+               The references are resolved as incomplete code so that a call whose arguments are not typed
+               yet resolves at all, which is exactly when the hint is wanted: resolving them completely
+               collapses `foo/1` and `foo/2` to a single arity, and does not drop the prefix matches
+               either. Both halves were measured. */
+            val itemToShowList = preferFunctionHeadsByArity(allClauses, call.functionName())
 
             if (itemToShowList.isNotEmpty()) {
                 context.itemsToShow = itemToShowList.toTypedArray()

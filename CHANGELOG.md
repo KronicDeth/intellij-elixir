@@ -94,6 +94,8 @@
   - **A trailing comma in a call's argument list no longer breaks the rest of the file.** Typing
     `foo(a,)` on the way to the next argument used to discard the enclosing definition and everything
     after it, taking parameter hints with it. Applies to `foo(a,)`, `Mod.fun(a,)` and `fun.(a,)`.
+  - **Parameter hints no longer describe functions you are not calling.** `Enum.reduce` listed eight
+    signatures, including `reduce_while`'s. Each arity of the called function still gets its own hint.
   - **Pressing Enter after a delimiter now indents the caret where an element goes** rather than back
     to the enclosing statement: after `[`, `{`, `%{`, `%S{`, `<<` and `Foo.{`, after a comma, after
     `->` in a clause, after the `rescue`, `after`, `else` and `catch` keywords, and inside empty
