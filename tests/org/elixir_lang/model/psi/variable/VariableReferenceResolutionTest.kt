@@ -63,6 +63,28 @@ class VariableReferenceResolutionTest : PlatformTestCase() {
         assertEquals(VariableSymbol.Kind.PARAMETER, symbols.single().kind)
     }
 
+    /**
+     * A binding made inside a `quote` block resolves from a use in the same block. Macro bodies are
+     * the one place resolution has to look through quoting, and nothing else asserts that it does.
+     */
+    fun testPlainBindingInsideQuoteIsResolvedFromUsage() {
+        myFixture.configureByFiles("plain_binding_inside_quote.ex")
+        val file = myFixture.file
+        val offset = myFixture.caretOffset
+
+        val symbols = ApplicationManager.getApplication().runReadAction(Computable {
+            val leaf = file.findElementAt(offset)!!
+            VariableReference.resolveSymbols(hostOf(leaf)).toList()
+        })
+
+        assertEquals(
+            "A plain `bar = 1` inside a quote should resolve to its binding",
+            1,
+            symbols.size
+        )
+        assertEquals("bar", symbols.single().name)
+    }
+
     private fun hostOf(leaf: PsiElement): PsiElement =
         generateSequence(leaf) { it.parent }
             .firstOrNull { it is Call || it is ElixirVariable }
