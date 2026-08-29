@@ -2,7 +2,11 @@
 
 package org.elixir_lang.code_insight
 
+import com.intellij.codeInsight.CodeInsightSettings
 import com.intellij.codeInsight.completion.CompletionType
+import com.intellij.codeInsight.lookup.impl.LookupImpl
+import com.intellij.codeInsight.hint.ParameterInfoControllerBase
+import com.intellij.codeInsight.hint.ParameterInfoListener
 import com.intellij.find.usages.api.PsiUsage
 import com.intellij.find.usages.api.SearchTarget
 import com.intellij.find.usages.api.UsageOptions
@@ -21,6 +25,8 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.PsiUtilBase
+import com.intellij.testFramework.AutoPopupParameterInfoTestUtil
+import com.intellij.testFramework.PlatformTestUtil
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import junit.framework.TestCase.assertNull
 import junit.framework.TestCase.assertTrue
@@ -397,3 +403,149 @@ fun CodeInsightTestFixture.renameTargetsAtCaret(): List<RenameTarget> =
 @Suppress("UnstableApiUsage")
 private fun CodeInsightTestFixture.symbolResolutionFile(project: Project): PsiFile =
     PsiUtilBase.getPsiFileInEditor(editor, project) ?: file
+
+
+
+/**
+ * What the parameter-info popup holds once the IDE has decided to show one: one entry per signature
+ * offered, and which parameter the caret is on.
+ *
+ * A `null` [ParameterInfoPopup] means the IDE never got as far as building a popup at all - the outcome
+ * these gestures exist to tell apart from "the IDE offered me a choice".
+ */
+data class ParameterInfoPopup(val signatures: List<String>, val currentParameterIndex: Int)
+
+/**
+ * Runs [gesture] and returns the parameter-info popup the IDE builds in response, or `null` when it
+ * builds none.
+ *
+ * WHAT THIS CAN AND CANNOT SEE. It cannot see the popup on screen: a headless fixture paints no Swing, so
+ * `ParameterInfoControllerBase.existsWithVisibleHintForEditor` is `false` even for a gesture that
+ * unquestionably shows a hint in a real IDE - measured, not assumed. What it observes instead is that the
+ * platform built and populated a `ParameterInfoController` for the editor, the last step before
+ * `HintManagerImpl.showEditorHint`. A sandbox trace of these same gestures confirmed that remaining step
+ * follows within milliseconds whenever a controller is built, so this is a faithful proxy for the
+ * *decision* to show a hint - but it is a proxy, and a regression that suppressed only the final paint
+ * would not be caught here.
+ *
+ * Both halves are needed, because neither alone is honest. `ParameterInfoListener.hintUpdated` carries the
+ * signatures, but `ParameterInfoController` fires it under `|| isHeadlessEnvironment()`, which
+ * short-circuits the very visibility check the listener is otherwise gated on - so on its own it reports
+ * models the user would never see. `existsForEditor` says a controller was built but not what is in it.
+ *
+ * WHY NOT [org.elixir_lang.code_insight.ParameterInfo] DIRECTLY: the handler-level tests in
+ * `ParameterInfoTest` drive `findElementForParameterInfo`/`showParameterInfo` against a
+ * `MockCreateParameterInfoContext`, whose `showHint` is a no-op. That pins which signatures the handler
+ * *resolves*, a different question from whether the IDE shows anything: the handler resolves the same
+ * signature whether the caret arrived by typing, by accepting a completion, or by being moved back, and
+ * only one of those asks for a popup. The asking happens upstream of the handler - the platform's typed
+ * handler does it for `(` and `,`, and a completion insert handler must do it for an accepted lookup - so
+ * only the real chain tells them apart.
+ *
+ * The chain is asynchronous by design - an alarm, then a pooled-thread read action, then
+ * `performLaterWhenAllCommitted` - so the delay is set to zero and the event queue pumped until the
+ * controller reports. A gesture that asks for no popup never reports, so the wait running out is an
+ * expected outcome rather than a failure, and costs [POPUP_TIMEOUT_SECONDS].
+ */
+fun CodeInsightTestFixture.parameterInfoPopupAfter(gesture: CodeInsightTestFixture.() -> Unit): ParameterInfoPopup? {
+    val settings = CodeInsightSettings.getInstance()
+    val autoPopupWas = settings.AUTO_POPUP_PARAMETER_INFO
+    val delayWas = settings.PARAMETER_INFO_DELAY
+
+    val model = arrayOfNulls<ParameterInfoPopup>(1)
+    val reported = booleanArrayOf(false)
+
+    val listener = object : ParameterInfoListener {
+        override fun hintUpdated(result: ParameterInfoControllerBase.Model) {
+            model[0] = ParameterInfoPopup(
+                result.signatures.map { signature ->
+                    (signature as? ParameterInfoControllerBase.SignatureItem)?.text ?: signature.toString()
+                },
+                result.current
+            )
+            reported[0] = true
+        }
+
+        override fun hintHidden(project: Project) {
+            reported[0] = true
+        }
+    }
+
+    ParameterInfoListener.EP_NAME.point.registerExtension(listener, testRootDisposable)
+
+    try {
+        settings.AUTO_POPUP_PARAMETER_INFO = true
+        settings.PARAMETER_INFO_DELAY = 0
+
+        gesture()
+
+        /* Each stage is waited on with the platform's own helper where one exists, and the queue pumped
+           between them: `AutoPopupParameterInfoTestUtil` alone returns before the hint is built, because
+           the `performLaterWhenAllCommitted` between the alarm and the controller needs the queue pumped
+           to run at all - measured, every case reported nothing without it. */
+        AutoPopupParameterInfoTestUtil.waitForAutoPopup(project)
+
+        try {
+            PlatformTestUtil.waitWithEventsDispatching("", { reported[0] }, POPUP_TIMEOUT_SECONDS)
+        } catch (ignored: AssertionError) {
+            // a gesture that asks for no popup never reports, which is an outcome rather than a failure
+        }
+
+        AutoPopupParameterInfoTestUtil.waitForParameterInfoUpdate(editor)
+    } finally {
+        settings.AUTO_POPUP_PARAMETER_INFO = autoPopupWas
+        settings.PARAMETER_INFO_DELAY = delayWas
+    }
+
+    return if (ParameterInfoControllerBase.existsForEditor(editor)) model[0] else null
+}
+
+private const val POPUP_TIMEOUT_SECONDS = 5
+
+/** Types [charTyped] at the caret, as the user typing an opening parenthesis or a comma does. */
+fun CodeInsightTestFixture.parameterInfoPopupAfterTyping(charTyped: Char): ParameterInfoPopup? =
+    parameterInfoPopupAfter { type(charTyped) }
+
+/**
+ * Accepts the completion candidate named [lookupString] with [completionChar], the way a user finishes a
+ * name from the lookup rather than typing it out.
+ *
+ * The lookup is finished directly rather than by typing the character, because that is what the editor
+ * does: an open lookup consumes the keystroke, so `TypedHandler` - and with it the platform's own
+ * `(`-and-`,` auto-popup - never runs. Typing the character into the fixture instead reaches
+ * `TypedHandler` and quietly exercises the path that already works, which is the difference between a
+ * test that catches this and one that does not.
+ *
+ * The candidate is selected explicitly rather than relying on the lookup's ordering, so the test pins the
+ * popup rather than which candidate happened to sort first. The fixture must offer more than one
+ * candidate, or the lookup auto-inserts and there is nothing to accept.
+ */
+fun CodeInsightTestFixture.parameterInfoPopupAfterAcceptingCompletion(
+    lookupString: String,
+    completionChar: Char = '\t'
+): ParameterInfoPopup? = parameterInfoPopupAfter {
+    val candidates = completeBasic()
+        ?: throw AssertionError("Expected a completion lookup to open, but a single candidate was auto-inserted")
+    val candidate = candidates.firstOrNull { it.lookupString == lookupString }
+        ?: throw AssertionError(
+            "Expected a '$lookupString' completion candidate, got ${candidates.map { it.lookupString }}"
+        )
+
+    (lookup as LookupImpl).currentItem = candidate
+
+    finishLookup(completionChar)
+}
+
+/**
+ * Moves the caret out of the argument list and back to where it started, the way a user who looked
+ * elsewhere and returned does. Nothing is typed, so nothing asks the platform for a popup.
+ */
+fun CodeInsightTestFixture.parameterInfoPopupAfterLeavingAndReturning(): ParameterInfoPopup? {
+    val argumentOffset = caretOffset
+
+    return parameterInfoPopupAfter {
+        editor.caretModel.moveToOffset(0)
+        PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
+        editor.caretModel.moveToOffset(argumentOffset)
+    }
+}

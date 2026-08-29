@@ -1,5 +1,6 @@
 package org.elixir_lang.code_insight.completion.insert_handler;
 
+import com.intellij.codeInsight.AutoPopupController;
 import com.intellij.codeInsight.completion.InsertHandler;
 import com.intellij.codeInsight.completion.InsertionContext;
 import com.intellij.codeInsight.lookup.LookupElement;
@@ -42,6 +43,14 @@ public class CallDefinitionClause implements InsertHandler<LookupElement> {
             context.getDocument().insertString(tailOffset, "()");
             // + 1 to put between the `(`  and `)`
             context.getEditor().getCaretModel().moveToOffset(tailOffset + 1);
+
+            /* The caret now sits where the first argument goes, but nothing has asked for the parameter
+               hint: an open lookup consumes the keystroke that accepted the completion, so the platform's
+               typed handler - which asks on every `(` and `,` - never runs. Ask here, as the completion
+               that inserted the parentheses. */
+            AutoPopupController
+                    .getInstance(context.getProject())
+                    .autoPopupParameterInfo(context.getEditor(), null);
         }
     }
 }

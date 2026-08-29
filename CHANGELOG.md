@@ -96,6 +96,8 @@
     after it, taking parameter hints with it. Applies to `foo(a,)`, `Mod.fun(a,)` and `fun.(a,)`.
   - **Parameter hints no longer describe functions you are not calling.** `Enum.reduce` listed eight
     signatures, including `reduce_while`'s. Each arity of the called function still gets its own hint.
+  - **Parameter hints now appear when a completion is accepted.** Accepting a name from the completion
+    popup left the caret between the inserted parentheses with no hint there.
   - **Pressing Enter after a delimiter now indents the caret where an element goes** rather than back
     to the enclosing statement: after `[`, `{`, `%{`, `%S{`, `<<` and `Foo.{`, after a comma, after
     `->` in a clause, after the `rescue`, `after`, `else` and `catch` keywords, and inside empty
