@@ -62,6 +62,25 @@ public class Block extends AbstractBlock implements BlockEx {
             MATCHED_COMPARISON_OPERATION,
             UNMATCHED_COMPARISON_OPERATION
     );
+    /** The rules a delimiter's container is reached through: a container groups its pairs under a node of its own. */
+    private static final TokenSet DELIMITER_GROUPING_TOKEN_SET = TokenSet.create(
+            ASSOCIATIONS,
+            ASSOCIATIONS_BASE,
+            KEYWORDS,
+            MAP_CONSTRUCTION_ARGUMENTS
+    );
+    /**
+     * The tokens that punctuate a container: the delimiter it opens with, and the commas and {@code ->} between its
+     * elements.
+     */
+    private static final TokenSet DELIMITER_TOKEN_SET = TokenSet.create(
+            COMMA,
+            OPENING_BIT,
+            OPENING_BRACKET,
+            OPENING_CURLY,
+            OPENING_PARENTHESIS,
+            STAB_OPERATOR
+    );
     private static final TokenSet HEREDOC_LINE_TOKEN_SET = TokenSet.create(
             HEREDOC_LINE,
             INTERPOLATED_HEREDOC_LINE,
@@ -124,6 +143,16 @@ public class Block extends AbstractBlock implements BlockEx {
             UNMATCHED_UNQUALIFIED_NO_ARGUMENTS_CALL
     );
     private static final TokenSet NO_PARENTHESES_KEYWORD_PAIR_TOKEN_SET = TokenSet.create(NO_PARENTHESES_KEYWORD_PAIR);
+    /** The containers whose elements sit one indent in from the line the container starts on. */
+    private static final TokenSet NORMAL_INDENT_CONTAINER_TOKEN_SET = TokenSet.create(
+            BIT_STRING,
+            BLOCK_IDENTIFIER,
+            LIST,
+            MAP_ARGUMENTS,
+            MULTIPLE_ALIASES,
+            STAB_INFIX_OPERATOR,
+            TUPLE
+    );
     private static final TokenSet OPERATION_TOKEN_SET = TokenSet.orSet(
             TokenSet.create(
                     MATCHED_ADDITION_OPERATION,
@@ -2189,10 +2218,15 @@ public class Block extends AbstractBlock implements BlockEx {
     @Override
     public ChildAttributes getChildAttributes(int newChildIndex) {
         ChildAttributes childAttributes;
+        IElementType elementType = myNode.getElementType();
 
         if (newChildIndex > 0) {
-           childAttributes = DELEGATE_TO_PREV_CHILD;
-        } else if (myNode.getElementType() == DO) {
+            Indent afterDelimiterIndent = indentAfterDelimiter(newChildIndex);
+
+            childAttributes = afterDelimiterIndent != null ?
+                    new ChildAttributes(afterDelimiterIndent, null) :
+                    DELEGATE_TO_PREV_CHILD;
+        } else if (elementType == DO) {
             boolean indentRelativeToDirectParent =
                     codeStyleSettings(myNode).ALIGN_UNMATCHED_CALL_DO_BLOCKS ==
                             CodeStyleSettings.UnmatchedCallDoBlockAlignment.CALL.value;
@@ -2208,6 +2242,201 @@ public class Block extends AbstractBlock implements BlockEx {
         }
 
         return childAttributes;
+    }
+
+    /**
+     * The indent to put the caret at when it follows one of the tokens that punctuate a container - the delimiter it
+     * opens with, a comma between its elements, {@code ->} or a block identifier. All of these are built without an
+     * indent of their own, because they sit beside the element they punctuate rather than starting a line, so
+     * delegating to one indents against nothing and the caret falls back to the enclosing statement.
+     *
+     * <p>The delimiter is recognised by its own ancestry rather than by this block's element type, because a
+     * container's children are flattened into the enclosing block's sub-blocks: the block being asked after a comma
+     * in an argument list is the call, not the argument list.
+     *
+     * <p>Every column this produces is the one {@code mix format} puts an element at for the same construct.
+     *
+     * @return the indent to answer the delegation with, or {@code null} to keep delegating. A comma in a call written
+     * without parentheses keeps delegating: {@code mix format} aligns what follows it under the first argument in
+     * {@code with a <- one(),} but indents it in {@code import Foo,}, and which of the two applies is decided by the
+     * argument that has not been typed yet.
+     */
+    @Nullable
+    private Indent indentAfterDelimiter(int newChildIndex) {
+        List<com.intellij.formatting.Block> subBlocks = getSubBlocks();
+
+        if (newChildIndex > subBlocks.size()) {
+            return null;
+        }
+
+        com.intellij.formatting.Block previousChild = subBlocks.get(newChildIndex - 1);
+
+        if (!(previousChild instanceof Block)) {
+            return null;
+        }
+
+        ASTNode previousNode = ((Block) previousChild).myNode;
+        ASTNode container = previousNode.getTreeParent();
+
+        if (container == null) {
+            return null;
+        }
+
+        // a block identifier is a rule rather than a token, so its keyword is the leaf the caret follows
+        boolean afterDelimiter = DELIMITER_TOKEN_SET.contains(previousNode.getElementType()) ||
+                container.getElementType() == BLOCK_IDENTIFIER;
+
+        if (!afterDelimiter) {
+            return null;
+        }
+
+        while (DELIMITER_GROUPING_TOKEN_SET.contains(container.getElementType())) {
+            container = container.getTreeParent();
+
+            if (container == null) {
+                return null;
+            }
+        }
+
+        return indentInContainer(container);
+    }
+
+    /**
+     * The indent an element of {@code container} written on its own line takes.
+     *
+     * @return {@code null} when the container is not one whose elements indent, such as the argument list of a call
+     * written without parentheses.
+     */
+    @Nullable
+    private Indent indentInContainer(@NotNull ASTNode container) {
+        IElementType containerElementType = container.getElementType();
+        Indent indent;
+
+        if (containerElementType == PARENTHESES_ARGUMENTS) {
+            /* An argument list wraps to the column of the call it belongs to plus one indent, which is where the
+               answering block starts - except in a dot call, where the argument list is the answering block and
+               already starts at the parenthesis. */
+            indent = myNode.getElementType() == PARENTHESES_ARGUMENTS ?
+                    Indent.getNormalIndent() :
+                    Indent.getNormalIndent(true);
+        } else if (containerElementType == MAP_UPDATE_ARGUMENTS) {
+            indent = mapUpdatePairIndent(container);
+        } else if (NORMAL_INDENT_CONTAINER_TOKEN_SET.contains(containerElementType)) {
+            indent = Indent.getNormalIndent();
+        } else {
+            indent = null;
+        }
+
+        return indent;
+    }
+
+    /**
+     * The indent a map update's pairs take: one indent in from the pipe, wherever the pipe sits.
+     *
+     * <p>That is two indents in from the line the map starts on while the map starts a line of its own, but not when
+     * it is written as the value of an enclosing update, because it then begins on that update's continuation line and
+     * its pipe is further right than the line's own indent. Anchoring to the pipe covers both, so the columns follow
+     * {@code mix format} at any nesting depth.
+     *
+     * <p>A space indent is resolved against the indent of the line the answering block starts on, so the pipe's column
+     * has to be re-expressed as a distance from there. It cannot be anchored to the block itself: a map update's block
+     * starts at the {@code %{}, which is to the right of its own pipe, and an indent can never place the caret left of
+     * the block it is relative to.
+     *
+     * @return {@code null} when the pipe or either column cannot be read, so that the caret keeps delegating rather
+     * than landing on a column that was guessed.
+     */
+    @Nullable
+    private Indent mapUpdatePairIndent(@NotNull ASTNode mapUpdateArguments) {
+        ASTNode pipe = mapUpdateArguments.findChildByType(PIPE_INFIX_OPERATOR);
+
+        if (pipe == null) {
+            return null;
+        }
+
+        Integer pipeColumn = column(pipe);
+        Integer lineIndent = lineIndent(myNode);
+
+        if (pipeColumn == null || lineIndent == null) {
+            return null;
+        }
+
+        int spaces = pipeColumn + indentSize() - lineIndent;
+
+        return spaces >= 0 ? Indent.getSpaceIndent(spaces) : null;
+    }
+
+    /** The column {@code node} starts at, or {@code null} when there is no document to measure against. */
+    @Nullable
+    private Integer column(@NotNull ASTNode node) {
+        Document document = document(node.getPsi());
+
+        if (document == null) {
+            return null;
+        }
+
+        int startOffset = node.getStartOffset();
+        int lineStartOffset = document.getLineStartOffset(document.getLineNumber(startOffset));
+
+        return column(document.getCharsSequence(), lineStartOffset, startOffset);
+    }
+
+    /**
+     * The indent of the line {@code node} starts on - the column the whitespace before its first non-blank character
+     * ends at.
+     */
+    @Nullable
+    private Integer lineIndent(@NotNull ASTNode node) {
+        Document document = document(node.getPsi());
+
+        if (document == null) {
+            return null;
+        }
+
+        int lineNumber = document.getLineNumber(node.getStartOffset());
+        int lineStartOffset = document.getLineStartOffset(lineNumber);
+        int lineEndOffset = document.getLineEndOffset(lineNumber);
+        CharSequence text = document.getCharsSequence();
+        int indentEndOffset = lineStartOffset;
+
+        while (indentEndOffset < lineEndOffset && Character.isWhitespace(text.charAt(indentEndOffset))) {
+            indentEndOffset++;
+        }
+
+        return column(text, lineStartOffset, indentEndOffset);
+    }
+
+    /**
+     * The column {@code offset} sits at on the line starting at {@code lineStartOffset}.
+     *
+     * <p>Counting characters would do for a file indented with spaces, but {@link Indent#getSpaceIndent(int)} takes
+     * columns and a tab is worth however many columns it takes to reach the next tab stop, so a file indented with
+     * tabs would place the caret short of where the block it is measured against sits. This is
+     * {@link com.intellij.openapi.editor.ex.util.EditorUtil#calcColumnNumber}'s arithmetic, which there is no editor
+     * to ask for here.
+     */
+    private int column(@NotNull CharSequence text, int lineStartOffset, int offset) {
+        int tabSize = Math.max(tabSize(), 1);
+        int column = 0;
+
+        for (int charOffset = lineStartOffset; charOffset < offset; charOffset++) {
+            column += text.charAt(charOffset) == '\t' ? tabSize - column % tabSize : 1;
+        }
+
+        return column;
+    }
+
+    private int indentSize() {
+        return indentOptions().INDENT_SIZE;
+    }
+
+    private int tabSize() {
+        return indentOptions().TAB_SIZE;
+    }
+
+    @NotNull
+    private CommonCodeStyleSettings.IndentOptions indentOptions() {
+        return CodeStyle.getIndentOptions(myNode.getPsi().getContainingFile());
     }
 
     /**

@@ -99,6 +99,55 @@ public class ParameterInfoTest extends PlatformTestCase {
     }
 
     /**
+     * Parameter hints are wanted exactly after the comma that begins the next argument, and that is
+     * the moment the source is momentarily invalid.  The malformed argument list used to take the
+     * enclosing definition with it, leaving no Arguments ancestor for the caret to sit in.
+     */
+    public void testTrailingCommaKeepsHint() {
+        myFixture.configureByFile("trailing_comma_local_call.ex");
+
+        ParameterInfo handler = new ParameterInfo();
+        CreateParameterInfoContext context = new MockCreateParameterInfoContext(myFixture.getEditor(), myFixture.getFile());
+        Arguments args = handler.findElementForParameterInfo(context);
+
+        assertNotNull("Should find Arguments element at caret after a trailing comma", args);
+
+        handler.showParameterInfo(args, context);
+        Object[] items = context.getItemsToShow();
+
+        assertNotNull("Should have parameter info items", items);
+
+        List<String> paramTexts = renderedParameterTexts(handler, args, items);
+        assertEquals("A trailing comma should not change which signature is shown, got: " + paramTexts,
+                List.of("augend, addend"), paramTexts);
+    }
+
+    /**
+     * A function whose name another function's name starts with is not described by it.  References are
+     * resolved as incomplete code - which is what lets a call resolve before its arguments are typed, and
+     * so is exactly the state parameter info is wanted in - and that resolves every prefix match too, so
+     * {@code reduce} was described by {@code reduce_while} as well as by its own two arities.
+     */
+    public void testPrefixMatchedFunctionIsNotOffered() {
+        myFixture.configureByFiles("prefix_match_usage.ex", "prefix_match_declaration.ex");
+
+        ParameterInfo handler = new ParameterInfo();
+        CreateParameterInfoContext context = new MockCreateParameterInfoContext(myFixture.getEditor(), myFixture.getFile());
+        Arguments args = handler.findElementForParameterInfo(context);
+
+        assertNotNull("Should find Arguments element at caret", args);
+
+        handler.showParameterInfo(args, context);
+        Object[] items = context.getItemsToShow();
+
+        assertNotNull("Should have parameter info items", items);
+
+        List<String> paramTexts = renderedParameterTexts(handler, args, items);
+        assertEquals("Only reduce's own arities should be offered, got: " + paramTexts,
+                List.of("enumerable, fun", "enumerable, acc, fun"), paramTexts);
+    }
+
+    /**
      * Renders every parameter-info item as its user-visible parameter text (as {@code updateUI}
      * would present in the popup) with the caret on the first parameter.
      *

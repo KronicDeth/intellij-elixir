@@ -1399,6 +1399,34 @@ parenthesesArguments ::= OPENING_PARENTHESIS
                            ]
                          }
 
+/*
+ * `parenthesesArguments`, committed once the opening parenthesis is read.  Used wherever the
+ * parentheses are a call's argument list - after a `CALL` token, and after a `.` in a dot call -
+ * because an argument list that does not parse there is a half-typed call rather than something to
+ * back out of.  Uncommitted, the failure detaches the arguments from the call and propagates out
+ * through `stabBody` and `stab` until the enclosing `do` block and every expression after it are lost.
+ *
+ * `stabParenthesesSignature` keeps the uncommitted rule: it relies on backing out of an argument-list
+ * reading when it meets `->`, as in `(peerName :: charlist(), fingerprint() -> boolean())`.
+ *
+ * Recovery eats only the comma left over after the arguments read, because an argument list with a
+ * trailing comma before the `)` is an ordinary state to type through.  Newlines inside parentheses
+ * are whitespace rather than `EOL` tokens, so a multi-line list needs nothing more.  Anything else
+ * stops it: recovering as far as the next `)` anywhere in the file would pull the expressions after
+ * an unclosed parenthesis into its argument list, and eating the end of line would leave the
+ * expression after it with no separator to start from.
+ */
+callParenthesesArguments ::= OPENING_PARENTHESIS callParenthesesArgumentsBody? CLOSING_PARENTHESIS
+                             {
+                               elementType = parenthesesArguments
+                               pin = 1
+                             }
+private callParenthesesArgumentsBody ::= unqualifiedNoParenthesesManyArgumentsCall |
+                                         keywords |
+                                         parenthesesPositionalArguments (infixComma keywords)?
+                                         { recoverWhile = callParenthesesArgumentsBodyRecoverWhile }
+private callParenthesesArgumentsBodyRecoverWhile ::= &COMMA
+
 // call_args_no_parens_one
 noParenthesesOneArgument ::= noParenthesesKeywords | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L417
                              unqualifiedNoParenthesesManyArgumentsCall | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L419
@@ -1431,7 +1459,7 @@ noParenthesesOneArgument ::= noParenthesesKeywords | // @see https://github.com/
                                ]
                              }
 
-matchedParenthesesArguments ::= CALL parenthesesArguments parenthesesArguments? // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L254-255
+matchedParenthesesArguments ::= CALL callParenthesesArguments callParenthesesArguments? // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L254-255
 
 /*
  * Dot (Anonymous function) Call Operation
@@ -1439,7 +1467,7 @@ matchedParenthesesArguments ::= CALL parenthesesArguments parenthesesArguments? 
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L403
  */
 
-matchedDotCall ::= matchedExpression dotInfixOperator parenthesesArguments parenthesesArguments?
+matchedDotCall ::= matchedExpression dotInfixOperator callParenthesesArguments callParenthesesArguments?
                    {
                      implements = [
                        "org.elixir_lang.psi.DotCall<org.elixir_lang.psi.stub.MatchedDotCall>"
@@ -1751,7 +1779,7 @@ private associationInfixOperator ::= ASSOCIATION_OPERATOR
 containerAssociationOperation ::= containerExpression associationInfixOperator containerExpression
                                   { implements = "org.elixir_lang.psi.AssociationOperation" methods = [quote] }
 
-left maxDotCall ::= dotInfixOperator parenthesesArguments parenthesesArguments?
+left maxDotCall ::= dotInfixOperator callParenthesesArguments callParenthesesArguments?
                     { elementType = matchedDotCall }
 
 left maxQualifiedAlias ::= dotInfixOperator alias
@@ -2276,7 +2304,7 @@ private doBlockMaybe ::= doBlock?
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L403
  */
 
-unmatchedDotCall ::= unmatchedExpression dotInfixOperator parenthesesArguments parenthesesArguments? doBlockMaybe
+unmatchedDotCall ::= unmatchedExpression dotInfixOperator callParenthesesArguments callParenthesesArguments? doBlockMaybe
                      {
                        implements = "org.elixir_lang.psi.DotCall<org.elixir_lang.psi.stub.UnmatchedDotCall>"
                        mixin = "org.elixir_lang.psi.impl.NamedStubbedPsiElementBase<org.elixir_lang.psi.stub.UnmatchedDotCall>"
