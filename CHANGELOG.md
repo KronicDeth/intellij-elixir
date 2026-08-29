@@ -90,6 +90,15 @@
 
 ### Bug Fixes
 
+- [#3953](https://github.com/KronicDeth/intellij-elixir/pull/3953) [@sh41](https://github.com/sh41)
+  - **"Cannot find enclosing Modular" no longer fires for a `def` inside a map-held `quote`, or for a
+    `@callback` behind an infix operator.** The walk that finds a definition's enclosing module treated
+    lists and tuples as transparent but not a map's internals, so a `quote` held as a map value stopped
+    it; and it knew `=` and `|>` but no other infix operator, so an `@callback` on the right of `||`
+    stopped it too. Every infix operator is transparent now, since a binary operator is never itself a
+    module. Refs [#1695](https://github.com/KronicDeth/intellij-elixir/issues/1695) and
+    [#1438](https://github.com/KronicDeth/intellij-elixir/issues/1438).
+
 - [#3951](https://github.com/KronicDeth/intellij-elixir/pull/3951) [@sh41](https://github.com/sh41)
   - **`defstruct do ... end` and `defexception do ... end` no longer crash the structure view.** Both
     were gated on the arity Elixir resolves, which counts a `do` block as an argument even though
