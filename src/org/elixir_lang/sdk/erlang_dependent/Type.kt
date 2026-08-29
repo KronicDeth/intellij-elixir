@@ -8,7 +8,6 @@ import com.intellij.openapi.projectRoots.AdditionalDataConfigurable
 import com.intellij.openapi.projectRoots.SdkAdditionalData
 import com.intellij.openapi.projectRoots.impl.DependentSdkType
 import com.intellij.openapi.projectRoots.impl.SdkConfigurationUtil
-import com.intellij.openapi.roots.JavadocOrderRootType
 import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.Ref
@@ -48,7 +47,12 @@ abstract class Type protected constructor(name: String) : DependentSdkType(name)
     }
 
     override fun isRootTypeApplicable(type: OrderRootType): Boolean {
-        return type === OrderRootType.CLASSES || type === OrderRootType.SOURCES || type === JavadocOrderRootType.getInstance()
+        // Small IDEs do not register JavadocOrderRootType, so calling getInstance() there throws.
+        // documentationRootType() returns null instead. See
+        // https://github.com/KronicDeth/intellij-elixir/issues/976.
+        return type === OrderRootType.CLASSES ||
+                type === OrderRootType.SOURCES ||
+                type === org.elixir_lang.sdk.Type.documentationRootType()
     }
 
     override fun saveAdditionalData(additionalData: SdkAdditionalData, additional: Element) {
