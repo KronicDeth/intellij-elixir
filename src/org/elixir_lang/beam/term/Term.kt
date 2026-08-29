@@ -146,8 +146,24 @@ fun value(fullTag: UnsignedByte, data: ByteArray, offset: Int): Pair<Any, ByteCo
                 bits7to5.shl(8).or(lowByte)
             }
             bits7to5 == 0b111 -> {
-                val (byteCount, byteCountByteCount) = unsignedByte(data[internalOffset])
-                internalOffset += byteCountByteCount
+                // The 3-bit length field encodes byte lengths 2 through 8 directly, as
+                // `bits7to5 + 2` in the branch below. 7 is an escape: the length does not fit,
+                // so it follows as its own compact term, and the real length is that value plus
+                // 9 - the next length the direct form cannot express. See decode_int_length/2
+                // in OTP's lib/compiler/src/beam_disasm.erl, which imitates
+                // get_erlang_integer() in beam_load.c.
+                val (lengthTag, lengthTagByteCount) = unsignedByte(data[internalOffset])
+                internalOffset += lengthTagByteCount
+
+                val (length, lengthByteCount) = value(lengthTag, data, internalOffset)
+                internalOffset += lengthByteCount
+
+                val byteCount = when (length) {
+                    is Int -> length + 9
+                    else -> throw IllegalArgumentException(
+                        "Extended integer length is not a small integer (${length.javaClass} $length)"
+                    )
+                }
 
                 val value = ByteSubarray(data, internalOffset, byteCount)
                 internalOffset += byteCount

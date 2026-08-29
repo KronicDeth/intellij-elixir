@@ -6,6 +6,11 @@
 
 ### Enhancements
 
+- [#3947](https://github.com/KronicDeth/intellij-elixir/pull/3947) [@sh41](https://github.com/sh41)
+  - **Large integer literals in a decompiled BEAM now show their real value.** Anything nine bytes or
+    wider had been decoded wrongly since 2018, and on some files the Code tab threw
+    `ArrayIndexOutOfBoundsException` instead of opening.
+
 - [#3946](https://github.com/KronicDeth/intellij-elixir/pull/3946) [@sh41](https://github.com/sh41)
   - **Configuring an Elixir SDK no longer crashes PhpStorm, WebStorm and the other small IDEs** when
     another installed plugin registers a root type of its own. Opening the SDK editor threw
