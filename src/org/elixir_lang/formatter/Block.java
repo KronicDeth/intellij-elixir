@@ -1508,7 +1508,11 @@ public class Block extends AbstractBlock implements BlockEx {
                         leftOperand[0] = false;
                     } else {
                         if (leftOperand[0]) {
-                            blockList.add(buildChild(child, operandWrap));
+                            if (childElementType == ACCESS_EXPRESSION) {
+                                blockList.addAll(buildAccessExpressionChildren(child, operandWrap));
+                            } else {
+                                blockList.add(buildChild(child, operandWrap));
+                            }
                         } else {
                             blockList.addAll(
                                     buildMapTailArgumentsChildChildren(

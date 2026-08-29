@@ -6,16 +6,6 @@
 
 ### Enhancements
 
-- [#3947](https://github.com/KronicDeth/intellij-elixir/pull/3947) [@sh41](https://github.com/sh41)
-  - **Large integer literals in a decompiled BEAM now show their real value.** Anything nine bytes or
-    wider had been decoded wrongly since 2018, and on some files the Code tab threw
-    `ArrayIndexOutOfBoundsException` instead of opening.
-
-- [#3946](https://github.com/KronicDeth/intellij-elixir/pull/3946) [@sh41](https://github.com/sh41)
-  - **Configuring an Elixir SDK no longer crashes PhpStorm, WebStorm and the other small IDEs** when
-    another installed plugin registers a root type of its own. Opening the SDK editor threw
-    `Root type class ... JavadocOrderRootType not found`.
-
 - [#3925](https://github.com/KronicDeth/intellij-elixir/pull/3925) [@sh41](https://github.com/sh41)
   - **File and line are now linked inside an inspected stack trace.** A crash report often carries
     its trace as a term rather than a formatted trace, putting each frame's location in a keyword
@@ -99,6 +89,18 @@
   - **Find Usages finds a plain Elixir call embedded in a `~H` sigil**, e.g. `{some_function()}`.
 
 ### Bug Fixes
+
+- [#3948](https://github.com/KronicDeth/intellij-elixir/pull/3948) [@sh41](https://github.com/sh41)
+  - **Auto-Indent Lines and paste no longer throw on a map update with a literal on the left**, such
+    as `%{%{a} | k: 1}`.
+
+- [#3947](https://github.com/KronicDeth/intellij-elixir/pull/3947) [@sh41](https://github.com/sh41)
+  - **Large integer literals in a decompiled BEAM now show their real value**, and the Code tab no
+    longer throws on some files.
+
+- [#3946](https://github.com/KronicDeth/intellij-elixir/pull/3946) [@sh41](https://github.com/sh41)
+  - **Configuring an Elixir SDK no longer crashes PhpStorm, WebStorm and the other small IDEs** when
+    another plugin registers a root type of its own.
 
 - [#3934](https://github.com/KronicDeth/intellij-elixir/pull/3934) [@sh41](https://github.com/sh41)
   - **A trailing comma in a call's argument list no longer breaks the rest of the file.** Typing
