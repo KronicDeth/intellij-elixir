@@ -100,6 +100,10 @@
 
 ### Bug Fixes
 
+- [#3948](https://github.com/KronicDeth/intellij-elixir/pull/3948) [@sh41](https://github.com/sh41)
+  - **Auto-Indent Lines and paste no longer throw on a map update with a literal on the left**, such
+    as `%{%{a} | k: 1}`.
+
 - [#3934](https://github.com/KronicDeth/intellij-elixir/pull/3934) [@sh41](https://github.com/sh41)
   - **A trailing comma in a call's argument list no longer breaks the rest of the file.** Typing
     `foo(a,)` on the way to the next argument used to discard the enclosing definition and everything
