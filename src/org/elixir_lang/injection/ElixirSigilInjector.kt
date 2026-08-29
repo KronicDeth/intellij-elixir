@@ -99,7 +99,7 @@ internal class ElixirSigilInjector : MultiHostInjector {
 
         return when (sigilName) {
             'H' -> HeexLanguage.INSTANCE
-            'L' -> EexLanguage.INSTANCE
+            'E', 'L' -> EexLanguage.INSTANCE
             'r' -> RegExpLanguage.INSTANCE
             else -> null
         }

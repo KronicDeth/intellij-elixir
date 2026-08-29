@@ -17,7 +17,7 @@ import org.elixir_lang.eex.Language as EexLanguage
 
 /**
  * `~H` sigils must inject the same three-root HEEx tree a `.heex` file gets - HTML data, Elixir
- * code, and the HEEx root that layers them - not plain HTML text. `~L` stays plain EEx.
+ * code, and the HEEx root that layers them - not plain HTML text. `~E` and `~L` stay plain EEx.
  */
 class HeexSigilInjectionTest : PlatformTestCase() {
     private var originalEnableHtmlInjection = false
@@ -123,6 +123,60 @@ class HeexSigilInjectionTest : PlatformTestCase() {
         assertNotNull(
             "Expected `@x` inside <%= %> to parse as Elixir PSI, not HTML text",
             atOperation
+        )
+    }
+
+    fun testESigilInjectsEexNotHeex() {
+        myFixture.configureByText(
+            "test.ex",
+            """
+                defmodule Test do
+                  def render(assigns) do
+                    ~E'''
+                    <div><%= @x %></div>
+                    '''
+                  end
+                end
+            """.trimIndent()
+        )
+
+        val sigilHeredoc = PsiTreeUtil.findChildOfType(myFixture.file, SigilHeredocLiteral::class.java)
+        checkNotNull(sigilHeredoc) { "Sigil host not found in test file" }
+
+        val injected = InjectedLanguageManager.getInstance(project).getInjectedPsiFiles(sigilHeredoc).orEmpty()
+        assertTrue(
+            "Expected an EEx injection for ~E, got: ${injected.map { it.first.let { p -> p.containingFile.language } }}",
+            injected.any { it.first.containingFile.language.isKindOf(EexLanguage.INSTANCE) }
+        )
+        assertFalse(
+            "~E must not inject HEEx",
+            injected.any { it.first.containingFile.language.isKindOf(HeexLanguage.INSTANCE) }
+        )
+    }
+
+    fun testESigilInjectsNothingWhenSettingDisabled() {
+        ElixirExperimentalSettings.instance.state.enableHtmlInjection = false
+
+        myFixture.configureByText(
+            "test.ex",
+            """
+                defmodule Test do
+                  def render(assigns) do
+                    ~E'''
+                    <div><%= @x %></div>
+                    '''
+                  end
+                end
+            """.trimIndent()
+        )
+
+        val sigilHeredoc = PsiTreeUtil.findChildOfType(myFixture.file, SigilHeredocLiteral::class.java)
+        checkNotNull(sigilHeredoc) { "Sigil host not found in test file" }
+
+        val injected = InjectedLanguageManager.getInstance(project).getInjectedPsiFiles(sigilHeredoc)
+        assertTrue(
+            "Expected no injection while the experimental setting is off, got: $injected",
+            injected.isNullOrEmpty()
         )
     }
 

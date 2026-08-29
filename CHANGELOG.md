@@ -6,6 +6,12 @@
 
 ### Enhancements
 
+- [#3954](https://github.com/KronicDeth/intellij-elixir/pull/3954) [@sh41](https://github.com/sh41)
+  - **`~E` sigils now get EEx highlighting and completion.** `~H` injected HEEx and `~L` injected EEx,
+    but Phoenix.HTML's own `~E` fell through to no injection at all, leaving the template as plain
+    string text. It is EEx, like `~L`, and shares the same experimental HTML-injection setting.
+    Refs [#1257](https://github.com/KronicDeth/intellij-elixir/issues/1257).
+
 - [#3925](https://github.com/KronicDeth/intellij-elixir/pull/3925) [@sh41](https://github.com/sh41)
   - **File and line are now linked inside an inspected stack trace.** A crash report often carries
     its trace as a term rather than a formatted trace, putting each frame's location in a keyword
