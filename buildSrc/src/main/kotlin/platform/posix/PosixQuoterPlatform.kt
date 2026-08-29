@@ -17,6 +17,7 @@ class PosixQuoterPlatform : QuoterPlatform {
         execOps: ExecOperations,
         executable: File,
         releaseTmp: File?,
+        releaseName: String,
         logger: Logger
     ): Process? {
         logger.lifecycle("Starting Quoter daemon (POSIX - detached)...")
@@ -24,7 +25,7 @@ class PosixQuoterPlatform : QuoterPlatform {
         val startOutput = ByteArrayOutputStream()
         val result = execOps.exec {
             commandLine(executable.absolutePath, "daemon")
-            environment(getReleaseEnvironment(releaseTmp))
+            environment(getReleaseEnvironment(releaseTmp, releaseName))
             standardOutput = startOutput
             errorOutput = startOutput
             isIgnoreExitValue = true
@@ -44,6 +45,7 @@ class PosixQuoterPlatform : QuoterPlatform {
         execOps: ExecOperations,
         executable: File,
         releaseTmp: File?,
+        releaseName: String,
         process: Process?,
         logger: Logger
     ): Pair<Boolean, String> {
@@ -51,7 +53,7 @@ class PosixQuoterPlatform : QuoterPlatform {
         val errorStream = ByteArrayOutputStream()
         val result = execOps.exec {
             commandLine(executable.absolutePath, "pid")
-            environment(getReleaseEnvironment(releaseTmp))
+            environment(getReleaseEnvironment(releaseTmp, releaseName))
             standardOutput = pidOutput
             errorOutput = errorStream
             isIgnoreExitValue = true
@@ -71,6 +73,7 @@ class PosixQuoterPlatform : QuoterPlatform {
         execOps: ExecOperations,
         executable: File,
         releaseTmp: File?,
+        releaseName: String,
         process: Process?,
         logger: Logger
     ) {
@@ -79,7 +82,7 @@ class PosixQuoterPlatform : QuoterPlatform {
         val stopOutput = ByteArrayOutputStream()
         val result = execOps.exec {
             commandLine(executable.absolutePath, "stop")
-            environment(getReleaseEnvironment(releaseTmp))
+            environment(getReleaseEnvironment(releaseTmp, releaseName))
             standardOutput = stopOutput
             errorOutput = stopOutput
             isIgnoreExitValue = true
