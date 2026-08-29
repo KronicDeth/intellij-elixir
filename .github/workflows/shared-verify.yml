@@ -267,8 +267,14 @@ jobs:
       # 2026.2.0.1 (262.8665.337) exists.
       - name: Verify Plugin
         id: verify
-        # Fork to be replaced when/if https://github.com/ChrisCarini/intellij-platform-plugin-verifier-action/pull/102 merges
-        uses: sh41/intellij-platform-plugin-verifier-action@add_format_options
+        # Fork carrying two changes upstream does not have yet:
+        #   - the reports-format inputs, offered as
+        #     https://github.com/ChrisCarini/intellij-platform-plugin-verifier-action/pull/102
+        #   - a JDK 21 base image. The verifier resolves JDK classes against the JVM it runs on, and
+        #     upstream's image is Java 17, so every Java 21 API in the plugin is reported as an
+        #     unresolved method. Not yet offered upstream.
+        # Drop the fork once both land upstream.
+        uses: sh41/intellij-platform-plugin-verifier-action@add_format_options_jdk21
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
