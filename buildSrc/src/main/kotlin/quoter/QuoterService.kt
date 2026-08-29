@@ -5,6 +5,7 @@ import platform.logPlatformDetection
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.logging.Logging
+import org.gradle.api.provider.Property
 import org.gradle.api.services.BuildService
 import org.gradle.api.services.BuildServiceParameters
 import org.gradle.process.ExecOperations
@@ -29,6 +30,12 @@ abstract class QuoterService : BuildService<QuoterService.Params>, AutoCloseable
 
         /** Temporary directory for quoter runtime files */
         val tmpDir: DirectoryProperty
+
+        /**
+         * Distributed Erlang node name the daemon registers with the machine-wide epmd. Per checkout,
+         * so two worktrees can run tests at the same time - see [quoter.DEFAULT_QUOTER_NODE_NAME].
+         */
+        val nodeName: Property<String>
     }
 
     @get:Inject
@@ -60,13 +67,14 @@ abstract class QuoterService : BuildService<QuoterService.Params>, AutoCloseable
     private fun startDaemon() {
         val executable = parameters.executable.get().asFile
         val releaseTmp = parameters.tmpDir.orNull?.asFile
+        val nodeName = parameters.nodeName.getOrElse(DEFAULT_QUOTER_NODE_NAME)
         val maxAttempts = 20
 
         logPlatformDetection(logger)
-        logger.lifecycle("Starting Quoter daemon: ${executable.absolutePath}")
+        logger.lifecycle("Starting Quoter daemon: ${executable.absolutePath} as $nodeName")
 
         // Start the daemon (platform-specific)
-        process = quoterPlatform.startDaemon(execOps, executable, releaseTmp, logger)
+        process = quoterPlatform.startDaemon(execOps, executable, releaseTmp, nodeName, logger)
 
         // Wait for daemon to be ready (both platforms use RPC 'pid' command)
         logger.lifecycle("Waiting for Quoter daemon to be ready...")
@@ -75,7 +83,7 @@ abstract class QuoterService : BuildService<QuoterService.Params>, AutoCloseable
             Thread.sleep(1000)
 
             val (isRunning, pidOutput) = quoterPlatform.checkStatus(
-                execOps, executable, releaseTmp, process, logger
+                execOps, executable, releaseTmp, nodeName, process, logger
             )
 
             if (isRunning) {
@@ -93,7 +101,7 @@ abstract class QuoterService : BuildService<QuoterService.Params>, AutoCloseable
         // leaks and holds the distributed node name, making every subsequent start fail with
         // "name ... in use by another Erlang node".
         logger.warn("Quoter daemon did not become ready; stopping the spawned process to avoid a leak.")
-        quoterPlatform.stopDaemon(execOps, executable, releaseTmp, process, logger)
+        quoterPlatform.stopDaemon(execOps, executable, releaseTmp, nodeName, process, logger)
         process = null
 
         throw RuntimeException("Quoter daemon failed to start after $maxAttempts attempts.")
@@ -104,10 +112,11 @@ abstract class QuoterService : BuildService<QuoterService.Params>, AutoCloseable
 
         val executable = parameters.executable.get().asFile
         val releaseTmp = parameters.tmpDir.orNull?.asFile
+        val nodeName = parameters.nodeName.getOrElse(DEFAULT_QUOTER_NODE_NAME)
 
         logger.lifecycle("Shutting down Quoter daemon...")
 
-        quoterPlatform.stopDaemon(execOps, executable, releaseTmp, process, logger)
+        quoterPlatform.stopDaemon(execOps, executable, releaseTmp, nodeName, process, logger)
 
         logger.lifecycle("Quoter daemon shutdown complete")
     }

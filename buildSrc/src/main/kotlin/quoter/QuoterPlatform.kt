@@ -24,6 +24,7 @@ interface QuoterPlatform {
         execOps: ExecOperations,
         executable: File,
         releaseTmp: File?,
+        releaseName: String,
         logger: Logger
     ): Process?
 
@@ -40,6 +41,7 @@ interface QuoterPlatform {
         execOps: ExecOperations,
         executable: File,
         releaseTmp: File?,
+        releaseName: String,
         process: Process?,
         logger: Logger
     ): Pair<Boolean, String>
@@ -56,6 +58,7 @@ interface QuoterPlatform {
         execOps: ExecOperations,
         executable: File,
         releaseTmp: File?,
+        releaseName: String,
         process: Process?,
         logger: Logger
     )
@@ -75,14 +78,25 @@ fun createQuoterPlatform(platform: Platform): QuoterPlatform {
 }
 
 /**
+ * The node name used when no per-checkout name is supplied - the value this was hardcoded to before
+ * the name became configurable, so a caller that does not pass one behaves exactly as before.
+ */
+const val DEFAULT_QUOTER_NODE_NAME = "intellij_elixir@127.0.0.1"
+
+/**
  * Returns the standard environment variables for Quoter daemon.
  * Used by all platform implementations.
+ *
+ * [releaseName] is the distributed Erlang node name the daemon registers with the machine-wide epmd.
+ * It has to differ per checkout: epmd allows one node per name, so a second checkout starting a quoter
+ * under the same name gets "the name ... seems to be in use by another Erlang node" and exits 0, which
+ * the build reports as the daemon dying immediately.
  */
-fun getReleaseEnvironment(releaseTmp: File?): Map<String, String> {
+fun getReleaseEnvironment(releaseTmp: File?, releaseName: String = DEFAULT_QUOTER_NODE_NAME): Map<String, String> {
     return buildMap {
         put("RELEASE_COOKIE", "intellij_elixir")
         put("RELEASE_DISTRIBUTION", "name")
-        put("RELEASE_NAME", "intellij_elixir@127.0.0.1")
+        put("RELEASE_NAME", releaseName)
         releaseTmp?.let { put("RELEASE_TMP", it.absolutePath) }
     }
 }

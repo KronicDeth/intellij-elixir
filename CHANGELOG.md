@@ -11,6 +11,11 @@
     wider had been decoded wrongly since 2018, and on some files the Code tab threw
     `ArrayIndexOutOfBoundsException` instead of opening.
 
+- [#3946](https://github.com/KronicDeth/intellij-elixir/pull/3946) [@sh41](https://github.com/sh41)
+  - **Configuring an Elixir SDK no longer crashes PhpStorm, WebStorm and the other small IDEs** when
+    another installed plugin registers a root type of its own. Opening the SDK editor threw
+    `Root type class ... JavadocOrderRootType not found`.
+
 - [#3925](https://github.com/KronicDeth/intellij-elixir/pull/3925) [@sh41](https://github.com/sh41)
   - **File and line are now linked inside an inspected stack trace.** A crash report often carries
     its trace as a term rather than a formatted trace, putting each frame's location in a keyword

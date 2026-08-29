@@ -53,6 +53,7 @@ class WindowsQuoterPlatform : QuoterPlatform {
         execOps: ExecOperations,
         executable: File,
         releaseTmp: File?,
+        releaseName: String,
         logger: Logger
     ): Process {
         logger.lifecycle("Starting Quoter daemon (Windows - managed process)...")
@@ -64,7 +65,7 @@ class WindowsQuoterPlatform : QuoterPlatform {
         val pb = ProcessBuilder(windowsExecutable.absolutePath, "start")
 
         // Set environment variables
-        pb.environment().putAll(getReleaseEnvironment(releaseTmp))
+        pb.environment().putAll(getReleaseEnvironment(releaseTmp, releaseName))
 
         logger.debug("Environment: ${pb.environment().filterKeys { it.startsWith("RELEASE_") }}")
 
@@ -117,6 +118,7 @@ class WindowsQuoterPlatform : QuoterPlatform {
         execOps: ExecOperations,
         executable: File,
         releaseTmp: File?,
+        releaseName: String,
         process: Process?,
         logger: Logger
     ): Pair<Boolean, String> {
@@ -133,7 +135,7 @@ class WindowsQuoterPlatform : QuoterPlatform {
         val errorStream = ByteArrayOutputStream()
         val result = execOps.exec {
             commandLine(windowsExecutable.absolutePath, "pid")
-            environment(getReleaseEnvironment(releaseTmp))
+            environment(getReleaseEnvironment(releaseTmp, releaseName))
             standardOutput = pidOutput
             errorOutput = errorStream
             isIgnoreExitValue = true
@@ -165,6 +167,7 @@ class WindowsQuoterPlatform : QuoterPlatform {
         execOps: ExecOperations,
         executable: File,
         releaseTmp: File?,
+        releaseName: String,
         process: Process?,
         logger: Logger
     ) {
@@ -178,7 +181,7 @@ class WindowsQuoterPlatform : QuoterPlatform {
             val stopError = ByteArrayOutputStream()
             val result = execOps.exec {
                 commandLine(windowsExecutable.absolutePath, "stop")
-                environment(getReleaseEnvironment(releaseTmp))
+                environment(getReleaseEnvironment(releaseTmp, releaseName))
                 standardOutput = stopOutput
                 errorOutput = stopError
                 isIgnoreExitValue = true
