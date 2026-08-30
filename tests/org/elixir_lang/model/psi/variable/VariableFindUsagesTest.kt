@@ -61,6 +61,40 @@ class VariableFindUsagesTest : PlatformTestCase() {
         assertEquals(1, nonDeclarationUsageCount("usages_parameter_sibling_clause_same_name.ex"))
     }
 
+    fun testFindUsagesOnVariableDeclarationIgnoresShadowingAnonymousFunctionBinding() {
+        // An `fn` parameter that reuses an outer name is an independent binding, so only the
+        // trailing read belongs to the outer variable - the `fn`'s own parameter and body read
+        // do not. Rename shares this search, so over-reporting here silently rewrites them.
+        assertEquals(1, nonDeclarationUsageCount("usages_variable_shadowed_in_anonymous_function.ex"))
+    }
+
+    fun testFindUsagesOnAnonymousFunctionParameterIgnoresShadowedOuterBinding() {
+        // The mirror direction: from the `fn` parameter, only its own body read is a usage.
+        assertEquals(1, nonDeclarationUsageCount("usages_variable_shadowing_anonymous_function_parameter.ex"))
+    }
+
+    fun testFindUsagesOnVariableDeclarationIgnoresShadowingCaseClauseBinding() {
+        assertEquals(1, nonDeclarationUsageCount("usages_variable_shadowed_in_case_clause.ex"))
+    }
+
+    fun testFindUsagesOnVariableDeclarationIgnoresShadowingComprehensionBinding() {
+        assertEquals(1, nonDeclarationUsageCount("usages_variable_shadowed_in_comprehension.ex"))
+    }
+
+    fun testFindUsagesOnVariableDeclarationIgnoresShadowingComprehensionDoBlockBinding() {
+        assertEquals(1, nonDeclarationUsageCount("usages_variable_shadowed_in_comprehension_do_block.ex"))
+    }
+
+    fun testFindUsagesOnComprehensionKeywordDoGeneratorFindsBodyRead() {
+        assertEquals(1, nonDeclarationUsageCount("usages_comprehension_keyword_do_generator.ex"))
+    }
+
+    fun testFindUsagesOnNestedComprehensionKeywordDoGeneratorFindsBodyRead() {
+        // The inner generator sits in the OUTER comprehension's `do:` value, so it must still read
+        // as a binding of its own rather than as a body read of the outer one.
+        assertEquals(1, nonDeclarationUsageCount("usages_nested_comprehension_keyword_do_generator.ex"))
+    }
+
     fun testCtrlClickOnIgnoredParameterDeclarationChoosesShowUsages() {
         myFixture.configureByFiles("usages_ignored_parameter_declaration.ex")
         myFixture.assertShowUsagesChosenAtCaret()
