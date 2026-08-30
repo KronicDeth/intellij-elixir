@@ -23,7 +23,7 @@ object CallDefinitionClause : ResolveCache.PolyVariantResolver<org.elixir_lang.r
         ApplicationManager.getApplication().assertReadAccessAllowed()
         return enclosingModularMacroCall(callDefinitionClause.moduleAttribute)?.macroChildCalls()?.let { siblings ->
             if (siblings.isNotEmpty()) {
-                val nameArity = typeNameArity(callDefinitionClause.element)
+                val nameArity = typeNameArity(callDefinitionClause.element) ?: return emptyArray()
                 val name = nameArity.name
                 val arity = nameArity.arity
 
