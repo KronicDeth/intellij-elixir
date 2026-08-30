@@ -215,6 +215,14 @@ The build system automatically detects your platform:
 - Verify no orphaned Erlang processes: `tasklist | findstr erl`
 - Kill orphaned processes: `taskkill /F /IM erl.exe`
 
+**Deleting a checkout or worktree fails with "Device or resource busy":**
+- A leftover `epmd` running from inside the tree pins the directory. The build starts `epmd` from the
+  Erlang SDK to avoid this, but one started earlier can still be holding it.
+- Find it with `Get-Process epmd | Select-Object Id,Path`; if the path is inside the checkout, stop it
+  with `Stop-Process -Id <id> -Force`.
+- Check `epmd -names` first: `epmd` is machine-wide, so stopping it deregisters every node and fails
+  any test run in progress in another checkout.
+
 **`erl` not found, or the build starts compiling Elixir from source:**
 - The resolver could not find the *expected* version. Check what it decided - it logs
   `Expected versions (from ...): Elixir ..., Erlang ...` followed by `Resolved SDKs: ...` with the

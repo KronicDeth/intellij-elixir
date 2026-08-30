@@ -10,8 +10,10 @@ import java.io.File
 /**
  * POSIX implementation of QuoterPlatform.
  * Uses the 'daemon' command which detaches the process automatically.
+ *
+ * [startEpmd] false when an epmd is already answering - see [quoter.Epmd].
  */
-class PosixQuoterPlatform : QuoterPlatform {
+class PosixQuoterPlatform(private val startEpmd: Boolean = true) : QuoterPlatform {
 
     override fun startDaemon(
         execOps: ExecOperations,
@@ -25,7 +27,7 @@ class PosixQuoterPlatform : QuoterPlatform {
         val startOutput = ByteArrayOutputStream()
         val result = execOps.exec {
             commandLine(executable.absolutePath, "daemon")
-            environment(getReleaseEnvironment(releaseTmp, releaseName))
+            environment(getReleaseEnvironment(releaseTmp, releaseName, startEpmd))
             standardOutput = startOutput
             errorOutput = startOutput
             isIgnoreExitValue = true
@@ -53,7 +55,7 @@ class PosixQuoterPlatform : QuoterPlatform {
         val errorStream = ByteArrayOutputStream()
         val result = execOps.exec {
             commandLine(executable.absolutePath, "pid")
-            environment(getReleaseEnvironment(releaseTmp, releaseName))
+            environment(getReleaseEnvironment(releaseTmp, releaseName, startEpmd))
             standardOutput = pidOutput
             errorOutput = errorStream
             isIgnoreExitValue = true
@@ -82,7 +84,7 @@ class PosixQuoterPlatform : QuoterPlatform {
         val stopOutput = ByteArrayOutputStream()
         val result = execOps.exec {
             commandLine(executable.absolutePath, "stop")
-            environment(getReleaseEnvironment(releaseTmp, releaseName))
+            environment(getReleaseEnvironment(releaseTmp, releaseName, startEpmd))
             standardOutput = stopOutput
             errorOutput = stopOutput
             isIgnoreExitValue = true

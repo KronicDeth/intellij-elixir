@@ -2,6 +2,7 @@ package quoter
 
 import platform.detectPlatform
 import platform.logPlatformDetection
+import sdk.readPropertiesFile
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.logging.Logging
@@ -9,6 +10,7 @@ import org.gradle.api.provider.Property
 import org.gradle.api.services.BuildService
 import org.gradle.api.services.BuildServiceParameters
 import org.gradle.process.ExecOperations
+import java.io.File
 import javax.inject.Inject
 
 /**
@@ -36,6 +38,13 @@ abstract class QuoterService : BuildService<QuoterService.Params>, AutoCloseable
          * so two worktrees can run tests at the same time - see [quoter.DEFAULT_QUOTER_NODE_NAME].
          */
         val nodeName: Property<String>
+
+        /**
+         * Read for `erlang.sdk.path`, so epmd starts from the SDK rather than the release's bundled
+         * ERTS - see [Epmd]. The daemon itself still needs no SDK; this is only about where the
+         * machine-wide epmd lives. Optional: unset, and the daemon starts as it always has.
+         */
+        val sdkProperties: RegularFileProperty
     }
 
     @get:Inject
@@ -43,7 +52,10 @@ abstract class QuoterService : BuildService<QuoterService.Params>, AutoCloseable
 
     private val logger = Logging.getLogger(QuoterService::class.java)
     private val platform = detectPlatform()
-    private val quoterPlatform = createQuoterPlatform(platform)
+
+    /** Lazy: the epmd probe has to run before the platform is configured, and [close] needs the same
+     * instance [startDaemon] used. */
+    private val quoterPlatform by lazy { createQuoterPlatform(platform, startEpmd = !ensureSdkEpmdRunning()) }
 
     @Volatile
     private var started = false
@@ -105,6 +117,30 @@ abstract class QuoterService : BuildService<QuoterService.Params>, AutoCloseable
         process = null
 
         throw RuntimeException("Quoter daemon failed to start after $maxAttempts attempts.")
+    }
+
+    /**
+     * Starts epmd from the Erlang SDK so the one owning port 4369 lives outside the checkout, and
+     * reports whether it answers. Anything missing or failing returns false, restoring the previous
+     * behaviour rather than failing the build.
+     */
+    private fun ensureSdkEpmdRunning(): Boolean = try {
+        val sdkProperties = parameters.sdkProperties.orNull?.asFile?.takeIf { it.isFile }
+        val erlangHome = sdkProperties?.let { readPropertiesFile(it)["erlang.sdk.path"] }?.let(::File)
+        val epmd = erlangHome?.let(Epmd::find)
+
+        when {
+            erlangHome == null -> false
+            epmd == null -> {
+                logger.info("No epmd under ${erlangHome.absolutePath}; the release will start its own")
+                false
+            }
+            else -> Epmd.ensureRunning(epmd, logger)
+        }
+    } catch (exception: Exception) {
+        // readPropertiesFile throws on a malformed file, and this path is only an optimisation.
+        logger.info("Could not resolve an SDK epmd: ${exception.message}")
+        false
     }
 
     override fun close() {

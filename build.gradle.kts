@@ -890,14 +890,22 @@ val releaseQuoter = tasks.register<ReleaseQuoterTask>("releaseQuoter") {
     inputs.dir(quoterUnzippedPath.dir("deps")).withPathSensitivity(PathSensitivity.RELATIVE)
 }
 
+// Written by resolveElixirErlangSdks below. Declared here because a build service's `parameters {}`
+// runs at registration rather than deferred like a task lambda, so a val declared further down is
+// still null at that point.
+val sdkPropertiesFile = layout.buildDirectory.file("elixir-erlang-sdks.properties")
+
 // Register the QuoterService - Gradle calls close() at build end regardless of failure.
-// The daemon is a self-contained mix release (bundled ERTS), so it needs no Elixir/Erlang SDK here.
+// The daemon is a self-contained mix release (bundled ERTS), so it needs no Elixir/Erlang SDK to run.
+// sdkProperties is only for epmd's sake: started from the SDK, the machine-wide daemon stays out of
+// cache/, where a leftover pins the checkout against deletion. See quoter.Epmd.
 // See: https://docs.gradle.org/current/userguide/build_services.html
 val quoterService = gradle.sharedServices.registerIfAbsent("quoter", QuoterService::class) {
     parameters {
         executable.set(quoterExe)
         tmpDir.set(quoterTmpPath)
         nodeName.set(quoterNodeName)
+        sdkProperties.set(sdkPropertiesFile)
     }
 }
 
@@ -1024,8 +1032,6 @@ tasks.named<Zip>("buildPlugin") {
     }
 }
 
-
-val sdkPropertiesFile = layout.buildDirectory.file("elixir-erlang-sdks.properties")
 
 val resolveElixirErlangSdks = tasks.register<ResolveElixirErlangSdksTask>("resolveElixirErlangSdks") {
     description = "Resolves Erlang and Elixir SDKs for testing"
