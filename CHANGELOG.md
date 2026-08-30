@@ -96,6 +96,12 @@
 
 ### Bug Fixes
 
+- [#3964](https://github.com/KronicDeth/intellij-elixir/pull/3964) [@sh41](https://github.com/sh41)
+  - **"Remove space between function name and parentheses" now removes the space instead of
+    throwing.** The space stopped being a child of the element the quick fix searched when the
+    grammar gained `noParenthesesOneArgument` in 2015. Fixes
+    [#3107](https://github.com/KronicDeth/intellij-elixir/issues/3107).
+
 - [#3963](https://github.com/KronicDeth/intellij-elixir/pull/3963) [@sh41](https://github.com/sh41)
   - **A `@spec` whose head has no function name no longer crashes the structure view.** Heads like
     `@spec foo.() :: term` and `@spec bar not in baz :: term` parse to a call with no name, so the

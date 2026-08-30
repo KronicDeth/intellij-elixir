@@ -1,12 +1,14 @@
 package org.elixir_lang.local_quick_fix;
 
 import com.intellij.codeInspection.LocalQuickFixOnPsiElement;
+import com.intellij.lang.ASTNode;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.text.BlockSupport;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Created by kadie.enheduanna.inanna on 12/7/14.
@@ -21,7 +23,36 @@ public class RemoveSpaceInFrontOfNoParenthesesStrict extends LocalQuickFixOnPsiE
     }
 
     /*
-     * Methods
+     * Static Methods
+     */
+
+    /**
+     * The space to remove is not always a child of {@code node}: when the grammar gained
+     * {@code noParenthesesOneArgument}, that wrapper came to span only the parentheses, leaving the space on its
+     * previous sibling instead. The children are still searched first because a call that reaches
+     * {@code noParenthesesStrict} without the wrapper keeps the space inside.
+     */
+    @Nullable
+    private static ASTNode whiteSpaceBefore(@NotNull ASTNode node) {
+        ASTNode child = node.findChildByType(TokenType.WHITE_SPACE);
+
+        if (child != null) {
+            return child;
+        }
+
+        for (ASTNode ancestor = node; ancestor != null; ancestor = ancestor.getTreeParent()) {
+            ASTNode previous = ancestor.getTreePrev();
+
+            if (previous != null) {
+                return previous.getElementType() == TokenType.WHITE_SPACE ? previous : null;
+            }
+        }
+
+        return null;
+    }
+
+    /*
+     * Instance Methods
      */
 
     /**
@@ -44,8 +75,11 @@ public class RemoveSpaceInFrontOfNoParenthesesStrict extends LocalQuickFixOnPsiE
     @Override
     public void invoke(@NotNull Project project, @NotNull PsiFile file, @NotNull PsiElement startElement, @NotNull PsiElement endElement) {
         assert startElement == endElement;
-        com.intellij.lang.ASTNode parentNode = startElement.getNode();
-        com.intellij.lang.ASTNode whiteSpace = parentNode.findChildByType(TokenType.WHITE_SPACE);
+        ASTNode whiteSpace = whiteSpaceBefore(startElement.getNode());
+
+        if (whiteSpace == null) {
+            return;
+        }
 
         BlockSupport blockSupport = BlockSupport.getInstance(project);
         final int startOffset = whiteSpace.getStartOffset();
