@@ -42,6 +42,19 @@ public class CallDefinitionClauseTest extends PlatformTestCase {
         assertCompletionOffersExactly(myFixture.getLookupElementStrings(), "public_macro1", "public_macro2");
     }
 
+    public void testPrivateGuardExcludedFromRemoteCompletion() {
+        myFixture.configureByFiles("private_guard_usage.ex", "private_guard_declaration.ex");
+        myFixture.complete(CompletionType.BASIC, 1);
+        // The private_guard* defguardp clauses must not leak into a remote (qualified) call's completion.
+        assertCompletionOffersExactly(myFixture.getLookupElementStrings(), "public_guard1", "public_guard2");
+    }
+
+    public void testPublicGuard() {
+        myFixture.configureByFiles("public_guard_usage.ex", "public_guard_declaration.ex");
+        myFixture.complete(CompletionType.BASIC, 1);
+        assertCompletionOffersExactly(myFixture.getLookupElementStrings(), "public_guard1", "public_guard2");
+    }
+
     public void testMixesWithNestedModules() {
         myFixture.configureByFiles("mixed_usage.ex", "mixed_declaration.ex");
         myFixture.complete(CompletionType.BASIC, 1);
