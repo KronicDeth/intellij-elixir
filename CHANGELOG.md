@@ -251,6 +251,14 @@
 
 ### Build / CI
 
+- [#3960](https://github.com/KronicDeth/intellij-elixir/pull/3960) [@sh41](https://github.com/sh41)
+  - **`epmd` is now started from the Erlang SDK rather than the quoter's own bundled ERTS.** A
+    distributed node starts `epmd` from the ERTS of whatever release is starting, detached, so the one
+    the quoter left behind ran from under `cache/` inside the checkout. On Windows a running executable
+    pins its own directory, which made deleting a checkout or a git worktree fail with "Device or
+    resource busy" long after the build finished. The build now starts `epmd` from the SDK first and
+    passes `-start_epmd false`, falling back to the previous behaviour when no SDK `epmd` is found.
+
 - [#3913](https://github.com/KronicDeth/intellij-elixir/pull/3913) [@sh41](https://github.com/sh41)
   - **Quoter tests now respect the quoting rules for the Elixir version under test.** Six quoted-form
     divergences are gated on the release that introduced each, so the same fixtures pass on every

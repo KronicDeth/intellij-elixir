@@ -17,8 +17,11 @@ import kotlin.concurrent.thread
  * so we use 'start' and manage the process lifecycle directly.
  *
  * This approach does NOT use Windows services (no admin required).
+ *
+ * [startEpmd] false when an epmd is already answering. It matters most here: erlexec launches epmd
+ * detached on Windows, and a running executable pins its own directory - see [quoter.Epmd].
  */
-class WindowsQuoterPlatform : QuoterPlatform {
+class WindowsQuoterPlatform(private val startEpmd: Boolean = true) : QuoterPlatform {
 
     /**
      * Converts the executable path to Windows format by appending .bat extension.
@@ -65,7 +68,7 @@ class WindowsQuoterPlatform : QuoterPlatform {
         val pb = ProcessBuilder(windowsExecutable.absolutePath, "start")
 
         // Set environment variables
-        pb.environment().putAll(getReleaseEnvironment(releaseTmp, releaseName))
+        pb.environment().putAll(getReleaseEnvironment(releaseTmp, releaseName, startEpmd))
 
         logger.debug("Environment: ${pb.environment().filterKeys { it.startsWith("RELEASE_") }}")
 
@@ -135,7 +138,7 @@ class WindowsQuoterPlatform : QuoterPlatform {
         val errorStream = ByteArrayOutputStream()
         val result = execOps.exec {
             commandLine(windowsExecutable.absolutePath, "pid")
-            environment(getReleaseEnvironment(releaseTmp, releaseName))
+            environment(getReleaseEnvironment(releaseTmp, releaseName, startEpmd))
             standardOutput = pidOutput
             errorOutput = errorStream
             isIgnoreExitValue = true
@@ -181,7 +184,7 @@ class WindowsQuoterPlatform : QuoterPlatform {
             val stopError = ByteArrayOutputStream()
             val result = execOps.exec {
                 commandLine(windowsExecutable.absolutePath, "stop")
-                environment(getReleaseEnvironment(releaseTmp, releaseName))
+                environment(getReleaseEnvironment(releaseTmp, releaseName, startEpmd))
                 standardOutput = stopOutput
                 errorOutput = stopError
                 isIgnoreExitValue = true
