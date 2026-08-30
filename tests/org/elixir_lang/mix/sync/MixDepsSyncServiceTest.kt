@@ -108,6 +108,52 @@ class MixDepsSyncServiceTest : PlatformTestCase() {
         )
     }
 
+    /**
+     * A burst of *distinct* dep roots drains in a single pass.
+     *
+     * The two dedup tests above enqueue the same request repeatedly, so they pin Set semantics and
+     * nothing more. The reported freeze was ~90 different deps, each of which used to get its own
+     * background task and its own blocking write action; what makes that impossible now is that the
+     * whole burst is one snapshot-and-clear, so assert that count rather than leaving it structural.
+     */
+    fun testEnqueue_manyDistinctDepRootsInOneBurst_drainInASinglePass() {
+        val depCount = 90
+        val root = MixTestFixtures.createMixRoot(myFixture, "my_app")
+        val depNames = (1..depCount).map { "dep_$it" }
+        val depRoots = MixTestFixtures.addDeps(myFixture, "my_app", *depNames.toTypedArray())
+        MixTestFixtures.addBuildArtifacts(myFixture, "my_app", "dev", *depNames.toTypedArray())
+
+        val service = project.service<MixDepsSyncService>()
+        val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
+
+        // Discard the enqueues that fixture setup's own directory creation triggered.
+        service.clearPendingForTesting()
+
+        depRoots.forEach { service.enqueue(SyncRequest.DepRoot(it)) }
+
+        assertEquals(
+            "$depCount distinct DepRoot enqueues must all be pending, not deduplicated",
+            depCount,
+            service.pendingCount
+        )
+
+        drainDirectly(service)
+
+        assertEquals(
+            "one drain must consume the whole pending set, leaving nothing for a second drain",
+            0,
+            service.pendingCount
+        )
+
+        val rootToken = contentRootToken(project, root.url)
+        val missing = depNames.filter { libraryTable.getLibraryByName(scopedDepLibraryName(rootToken, it)) == null }
+        assertEquals(
+            "a single drain must create a library for every dep in the burst",
+            emptyList<String>(),
+            missing
+        )
+    }
+
     // ------------------------------------------------------------------
     // Test 6b - DeleteAll suppresses DepRoot for the same tree
     // (also covers Test 8 - delete-before-sync ordering for the same tree)
