@@ -1,9 +1,14 @@
 package org.elixir_lang.annotator;
 
 
+import com.intellij.codeInsight.daemon.impl.HighlightInfo;
+import com.intellij.openapi.editor.colors.EditorColorsManager;
+import com.intellij.openapi.editor.markup.TextAttributes;
+import org.elixir_lang.ElixirSyntaxHighlighter;
 import org.elixir_lang.PlatformTestCase;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Two kinds of test live here and they want opposite fixtures, so one that looks redundant beside
@@ -95,6 +100,59 @@ public class ModuleAttributeTest extends PlatformTestCase {
     public void testIssue1194() {
         myFixture.configureByFile("issue_1194.ex");
         myFixture.checkHighlighting(false, false, true);
+    }
+
+    /**
+     * A dot call with parentheses is what a qualified type looks like part-way through being typed, as in
+     * {@code String.()} on the way to {@code String.t()}. Covers both halves of the annotator's handling: the
+     * empty-parentheses form the original report hit, and a non-empty one, whose argument is the only
+     * observable output the handling produces.
+     */
+    public void testIssue1397() {
+        myFixture.configureByFile("issue_1397.ex");
+        myFixture.checkHighlighting(false, false, true);
+        assertDotCallArgumentHighlightedAsType();
+    }
+
+    /**
+     * {@code checkHighlighting} cannot see this: {@link Highlighter} enforces attributes rather than naming a
+     * key, so {@code forcedTextAttributesKey} is null and the {@code textAttributesKey=} markup has nothing to
+     * match. Resolved attributes are compared instead, the same way {@link BeamHighlightingTest} does and for
+     * the same reason.
+     * <p>
+     * Without this the test would only pin that the annotator does not throw - a branch that swallowed the
+     * element and highlighted nothing would still pass, because an empty {@code String.()} highlights nothing
+     * either way.
+     */
+    private void assertDotCallArgumentHighlightedAsType() {
+        String argument = "integer";
+        int dotCallStart = myFixture.getEditor().getDocument().getText().indexOf("String.(" + argument);
+        assertTrue("Fixture must contain a dot call with an argument", dotCallStart >= 0);
+
+        int argumentStart = dotCallStart + "String.(".length();
+        int argumentEnd = argumentStart + argument.length();
+
+        TextAttributes expected = EditorColorsManager
+                .getInstance()
+                .getGlobalScheme()
+                .getAttributes(ElixirSyntaxHighlighter.TYPE);
+
+        List<HighlightInfo> covering = myFixture
+                .doHighlighting()
+                .stream()
+                .filter(info -> info.getStartOffset() <= argumentStart && info.getEndOffset() >= argumentEnd)
+                .collect(Collectors.toList());
+
+        assertTrue(
+                "`" + argument + "` inside a dot call in a @callback should carry " +
+                        ElixirSyntaxHighlighter.TYPE.getExternalName() + " attributes; " +
+                        covering.size() + " HighlightInfo(s) cover " + argumentStart + ".." + argumentEnd + ": " +
+                        covering.stream()
+                                .map(info -> info.getStartOffset() + ".." + info.getEndOffset() + " " +
+                                        info.forcedTextAttributes)
+                                .collect(Collectors.joining(" ; ")),
+                covering.stream().anyMatch(info -> expected.equals(info.forcedTextAttributes))
+        );
     }
 
     public void testMatch() {
