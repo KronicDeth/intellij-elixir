@@ -24,6 +24,7 @@ import org.elixir_lang.psi.ElixirStabNoParenthesesSignature
 import org.elixir_lang.psi.ElixirStabOperation
 import org.elixir_lang.psi.ElixirStabParenthesesSignature
 import org.elixir_lang.psi.ElixirVariable
+import org.elixir_lang.psi.QuotableKeywordPair
 import org.elixir_lang.psi.CallDefinitionClause
 import org.elixir_lang.psi.operation.InMatch
 import org.elixir_lang.psi.operation.Match
@@ -170,6 +171,9 @@ class VariableSymbol(
             }
 
     companion object {
+        /** Keyword keys whose value is a body rather than an argument. */
+        private val BLOCK_KEYWORDS = setOf("do", "else", "after", "catch", "rescue")
+
         /**
          * True when a rebinding chain from [declaration] cannot continue out through [ancestor].
          *
@@ -249,7 +253,8 @@ class VariableSymbol(
                 Kind.PARAMETER, Kind.IGNORED ->
                     ((org.elixir_lang.reference.Callable.isParameter(element) ||
                         org.elixir_lang.reference.Callable.isParameterWithDefault(element)) &&
-                        !isInsideAnonymousFunctionBody(element)) ||
+                        !isInsideAnonymousFunctionBody(element) &&
+                        !isInsideKeywordBody(element)) ||
                         isVariableDeclaration(element)
                 Kind.VARIABLE -> isVariableDeclaration(element)
                 null -> false
@@ -309,6 +314,26 @@ class VariableSymbol(
             }
             return false
         }
+
+        /**
+         * True when [element] sits in the VALUE of a `do:`-style keyword pair (`for x <- xs, do: x`).
+         *
+         * The same over-marking [isInsideAnonymousFunctionBody] discounts: the legacy parameter
+         * classifier walks out of the keyword value into the enclosing call and marks a plain read
+         * there as a parameter. The `do`-block spelling of the same code is unaffected, because a
+         * stab body intervenes. The walk stops at a binding boundary so that a nested construct's
+         * own binding - the inner generator of `for x <- xs, do: for(y <- ys, do: y)` - is still
+         * read as the declaration it is.
+         */
+        @RequiresReadLock
+        private fun isInsideKeywordBody(element: PsiElement): Boolean =
+            generateSequence(element) { it.parent }
+                .takeWhile { !isBindingBoundary(it, element) }
+                .filterIsInstance<QuotableKeywordPair>()
+                .any { pair ->
+                    pair.keywordKey.text.removeSuffix(":") in BLOCK_KEYWORDS &&
+                        PsiTreeUtil.isAncestor(pair.keywordValue, element, false)
+                }
 
         private fun isInsideStabSignature(element: PsiElement): Boolean =
             nearestStabContainer(element).let {

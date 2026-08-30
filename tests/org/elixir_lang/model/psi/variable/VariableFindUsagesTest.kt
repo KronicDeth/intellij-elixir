@@ -61,6 +61,16 @@ class VariableFindUsagesTest : PlatformTestCase() {
         assertEquals(1, nonDeclarationUsageCount("usages_parameter_sibling_clause_same_name.ex"))
     }
 
+    fun testFindUsagesOnComprehensionKeywordDoGeneratorFindsBodyRead() {
+        assertEquals(1, nonDeclarationUsageCount("usages_comprehension_keyword_do_generator.ex"))
+    }
+
+    fun testFindUsagesOnNestedComprehensionKeywordDoGeneratorFindsBodyRead() {
+        // The inner generator sits in the OUTER comprehension's `do:` value, so it must still read
+        // as a binding of its own rather than as a body read of the outer one.
+        assertEquals(1, nonDeclarationUsageCount("usages_nested_comprehension_keyword_do_generator.ex"))
+    }
+
     fun testCtrlClickOnIgnoredParameterDeclarationChoosesShowUsages() {
         myFixture.configureByFiles("usages_ignored_parameter_declaration.ex")
         myFixture.assertShowUsagesChosenAtCaret()
