@@ -176,6 +176,17 @@ class RenameMatrixTest : PlatformTestCase() {
     fun testVariableComprehension() =
         doTestFromEveryOccurrence("variable_comprehension", "renamee", "fresh", expectedCarets = 2)
 
+    /**
+     * A rebinding inside an `fn` BODY is the same variable as the one it rebinds, unlike an `fn`
+     * PARAMETER of the same name, which shadows it.
+     */
+    fun testVariableAnonymousFunctionBodyRebinding() =
+        doTestFromEveryOccurrence("variable_fn_body_rebinding", "renamee", "fresh", expectedCarets = 5)
+
+    /** The same for a `case` clause body: only the clause PATTERN binds afresh. */
+    fun testVariableCaseClauseBodyRebinding() =
+        doTestFromEveryOccurrence("variable_case_clause_rebinding", "renamee", "fresh", expectedCarets = 5)
+
     /** `with {:ok, renamee} <- ...` binding and body use. */
     fun testVariableWith() = doTestFromEveryOccurrence("variable_with", "renamee", "fresh", expectedCarets = 2)
 

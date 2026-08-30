@@ -21,9 +21,11 @@ import org.elixir_lang.model.psi.ElixirSymbolWithUsages
 import org.elixir_lang.psi.ElixirAnonymousFunction
 import org.elixir_lang.psi.ElixirStabBody
 import org.elixir_lang.psi.ElixirStabNoParenthesesSignature
+import org.elixir_lang.psi.ElixirStabOperation
 import org.elixir_lang.psi.ElixirStabParenthesesSignature
 import org.elixir_lang.psi.ElixirVariable
 import org.elixir_lang.psi.CallDefinitionClause
+import org.elixir_lang.psi.operation.InMatch
 import org.elixir_lang.psi.operation.Match
 import org.elixir_lang.psi.UnaryOperation
 import org.elixir_lang.psi.UnqualifiedNoArgumentsCall
@@ -97,10 +99,9 @@ class VariableSymbol(
      * A use scope anchored at a later rebinding is `SELF_AND_FOLLOWING_SIBLINGS` and would miss
      * the earlier bindings and the reads that resolve to them. The chain root is the earliest of:
      * this declaration, any same-named declaration in a PRECEDING statement of an enclosing stab
-     * body, or a same-named parameter of the enclosing definition clause head. The walk stops at
-     * the definition-clause and anonymous-function boundaries: a same-named variable in another
-     * function (or in the enclosing scope of an `fn` that rebinds locally) is a different
-     * variable.
+     * body, or a same-named parameter of the enclosing definition clause head. Both walks stop at
+     * the definition clause and at [isBindingBoundary]: a same-named variable on the far side of
+     * one of those is a different variable.
      */
     @RequiresReadLock
     private fun chainRootDeclaration(declaration: UnqualifiedNoArgumentsCall<*>): UnqualifiedNoArgumentsCall<*> {
@@ -108,9 +109,7 @@ class VariableSymbol(
 
         val ancestorsInClause = generateSequence(declaration as PsiElement) { it.parent }
             .takeWhile {
-                it !is PsiFile &&
-                    it !is ElixirAnonymousFunction &&
-                    !(it is Call && CallDefinitionClause.`is`(it))
+                !isBindingBoundary(it, declaration) && !(it is Call && CallDefinitionClause.`is`(it))
             }
 
         // Same-named declarations in preceding statements of every enclosing stab body.
@@ -127,7 +126,10 @@ class VariableSymbol(
             }
 
         // A same-named parameter of the enclosing definition clause is the outermost chain root.
+        // The walk stops at a binding boundary as well, or an `fn` parameter would chain to a
+        // same-named parameter of the `def` it happens to sit in.
         generateSequence(declaration as PsiElement) { it.parent }
+            .takeWhile { !isBindingBoundary(it, declaration) }
             .filterIsInstance<Call>()
             .firstOrNull { CallDefinitionClause.`is`(it) }
             ?.let { clause -> CallDefinitionClause.head(clause) }
@@ -168,6 +170,29 @@ class VariableSymbol(
             }
 
     companion object {
+        /**
+         * True when a rebinding chain from [declaration] cannot continue out through [ancestor].
+         *
+         * A stab signature (an `fn` parameter list, a `case`/`with`/`receive` clause head) and the
+         * left side of a `<-` generator bind the name afresh, so a same-named declaration outside
+         * is a different variable rather than an earlier link in the same chain. Only the PATTERN
+         * binds: a declaration in the clause BODY still rebinds whatever the name meant outside,
+         * so the chain continues through it - stopping there would report the body's write as a
+         * different variable from the read on its own right-hand side.
+         */
+        @RequiresReadLock
+        private fun isBindingBoundary(ancestor: PsiElement, declaration: PsiElement): Boolean =
+            when (ancestor) {
+                is PsiFile -> true
+                is ElixirStabOperation -> ancestor.leftOperand().bindsAsPattern(declaration)
+                is InMatch -> ancestor.leftOperand().bindsAsPattern(declaration)
+                else -> false
+            }
+
+        @RequiresReadLock
+        private fun PsiElement?.bindsAsPattern(declaration: PsiElement): Boolean =
+            this != null && PsiTreeUtil.isAncestor(this, declaration, false)
+
         @RequiresReadLock
         fun fromDeclaration(call: Call): VariableSymbol? {
             if (!isDeclaration(call)) return null
