@@ -48,6 +48,7 @@ import org.elixir_lang.model.psi.protocol.ProtocolFunction
 import org.elixir_lang.model.psi.type.TypeReference
 import org.elixir_lang.model.psi.type.TypeSymbol
 import org.elixir_lang.model.psi.type.TypeVariableSymbol
+import org.elixir_lang.model.psi.variable.VariableReference
 import org.elixir_lang.model.psi.variable.VariableSymbol
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
@@ -994,6 +995,7 @@ internal object ElixirUsageQueries {
         @RequiresReadLock
         override fun mapOccurrence(occurrence: LeafOccurrence): Collection<PsiUsage> {
             val symbol = symbolPointer.dereference() ?: return emptyList()
+            val symbolChainRoot = symbol.chainRootSymbol() ?: return emptyList()
             val (_, leaf, _) = occurrence
             for (candidate in generateSequence(leaf) { it.parent }.takeWhile { it !is PsiFile }) {
                 ProgressManager.checkCanceled()
@@ -1005,11 +1007,15 @@ internal object ElixirUsageQueries {
                 ) {
                     continue
                 }
+                // A search scope is a text range, so it cannot tell a binding that SHADOWS this
+                // variable (an `fn` parameter, a `case` clause pattern, a `for` generator) from
+                // the outer one it hides - the inner binding sits inside the outer's scope.
+                // Resolution can, so the occurrence is kept only when it is this same variable.
+                if (!isOccurrenceOf(candidate, symbolChainRoot)) return emptyList()
                 // NOTE: the right-hand read of a rebinding (`x` in `x = x + 1`) semantically reads
-                // the PREVIOUS binding, but a rebinding chain is one user-facing variable (the
-                // symbol's search scope starts at the chain root - see
-                // VariableSymbol.maximalSearchScope), so it is a usage regardless of which
-                // binding anchors the symbol.
+                // the PREVIOUS binding, but a rebinding chain is one user-facing variable, so it
+                // is a usage regardless of which binding anchors the symbol. That is why the
+                // comparison above is by chain root rather than by symbol.
                 return listOf(
                     ElixirPsiUsage.create(
                         nameElement,
@@ -1020,6 +1026,24 @@ internal object ElixirUsageQueries {
                 )
             }
             return emptyList()
+        }
+
+        /**
+         * True when [candidate] is an occurrence of the variable rooted at [symbolChainRoot].
+         *
+         * A binding is compared by its own chain root; a read is resolved first, because a read
+         * belongs to whichever binding resolution reaches from where it stands. A read that
+         * resolution cannot place at all falls back to the search scope, so that a gap in
+         * resolution over-reports a usage rather than dropping one - Rename shares this search,
+         * and a dropped usage leaves a dangling reference behind.
+         */
+        @RequiresReadLock
+        private fun isOccurrenceOf(candidate: PsiElement, symbolChainRoot: VariableSymbol): Boolean {
+            if (VariableSymbol.isDeclaration(candidate)) {
+                return VariableSymbol.fromDeclaration(candidate)?.chainRootSymbol() == symbolChainRoot
+            }
+            val resolved = VariableReference.resolveSymbols(candidate)
+            return resolved.isEmpty() || resolved.any { it.chainRootSymbol() == symbolChainRoot }
         }
     }
 

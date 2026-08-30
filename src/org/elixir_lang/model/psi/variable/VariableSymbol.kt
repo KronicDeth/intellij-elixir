@@ -93,6 +93,18 @@ class VariableSymbol(
         }
 
     /**
+     * This variable's identity for search and rename: its chain root, as a symbol.
+     *
+     * Two occurrences are the same variable exactly when their chain roots are equal, which is
+     * what lets a usage search tell an inner binding from the outer one it shadows.
+     */
+    @RequiresReadLock
+    fun chainRootSymbol(): VariableSymbol? =
+        (declarationCall() as? UnqualifiedNoArgumentsCall<*>)
+            ?.let { chainRootDeclaration(it) }
+            ?.let { fromElement(it) }
+
+    /**
      * The earliest same-named declaration in this declaration's rebinding chain - possibly itself.
      *
      * A rebinding (`x = x + 1` after `x = input`) SHADOWS the earlier binding, but the chain

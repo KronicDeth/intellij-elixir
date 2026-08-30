@@ -96,6 +96,13 @@
 
 ### Bug Fixes
 
+- [#3965](https://github.com/KronicDeth/intellij-elixir/pull/3965) [@sh41](https://github.com/sh41)
+  - **Renaming a variable no longer rewrites an inner binding that shadows it.** The shared usage
+    search matched by name and scope alone, so an `fn` parameter, `case` clause pattern or `for`
+    generator reusing an outer name was renamed with it. Fixes
+    [#1479](https://github.com/KronicDeth/intellij-elixir/issues/1479).
+  - **Renaming from a rebinding inside an `fn` or `case` body now covers the whole variable.**
+
 - [#3964](https://github.com/KronicDeth/intellij-elixir/pull/3964) [@sh41](https://github.com/sh41)
   - **"Remove space between function name and parentheses" now removes the space instead of
     throwing.** The space stopped being a child of the element the quick fix searched when the
