@@ -1,6 +1,5 @@
 package org.elixir_lang.reference.callable
 
-import com.intellij.testFramework.LoggedErrorProcessor
 import org.elixir_lang.PlatformTestCase
 import java.io.File
 
@@ -19,20 +18,9 @@ import java.io.File
 class UnquoteCallbackNamedVariableTest : PlatformTestCase() {
 
     private fun testNoErrorLogged(fixtureDir: String, fixtureFile: String, displayName: String) {
-        var errorLogged = false
-        LoggedErrorProcessor.executeWith<RuntimeException>(object : LoggedErrorProcessor() {
-            override fun processError(
-                category: String,
-                message: String,
-                details: Array<out String>,
-                t: Throwable?
-            ): Set<Action> {
-                if (t?.message?.contains("Don't know how to walk unquoted variable parent") == true) {
-                    errorLogged = true
-                }
-                return Action.ALL
-            }
-        }) {
+        // suppress = false keeps the default RETHROW, so any logged error fails the test outright;
+        // the captured list only sharpens the message for the one this is actually about.
+        val (_, loggedErrors) = captureLoggedErrors(suppress = false) {
             val testFile = File("testData/org/elixir_lang/reference/callable/$fixtureDir", fixtureFile)
             val content = testFile.readText()
             val psiFile = myFixture.configureByText(fixtureFile, content)
@@ -53,9 +41,11 @@ class UnquoteCallbackNamedVariableTest : PlatformTestCase() {
             })
         }
 
-        assertFalse(
+        assertEmpty(
             "Logger.error should not be called for unquoted variable parent in $displayName",
-            errorLogged
+            loggedErrors.filter {
+                it.title?.contains("Don't know how to walk unquoted variable parent") == true
+            }
         )
     }
 

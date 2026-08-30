@@ -2,7 +2,6 @@ package org.elixir_lang.injection.markdown
 
 import com.intellij.lang.injection.InjectedLanguageManager
 import com.intellij.psi.util.PsiTreeUtil
-import com.intellij.testFramework.LoggedErrorProcessor
 import org.elixir_lang.ElixirLanguage
 import org.elixir_lang.PlatformTestCase
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
@@ -37,36 +36,21 @@ class DelegateToInjectorTest : PlatformTestCase() {
     fun testDelegateToKeyDoesNotCauseSevereError() {
         myFixture.configureByFile("delegate_to.ex")
 
-        var severeLogged = false
-        var severeMessage: String? = null
-
-        val processor = object : LoggedErrorProcessor() {
-            override fun processError(
-                category: String,
-                message: String,
-                details: Array<out String>,
-                t: Throwable?
-            ): Set<Action> {
-                val normalizedCategory = category.removePrefix("#")
-                if (normalizedCategory.contains("elixir_lang.injection.markdown.Injector")) {
-                    severeLogged = true
-                    severeMessage = message
-                }
-                // Return NONE to prevent the error from propagating and failing the test infrastructure
-                return Action.NONE
-            }
-        }
-
-        LoggedErrorProcessor.executeWith<RuntimeException>(processor) {
+        val (_, loggedErrors) = captureLoggedErrors {
             // Trigger highlighting - this invokes all MultiHostInjectors including our Injector
             myFixture.doHighlighting()
         }
 
-        assertFalse(
-            "The markdown Injector logged a SEVERE error for an @doc keyword pair: $severeMessage. " +
+        val injectorErrors = loggedErrors.filter {
+            it.category.contains("elixir_lang.injection.markdown.Injector")
+        }
+
+        assertEmpty(
+            "The markdown Injector logged a SEVERE error for an @doc keyword pair: " +
+                "${injectorErrors.map { it.message }}. " +
                 "The injector must handle 'delegate_to' (and any other non-markdown metadata key) " +
                 "without logging errors.",
-            severeLogged
+            injectorErrors
         )
     }
 
