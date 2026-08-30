@@ -96,6 +96,10 @@
 
 ### Bug Fixes
 
+- [#3962](https://github.com/KronicDeth/intellij-elixir/pull/3962) [@sh41](https://github.com/sh41)
+  - **Ctrl+Click and highlighting no longer throw on a function the decompiler could not recreate.**
+    Refs [#3309](https://github.com/KronicDeth/intellij-elixir/issues/3309).
+
 - [#3957](https://github.com/KronicDeth/intellij-elixir/pull/3957) [@sh41](https://github.com/sh41)
   - **A dep with `allow_pre:` no longer reports an unknown Mix dep option.** It is a Hex flag that
     cannot change where a dep is checked out. Fixes

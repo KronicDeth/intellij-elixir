@@ -154,7 +154,9 @@ class ModuleImpl<T : ModuleStub<*>?>(private val stub: T) : ModuleElementImpl(),
     override fun setName(@NonNls name: String): PsiElement =
         throw IncorrectOperationException("Cannot modify module name in Beam files")
 
-    override fun getNavigationElement(): PsiElement = mirror
+    // The mirror is unset whenever the file's own `setMirror` threw, and `getMirror()` is unannotated Java
+    // that Kotlin reads as non-null. `this` is `PsiElementBase`'s default.
+    override fun getNavigationElement(): PsiElement = mirror ?: this
 
     override fun processDeclarations(
         processor: PsiScopeProcessor,
