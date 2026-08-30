@@ -96,6 +96,11 @@
 
 ### Bug Fixes
 
+- [#3957](https://github.com/KronicDeth/intellij-elixir/pull/3957) [@sh41](https://github.com/sh41)
+  - **A dep with `allow_pre:` no longer reports an unknown Mix dep option.** It is a Hex flag that
+    cannot change where a dep is checked out. Fixes
+    [#2487](https://github.com/KronicDeth/intellij-elixir/issues/2487).
+
 - [#3953](https://github.com/KronicDeth/intellij-elixir/pull/3953) [@sh41](https://github.com/sh41)
   - **"Cannot find enclosing Modular" no longer fires for a `def` inside a map-held `quote`, or for a
     `@callback` behind an infix operator.** The walk that finds a definition's enclosing module treated

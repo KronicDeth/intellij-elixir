@@ -68,8 +68,8 @@ data class Dep(val application: String, val path: String, val type: Type = Type.
                                 val key = keywordPair.keywordKey.text
 
                                 when (key) {
-                                    "app", "branch", "commit", "compile", "env", "git", "github", "hex", "manager",
-                                    "only", "optional", "organization", "override", "ref", "repo", "runtime",
+                                    "allow_pre", "app", "branch", "commit", "compile", "env", "git", "github", "hex",
+                                    "manager", "only", "optional", "organization", "override", "ref", "repo", "runtime",
                                     GUARDIAN_RUNTIME_TYPO, "sparse", "submodules", "system_env", "tag", "targets",
                                     EDELIVER_DISTILLERY_WARN_MISSING, "sha", "depth", "subdir", "warn_if_outdated" -> acc
 
