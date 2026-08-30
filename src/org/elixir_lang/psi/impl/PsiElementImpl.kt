@@ -19,8 +19,8 @@ import org.elixir_lang.psi.call.name.Function.ALIAS
 import org.elixir_lang.psi.call.name.Function.CREATE
 import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.impl.call.maybeModularNameToModulars
+import org.elixir_lang.psi.operation.Infix
 import org.elixir_lang.psi.operation.Match
-import org.elixir_lang.psi.operation.Pipe
 import org.elixir_lang.psi.scope.WhileIn.whileIn
 import org.elixir_lang.util.AccumulatorContinue
 import org.elixir_lang.util.foldWhile
@@ -70,9 +70,15 @@ tailrec fun PsiElement.selfOrEnclosingMacroCall(): Call? =
         is Arguments,
         is AtUnqualifiedNoParenthesesCall<*>,
         is ElixirAccessExpression,
+        is ElixirAssociations,
+        is ElixirAssociationsBase,
         is ElixirBlockItem,
         is ElixirBlockList,
+        is ElixirContainerAssociationOperation,
         is ElixirList,
+        is ElixirMapArguments,
+        is ElixirMapConstructionArguments,
+        is ElixirMapOperation,
         is ElixirMatchedParenthesesArguments,
         is ElixirMatchedWhenOperation,
         is ElixirNoParenthesesManyStrictNoParenthesesExpression,
@@ -81,8 +87,7 @@ tailrec fun PsiElement.selfOrEnclosingMacroCall(): Call? =
         is ElixirStabBody,
         is ElixirStabOperation,
         is ElixirTuple,
-        is Match,
-        is Pipe,
+        is Infix,
         is QualifiedAlias,
         is QualifiedMultipleAliases ->
             parent.selfOrEnclosingMacroCall()
