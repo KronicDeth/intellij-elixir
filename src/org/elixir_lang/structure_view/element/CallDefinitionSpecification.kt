@@ -95,9 +95,14 @@ class CallDefinitionSpecification(
         fun type(matchedWhenOperation: ElixirMatchedWhenOperation): Call? =
                 (matchedWhenOperation.leftOperand() as? Type)?.let { type(it) }
 
+        /**
+         * `null` when [type] has no function name, as for the `foo.()` and `bar not in baz` heads
+         * the parser produces from a malformed `@spec`: [Call.functionName] is `@Nullable` and
+         * every caller here already treats a missing name as "not a specification".
+         */
         @JvmStatic
-        fun typeNameArity(type: Call): org.elixir_lang.NameArity {
-            val name = type.functionName()!!
+        fun typeNameArity(type: Call): org.elixir_lang.NameArity? {
+            val name = type.functionName() ?: return null
             val arity = type.resolvedFinalArity()
 
             return org.elixir_lang.NameArity(name, arity)

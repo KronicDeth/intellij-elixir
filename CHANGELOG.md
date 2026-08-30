@@ -96,6 +96,12 @@
 
 ### Bug Fixes
 
+- [#3963](https://github.com/KronicDeth/intellij-elixir/pull/3963) [@sh41](https://github.com/sh41)
+  - **A `@spec` whose head has no function name no longer crashes the structure view.** Heads like
+    `@spec foo.() :: term` and `@spec bar not in baz :: term` parse to a call with no name, so the
+    malformed spec is now left out of the tree instead of throwing. Fixes
+    [#1564](https://github.com/KronicDeth/intellij-elixir/issues/1564).
+
 - [#3962](https://github.com/KronicDeth/intellij-elixir/pull/3962) [@sh41](https://github.com/sh41)
   - **Ctrl+Click and highlighting no longer throw on a function the decompiler could not recreate.**
     Refs [#3309](https://github.com/KronicDeth/intellij-elixir/issues/3309).
