@@ -81,6 +81,22 @@ class ModuleGotoDeclarationTest : PlatformTestCase() {
         assertEquals("MyApp.Module", ModuleSymbol.moduleNameText(declaration))
     }
 
+    fun testCtrlClickOnAliasNamingAPrefixOfTheEnclosingModuleChoosesGotoDeclaration() {
+        myFixture.configureByFiles("goto_declaration_prefix_sibling.ex")
+        myFixture.assertGotoDeclarationChosenAtCaret()
+    }
+
+    fun testGoToDeclarationFromAliasNamingAPrefixOfTheEnclosingModuleNavigatesToTheSibling() {
+        myFixture.configureByFiles("goto_declaration_prefix_sibling.ex")
+        // In scope the walk finds only the enclosing MyModule.InternalTest, an invalid match because a
+        // prefix is not an exact name, so resolution has to fall through to the module index to reach
+        // the sibling - taking a non-empty in-scope set regardless of validity lets the enclosing
+        // module win instead. Both assertions carry weight: both candidates begin with the leaf text
+        // MyModule, so only the full-name comparison below says which one was reached.
+        val declaration = myFixture.assertGotoDeclarationLandsIn("MyModule", "a defmodule declaration") { Module.`is`(it) }
+        assertEquals("MyModule.Internal", ModuleSymbol.moduleNameText(declaration))
+    }
+
     fun testCtrlClickOnMultiAliasBraceMemberChoosesGotoDeclaration() {
         myFixture.configureByFiles("goto_declaration_multi_alias.ex")
         myFixture.assertGotoDeclarationChosenAtCaret()
