@@ -96,6 +96,21 @@
 
 ### Bug Fixes
 
+- [#3977](https://github.com/KronicDeth/intellij-elixir/pull/3977) [@sh41](https://github.com/sh41)
+  - **Resolving `__MODULE__` inside a module that `use`s another no longer reports a non-idempotent
+    computation.** The reference was cached under one key per `__MODULE__` call, and the platform's
+    parameterized cache never consults the parameter when it looks a value up, so the reference built
+    for one `use` call was handed back to callers that passed a different one - and the two
+    computations disagreed on their dependencies. Completion and Go to Declaration were the usual
+    triggers. Fixes [#2205](https://github.com/KronicDeth/intellij-elixir/issues/2205),
+    [#3320](https://github.com/KronicDeth/intellij-elixir/issues/3320),
+    [#3467](https://github.com/KronicDeth/intellij-elixir/issues/3467),
+    [#3477](https://github.com/KronicDeth/intellij-elixir/issues/3477),
+    [#3495](https://github.com/KronicDeth/intellij-elixir/issues/3495),
+    [#3517](https://github.com/KronicDeth/intellij-elixir/issues/3517),
+    [#3592](https://github.com/KronicDeth/intellij-elixir/issues/3592) and
+    [#3593](https://github.com/KronicDeth/intellij-elixir/issues/3593).
+
 - [#3976](https://github.com/KronicDeth/intellij-elixir/pull/3976) [@sh41](https://github.com/sh41)
   - **An `fn` whose body has no `->` no longer reports "Don't know how to check if variable".** The
     walk that decides whether a name is a variable enumerates the ancestor types it understands and
