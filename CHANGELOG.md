@@ -96,6 +96,13 @@
 
 ### Bug Fixes
 
+- [#3975](https://github.com/KronicDeth/intellij-elixir/pull/3975) [@sh41](https://github.com/sh41)
+  - **A hexadecimal or octal number in a type no longer reports "Cannot highlight types".** The
+    annotator listed the bases it knew rather than matching whole numbers, so `0x0001..0xFFFF` in a
+    `@type` raised an error report instead of highlighting as an ordinary number. Fixes
+    [#1796](https://github.com/KronicDeth/intellij-elixir/issues/1796) and
+    [#3142](https://github.com/KronicDeth/intellij-elixir/issues/3142).
+
 - [#3973](https://github.com/KronicDeth/intellij-elixir/pull/3973) [@sh41](https://github.com/sh41)
   - **HTML inside a `~L` or `~E` sigil is now highlighted.** The injected fragment carried no file
     extension, so EEx's template-data language fell through to plain text and only the Elixir inside

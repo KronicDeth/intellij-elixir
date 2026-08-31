@@ -1093,8 +1093,9 @@ internal class ModuleAttribute : Annotator, DumbAware {
             is ElixirAtomKeyword,
             is ElixirBitString,
             is ElixirCharToken,
-            is ElixirBinaryWholeNumber,
-            is ElixirDecimalWholeNumber,
+            // Every base highlights as an ordinary number, so match the supertype rather than
+            // enumerating them; enumerating left hexadecimal and octal reaching cannotHighlightTypes.
+            is WholeNumber,
                 // Fixes #2583
             is ElixirEmptyParentheses,
             is ElixirKeywordKey,  /* happens when :: is typed in `@spec` above function clause that uses `do:` */
