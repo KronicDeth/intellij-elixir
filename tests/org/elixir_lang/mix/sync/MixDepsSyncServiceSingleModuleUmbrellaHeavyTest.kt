@@ -128,7 +128,7 @@ class MixDepsSyncServiceSingleModuleUmbrellaHeavyTest : HeavyPlatformTestCase() 
      * unresolved module aliases for all app-declared deps in single-module umbrellas).
      */
     fun testRootMixFileSync_wiresAppDeclaredDepToUmbrellaModule() {
-        val libName = scopedDepLibraryName(umbrellaVf.url, "phoenix")
+        val libName = scopedDepLibraryName(contentRootToken(project, umbrellaVf.url), "phoenix")
 
         val service = project.service<MixDepsSyncService>()
         service.clearPendingForTesting()
@@ -160,7 +160,7 @@ class MixDepsSyncServiceSingleModuleUmbrellaHeavyTest : HeavyPlatformTestCase() 
      * trigger dependency wiring in a single-module umbrella.
      */
     fun testAppMixFileEvent_resolvesToOwningUmbrellaModuleAndWires() {
-        val libName = scopedDepLibraryName(umbrellaVf.url, "phoenix")
+        val libName = scopedDepLibraryName(contentRootToken(project, umbrellaVf.url), "phoenix")
 
         val service = project.service<MixDepsSyncService>()
         service.clearPendingForTesting()
@@ -186,7 +186,7 @@ class MixDepsSyncServiceSingleModuleUmbrellaHeavyTest : HeavyPlatformTestCase() 
      * at all (otherwise this test would pass vacuously against the pre-fix code).
      */
     fun testInUmbrellaSiblingDep_doesNotCreateModuleOrderEntryOnOwnModule() {
-        val libName = scopedDepLibraryName(umbrellaVf.url, "phoenix")
+        val libName = scopedDepLibraryName(contentRootToken(project, umbrellaVf.url), "phoenix")
 
         val service = project.service<MixDepsSyncService>()
         service.clearPendingForTesting()

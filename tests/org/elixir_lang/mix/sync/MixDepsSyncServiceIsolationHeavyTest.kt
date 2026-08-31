@@ -46,8 +46,8 @@ class MixDepsSyncServiceIsolationHeavyTest : MixDepsSyncServiceHeavyTestBase() {
      *   root; umbrella_b/ is NOT an ancestor of umbrella_a/apps/child_a → filtered; umbrella_a/ IS → picked
      */
     fun testUmbrellaFallback_twoModuleSeparatedUmbrellas_childModuleWiredToOwningUmbrella() {
-        val libNameA = scopedDepLibraryName(umbrellaAVf.url, "phoenix")
-        val libNameB = scopedDepLibraryName(umbrellaBVf.url, "phoenix")
+        val libNameA = scopedDepLibraryName(contentRootToken(project, umbrellaAVf.url), "phoenix")
+        val libNameB = scopedDepLibraryName(contentRootToken(project, umbrellaBVf.url), "phoenix")
         assertFalse("Sanity: two umbrella roots must produce distinct library names", libNameA == libNameB)
 
         val service = project.service<MixDepsSyncService>()

@@ -121,7 +121,7 @@ class MixDepsSyncServicePruneStaleEntriesHeavyTest : HeavyPlatformTestCase() {
         )
 
         // And the correctly-scoped replacement must be wired (the prune must not interfere).
-        val currentName = scopedDepLibraryName(rootVf.url, "phoenix")
+        val currentName = scopedDepLibraryName(contentRootToken(project, rootVf.url), "phoenix")
         assertTrue(
             "The current-root-scoped library '$currentName' must still be wired. Order entries: $entries",
             entries.contains(currentName)
@@ -134,7 +134,7 @@ class MixDepsSyncServicePruneStaleEntriesHeavyTest : HeavyPlatformTestCase() {
      * the dep is fetched and the library is created - the prune must leave it alone.
      */
     fun testInvalidEntryForCurrentRootIsPreserved() {
-        val unfetchedName = scopedDepLibraryName(rootVf.url, "ecto")
+        val unfetchedName = scopedDepLibraryName(contentRootToken(project, rootVf.url), "ecto")
         addInvalidProjectLibraryEntry(unfetchedName)
 
         drainForRootMixExs()

@@ -63,6 +63,11 @@
 - [#3991](https://github.com/KronicDeth/intellij-elixir/pull/3991) [@sh41](https://github.com/sh41)
   - **The `+++` and `---` operators are now parsed.** Fixes [#2755](https://github.com/KronicDeth/intellij-elixir/issues/2755).
 
+- [#3983](https://github.com/KronicDeth/intellij-elixir/pull/3983) [@sh41](https://github.com/sh41)
+  - **Dependency libraries are scoped relative to the project**, so `.idea/libraries` and `.iml` can
+    be shared again. Refs [#3926](https://github.com/KronicDeth/intellij-elixir/issues/3926).
+  - **External Libraries shows a dependency's name and location again.**
+
 - [#3982](https://github.com/KronicDeth/intellij-elixir/pull/3982) [@sh41](https://github.com/sh41)
   - **A parameter of an `fn` that has no `->` yet no longer reports "Use scope for parameter not found
     before reaching file scope".** The scope search stopped at a definition clause, a delegation, a call

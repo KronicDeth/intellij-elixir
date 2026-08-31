@@ -42,8 +42,8 @@ class MixDepsSyncServiceMultiUmbrellaHeavyTest : MixDepsSyncServiceHeavyTestBase
      * `umbrella_a/`, so it is excluded and receives no phoenix library entry.
      */
     fun testAffectedModuleNames_depRootFanOutIncludesOnlyAncestorChild() {
-        val libNameA = scopedDepLibraryName(umbrellaAVf.url, "phoenix")
-        val libNameB = scopedDepLibraryName(umbrellaBVf.url, "phoenix")
+        val libNameA = scopedDepLibraryName(contentRootToken(project, umbrellaAVf.url), "phoenix")
+        val libNameB = scopedDepLibraryName(contentRootToken(project, umbrellaBVf.url), "phoenix")
 
         val service = project.service<MixDepsSyncService>()
         service.clearPendingForTesting()
@@ -103,8 +103,8 @@ class MixDepsSyncServiceMultiUmbrellaHeavyTest : MixDepsSyncServiceHeavyTestBase
      * child_a's wiring. This test verifies BOTH children independently.
      */
     fun testFullTwoSidedCrossRootWiringIsolation() {
-        val libNameA = scopedDepLibraryName(umbrellaAVf.url, "phoenix")
-        val libNameB = scopedDepLibraryName(umbrellaBVf.url, "phoenix")
+        val libNameA = scopedDepLibraryName(contentRootToken(project, umbrellaAVf.url), "phoenix")
+        val libNameB = scopedDepLibraryName(contentRootToken(project, umbrellaBVf.url), "phoenix")
         assertFalse("Sanity: two umbrella roots must produce distinct library names", libNameA == libNameB)
 
         val service = project.service<MixDepsSyncService>()
@@ -163,8 +163,8 @@ class MixDepsSyncServiceMultiUmbrellaHeavyTest : MixDepsSyncServiceHeavyTestBase
      * `phoenix [umbrella_a/apps/child_a]` instead of the correct `phoenix \[umbrella_a\]`.
      */
     fun testSyncModuleOnly_ancestorWalkProducesCorrectlyScopedLibrary() {
-        val correctLibName = scopedDepLibraryName(umbrellaAVf.url, "phoenix")
-        val wrongLibName = scopedDepLibraryName(childAVf.url, "phoenix")
+        val correctLibName = scopedDepLibraryName(contentRootToken(project, umbrellaAVf.url), "phoenix")
+        val wrongLibName = scopedDepLibraryName(contentRootToken(project, childAVf.url), "phoenix")
         assertFalse("Sanity: correct and wrong library names must differ", correctLibName == wrongLibName)
 
         val service = project.service<MixDepsSyncService>()

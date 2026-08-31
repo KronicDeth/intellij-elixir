@@ -1,6 +1,7 @@
 package org.elixir_lang.mix.sync
 
 import com.intellij.openapi.application.edtWriteAction
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
@@ -9,6 +10,8 @@ import com.intellij.openapi.roots.libraries.Library
 import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar
 import com.intellij.openapi.vfs.VfsUtilCore
 import org.elixir_lang.mix.library.Kind
+
+private val LOG = logger<ApplyStats>()
 
 /**
  * Counts of model objects changed during one [applyWritePlan] call.  Used for drain-complete
@@ -178,15 +181,24 @@ private fun applyModuleWriteOp(
     moduleManager: ModuleManager,
     libraryTable: com.intellij.openapi.roots.libraries.LibraryTable,
 ) {
-    // Stale-entry pruning - remove the invalid project-level entries scheduled by buildWritePlan.
-    // Re-check isValid at apply time: if a concurrent write action created the referenced library
-    // after the read-phase snapshot, the entry is no longer invalid and must be kept.
+    // Remove the entries scheduled by buildWritePlan.  Validity is deliberately not re-checked:
+    // these are removed because their scope token is not a current content root, which has nothing
+    // to do with whether the library still exists - and for entries left by an older naming scheme
+    // it usually does, so a validity guard here would silently drop every removal.
     if (op.removeStaleLibraryDeps.isNotEmpty()) {
+        var removed = 0
         for (entry in modifiableModel.orderEntries.filterIsInstance<LibraryOrderEntry>()) {
             ProgressManager.checkCanceled()
-            if (!entry.isValid && entry.libraryName in op.removeStaleLibraryDeps) {
+            if (entry.libraryName in op.removeStaleLibraryDeps) {
                 modifiableModel.removeOrderEntry(entry)
+                removed++
             }
+        }
+        if (LOG.isDebugEnabled) {
+            LOG.debug(
+                "applyWritePlan[${op.moduleName}]: removed $removed of " +
+                    "${op.removeStaleLibraryDeps.size} planned library entries"
+            )
         }
     }
 

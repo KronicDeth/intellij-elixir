@@ -4,6 +4,7 @@ import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.components.service
 import com.intellij.openapi.roots.LibraryOrderEntry
 import com.intellij.openapi.roots.ModuleRootManager
+import com.intellij.openapi.roots.ModuleRootModificationUtil
 import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar
 import com.intellij.openapi.vfs.newvfs.impl.VfsRootAccess
@@ -118,7 +119,7 @@ class MixDepsSyncServiceTest : PlatformTestCase() {
         val depRoot = myFixture.tempDirFixture.findOrCreateDir("my_app/deps/phoenix")
         myFixture.tempDirFixture.findOrCreateDir("my_app/deps/phoenix/lib")
         MixTestFixtures.addBuildArtifacts(myFixture, "my_app", "dev", "phoenix")
-        val phoenixLibName = scopedDepLibraryName(myApp.url, "phoenix")
+        val phoenixLibName = scopedDepLibraryName(contentRootToken(project, myApp.url), "phoenix")
 
         val service = project.service<MixDepsSyncService>()
         val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
@@ -174,8 +175,8 @@ class MixDepsSyncServiceTest : PlatformTestCase() {
         val ectoRoot = myFixture.tempDirFixture.findOrCreateDir("my_app/deps/ecto")
         myFixture.tempDirFixture.findOrCreateDir("my_app/deps/ecto/lib")
         MixTestFixtures.addBuildArtifacts(myFixture, "my_app", "dev", "phoenix", "ecto")
-        val phoenixLibName = scopedDepLibraryName(myApp.url, "phoenix")
-        val ectoLibName = scopedDepLibraryName(myApp.url, "ecto")
+        val phoenixLibName = scopedDepLibraryName(contentRootToken(project, myApp.url), "phoenix")
+        val ectoLibName = scopedDepLibraryName(contentRootToken(project, myApp.url), "ecto")
 
         val service = project.service<MixDepsSyncService>()
         val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
@@ -219,7 +220,7 @@ class MixDepsSyncServiceTest : PlatformTestCase() {
         val depRoot = myFixture.tempDirFixture.findOrCreateDir("my_app/deps/phoenix")
         myFixture.tempDirFixture.findOrCreateDir("my_app/deps/phoenix/lib")
         MixTestFixtures.addBuildArtifacts(myFixture, "my_app", "dev", "phoenix")
-        val phoenixLibName = scopedDepLibraryName(root.url, "phoenix")
+        val phoenixLibName = scopedDepLibraryName(contentRootToken(project, root.url), "phoenix")
 
         val service = project.service<MixDepsSyncService>()
         val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
@@ -264,8 +265,8 @@ class MixDepsSyncServiceTest : PlatformTestCase() {
         MixTestFixtures.addBuildArtifacts(myFixture, "project_a", "dev", "phoenix")
         MixTestFixtures.addBuildArtifacts(myFixture, "project_b", "dev", "phoenix")
 
-        val libNameA = scopedDepLibraryName(rootA.url, "phoenix")
-        val libNameB = scopedDepLibraryName(rootB.url, "phoenix")
+        val libNameA = scopedDepLibraryName(contentRootToken(project, rootA.url), "phoenix")
+        val libNameB = scopedDepLibraryName(contentRootToken(project, rootB.url), "phoenix")
 
         // The two scoped names must be distinct.
         assertFalse(
@@ -303,8 +304,8 @@ class MixDepsSyncServiceTest : PlatformTestCase() {
         MixTestFixtures.addBuildArtifacts(myFixture, "project_a", "dev", "phoenix")
         MixTestFixtures.addBuildArtifacts(myFixture, "project_b", "dev", "phoenix")
 
-        val libNameA = scopedDepLibraryName(rootA.url, "phoenix")
-        val libNameB = scopedDepLibraryName(rootB.url, "phoenix")
+        val libNameA = scopedDepLibraryName(contentRootToken(project, rootA.url), "phoenix")
+        val libNameB = scopedDepLibraryName(contentRootToken(project, rootB.url), "phoenix")
 
         val service = project.service<MixDepsSyncService>()
         val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
@@ -346,8 +347,8 @@ class MixDepsSyncServiceTest : PlatformTestCase() {
         MixTestFixtures.addBuildArtifacts(myFixture, "project_a", "dev", "phoenix")
         MixTestFixtures.addBuildArtifacts(myFixture, "project_b", "dev", "phoenix")
 
-        val libNameA = scopedDepLibraryName(rootA.url, "phoenix")
-        val libNameB = scopedDepLibraryName(rootB.url, "phoenix")
+        val libNameA = scopedDepLibraryName(contentRootToken(project, rootA.url), "phoenix")
+        val libNameB = scopedDepLibraryName(contentRootToken(project, rootB.url), "phoenix")
 
         val service = project.service<MixDepsSyncService>()
         val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
@@ -392,8 +393,8 @@ class MixDepsSyncServiceTest : PlatformTestCase() {
         // project_b has no phoenix ebin artifact.
         myFixture.tempDirFixture.findOrCreateDir("project_b/_build/dev/consolidated")
 
-        val libNameA = scopedDepLibraryName(rootA.url, "phoenix")
-        val libNameB = scopedDepLibraryName(rootB.url, "phoenix")
+        val libNameA = scopedDepLibraryName(contentRootToken(project, rootA.url), "phoenix")
+        val libNameB = scopedDepLibraryName(contentRootToken(project, rootB.url), "phoenix")
 
         val service = project.service<MixDepsSyncService>()
         val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
@@ -428,7 +429,7 @@ class MixDepsSyncServiceTest : PlatformTestCase() {
         val depRoot = myFixture.tempDirFixture.findOrCreateDir("my_app/deps/phoenix")
         myFixture.tempDirFixture.findOrCreateDir("my_app/deps/phoenix/lib")
         MixTestFixtures.addBuildArtifacts(myFixture, "my_app", "dev", "phoenix")
-        val phoenixLibName = scopedDepLibraryName(myApp.url, "phoenix")
+        val phoenixLibName = scopedDepLibraryName(contentRootToken(project, myApp.url), "phoenix")
 
         val service = project.service<MixDepsSyncService>()
         val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
@@ -478,7 +479,7 @@ class MixDepsSyncServiceTest : PlatformTestCase() {
         val depRoot = myFixture.tempDirFixture.findOrCreateDir("my_app/deps/phoenix")
         myFixture.tempDirFixture.findOrCreateDir("my_app/deps/phoenix/lib")
         MixTestFixtures.addBuildArtifacts(myFixture, "my_app", "dev", "phoenix")
-        val scopedLibName = scopedDepLibraryName(myApp.url, "phoenix")
+        val scopedLibName = scopedDepLibraryName(contentRootToken(project, myApp.url), "phoenix")
 
         val service = project.service<MixDepsSyncService>()
         val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
@@ -611,8 +612,8 @@ class MixDepsSyncServiceTest : PlatformTestCase() {
         MixTestFixtures.addBuildArtifacts(myFixture, "project_a", "dev", "phoenix")
         MixTestFixtures.addBuildArtifacts(myFixture, "project_b", "dev", "phoenix")
 
-        val libNameA = scopedDepLibraryName(rootA.url, "phoenix")
-        val libNameB = scopedDepLibraryName(rootB.url, "phoenix")
+        val libNameA = scopedDepLibraryName(contentRootToken(project, rootA.url), "phoenix")
+        val libNameB = scopedDepLibraryName(contentRootToken(project, rootB.url), "phoenix")
 
         val service = project.service<MixDepsSyncService>()
         val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
@@ -666,7 +667,7 @@ class MixDepsSyncServiceTest : PlatformTestCase() {
         // Seed the library table:
         //   (a) scoped placeholder with Kind but NO roots (simulates an unfetched dep)
         //   (b) user library without Kind (must survive delete)
-        val placeholderName = scopedDepLibraryName(contentRootUrl, "placeholder_dep")
+        val placeholderName = scopedDepLibraryName(contentRootToken(project, contentRootUrl), "placeholder_dep")
         WriteAction.run<Throwable> {
             val model = libraryTable.modifiableModel
             model.createLibrary(placeholderName, MixLibraryKind)  // placeholder - no roots added
@@ -805,7 +806,7 @@ class MixDepsSyncServiceTest : PlatformTestCase() {
 
         // Seed: create the phoenix library so we can verify it is re-created by the SyncRoot.
         val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
-        val phoenixLibName = scopedDepLibraryName(app.url, "phoenix")
+        val phoenixLibName = scopedDepLibraryName(contentRootToken(project, app.url), "phoenix")
         service.enqueue(SyncRequest.DepRoot(myFixture.tempDirFixture.getFile("app/deps/phoenix")!!))
         drainDirectly(service)
         assertNotNull("phoenix library must exist after seed", libraryTable.getLibraryByName(phoenixLibName))
@@ -931,7 +932,8 @@ class MixDepsSyncServiceTest : PlatformTestCase() {
         PsiTestUtil.addContentRoot(myFixture.module, myApp)
 
         val contentRootUrl = myApp.url
-        val libName = scopedDepLibraryName(contentRootUrl, "phoenix")
+        val rootToken = contentRootToken(project, contentRootUrl)
+        val libName = scopedDepLibraryName(rootToken, "phoenix")
 
         val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
 
@@ -951,6 +953,7 @@ class MixDepsSyncServiceTest : PlatformTestCase() {
             libraryPlans = listOf(
                 LibraryRootsPlan(
                     contentRootUrl = contentRootUrl,
+                    contentRootToken = rootToken,
                     depName = "phoenix",
                     classRootUrls = emptyList(),
                     sourceRootUrls = listOf(libNew.url),
@@ -987,7 +990,8 @@ class MixDepsSyncServiceTest : PlatformTestCase() {
         PsiTestUtil.addContentRoot(myFixture.module, myApp)
 
         val contentRootUrl = myApp.url
-        val libName = scopedDepLibraryName(contentRootUrl, "phoenix")
+        val rootToken = contentRootToken(project, contentRootUrl)
+        val libName = scopedDepLibraryName(rootToken, "phoenix")
         val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
 
         // Seed with the exact same source roots as the plan.
@@ -1005,6 +1009,7 @@ class MixDepsSyncServiceTest : PlatformTestCase() {
             libraryPlans = listOf(
                 LibraryRootsPlan(
                     contentRootUrl = contentRootUrl,
+                    contentRootToken = rootToken,
                     depName = "phoenix",
                     classRootUrls = emptyList(),
                     sourceRootUrls = listOf(libDir.url),
@@ -1036,7 +1041,7 @@ class MixDepsSyncServiceTest : PlatformTestCase() {
      */
     fun testApplyWritePlan_nonExistentModuleSkippedGracefully() {
         val contentRootUrl = myFixture.tempDirFixture.findOrCreateDir("stale_test").url
-        val libName = scopedDepLibraryName(contentRootUrl, "phoenix")
+        val libName = scopedDepLibraryName(contentRootToken(project, contentRootUrl), "phoenix")
 
         val writePlan = WritePlan(
             librariesToRemove = emptyList(),
@@ -1102,7 +1107,7 @@ class MixDepsSyncServiceTest : PlatformTestCase() {
         service.enqueue(SyncRequest.DepRoot(depsPhoenix))
         drainDirectly(service)
 
-        val libName = scopedDepLibraryName(myApp.url, "phoenix")
+        val libName = scopedDepLibraryName(contentRootToken(project, myApp.url), "phoenix")
         val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
         val lib = libraryTable.getLibraryByName(libName)
 
@@ -1139,7 +1144,7 @@ class MixDepsSyncServiceTest : PlatformTestCase() {
         PsiTestUtil.addContentRoot(myFixture.module, myApp)
 
         val contentRootUrl = myApp.url
-        val libName = scopedDepLibraryName(contentRootUrl, "placeholder_dep")
+        val libName = scopedDepLibraryName(contentRootToken(project, contentRootUrl), "placeholder_dep")
         val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
 
         // Seed the library so it exists in the snapshot.
@@ -1202,7 +1207,8 @@ class MixDepsSyncServiceTest : PlatformTestCase() {
         PsiTestUtil.addContentRoot(myFixture.module, myApp)
 
         val contentRootUrl = myApp.url
-        val libName = scopedDepLibraryName(contentRootUrl, "phoenix")
+        val rootToken = contentRootToken(project, contentRootUrl)
+        val libName = scopedDepLibraryName(rootToken, "phoenix")
         val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
 
         // Seed the library with the same roots the re-sync will request - this is the critical
@@ -1221,10 +1227,11 @@ class MixDepsSyncServiceTest : PlatformTestCase() {
         // same roots (simulating a delete event immediately followed by a re-sync event in the
         // same coalesced drain).
         val syncPlan = SyncPlan(
-            deleteOnes = listOf(DeleteOnePlan("phoenix", contentRootUrl)),
+            deleteOnes = listOf(DeleteOnePlan("phoenix", contentRootUrl, rootToken)),
             libraryPlans = listOf(
                 LibraryRootsPlan(
                     contentRootUrl = contentRootUrl,
+                    contentRootToken = rootToken,
                     depName = "phoenix",
                     classRootUrls = emptyList(),
                     sourceRootUrls = listOf(libDir.url),
@@ -1260,9 +1267,169 @@ class MixDepsSyncServiceTest : PlatformTestCase() {
         WriteAction.run<Throwable> { libraryTable.getLibraryByName(libName)?.let { libraryTable.removeLibrary(it) } }
     }
 
+    /**
+     * Deleting a deps directory must remove that root's libraries under either scope scheme. The
+     * match is by name suffix, so a project last synced by an older version - whose names carry the
+     * absolute URL - would otherwise keep every library it had.
+     */
+    fun testBuildWritePlan_deleteAllRemovesBothScopeSchemes() {
+        val myApp = myFixture.tempDirFixture.findOrCreateDir("delete_all_schemes")
+        myFixture.tempDirFixture.findOrCreateDir("delete_all_schemes/deps")
+        PsiTestUtil.addContentRoot(myFixture.module, myApp)
+
+        val contentRootUrl = myApp.url
+        val currentName = scopedDepLibraryName(contentRootToken(project, contentRootUrl), "phoenix")
+        val olderSchemeName = scopedDepLibraryName(contentRootUrl, "ecto")
+
+        WriteAction.run<Throwable> {
+            val model = LibraryTablesRegistrar.getInstance().getLibraryTable(project).modifiableModel
+            model.createLibrary(currentName, MixLibraryKind)
+            if (olderSchemeName != currentName) model.createLibrary(olderSchemeName, MixLibraryKind)
+            model.commit()
+        }
+
+        val plan = SyncPlan(deleteAlls = listOf(DeleteAllPlan("$contentRootUrl/deps")))
+        val writePlan = runSuspendOnPooledThread { buildWritePlan(project, plan) }
+
+        assertTrue(
+            "The current scheme's library must be removed. Removing: ${writePlan.librariesToRemove}",
+            currentName in writePlan.librariesToRemove
+        )
+        assertTrue(
+            "A library named by the older scheme must be removed too. " +
+                "Removing: ${writePlan.librariesToRemove}",
+            olderSchemeName in writePlan.librariesToRemove
+        )
+    }
+
+    // ------------------------------------------------------------------
+    // One dep, one library entry per module
+    // ------------------------------------------------------------------
+
+    /**
+     * An entry the plugin wrote under an older scope scheme must be removed once the dep is wired
+     * under the current one, or a module collects an entry per scheme the plugin has shipped.
+     * Recognised by the `"<dep> [<token>]"` shape, so a bare name - possibly a user's own library -
+     * is left strictly alone.
+     */
+    fun testBuildWritePlan_removesEntriesScopedByAnOlderScheme() {
+        val myApp = myFixture.tempDirFixture.findOrCreateDir("supersede_app")
+        val ebin = myFixture.tempDirFixture.findOrCreateDir("supersede_app/_build/dev/lib/phoenix/ebin")
+        PsiTestUtil.addContentRoot(myFixture.module, myApp)
+
+        val contentRootUrl = myApp.url
+        val rootToken = contentRootToken(project, contentRootUrl)
+        val newName = scopedDepLibraryName(rootToken, "phoenix")
+        val legacyUnscoped = "phoenix"
+        // A token that is not a current content root, which is the shape every superseded scheme
+        // takes once the plugin stops writing it.  Deliberately a *valid* library: the removal used
+        // to be guarded on invalidity, which is exactly what let these accumulate.
+        val supersededName = scopedDepLibraryName("file:///gone/previous/scheme/root", "phoenix")
+        assertFalse("Fixture needs the two names to differ", newName == supersededName)
+
+        WriteAction.run<Throwable> {
+            val model = LibraryTablesRegistrar.getInstance().getLibraryTable(project).modifiableModel
+            model.createLibrary(legacyUnscoped, MixLibraryKind)
+            model.createLibrary(supersededName, MixLibraryKind)
+            model.commit()
+            ModuleRootModificationUtil.updateModel(myFixture.module) { rootModel ->
+                val table = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
+                rootModel.addLibraryEntry(table.getLibraryByName(legacyUnscoped)!!)
+                rootModel.addLibraryEntry(table.getLibraryByName(supersededName)!!)
+            }
+        }
+
+        val plan = SyncPlan(
+            libraryPlans = listOf(
+                LibraryRootsPlan(
+                    contentRootUrl = contentRootUrl,
+                    contentRootToken = rootToken,
+                    depName = "phoenix",
+                    classRootUrls = listOf(ebin.url),
+                    sourceRootUrls = emptyList(),
+                    excludeFolders = emptyList(),
+                )
+            ),
+            modulePlans = listOf(
+                ModuleDepsPlan(
+                    moduleName = myFixture.module.name,
+                    moduleDeps = emptySet(),
+                    libraryDeps = setOf(newName),
+                    externalLibraryPlans = emptyList(),
+                )
+            ),
+        )
+
+        val writePlan = runSuspendOnPooledThread { buildWritePlan(project, plan) }
+        val op = writePlan.moduleWriteOps.single { it.moduleName == myFixture.module.name }
+
+        assertTrue("The current scoped name must be wired", newName in op.addLibraryDeps)
+        assertFalse(
+            "A bare name may be a user library and must be left alone. Removed: ${op.removeStaleLibraryDeps}",
+            legacyUnscoped in op.removeStaleLibraryDeps
+        )
+        assertTrue(
+            "The entry scoped by the older scheme must be removed even though its library is valid. " +
+                "Removed: ${op.removeStaleLibraryDeps}",
+            supersededName in op.removeStaleLibraryDeps
+        )
+        assertFalse(
+            "The entry being wired must never be removed",
+            newName in op.removeStaleLibraryDeps
+        )
+    }
+
+
+    // ------------------------------------------------------------------
+    // contentRootToken
+    // ------------------------------------------------------------------
+
+    /**
+     * A content root under the project base directory scopes to its relative path, matching the
+     * `$PROJECT_DIR$/apps/child` the platform already writes for that library's roots.
+     */
+    fun testContentRootToken_belowProjectBaseIsRelative() {
+        val basePath = projectBasePath()
+        assertEquals("apps/child", contentRootToken(project, "file://$basePath/apps/child"))
+    }
+
+    /** The base directory itself is ".", never "" - "" is the separate "no owning root" fallback. */
+    fun testContentRootToken_projectBaseIsDot() {
+        val basePath = projectBasePath()
+        assertEquals(".", contentRootToken(project, "file://$basePath"))
+    }
+
+    /**
+     * A Mix module that is part of the project but sits outside its base directory scopes to a
+     * `../`-prefixed path.  `PathMacroManager.addFileHierarchyReplacements` walks to the filesystem
+     * root, so the platform writes such a library's roots as `$PROJECT_DIR$/../...` - the name has to
+     * relocate on that same boundary or it would be less shareable than the roots it names.
+     */
+    fun testContentRootToken_outsideProjectBaseIsParentRelative() {
+        val basePath = projectBasePath()
+        val parent = basePath.substringBeforeLast('/', "")
+        assertTrue("Test needs a project base with a parent directory, got '$basePath'", parent.contains('/'))
+        val token = contentRootToken(project, "file://$parent/sibling_mix_app")
+        assertTrue("Expected a ../-prefixed token, got '$token'", token.startsWith("../"))
+        assertTrue("Expected the module directory in the token, got '$token'", token.endsWith("sibling_mix_app"))
+    }
+
+    /** No relative path can span two drives or mounts, so the absolute URL is kept unchanged. */
+    fun testContentRootToken_unrelatedRootKeepsAbsoluteUrl() {
+        val url = "file://nonexistent-mount-0/elsewhere/mix_app"
+        assertEquals(url, contentRootToken(project, url))
+    }
+
     // ------------------------------------------------------------------
     // Helpers
     // ------------------------------------------------------------------
+
+    /** Asserted rather than skipped: a silent return would pass without testing anything. */
+    private fun projectBasePath(): String {
+        val basePath = project.basePath
+        assertNotNull("Test fixture must provide a project base path", basePath)
+        return basePath!!
+    }
 
     /**
      * Runs an arbitrary [suspend] block on a pooled thread while the EDT (test thread) continues

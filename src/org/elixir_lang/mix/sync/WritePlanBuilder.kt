@@ -35,12 +35,12 @@ internal data class LibraryWriteOp(
  * contains names whose dep-module is absent or disposed at plan-build time.  [addLibraryDeps] and
  * [addInvalidLibraryDeps] follow the same convention for project libraries.
  *
- * [removeStaleLibraryDeps] is the single removal case the pipeline performs on existing entries:
- * INVALID project-level library entries whose root-scoped name embeds a content-root URL that is
- * no longer a project content root.  Such entries can never become valid again - no sync will
- * recreate a library scoped to a root that left the project (e.g. after the project moved on disk
- * or a WSL distro rename changed every file URL) - so they are permanently dead weight.  All other
- * existing entries are never removed by the sync pipeline.
+ * [removeStaleLibraryDeps] is project-level entries carrying the `"<dep> [<token>]"` shape this
+ * plugin writes - nothing else produces it - whose token is not a current content root.  Either the
+ * root left the project (it moved on disk, or a WSL distro rename changed every file URL), or the
+ * token names a current root in a scheme the plugin no longer writes, which is how an entry left by
+ * an older version is recognised as superseded.  An entry without that shape is never removed: it
+ * may be a user-created reference the sync has no claim over.
  */
 internal data class ModuleWriteOp(
     val moduleName: String,
@@ -146,14 +146,19 @@ private fun buildWritePlanInCurrentContext(project: Project, syncPlan: SyncPlan)
         ProgressManager.checkCanceled()
         // depsUrl is always "<contentRootUrl>/deps"; strip the suffix to derive scoped-name suffix.
         val contentRootUrl = deleteAll.depsUrl.removeSuffix("/deps")
-        val scopedSuffix = " [$contentRootUrl]"
+        // Both scope schemes: a project last synced by an older version names its libraries after
+        // the absolute URL, and matching only today's token would leave every one of them behind.
+        val scopedSuffixes = setOf(
+            " [${contentRootToken(project, contentRootUrl)}]",
+            " [$contentRootUrl]",
+        )
         // Append "/" so VfsUtilCore.isEqualOrAncestor is path-boundary-safe (Strategy 2 mirror).
         val depsPrefixUrl = if (deleteAll.depsUrl.endsWith("/")) deleteAll.depsUrl else "${deleteAll.depsUrl}/"
 
         for ((name, snap) in libSnap) {
             ProgressManager.checkCanceled()
             // Strategy 1: scoped-name + Kind (catches empty placeholders and class-only libs).
-            val matchesScoped = name.endsWith(scopedSuffix) && snap.isKind
+            val matchesScoped = snap.isKind && scopedSuffixes.any { name.endsWith(it) }
             // Strategy 2: source-root ancestor check (backwards-compat for legacy unscoped libs).
             val matchesSources = snap.sourceUrls.isNotEmpty() &&
                 snap.sourceUrls.all { VfsUtilCore.isEqualOrAncestor(depsPrefixUrl, it) }
@@ -179,6 +184,13 @@ private fun buildWritePlanInCurrentContext(project: Project, syncPlan: SyncPlan)
         // unscoped library (only if it is a Mix-Kind library to avoid touching user libraries).
         if (deleteOne.depName != deleteOne.libraryName && libSnap[deleteOne.depName]?.isKind == true) {
             librariesToRemove += deleteOne.depName
+        }
+        // And the absolute-URL-scoped name from before tokens went relative, so a delete still
+        // finds its target in a project last synced by an older plugin version.
+        deleteOne.previousLibraryName?.let { previousName ->
+            if (libSnap[previousName]?.isKind == true) {
+                librariesToRemove += previousName
+            }
         }
     }
 
@@ -252,6 +264,15 @@ private fun buildWritePlanInCurrentContext(project: Project, syncPlan: SyncPlan)
             val legacy = libSnap[plan.depName]
             if (legacy != null && legacy.isKind) {
                 legacyLibrariesToRemove += plan.depName
+            }
+        }
+
+        // Same cleanup one format later, for the absolute-URL-scoped name used before tokens went
+        // relative. Removing it invalidates its order entries, which stale-entry pruning then
+        // clears from the .iml.
+        plan.previousLibraryName?.let { previousName ->
+            if (libSnap[previousName]?.isKind == true) {
+                legacyLibrariesToRemove += previousName
             }
         }
     }
@@ -351,10 +372,12 @@ private fun buildWritePlanInCurrentContext(project: Project, syncPlan: SyncPlan)
         (libSnap.keys - allLibrariesToRemoveSet) + plannedLibraryNames + placeholderLibraries
 
     val moduleManager = ModuleManager.getInstance(project)
-    // Current content-root URLs, used to recognise stale root-scoped library entries: a scoped
-    // name embedding a URL outside this set references a root that left the project.
-    val projectContentRootUrls = ProjectRootManager.getInstance(project).contentRoots
-        .mapTo(HashSet()) { it.url }
+    // Current content-root scope tokens, used to recognise stale root-scoped library entries: a
+    // scoped name embedding a token outside this set references a root that left the project - or
+    // names the same root in a scheme the plugin no longer writes, which is how an entry left by
+    // an older version is recognised as superseded rather than current.
+    val projectContentRootTokens = ProjectRootManager.getInstance(project).contentRoots
+        .mapTo(HashSet()) { contentRootToken(project, it.url) }
     val moduleNames = (syncPlan.modulePlans.map { it.moduleName } +
         syncPlan.libraryPlans.flatMap { it.excludeFolders }.map { it.moduleName } +
         syncPlan.consolidatedPlans.mapNotNull { it.ownerModuleName })
@@ -443,15 +466,31 @@ private fun buildWritePlanInCurrentContext(project: Project, syncPlan: SyncPlan)
         // valid again - no sync will ever recreate a library scoped to a root that left the
         // project.  Entries scoped to a CURRENT content root are the deliberate placeholder
         // wiring for declared-but-unfetched deps and stay untouched, as do entries without
-        // the `name [url]` scoped-name shape (potentially user-created libraries).
-        val removeStaleLibraryDeps = rootManager.orderEntries
-            .filterIsInstance<LibraryOrderEntry>()
-            .filter { !it.isValid && it.libraryLevel == LibraryTablesRegistrar.PROJECT_LEVEL }
-            .mapNotNull { it.libraryName }
-            .filterTo(LinkedHashSet()) { name ->
-                scopedLibraryNameContentRootUrl(name)
-                    ?.let { embeddedUrl -> embeddedUrl !in projectContentRootUrls } == true
+        // the `name [token]` scoped-name shape (potentially user-created libraries).
+        // Only entries the plugin itself writes are ever removed, and the `"<dep> [<token>]"` shape
+        // is what identifies them - nothing else produces it, so a name without it may be a
+        // user-created reference and is left strictly alone.
+        //
+        // Of those, an entry is dead when its token is not a current content root: either the root
+        // left the project (it moved on disk, or a WSL distro rename changed every file URL), or it
+        // names a still-current root in a scheme the plugin has stopped writing, which is how the
+        // entries left by an older version are recognised. Validity does not come into it - the
+        // superseded ones are usually valid, since their libraries still exist.
+        val removeStaleLibraryDeps = LinkedHashSet<String>()
+
+        for (entry in rootManager.orderEntries.filterIsInstance<LibraryOrderEntry>()) {
+            ProgressManager.checkCanceled()
+            if (entry.libraryLevel != LibraryTablesRegistrar.PROJECT_LEVEL) continue
+            val name = entry.libraryName ?: continue
+            if (name in addLibraryDeps || name in addInvalidLibraryDeps) continue
+            if (modulePlan != null && name in modulePlan.libraryDeps) continue
+            if (consolidatedLibsByModule[moduleName].orEmpty().contains(name)) continue
+
+            if (scopedLibraryNameToken(name)?.let { it !in projectContentRootTokens } == true) {
+                removeStaleLibraryDeps += name
             }
+        }
+
 
         if (addModuleDeps.isNotEmpty() || addInvalidModuleDeps.isNotEmpty() ||
             addLibraryDeps.isNotEmpty() || addInvalidLibraryDeps.isNotEmpty() ||
