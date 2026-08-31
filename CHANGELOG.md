@@ -96,6 +96,14 @@
 
 ### Bug Fixes
 
+- [#3968](https://github.com/KronicDeth/intellij-elixir/pull/3968) [@sh41](https://github.com/sh41)
+  - **"Align operands of pipe operator (|)" no longer staircases a multi-operand union.** `a | b | c`
+    parses as nested pipe operations, and each level built its own alignment, so every level anchored
+    its operands one column-step further right than the level above - turning the setting off was the
+    only way to get them lined up. A nested level now shares the alignment of the pipe operation it
+    sits in, matching what `mix format` produces. Fixes
+    [#1787](https://github.com/KronicDeth/intellij-elixir/issues/1787).
+
 - [#3965](https://github.com/KronicDeth/intellij-elixir/pull/3965) [@sh41](https://github.com/sh41)
   - **Renaming a variable no longer rewrites an inner binding that shadows it.** The shared usage
     search matched by name and scope alone, so an `fn` parameter, `case` clause pattern or `for`
