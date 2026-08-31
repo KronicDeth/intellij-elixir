@@ -19,6 +19,16 @@ import org.gradle.api.tasks.TaskAction
  */
 abstract class StartQuoterTask : DefaultTask() {
 
+    init {
+        // [QuoterService.close] stops the daemon at the end of the build that started it, so no build
+        // leaves one running and this task has no correct up-to-date state. Skipped, [startedFile] goes
+        // on reporting a daemon that died with the run that wrote it.
+        outputs.upToDateWhen { false }
+
+        // A cache hit would skip the start just as thoroughly. Caching is not enabled here today.
+        outputs.cacheIf { false }
+    }
+
     @get:ServiceReference("quoter")
     abstract val quoterService: Property<QuoterService>
 
