@@ -60,6 +60,14 @@
 
 ### Bug Fixes
 
+- [#3982](https://github.com/KronicDeth/intellij-elixir/pull/3982) [@sh41](https://github.com/sh41)
+  - **A parameter of an `fn` that has no `->` yet no longer reports "Use scope for parameter not found
+    before reaching file scope".** The scope search stopped at a definition clause, a delegation, a call
+    with a do block or keyword, or a `->` clause, but not at the anonymous function around them - so
+    `fn p end`, which is what `fn p -> ... end` looks like part-way through being typed, searched past
+    the `fn` to the file and was reported. Fixes
+    [#2491](https://github.com/KronicDeth/intellij-elixir/issues/2491).
+
 - [#3979](https://github.com/KronicDeth/intellij-elixir/pull/3979) [@sh41](https://github.com/sh41)
   - **A variable whose scope search reaches the top of the file no longer reports "Don't know how to
     find variable use scope".** The search enumerates the ancestor types it understands and raises an
