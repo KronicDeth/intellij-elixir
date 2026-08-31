@@ -106,9 +106,16 @@ class ModuleAttributeSymbol(
             val atIdentifier = call.atIdentifier
             if (ModuleAttribute.isNonReferencing(atIdentifier)) return null
             val name = atIdentifier.identifierName()
-            val enclosingModular = CallDefinitionClause.enclosingModularMacroCall(call) ?: return null
-            val moduleName = runCatching { org.elixir_lang.psi.Module.name(enclosingModular) }
-                .getOrElse { if (it is ProcessCanceledException) throw it else null }
+            // An attribute declared inside a `quote` block is enclosed by the `quote` call, which is
+            // not a modular and has no name, so walk outward until one that does name a module is
+            // found. Without this the declaration resolves but no symbol is ever built for it.
+            val moduleName = generateSequence(CallDefinitionClause.enclosingModularMacroCall(call)) {
+                CallDefinitionClause.enclosingModularMacroCall(it)
+            }
+                .firstNotNullOfOrNull { modular ->
+                    runCatching { org.elixir_lang.psi.Module.name(modular) }
+                        .getOrElse { if (it is ProcessCanceledException) throw it else null }
+                }
                 ?: return null
             return ModuleAttributeSymbol(call.containingFile, atIdentifier.identifierTextRange(), moduleName, name)
         }
