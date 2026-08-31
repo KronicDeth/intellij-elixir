@@ -13,64 +13,28 @@
     Refs [#1257](https://github.com/KronicDeth/intellij-elixir/issues/1257).
 
 - [#3925](https://github.com/KronicDeth/intellij-elixir/pull/3925) [@sh41](https://github.com/sh41)
-  - **File and line are now linked inside an inspected stack trace.** A crash report often carries
-    its trace as a term rather than a formatted trace, putting each frame's location in a keyword
-    list - `[file: 'lib/gald/phase.ex', line: 75]`. Only the formatted `(app) path:line:` frames
-    were clickable, so the frame that named the failing call had to be found by hand. Every location
-    on the line is linked now, and a path inspected as a `~c` sigil is read the same as a plain
-    charlist. Where `inspect` wrapped the entry so the number sits on its own line, the path still
-    navigates to that line in the Mix, Elixir, Distillery and test-runner consoles; in the IEx
-    consoles it opens the file, because a filter there is given one line at a time with no way to
-    reach the next. Refs [#510](https://github.com/KronicDeth/intellij-elixir/issues/510).
-  - **Stack traces are now linked in the Terminal tool window as well.** `iex -S mix`, `mix test`
-    and `mix phx.server` run from the Terminal had no Elixir linking at all, because the filters
-    were only ever attached to consoles the plugin's own run configurations built. They are now
-    contributed to every console the IDE builds for a project with an Elixir module or SDK, and on
-    the reworked terminal engine a wrapped entry links to its exact line rather than to the top of
-    the file.
-  - **Erlang, HEEx and LEEx locations in a trace are now linked too.** A stack trace mixes them with
-    Elixir freely, but only `.ex`, `.exs` and `.eex` were recognised, so an Erlang dependency's frame
-    stayed plain text beside the Elixir frames around it. Whether a path then opens still depends on
-    the file being indexed - see the Erlang SDK source roots below.
-  - **An Erlang SDK now exposes its own sources.** OTP ships them beside the compiled beams, in
-    `lib/<app>-<version>/src`, but only the `ebin` directories were registered, so an OTP frame in a
-    stack trace named a file nothing indexed could find and `gen_server.erl` was not navigable.
-    Existing SDKs pick the roots up on the next refresh.
-  - **External Libraries now shows an SDK application's source beside its beams.** A tree node for an
-    application that ships both is now the application itself, holding `ebin` and the `lib` or `src`
-    next to it; one shipping only beams is unchanged. An SDK node's children are its class roots
-    alone, so the source directory has to be put there deliberately - registering it as a source root
-    makes it searchable, not visible.
+  - **File and line are now linked inside an inspected stack trace**, where a frame's location sits in
+    a keyword list - `[file: 'lib/gald/phase.ex', line: 75]` - rather than a formatted
+    `(app) path:line:` frame. A path inspected as a `~c` sigil reads the same as a plain charlist.
+    Refs [#510](https://github.com/KronicDeth/intellij-elixir/issues/510).
+  - **Stack traces are now linked in the Terminal tool window too**, for `iex -S mix`, `mix test` and
+    `mix phx.server`, and in every console the IDE builds for a project with an Elixir module or SDK.
+  - **Erlang, HEEx and LEEx locations in a trace are now linked**, not just `.ex`, `.exs` and `.eex`.
+  - **An Erlang SDK now exposes its own sources** from `lib/<app>-<version>/src`, so an OTP frame such
+    as `gen_server.erl` is navigable. Existing SDKs pick the roots up on the next refresh.
+  - **External Libraries now shows an SDK application's source beside its beams.**
 
 - [#3923](https://github.com/KronicDeth/intellij-elixir/pull/3923) [@sh41](https://github.com/sh41)
-  - **Elixir and Erlang SDKs under `/usr/lib64` are now detected automatically.** Gentoo builds both
-    with the multilib libdir, and Fedora does for Erlang, so the SDK had to be selected by hand on
-    those distributions even though the path was valid. Refs
-    [#312](https://github.com/KronicDeth/intellij-elixir/issues/312).
-  - **Elixir SDKs under `/usr/share/elixir/<version>` are now detected automatically.** Fedora and
-    RHEL package Elixir there rather than under a libdir; the version is read from the directory
-    name, so several installed versions are offered separately.
-  - **Homebrew Elixir installed since 2024-09-22 is now detected and accepted.** Homebrew changed to
-    the Makefile's `install` target, which nests the SDK home in `lib/elixir` instead of placing it
-    directly in the version directory. Installs predating the change keep working. Refs
+  - **SDK auto-detection now covers many more install layouts.** Newly found: `/usr/lib64` (Gentoo,
+    and Erlang on Fedora); `/usr/share/elixir/<version>` (Fedora, RHEL), each version offered
+    separately; Homebrew on Apple Silicon, on Linux and WSL, and installs since 2024-09-22 that nest
+    the home in `lib/elixir`; version-pinned formulae such as `erlang@25` through `erlang@28`; and the
+    `elixir-install` script on macOS. Every platform now scans the same sources. Refs
+    [#312](https://github.com/KronicDeth/intellij-elixir/issues/312),
     [#3670](https://github.com/KronicDeth/intellij-elixir/issues/3670).
-  - **Homebrew SDKs on Apple Silicon are now detected.** Only the Intel `/usr/local/Cellar` prefix
-    was scanned, never `/opt/homebrew/Cellar`.
-  - **Selecting an install prefix in the SDK chooser now finds the home inside it.** A prefix such
-    as a Homebrew version directory, `/usr` or `/usr/local` holds the SDK in `lib/<tool>` and only
-    symlinks in `bin`, so picking the directory a user naturally lands on was rejected as an invalid
-    home with no hint of where the real one was. Erlang had no adjustment at all. Refs
-    [#3670](https://github.com/KronicDeth/intellij-elixir/issues/3670),
-    [#312](https://github.com/KronicDeth/intellij-elixir/issues/312).
-  - **Version-pinned Homebrew formulae are now detected.** `erlang@25` through `erlang@28` live
-    under their own Cellar directory rather than beside the unpinned versions, so a pinned OTP
-    release - the usual way to hold an OTP version for a given Elixir - was never offered.
-  - **macOS now detects SDKs installed by the `elixir-install` script.** Every platform now scans
-    the same set of sources, so a source can no longer be present on one platform and missing on
-    another.
-  - **Homebrew SDKs on Linux and WSL are now detected.** Homebrew's Linux prefix
-    (`/home/linuxbrew/.linuxbrew`) was never scanned on any platform, and a Homebrew home there is
-    now labelled as such in the SDK list.
+  - **Selecting an install prefix in the SDK chooser now finds the home inside it** - a prefix such as
+    a Homebrew version directory, `/usr` or `/usr/local` holds the SDK in `lib/<tool>` and only
+    symlinks in `bin`, so the directory a user naturally picks was rejected as invalid.
 
 - [#3914](https://github.com/KronicDeth/intellij-elixir/pull/3914) [@sh41](https://github.com/sh41)
   - **Elixir 1.13 through 1.20 are now fully supported.** Code written for any Elixir from 1.13.4 to
@@ -306,22 +270,18 @@
     Elixir 1.20+.
 
 - [#3919](https://github.com/KronicDeth/intellij-elixir/pull/3919) [@sh41](https://github.com/sh41)
-  - **New Elixir projects get the right compiler output directory.** Leaving `--app` blank in the
-    New Project wizard - which is allowed, and is what most people do - configured the module with
-    `_build/dev/lib/ebin` instead of `_build/dev/lib/<app>/ebin`. It now falls back to the project
-    name, which is what `mix new` itself uses.
-  - **`--sup` is no longer offered for umbrella projects.** `mix new` ignores it at an umbrella root
-    without reporting anything, so ticking it appeared to work and silently did nothing.
-  - **New umbrella projects no longer get a stray empty `lib/` or a compiler output directory that
-    never exists.** An umbrella root has no application of its own, so neither applies to it.
-  - **New Elixir projects and modules are no longer reported as having "an outdated format".** Every
-    project the plugin created was offered for conversion the next time it was opened, because the
-    module was written with compiler-output exclusion switched on - the exact setting the plugin's
-    converter exists to remove. Elixir compiles to `_build`, so the setting never applied.
+  - **New Elixir projects get the right compiler output directory.** Leaving `--app` blank in the New
+    Project wizard configured `_build/dev/lib/ebin` rather than `_build/dev/lib/<app>/ebin`; it now
+    falls back to the project name, as `mix new` does.
+  - **`--sup` is no longer offered for umbrella projects**, where `mix new` silently ignores it.
+  - **New umbrella projects no longer get a stray empty `lib/` or an output directory that never
+    exists.** An umbrella root has no application of its own.
+  - **New Elixir projects and modules are no longer reported as having "an outdated format".** They
+    were written with compiler-output exclusion switched on - the setting the converter exists to
+    remove - and Elixir compiles to `_build`, so it never applied.
   - **Umbrella sub-apps now get their `lib/` and `test/` marked.** `mix new` writes an app from an
-    external process, so the IDE could hold a stale view of the directory that did not include its
-    `mix.exs` - and every folder-mark scan skipped the app in silence because of it. The New Project
-    wizard, *Reconfigure Elixir Module Setup* and the module-setup check now refresh first.
+    external process, so the IDE could hold a stale view omitting its `mix.exs`. The wizard,
+    *Reconfigure Elixir Module Setup* and the module-setup check now refresh first.
 
 - [#3921](https://github.com/KronicDeth/intellij-elixir/pull/3921) [@sh41](https://github.com/sh41)
   - **Variables bound by a macro call in a match now resolve.** `session(id, user) = raw` binds all
@@ -446,9 +406,8 @@
     `resources/META-INF/changelog.html`, which held a separately hand-written copy, is removed - it had
     gone stale, so 24.0.0 shipped with v23.9.0 as its newest section.
   - Every pull request now needs a `CHANGELOG.md` entry, checked by `changelog.yml`: it must land under
-    `## [Unreleased]`, be a list item, and use a known group. Apply the `no-changelog` label when there
-
-    is genuinely nothing to record.
+    `## [Unreleased]`, be a list item, and use a known group. Apply the `no-changelog` label
+    when there is genuinely nothing to record.
   - The Tag Release workflow validates the tag shape against the `prerelease` input, that a release is
     cut from `main`, that the tag is new and increases, and that it matches `pluginVersion`.
   - Plugin verifier reports are now uploaded whenever a verification leg fails, including on pull
@@ -931,8 +890,6 @@
 
 ### Enhancements
 
-- [#3696](https://github.com/KronicDeth/intellij-elixir/pull/3696) - [@mwnciau](https://github.com/mwnciau)
-  - HEEx support with `.heex` file type recognition, syntax highlighting for `{@assigns}` and `{expressions}`, relative component support (`<.component>` tags), and CSS/JavaScript injection in `<style>` and `<script>` tags.
 - Language Injection for literal sigils (`~H`, `~r`, etc.) - [@polymorfiq](https://github.com/polymorfiq)
 - [#3711](https://github.com/KronicDeth/intellij-elixir/pull/3711) - [@joshuataylor](https://github.com/joshuataylor)
   - Status Bar Widget showing the current project's Elixir SDK version.
