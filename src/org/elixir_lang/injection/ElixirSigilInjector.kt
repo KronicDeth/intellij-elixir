@@ -35,11 +35,12 @@ internal class ElixirSigilInjector : MultiHostInjector {
 
     private fun handleSigilLine(registrar: MultiHostRegistrar, sigilLine: SigilLine) {
         if (!sigilLine.isValidHost) return
-        val lang = languageForSigil(sigilLine.sigilName()) ?: return
+        val sigilName = sigilLine.sigilName()
+        val lang = languageForSigil(sigilName) ?: return
         val ranges = sigilLineInjectionRanges(sigilLine, lang)
         if (ranges.isEmpty()) return
 
-        registrar.startInjecting(lang)
+        registrar.startInjecting(lang, fileExtensionForSigil(sigilName))
         for (range in ranges) {
             registrar.addPlace(null, null, sigilLine, range)
         }
@@ -59,7 +60,8 @@ internal class ElixirSigilInjector : MultiHostInjector {
             return
         }
 
-        val lang = languageForSigil(sigilHeredoc.sigilName()) ?: return
+        val sigilName = sigilHeredoc.sigilName()
+        val lang = languageForSigil(sigilName) ?: return
         val heredocLineList = sigilHeredoc.heredocLineList
 
         if (LOG.isDebugEnabled) {
@@ -71,7 +73,7 @@ internal class ElixirSigilInjector : MultiHostInjector {
             return
         }
 
-        registrar.startInjecting(lang)
+        registrar.startInjecting(lang, fileExtensionForSigil(sigilName))
         for (range in ranges) {
             if (LOG.isDebugEnabled) {
                 LOG.debug("handleSigilHeredoc: injecting range $range")
@@ -103,6 +105,16 @@ internal class ElixirSigilInjector : MultiHostInjector {
             'r' -> RegExpLanguage.INSTANCE
             else -> null
         }
+    }
+
+    // EEx guesses an injected fragment's template-data language from a double extension, the way a
+    // real `.html.eex` file carries one; with no extension the guess falls through to plain text and
+    // the markup gets no HTML highlighting. Phoenix.HTML's ~E and LiveView's ~L are HTML by
+    // definition, so name the fragment to say so. HEEx defaults to HTML without help, and a regex is
+    // not a template.
+    private fun fileExtensionForSigil(sigilName: Char): String? = when (sigilName) {
+        'E', 'L' -> "html.eex"
+        else -> null
     }
 
     private fun interpolationRanges(body: PsiElement, bodyStartOffsetInHost: Int): List<TextRange> {
