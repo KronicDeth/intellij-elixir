@@ -34,6 +34,11 @@ public class FormattingParsingTestCase extends ParsingTestCase {
     }
 
 
+    public void testalign_pipe_operands_type_union() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+
     public void testalign_two_operands_false() {
         assertParsedAndQuotedCorrectly();
     }

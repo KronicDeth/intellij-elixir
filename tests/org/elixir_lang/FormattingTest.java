@@ -97,6 +97,19 @@ public class FormattingTest extends PlatformTestCase {
         myFixture.checkResultByFile("align_pipe_operands_true.ex");
     }
 
+    public void testAlignPipeOperandsTypeUnion() {
+        myFixture.configureByFile("align_pipe_operands_type_union.ex");
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;
+
+        temporaryCodeStyleSettings
+                .getCustomSettings(CodeStyleSettings.class)
+                .ALIGN_PIPE_OPERANDS = true;
+
+        reformatFixture();
+
+        myFixture.checkResultByFile("align_pipe_operands_type_union.ex");
+    }
+
     public void testAlignTwoOperandsFalse() {
         myFixture.configureByFile("align_two_operands_true.ex");
         temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).MIX_FORMAT = false;

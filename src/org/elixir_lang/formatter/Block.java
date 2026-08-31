@@ -414,10 +414,24 @@ public class Block extends AbstractBlock implements BlockEx {
             @NotNull ASTNode operation,
             @NotNull Predicate<CodeStyleSettings> alignOperands,
             @NotNull TokenSet operatorRuleTokenSet) {
+        return buildAlignedOperandsOperationChildren(operation, alignOperands, operatorRuleTokenSet, null);
+    }
+
+    /**
+     * @param inheritedOperandAlignment the {@link Alignment} of the operation this one is nested in, so that the
+     *                                  operands of both share a column; {@code null} to start a new one
+     */
+    @NotNull
+    private List<com.intellij.formatting.Block> buildAlignedOperandsOperationChildren(
+            @NotNull ASTNode operation,
+            @NotNull Predicate<CodeStyleSettings> alignOperands,
+            @NotNull TokenSet operatorRuleTokenSet,
+            @Nullable Alignment inheritedOperandAlignment) {
         Alignment operandAlignment;
 
         if (alignOperands.test(codeStyleSettings(operation))) {
-            operandAlignment = Alignment.createAlignment();
+            operandAlignment =
+                    inheritedOperandAlignment != null ? inheritedOperandAlignment : Alignment.createAlignment();
         } else {
             operandAlignment = null;
         }
@@ -887,7 +901,7 @@ public class Block extends AbstractBlock implements BlockEx {
         } else if (OPERATION_TOKEN_SET.contains(parentElementType)) {
             blocks = buildOperationChildren(parent);
         } else if (PIPE_OPERATION_TOKEN_SET.contains(parentElementType)) {
-            blocks = buildPipeOperationChildren(parent);
+            blocks = buildPipeOperationChildren(parent, enclosingPipeOperandAlignment(parent, parentAlignment));
         } else if (SOMETIMES_BOOLEAN_OPERATION_TOKEN_SET.contains(parentElementType)) {
             blocks = buildSometimesBooleanOperationChildren(parent);
         } else if (TWO_OPERATION_TOKEN_SET.contains(parentElementType)) {
@@ -1820,13 +1834,28 @@ public class Block extends AbstractBlock implements BlockEx {
         );
     }
 
+    /**
+     * {@code a | b | c} parses as nested pipe operations, so each level would otherwise create its own
+     * {@link Alignment} and anchor the operands one step further right than the level above. Only an alignment
+     * handed down by an enclosing pipe operation may be reused; any other is a container's and would drag the
+     * operands onto something unrelated.
+     */
+    @Nullable
+    private Alignment enclosingPipeOperandAlignment(@NotNull ASTNode pipeOperation, @Nullable Alignment alignment) {
+        ASTNode parent = pipeOperation.getTreeParent();
+
+        return parent != null && PIPE_OPERATION_TOKEN_SET.contains(parent.getElementType()) ? alignment : null;
+    }
+
     @NotNull
-    private List<com.intellij.formatting.Block> buildPipeOperationChildren(@NotNull ASTNode pipeOperation) {
+    private List<com.intellij.formatting.Block> buildPipeOperationChildren(@NotNull ASTNode pipeOperation,
+                                                                           @Nullable Alignment operandAlignment) {
         //noinspection ConstantConditions
         return buildAlignedOperandsOperationChildren(
                 pipeOperation,
                 (codeStyleSettings) -> codeStyleSettings.ALIGN_PIPE_OPERANDS,
-                PIPE_INFIX_OPERATOR
+                TokenSet.create(PIPE_INFIX_OPERATOR),
+                operandAlignment
         );
     }
 
