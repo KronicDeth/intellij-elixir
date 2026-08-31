@@ -475,6 +475,17 @@ internal class ModuleAttribute : Annotator, DumbAware {
                 )
             }
 
+            /* A qualified call declares no type parameter, so both halves are painted the way a type
+               usage is. */
+            is QualifiedNoArgumentsCall<*> -> {
+                highlightTypesAndTypeParameterUsages(
+                    psiElement,
+                    typeParameterNameSet,
+                    annotationHolder,
+                    typeTextAttributesKey
+                )
+            }
+
             else -> {
                 if (psiElement !is ElixirAtomKeyword) {
                     error("Cannot highlight types and type parameter declarations", psiElement)
@@ -1515,6 +1526,11 @@ internal class ModuleAttribute : Annotator, DumbAware {
             is ElixirUnmatchedUnqualifiedNoArgumentsCall -> {
                 setOf(psiElement.getText())
             }
+
+            /* A qualified call names a type in another module, so it declares no type parameter of its own.
+
+               See https://github.com/KronicDeth/intellij-elixir/issues/1835 */
+            is QualifiedNoArgumentsCall<*> -> emptySet()
 
             else -> {
                 error("Cannot extract type type parameter name set", psiElement)
