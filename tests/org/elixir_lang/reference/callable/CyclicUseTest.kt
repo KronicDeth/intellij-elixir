@@ -55,6 +55,23 @@ class CyclicUseTest : PlatformTestCase() {
     }
 
     /**
+     * The same cycle reached the way the crash reports were: `plugin.xml` registers
+     * [org.elixir_lang.annotator.Callable] as an Elixir annotator and it resolves every plain call it
+     * visits, so running the highlighting pass drives the annotator door above the reference that
+     * calling [Callable.multiResolve] directly cannot exercise.
+     */
+    fun testAnnotatingACallThroughCyclicUseTerminates() {
+        myFixture.configureByFiles("injected.ex", "cyclic_web.ex")
+
+        val (_, loggedErrors) = captureLoggedErrors { myFixture.doHighlighting() }
+
+        assertEmpty(
+            "annotating through a cyclic `use` chain overflowed the stack",
+            loggedErrors.filter { it.title == STACK_OVERFLOW_TITLE }
+        )
+    }
+
+    /**
      * The [Callable] reference of the call left of the caret, which the fixtures place immediately
      * after the call's name.
      *
