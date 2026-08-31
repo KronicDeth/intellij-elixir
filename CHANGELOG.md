@@ -96,6 +96,13 @@
 
 ### Bug Fixes
 
+- [#3979](https://github.com/KronicDeth/intellij-elixir/pull/3979) [@sh41](https://github.com/sh41)
+  - **A variable whose scope search reaches the top of the file no longer reports "Don't know how to
+    find variable use scope".** The search enumerates the ancestor types it understands and raises an
+    error report for anything else, so a `<-` outside any comprehension - a syntax error, but also a
+    state code passes through while being typed - reached the file itself and was reported. Fixes
+    [#3358](https://github.com/KronicDeth/intellij-elixir/issues/3358).
+
 - [#3977](https://github.com/KronicDeth/intellij-elixir/pull/3977) [@sh41](https://github.com/sh41)
   - **Resolving `__MODULE__` inside a module that `use`s another no longer reports a non-idempotent
     computation.** The reference was cached under one key per `__MODULE__` call, and the platform's
