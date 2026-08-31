@@ -588,7 +588,11 @@ class Callable : PsiReferenceBase<Call>, PsiPolyVariantReference {
 
                 is ElixirMapUpdateArguments,
                 is ElixirEexTag,
-                is ElixirInterpolation ->
+                is ElixirInterpolation,
+                    /* reaching the file root means the walk passed no scope that could declare the variable,
+                       as happens for a match operator outside any comprehension - a syntax error, but also a
+                       state code passes through while being typed */
+                is PsiFile ->
                     /* no variable can be declared inside these classes, so this is a variable usage missing a
                        declaration, so it has no use scope */
                     LocalSearchScope.EMPTY
