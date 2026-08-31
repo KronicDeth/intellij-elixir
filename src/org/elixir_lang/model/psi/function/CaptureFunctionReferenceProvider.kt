@@ -10,6 +10,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.util.concurrency.annotations.RequiresReadLock
+import org.elixir_lang.beam.psi.impl.CallDefinitionImpl
 import org.elixir_lang.model.psi.protocol.ProtocolFunction
 import org.elixir_lang.psi.CallDefinitionClause
 import org.elixir_lang.psi.call.Call
@@ -60,7 +61,15 @@ class CaptureFunctionReference(
     override fun resolveReference(): Collection<Symbol> {
         val clauses = legacyReference.multiResolve(false)
             .filter { it.isValidResult }
-            .mapNotNull { it.element as? Call }
+            .mapNotNull { result ->
+                when (val element = result.element) {
+                    // A source clause is already a `Call`, while a decompiled beam function exposes the
+                    // equivalent clause as its navigation element, so capturing one navigates like calling it.
+                    is Call -> element
+                    is CallDefinitionImpl<*> -> element.navigationElement as? Call
+                    else -> null
+                }
+            }
             .filter { CallDefinitionClause.`is`(it) }
 
         val functionSymbols = clauses

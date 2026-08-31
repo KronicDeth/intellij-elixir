@@ -102,6 +102,18 @@
     `<%= %>` was coloured. Still behind the experimental sigil-injection setting. Fixes
     [#1827](https://github.com/KronicDeth/intellij-elixir/issues/1827).
 
+- [#3972](https://github.com/KronicDeth/intellij-elixir/pull/3972) [@sh41](https://github.com/sh41)
+  - **Quick Documentation now works on a captured function.** `&Callee.multiply/2` showed nothing
+    where `Callee.multiply(2, 3)` showed its `@doc`, because a captured name carries no reference of
+    its own - it lives on the enclosing capture operator, the only element that also spans the
+    `/arity`.
+  - **Go To Definition on a capture of a decompiled function now navigates.** `&:queue.new/0` went
+    nowhere while `:queue.new()` opened the decompiled module, because the capture dropped every
+    result that was not already source PSI.
+  - Captures are now covered by the Go To Definition, Find Usages, arity and protocol-function
+    suites as well, which previously exercised only ordinary calls. Refs
+    [#1810](https://github.com/KronicDeth/intellij-elixir/issues/1810).
+
 - [#3971](https://github.com/KronicDeth/intellij-elixir/pull/3971) [@sh41](https://github.com/sh41)
   - **A module attribute declared in a `__using__` macro's `quote` block resolves again.** Since
     24.0.0 a symbol was only built for a declaration whose enclosing modular could be named, and a
