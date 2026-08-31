@@ -25,7 +25,9 @@ import org.elixir_lang.psi.impl.call.macroChildCallSequence
 import org.elixir_lang.psi.impl.childExpressions
 import org.elixir_lang.psi.impl.identifierName
 import org.elixir_lang.psi.impl.stripAccessExpression
+import org.elixir_lang.psi.operation.capture.NonNumeric
 import org.elixir_lang.psi.stub.type.call.Stub.isModular
+import org.elixir_lang.reference.CaptureNameArity
 import org.elixir_lang.reference.Resolver
 import org.elixir_lang.structure_view.element.Callback
 import org.intellij.markdown.html.HtmlGenerator
@@ -273,6 +275,18 @@ internal class ElixirDocumentationProvider : DocumentationProvider {
         return contextElement?.let(::getCustomDocumentationElement)
     }
 
+    /**
+     * The reference to resolve for documentation on [call]. Inside `&Mod.name/arity` the name carries no
+     * reference of its own - it lives on the enclosing capture operator, which is the only element that
+     * also spans the `/arity` - so a captured name is looked up through that instead.
+     */
+    private fun documentedReference(call: Call): PsiPolyVariantReference? =
+        PsiTreeUtil.getParentOfType(call, NonNumeric::class.java)
+            ?.reference
+            ?.let { it as? CaptureNameArity }
+            ?.takeIf { it.nameElement == call }
+            ?: call.getReference() as? PsiPolyVariantReference
+
     private tailrec fun getCustomDocumentationElement(contextElement: PsiElement): PsiElement? = when {
         contextElement is LeafPsiElement || contextElement is ElixirIdentifier || contextElement is ElixirRelativeIdentifier ->
             getCustomDocumentationElement(contextElement.parent)
@@ -289,9 +303,7 @@ internal class ElixirDocumentationProvider : DocumentationProvider {
         }
 
         contextElement is Call -> {
-            contextElement
-                .getReference()
-                ?.let { it as PsiPolyVariantReference }
+            documentedReference(contextElement)
                 ?.let { reference ->
                     val allResults = reference.multiResolve(false)
 

@@ -80,6 +80,21 @@ class FunctionGotoDeclarationTest : PlatformTestCase() {
         myFixture.assertGotoDeclarationLandsIn("perform", "a defmacro clause") { CallDefinitionClause.`is`(it) }
     }
 
+    /**
+     * A capture, `&Mod.fun/arity`, must navigate to the same `def` the equivalent qualified call does.
+     * The capture carries its arity in the source rather than in an argument list, so it reaches the
+     * resolver by a different route and needs its own case; the call below is the control.
+     */
+    fun testGoToDeclarationNavigatesFromQualifiedCapture() {
+        myFixture.configureByFiles("goto_declaration_qualified_capture.ex", "goto_declaration_capture_referenced.ex")
+        myFixture.assertGotoDeclarationLandsIn("changeset", "a def clause") { CallDefinitionClause.`is`(it) }
+    }
+
+    fun testGoToDeclarationNavigatesFromQualifiedCall() {
+        myFixture.configureByFiles("goto_declaration_qualified_call.ex", "goto_declaration_capture_referenced.ex")
+        myFixture.assertGotoDeclarationLandsIn("changeset", "a def clause") { CallDefinitionClause.`is`(it) }
+    }
+
     fun testCtrlClickOnErlangQualifiedCallDoesNothingYet() {
         myFixture.configureByFiles("goto_declaration_erlang_qualified_call.ex")
         myFixture.assertNoNavigationAtCaret()

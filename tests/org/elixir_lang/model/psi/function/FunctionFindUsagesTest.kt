@@ -29,6 +29,14 @@ class FunctionFindUsagesTest : PlatformTestCase() {
         )
     }
 
+    /** A capture is a use of the function, so Find Usages on the `def` must list the capture site. */
+    fun testCaptureSiteIsFound() {
+        assertTrue(
+            "Expected the capture site `&UsagesCapture.perform/1` among the function's usages",
+            callSiteUsageCount("usages_capture.ex") >= 1
+        )
+    }
+
     fun testApplyCallSiteIsFound() {
         assertTrue(
             "Expected the `apply(ApplyTarget, :reverse, [...])` call site among the function's usages",

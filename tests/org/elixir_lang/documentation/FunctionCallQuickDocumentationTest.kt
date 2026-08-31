@@ -48,6 +48,27 @@ class FunctionCallQuickDocumentationTest : QuickDocumentationTestCase() {
         )
     }
 
+    /** A capture names the function without calling it, so Ctrl+Q on it must still show its `@doc`. */
+    fun testQuickDocOnQualifiedCaptureShowsAtDoc() {
+        myFixture.configureByFiles("capture_function.ex")
+
+        val documentation = quickDocumentationAtCaret()
+
+        assertNotNull("Quick Documentation should be shown for a documented captured function", documentation)
+        assertTrue(
+            "Expected the defining module in the documentation, got: $documentation",
+            documentation!!.contains("<b>Callee</b>")
+        )
+        assertTrue(
+            "Expected the function head in the documentation, got: $documentation",
+            documentation.contains("multiply")
+        )
+        assertTrue(
+            "Expected the @doc body in the documentation, got: $documentation",
+            documentation.contains("Multiplies two numbers")
+        )
+    }
+
     fun testQuickDocOnModuleAliasShowsModuleDoc() {
         myFixture.configureByFiles("module_alias.ex")
 

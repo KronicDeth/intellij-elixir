@@ -39,6 +39,21 @@ class BeamFunctionGotoDeclarationTest : BeamLibraryTestCase() {
         )
     }
 
+    /** Capturing a decompiled function must navigate into the `.beam` mirror the same way calling it does. */
+    fun testGoToDeclarationNavigatesFromCaptureToRemoteBeamFunction() {
+        myFixture.configureByFiles("beam_capture_goto.ex")
+        val target = myFixture.gotoDeclarationDestinationAtCaret()
+        assertNotNull("Go To Declaration should navigate into the decompiled :queue module", target)
+        assertTrue(
+            "Should land in the decompiled queue.beam, not the source file (was ${target!!.containingFile.name})",
+            target.containingFile.name.startsWith("queue")
+        )
+        assertTrue(
+            "Should land on the decompiled `def new` definition (was '${target.text}')",
+            target.text.contains("new")
+        )
+    }
+
     fun testFindUsagesFromRemoteBeamFunctionUsageFindsSourceUsages() {
         myFixture.configureByFiles("beam_qualified_call_find_usages.ex")
         assertEquals(
