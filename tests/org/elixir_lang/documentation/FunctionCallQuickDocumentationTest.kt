@@ -69,6 +69,54 @@ class FunctionCallQuickDocumentationTest : QuickDocumentationTestCase() {
         )
     }
 
+    /**
+     * The qualifier is a short name bound by an `alias` directive, so showing the right `@doc`
+     * requires following the alias to the declaring module.
+     */
+    fun testQuickDocOnAliasedRemoteFunctionCallShowsAtDoc() {
+        myFixture.configureByFiles("aliased_remote_function.ex")
+
+        val documentation = quickDocumentationAtCaret()
+
+        assertNotNull("Quick Documentation should be shown for a call qualified by an alias", documentation)
+        assertTrue(
+            "Expected the declaring module in the documentation, got: $documentation",
+            documentation!!.contains("Callee")
+        )
+        assertTrue(
+            "Expected the function head in the documentation, got: $documentation",
+            documentation.contains("divide")
+        )
+        assertTrue(
+            "Expected the @doc body in the documentation, got: $documentation",
+            documentation.contains("Divides two numbers")
+        )
+    }
+
+    /**
+     * `as:` renames the qualifier to something no module is called, so nothing but the alias can
+     * lead back to the declaring module - the case a suffix match cannot accidentally satisfy.
+     */
+    fun testQuickDocOnRenamedAliasRemoteFunctionCallShowsAtDoc() {
+        myFixture.configureByFiles("renamed_alias_remote_function.ex")
+
+        val documentation = quickDocumentationAtCaret()
+
+        assertNotNull("Quick Documentation should be shown for a call qualified by a renamed alias", documentation)
+        assertTrue(
+            "Expected the declaring module in the documentation, got: $documentation",
+            documentation!!.contains("Callee")
+        )
+        assertTrue(
+            "Expected the function head in the documentation, got: $documentation",
+            documentation.contains("subtract")
+        )
+        assertTrue(
+            "Expected the @doc body in the documentation, got: $documentation",
+            documentation.contains("Subtracts two numbers")
+        )
+    }
+
     fun testQuickDocOnModuleAliasShowsModuleDoc() {
         myFixture.configureByFiles("module_alias.ex")
 
