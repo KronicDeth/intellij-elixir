@@ -280,6 +280,10 @@
     so from the second run onwards the task was skipped while its marker still reported
     `quoter.available=true` and every test that quotes failed on a PID timeout. The task is now always
     out of date and never cached.
+  - **The quoter's Erlang distribution and `epmd` now bind loopback rather than every interface.** Both
+    listeners bound the wildcard address despite the nodes being local, which is what made Windows
+    Firewall prompt for the release's `erl.exe` and the IDE's `java.exe`, once per worktree. An `epmd`
+    that is already running is used as it is; only a fresh start asks for loopback.
 
 - [#3960](https://github.com/KronicDeth/intellij-elixir/pull/3960) [@sh41](https://github.com/sh41)
   - **`epmd` is now started from the Erlang SDK rather than the quoter's own bundled ERTS.** A

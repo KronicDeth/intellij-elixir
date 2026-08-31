@@ -25,7 +25,7 @@ public class IntellijElixir {
 
     public static OtpNode getLocalNode() throws IOException {
         if (localNode == null) {
-            localNode = new OtpNode(LOCAL_NODE, "intellij_elixir");
+            localNode = new OtpNode(LOCAL_NODE, "intellij_elixir", LoopbackTransportFactory.INSTANCE);
         }
 
         return localNode;

@@ -31,14 +31,19 @@ object Epmd {
     }
 
     /**
-     * `epmd -daemon` is a no-op when the port is already bound, so this runs on every build regardless
-     * of who started the one already there. The `-names` probe is what the result reports: suppressing
-     * the release's own start on a false positive would leave it unable to bring up distribution.
+     * An epmd that is already running is used as it is, whatever it is bound to; only a fresh start asks
+     * for loopback. Probed rather than started unconditionally, because on Windows a narrower bind
+     * succeeds alongside an existing wildcard one and would leave two daemons on 4369.
      */
     fun ensureRunning(epmd: File, logger: Logger): Boolean = try {
-        run(epmd, "-daemon")
-        run(epmd, "-names").also { up ->
-            logger.info(if (up) "epmd is up, from ${epmd.absolutePath}" else "epmd did not answer")
+        if (run(epmd, "-names")) {
+            logger.info("epmd is already up")
+            true
+        } else {
+            run(epmd, "-daemon", bindLoopback = true)
+            run(epmd, "-names").also { up ->
+                logger.info(if (up) "epmd is up, from ${epmd.absolutePath}" else "epmd did not answer")
+            }
         }
     } catch (exception: Exception) {
         logger.info("Could not start epmd from ${epmd.absolutePath}: ${exception.message}")
@@ -51,11 +56,17 @@ object Epmd {
      * the full 30-minute job timeout. Discarding both streams, and bounding the wait, is what makes this
      * safe to call on every build.
      */
-    private fun run(epmd: File, argument: String): Boolean {
-        val process = ProcessBuilder(epmd.absolutePath, argument)
+    private fun run(epmd: File, argument: String, bindLoopback: Boolean = false): Boolean {
+        val builder = ProcessBuilder(epmd.absolutePath, argument)
             .redirectOutput(ProcessBuilder.Redirect.DISCARD)
             .redirectError(ProcessBuilder.Redirect.DISCARD)
-            .start()
+
+        // Only when starting, never when probing - see [ensureRunning].
+        if (bindLoopback) {
+            builder.environment()["ERL_EPMD_ADDRESS"] = LOOPBACK_ADDRESS
+        }
+
+        val process = builder.start()
 
         if (!process.waitFor(TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
             process.destroyForcibly()

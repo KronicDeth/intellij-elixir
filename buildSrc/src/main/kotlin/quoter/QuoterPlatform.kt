@@ -85,6 +85,9 @@ fun createQuoterPlatform(platform: Platform, startEpmd: Boolean = true): QuoterP
  */
 const val DEFAULT_QUOTER_NODE_NAME = "intellij_elixir@127.0.0.1"
 
+/** The only interface the quoter's distribution and epmd ever need; see [Epmd] and [getReleaseEnvironment]. */
+const val LOOPBACK_ADDRESS = "127.0.0.1"
+
 /**
  * Returns the standard environment variables for Quoter daemon.
  * Used by all platform implementations.
@@ -110,11 +113,22 @@ fun getReleaseEnvironment(
         put("RELEASE_NAME", releaseName)
         releaseTmp?.let { put("RELEASE_TMP", it.absolutePath) }
 
-        if (!startEpmd) {
-            // Appended rather than set: erlexec reads one ERL_AFLAGS, so overwriting an inherited value
-            // would silently drop flags the developer or CI set.
-            val inherited = System.getenv("ERL_AFLAGS")?.trim().orEmpty()
-            put("ERL_AFLAGS", listOf(inherited, "-start_epmd false").filter { it.isNotEmpty() }.joinToString(" "))
+        // Appended rather than set: erlexec reads one ERL_AFLAGS, so overwriting an inherited value
+        // would silently drop flags the developer or CI set.
+        val inherited = System.getenv("ERL_AFLAGS")?.trim().orEmpty()
+        val flags = buildList {
+            add(inherited)
+
+            // The node is named @127.0.0.1 but its listener binds every interface anyway, which is what
+            // makes Windows Firewall prompt for the release's erl.exe - once per worktree, since a rule
+            // is keyed on the program path.
+            add("-kernel inet_dist_use_interface {127,0,0,1}")
+
+            if (!startEpmd) {
+                add("-start_epmd false")
+            }
         }
+
+        put("ERL_AFLAGS", flags.filter { it.isNotEmpty() }.joinToString(" "))
     }
 }
