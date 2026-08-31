@@ -96,6 +96,15 @@
 
 ### Bug Fixes
 
+- [#3971](https://github.com/KronicDeth/intellij-elixir/pull/3971) [@sh41](https://github.com/sh41)
+  - **A module attribute declared in a `__using__` macro's `quote` block resolves again.** Since
+    24.0.0 a symbol was only built for a declaration whose enclosing modular could be named, and a
+    declaration inside `quote` is enclosed by the `quote` call rather than by a module. The scope
+    walk found the declaration and the result was then discarded, so Go To Declaration, Find Usages
+    and completion silently stopped working for every attribute injected through `use`. Refs
+    [#1783](https://github.com/KronicDeth/intellij-elixir/issues/1783),
+    [#1292](https://github.com/KronicDeth/intellij-elixir/issues/1292).
+
 - [#3968](https://github.com/KronicDeth/intellij-elixir/pull/3968) [@sh41](https://github.com/sh41)
   - **"Align operands of pipe operator (|)" no longer staircases a multi-operand union.** `a | b | c`
     parses as nested pipe operations, and each level built its own alignment, so every level anchored
