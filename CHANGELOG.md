@@ -10,6 +10,8 @@
   - **Elixir's `Tools` menu actions are grouped under `Tools > Elixir`.**
   - **New `Tools > Elixir > Sync Dependency Libraries` Action**. Rescans every content root's
     `deps` and `_build`.
+  - **Mix libraries are re-checked when a project opens**, picking up changes made while it was
+    closed.
 
 - [#3954](https://github.com/KronicDeth/intellij-elixir/pull/3954) [@sh41](https://github.com/sh41)
   - **`~E` sigils now get EEx highlighting and completion.** `~H` injected HEEx and `~L` injected EEx,
@@ -71,6 +73,8 @@
 - [#3983](https://github.com/KronicDeth/intellij-elixir/pull/3983) [@sh41](https://github.com/sh41)
   - **Dependency libraries are scoped relative to the project**, so `.idea/libraries` and `.iml` can
     be shared again. Refs [#3926](https://github.com/KronicDeth/intellij-elixir/issues/3926).
+  - **Dependency scanning waits for the IDE's Project Model to be fully loaded to avoid lost
+    writes**, however it was triggered.
   - **External Libraries shows a dependency's name and location again.**
 
 - [#3982](https://github.com/KronicDeth/intellij-elixir/pull/3982) [@sh41](https://github.com/sh41)

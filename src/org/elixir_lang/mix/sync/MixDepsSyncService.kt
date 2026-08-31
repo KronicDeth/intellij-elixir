@@ -180,6 +180,16 @@ class MixDepsSyncService(private val project: Project, cs: CoroutineScope) {
                 }
             }
 
+            // The platform only flushes project settings at its own save points - frame
+            // deactivation, periodic autosave, project close - so a drain that runs in the
+            // background and is never followed by one leaves the rewritten .iml and
+            // .idea/libraries unwritten, and an IDE killed before the next save point loses them.
+            if (applyStats.librariesChanged > 0 || applyStats.modulesChanged > 0) {
+                // forceSavingAllSettings, because the default saves only components that report
+                // themselves changed and the module/library edits below do not, so the rewritten
+                // .iml and .idea/libraries were left on disk as they were.
+                SaveAndSyncHandler.getInstance().scheduleProjectSave(project, forceSavingAllSettings = true)
+            }
 
             val totalMs = (System.nanoTime() - drainStartNs) / 1_000_000
             LOG.debug(

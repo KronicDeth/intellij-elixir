@@ -1379,7 +1379,6 @@ class MixDepsSyncServiceTest : PlatformTestCase() {
         )
     }
 
-
     // ------------------------------------------------------------------
     // Sync Dependency Libraries action
     // ------------------------------------------------------------------
@@ -1404,6 +1403,7 @@ class MixDepsSyncServiceTest : PlatformTestCase() {
         assertEquals("The action must enqueue exactly one request", 1, service.pendingCount)
         service.clearPendingForTesting()
     }
+
     // ------------------------------------------------------------------
     // contentRootToken
     // ------------------------------------------------------------------
