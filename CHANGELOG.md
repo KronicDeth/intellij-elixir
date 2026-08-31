@@ -96,6 +96,12 @@
 
 ### Bug Fixes
 
+- [#3973](https://github.com/KronicDeth/intellij-elixir/pull/3973) [@sh41](https://github.com/sh41)
+  - **HTML inside a `~L` or `~E` sigil is now highlighted.** The injected fragment carried no file
+    extension, so EEx's template-data language fell through to plain text and only the Elixir inside
+    `<%= %>` was coloured. Still behind the experimental sigil-injection setting. Fixes
+    [#1827](https://github.com/KronicDeth/intellij-elixir/issues/1827).
+
 - [#3971](https://github.com/KronicDeth/intellij-elixir/pull/3971) [@sh41](https://github.com/sh41)
   - **A module attribute declared in a `__using__` macro's `quote` block resolves again.** Since
     24.0.0 a symbol was only built for a declaration whose enclosing modular could be named, and a

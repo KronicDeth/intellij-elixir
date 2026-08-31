@@ -5,6 +5,7 @@ import com.intellij.lang.html.HTMLLanguage
 import com.intellij.lang.injection.InjectedLanguageManager
 import com.intellij.psi.PsiErrorElement
 import com.intellij.psi.PsiFile
+import com.intellij.psi.templateLanguages.TemplateLanguageFileViewProvider
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.xml.XmlTag
 import org.elixir_lang.ElixirLanguage
@@ -232,6 +233,86 @@ class HeexSigilInjectionTest : PlatformTestCase() {
             "Expected no injection while the experimental setting is off, got: $injected",
             injected.isNullOrEmpty()
         )
+    }
+
+    fun testLSigilInjectsNothingWhenSettingDisabled() {
+        ElixirExperimentalSettings.instance.state.enableHtmlInjection = false
+
+        myFixture.configureByText(
+            "test.ex",
+            """
+                defmodule Test do
+                  def render(assigns) do
+                    ~L'''
+                    <div><%= @x %></div>
+                    '''
+                  end
+                end
+            """.trimIndent()
+        )
+
+        val sigilHeredoc = PsiTreeUtil.findChildOfType(myFixture.file, SigilHeredocLiteral::class.java)
+        checkNotNull(sigilHeredoc) { "Sigil host not found in test file" }
+
+        val injected = InjectedLanguageManager.getInstance(project).getInjectedPsiFiles(sigilHeredoc)
+        assertTrue(
+            "Expected no injection while the experimental setting is off, got: $injected",
+            injected.isNullOrEmpty()
+        )
+    }
+
+    fun testLSigilDataRootIsHtmlNotPlainText() {
+        val viewProvider = injectedEexViewProvider("L")
+
+        assertEquals(
+            "~L is LiveView's HTML template sigil, so its data root must be HTML, not plain text",
+            HTMLLanguage.INSTANCE,
+            viewProvider.templateDataLanguage
+        )
+
+        val divTag = PsiTreeUtil.findChildOfType(viewProvider.getPsi(HTMLLanguage.INSTANCE), XmlTag::class.java)
+        assertNotNull("Expected the <div> to parse as real HTML PSI, not text", divTag)
+        assertEquals("div", divTag!!.name)
+    }
+
+    fun testESigilDataRootIsHtmlNotPlainText() {
+        val viewProvider = injectedEexViewProvider("E")
+
+        assertEquals(
+            "Phoenix.HTML's ~E is an HTML template sigil, so its data root must be HTML, not plain text",
+            HTMLLanguage.INSTANCE,
+            viewProvider.templateDataLanguage
+        )
+
+        val divTag = PsiTreeUtil.findChildOfType(viewProvider.getPsi(HTMLLanguage.INSTANCE), XmlTag::class.java)
+        assertNotNull("Expected the <div> to parse as real HTML PSI, not text", divTag)
+        assertEquals("div", divTag!!.name)
+    }
+
+    private fun injectedEexViewProvider(sigilName: String): TemplateLanguageFileViewProvider {
+        myFixture.configureByText(
+            "test.ex",
+            """
+                defmodule Test do
+                  def render(assigns) do
+                    ~$sigilName'''
+                    <div><%= @x %></div>
+                    '''
+                  end
+                end
+            """.trimIndent()
+        )
+
+        val sigilHeredoc = PsiTreeUtil.findChildOfType(myFixture.file, SigilHeredocLiteral::class.java)
+        checkNotNull(sigilHeredoc) { "Sigil host not found in test file" }
+
+        val injected = InjectedLanguageManager.getInstance(project).getInjectedPsiFiles(sigilHeredoc).orEmpty()
+        val eexRoot = injected
+            .map { it.first.containingFile }
+            .firstOrNull { it.language.isKindOf(EexLanguage.INSTANCE) }
+        checkNotNull(eexRoot) { "Expected an EEx injection, got: ${injected.map { it.first.containingFile.language }}" }
+
+        return eexRoot.viewProvider as TemplateLanguageFileViewProvider
     }
 
     private fun injectedHeexFile(text: String): PsiFile {
