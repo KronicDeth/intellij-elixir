@@ -105,6 +105,12 @@ object UseScopeImpl {
                     }
                 } else if (ancestor is ElixirStabOperation) {
                     break
+                } else if (ancestor is ElixirAnonymousFunction) {
+                    /* `Parameter.putParameterized` stops at an anonymous function and calls what it found a
+                       parameter, so this walk has to recognise one too. A well-formed `fn` hides the omission
+                       behind the `ElixirStabOperation` of its `->` clause, but code being typed reaches the `fn`
+                       without one. */
+                    break
                 } else if (ancestor is PsiFile) {
                     Logger.error(
                         UnqualifiedNoArgumentsCall::class.java,
