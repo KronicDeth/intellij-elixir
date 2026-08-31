@@ -103,6 +103,15 @@
     [#1796](https://github.com/KronicDeth/intellij-elixir/issues/1796) and
     [#3142](https://github.com/KronicDeth/intellij-elixir/issues/3142).
 
+- [#3974](https://github.com/KronicDeth/intellij-elixir/pull/3974) [@sh41](https://github.com/sh41)
+  - **A qualified call in a `@type` parameter list no longer raises an error report.** `@type
+    date(spec.date_type)` reached two annotator branches that between them knew every other shape a
+    parameter can take but not a dot-qualified one, so typing it reported "Cannot extract type type
+    parameter name set" and, on the same keystroke, "Cannot highlight types and type parameter
+    declarations". A qualified call names a type in another module rather than declaring a parameter,
+    so it is now left out of the parameter-name set and painted the way a type usage is. Fixes
+    [#1835](https://github.com/KronicDeth/intellij-elixir/issues/1835).
+
 - [#3973](https://github.com/KronicDeth/intellij-elixir/pull/3973) [@sh41](https://github.com/sh41)
   - **HTML inside a `~L` or `~E` sigil is now highlighted.** The injected fragment carried no file
     extension, so EEx's template-data language fell through to plain text and only the Elixir inside
