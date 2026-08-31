@@ -320,6 +320,9 @@ class Callable : PsiReferenceBase<Call>, PsiPolyVariantReference {
                     true
 
                 is ElixirAccessExpression,
+                    /* an anonymous function is only reached when its stab has no `->`, which is a syntax error,
+                       but it can also occur during typing, so try searching above it */
+                is ElixirAnonymousFunction,
                 is ElixirAssociations,
                 is ElixirAssociationsBase,
                 is ElixirBitString,

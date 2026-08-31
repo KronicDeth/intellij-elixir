@@ -96,6 +96,13 @@
 
 ### Bug Fixes
 
+- [#3976](https://github.com/KronicDeth/intellij-elixir/pull/3976) [@sh41](https://github.com/sh41)
+  - **An `fn` whose body has no `->` no longer reports "Don't know how to check if variable".** The
+    walk that decides whether a name is a variable enumerates the ancestor types it understands and
+    raises an error report for anything else, and an anonymous function missing its clause arrow
+    reaches it while the code is still being typed. Fixes
+    [#2376](https://github.com/KronicDeth/intellij-elixir/issues/2376).
+
 - [#3975](https://github.com/KronicDeth/intellij-elixir/pull/3975) [@sh41](https://github.com/sh41)
   - **A hexadecimal or octal number in a type no longer reports "Cannot highlight types".** The
     annotator listed the bases it knew rather than matching whole numbers, so `0x0001..0xFFFF` in a
