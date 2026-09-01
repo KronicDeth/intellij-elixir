@@ -21,10 +21,16 @@ import org.elixir_lang.mix.watcher.TransitiveResolution.transitiveResolution
  */
 class TransitiveResolutionTest : PlatformTestCase() {
 
-    /** The dep applications reachable from [roots], which is what the sync pipeline consumes. */
+    /**
+     * The dep applications reachable from [roots], which is what the sync pipeline consumes.
+     *
+     * The longer deadline is for the fixture, not the product: a case here walks a chain of
+     * `mix.exs` files and each one is parsed from scratch, where the helper's default assumes a
+     * single file.
+     */
     private fun applicationsFrom(vararg roots: VirtualFile): Set<String> =
         MixSyncTestHelpers
-            .runSuspendOnPooledThread {
+            .runSuspendOnPooledThread(timeoutMillis = 60_000L) {
                 transitiveResolution(PsiManager.getInstance(project), EmptyProgressIndicator(), *roots)
             }
             .map(Dep::application)
@@ -147,6 +153,105 @@ class TransitiveResolutionTest : PlatformTestCase() {
         )
 
         assertEquals(setOf("cachex", "jumper"), applicationsFrom(root))
+    }
+
+    // -----------------------------------------------------------------
+    // Where a dep's own deps are looked for
+    // -----------------------------------------------------------------
+
+    /**
+     * Mix converges every hex and git dep into the top-level project's `deps_path`, which
+     * `Mix.Project.deps_config/1` passes down already expanded to an absolute path. So a dep
+     * declared by a dependency is checked out *beside* it under the project, never nested inside
+     * it - `deps/cachex/deps/jumper` is a directory no Mix configuration produces.
+     *
+     * Resolving it there anyway ends the walk one level below every project root, so nothing deeper
+     * than a direct dep's own deps is ever seen.
+     */
+    fun testTransitiveDepsAreReachedThroughTheProjectsDepsDirectory() {
+        val path = nextFixturePath()
+        val root = mixProject(path, "{:cachex, \">= 0.0.0\"}")
+        mixProject("$path/deps/cachex", "{:jumper, \">= 0.0.0\"}")
+        mixProject("$path/deps/jumper", "{:mime, \">= 0.0.0\"}")
+        mixProject("$path/deps/mime", "")
+
+        assertEquals(setOf("cachex", "jumper", "mime"), applicationsFrom(root))
+    }
+
+    /**
+     * An explicit `path:` dep is the exception: `Mix.SCM.Path` expands it against the directory of
+     * the project that declared it, so one declared by a dependency really is relative to that
+     * dependency. Guards against resolving every dep against the project root.
+     */
+    fun testExplicitRelativePathDepOfADepIsResolvedAgainstTheDeclaringDep() {
+        val path = nextFixturePath()
+        val root = mixProject(path, "{:cachex, \">= 0.0.0\"}")
+        mixProject("$path/deps/cachex", "{:vendored, path: \"../vendored\"}")
+        mixProject("$path/deps/vendored", "{:deep, \">= 0.0.0\"}")
+        mixProject("$path/deps/deep", "")
+
+        assertEquals(setOf("cachex", "vendored", "deep"), applicationsFrom(root))
+    }
+
+    /**
+     * Two content roots that both carry `deps/shared` must not be confused for one another, which
+     * is the cross-root contamination scoped library names exist to prevent.
+     */
+    fun testDepResolutionStaysInTheDeclaringRoot() {
+        val a = nextFixturePath()
+        val b = nextFixturePath()
+        val rootA = mixProject(a, "{:dep_a, \">= 0.0.0\"}")
+        mixProject("$a/deps/dep_a", "{:shared, \">= 0.0.0\"}")
+        mixProject("$a/deps/shared", "{:only_in_a, \">= 0.0.0\"}")
+        val rootB = mixProject(b, "")
+        mixProject("$b/deps/shared", "{:only_in_b, \">= 0.0.0\"}")
+
+        val applications = applicationsFrom(rootA, rootB)
+
+        assertTrue(
+            "`shared` must resolve under the root that owns the dep declaring it: $applications",
+            "only_in_a" in applications,
+        )
+        assertFalse(
+            "`shared` must not resolve under an unrelated content root: $applications",
+            "only_in_b" in applications,
+        )
+    }
+
+    /**
+     * An umbrella app shares the umbrella's `deps`, `_build` and lock file, so it has no `deps` of
+     * its own and Mix never creates one. A directory there is debris from before the app joined the
+     * umbrella, and must not be preferred over the umbrella's.
+     */
+    fun testUmbrellaAppDepsResolveUnderTheUmbrella() {
+        val u = nextFixturePath()
+        val umbrella = mixProject(u, "", "      apps_path: \"apps\",\n")
+        val app = mixProject("$u/apps/app_a", "{:shared, \">= 0.0.0\"}")
+        mixProject("$u/deps/shared", "{:from_umbrella, \">= 0.0.0\"}")
+        mixProject("$u/apps/app_a/deps/shared", "{:from_app, \">= 0.0.0\"}")
+
+        val applications = applicationsFrom(umbrella, app)
+
+        assertTrue("The umbrella's deps own the app's deps: $applications", "from_umbrella" in applications)
+        assertFalse("An app's own deps directory is debris: $applications", "from_app" in applications)
+    }
+
+    /**
+     * A content root that is not an umbrella app is its own Mix project, so it keeps its own `deps`
+     * rather than deferring to a root it happens to sit inside. Guards against answering the case
+     * above by always taking the outermost root.
+     */
+    fun testNestedProjectRootKeepsItsOwnDeps() {
+        val p = nextFixturePath()
+        val outer = mixProject(p, "")
+        val inner = mixProject("$p/vendor/lib_a", "{:shared, \">= 0.0.0\"}")
+        mixProject("$p/deps/shared", "{:from_outer, \">= 0.0.0\"}")
+        mixProject("$p/vendor/lib_a/deps/shared", "{:from_inner, \">= 0.0.0\"}")
+
+        val applications = applicationsFrom(outer, inner)
+
+        assertTrue("A standalone nested project owns its deps: $applications", "from_inner" in applications)
+        assertFalse("It must not borrow the enclosing root's deps: $applications", "from_outer" in applications)
     }
 
     // -----------------------------------------------------------------

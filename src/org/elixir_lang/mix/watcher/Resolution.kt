@@ -4,6 +4,7 @@ import com.intellij.openapi.application.readAction
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.util.Key
+import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
@@ -67,7 +68,8 @@ class Resolution(
                            Module deps handle transitivity while Library deps don't */
                         if (dep.type == Dep.Type.LIBRARY) {
                             if (!depToRootVirtualFile.contains(dep)) {
-                                val depRootVirtualFile = dep.virtualFile(rootVirtualFile)
+                                val depRootVirtualFile =
+                                    depRootVirtualFile(dep, rootVirtualFile, projectRootVirtualFiles)
 
                                 depToRootVirtualFile[dep] = depRootVirtualFile
 
@@ -86,6 +88,67 @@ class Resolution(
             }
 
             return Resolution(rootVirtualFileToDepSet, depToRootVirtualFile)
+        }
+
+        /**
+         * The directory Mix would check [dep] out into.
+         *
+         * `Mix.Project.deps_config/1` hands every dependency the *top-level* project's `deps_path`,
+         * already expanded, so a hex or git dep declared by a dependency is checked out beside it
+         * under the project - `deps/<parent>/deps/<child>` is a directory no Mix configuration
+         * produces. Looking there ended the walk one level below every project root.
+         *
+         * An explicit `path:` dep is the exception and keeps the old base: `Mix.SCM.Path` expands it
+         * against the directory of whatever declared it, so `"../sibling"` inside a dependency
+         * really is relative to that dependency.
+         *
+         * The search is confined to the one project that owns the declaring file, so two content
+         * roots that both have `deps/<name>` cannot be confused for one another. The lookup stays on
+         * [VirtualFile.findFileByRelativePath] because a `deps/` path needs no upward traversal,
+         * leaving [Dep.virtualFile]'s refresh-based resolution for the paths that do.
+         */
+        private fun depRootVirtualFile(
+            dep: Dep,
+            declaringRootVirtualFile: VirtualFile,
+            projectRootVirtualFiles: Set<VirtualFile>
+        ): VirtualFile? {
+            val owningProjectRoot = if (dep.path.startsWith(MIX_DEPS_DIRECTORY_PREFIX)) {
+                owningProjectRoot(declaringRootVirtualFile, projectRootVirtualFiles)
+            } else {
+                null
+            }
+
+            return owningProjectRoot?.findFileByRelativePath(dep.path)
+                ?: dep.virtualFile(declaringRootVirtualFile)
+        }
+
+        /**
+         * The content root of the Mix project whose `deps` directory Mix would install into.
+         *
+         * That is the innermost root containing [declaringRootVirtualFile], except for an umbrella
+         * app: an app shares the umbrella's `deps`, `_build` and lock file and never has its own, so
+         * a `deps` directory beside its `mix.exs` is debris from before it joined the umbrella.
+         * Every other content root is a project in its own right and keeps its own `deps`, including
+         * one that merely happens to sit inside another.
+         */
+        private fun owningProjectRoot(
+            declaringRootVirtualFile: VirtualFile,
+            projectRootVirtualFiles: Set<VirtualFile>
+        ): VirtualFile? {
+            var root = projectRootVirtualFiles
+                .filter { VfsUtilCore.isAncestor(it, declaringRootVirtualFile, false) }
+                .maxByOrNull { it.path.length }
+                ?: return null
+
+            while (true) {
+                val umbrella = root.parent
+                    ?.takeIf { it.name == UMBRELLA_APPS_DIRECTORY_NAME }
+                    ?.parent
+                    ?.takeIf { it in projectRootVirtualFiles }
+                    ?: return root
+
+                root = umbrella
+            }
         }
 
         private suspend fun rootVirtualFileToDepSet(
@@ -170,6 +233,9 @@ class Resolution(
             }
     }
 }
+
+private const val MIX_DEPS_DIRECTORY_PREFIX = "deps/"
+private const val UMBRELLA_APPS_DIRECTORY_NAME = "apps"
 
 private val PROJECT_DEP_SET: Key<CachedValue<Set<Dep>>> = Key.create<CachedValue<Set<Dep>>>("PROJECT_DEP_SET")
 private val DEPENDENCY_DEP_SET: Key<CachedValue<Set<Dep>>> = Key.create<CachedValue<Set<Dep>>>("DEPENDENCY_DEP_SET")

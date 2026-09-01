@@ -78,6 +78,7 @@
   - **External Libraries shows a dependency's name and location again.**
   - **A dependency's optional and non-`:prod` dependencies no longer become empty libraries.**
   - **A `sparse:` and/or `subdir:` git dependency is now located correctly.** Refs [#3928](https://github.com/KronicDeth/intellij-elixir/issues/3928).
+  - **A dependency's own dependencies are located correctly.** Refs [#3928](https://github.com/KronicDeth/intellij-elixir/issues/3928).
   - **Bracketed dependency options such as `[path: "../dep"]` are read.**
 
 - [#3982](https://github.com/KronicDeth/intellij-elixir/pull/3982) [@sh41](https://github.com/sh41)

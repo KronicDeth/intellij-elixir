@@ -1492,7 +1492,7 @@ class MixDepsSyncServiceTest : PlatformTestCase() {
      * pumping its event queue.  Delegates to [MixSyncTestHelpers.runSuspendOnPooledThread].
      */
     private fun <T> runSuspendOnPooledThread(block: suspend () -> T): T =
-        MixSyncTestHelpers.runSuspendOnPooledThread(block)
+        MixSyncTestHelpers.runSuspendOnPooledThread(block = block)
 
     /**
      * Calls [MixDepsSyncService.drain] directly on a pooled thread (bypassing the 250 ms debounce),

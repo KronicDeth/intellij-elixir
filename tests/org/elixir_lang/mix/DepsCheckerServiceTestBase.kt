@@ -124,7 +124,7 @@ abstract class DepsCheckerServiceTestBase : PlatformTestCase() {
      * if [kotlinx.coroutines.runBlocking] were called directly on the EDT test thread.
      */
     protected fun <T> runSuspendOnPooledThread(block: suspend () -> T): T =
-        MixSyncTestHelpers.runSuspendOnPooledThread(block)
+        MixSyncTestHelpers.runSuspendOnPooledThread(block = block)
 
     /**
      * Polls [condition] in a tight loop, pumping the IDE event queue on each iteration
