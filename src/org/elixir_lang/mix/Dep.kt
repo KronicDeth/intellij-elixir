@@ -76,10 +76,16 @@ data class Dep(val application: String, val path: String, val type: Type = Type.
                                 val key = keywordPair.keywordKey.text
 
                                 when (key) {
-                                    "allow_pre", "app", "branch", "commit", "compile", "env", "git", "github", "hex",
+                                    "allow_pre", "app", "branch", "commit", "compile", "env", "hex",
                                     "manager", "organization", "override", "ref", "repo", "runtime",
-                                    GUARDIAN_RUNTIME_TYPO, "sparse", "submodules", "system_env", "tag", "targets",
-                                    EDELIVER_DISTILLERY_WARN_MISSING, "sha", "depth", "subdir", "warn_if_outdated" -> acc
+                                    GUARDIAN_RUNTIME_TYPO, "submodules", "system_env", "tag", "targets",
+                                    EDELIVER_DISTILLERY_WARN_MISSING, "sha", "depth", "warn_if_outdated" -> acc
+
+                                    // Only `Mix.SCM.Git` joins `sparse`/`subdir` onto the destination,
+                                    // and it declines a dep naming neither `git:` nor `github:`.
+                                    "git", "github" -> acc.copy(hasGitScm = true)
+                                    "sparse" -> acc.copy(sparse = stringBody(keywordPair.keywordValue))
+                                    "subdir" -> acc.copy(subdir = stringBody(keywordPair.keywordValue))
 
                                     "only" -> acc.copy(only = environments(keywordPair.keywordValue))
                                     "optional" -> acc.copy(optional = isTrue(keywordPair.keywordValue))
@@ -122,8 +128,11 @@ data class Dep(val application: String, val path: String, val type: Type = Type.
          */
         private data class Options(
             val dep: Dep,
+            val sparse: String? = null,
+            val subdir: String? = null,
             val only: List<String>? = null,
             val optional: Boolean = false,
+            val hasGitScm: Boolean = false,
         )
 
         /** The dep this tuple describes, or `null` when Mix would not fetch it here. */
@@ -135,7 +144,11 @@ data class Dep(val application: String, val path: String, val type: Type = Type.
                 if (optional || (only != null && PROD_ENVIRONMENT !in only)) return null
             }
 
-            return dep
+            return if (hasGitScm && dep.type == Type.LIBRARY) {
+                dep.copy(path = listOfNotNull(dep.path, sparse, subdir).joinToString("/"))
+            } else {
+                dep
+            }
         }
 
         /**
@@ -157,6 +170,9 @@ data class Dep(val application: String, val path: String, val type: Type = Type.
 
         private fun isTrue(keywordValue: Quotable): Boolean =
             keywordValue is ElixirAtomKeyword && keywordValue.text == "true"
+
+        private fun stringBody(keywordValue: Quotable): String? =
+            (keywordValue as? ElixirLine)?.body?.text
 
         private const val PROD_ENVIRONMENT = "prod"
 

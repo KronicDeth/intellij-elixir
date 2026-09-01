@@ -24,9 +24,8 @@ class DepTest : PlatformTestCase() {
      * named constants are misspellings that widely installed packages ship, referenced by name rather
      * than spelled out so a future reader does not "correct" them.
      *
-     * `sparse` and `subdir` are on [Dep.from]'s ignored list but are deliberately absent here,
-     * because they do not belong on it: `Mix.SCM.Git` joins each onto the dep's destination, so Mix
-     * checks the dep out at `deps/<name>/<option>`. Tracked on #3928.
+     * `sparse` and `subdir` are absent because they are not path-neutral - `Mix.SCM.Git` joins each
+     * onto the dep's destination. They are handled options, covered by their own cases below.
      *
      * `only` and `optional` stay here because neither moves the dep, but they are no longer *merely*
      * path-neutral: inside a dependency's own `mix.exs` either can drop the dep entirely, which is
@@ -79,6 +78,76 @@ class DepTest : PlatformTestCase() {
         assertEmpty("`in_umbrella` is handled, so it must not be reported", errorTitles)
         assertEquals("apps/my_dep", deps.single()?.path)
         assertEquals(Dep.Type.MODULE, deps.single()?.type)
+    }
+
+    // ---------------------------------------------------------------------
+    // `sparse:` / `subdir:` - both join onto the dep's destination
+    // ---------------------------------------------------------------------
+
+    fun testSparseAppendsToDepsPath() {
+        val (deps, errorTitles) = depsFrom("{:d, git: \"u\", sparse: \"s\"}")
+
+        assertEmpty("`sparse` is handled, so it must not be reported", errorTitles)
+        assertEquals("deps/d/s", deps.single()?.path)
+    }
+
+    fun testSubdirAppendsToDepsPath() {
+        val (deps, errorTitles) = depsFrom("{:d, git: \"u\", subdir: \"sd\"}")
+
+        assertEmpty("`subdir` is handled, so it must not be reported", errorTitles)
+        assertEquals("deps/d/sd", deps.single()?.path)
+    }
+
+    fun testSparseAndSubdirBothAppend() {
+        val (deps, _) = depsFrom("{:d, git: \"u\", sparse: \"s\", subdir: \"sd\"}")
+
+        assertEquals("deps/d/s/sd", deps.single()?.path)
+    }
+
+    /**
+     * `Mix.SCM.Git.accepts_options` pipes `sparse_opts()` then `subdir_opts()`, so the order is
+     * Mix's, not the source's. Written reversed so inheriting the fold's order fails.
+     */
+    fun testSparseIsAppliedBeforeSubdirWhateverTheSourceOrder() {
+        val (deps, _) = depsFrom("{:d, git: \"u\", subdir: \"sd\", sparse: \"s\"}")
+
+        assertEquals("deps/d/s/sd", deps.single()?.path)
+    }
+
+    fun testSubdirAppliesToAGithubDep() {
+        val (deps, _) = depsFrom("{:d, github: \"o/r\", subdir: \"sd\"}")
+
+        assertEquals("deps/d/sd", deps.single()?.path)
+    }
+
+    /**
+     * `Mix.SCM.Git.accepts_options` returns nil without `git:`/`github:`, so `Mix.SCM.Path` wins and
+     * sets the destination from `path:` alone - `subdir` never applies.
+     */
+    fun testSubdirIsIgnoredForAPathDep() {
+        val (deps, _) = depsFrom("{:d, path: \"vendor/d\", subdir: \"sd\"}")
+
+        assertEquals("vendor/d", deps.single()?.path)
+    }
+
+    fun testSubdirIsIgnoredWithoutAnScmOption() {
+        val (deps, _) = depsFrom("{:d, subdir: \"sd\"}")
+
+        assertEquals("deps/d", deps.single()?.path)
+    }
+
+    fun testSubdirIsIgnoredForAnInUmbrellaDep() {
+        val (deps, _) = depsFrom("{:d, in_umbrella: true, subdir: \"sd\"}")
+
+        assertEquals("apps/d", deps.single()?.path)
+        assertEquals(Dep.Type.MODULE, deps.single()?.type)
+    }
+
+    /** A non-literal value cannot be read, so it is a no-op - as `path:` already treats a call. */
+    fun testNonLiteralSubdirIsANoOp() {
+        val (deps, _) = depsFrom("{:d, git: \"u\", subdir: helper()}")
+
+        assertEquals("deps/d", deps.single()?.path)
     }
 
     // ---------------------------------------------------------------------
@@ -182,6 +251,12 @@ class DepTest : PlatformTestCase() {
 
         assertEquals("apps/d", deps.single()?.path)
         assertEquals(Dep.Type.MODULE, deps.single()?.type)
+    }
+
+    fun testBracketedSubdirIsHonoured() {
+        val (deps, _) = depsFrom("{:d, [git: \"u\", subdir: \"sd\"]}")
+
+        assertEquals("deps/d/sd", deps.single()?.path)
     }
 
     /** An unknown option must still be reported when bracketed, or the tripwire has a blind spot. */
