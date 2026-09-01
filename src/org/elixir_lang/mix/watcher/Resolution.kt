@@ -36,6 +36,12 @@ class Resolution(
         ): Resolution {
             val rootVirtualFileQueue: Queue<VirtualFile> = ArrayDeque<VirtualFile>()
             rootVirtualFileQueue.addAll(rootVirtualFiles)
+            // Anything reached that was not handed in got here by following a Dep.Type.LIBRARY dep,
+            // so Mix would resolve its deps as a dependency's. Membership rather than dequeue order
+            // decides it, so a root reads the same however the queue is drained. Umbrella apps are
+            // handed in by the caller alongside the roots, and MODULE deps are never walked, so
+            // neither can be mistaken for a dependency.
+            val projectRootVirtualFiles = rootVirtualFiles.toHashSet()
             val rootVirtualFileToDepSet = mutableMapOf<VirtualFile, Set<Dep>>()
             val depToRootVirtualFile = mutableMapOf<Dep, VirtualFile?>()
 
@@ -44,7 +50,12 @@ class Resolution(
                 val rootVirtualFile = rootVirtualFileQueue.remove()
 
                 if (!rootVirtualFileToDepSet.containsKey(rootVirtualFile)) {
-                    val depSet = rootVirtualFileToDepSet(psiManager, progressIndicator, rootVirtualFile)
+                    val depSet = rootVirtualFileToDepSet(
+                        psiManager,
+                        progressIndicator,
+                        rootVirtualFile,
+                        isDependency = rootVirtualFile !in projectRootVirtualFiles,
+                    )
 
                     for (dep in depSet) {
                         if (progressIndicator.isCanceled) {
@@ -80,7 +91,8 @@ class Resolution(
         private suspend fun rootVirtualFileToDepSet(
             psiManager: PsiManager,
             progressIndicator: ProgressIndicator,
-            rootVirtualFile: VirtualFile
+            rootVirtualFile: VirtualFile,
+            isDependency: Boolean
         ): Set<Dep> {
             progressIndicator.text2 = "Finding package file under ${rootVirtualFile.path}"
             val packageManagerVirtualFile = virtualFile(rootVirtualFile)
@@ -88,7 +100,13 @@ class Resolution(
             return if (packageManagerVirtualFile != null) {
                 val (packageManager, packageVirtualFile) = packageManagerVirtualFile
 
-                packageVirtualFileToDepSet(psiManager, progressIndicator, packageManager, packageVirtualFile)
+                packageVirtualFileToDepSet(
+                    psiManager,
+                    progressIndicator,
+                    packageManager,
+                    packageVirtualFile,
+                    isDependency
+                )
             } else {
                 emptySet()
             }
@@ -98,7 +116,8 @@ class Resolution(
             psiManager: PsiManager,
             progressIndicator: ProgressIndicator,
             packageManager: PackageManager,
-            packageVirtualFile: VirtualFile
+            packageVirtualFile: VirtualFile,
+            isDependency: Boolean
         ): Set<Dep> {
             // WARA: acquires the read lock without blocking the EDT. If a write action preempts,
             // readAction restarts the lambda. IncorrectOperationException can occur when the
@@ -114,7 +133,7 @@ class Resolution(
             return if (packagePsiFile != null && !progressIndicator.isCanceled) {
                 progressIndicator.text2 = "Finding deps in ${packagePsiFile.virtualFile.path}"
 
-                packagePsiFileToDepSet(packageManager, packagePsiFile)
+                packagePsiFileToDepSet(packageManager, packagePsiFile, isDependency)
             } else {
                 emptySet()
             }
@@ -134,12 +153,16 @@ class Resolution(
          */
         private suspend fun packagePsiFileToDepSet(
             packageManager: PackageManager,
-            packagePsiFile: PsiFile
+            packagePsiFile: PsiFile,
+            isDependency: Boolean
         ): Set<Dep> =
             readAction {
-                getCachedValue(packagePsiFile, DEP_SET) {
+                // Two keys, because the dep set a file yields now depends on how the file was
+                // reached, while a CachedValue outlives the resolution that populated it: one
+                // module's run can hand in a root that another's reaches as a dependency.
+                getCachedValue(packagePsiFile, if (isDependency) DEPENDENCY_DEP_SET else PROJECT_DEP_SET) {
                     packageManager
-                        .depGatherer()
+                        .depGatherer(isDependency)
                         .apply { packagePsiFile.accept(this) }
                         .depSet.toSet()
                         .let { CachedValueProvider.Result.create(it, packagePsiFile) }
@@ -148,4 +171,5 @@ class Resolution(
     }
 }
 
-private val DEP_SET: Key<CachedValue<Set<Dep>>> = Key.create<CachedValue<Set<Dep>>>("DEP_SET")
+private val PROJECT_DEP_SET: Key<CachedValue<Set<Dep>>> = Key.create<CachedValue<Set<Dep>>>("PROJECT_DEP_SET")
+private val DEPENDENCY_DEP_SET: Key<CachedValue<Set<Dep>>> = Key.create<CachedValue<Set<Dep>>>("DEPENDENCY_DEP_SET")

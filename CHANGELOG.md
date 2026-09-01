@@ -76,6 +76,7 @@
   - **Dependency scanning waits for the IDE's Project Model to be fully loaded to avoid lost
     writes**, however it was triggered.
   - **External Libraries shows a dependency's name and location again.**
+  - **A dependency's optional and non-`:prod` dependencies no longer become empty libraries.**
   - **Bracketed dependency options such as `[path: "../dep"]` are read.**
 
 - [#3982](https://github.com/KronicDeth/intellij-elixir/pull/3982) [@sh41](https://github.com/sh41)

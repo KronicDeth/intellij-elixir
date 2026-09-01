@@ -18,7 +18,10 @@ import org.elixir_lang.psi.impl.keywordValue
 import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.util.AccumulatorContinue
 
-class DepGatherer : DepGatherer() {
+/**
+ * @param isDependency whether the `mix.exs` being visited belongs to a dependency; see [Dep.from].
+ */
+class DepGatherer(private val isDependency: Boolean = false) : DepGatherer() {
     override fun visitFile(file: PsiFile) {
         // Caller (Resolution.packagePsiFileToDepSet) already holds a read lock via runReadAction { ... }.
         // A nested runReadAction here is redundant. Protect from inadvertent calls with
@@ -37,7 +40,7 @@ class DepGatherer : DepGatherer() {
 
             childCalls
                     .foldDepsDefinersWhile(listOf<Dep>()) { depsDefiner, acc ->
-                        AccumulatorContinue(acc + depsDefiner.deps(), true)
+                        AccumulatorContinue(acc + depsDefiner.deps(isDependency), true)
                     }
                     .accumulator
                     .let { depSet.addAll(it) }
@@ -45,7 +48,7 @@ class DepGatherer : DepGatherer() {
     }
 }
 
-private fun Call.deps(): List<Dep> = lastList()?.deps() ?: emptyList()
+private fun Call.deps(isDependency: Boolean): List<Dep> = lastList()?.deps(isDependency) ?: emptyList()
 
 private fun Call.lastList(): ElixirList? =
     foldChildrenWhile(null as ElixirList?) { child, acc ->
@@ -144,5 +147,5 @@ private fun QuotableKeywordList.depsNameArity(): NameArity? =
                             }
                 }
 
-private fun ElixirList.deps(): List<Dep> =
-    children.map { it.stripAccessExpression() }.asSequence().flatMap { Deps.from(it) }.toList()
+private fun ElixirList.deps(isDependency: Boolean): List<Dep> =
+    children.map { it.stripAccessExpression() }.asSequence().flatMap { Deps.from(it, isDependency) }.toList()

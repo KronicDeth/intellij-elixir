@@ -1,0 +1,252 @@
+package org.elixir_lang.mix.watcher
+
+import com.intellij.openapi.progress.EmptyProgressIndicator
+import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.psi.PsiManager
+import org.elixir_lang.PlatformTestCase
+import org.elixir_lang.mix.Dep
+import org.elixir_lang.mix.sync.MixSyncTestHelpers
+import org.elixir_lang.mix.watcher.TransitiveResolution.transitiveResolution
+
+/**
+ * Pins which deps [transitiveResolution] reaches, at each of the three positions a `mix.exs` can
+ * occupy: a project root, an umbrella app, and a dependency's own file.
+ *
+ * Every dep reached becomes a library the sync pipeline believes the project should have, so a dep
+ * Mix will never fetch becomes an empty placeholder library that no `mix deps.get` can fill.
+ * `only:` and `optional:` decide that, and both are **positional** - neither is a reason to drop a
+ * dep on its own. Mix fetches every environment's deps for a project it is building and exempts
+ * umbrella apps outright, while a dependency's own deps are resolved in `:prod` and are not entitled
+ * to its optional ones.
+ */
+class TransitiveResolutionTest : PlatformTestCase() {
+
+    /** The dep applications reachable from [roots], which is what the sync pipeline consumes. */
+    private fun applicationsFrom(vararg roots: VirtualFile): Set<String> =
+        MixSyncTestHelpers
+            .runSuspendOnPooledThread {
+                transitiveResolution(PsiManager.getInstance(project), EmptyProgressIndicator(), *roots)
+            }
+            .map(Dep::application)
+            .toSet()
+
+    /**
+     * Writes a `mix.exs` at [path] declaring [depTuples] verbatim, with [extraProjectKeys] added to
+     * `project/0` for the `apps_path:` an umbrella root needs.
+     *
+     * The tuples are source text rather than names so a case can attach the option under test.
+     */
+    private fun mixProject(path: String, depTuples: String, extraProjectKeys: String = ""): VirtualFile {
+        val directory = myFixture.tempDirFixture.findOrCreateDir(path)
+        val application = path.substringAfterLast('/')
+        val moduleName = application.split("_").joinToString("") { it.replaceFirstChar(Char::uppercase) }
+
+        // DepGatherer needs `deps: deps()` in project/0 before it will read `def deps`.
+        myFixture.tempDirFixture.createFile(
+            "$path/mix.exs",
+            "defmodule " + moduleName + ".MixProject do\n" +
+                "  use Mix.Project\n" +
+                "\n" +
+                "  def project do\n" +
+                "    [\n" +
+                "      app: :" + application + ",\n" +
+                "      version: \"0.1.0\",\n" +
+                extraProjectKeys +
+                "      deps: deps()\n" +
+                "    ]\n" +
+                "  end\n" +
+                "\n" +
+                "  def deps do\n" +
+                "    [" + depTuples + "]\n" +
+                "  end\n" +
+                "end\n"
+        )
+
+        return directory
+    }
+
+    /**
+     * Fixture directories are keyed on the test name, plus a counter so a case that asserts over
+     * several declarations does not write `mix.exs` into a directory it already used.
+     */
+    private var fixtureCount = 0
+
+    private fun nextFixturePath(): String = "${name}_${fixtureCount++}"
+
+    /** Resolution when the project root itself declares [depTuple]. */
+    private fun projectRootDeclaring(depTuple: String): Set<String> =
+        applicationsFrom(mixProject(nextFixturePath(), depTuple))
+
+    /** Resolution when an umbrella app declares [depTuple], resolved as the plugin resolves one. */
+    private fun umbrellaAppDeclaring(depTuple: String): Set<String> {
+        val path = nextFixturePath()
+        val umbrella = mixProject(path, "", "      apps_path: \"apps\",\n")
+        val app = mixProject("$path/apps/app_a", depTuple)
+
+        return applicationsFrom(umbrella, app)
+    }
+
+    /** Resolution when a dependency's own `mix.exs` declares [depTuple]. Always includes `cachex`. */
+    private fun dependencyDeclaring(depTuple: String): Set<String> {
+        val path = nextFixturePath()
+        val root = mixProject(path, "{:cachex, \">= 0.0.0\"}")
+        mixProject("$path/deps/cachex", depTuple)
+
+        return applicationsFrom(root)
+    }
+
+    private fun assertReachedAtProjectPositions(depTuple: String, application: String) {
+        assertEquals(
+            "A project root's own dep must be reached: $depTuple",
+            setOf(application),
+            projectRootDeclaring(depTuple),
+        )
+        assertEquals(
+            "An umbrella app's own dep must be reached: $depTuple",
+            setOf(application),
+            umbrellaAppDeclaring(depTuple),
+        )
+    }
+
+    private fun assertReachedInsideADep(depTuple: String, application: String) {
+        assertEquals(
+            "A dep Mix would fetch must be reached: $depTuple",
+            setOf("cachex", application),
+            dependencyDeclaring(depTuple),
+        )
+    }
+
+    private fun assertNotReachedInsideADep(depTuple: String) {
+        assertEquals(
+            "A dep Mix would not fetch must not be reached: $depTuple",
+            setOf("cachex"),
+            dependencyDeclaring(depTuple),
+        )
+    }
+
+    // -----------------------------------------------------------------
+    // Baseline
+    // -----------------------------------------------------------------
+
+    /** Without this the rest assert nothing: an option cannot be filtered out of a walk that never happens. */
+    fun testDepDeclaredByADepIsReached() {
+        val root = mixProject("reaches", "{:cachex, \">= 0.0.0\"}")
+        mixProject("reaches/deps/cachex", "{:jumper, \">= 0.0.0\"}")
+
+        assertEquals(setOf("cachex", "jumper"), applicationsFrom(root))
+    }
+
+    /** `cachex`'s own declarations: one real dep beside two that Mix will never fetch here. */
+    fun testOnlyTheFetchableDepsOfADepAreReached() {
+        val root = mixProject("mixed", "{:cachex, \">= 0.0.0\"}")
+        mixProject(
+            "mixed/deps/cachex",
+            "{:jumper, \"~> 1.0\"},\n" +
+                "{:excoveralls, \"~> 0.11\", optional: true, only: [:cover]},\n" +
+                "{:benchee, \"~> 1.0\", optional: true, only: [:bench]}"
+        )
+
+        assertEquals(setOf("cachex", "jumper"), applicationsFrom(root))
+    }
+
+    // -----------------------------------------------------------------
+    // Reached at every position
+    // -----------------------------------------------------------------
+
+    fun testUnrestrictedDepIsReachedEverywhere() {
+        assertReachedAtProjectPositions("{:jason, \">= 0.0.0\"}", "jason")
+        assertReachedInsideADep("{:jason, \">= 0.0.0\"}", "jason")
+    }
+
+    /** `:prod` is the environment a dep's own deps are resolved in, so this excludes nothing. */
+    fun testProdOnlyDepIsReachedEverywhere() {
+        assertReachedAtProjectPositions("{:jason, \">= 0.0.0\", only: [:prod]}", "jason")
+        assertReachedInsideADep("{:jason, \">= 0.0.0\", only: [:prod]}", "jason")
+    }
+
+    fun testSingleAtomProdOnlyDepIsReachedEverywhere() {
+        assertReachedAtProjectPositions("{:jason, \">= 0.0.0\", only: :prod}", "jason")
+        assertReachedInsideADep("{:jason, \">= 0.0.0\", only: :prod}", "jason")
+    }
+
+    fun testOnlyListIncludingProdIsReachedEverywhere() {
+        assertReachedAtProjectPositions("{:jason, \">= 0.0.0\", only: [:dev, :prod]}", "jason")
+        assertReachedInsideADep("{:jason, \">= 0.0.0\", only: [:dev, :prod]}", "jason")
+    }
+
+    fun testOptionalFalseDepIsReachedEverywhere() {
+        assertReachedAtProjectPositions("{:jason, \">= 0.0.0\", optional: false}", "jason")
+        assertReachedInsideADep("{:jason, \">= 0.0.0\", optional: false}", "jason")
+    }
+
+    /**
+     * Every `only:` shape the plugin cannot read must keep the dep at every position. Dropping a dep
+     * that is physically present costs resolution and completion; keeping one Mix never fetches
+     * costs an empty placeholder library, which is the status quo.
+     */
+    fun testUnreadableOnlyValuesAreReachedEverywhere() {
+        listOf(
+            "only: :\"prod\"",
+            "only: true",
+            "only: @envs",
+            "only: Mix.env()",
+            "only: [:dev] ++ other()",
+        ).forEach { option ->
+            assertReachedInsideADep("{:jason, \">= 0.0.0\", $option}", "jason")
+        }
+    }
+
+    // -----------------------------------------------------------------
+    // Reached at a project position, dropped inside a dep
+    // -----------------------------------------------------------------
+
+    fun testEnvironmentRestrictedDepIsReachedAtProjectPositions() {
+        assertReachedAtProjectPositions("{:mox, \">= 0.0.0\", only: [:test]}", "mox")
+    }
+
+    fun testEnvironmentRestrictedDepOfADepIsNotReached() {
+        assertNotReachedInsideADep("{:mox, \">= 0.0.0\", only: [:test]}")
+    }
+
+    fun testSingleAtomEnvironmentRestrictedDepIsReachedAtProjectPositions() {
+        assertReachedAtProjectPositions("{:mox, \">= 0.0.0\", only: :test}", "mox")
+    }
+
+    fun testSingleAtomEnvironmentRestrictedDepOfADepIsNotReached() {
+        assertNotReachedInsideADep("{:mox, \">= 0.0.0\", only: :test}")
+    }
+
+    fun testMultiEnvironmentRestrictedDepIsReachedAtProjectPositions() {
+        assertReachedAtProjectPositions("{:mox, \">= 0.0.0\", only: [:dev, :test]}", "mox")
+    }
+
+    fun testMultiEnvironmentRestrictedDepOfADepIsNotReached() {
+        assertNotReachedInsideADep("{:mox, \">= 0.0.0\", only: [:dev, :test]}")
+    }
+
+    fun testOptionalDepIsReachedAtProjectPositions() {
+        assertReachedAtProjectPositions("{:jason, \">= 0.0.0\", optional: true}", "jason")
+    }
+
+    fun testOptionalDepOfADepIsNotReached() {
+        assertNotReachedInsideADep("{:jason, \">= 0.0.0\", optional: true}")
+    }
+
+    /** The two gates are independent: clearing the environment one does not rescue an optional dep. */
+    fun testOptionalProdOnlyDepOfADepIsNotReached() {
+        assertNotReachedInsideADep("{:jason, \">= 0.0.0\", optional: true, only: [:prod]}")
+    }
+
+    /**
+     * An `in_umbrella:` dep inside a third-party dependency is an app of *that* umbrella and can
+     * never be a module of this project. Left reachable it becomes an invalid module order entry in
+     * the user's `.iml`, which is what a `subdir:` monorepo dep would otherwise produce.
+     */
+    fun testInUmbrellaDepIsReachedAtProjectPositions() {
+        assertReachedAtProjectPositions("{:sib, in_umbrella: true}", "sib")
+    }
+
+    fun testInUmbrellaDepOfADepIsNotReached() {
+        assertNotReachedInsideADep("{:sib, in_umbrella: true}")
+    }
+}

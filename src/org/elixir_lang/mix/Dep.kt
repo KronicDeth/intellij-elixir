@@ -55,7 +55,15 @@ data class Dep(val application: String, val path: String, val type: Type = Type.
     }
 
     companion object {
-        fun from(depsListElement: ElixirTuple): Dep? {
+        fun from(depsListElement: ElixirTuple): Dep? = from(depsListElement, isDependency = false)
+
+        /**
+         * @param isDependency whether the `mix.exs` being read belongs to a dependency rather than to
+         *   a project the IDE is building. Mix checks a dependency's own deps against `:prod` rather
+         *   than the current `MIX_ENV`, and does not force a dependency's optional deps on the project
+         *   using it, so under this flag either option can drop the dep.
+         */
+        fun from(depsListElement: ElixirTuple, isDependency: Boolean): Dep? {
             val stripped = depsListElement.children.stripAccessExpressions()
 
             return if (stripped.isNotEmpty()) {
@@ -69,9 +77,12 @@ data class Dep(val application: String, val path: String, val type: Type = Type.
 
                                 when (key) {
                                     "allow_pre", "app", "branch", "commit", "compile", "env", "git", "github", "hex",
-                                    "manager", "only", "optional", "organization", "override", "ref", "repo", "runtime",
+                                    "manager", "organization", "override", "ref", "repo", "runtime",
                                     GUARDIAN_RUNTIME_TYPO, "sparse", "submodules", "system_env", "tag", "targets",
                                     EDELIVER_DISTILLERY_WARN_MISSING, "sha", "depth", "subdir", "warn_if_outdated" -> acc
+
+                                    "only" -> acc.copy(only = environments(keywordPair.keywordValue))
+                                    "optional" -> acc.copy(optional = isTrue(keywordPair.keywordValue))
 
                                     "in_umbrella" ->
                                         acc.copy(dep = acc.dep.copy(path = "apps/$name", type = Type.MODULE))
@@ -91,7 +102,9 @@ data class Dep(val application: String, val path: String, val type: Type = Type.
                         initial
                     }
 
-                    options.resolve()
+                    // Accumulate first and resolve once: an elvis on the resolved dep would read a
+                    // deliberate null as "this tuple had no options" and hand back the unfiltered dep.
+                    options.resolve(isDependency)
                 }
             } else {
                 null
@@ -107,10 +120,45 @@ data class Dep(val application: String, val path: String, val type: Type = Type.
          * depending on which `mix.exs` the tuple came from. Deciding once, at the end, is the only
          * shape that accommodates any of that.
          */
-        private data class Options(val dep: Dep)
+        private data class Options(
+            val dep: Dep,
+            val only: List<String>? = null,
+            val optional: Boolean = false,
+        )
 
-        /** The dep this tuple describes. */
-        private fun Options.resolve(): Dep = dep
+        /** The dep this tuple describes, or `null` when Mix would not fetch it here. */
+        private fun Options.resolve(isDependency: Boolean): Dep? {
+            if (isDependency) {
+                // An `in_umbrella:` dep of a dependency is an app of *that* umbrella, never a module
+                // of this project, so it cannot be wired here either.
+                if (dep.type == Type.MODULE) return null
+                if (optional || (only != null && PROD_ENVIRONMENT !in only)) return null
+            }
+
+            return dep
+        }
+
+        /**
+         * The environments an `only:` names, or `null` when the value cannot be read.
+         *
+         * Unreadable means unrestricted. Dropping a dep that is physically present costs resolution
+         * and completion, while keeping one Mix never fetches costs an empty placeholder library -
+         * so every shape this cannot parse, including a quoted atom, keeps the dep.
+         */
+        private fun environments(keywordValue: Quotable): List<String>? =
+            when (keywordValue) {
+                is ElixirAtom -> keywordValue.name?.let { listOf(it) }
+                is ElixirList ->
+                    keywordValue.children.stripAccessExpressions().map { element ->
+                        (element as? ElixirAtom)?.name ?: return null
+                    }
+                else -> null
+            }
+
+        private fun isTrue(keywordValue: Quotable): Boolean =
+            keywordValue is ElixirAtomKeyword && keywordValue.text == "true"
+
+        private const val PROD_ENVIRONMENT = "prod"
 
         /**
          * The options of a dep tuple, whether or not they are wrapped in a list.

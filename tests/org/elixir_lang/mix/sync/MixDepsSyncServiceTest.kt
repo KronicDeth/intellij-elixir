@@ -596,6 +596,38 @@ class MixDepsSyncServiceTest : PlatformTestCase() {
     }
 
     /**
+     * A dep that only a *dependency's* `mix.exs` declares, under options Mix honours by not fetching
+     * it, must not become a library.
+     *
+     * This is the whole point of the filter, seen from where the user sees it: such a library can
+     * never gain roots, because no `mix deps.get` in any environment will create the directory. The
+     * declaration is `cachex`'s own, which is what put `benchee` in a real project's
+     * `.idea/libraries`.
+     */
+    fun testDepDeclaredOnlyByADependencyUnderOnlyProducesNoLibrary() {
+        val myApp = MixTestFixtures.createMixRootWithDeps(myFixture, "filtered_app", "cachex")
+        MixTestFixtures.addDeps(myFixture, "filtered_app", "cachex")
+        MixTestFixtures.createDepMixExs(
+            myFixture,
+            "filtered_app/deps/cachex",
+            "{:benchee, \"~> 1.0\", optional: true, only: [:bench]}",
+        )
+
+        val service = project.service<MixDepsSyncService>()
+        val libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
+
+        service.clearPendingForTesting()
+        service.enqueue(SyncRequest.MixFile(myApp.findChild("mix.exs")!!))
+        drainDirectly(service)
+
+        assertNull(
+            "A dep Mix will never fetch must not become a library. " +
+                "Libraries: ${libraryTable.libraries.mapNotNull { it.name }}",
+            libraryTable.libraries.firstOrNull { it.name?.startsWith("benchee") == true },
+        )
+    }
+
+    /**
      * A `SyncRequest.SyncRoot` (produced by resolving a `BuildPath` event for a registered content
      * root) scopes the sync to that single content root's deps, not all content roots.
      *

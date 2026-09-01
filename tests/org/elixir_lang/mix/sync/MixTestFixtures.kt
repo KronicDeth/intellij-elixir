@@ -130,6 +130,40 @@ object MixTestFixtures {
     }
 
     /**
+     * Writes a `mix.exs` at [rootPath] declaring [depTuples] verbatim, and does **not** register a
+     * content root - the shape of a dependency's own package file.
+     *
+     * The tuples are source text rather than names so a caller can attach the option under test,
+     * which [createMixRootWithDeps]'s bare `{:name, ">= 0.0.0"}` output cannot express.
+     */
+    fun createDepMixExs(fixture: CodeInsightTestFixture, rootPath: String, depTuples: String): VirtualFile {
+        val root = fixture.tempDirFixture.findOrCreateDir(rootPath)
+        val application = rootPath.substringAfterLast('/')
+        val moduleName = application.split("_").joinToString("") { it.replaceFirstChar(Char::uppercase) }
+
+        fixture.tempDirFixture.createFile(
+            "$rootPath/mix.exs",
+            "defmodule ${moduleName}.MixProject do\n" +
+                "  use Mix.Project\n" +
+                "\n" +
+                "  def project do\n" +
+                "    [\n" +
+                "      app: :$application,\n" +
+                "      version: \"0.1.0\",\n" +
+                "      deps: deps()\n" +
+                "    ]\n" +
+                "  end\n" +
+                "\n" +
+                "  def deps do\n" +
+                "    [$depTuples]\n" +
+                "  end\n" +
+                "end\n"
+        )
+
+        return root
+    }
+
+    /**
      * Creates multiple independent (non-nested) Mix project roots.
      *
      * Each root path gets a `mix.exs`. Suitable for multi-module workspace fixtures and for the
