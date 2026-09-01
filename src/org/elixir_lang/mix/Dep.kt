@@ -60,9 +60,9 @@ data class Dep(val application: String, val path: String, val type: Type = Type.
 
             return if (stripped.isNotEmpty()) {
                 name(stripped[0])?.let { name ->
-                    val initial = Dep(application = name, path = "deps/$name")
+                    val initial = Options(Dep(application = name, path = "deps/$name"))
 
-                    if (stripped.size > 1) {
+                    val options = if (stripped.size > 1) {
                         stripped.last().let { it as? ElixirKeywords }?.keywordPairList?.let { keywordPairList ->
                             keywordPairList.fold(initial) { acc, keywordPair ->
                                 val key = keywordPair.keywordKey.text
@@ -73,8 +73,9 @@ data class Dep(val application: String, val path: String, val type: Type = Type.
                                     GUARDIAN_RUNTIME_TYPO, "sparse", "submodules", "system_env", "tag", "targets",
                                     EDELIVER_DISTILLERY_WARN_MISSING, "sha", "depth", "subdir", "warn_if_outdated" -> acc
 
-                                    "in_umbrella" -> acc.copy(path = "apps/$name", type = Type.MODULE)
-                                    "path" -> putPath(acc, keywordPair.keywordValue)
+                                    "in_umbrella" ->
+                                        acc.copy(dep = acc.dep.copy(path = "apps/$name", type = Type.MODULE))
+                                    "path" -> acc.copy(dep = putPath(acc.dep, keywordPair.keywordValue))
                                     else -> {
                                         Logger.error(
                                             logger,
@@ -89,11 +90,27 @@ data class Dep(val application: String, val path: String, val type: Type = Type.
                     } else {
                         initial
                     }
+
+                    options.resolve()
                 }
             } else {
                 null
             }
         }
+
+        /**
+         * The options of one dep tuple, accumulated across the whole fold before any is acted on.
+         *
+         * An option cannot always be applied where it is read. Two can combine into one path, Mix can
+         * apply a pair in a fixed order that need not match the order they are written, one can gate
+         * whether another applies at all and may appear after it, and one can mean different things
+         * depending on which `mix.exs` the tuple came from. Deciding once, at the end, is the only
+         * shape that accommodates any of that.
+         */
+        private data class Options(val dep: Dep)
+
+        /** The dep this tuple describes. */
+        private fun Options.resolve(): Dep = dep
 
         private val logger by lazy { com.intellij.openapi.diagnostic.Logger.getInstance(Dep::class.java) }
 
