@@ -76,6 +76,7 @@
   - **Dependency scanning waits for the IDE's Project Model to be fully loaded to avoid lost
     writes**, however it was triggered.
   - **External Libraries shows a dependency's name and location again.**
+  - **Bracketed dependency options such as `[path: "../dep"]` are read.**
 
 - [#3982](https://github.com/KronicDeth/intellij-elixir/pull/3982) [@sh41](https://github.com/sh41)
   - **A parameter of an `fn` that has no `->` yet no longer reports "Use scope for parameter not found

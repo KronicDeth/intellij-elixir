@@ -78,6 +78,37 @@ class DepTest : PlatformTestCase() {
         assertEquals(Dep.Type.MODULE, deps.single()?.type)
     }
 
+    // ---------------------------------------------------------------------
+    // Options written as an explicit list
+    // ---------------------------------------------------------------------
+
+    fun testBracketedPathIsHonoured() {
+        val (deps, errorTitles) = depsFrom("{:d, [path: \"../d\"]}")
+
+        assertEmpty("`path` is handled, bracketed or not", errorTitles)
+        assertEquals("../d", deps.single()?.path)
+    }
+
+    fun testBracketedInUmbrellaIsHonoured() {
+        val (deps, _) = depsFrom("{:d, [in_umbrella: true]}")
+
+        assertEquals("apps/d", deps.single()?.path)
+        assertEquals(Dep.Type.MODULE, deps.single()?.type)
+    }
+
+    /** An unknown option must still be reported when bracketed, or the tripwire has a blind spot. */
+    fun testBracketedUnknownOptionIsReported() {
+        val (_, errorTitles) = depsFrom("{:d, \"~> 1.0\", [not_a_mix_dep_option: true]}")
+
+        assertEquals(
+            listOf(
+                "Don't know if Mix.Dep option `not_a_mix_dep_option` is important for determining " +
+                        "location of dependency"
+            ),
+            errorTitles
+        )
+    }
+
     /**
      * Parses [depTuples] as the `deps` of a `mix.exs` and runs [Dep.from] over each tuple, returning
      * the deps in source order alongside the title of every error [Dep] logged.

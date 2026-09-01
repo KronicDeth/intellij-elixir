@@ -63,7 +63,7 @@ data class Dep(val application: String, val path: String, val type: Type = Type.
                     val initial = Options(Dep(application = name, path = "deps/$name"))
 
                     val options = if (stripped.size > 1) {
-                        stripped.last().let { it as? ElixirKeywords }?.keywordPairList?.let { keywordPairList ->
+                        keywords(stripped.last())?.keywordPairList?.let { keywordPairList ->
                             keywordPairList.fold(initial) { acc, keywordPair ->
                                 val key = keywordPair.keywordKey.text
 
@@ -111,6 +111,21 @@ data class Dep(val application: String, val path: String, val type: Type = Type.
 
         /** The dep this tuple describes. */
         private fun Options.resolve(): Dep = dep
+
+        /**
+         * The options of a dep tuple, whether or not they are wrapped in a list.
+         *
+         * `{:dep, "~> 1.0", optional: true}` and `{:dep, "~> 1.0", [optional: true]}` are the same
+         * declaration and both are written in the wild - `ecto` brackets neither, `db_connection`
+         * brackets its `optional:`. Only the bare form was read, so the bracketed one silently had
+         * every option ignored, `path:` and `in_umbrella:` included.
+         */
+        private fun keywords(optionsElement: PsiElement): ElixirKeywords? =
+            optionsElement as? ElixirKeywords
+                ?: (optionsElement as? ElixirList)
+                    ?.children
+                    ?.singleOrNull()
+                    ?.stripAccessExpression() as? ElixirKeywords
 
         private val logger by lazy { com.intellij.openapi.diagnostic.Logger.getInstance(Dep::class.java) }
 
