@@ -491,7 +491,8 @@
     TILDE = "~"
     TRUE = "true"
     TUPLE_OPERATOR = "{}"
-    TWO_OPERATOR = "++, --, <>"
+    // https://github.com/elixir-lang/elixir/pull/9954
+    TWO_OPERATOR = "++, --, <>, +++, ---"
     // https://github.com/elixir-lang/elixir/commit/3487d00ddb5e90c7cf0e65d03717903b9b27eafd
     THREE_OPERATOR = "^^^"
     TYPE_OPERATOR = "::"
@@ -1220,6 +1221,7 @@ matchedTernaryOperation ::= matchedExpression ternaryInfixOperator matchedExpres
  * Two Operation - right-associative
  *
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L63
+ * @see https://github.com/elixir-lang/elixir/pull/9954 for +++ and ---
  */
 
 twoInfixOperator ::= RANGE_OPERATOR | TWO_OPERATOR
@@ -1229,7 +1231,7 @@ twoInfixOperator ::= RANGE_OPERATOR | TWO_OPERATOR
                          operatorTokenSet
                          quote
                        ]
-                       name = "++, --, .., <>"
+                       name = "++, --, .., <>, +++, ---"
                      }
 // implements and methods defined by "infix operations" section above
 matchedTwoOperation ::= matchedExpression twoInfixOperator matchedExpression

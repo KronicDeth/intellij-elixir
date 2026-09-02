@@ -4439,7 +4439,7 @@ IntelliJ Elixir's internal formatter can reformat code to follow a consistent st
   * `<~`, `|>`, `~>`, `<<<`, `<<~`, `<|>`, `<~>`, `>>>`, and `~>>`
   * `..`
   * `^^^`
-  * `++`, `--`, `..`, `<>`
+  * `++`, `--`, `..`, `<>`, `+++`, `---`
   * `=>`
 * Configure spaces before...
   * `,`
@@ -4468,7 +4468,7 @@ IntelliJ Elixir's internal formatter can reformat code to follow a consistent st
 * Indent tuple elements when wrapped
 * Align type definition to right of `::`
 * Align guard to right of `when` when guards span multiple lines
-* Align two operator (`++`, `--`, `..`, `<>`) operands, so that `<>` binaries are multiple lines align their starts instead of using continuation indent and being indented relative to first operand.
+* Align two operator (`++`, `--`, `..`, `<>`, `+++`, `---`) operands, so that `<>` binaries are multiple lines align their starts instead of using continuation indent and being indented relative to first operand.
 * Align pipe `|` operands, so that alternates in types and specs are aligned instead of continuation indented relative to the first operand.
 * Comments in `spec` (that is above operands to `|` align with the operands
 * Remove newlines from pipelines, so that all pipelines start with an initial value or call and each `|>` is the start of a successive line.

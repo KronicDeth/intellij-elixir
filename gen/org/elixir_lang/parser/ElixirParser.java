@@ -3566,9 +3566,9 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   // RANGE_OPERATOR | TWO_OPERATOR
   public static boolean twoInfixOperator(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "twoInfixOperator")) return false;
-    if (!nextTokenIs(b, "<++, --, .., <>>", RANGE_OPERATOR, TWO_OPERATOR)) return false;
+    if (!nextTokenIs(b, "<++, --, .., <>, +++, --->", RANGE_OPERATOR, TWO_OPERATOR)) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, TWO_INFIX_OPERATOR, "<++, --, .., <>>");
+    Marker m = enter_section_(b, l, _NONE_, TWO_INFIX_OPERATOR, "<++, --, .., <>, +++, --->");
     r = consumeToken(b, RANGE_OPERATOR);
     if (!r) r = consumeToken(b, TWO_OPERATOR);
     exit_section_(b, l, m, r, false, null);

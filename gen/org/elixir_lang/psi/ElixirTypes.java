@@ -303,7 +303,7 @@ public interface ElixirTypes {
   IElementType TILDE = new ElixirTokenType("~");
   IElementType TRUE = new ElixirTokenType("true");
   IElementType TUPLE_OPERATOR = new ElixirTokenType("{}");
-  IElementType TWO_OPERATOR = new ElixirTokenType("++, --, <>");
+  IElementType TWO_OPERATOR = new ElixirTokenType("++, --, <>, +++, ---");
   IElementType TYPE_OPERATOR = new ElixirTokenType("::");
   IElementType UNARY_OPERATOR = new ElixirTokenType("~~~, !, ^");
   IElementType UNICODE_ESCAPE_CHARACTER = new ElixirTokenType("u");

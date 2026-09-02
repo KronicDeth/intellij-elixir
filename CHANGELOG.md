@@ -60,6 +60,9 @@
 
 ### Bug Fixes
 
+- [#3991](https://github.com/KronicDeth/intellij-elixir/pull/3991) [@sh41](https://github.com/sh41)
+  - **The `+++` and `---` operators are now parsed.** Fixes [#2755](https://github.com/KronicDeth/intellij-elixir/issues/2755).
+
 - [#3982](https://github.com/KronicDeth/intellij-elixir/pull/3982) [@sh41](https://github.com/sh41)
   - **A parameter of an `fn` that has no `->` yet no longer reports "Use scope for parameter not found
     before reaching file scope".** The scope search stopped at a definition clause, a delegation, a call

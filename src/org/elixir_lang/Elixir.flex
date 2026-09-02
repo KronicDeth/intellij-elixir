@@ -164,6 +164,10 @@ THREE_TOKEN_MAP_OPERATOR = "%" {OPENING_CURLY} {CLOSING_CURLY}
 THREE_TOKEN_OR_SYMBOL_OPERATOR = "|||"
 // https://github.com/elixir-lang/elixir/commit/3487d00ddb5e90c7cf0e65d03717903b9b27eafd
 THREE_TOKEN_THREE_OPERATOR = "^^^"
+// Custom operators Elixir parses into the same class as ++, -- and <> without defining them.
+// https://github.com/elixir-lang/elixir/pull/9954
+THREE_TOKEN_TWO_OPERATOR = "+++" |
+                           "---"
 THREE_TOKEN_NOT_OPERATOR = "not"
 THREE_TOKEN_UNARY_OPERATOR = "~~~"
 
@@ -174,6 +178,7 @@ THREE_TOKEN_OPERATOR = {THREE_TOKEN_AND_SYMBOL_OPERATOR} |
                        {THREE_TOKEN_MAP_OPERATOR} |
                        {THREE_TOKEN_OR_SYMBOL_OPERATOR} |
                        {THREE_TOKEN_THREE_OPERATOR} |
+                       {THREE_TOKEN_TWO_OPERATOR} |
                        {THREE_TOKEN_UNARY_OPERATOR} |
                        {THREE_TOKEN_NOT_OPERATOR} |
                        "..."
@@ -297,7 +302,8 @@ SUBTRACTION_OPERATOR = {ONE_TOKEN_SUBTRACTION_OPERATOR}
 // https://github.com/elixir-lang/elixir/commit/3487d00ddb5e90c7cf0e65d03717903b9b27eafd
 THREE_OPERATOR = {THREE_TOKEN_THREE_OPERATOR}
 TUPLE_OPERATOR = {TWO_TOKEN_TUPLE_OPERATOR}
-TWO_OPERATOR = {TWO_TOKEN_TWO_OPERATOR}
+TWO_OPERATOR = {TWO_TOKEN_TWO_OPERATOR} |
+               {THREE_TOKEN_TWO_OPERATOR}
 TYPE_OPERATOR = {TWO_TOKEN_TYPE_OPERATOR}
 UNARY_OPERATOR = {THREE_TOKEN_UNARY_OPERATOR} |
                  {ONE_TOKEN_UNARY_OPERATOR}
