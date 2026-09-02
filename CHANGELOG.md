@@ -130,9 +130,6 @@
   - **Go To Definition on a capture of a decompiled function now navigates.** `&:queue.new/0` went
     nowhere while `:queue.new()` opened the decompiled module, because the capture dropped every
     result that was not already source PSI.
-  - Captures are now covered by the Go To Definition, Find Usages, arity and protocol-function
-    suites as well, which previously exercised only ordinary calls. Refs
-    [#1810](https://github.com/KronicDeth/intellij-elixir/issues/1810).
 
 - [#3971](https://github.com/KronicDeth/intellij-elixir/pull/3971) [@sh41](https://github.com/sh41)
   - **A module attribute declared in a `__using__` macro's `quote` block resolves again.** Since
@@ -251,8 +248,6 @@
     script or style content.
   - **`<% %>` tags that produce no output (comments, `<% if %>`) no longer inject placeholder text**
     into the HTML tree.
-  - **Other HTML-based template languages are no longer affected by HEEx's outer-language patcher**,
-    which ran for every HTML-data template language in the IDE.
   - **HEEx's special attributes and `phx-` bindings are no longer reported as "not allowed here"
     on HTML tags**: `:let`, `:if`, `:for`, `:key`, `:type` and every `phx-*` binding.
   - **`<:slot>` tags are no longer validated as HTML elements.** `<:col>` was checked against HTML's
@@ -487,17 +482,15 @@
   - **BEAM viewer improvement (View → Tool Windows → BEAM Viewer):** the StrT (string table) tab now shows individual strings with their lengths and auto-sizes columns.
 - [#3852](https://github.com/KronicDeth/intellij-elixir/pull/3852) - [@sh41](https://github.com/sh41)
   - **Fewer "unknown AST node" warnings when decompiling OTP 26+ BEAM files.** Map comprehension nodes (`m_generate`, `mc`) introduced in OTP 26 are now decompiled correctly.
-- [#3836](https://github.com/KronicDeth/intellij-elixir/pull/3836) - [@joshuataylor](https://github.com/joshuataylor)
-  - Mix settings and Mix deps checking reworked, Experimental Settings added, and mise SDK detection improved.
+  - Elixir settings consolidated -- renamed "Experimental Settings" to "Elixir Settings" and moved all settings into the top-level Elixir configurable (no more separate child page).
+  - Mix deps checker setting -- added an "Enable automatic Mix deps checking" toggle (default enabled) under Elixir Settings. When disabled, no deps check runs on project open or file changes. The checker also skips with a debug log when no Elixir SDK is configured, instead of showing the unhelpful "Mix deps check failed" notification.
+  - Erlang SDK prompt for mise Elixir SDKs -- when adding a mise-detected Elixir SDK without an Erlang SDK registered, a chooser dialog now lists valid mise-installed Erlang SDKs (sorted newest first, broken installations filtered out). The selected Erlang SDK is registered and linked automatically.
+  - Status bar widget -- when no Elixir SDK is configured, the widget popup now shows a "Detected Elixir SDKs" section listing valid mise installations. Clicking one registers the Elixir SDK, prompts for Erlang if needed, and sets it as the project SDK.
+  - **Adding an Elixir SDK in Project Structure now links an Erlang SDK that is already registered**, instead of leaving the Erlang SDK unset.
 - [#3843](https://github.com/KronicDeth/intellij-elixir/pull/3843) - [@sh41](https://github.com/sh41)
   - **The New Project Wizard now configures the Elixir SDK correctly.** SDK type handling was also split into single-responsibility objects.
 - [#3891](https://github.com/KronicDeth/intellij-elixir/pull/3891) - [@makoto-developer](https://github.com/makoto-developer)
   - **README typo fixes** (`Subcription`, `referneced`, `Configuations`, `Wih`) - a first contribution, thank you!
-- Elixir settings consolidated -- renamed "Experimental Settings" to "Elixir Settings" and moved all settings into the top-level Elixir configurable (no more separate child page). - [@joshuataylor](https://github.com/joshuataylor)
-- Mix deps checker setting -- added an "Enable automatic Mix deps checking" toggle (default enabled) under Elixir Settings. When disabled, no deps check runs on project open or file changes. The checker also skips with a debug log when no Elixir SDK is configured, instead of showing the unhelpful "Mix deps check failed" notification. - [@joshuataylor](https://github.com/joshuataylor)
-- Erlang SDK prompt for mise Elixir SDKs -- when adding a mise-detected Elixir SDK without an Erlang SDK registered, a chooser dialog now lists valid mise-installed Erlang SDKs (sorted newest first, broken installations filtered out). The selected Erlang SDK is registered and linked automatically. - [@joshuataylor](https://github.com/joshuataylor)
-- Status bar widget -- when no Elixir SDK is configured, the widget popup now shows a "Detected Elixir SDKs" section listing valid mise installations. Clicking one registers the Elixir SDK, prompts for Erlang if needed, and sets it as the project SDK. - [@joshuataylor](https://github.com/joshuataylor)
-- When an Elixir SDK is added via Project Structure and no Erlang SDK is explicitly set, `configureInternalErlangSdk` now falls back to any Erlang SDK already registered in `ProjectJdkTable`. - [@joshuataylor](https://github.com/joshuataylor)
 
 ### Bug Fixes
 
@@ -583,40 +576,32 @@
 
 ### Enhancements
 
+- [#3821](https://github.com/KronicDeth/intellij-elixir/pull/3821) - [@sh41](https://github.com/sh41)
+  - MFA tuple reference resolution: Go-to-Declaration, Find Usages, and hover documentation now work on `:function` atoms inside `{Module, :function, arity}` MFA tuples. Covers Supervisor child specs, `@doc delegate_to:` attributes, and general MFA references throughout Elixir code.
+  - Supports both Elixir modules (`{Enum, :map, 2}`) and Erlang modules (`{:math, :sqrt, 1}`). Arity can be an integer literal, an args list (`[arg1, arg2]`), or a dynamic expression/wildcard (resolves with `isValidResult=false` for navigation support without error highlighting).
+  - New `UnresolvableModuleQualifier` inspection (`enabledByDefault=true`, error level) flags unresolvable module qualifiers in qualified calls. Highlights the qualifier itself, not the entire call expression.
+  - False-positive guards: dynamic qualifiers (module attributes, variables, function call results, bracket access, chained calls), injected doc code fragments (`@doc`/`@moduledoc` heredocs), non-source roots, Phoenix `Router.Helpers` (verifies parent Router module exists, handles both FQN and aliased forms), and opaque `use` calls where `__using__/1` macro cannot be traced (e.g. `ExUnit.CaseTemplate`).
+  - Go to Declaration and Find Usages now prefer a module's Elixir source over its decompiled `.beam`.
+
+### Bug Fixes
+
+- [#3832](https://github.com/KronicDeth/intellij-elixir/pull/3832), [#3831](https://github.com/KronicDeth/intellij-elixir/pull/3831) - [@joshuataylor](https://github.com/joshuataylor)
+  - The IDE no longer crashes or freezes on 2025.2+ during bulk decompilation, project import, dependency scanning, reference search, Credo and Dialyzer runs, or status-bar SDK updates. Project-model and PSI access from background threads now takes a read lock, and the Dialyzer inspection no longer holds it while waiting for the external process.
+  - Downgraded non-critical decompiler/documentation-provider errors from `Logger.error()` to `logger.warn()`. `Logger.error()` creates a `Throwable` and shows an IDE error notification in internal mode -- too noisy for situations where code simply doesn't recognise an element (unknown Erlang AST nodes from newer OTP versions, missing decompiled functions, unhandled element types).
+
+### Threading / Platform Hygiene
+
+- [#3833](https://github.com/KronicDeth/intellij-elixir/pull/3833) - [@joshuataylor](https://github.com/joshuataylor)
+  - Added `@RequiresReadLock` annotations to PSI-accessing methods across 10 files (`CallDefinitionClause`, `Definition`, `Implementation`, `Module`, `Protocol`, `ElixirPsiImplUtil`, `PsiElementImpl`, `PsiNamedElementImpl`, `CallImpl`, `CanonicallyNamedImpl`). Enables the `ThreadingConcurrency` inspection to statically detect callers that don't hold the read lock.
+
+### Build / CI
+
 - [#3822](https://github.com/KronicDeth/intellij-elixir/pull/3822) - [@sh41](https://github.com/sh41)
   - Moved 108 hand-written `.kt`/`.java` files from `gen/` to `src/` -- these files were vulnerable to silent overwrite by parser regeneration. Regenerating `gen/` previously clobbered them with GrammarKit stubs, causing `StackOverflowError` at runtime when hand-written interface names matched BNF rule names (visitor generates self-recursive methods).
   - Renamed 3 PSI interfaces to avoid GrammarKit visitor collisions: `Heredoc` -> `HeredocLiteral`, `HeredocLine` -> `HeredocLineable`, `SigilHeredoc` -> `SigilHeredocLiteral`.
   - Consolidated ambiguous `ElixirPsiImplUtil` overloads (`processDeclarations`, `getNameIdentifier`, `getReference`) using Java 21 pattern matching switch expressions so that hand edits are no longer needed in generated files after parser regeneration.
   - Marked `gen/` as generated sources in Gradle (`idea.module.generatedSourceDirs`) to suppress inspections on GrammarKit-generated PSI classes.
   - `CONTRIBUTING.md` updated with comprehensive GrammarKit usage conventions: rule names vs interface names, visitor collision avoidance, `extends`/`mixin`/`fake` rules, `ElixirPsiImplUtil` method resolution and ambiguity pitfalls, source layout (`gen/` vs `src/`), CRLF conversion, and testing workflow after BNF changes.
-- [#3821](https://github.com/KronicDeth/intellij-elixir/pull/3821) - [@sh41](https://github.com/sh41)
-  - MFA tuple reference resolution: Go-to-Declaration, Find Usages, and hover documentation now work on `:function` atoms inside `{Module, :function, arity}` MFA tuples. Covers Supervisor child specs, `@doc delegate_to:` attributes, and general MFA references throughout Elixir code.
-  - Supports both Elixir modules (`{Enum, :map, 2}`) and Erlang modules (`{:math, :sqrt, 1}`). Arity can be an integer literal, an args list (`[arg1, arg2]`), or a dynamic expression/wildcard (resolves with `isValidResult=false` for navigation support without error highlighting).
-  - Implemented via `MfaTupleReferenceContributor` + `MfaTupleReferenceProvider` + `MfaFunctionReference` (poly-variant, uses `ResolveCache`). `ElixirAtomMixin` registered as `HintedReferenceHost` so `PsiReferenceService` picks up contributed references. Soft reference -- unresolvable MFA tuples produce no error highlighting.
-  - New `UnresolvableModuleQualifier` inspection (`enabledByDefault=true`, error level) flags unresolvable module qualifiers in qualified calls. Highlights the qualifier itself, not the entire call expression.
-  - False-positive guards: dynamic qualifiers (module attributes, variables, function call results, bracket access, chained calls), injected doc code fragments (`@doc`/`@moduledoc` heredocs), non-source roots, Phoenix `Router.Helpers` (verifies parent Router module exists, handles both FQN and aliased forms), and opaque `use` calls where `__using__/1` macro cannot be traced (e.g. `ExUnit.CaseTemplate`).
-  - Resolver source-over-decompiled preference consolidated into `Resolver.preferred()`. Previous order: `valid -> same-module`. New order: `valid -> source -> same-module`. Redundant `preferSource()` call removed from `TargetElementEvaluator.getTargetCandidates()`. `Nested.kt` ordering updated to match.
-- [#3833](https://github.com/KronicDeth/intellij-elixir/pull/3833) - [@joshuataylor](https://github.com/joshuataylor)
-  - Added `@RequiresReadLock` annotations to PSI-accessing methods across 10 files (`CallDefinitionClause`, `Definition`, `Implementation`, `Module`, `Protocol`, `ElixirPsiImplUtil`, `PsiElementImpl`, `PsiNamedElementImpl`, `CallImpl`, `CanonicallyNamedImpl`). Enables the `ThreadingConcurrency` inspection to statically detect callers that don't hold the read lock.
-
-### Bug Fixes
-
-- [#3832](https://github.com/KronicDeth/intellij-elixir/pull/3832) - [@joshuataylor](https://github.com/joshuataylor)
-  - `BulkDecompilation` -- wrapped `ModuleManager.modules`, `ModuleRootManager.sdk`/`.contentRoots`, and `ProjectRootManager.projectSdk` access in `readAction {}`. Previously accessed on `Dispatchers.Default` without a read lock, causing crashes on 2025.2+.
-  - `DirectoryConfigurator` -- wrapped `ModuleManager.getInstance(otpAppProject).modules` in `ReadAction.nonBlocking` inside `Task.Backgroundable` for newly attached umbrella sub-projects.
-- [#3831](https://github.com/KronicDeth/intellij-elixir/pull/3831) - [@joshuataylor](https://github.com/joshuataylor)
-  - Dialyzer inspection -- use explicit `runReadAction` blocks around PSI and module-model access instead of `isReadActionNeeded = true`. The previous approach (`isReadActionNeeded = true`) held the read lock for the entire inspection run including `waitFor()` on the Dialyzer process, blocking writes. Now the read lock is acquired only for the PSI/model access windows.
-  - Status bar SDK widget -- restructured `updateWidget()` to run `detectSdkStatus()` on the widget's coroutine scope (background thread with read action) and dispatch UI updates via `Dispatchers.EDT`. Previously ran SDK/module-model queries without a read lock, crashing on 2025.2+.
-  - Reference search (`ReferencesSearch.java`) -- wrapped PSI access (`Implementation.is`, `Module.is`, `getName`, `getLanguage`) in `ReadAction.nonBlocking().executeSynchronously()`. `processQuery` runs on a pooled thread without a read lock.
-  - `OtpApp.kt` -- merged `elixirFile()` and `appList()` PSI traversal into a single read action. Previously `appList()` ran heavy PSI walking (`.modulars()`, `.macroChildCallList()`, `nameArityInterval()`) outside the read action returned by `computeReadAction`.
-  - `DepsWatcher` and `DepsCheckerService` -- wrapped `ProjectRootManager`, `ModuleManager`, and `ModuleRootManager` access in `ReadAction.nonBlocking`. These run on `Alarm(POOLED_THREAD)` callbacks without a read lock.
-  - Mix `Watcher` -- wrapped `ModuleRootManager.getInstance(module).contentRoots` in `ReadAction.nonBlocking`. Runs inside `Task.Backgroundable` without a read lock.
-  - Credo inspection -- wrapped `ModuleManager.getInstance(project).modules` model access in the `workingDirectorySet()` method with a read action. The inspection uses `isReadActionNeeded = false` and module-model access was unprotected.
-  - `ReconfigureModuleSetupAction` -- wrapped `ModuleManager.getInstance(project).modules` and `ElixirSdkType.mostSpecificSdk(project)` in `update()` with `ReadAction.nonBlocking`. `ActionUpdateThread.BGT` does not guarantee a read lock since 2024.2.
-  - Downgraded non-critical decompiler/documentation-provider errors from `Logger.error()` to `logger.warn()`. `Logger.error()` creates a `Throwable` and shows an IDE error notification in internal mode -- too noisy for situations where code simply doesn't recognise an element (unknown Erlang AST nodes from newer OTP versions, missing decompiled functions, unhandled element types).
-
-### Build / CI
-
 - [#3830](https://github.com/KronicDeth/intellij-elixir/pull/3830) - [@joshuataylor](https://github.com/joshuataylor)
   - Bumped IntelliJ 2026.1.x target to 2026.1.2.
 - [#3832](https://github.com/KronicDeth/intellij-elixir/pull/3832) - [@joshuataylor](https://github.com/joshuataylor)
@@ -631,21 +616,19 @@
 
 - [#3817](https://github.com/KronicDeth/intellij-elixir/pull/3817) - [@sh41](https://github.com/sh41)
   - All Elixir settings panels (Credo, Dialyzer, SDKs, Experimental Settings) grouped under a single "Elixir" parent configurable in both full IDEs and small IDEs (RubyMine, PyCharm, etc.). Dropped redundant "Elixir" prefixes from child panel display names.
-  - Top-level configurable selection refactored to a service-provider strategy (`TopLevelElixirConfigurableFactory`) with small IDE and rich platform implementations, replacing the `isSmallIde` class detection approach.
   - Settings search indexing via `ElixirSearchableOptionContributor` -- typing "credo", "dialyzer", "elixir", or "liveview" in the Settings search box now surfaces the relevant Elixir settings pages.
   - Credo inspection -- umbrella project support: `resolveCredoWorkingDirectory` walks up from `apps/<app>` content roots to the umbrella root so Credo runs once per umbrella root instead of once per app. Working directories deduplicated by ancestor path.
   - Credo inspection -- execution failure surfacing: failures (missing SDK, missing Credo dependency, compilation errors) now appear as inspection problems on `mix.exs` and as aggregated IDE notifications, instead of being silently dropped.
   - Credo inspection -- partial result preservation: when a Credo run emits some findings before hitting a fatal error, the findings are kept and a warning notification is shown alongside them.
-  - Flycheck output parsing extracted and hardened: two-phase approach (record split, then location parse) correctly handles line+column, line-only, and file-level findings. Invalid paths and out-of-range offsets logged at debug level instead of crashing the inspection run.
-  - `--mute-exit-status` added to Credo command line so lint-level exit codes are not treated as execution failures.
+  - Credo inspection -- a finding with an unusual location no longer aborts the run: line-and-column, line-only and file-level findings are all handled, and an invalid path is skipped rather than failing the inspection.
+  - Credo inspection -- findings no longer report as an execution failure; a lint-level exit code is expected, not an error.
 
 ### Bug Fixes
 
 - [#3817](https://github.com/KronicDeth/intellij-elixir/pull/3817) - [@sh41](https://github.com/sh41)
-  - Credo inspection read-action lock churn: consolidated 4-6 separate `runReadAction(Computable { })` calls per output line into a single `runReadAction {}` block per finding. Under 2025.3+ writer-preference locking, the repeated lock acquire/release blocked the EDT when a write action was pending. Partially fixes [#3790](https://github.com/KronicDeth/intellij-elixir/issues/3790).
-  - Credo "Configure credo" notification action used internal `ShowSettingsUtilImpl` API -- replaced with `ShowSettingsUtil.getInstance()` and added `project.isDisposed` guard.
+  - Credo inspection -- the editor no longer stalls while a run reports its findings, under 2025.3+ writer-preference locking. Partially fixes [#3790](https://github.com/KronicDeth/intellij-elixir/issues/3790).
+  - Credo "Configure credo" notification link opens the Credo settings page again -- it still pointed at the old Editor > Inspections > Errors location after the settings moved under Elixir.
   - Credo and Dialyzer configurable IDs (`"Credo"`, `"Dialyzer"`) collided with display names -- separated into distinct `language.elixir.credo` / `language.elixir.dialyzer` IDs.
-  - Java-style `//` comment in `plugin.xml` replaced with proper XML `<!-- -->` comment.
 
 ## [23.4.0] - 2026-05-15
 
