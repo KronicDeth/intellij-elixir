@@ -182,6 +182,20 @@ public class CallDefinitionClauseTest extends PlatformTestCase {
         assertEquals("(value, fallback) when is_binary(value) (/src/no_bare_head_fallback_declaration.ex defmodule Prefix.NoBareHeadFallbackDeclaration)", lookupElementPresentation.getTailText());
     }
 
+    public void testQualifiedFunctionOfferedWhenLastStatementInBlock() {
+        myFixture.configureByFiles("last_statement_usage.ex", "following_statement_declaration.ex");
+        myFixture.complete(CompletionType.BASIC, 1);
+
+        assertCompletionOffersExactly(myFixture.getLookupElementStrings(), "public_function1", "public_function2");
+    }
+
+    public void testQualifiedFunctionOfferedWhenAnotherStatementFollowsInBlock() {
+        myFixture.configureByFiles("following_statement_usage.ex", "following_statement_declaration.ex");
+        myFixture.complete(CompletionType.BASIC, 1);
+
+        assertCompletionOffersExactly(myFixture.getLookupElementStrings(), "public_function1", "public_function2");
+    }
+
     /*
      * Protected Instance Methods
      */
