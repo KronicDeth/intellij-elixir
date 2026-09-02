@@ -20,7 +20,7 @@ Elixir File(0,32)
           ElixirSigilModifiersImpl(SIGIL_MODIFIERS)(14,14)
             <empty list>
       ElixirTwoInfixOperatorImpl(TWO_INFIX_OPERATOR)(14,16)
-        PsiElement(++, --, <>)('<>')(14,16)
+        PsiElement(++, --, <>, +++, ---)('<>')(14,16)
       PsiWhiteSpace('\n      ')(16,23)
       ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(23,32)
         ElixirInterpolatedSigilLineImpl(INTERPOLATED_SIGIL_LINE)(23,32)

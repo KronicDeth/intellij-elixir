@@ -23,7 +23,7 @@ Elixir File(0,46)
                   ElixirSigilModifiersImpl(SIGIL_MODIFIERS)(15,15)
                     <empty list>
               ElixirTwoInfixOperatorImpl(TWO_INFIX_OPERATOR)(15,17)
-                PsiElement(++, --, <>)('<>')(15,17)
+                PsiElement(++, --, <>, +++, ---)('<>')(15,17)
               PsiWhiteSpace(' ')(17,18)
               UNMATCHED_UNQUALIFIED_NO_ARGUMENTS_CALL(18,23)
                 ElixirIdentifierImpl(IDENTIFIER)(18,23)
