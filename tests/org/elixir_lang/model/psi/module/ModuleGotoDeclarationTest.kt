@@ -108,4 +108,18 @@ class ModuleGotoDeclarationTest : PlatformTestCase() {
         assertEquals("MyApp.B", ModuleSymbol.moduleNameText(declaration))
     }
 
+    fun testGoToDeclarationFromAliasedQualifierOfACrossFileCallNavigatesToDefmodule() {
+        myFixture.configureByFiles(
+            "goto_declaration_alias_qualified_call.ex",
+            "goto_declaration_alias_qualified_call_target.ex"
+        )
+        // An `alias` in scope plus the aliased name used as a remote-call qualifier, with the defmodule
+        // in another file. assertGotoDeclarationLandsIn requires a SINGLE target, which is the assertion
+        // that matters: the legacy PsiReference layer deliberately reports two results here - the
+        // defmodule and the `alias` line, per AsTest1.testReference - and only hosting the module
+        // reference on the alias keeps the gesture from offering that chooser.
+        val declaration = myFixture.assertGotoDeclarationLandsIn("MyApp", "a defmodule declaration") { Module.`is`(it) }
+        assertEquals("MyApp.Module", ModuleSymbol.moduleNameText(declaration))
+    }
+
 }
