@@ -80,6 +80,8 @@
   - **A `sparse:` and/or `subdir:` git dependency is now located correctly.** Refs [#3928](https://github.com/KronicDeth/intellij-elixir/issues/3928).
   - **A dependency's own dependencies are located correctly.** Refs [#3928](https://github.com/KronicDeth/intellij-elixir/issues/3928).
   - **Bracketed dependency options such as `[path: "../dep"]` are read.**
+  - **An umbrella app's dependencies resolve when each app is its own module.** Refs
+    [#3986](https://github.com/KronicDeth/intellij-elixir/issues/3986).
 
 - [#3982](https://github.com/KronicDeth/intellij-elixir/pull/3982) [@sh41](https://github.com/sh41)
   - **A parameter of an `fn` that has no `->` yet no longer reports "Use scope for parameter not found

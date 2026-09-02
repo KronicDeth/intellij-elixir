@@ -14,6 +14,7 @@ import com.intellij.psi.util.CachedValuesManager.getCachedValue
 import com.intellij.util.IncorrectOperationException
 import org.elixir_lang.PackageManager
 import org.elixir_lang.mix.Dep
+import org.elixir_lang.mix.Project.MIX_EXS
 import org.elixir_lang.package_manager.virtualFile
 import java.util.*
 
@@ -51,7 +52,7 @@ class Resolution(
                 val rootVirtualFile = rootVirtualFileQueue.remove()
 
                 if (!rootVirtualFileToDepSet.containsKey(rootVirtualFile)) {
-                    val depSet = rootVirtualFileToDepSet(
+                    val (depSet, declaredDepsPath) = rootVirtualFileToPackageDeps(
                         psiManager,
                         progressIndicator,
                         rootVirtualFile,
@@ -69,7 +70,12 @@ class Resolution(
                         if (dep.type == Dep.Type.LIBRARY) {
                             if (!depToRootVirtualFile.contains(dep)) {
                                 val depRootVirtualFile =
-                                    depRootVirtualFile(dep, rootVirtualFile, projectRootVirtualFiles)
+                                    depRootVirtualFile(
+                                        dep,
+                                        rootVirtualFile,
+                                        projectRootVirtualFiles,
+                                        declaredDepsPath
+                                    )
 
                                 depToRootVirtualFile[dep] = depRootVirtualFile
 
@@ -110,16 +116,25 @@ class Resolution(
         private fun depRootVirtualFile(
             dep: Dep,
             declaringRootVirtualFile: VirtualFile,
-            projectRootVirtualFiles: Set<VirtualFile>
+            projectRootVirtualFiles: Set<VirtualFile>,
+            declaredDepsPath: String?
         ): VirtualFile? {
-            val owningProjectRoot = if (dep.path.startsWith(MIX_DEPS_DIRECTORY_PREFIX)) {
+            if (dep.path.startsWith(MIX_DEPS_DIRECTORY_PREFIX)) {
+                val relativeToDepsDirectory = dep.path.removePrefix(MIX_DEPS_DIRECTORY_PREFIX)
+
+                // A declared `deps_path:` is the file saying outright where its deps live, so it
+                // beats anything inferred from the directory layout.
+                declaredDepsPath
+                    ?.let { declaringRootVirtualFile.findFileByRelativePath(it) }
+                    ?.findFileByRelativePath(relativeToDepsDirectory)
+                    ?.let { return it }
+
                 owningProjectRoot(declaringRootVirtualFile, projectRootVirtualFiles)
-            } else {
-                null
+                    ?.findFileByRelativePath(dep.path)
+                    ?.let { return it }
             }
 
-            return owningProjectRoot?.findFileByRelativePath(dep.path)
-                ?: dep.virtualFile(declaringRootVirtualFile)
+            return dep.virtualFile(declaringRootVirtualFile)
         }
 
         /**
@@ -141,29 +156,32 @@ class Resolution(
                 ?: return null
 
             while (true) {
+                // An umbrella imported one module per app hands in only `apps/<app>`, so requiring
+                // the umbrella root to be among them would strand every such app. A `mix.exs` above
+                // an `apps` directory is an umbrella whether or not the caller named it.
                 val umbrella = root.parent
                     ?.takeIf { it.name == UMBRELLA_APPS_DIRECTORY_NAME }
                     ?.parent
-                    ?.takeIf { it in projectRootVirtualFiles }
+                    ?.takeIf { it in projectRootVirtualFiles || it.findChild(MIX_EXS) != null }
                     ?: return root
 
                 root = umbrella
             }
         }
 
-        private suspend fun rootVirtualFileToDepSet(
+        private suspend fun rootVirtualFileToPackageDeps(
             psiManager: PsiManager,
             progressIndicator: ProgressIndicator,
             rootVirtualFile: VirtualFile,
             isDependency: Boolean
-        ): Set<Dep> {
+        ): PackageDeps {
             progressIndicator.text2 = "Finding package file under ${rootVirtualFile.path}"
             val packageManagerVirtualFile = virtualFile(rootVirtualFile)
 
             return if (packageManagerVirtualFile != null) {
                 val (packageManager, packageVirtualFile) = packageManagerVirtualFile
 
-                packageVirtualFileToDepSet(
+                packageVirtualFileToPackageDeps(
                     psiManager,
                     progressIndicator,
                     packageManager,
@@ -171,17 +189,17 @@ class Resolution(
                     isDependency
                 )
             } else {
-                emptySet()
+                PackageDeps.EMPTY
             }
         }
 
-        private suspend fun packageVirtualFileToDepSet(
+        private suspend fun packageVirtualFileToPackageDeps(
             psiManager: PsiManager,
             progressIndicator: ProgressIndicator,
             packageManager: PackageManager,
             packageVirtualFile: VirtualFile,
             isDependency: Boolean
-        ): Set<Dep> {
+        ): PackageDeps {
             // WARA: acquires the read lock without blocking the EDT. If a write action preempts,
             // readAction restarts the lambda. IncorrectOperationException can occur when the
             // VirtualFile is no longer valid (e.g., deleted while we waited for the lock).
@@ -196,9 +214,9 @@ class Resolution(
             return if (packagePsiFile != null && !progressIndicator.isCanceled) {
                 progressIndicator.text2 = "Finding deps in ${packagePsiFile.virtualFile.path}"
 
-                packagePsiFileToDepSet(packageManager, packagePsiFile, isDependency)
+                packagePsiFileToPackageDeps(packageManager, packagePsiFile, isDependency)
             } else {
-                emptySet()
+                PackageDeps.EMPTY
             }
         }
 
@@ -214,11 +232,11 @@ class Resolution(
          * The [org.elixir_lang.package_manager.DepGatherer] is constructed freshly per WARA attempt (via [PackageManager.depGatherer])
          * so partial results from a cancelled attempt are never reused.
          */
-        private suspend fun packagePsiFileToDepSet(
+        private suspend fun packagePsiFileToPackageDeps(
             packageManager: PackageManager,
             packagePsiFile: PsiFile,
             isDependency: Boolean
-        ): Set<Dep> =
+        ): PackageDeps =
             readAction {
                 // Two keys, because the dep set a file yields now depends on how the file was
                 // reached, while a CachedValue outlives the resolution that populated it: one
@@ -227,7 +245,7 @@ class Resolution(
                     packageManager
                         .depGatherer(isDependency)
                         .apply { packagePsiFile.accept(this) }
-                        .depSet.toSet()
+                        .let { PackageDeps(it.depSet.toSet(), it.depsPath) }
                         .let { CachedValueProvider.Result.create(it, packagePsiFile) }
                 }
             }
@@ -237,5 +255,17 @@ class Resolution(
 private const val MIX_DEPS_DIRECTORY_PREFIX = "deps/"
 private const val UMBRELLA_APPS_DIRECTORY_NAME = "apps"
 
-private val PROJECT_DEP_SET: Key<CachedValue<Set<Dep>>> = Key.create<CachedValue<Set<Dep>>>("PROJECT_DEP_SET")
-private val DEPENDENCY_DEP_SET: Key<CachedValue<Set<Dep>>> = Key.create<CachedValue<Set<Dep>>>("DEPENDENCY_DEP_SET")
+/**
+ * What one package file yields: the deps it declares, and the `deps_path:` it declares them to live
+ * under, if any.
+ */
+private data class PackageDeps(val depSet: Set<Dep>, val depsPath: String?) {
+    companion object {
+        val EMPTY = PackageDeps(emptySet(), null)
+    }
+}
+
+private val PROJECT_DEP_SET: Key<CachedValue<PackageDeps>> =
+    Key.create<CachedValue<PackageDeps>>("PROJECT_DEP_SET")
+private val DEPENDENCY_DEP_SET: Key<CachedValue<PackageDeps>> =
+    Key.create<CachedValue<PackageDeps>>("DEPENDENCY_DEP_SET")

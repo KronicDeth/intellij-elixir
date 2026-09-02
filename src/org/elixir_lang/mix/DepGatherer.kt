@@ -22,6 +22,15 @@ import org.elixir_lang.util.AccumulatorContinue
  * @param isDependency whether the `mix.exs` being visited belongs to a dependency; see [Dep.from].
  */
 class DepGatherer(private val isDependency: Boolean = false) : DepGatherer() {
+    /**
+     * `Mix.Project.deps_path/1` reads `:deps_path` and expands it, and `Mix.Dep.in_dependency`
+     * pushes the result down to every dependency already absolute, so there is one `deps` directory
+     * per project tree and the top-level project owns it. `mix new --umbrella` therefore writes
+     * `deps_path: "../../deps"` into each app. Taken verbatim here; the caller resolves it.
+     */
+    override var depsPath: String? = null
+        private set
+
     override fun visitFile(file: PsiFile) {
         // Caller (Resolution.packagePsiFileToDepSet) already holds a read lock via runReadAction { ... }.
         // A nested runReadAction here is redundant. Protect from inadvertent calls with
@@ -37,6 +46,8 @@ class DepGatherer(private val isDependency: Boolean = false) : DepGatherer() {
     override fun visitElement(element: PsiElement) {
         if (element is Call && Module.`is`(element)) {
             val childCalls = element.macroChildCalls()
+
+            childCalls.projectKeywordList()?.depsPath()?.let { depsPath = it }
 
             childCalls
                     .foldDepsDefinersWhile(listOf<Dep>()) { depsDefiner, acc ->
@@ -81,6 +92,21 @@ private fun <R> Array<Call>.foldDepsDefinersWhile(
 
     return final
 }
+
+private fun Array<Call>.projectKeywordList(): QuotableKeywordList? {
+    for (call in this) {
+        ProgressManager.checkCanceled()
+
+        if (isDefiningProject(call)) {
+            call.lastKeywordList()?.let { return it }
+        }
+    }
+
+    return null
+}
+
+private fun QuotableKeywordList.depsPath(): String? =
+    (keywordValue("deps_path")?.stripAccessExpression() as? ElixirLine)?.body?.text
 
 private fun Array<Call>.depsNameArity(): NameArity? {
     var nameArity: NameArity? = null

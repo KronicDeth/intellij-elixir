@@ -254,6 +254,57 @@ class TransitiveResolutionTest : PlatformTestCase() {
         assertFalse("It must not borrow the enclosing root's deps: $applications", "from_outer" in applications)
     }
 
+    /**
+     * The umbrella root is not always handed in. An umbrella imported one module per app gives each
+     * app module only `apps/<app>` as a content root, so that is the whole root set the resolver
+     * sees, and the app's deps still live under the umbrella. Refs
+     * [#3986](https://github.com/KronicDeth/intellij-elixir/issues/3986).
+     */
+    fun testUmbrellaAppDepsResolveUnderTheUmbrellaWhenOnlyTheAppIsHandedIn() {
+        val u = nextFixturePath()
+        mixProject(u, "", "      apps_path: \"apps\",\n")
+        val app = mixProject("$u/apps/app_a", "{:shared, \">= 0.0.0\"}")
+        mixProject("$u/deps/shared", "{:from_umbrella, \">= 0.0.0\"}")
+
+        val applications = applicationsFrom(app)
+
+        assertTrue("The umbrella owns the app's deps: $applications", "from_umbrella" in applications)
+    }
+
+    /**
+     * `mix new --umbrella` writes `deps_path: "../../deps"` into every app, and
+     * `Mix.Project.deps_path/1` expands it, so the app states outright where its deps live. Reading
+     * it settles the case without inferring anything from directory names.
+     */
+    fun testDeclaredDepsPathIsHonouredWhenOnlyTheAppIsHandedIn() {
+        val u = nextFixturePath()
+        mixProject(u, "", "      apps_path: \"apps\",\n")
+        val app = mixProject(
+            "$u/apps/app_a",
+            "{:shared, \">= 0.0.0\"}",
+            "      deps_path: \"../../deps\",\n"
+        )
+        mixProject("$u/deps/shared", "{:from_umbrella, \">= 0.0.0\"}")
+
+        val applications = applicationsFrom(app)
+
+        assertTrue("A declared deps_path names the deps directory: $applications", "from_umbrella" in applications)
+    }
+
+    /**
+     * `deps_path:` is not umbrella-only - any project may move its deps directory, and then
+     * `deps/<name>` beside the `mix.exs` is not where Mix checks anything out.
+     */
+    fun testDeclaredDepsPathIsHonouredOutsideAnUmbrella() {
+        val p = nextFixturePath()
+        val root = mixProject(p, "{:shared, \">= 0.0.0\"}", "      deps_path: \"vendor_deps\",\n")
+        mixProject("$p/vendor_deps/shared", "{:from_vendor, \">= 0.0.0\"}")
+
+        val applications = applicationsFrom(root)
+
+        assertTrue("A relocated deps directory is searched: $applications", "from_vendor" in applications)
+    }
+
     // -----------------------------------------------------------------
     // Reached at every position
     // -----------------------------------------------------------------
