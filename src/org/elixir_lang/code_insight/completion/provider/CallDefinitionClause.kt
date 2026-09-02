@@ -25,7 +25,10 @@ class CallDefinitionClause : CompletionProvider<CompletionParameters>() {
                         val previousElement = parameters.originalFile.findElementAt(originalPositionOffset - 1)
 
                         if (previousElement != null && previousElement.node.elementType === ElixirTypes.DOT_OPERATOR) {
-                            previousElement.parent.prevSibling
+                            // A trailing dot has no grammar production, so error recovery only wraps it in a
+                            // dotInfixOperator when what follows can complete the call. When a sibling statement
+                            // follows instead, the dot stays a loose leaf beside its qualifier.
+                            previousElement.prevSibling ?: previousElement.parent.prevSibling
                         } else {
                             null
                         }

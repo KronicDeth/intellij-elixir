@@ -61,6 +61,9 @@
 
 ### Bug Fixes
 
+- [#3993](https://github.com/KronicDeth/intellij-elixir/pull/3993) [@sh41](https://github.com/sh41)
+  - **Function names are offered after a `.` even when another statement follows it.** Fixes [#3219](https://github.com/KronicDeth/intellij-elixir/issues/3219).
+
 - [#3991](https://github.com/KronicDeth/intellij-elixir/pull/3991) [@sh41](https://github.com/sh41)
   - **The `+++` and `---` operators are now parsed.** Fixes [#2755](https://github.com/KronicDeth/intellij-elixir/issues/2755).
 
