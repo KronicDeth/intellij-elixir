@@ -292,6 +292,28 @@ class TransitiveResolutionTest : PlatformTestCase() {
     }
 
     /**
+     * The deps directory an app resolves through owns everything reached through it, however deep.
+     *
+     * A two-level chain passes as soon as the app itself can find the umbrella's `deps`, so it
+     * cannot tell whether that answer carries. The third level is the discriminating one: its
+     * declaring root is `deps/<dep>`, which no handed-in root is an ancestor of. Refs
+     * [#3986](https://github.com/KronicDeth/intellij-elixir/issues/3986).
+     */
+    fun testDepsOfDepsResolveAtEveryDepthWhenOnlyTheAppIsHandedIn() {
+        val u = nextFixturePath()
+        mixProject(u, "", "      apps_path: \"apps\",\n")
+        val app = mixProject("$u/apps/app_a", "{:level_one, \">= 0.0.0\"}")
+        mixProject("$u/deps/level_one", "{:level_two, \">= 0.0.0\"}")
+        mixProject("$u/deps/level_two", "{:level_three, \">= 0.0.0\"}")
+
+        val applications = applicationsFrom(app)
+
+        assertTrue("The app's own dep is reached: $applications", "level_one" in applications)
+        assertTrue("A dep of that dep is reached: $applications", "level_two" in applications)
+        assertTrue("The chain does not stop at two levels: $applications", "level_three" in applications)
+    }
+
+    /**
      * `deps_path:` is not umbrella-only - any project may move its deps directory, and then
      * `deps/<name>` beside the `mix.exs` is not where Mix checks anything out.
      */
