@@ -14,16 +14,12 @@
     closed.
 
 - [#3954](https://github.com/KronicDeth/intellij-elixir/pull/3954) [@sh41](https://github.com/sh41)
-  - **`~E` sigils now get EEx highlighting and completion.** `~H` injected HEEx and `~L` injected EEx,
-    but Phoenix.HTML's own `~E` fell through to no injection at all, leaving the template as plain
-    string text. It is EEx, like `~L`, and shares the same experimental HTML-injection setting.
-    Refs [#1257](https://github.com/KronicDeth/intellij-elixir/issues/1257).
+  - **`~E` sigils now get EEx highlighting and completion**, behind the same experimental
+    HTML-injection setting as `~L`. Refs [#1257](https://github.com/KronicDeth/intellij-elixir/issues/1257).
 
 - [#3925](https://github.com/KronicDeth/intellij-elixir/pull/3925) [@sh41](https://github.com/sh41)
   - **File and line are now linked inside an inspected stack trace**, where a frame's location sits in
-    a keyword list - `[file: 'lib/gald/phase.ex', line: 75]` - rather than a formatted
-    `(app) path:line:` frame. A path inspected as a `~c` sigil reads the same as a plain charlist.
-    Refs [#510](https://github.com/KronicDeth/intellij-elixir/issues/510).
+    a keyword list - `[file: 'lib/gald/phase.ex', line: 75]`. Refs [#510](https://github.com/KronicDeth/intellij-elixir/issues/510).
   - **Stack traces are now linked in the Terminal tool window too**, for `iex -S mix`, `mix test` and
     `mix phx.server`, and in every console the IDE builds for a project with an Elixir module or SDK.
   - **Erlang, HEEx and LEEx locations in a trace are now linked**, not just `.ex`, `.exs` and `.eex`.
@@ -39,13 +35,12 @@
     `elixir-install` script on macOS. Every platform now scans the same sources. Refs
     [#312](https://github.com/KronicDeth/intellij-elixir/issues/312),
     [#3670](https://github.com/KronicDeth/intellij-elixir/issues/3670).
-  - **Selecting an install prefix in the SDK chooser now finds the home inside it** - a prefix such as
-    a Homebrew version directory, `/usr` or `/usr/local` holds the SDK in `lib/<tool>` and only
-    symlinks in `bin`, so the directory a user naturally picks was rejected as invalid.
+  - **Selecting an install prefix in the SDK chooser now finds the home inside it**, such as a Homebrew
+    version directory, `/usr` or `/usr/local`.
 
 - [#3914](https://github.com/KronicDeth/intellij-elixir/pull/3914) [@sh41](https://github.com/sh41)
-  - **Elixir 1.13 through 1.20 are now fully supported.** Code written for any Elixir from 1.13.4 to
-    1.20.2 parses without spurious errors, including syntax whose meaning changed between releases.
+  - **Elixir 1.13 through 1.20 are now fully supported**, including syntax whose meaning changed
+    between releases.
   - **`.beam` files compiled by OTP 24 through 29 decompile to valid Elixir.**
 
 - [#3696](https://github.com/KronicDeth/intellij-elixir/pull/3696) [@mwnciau](https://github.com/mwnciau), [@sh41](https://github.com/sh41)
@@ -56,10 +51,9 @@
     Frameworks → Elixir → Experimental → "Enable ~H Sigil HEEx language injection".
   - **`<.component>` and `<Module.component>` tags now resolve** to their `def`/`defp` definition -
     local components, components brought in via an explicit `import`, and components brought in via
-    `use MyAppWeb, :html` all navigate to their definition. A dotted name that is not valid component
-    syntax is flagged by `HtmlUnknownTagInspection` like any other unknown tag.
+    `use MyAppWeb, :html`.
   - **Find Usages and Rename on a `def`/`defp` include its HEEx component tags**, in `.heex` files
-    and inside `~H` sigils; a renamed tag keeps its `.`/module-alias prefix.
+    and inside `~H` sigils.
   - **Rename works with the caret on a component tag**, not only on the `def`/`defp`.
   - **Quick Docs and hover on a component tag show the function's documentation**, including inside
     a `~H` sigil.
@@ -87,137 +81,77 @@
 
 - [#3982](https://github.com/KronicDeth/intellij-elixir/pull/3982) [@sh41](https://github.com/sh41)
   - **A parameter of an `fn` that has no `->` yet no longer reports "Use scope for parameter not found
-    before reaching file scope".** The scope search stopped at a definition clause, a delegation, a call
-    with a do block or keyword, or a `->` clause, but not at the anonymous function around them - so
-    `fn p end`, which is what `fn p -> ... end` looks like part-way through being typed, searched past
-    the `fn` to the file and was reported. Fixes
-    [#2491](https://github.com/KronicDeth/intellij-elixir/issues/2491).
+    before reaching file scope".** Fixes [#2491](https://github.com/KronicDeth/intellij-elixir/issues/2491).
 
 - [#3979](https://github.com/KronicDeth/intellij-elixir/pull/3979) [@sh41](https://github.com/sh41)
   - **A variable whose scope search reaches the top of the file no longer reports "Don't know how to
-    find variable use scope".** The search enumerates the ancestor types it understands and raises an
-    error report for anything else, so a `<-` outside any comprehension - a syntax error, but also a
-    state code passes through while being typed - reached the file itself and was reported. Fixes
-    [#3358](https://github.com/KronicDeth/intellij-elixir/issues/3358).
+    find variable use scope".** Fixes [#3358](https://github.com/KronicDeth/intellij-elixir/issues/3358).
 
 - [#3977](https://github.com/KronicDeth/intellij-elixir/pull/3977) [@sh41](https://github.com/sh41)
   - **Resolving `__MODULE__` inside a module that `use`s another no longer reports a non-idempotent
-    computation.** The reference was cached under one key per `__MODULE__` call, and the platform's
-    parameterized cache never consults the parameter when it looks a value up, so the reference built
-    for one `use` call was handed back to callers that passed a different one - and the two
-    computations disagreed on their dependencies. Completion and Go to Declaration were the usual
-    triggers. Fixes [#2205](https://github.com/KronicDeth/intellij-elixir/issues/2205),
-    [#3320](https://github.com/KronicDeth/intellij-elixir/issues/3320),
-    [#3467](https://github.com/KronicDeth/intellij-elixir/issues/3467),
-    [#3477](https://github.com/KronicDeth/intellij-elixir/issues/3477),
-    [#3495](https://github.com/KronicDeth/intellij-elixir/issues/3495),
-    [#3517](https://github.com/KronicDeth/intellij-elixir/issues/3517),
-    [#3592](https://github.com/KronicDeth/intellij-elixir/issues/3592) and
-    [#3593](https://github.com/KronicDeth/intellij-elixir/issues/3593).
+    computation.** Completion and Go to Declaration were the usual triggers. Fixes
+    [#2205](https://github.com/KronicDeth/intellij-elixir/issues/2205), [#3320](https://github.com/KronicDeth/intellij-elixir/issues/3320), [#3467](https://github.com/KronicDeth/intellij-elixir/issues/3467),
+    [#3477](https://github.com/KronicDeth/intellij-elixir/issues/3477), [#3495](https://github.com/KronicDeth/intellij-elixir/issues/3495), [#3517](https://github.com/KronicDeth/intellij-elixir/issues/3517),
+    [#3592](https://github.com/KronicDeth/intellij-elixir/issues/3592) and [#3593](https://github.com/KronicDeth/intellij-elixir/issues/3593).
 
 - [#3976](https://github.com/KronicDeth/intellij-elixir/pull/3976) [@sh41](https://github.com/sh41)
-  - **An `fn` whose body has no `->` no longer reports "Don't know how to check if variable".** The
-    walk that decides whether a name is a variable enumerates the ancestor types it understands and
-    raises an error report for anything else, and an anonymous function missing its clause arrow
-    reaches it while the code is still being typed. Fixes
+  - **An `fn` whose body has no `->` no longer reports "Don't know how to check if variable".** Fixes
     [#2376](https://github.com/KronicDeth/intellij-elixir/issues/2376).
 
 - [#3975](https://github.com/KronicDeth/intellij-elixir/pull/3975) [@sh41](https://github.com/sh41)
-  - **A hexadecimal or octal number in a type no longer reports "Cannot highlight types".** The
-    annotator listed the bases it knew rather than matching whole numbers, so `0x0001..0xFFFF` in a
-    `@type` raised an error report instead of highlighting as an ordinary number. Fixes
-    [#1796](https://github.com/KronicDeth/intellij-elixir/issues/1796) and
-    [#3142](https://github.com/KronicDeth/intellij-elixir/issues/3142).
+  - **A hexadecimal or octal number in a type no longer reports "Cannot highlight types".** Fixes
+    [#1796](https://github.com/KronicDeth/intellij-elixir/issues/1796) and [#3142](https://github.com/KronicDeth/intellij-elixir/issues/3142).
 
 - [#3974](https://github.com/KronicDeth/intellij-elixir/pull/3974) [@sh41](https://github.com/sh41)
-  - **A qualified call in a `@type` parameter list no longer raises an error report.** `@type
-    date(spec.date_type)` reached two annotator branches that between them knew every other shape a
-    parameter can take but not a dot-qualified one, so typing it reported "Cannot extract type type
-    parameter name set" and, on the same keystroke, "Cannot highlight types and type parameter
-    declarations". A qualified call names a type in another module rather than declaring a parameter,
-    so it is now left out of the parameter-name set and painted the way a type usage is. Fixes
-    [#1835](https://github.com/KronicDeth/intellij-elixir/issues/1835).
+  - **A qualified call in a `@type` parameter list no longer raises an error report**, such as
+    `@type date(spec.date_type)`. Fixes [#1835](https://github.com/KronicDeth/intellij-elixir/issues/1835).
 
 - [#3973](https://github.com/KronicDeth/intellij-elixir/pull/3973) [@sh41](https://github.com/sh41)
-  - **HTML inside a `~L` or `~E` sigil is now highlighted.** The injected fragment carried no file
-    extension, so EEx's template-data language fell through to plain text and only the Elixir inside
-    `<%= %>` was coloured. Still behind the experimental sigil-injection setting. Fixes
-    [#1827](https://github.com/KronicDeth/intellij-elixir/issues/1827).
+  - **HTML inside a `~L` or `~E` sigil is now highlighted.** Still behind the experimental
+    sigil-injection setting. Fixes [#1827](https://github.com/KronicDeth/intellij-elixir/issues/1827).
 
 - [#3972](https://github.com/KronicDeth/intellij-elixir/pull/3972) [@sh41](https://github.com/sh41)
-  - **Quick Documentation now works on a captured function.** `&Callee.multiply/2` showed nothing
-    where `Callee.multiply(2, 3)` showed its `@doc`, because a captured name carries no reference of
-    its own - it lives on the enclosing capture operator, the only element that also spans the
-    `/arity`.
-  - **Go To Definition on a capture of a decompiled function now navigates.** `&:queue.new/0` went
-    nowhere while `:queue.new()` opened the decompiled module, because the capture dropped every
-    result that was not already source PSI.
-  - Captures are now covered by the Go To Definition, Find Usages, arity and protocol-function
-    suites as well, which previously exercised only ordinary calls. Refs
-    [#1810](https://github.com/KronicDeth/intellij-elixir/issues/1810).
+  - **Quick Documentation now works on a captured function**, such as `&Callee.multiply/2`.
+  - **Go To Definition on a capture of a decompiled function now navigates**, such as `&:queue.new/0`.
+    Refs [#1810](https://github.com/KronicDeth/intellij-elixir/issues/1810).
 
 - [#3971](https://github.com/KronicDeth/intellij-elixir/pull/3971) [@sh41](https://github.com/sh41)
-  - **A module attribute declared in a `__using__` macro's `quote` block resolves again.** Since
-    24.0.0 a symbol was only built for a declaration whose enclosing modular could be named, and a
-    declaration inside `quote` is enclosed by the `quote` call rather than by a module. The scope
-    walk found the declaration and the result was then discarded, so Go To Declaration, Find Usages
-    and completion silently stopped working for every attribute injected through `use`. Refs
-    [#1783](https://github.com/KronicDeth/intellij-elixir/issues/1783),
+  - **A module attribute declared in a `__using__` macro's `quote` block resolves again.** Broken since
+    24.0.0 for Go To Declaration, Find Usages and completion. Refs [#1783](https://github.com/KronicDeth/intellij-elixir/issues/1783),
     [#1292](https://github.com/KronicDeth/intellij-elixir/issues/1292).
 
 - [#3968](https://github.com/KronicDeth/intellij-elixir/pull/3968) [@sh41](https://github.com/sh41)
   - **"Align operands of pipe operator (|)" no longer staircases a multi-operand union.** `a | b | c`
-    parses as nested pipe operations, and each level built its own alignment, so every level anchored
-    its operands one column-step further right than the level above - turning the setting off was the
-    only way to get them lined up. A nested level now shares the alignment of the pipe operation it
-    sits in, matching what `mix format` produces. Fixes
-    [#1787](https://github.com/KronicDeth/intellij-elixir/issues/1787).
+    now aligns the way `mix format` produces. Fixes [#1787](https://github.com/KronicDeth/intellij-elixir/issues/1787).
 
 - [#3965](https://github.com/KronicDeth/intellij-elixir/pull/3965) [@sh41](https://github.com/sh41)
-  - **Renaming a variable no longer rewrites an inner binding that shadows it.** The shared usage
-    search matched by name and scope alone, so an `fn` parameter, `case` clause pattern or `for`
-    generator reusing an outer name was renamed with it. Fixes
-    [#1479](https://github.com/KronicDeth/intellij-elixir/issues/1479).
+  - **Renaming a variable no longer rewrites an inner binding that shadows it** - an `fn` parameter,
+    `case` clause pattern or `for` generator reusing an outer name. Fixes [#1479](https://github.com/KronicDeth/intellij-elixir/issues/1479).
   - **Renaming from a rebinding inside an `fn` or `case` body now covers the whole variable.**
 
 - [#3964](https://github.com/KronicDeth/intellij-elixir/pull/3964) [@sh41](https://github.com/sh41)
   - **"Remove space between function name and parentheses" now removes the space instead of
-    throwing.** The space stopped being a child of the element the quick fix searched when the
-    grammar gained `noParenthesesOneArgument` in 2015. Fixes
-    [#3107](https://github.com/KronicDeth/intellij-elixir/issues/3107).
+    throwing.** Fixes [#3107](https://github.com/KronicDeth/intellij-elixir/issues/3107).
 
 - [#3963](https://github.com/KronicDeth/intellij-elixir/pull/3963) [@sh41](https://github.com/sh41)
-  - **A `@spec` whose head has no function name no longer crashes the structure view.** Heads like
-    `@spec foo.() :: term` and `@spec bar not in baz :: term` parse to a call with no name, so the
-    malformed spec is now left out of the tree instead of throwing. Fixes
-    [#1564](https://github.com/KronicDeth/intellij-elixir/issues/1564).
+  - **A `@spec` whose head has no function name no longer crashes the structure view**, such as
+    `@spec foo.() :: term` and `@spec bar not in baz :: term`. Fixes [#1564](https://github.com/KronicDeth/intellij-elixir/issues/1564).
 
 - [#3962](https://github.com/KronicDeth/intellij-elixir/pull/3962) [@sh41](https://github.com/sh41)
   - **Ctrl+Click and highlighting no longer throw on a function the decompiler could not recreate.**
     Refs [#3309](https://github.com/KronicDeth/intellij-elixir/issues/3309).
 
 - [#3957](https://github.com/KronicDeth/intellij-elixir/pull/3957) [@sh41](https://github.com/sh41)
-  - **A dep with `allow_pre:` no longer reports an unknown Mix dep option.** It is a Hex flag that
-    cannot change where a dep is checked out. Fixes
-    [#2487](https://github.com/KronicDeth/intellij-elixir/issues/2487).
+  - **A dep with `allow_pre:` no longer reports an unknown Mix dep option.** Fixes [#2487](https://github.com/KronicDeth/intellij-elixir/issues/2487).
 
 - [#3953](https://github.com/KronicDeth/intellij-elixir/pull/3953) [@sh41](https://github.com/sh41)
   - **"Cannot find enclosing Modular" no longer fires for a `def` inside a map-held `quote`, or for a
-    `@callback` behind an infix operator.** The walk that finds a definition's enclosing module treated
-    lists and tuples as transparent but not a map's internals, so a `quote` held as a map value stopped
-    it; and it knew `=` and `|>` but no other infix operator, so an `@callback` on the right of `||`
-    stopped it too. Every infix operator is transparent now, since a binary operator is never itself a
-    module. Refs [#1695](https://github.com/KronicDeth/intellij-elixir/issues/1695) and
-    [#1438](https://github.com/KronicDeth/intellij-elixir/issues/1438).
+    `@callback` behind an infix operator.** Refs [#1695](https://github.com/KronicDeth/intellij-elixir/issues/1695) and [#1438](https://github.com/KronicDeth/intellij-elixir/issues/1438).
 
 - [#3951](https://github.com/KronicDeth/intellij-elixir/pull/3951) [@sh41](https://github.com/sh41)
-  - **`defstruct do ... end` and `defexception do ... end` no longer crash the structure view.** Both
-    were gated on the arity Elixir resolves, which counts a `do` block as an argument even though
-    nothing is actually written inside the call - so the structure view then asserted on an argument
-    list that was empty. Fixes [#2107](https://github.com/KronicDeth/intellij-elixir/issues/2107) and
-    [#1095](https://github.com/KronicDeth/intellij-elixir/issues/1095).
-  - **A piped `defdelegate` with a `do` block no longer throws while resolving variables.** Same
-    resolved-arity-vs-written-arity mismatch as above, reached through `defdelegate`'s own gate.
+  - **`defstruct do ... end` and `defexception do ... end` no longer crash the structure view.** Fixes
+    [#2107](https://github.com/KronicDeth/intellij-elixir/issues/2107) and [#1095](https://github.com/KronicDeth/intellij-elixir/issues/1095).
+  - **A piped `defdelegate` with a `do` block no longer throws while resolving variables.**
 
 - [#3948](https://github.com/KronicDeth/intellij-elixir/pull/3948) [@sh41](https://github.com/sh41)
   - **Auto-Indent Lines and paste no longer throw on a map update with a literal on the left**, such
@@ -232,11 +166,10 @@
     another plugin registers a root type of its own.
 
 - [#3934](https://github.com/KronicDeth/intellij-elixir/pull/3934) [@sh41](https://github.com/sh41)
-  - **A trailing comma in a call's argument list no longer breaks the rest of the file.** Typing
-    `foo(a,)` on the way to the next argument used to discard the enclosing definition and everything
-    after it, taking parameter hints with it. Applies to `foo(a,)`, `Mod.fun(a,)` and `fun.(a,)`.
-  - **Parameter hints no longer describe functions you are not calling.** `Enum.reduce` listed eight
-    signatures, including `reduce_while`'s. Each arity of the called function still gets its own hint.
+  - **A trailing comma in a call's argument list no longer breaks the rest of the file.** Applies to
+    `foo(a,)`, `Mod.fun(a,)` and `fun.(a,)`.
+  - **Parameter hints no longer describe functions you are not calling.** Each arity of the called
+    function still gets its own hint.
   - **Parameter hints now appear when a completion is accepted.** Accepting a name from the completion
     popup left the caret between the inserted parentheses with no hint there.
   - **Pressing Enter after a delimiter now indents the caret where an element goes** rather than back
@@ -246,22 +179,15 @@
     [#799](https://github.com/KronicDeth/intellij-elixir/issues/799).
 
 - [#3925](https://github.com/KronicDeth/intellij-elixir/pull/3925) [@sh41](https://github.com/sh41)
-  - **A console path written with backslashes now links on Windows.** A compile error prints the
-    path the way the platform writes it, while the virtual file system holds forward slashes, and
-    the two were compared without normalising either - so on the one platform where every console
-    path looks like that, the frame resolved to nothing.
+  - **A console path written with backslashes now links on Windows.**
 
 - [#3924](https://github.com/KronicDeth/intellij-elixir/pull/3924) [@sh41](https://github.com/sh41)
-  - **Variable completion no longer shows a parameter's name twice.** A parameter that is not bound
-    by a match is its own enclosing match, so the match appended after the name only repeated it.
-    Variables bound by a match still show that match, which is what makes the tail text useful.
-    Fixes [#496](https://github.com/KronicDeth/intellij-elixir/issues/496).
+  - **Variable completion no longer shows a parameter's name twice.** Variables bound by a match still
+    show that match. Fixes [#496](https://github.com/KronicDeth/intellij-elixir/issues/496).
 
 - [#3923](https://github.com/KronicDeth/intellij-elixir/pull/3923) [@sh41](https://github.com/sh41)
-  - **Homebrew Erlang SDKs no longer report an unknown version.** The version was read from the
-    home path after the Homebrew layout adjustment had been applied, so every Homebrew Erlang was
-    keyed on the literal string `erlang` instead of its version, leaving them unsorted and
-    unlabelled in the SDK list.
+  - **Homebrew Erlang SDKs no longer report an unknown version**, and sort and label correctly in the
+    SDK list.
 
 - [#3696](https://github.com/KronicDeth/intellij-elixir/pull/3696) [@mwnciau](https://github.com/mwnciau), [@sh41](https://github.com/sh41)
   - **`\{` and `\}` in HEEx are now literal braces** instead of affecting `{...}` expression nesting.
@@ -273,19 +199,15 @@
     script or style content.
   - **`<% %>` tags that produce no output (comments, `<% if %>`) no longer inject placeholder text**
     into the HTML tree.
-  - **Other HTML-based template languages are no longer affected by HEEx's outer-language patcher**,
-    which ran for every HTML-data template language in the IDE.
   - **HEEx's special attributes and `phx-` bindings are no longer reported as "not allowed here"
     on HTML tags**: `:let`, `:if`, `:for`, `:key`, `:type` and every `phx-*` binding.
   - **`<:slot>` tags are no longer validated as HTML elements.** `<:col>` was checked against HTML's
     `<col>` and `<:action>` reported as an unknown tag.
   - **A component tag that doesn't resolve no longer shows "Cannot resolve symbol".**
-  - **Components brought into scope by a `use` nested inside `use MyAppWeb, :html` now resolve**,
-    such as `Phoenix.Component`'s `<.link>` and `<.live_title>`: `use` resolution now follows a
-    `__using__` whose body ends in a list of fragments, a `quote` bound to a variable, or another
-    `use`.
-  - **Rename and Find Usages on a component tag could miss the tag**, varying between IDE sessions:
-    at a tag's offset the Elixir root of a `.heex` file or `~H` sigil could win over the HTML root.
+  - **Components brought into scope by a `use` nested inside `use MyAppWeb, :html` now resolve**, such
+    as `Phoenix.Component`'s `<.link>` and `<.live_title>`.
+  - **Rename and Find Usages on a component tag no longer miss the tag**, which varied between IDE
+    sessions.
   - **An unqualified call inside a `~H` sigil now resolves to a `def` in the surrounding module.**
 
 - [#3914](https://github.com/KronicDeth/intellij-elixir/pull/3914) [@sh41](https://github.com/sh41)
@@ -303,39 +225,29 @@
     Elixir 1.20+.
 
 - [#3919](https://github.com/KronicDeth/intellij-elixir/pull/3919) [@sh41](https://github.com/sh41)
-  - **New Elixir projects get the right compiler output directory.** Leaving `--app` blank in the New
-    Project wizard configured `_build/dev/lib/ebin` rather than `_build/dev/lib/<app>/ebin`; it now
-    falls back to the project name, as `mix new` does.
+  - **New Elixir projects get the right compiler output directory** when `--app` is left blank in the
+    New Project wizard; it now falls back to the project name, as `mix new` does.
   - **`--sup` is no longer offered for umbrella projects**, where `mix new` silently ignores it.
   - **New umbrella projects no longer get a stray empty `lib/` or an output directory that never
-    exists.** An umbrella root has no application of its own.
-  - **New Elixir projects and modules are no longer reported as having "an outdated format".** They
-    were written with compiler-output exclusion switched on - the setting the converter exists to
-    remove - and Elixir compiles to `_build`, so it never applied.
-  - **Umbrella sub-apps now get their `lib/` and `test/` marked.** `mix new` writes an app from an
-    external process, so the IDE could hold a stale view omitting its `mix.exs`. The wizard,
-    *Reconfigure Elixir Module Setup* and the module-setup check now refresh first.
+    exists.**
+  - **New Elixir projects and modules are no longer reported as having "an outdated format".**
+  - **Umbrella sub-apps now get their `lib/` and `test/` marked.** The wizard, *Reconfigure Elixir
+    Module Setup* and the module-setup check now refresh the IDE's view of the app first.
 
 - [#3921](https://github.com/KronicDeth/intellij-elixir/pull/3921) [@sh41](https://github.com/sh41)
-  - **Variables bound by a macro call in a match now resolve.** `session(id, user) = raw` binds all
-    of the macro's arguments, but every use of them was reported as unresolved: only three `Kernel`
-    names were recognised as binding, and any other parenthesised call was assumed to be a function,
-    whose arguments are values. The call is now resolved to decide whether it is a macro. Calls that
-    resolve to a function are unaffected, as are macros that cannot be resolved at all.
+  - **Variables bound by a macro call in a match now resolve**, such as `session(id, user) = raw`.
+    Calls that resolve to a function are unaffected.
 
 - [#3918](https://github.com/KronicDeth/intellij-elixir/pull/3918) [@sh41](https://github.com/sh41)
-  - **Saved run configurations no longer record the module twice.** Every Elixir run configuration
-    wrote a second `module` element on top of the one the IDE already writes, which the platform
-    logs as "Module serialized more than one time".
+  - **Saved run configurations no longer record the module twice**, which the platform logged as
+    "Module serialized more than one time".
   - **"Include system environment variables" is now remembered.** The setting was accepted in the
     run configuration editor but silently discarded when the configuration was saved.
-  - **A run configuration whose module is not loaded yet keeps it.** Reading a saved configuration
-    before its module exists no longer clears the module instead of leaving the IDE to resolve it.
+  - **A run configuration whose module is not loaded yet keeps it.**
 
 - [#3915](https://github.com/KronicDeth/intellij-elixir/pull/3915) [@sh41](https://github.com/sh41)
-  - **The IDE no longer starts every WSL distro that hosts a registered Erlang or Elixir SDK, and
-    will no longer freeze if WSL is slow or hangs while starting.** Checking whether two WSL-hosted
-    SDKs are the same no longer touches the distro's filesystem.
+  - **The IDE no longer starts every WSL distro that hosts a registered Erlang or Elixir SDK, and will
+    no longer freeze if WSL is slow or hangs while starting.**
 
 ### Threading / Platform Hygiene
 
@@ -407,9 +319,9 @@
 ### Enhancements
 
 - [@sh41](https://github.com/sh41)
-  - **The plugin's "What's New" now shows the last six releases instead of the whole history.** Each
-    version is listed with its release date, so upgrading after skipping a few releases shows what you
-    missed rather than one undifferentiated list.
+  - **The plugin's "What's New" now shows the most recent releases instead of the whole history.**
+    Each version is listed with its release date, so upgrading after skipping a few releases shows
+    what you missed rather than one undifferentiated list.
 
 ### Bug Fixes
 
@@ -509,17 +421,15 @@
   - **BEAM viewer improvement (View → Tool Windows → BEAM Viewer):** the StrT (string table) tab now shows individual strings with their lengths and auto-sizes columns.
 - [#3852](https://github.com/KronicDeth/intellij-elixir/pull/3852) - [@sh41](https://github.com/sh41)
   - **Fewer "unknown AST node" warnings when decompiling OTP 26+ BEAM files.** Map comprehension nodes (`m_generate`, `mc`) introduced in OTP 26 are now decompiled correctly.
-- [#3836](https://github.com/KronicDeth/intellij-elixir/pull/3836) - [@joshuataylor](https://github.com/joshuataylor)
-  - Mix settings and Mix deps checking reworked, Experimental Settings added, and mise SDK detection improved.
+  - Elixir settings consolidated -- renamed "Experimental Settings" to "Elixir Settings" and moved all settings into the top-level Elixir configurable (no more separate child page).
+  - Mix deps checker setting -- added an "Enable automatic Mix deps checking" toggle (default enabled) under Elixir Settings. When disabled, no deps check runs on project open or file changes. The checker also skips with a debug log when no Elixir SDK is configured, instead of showing the unhelpful "Mix deps check failed" notification.
+  - Erlang SDK prompt for mise Elixir SDKs -- when adding a mise-detected Elixir SDK without an Erlang SDK registered, a chooser dialog now lists valid mise-installed Erlang SDKs (sorted newest first, broken installations filtered out). The selected Erlang SDK is registered and linked automatically.
+  - Status bar widget -- when no Elixir SDK is configured, the widget popup now shows a "Detected Elixir SDKs" section listing valid mise installations. Clicking one registers the Elixir SDK, prompts for Erlang if needed, and sets it as the project SDK.
+  - **Adding an Elixir SDK in Project Structure now links an Erlang SDK that is already registered**, instead of leaving the Erlang SDK unset.
 - [#3843](https://github.com/KronicDeth/intellij-elixir/pull/3843) - [@sh41](https://github.com/sh41)
   - **The New Project Wizard now configures the Elixir SDK correctly.** SDK type handling was also split into single-responsibility objects.
 - [#3891](https://github.com/KronicDeth/intellij-elixir/pull/3891) - [@makoto-developer](https://github.com/makoto-developer)
   - **README typo fixes** (`Subcription`, `referneced`, `Configuations`, `Wih`) - a first contribution, thank you!
-- Elixir settings consolidated -- renamed "Experimental Settings" to "Elixir Settings" and moved all settings into the top-level Elixir configurable (no more separate child page). - [@joshuataylor](https://github.com/joshuataylor)
-- Mix deps checker setting -- added an "Enable automatic Mix deps checking" toggle (default enabled) under Elixir Settings. When disabled, no deps check runs on project open or file changes. The checker also skips with a debug log when no Elixir SDK is configured, instead of showing the unhelpful "Mix deps check failed" notification. - [@joshuataylor](https://github.com/joshuataylor)
-- Erlang SDK prompt for mise Elixir SDKs -- when adding a mise-detected Elixir SDK without an Erlang SDK registered, a chooser dialog now lists valid mise-installed Erlang SDKs (sorted newest first, broken installations filtered out). The selected Erlang SDK is registered and linked automatically. - [@joshuataylor](https://github.com/joshuataylor)
-- Status bar widget -- when no Elixir SDK is configured, the widget popup now shows a "Detected Elixir SDKs" section listing valid mise installations. Clicking one registers the Elixir SDK, prompts for Erlang if needed, and sets it as the project SDK. - [@joshuataylor](https://github.com/joshuataylor)
-- When an Elixir SDK is added via Project Structure and no Erlang SDK is explicitly set, `configureInternalErlangSdk` now falls back to any Erlang SDK already registered in `ProjectJdkTable`. - [@joshuataylor](https://github.com/joshuataylor)
 
 ### Bug Fixes
 
@@ -605,40 +515,32 @@
 
 ### Enhancements
 
+- [#3821](https://github.com/KronicDeth/intellij-elixir/pull/3821) - [@sh41](https://github.com/sh41)
+  - MFA tuple reference resolution: Go-to-Declaration, Find Usages, and hover documentation now work on `:function` atoms inside `{Module, :function, arity}` MFA tuples. Covers Supervisor child specs, `@doc delegate_to:` attributes, and general MFA references throughout Elixir code.
+  - Supports both Elixir modules (`{Enum, :map, 2}`) and Erlang modules (`{:math, :sqrt, 1}`). Arity can be an integer literal, an args list (`[arg1, arg2]`), or a dynamic expression/wildcard (resolves with `isValidResult=false` for navigation support without error highlighting).
+  - New `UnresolvableModuleQualifier` inspection (`enabledByDefault=true`, error level) flags unresolvable module qualifiers in qualified calls. Highlights the qualifier itself, not the entire call expression.
+  - False-positive guards: dynamic qualifiers (module attributes, variables, function call results, bracket access, chained calls), injected doc code fragments (`@doc`/`@moduledoc` heredocs), non-source roots, Phoenix `Router.Helpers` (verifies parent Router module exists, handles both FQN and aliased forms), and opaque `use` calls where `__using__/1` macro cannot be traced (e.g. `ExUnit.CaseTemplate`).
+  - Module and alias resolution now prefers a module's Elixir source over its decompiled `.beam`.
+
+### Bug Fixes
+
+- [#3832](https://github.com/KronicDeth/intellij-elixir/pull/3832), [#3831](https://github.com/KronicDeth/intellij-elixir/pull/3831) - [@joshuataylor](https://github.com/joshuataylor)
+  - The IDE no longer crashes or freezes on 2025.2+ during bulk decompilation, project import, dependency scanning, reference search, Credo and Dialyzer runs, or status-bar SDK updates. Project-model and PSI access from background threads now takes a read lock, and the Dialyzer inspection no longer holds it while waiting for the external process.
+  - Downgraded non-critical decompiler/documentation-provider errors from `Logger.error()` to `logger.warn()`. `Logger.error()` creates a `Throwable` and shows an IDE error notification in internal mode -- too noisy for situations where code simply doesn't recognise an element (unknown Erlang AST nodes from newer OTP versions, missing decompiled functions, unhandled element types).
+
+### Threading / Platform Hygiene
+
+- [#3833](https://github.com/KronicDeth/intellij-elixir/pull/3833) - [@joshuataylor](https://github.com/joshuataylor)
+  - Added `@RequiresReadLock` annotations to PSI-accessing methods across 10 files (`CallDefinitionClause`, `Definition`, `Implementation`, `Module`, `Protocol`, `ElixirPsiImplUtil`, `PsiElementImpl`, `PsiNamedElementImpl`, `CallImpl`, `CanonicallyNamedImpl`). Enables the `ThreadingConcurrency` inspection to statically detect callers that don't hold the read lock.
+
+### Build / CI
+
 - [#3822](https://github.com/KronicDeth/intellij-elixir/pull/3822) - [@sh41](https://github.com/sh41)
   - Moved 108 hand-written `.kt`/`.java` files from `gen/` to `src/` -- these files were vulnerable to silent overwrite by parser regeneration. Regenerating `gen/` previously clobbered them with GrammarKit stubs, causing `StackOverflowError` at runtime when hand-written interface names matched BNF rule names (visitor generates self-recursive methods).
   - Renamed 3 PSI interfaces to avoid GrammarKit visitor collisions: `Heredoc` -> `HeredocLiteral`, `HeredocLine` -> `HeredocLineable`, `SigilHeredoc` -> `SigilHeredocLiteral`.
   - Consolidated ambiguous `ElixirPsiImplUtil` overloads (`processDeclarations`, `getNameIdentifier`, `getReference`) using Java 21 pattern matching switch expressions so that hand edits are no longer needed in generated files after parser regeneration.
   - Marked `gen/` as generated sources in Gradle (`idea.module.generatedSourceDirs`) to suppress inspections on GrammarKit-generated PSI classes.
   - `CONTRIBUTING.md` updated with comprehensive GrammarKit usage conventions: rule names vs interface names, visitor collision avoidance, `extends`/`mixin`/`fake` rules, `ElixirPsiImplUtil` method resolution and ambiguity pitfalls, source layout (`gen/` vs `src/`), CRLF conversion, and testing workflow after BNF changes.
-- [#3821](https://github.com/KronicDeth/intellij-elixir/pull/3821) - [@sh41](https://github.com/sh41)
-  - MFA tuple reference resolution: Go-to-Declaration, Find Usages, and hover documentation now work on `:function` atoms inside `{Module, :function, arity}` MFA tuples. Covers Supervisor child specs, `@doc delegate_to:` attributes, and general MFA references throughout Elixir code.
-  - Supports both Elixir modules (`{Enum, :map, 2}`) and Erlang modules (`{:math, :sqrt, 1}`). Arity can be an integer literal, an args list (`[arg1, arg2]`), or a dynamic expression/wildcard (resolves with `isValidResult=false` for navigation support without error highlighting).
-  - Implemented via `MfaTupleReferenceContributor` + `MfaTupleReferenceProvider` + `MfaFunctionReference` (poly-variant, uses `ResolveCache`). `ElixirAtomMixin` registered as `HintedReferenceHost` so `PsiReferenceService` picks up contributed references. Soft reference -- unresolvable MFA tuples produce no error highlighting.
-  - New `UnresolvableModuleQualifier` inspection (`enabledByDefault=true`, error level) flags unresolvable module qualifiers in qualified calls. Highlights the qualifier itself, not the entire call expression.
-  - False-positive guards: dynamic qualifiers (module attributes, variables, function call results, bracket access, chained calls), injected doc code fragments (`@doc`/`@moduledoc` heredocs), non-source roots, Phoenix `Router.Helpers` (verifies parent Router module exists, handles both FQN and aliased forms), and opaque `use` calls where `__using__/1` macro cannot be traced (e.g. `ExUnit.CaseTemplate`).
-  - Resolver source-over-decompiled preference consolidated into `Resolver.preferred()`. Previous order: `valid -> same-module`. New order: `valid -> source -> same-module`. Redundant `preferSource()` call removed from `TargetElementEvaluator.getTargetCandidates()`. `Nested.kt` ordering updated to match.
-- [#3833](https://github.com/KronicDeth/intellij-elixir/pull/3833) - [@joshuataylor](https://github.com/joshuataylor)
-  - Added `@RequiresReadLock` annotations to PSI-accessing methods across 10 files (`CallDefinitionClause`, `Definition`, `Implementation`, `Module`, `Protocol`, `ElixirPsiImplUtil`, `PsiElementImpl`, `PsiNamedElementImpl`, `CallImpl`, `CanonicallyNamedImpl`). Enables the `ThreadingConcurrency` inspection to statically detect callers that don't hold the read lock.
-
-### Bug Fixes
-
-- [#3832](https://github.com/KronicDeth/intellij-elixir/pull/3832) - [@joshuataylor](https://github.com/joshuataylor)
-  - `BulkDecompilation` -- wrapped `ModuleManager.modules`, `ModuleRootManager.sdk`/`.contentRoots`, and `ProjectRootManager.projectSdk` access in `readAction {}`. Previously accessed on `Dispatchers.Default` without a read lock, causing crashes on 2025.2+.
-  - `DirectoryConfigurator` -- wrapped `ModuleManager.getInstance(otpAppProject).modules` in `ReadAction.nonBlocking` inside `Task.Backgroundable` for newly attached umbrella sub-projects.
-- [#3831](https://github.com/KronicDeth/intellij-elixir/pull/3831) - [@joshuataylor](https://github.com/joshuataylor)
-  - Dialyzer inspection -- use explicit `runReadAction` blocks around PSI and module-model access instead of `isReadActionNeeded = true`. The previous approach (`isReadActionNeeded = true`) held the read lock for the entire inspection run including `waitFor()` on the Dialyzer process, blocking writes. Now the read lock is acquired only for the PSI/model access windows.
-  - Status bar SDK widget -- restructured `updateWidget()` to run `detectSdkStatus()` on the widget's coroutine scope (background thread with read action) and dispatch UI updates via `Dispatchers.EDT`. Previously ran SDK/module-model queries without a read lock, crashing on 2025.2+.
-  - Reference search (`ReferencesSearch.java`) -- wrapped PSI access (`Implementation.is`, `Module.is`, `getName`, `getLanguage`) in `ReadAction.nonBlocking().executeSynchronously()`. `processQuery` runs on a pooled thread without a read lock.
-  - `OtpApp.kt` -- merged `elixirFile()` and `appList()` PSI traversal into a single read action. Previously `appList()` ran heavy PSI walking (`.modulars()`, `.macroChildCallList()`, `nameArityInterval()`) outside the read action returned by `computeReadAction`.
-  - `DepsWatcher` and `DepsCheckerService` -- wrapped `ProjectRootManager`, `ModuleManager`, and `ModuleRootManager` access in `ReadAction.nonBlocking`. These run on `Alarm(POOLED_THREAD)` callbacks without a read lock.
-  - Mix `Watcher` -- wrapped `ModuleRootManager.getInstance(module).contentRoots` in `ReadAction.nonBlocking`. Runs inside `Task.Backgroundable` without a read lock.
-  - Credo inspection -- wrapped `ModuleManager.getInstance(project).modules` model access in the `workingDirectorySet()` method with a read action. The inspection uses `isReadActionNeeded = false` and module-model access was unprotected.
-  - `ReconfigureModuleSetupAction` -- wrapped `ModuleManager.getInstance(project).modules` and `ElixirSdkType.mostSpecificSdk(project)` in `update()` with `ReadAction.nonBlocking`. `ActionUpdateThread.BGT` does not guarantee a read lock since 2024.2.
-  - Downgraded non-critical decompiler/documentation-provider errors from `Logger.error()` to `logger.warn()`. `Logger.error()` creates a `Throwable` and shows an IDE error notification in internal mode -- too noisy for situations where code simply doesn't recognise an element (unknown Erlang AST nodes from newer OTP versions, missing decompiled functions, unhandled element types).
-
-### Build / CI
-
 - [#3830](https://github.com/KronicDeth/intellij-elixir/pull/3830) - [@joshuataylor](https://github.com/joshuataylor)
   - Bumped IntelliJ 2026.1.x target to 2026.1.2.
 - [#3832](https://github.com/KronicDeth/intellij-elixir/pull/3832) - [@joshuataylor](https://github.com/joshuataylor)
@@ -653,21 +555,19 @@
 
 - [#3817](https://github.com/KronicDeth/intellij-elixir/pull/3817) - [@sh41](https://github.com/sh41)
   - All Elixir settings panels (Credo, Dialyzer, SDKs, Experimental Settings) grouped under a single "Elixir" parent configurable in both full IDEs and small IDEs (RubyMine, PyCharm, etc.). Dropped redundant "Elixir" prefixes from child panel display names.
-  - Top-level configurable selection refactored to a service-provider strategy (`TopLevelElixirConfigurableFactory`) with small IDE and rich platform implementations, replacing the `isSmallIde` class detection approach.
   - Settings search indexing via `ElixirSearchableOptionContributor` -- typing "credo", "dialyzer", "elixir", or "liveview" in the Settings search box now surfaces the relevant Elixir settings pages.
   - Credo inspection -- umbrella project support: `resolveCredoWorkingDirectory` walks up from `apps/<app>` content roots to the umbrella root so Credo runs once per umbrella root instead of once per app. Working directories deduplicated by ancestor path.
   - Credo inspection -- execution failure surfacing: failures (missing SDK, missing Credo dependency, compilation errors) now appear as inspection problems on `mix.exs` and as aggregated IDE notifications, instead of being silently dropped.
   - Credo inspection -- partial result preservation: when a Credo run emits some findings before hitting a fatal error, the findings are kept and a warning notification is shown alongside them.
-  - Flycheck output parsing extracted and hardened: two-phase approach (record split, then location parse) correctly handles line+column, line-only, and file-level findings. Invalid paths and out-of-range offsets logged at debug level instead of crashing the inspection run.
-  - `--mute-exit-status` added to Credo command line so lint-level exit codes are not treated as execution failures.
+  - Credo inspection -- a finding with an unusual location no longer aborts the run: line-and-column, line-only and file-level findings are all handled, and an invalid path is skipped rather than failing the inspection.
+  - Credo inspection -- findings no longer report as an execution failure; a lint-level exit code is expected, not an error.
 
 ### Bug Fixes
 
 - [#3817](https://github.com/KronicDeth/intellij-elixir/pull/3817) - [@sh41](https://github.com/sh41)
-  - Credo inspection read-action lock churn: consolidated 4-6 separate `runReadAction(Computable { })` calls per output line into a single `runReadAction {}` block per finding. Under 2025.3+ writer-preference locking, the repeated lock acquire/release blocked the EDT when a write action was pending. Partially fixes [#3790](https://github.com/KronicDeth/intellij-elixir/issues/3790).
-  - Credo "Configure credo" notification action used internal `ShowSettingsUtilImpl` API -- replaced with `ShowSettingsUtil.getInstance()` and added `project.isDisposed` guard.
+  - Credo inspection -- the editor no longer stalls while a run reports its findings, under 2025.3+ writer-preference locking. Partially fixes [#3790](https://github.com/KronicDeth/intellij-elixir/issues/3790).
+  - Credo "Configure credo" notification link opens the Credo settings page again -- it still pointed at the old Editor > Inspections > Errors location after the settings moved under Elixir.
   - Credo and Dialyzer configurable IDs (`"Credo"`, `"Dialyzer"`) collided with display names -- separated into distinct `language.elixir.credo` / `language.elixir.dialyzer` IDs.
-  - Java-style `//` comment in `plugin.xml` replaced with proper XML `<!-- -->` comment.
 
 ## [23.4.0] - 2026-05-15
 
