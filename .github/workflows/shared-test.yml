@@ -375,7 +375,21 @@ jobs:
         id: checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ inputs.ref || github.ref }}
+          # The pull request's head commit, not `github.ref`. On a `pull_request` event `github.ref`
+          # is `refs/pull/<n>/merge`, a merge commit GitHub synthesises for the run: it exists on no
+          # branch, is recreated whenever the base moves, and its committer date is when GitHub made
+          # it rather than when anything was written. This is the only job that stamps a version -
+          # versioning.GitSourceIdValueSource reads `HEAD` for the `<commit time>.<commit>` that ends
+          # up in `intellij-elixir-<version>.zip` and in `<version>` in plugin.xml, which is the sole
+          # field identifying the built code in a Marketplace exception report - so checking out the
+          # merge commit stamps the artifact with a SHA nobody can look up. Checking out the head
+          # commit makes the stamp a commit that is actually in the pull request.
+          #
+          # The test jobs deliberately keep `github.ref`: they publish no version, and testing the
+          # merge result is what catches a pull request that breaks against a moved base.
+          #
+          # Empty for every other trigger, so those fall through to the ref they already used.
+          ref: ${{ inputs.ref || github.event.pull_request.head.sha || github.ref }}
           persist-credentials: false
 
       - name: Setup Build Environment

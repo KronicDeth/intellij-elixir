@@ -259,6 +259,9 @@
 
 ### Build / CI
 
+- [#3994](https://github.com/KronicDeth/intellij-elixir/pull/3994) [@sh41](https://github.com/sh41)
+  - **A pull request build's plugin artifact is now stamped with a commit that exists.**
+
 - [#3969](https://github.com/KronicDeth/intellij-elixir/pull/3969) [@sh41](https://github.com/sh41)
   - **The quoter daemon is now started on every test run, not just the first in a checkout.** Its files
     made `startQuoter` look up to date, but the daemon it starts is stopped again when the build ends,
