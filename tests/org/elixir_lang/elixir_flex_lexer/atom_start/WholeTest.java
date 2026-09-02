@@ -11,7 +11,7 @@ import org.junit.runner.RunWith;
 import java.io.IOException;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNull;
 
 /**
  * Created by kadie.enheduanna.inanna on 9/28/14.
@@ -94,8 +94,8 @@ public class WholeTest extends org.elixir_lang.elixir_flex_lexer.Test {
 
         assertEquals(ElixirFlexLexer.ADDITION_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE, lexer.getState());
 
-        lexer.advance();
-
-        assertTrue("Failure: expected all of \"" + charSequence + "\" to be consumed", lexer.getTokenType() == null);
+        // Asserting null on the *first* advance is what makes this discriminating: a second advance
+        // consumes a stray trailing token, so an operator lexed as two tokens would still reach null.
+        assertNull("Failure: expected all of \"" + charSequence + "\" to be one atom fragment", lexer.getTokenType());
     }
 }
