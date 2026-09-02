@@ -313,6 +313,106 @@ class TransitiveResolutionTest : PlatformTestCase() {
         assertTrue("The chain does not stop at two levels: $applications", "level_three" in applications)
     }
 
+    // -----------------------------------------------------------------
+    // Across an `in_umbrella:` sibling
+    // -----------------------------------------------------------------
+
+    /**
+     * Since Elixir 1.15.0 the compiler prunes the code path to the apps the project's own declared
+     * deps reach, so `{:app_b, in_umbrella: true}` is what makes everything `app_b` declares
+     * available to `app_a`. Nothing walked into `app_b`'s `mix.exs`, so those deps reached no
+     * module of the project and Go to Definition had nowhere to land. Refs
+     * [#3990](https://github.com/KronicDeth/intellij-elixir/issues/3990).
+     */
+    fun testSiblingsDepsAreReachedThroughAnInUmbrellaDep() {
+        val u = nextFixturePath()
+        mixProject(u, "", "      apps_path: \"apps\",\n")
+        val appA = mixProject("$u/apps/app_a", "{:app_b, in_umbrella: true}")
+        mixProject("$u/apps/app_b", "{:shared, \">= 0.0.0\"}")
+        mixProject("$u/deps/shared", "")
+
+        val applications = applicationsFrom(appA)
+
+        assertTrue("The sibling itself stays reachable: $applications", "app_b" in applications)
+        assertTrue("What the sibling declares is reached: $applications", "shared" in applications)
+    }
+
+    /**
+     * `apps/<name>` is relative to the umbrella root, never to the app that wrote it - there is no
+     * `apps/app_a/apps/app_b`. The case above passes for either base whenever the umbrella root
+     * happens to be handed in; handing in only the app is what discriminates.
+     */
+    fun testSiblingIsFoundUnderTheUmbrellaWhenOnlyTheAppIsHandedIn() {
+        val u = nextFixturePath()
+        mixProject(u, "", "      apps_path: \"apps\",\n")
+        val appA = mixProject("$u/apps/app_a", "{:app_b, in_umbrella: true}")
+        mixProject("$u/apps/app_b", "{:from_sibling, \">= 0.0.0\"}")
+        mixProject("$u/deps/from_sibling", "")
+
+        assertTrue(
+            "The sibling resolves under the umbrella, not under the declaring app",
+            "from_sibling" in applicationsFrom(appA),
+        )
+    }
+
+    /**
+     * Mix's reachability is transitive through the declared-dep graph - `Mix.AppLoader.load_apps/5`
+     * walks each dep's own children - so a sibling's sibling, and the deps that one declares, are
+     * available too.
+     */
+    fun testSiblingsAreWalkedTransitively() {
+        val u = nextFixturePath()
+        mixProject(u, "", "      apps_path: \"apps\",\n")
+        val appA = mixProject("$u/apps/app_a", "{:app_b, in_umbrella: true}")
+        mixProject("$u/apps/app_b", "{:app_c, in_umbrella: true}")
+        mixProject("$u/apps/app_c", "{:deep, \">= 0.0.0\"}")
+        mixProject("$u/deps/deep", "")
+
+        val applications = applicationsFrom(appA)
+
+        assertTrue("A sibling's own sibling is reached: $applications", "app_c" in applications)
+        assertTrue("And what that one declares: $applications", "deep" in applications)
+    }
+
+    /**
+     * Umbrella apps declaring each other is an ordinary shape, so the walk has to terminate on a
+     * cycle rather than resolve one. A `deps/` graph is acyclic, so nothing before this could
+     * produce one.
+     */
+    fun testMutualInUmbrellaDepsTerminate() {
+        val u = nextFixturePath()
+        mixProject(u, "", "      apps_path: \"apps\",\n")
+        val appA = mixProject("$u/apps/app_a", "{:app_b, in_umbrella: true}")
+        mixProject("$u/apps/app_b", "{:app_a, in_umbrella: true}, {:shared, \">= 0.0.0\"}")
+        mixProject("$u/deps/shared", "")
+
+        assertEquals(setOf("app_a", "app_b", "shared"), applicationsFrom(appA))
+    }
+
+    /**
+     * A sibling is an app of the project being built, not something Mix fetched, so its deps are
+     * read at a project position: `mix deps.get` fetches every environment's for an umbrella app,
+     * and an optional dep of one is the umbrella's to resolve. Reaching a sibling through a MODULE
+     * dep must not demote it to a dependency's `:prod`-only reading.
+     */
+    fun testASiblingsDepsAreReadAtAProjectPosition() {
+        val u = nextFixturePath()
+        mixProject(u, "", "      apps_path: \"apps\",\n")
+        val appA = mixProject("$u/apps/app_a", "{:app_b, in_umbrella: true}")
+        mixProject(
+            "$u/apps/app_b",
+            "{:mox, \">= 0.0.0\", only: [:test]},\n" +
+                "{:jason, \">= 0.0.0\", optional: true}"
+        )
+        mixProject("$u/deps/mox", "")
+        mixProject("$u/deps/jason", "")
+
+        val applications = applicationsFrom(appA)
+
+        assertTrue("An umbrella app's environment-restricted dep is kept: $applications", "mox" in applications)
+        assertTrue("So is its optional one: $applications", "jason" in applications)
+    }
+
     /**
      * `deps_path:` is not umbrella-only - any project may move its deps directory, and then
      * `deps/<name>` beside the `mix.exs` is not where Mix checks anything out.

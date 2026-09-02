@@ -82,6 +82,8 @@
   - **Bracketed dependency options such as `[path: "../dep"]` are read.**
   - **An umbrella app's dependencies resolve when each app is its own module.** Refs
     [#3986](https://github.com/KronicDeth/intellij-elixir/issues/3986).
+  - **A dependency an umbrella app reaches through an `in_umbrella:` sibling now resolves.** Refs
+    [#3990](https://github.com/KronicDeth/intellij-elixir/issues/3990).
 
 - [#3982](https://github.com/KronicDeth/intellij-elixir/pull/3982) [@sh41](https://github.com/sh41)
   - **A parameter of an `fn` that has no `->` yet no longer reports "Use scope for parameter not found

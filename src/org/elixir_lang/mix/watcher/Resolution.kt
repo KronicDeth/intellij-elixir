@@ -38,17 +38,17 @@ class Resolution(
         ): Resolution {
             val rootVirtualFileQueue: Queue<VirtualFile> = ArrayDeque<VirtualFile>()
             rootVirtualFileQueue.addAll(rootVirtualFiles)
-            // Anything reached that was not handed in got here by following a Dep.Type.LIBRARY dep,
-            // so Mix would resolve its deps as a dependency's. Membership rather than dequeue order
-            // decides it, so a root reads the same however the queue is drained. Umbrella apps are
-            // handed in by the caller alongside the roots, and MODULE deps are never walked, so
-            // neither can be mistaken for a dependency.
+            // Anything reached by following a Dep.Type.LIBRARY dep is a dependency, and Mix resolves
+            // its deps as one. A MODULE dep names an app of the same umbrella, which is a project
+            // Mix is building rather than one it fetched, so reaching a root that way joins this set
+            // instead. Membership rather than dequeue order decides it, so a root reads the same
+            // however the queue is drained.
             val projectRootVirtualFiles = rootVirtualFiles.toHashSet()
             val rootVirtualFileToDepSet = mutableMapOf<VirtualFile, Set<Dep>>()
             val depToRootVirtualFile = mutableMapOf<Dep, VirtualFile?>()
             // The deps directory each reached file resolves through. Deliberately not folded into
-            // projectRootVirtualFiles: that set also decides isDependency, so adding a dep root to
-            // it would stop Mix's only:/optional: filter applying to that dep's own deps.
+            // projectRootVirtualFiles: that set also decides isDependency, so adding a library dep's
+            // root to it would stop Mix's only:/optional: filter applying to that dep's own deps.
             val rootVirtualFileToDepsDirectory = mutableMapOf<VirtualFile, VirtualFile>()
 
             while (rootVirtualFileQueue.isNotEmpty() && !progressIndicator.isCanceled) {
@@ -63,13 +63,14 @@ class Resolution(
                         isDependency = rootVirtualFile !in projectRootVirtualFiles,
                     )
 
+                    val owningProjectRoot = owningProjectRoot(rootVirtualFile, projectRootVirtualFiles)
+
                     // `Mix.Project.in_project` applies the inherited `deps_path` as post-config, so
                     // it overrides whatever the file itself declares: a dependency uses the deps
                     // directory of the project that reached it, never one of its own.
                     val depsDirectory = rootVirtualFileToDepsDirectory[rootVirtualFile]
                         ?: declaredDepsPath?.let { rootVirtualFile.findFileByRelativePath(it) }
-                        ?: owningProjectRoot(rootVirtualFile, projectRootVirtualFiles)
-                            ?.findFileByRelativePath(MIX_DEPS_DIRECTORY_NAME)
+                        ?: owningProjectRoot?.findFileByRelativePath(MIX_DEPS_DIRECTORY_NAME)
 
                     for (dep in depSet) {
                         if (progressIndicator.isCanceled) {
@@ -77,27 +78,29 @@ class Resolution(
                         }
                         ProgressManager.checkCanceled()
 
-                        /* Don't need to check module dep because it will already be in `rootVirtualFiles` AND
-                           Module deps handle transitivity while Library deps don't */
-                        if (dep.type == Dep.Type.LIBRARY) {
-                            if (!depToRootVirtualFile.contains(dep)) {
-                                val depRootVirtualFile =
-                                    depRootVirtualFile(dep, rootVirtualFile, depsDirectory)
+                        if (!depToRootVirtualFile.contains(dep)) {
+                            val depRootVirtualFile =
+                                depRootVirtualFile(dep, rootVirtualFile, depsDirectory, owningProjectRoot)
 
-                                depToRootVirtualFile[dep] = depRootVirtualFile
+                            depToRootVirtualFile[dep] = depRootVirtualFile
 
-                                if (depRootVirtualFile != null) {
-                                    // Mix checks a dependency's own deps out beside it, so the
-                                    // directory that held this one holds everything it declares.
-                                    depsDirectory?.let {
-                                        rootVirtualFileToDepsDirectory.putIfAbsent(depRootVirtualFile, it)
-                                    }
+                            if (depRootVirtualFile != null) {
+                                if (dep.type == Dep.Type.MODULE) {
+                                    // Registering it before it is dequeued is what settles its
+                                    // isDependency, which is read off this set.
+                                    projectRootVirtualFiles.add(depRootVirtualFile)
+                                }
 
-                                    if (!rootVirtualFileToDepSet.contains(depRootVirtualFile) &&
-                                        !rootVirtualFileQueue.contains(depRootVirtualFile)
-                                    ) {
-                                        rootVirtualFileQueue.add(depRootVirtualFile)
-                                    }
+                                // Mix checks a dependency's own deps out beside it, so the
+                                // directory that held this one holds everything it declares.
+                                depsDirectory?.let {
+                                    rootVirtualFileToDepsDirectory.putIfAbsent(depRootVirtualFile, it)
+                                }
+
+                                if (!rootVirtualFileToDepSet.contains(depRootVirtualFile) &&
+                                    !rootVirtualFileQueue.contains(depRootVirtualFile)
+                                ) {
+                                    rootVirtualFileQueue.add(depRootVirtualFile)
                                 }
                             }
                         }
@@ -111,12 +114,16 @@ class Resolution(
         }
 
         /**
-         * The directory Mix would check [dep] out into.
+         * The directory Mix would resolve [dep] to.
          *
          * `Mix.Project.deps_config/1` hands every dependency the *top-level* project's `deps_path`,
          * already expanded, so a hex or git dep declared by a dependency is checked out beside it
          * under the project - `deps/<parent>/deps/<child>` is a directory no Mix configuration
          * produces. Looking there ended the walk one level below every project root.
+         *
+         * An `in_umbrella:` dep is checked out nowhere - it is already an app of the umbrella that
+         * owns the declaring app, so its `apps/<name>` is relative to the umbrella root and not to
+         * the app that wrote it. `apps/<app>/apps/<sibling>` is a directory no umbrella produces.
          *
          * An explicit `path:` dep is the exception and keeps the old base: `Mix.SCM.Path` expands it
          * against the directory of whatever declared it, so `"../sibling"` inside a dependency
@@ -124,18 +131,26 @@ class Resolution(
          *
          * The search is confined to the one project that owns the declaring file, so two content
          * roots that both have `deps/<name>` cannot be confused for one another. The lookup stays on
-         * [VirtualFile.findFileByRelativePath] because a `deps/` path needs no upward traversal,
-         * leaving [Dep.virtualFile]'s refresh-based resolution for the paths that do.
+         * [VirtualFile.findFileByRelativePath] because neither a `deps/` nor an `apps/` path needs
+         * upward traversal, leaving [Dep.virtualFile]'s refresh-based resolution for the paths that
+         * do.
          */
         private fun depRootVirtualFile(
             dep: Dep,
             declaringRootVirtualFile: VirtualFile,
-            depsDirectory: VirtualFile?
+            depsDirectory: VirtualFile?,
+            owningProjectRoot: VirtualFile?
         ): VirtualFile? {
             if (dep.path.startsWith(MIX_DEPS_DIRECTORY_PREFIX)) {
                 depsDirectory
                     ?.findFileByRelativePath(dep.path.removePrefix(MIX_DEPS_DIRECTORY_PREFIX))
                     ?.let { return it }
+            }
+
+            // A `path:` written after `in_umbrella:` wins the path while leaving the type, so the
+            // prefix rather than the type is what says the umbrella owns this one.
+            if (dep.type == Dep.Type.MODULE && dep.path.startsWith(UMBRELLA_APPS_DIRECTORY_PREFIX)) {
+                owningProjectRoot?.findFileByRelativePath(dep.path)?.let { return it }
             }
 
             return dep.virtualFile(declaringRootVirtualFile)
@@ -259,6 +274,7 @@ class Resolution(
 private const val MIX_DEPS_DIRECTORY_NAME = "deps"
 private const val MIX_DEPS_DIRECTORY_PREFIX = "deps/"
 private const val UMBRELLA_APPS_DIRECTORY_NAME = "apps"
+private const val UMBRELLA_APPS_DIRECTORY_PREFIX = "apps/"
 
 /**
  * What one package file yields: the deps it declares, and the `deps_path:` it declares them to live
