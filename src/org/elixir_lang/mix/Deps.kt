@@ -13,16 +13,16 @@ import org.elixir_lang.psi.impl.childExpressions
 import org.elixir_lang.psi.impl.stripAccessExpression
 
 object Deps {
-    fun from(depsListElement: PsiElement): Sequence<Dep> =
+    fun from(depsListElement: PsiElement, isDependency: Boolean): Sequence<Dep> =
             when (depsListElement) {
-                is ElixirTuple -> fromTuple(depsListElement)
-                is Call -> fromCall(depsListElement)
+                is ElixirTuple -> fromTuple(depsListElement, isDependency)
+                is Call -> fromCall(depsListElement, isDependency)
                 else -> emptySequence()
             }
 
 
     // `ecto_dep()` in `ecto_sql` `deps`
-    private fun fromCall(depsListElement: Call): Sequence<Dep> =
+    private fun fromCall(depsListElement: Call, isDependency: Boolean): Sequence<Dep> =
             depsListElement
                     .reference?.let { it as PsiPolyVariantReference }
                     ?.multiResolve(false)
@@ -31,36 +31,36 @@ object Deps {
                     ?.mapNotNull(ResolveResult::getElement)
                     ?.filterIsInstance<Call>()
                     ?.filter { CallDefinitionClause.`is`(it) }
-                    ?.flatMap { fromCallDefinitionClause(it) }
+                    ?.flatMap { fromCallDefinitionClause(it, isDependency) }
                     .orEmpty()
 
-    private fun fromCallDefinitionClause(callDefinitionClause: Call): Sequence<Dep> =
+    private fun fromCallDefinitionClause(callDefinitionClause: Call, isDependency: Boolean): Sequence<Dep> =
             callDefinitionClause
                     .stabBodyChildExpressions()
-                    ?.flatMap { fromChildExpression(it) }
+                    ?.flatMap { fromChildExpression(it, isDependency) }
                     ?: emptySequence()
 
-    private tailrec fun fromChildExpression(childExpression: PsiElement): Sequence<Dep> =
+    private tailrec fun fromChildExpression(childExpression: PsiElement, isDependency: Boolean): Sequence<Dep> =
             when (childExpression) {
-                is Call -> fromChildExpression(childExpression)
-                is ElixirAccessExpression -> fromChildExpression(childExpression.stripAccessExpression())
-                is ElixirTuple -> fromTuple(childExpression)
+                is Call -> fromChildExpression(childExpression, isDependency)
+                is ElixirAccessExpression -> fromChildExpression(childExpression.stripAccessExpression(), isDependency)
+                is ElixirTuple -> fromTuple(childExpression, isDependency)
                 else -> {
                     emptySequence()
                 }
             }
 
-    private fun fromChildExpression(childExpression: Call): Sequence<Dep> =
+    private fun fromChildExpression(childExpression: Call, isDependency: Boolean): Sequence<Dep> =
         if (childExpression.isCalling(KERNEL, "if")) {
-            fromIf(childExpression)
+            fromIf(childExpression, isDependency)
         } else {
             emptySequence()
         }
 
-    private fun fromTuple(tuple: ElixirTuple): Sequence<Dep> =
-            Dep.from(tuple)?.let { sequenceOf(it) }.orEmpty()
+    private fun fromTuple(tuple: ElixirTuple, isDependency: Boolean): Sequence<Dep> =
+            Dep.from(tuple, isDependency)?.let { sequenceOf(it) }.orEmpty()
 
-    private fun fromIf(`if`: Call): Sequence<Dep> {
+    private fun fromIf(`if`: Call, isDependency: Boolean): Sequence<Dep> {
         val branchStabSequences = `if`.doBlock?.let { doBlock ->
             val trueStab = doBlock.stab
             val falseStab = doBlock
@@ -73,6 +73,6 @@ object Deps {
 
         return branchStabSequences
                 .flatMap { stab -> stab.stabBody?.childExpressions().orEmpty() }
-                .flatMap { fromChildExpression(it) }
+                .flatMap { fromChildExpression(it, isDependency) }
     }
 }

@@ -8,6 +8,7 @@ import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.roots.ProjectRootManager
+import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiManager
@@ -307,7 +308,9 @@ internal suspend fun buildSyncPlan(project: Project, requests: CoalescedRequests
 
     return SyncPlan(
         deleteAlls = requests.deleteAlls.map { DeleteAllPlan(it.depsUrl) },
-        deleteOnes = requests.deleteOnes.map { DeleteOnePlan(it.depName, it.contentRootUrl) },
+        deleteOnes = requests.deleteOnes.map {
+            DeleteOnePlan(it.depName, it.contentRootUrl, it.contentRootUrl?.let { url -> contentRootToken(project, url) })
+        },
         libraryPlans = libraryPlans,
         modulePlans = modulePlans,
         consolidatedPlans = consolidatedPlans,
@@ -567,13 +570,15 @@ internal suspend fun buildModuleDepsPlan(
     // run, so that the missingLibraryDeps path creates a placeholder library for it.
     val externalLibNames: Map<String, String> = externalLibraryPlans.associateBy({ it.depName }, { it.libraryName })
     val libraryDeps: Set<String> = readAction {
+        val basePath = project.basePath?.let { FileUtil.toSystemIndependentName(it) }
+        fun token(url: String) = basePath?.let { contentRootToken(it, url) } ?: url
         val mixExsRoots by lazy { contentRoots.filter { it.findFileByRelativePath("mix.exs") != null } }
         deps.filter { it.type == Dep.Type.LIBRARY }.mapTo(LinkedHashSet()) { dep ->
             val owningRoot = contentRoots.firstOrNull { root ->
                 root.findFileByRelativePath(dep.path)?.isValid == true
             }
             if (owningRoot != null) {
-                scopedDepLibraryName(owningRoot.url, dep.application)
+                scopedDepLibraryName(token(owningRoot.url), dep.application)
             } else {
                 externalLibNames[dep.application]
                     ?: requestedLibraryPlans
@@ -598,7 +603,9 @@ internal suspend fun buildModuleDepsPlan(
                         .maxByOrNull { it.contentRootUrl.length }
                         ?.libraryName
                     ?: scopedDepLibraryName(
-                        mixExsRoots.firstOrNull()?.url ?: contentRoots.firstOrNull()?.url ?: "",
+                        (mixExsRoots.firstOrNull()?.url ?: contentRoots.firstOrNull()?.url)
+                            ?.let { url -> token(url) }
+                            ?: "",
                         dep.application
                     )
             }
@@ -677,6 +684,8 @@ internal fun buildLibraryRootsPlansInCurrentContext(project: Project, deps: Coll
             .mapNotNull { it.findChild("_build") }
     }
 
+    val basePath = project.basePath?.let { FileUtil.toSystemIndependentName(it) }
+
     return deps
         .filter { it.isValid && it.isDirectory }
         .map { dep ->
@@ -727,6 +736,7 @@ internal fun buildLibraryRootsPlansInCurrentContext(project: Project, deps: Coll
 
             LibraryRootsPlan(
                 contentRootUrl = contentRootUrl,
+                contentRootToken = basePath?.let { contentRootToken(it, contentRootUrl) } ?: contentRootUrl,
                 depName = depName,
                 classRootUrls = classRoots.map { it.url }.distinct(),
                 sourceRootUrls = dep.children

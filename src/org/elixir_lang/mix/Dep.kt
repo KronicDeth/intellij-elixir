@@ -55,26 +55,44 @@ data class Dep(val application: String, val path: String, val type: Type = Type.
     }
 
     companion object {
-        fun from(depsListElement: ElixirTuple): Dep? {
+        fun from(depsListElement: ElixirTuple): Dep? = from(depsListElement, isDependency = false)
+
+        /**
+         * @param isDependency whether the `mix.exs` being read belongs to a dependency rather than to
+         *   a project the IDE is building. Mix checks a dependency's own deps against `:prod` rather
+         *   than the current `MIX_ENV`, and does not force a dependency's optional deps on the project
+         *   using it, so under this flag either option can drop the dep.
+         */
+        fun from(depsListElement: ElixirTuple, isDependency: Boolean): Dep? {
             val stripped = depsListElement.children.stripAccessExpressions()
 
             return if (stripped.isNotEmpty()) {
                 name(stripped[0])?.let { name ->
-                    val initial = Dep(application = name, path = "deps/$name")
+                    val initial = Options(Dep(application = name, path = "deps/$name"))
 
-                    if (stripped.size > 1) {
-                        stripped.last().let { it as? ElixirKeywords }?.keywordPairList?.let { keywordPairList ->
+                    val options = if (stripped.size > 1) {
+                        keywords(stripped.last())?.keywordPairList?.let { keywordPairList ->
                             keywordPairList.fold(initial) { acc, keywordPair ->
                                 val key = keywordPair.keywordKey.text
 
                                 when (key) {
-                                    "allow_pre", "app", "branch", "commit", "compile", "env", "git", "github", "hex",
-                                    "manager", "only", "optional", "organization", "override", "ref", "repo", "runtime",
-                                    GUARDIAN_RUNTIME_TYPO, "sparse", "submodules", "system_env", "tag", "targets",
-                                    EDELIVER_DISTILLERY_WARN_MISSING, "sha", "depth", "subdir", "warn_if_outdated" -> acc
+                                    "allow_pre", "app", "branch", "commit", "compile", "env", "hex",
+                                    "manager", "organization", "override", "ref", "repo", "runtime",
+                                    GUARDIAN_RUNTIME_TYPO, "submodules", "system_env", "tag", "targets",
+                                    EDELIVER_DISTILLERY_WARN_MISSING, "sha", "depth", "warn_if_outdated" -> acc
 
-                                    "in_umbrella" -> acc.copy(path = "apps/$name", type = Type.MODULE)
-                                    "path" -> putPath(acc, keywordPair.keywordValue)
+                                    // Only `Mix.SCM.Git` joins `sparse`/`subdir` onto the destination,
+                                    // and it declines a dep naming neither `git:` nor `github:`.
+                                    "git", "github" -> acc.copy(hasGitScm = true)
+                                    "sparse" -> acc.copy(sparse = stringBody(keywordPair.keywordValue))
+                                    "subdir" -> acc.copy(subdir = stringBody(keywordPair.keywordValue))
+
+                                    "only" -> acc.copy(only = environments(keywordPair.keywordValue))
+                                    "optional" -> acc.copy(optional = isTrue(keywordPair.keywordValue))
+
+                                    "in_umbrella" ->
+                                        acc.copy(dep = acc.dep.copy(path = "apps/$name", type = Type.MODULE))
+                                    "path" -> acc.copy(dep = putPath(acc.dep, keywordPair.keywordValue))
                                     else -> {
                                         Logger.error(
                                             logger,
@@ -89,11 +107,89 @@ data class Dep(val application: String, val path: String, val type: Type = Type.
                     } else {
                         initial
                     }
+
+                    // Accumulate first and resolve once: an elvis on the resolved dep would read a
+                    // deliberate null as "this tuple had no options" and hand back the unfiltered dep.
+                    options.resolve(isDependency)
                 }
             } else {
                 null
             }
         }
+
+        /**
+         * The options of one dep tuple, accumulated across the whole fold before any is acted on.
+         *
+         * An option cannot always be applied where it is read. Two can combine into one path, Mix can
+         * apply a pair in a fixed order that need not match the order they are written, one can gate
+         * whether another applies at all and may appear after it, and one can mean different things
+         * depending on which `mix.exs` the tuple came from. Deciding once, at the end, is the only
+         * shape that accommodates any of that.
+         */
+        private data class Options(
+            val dep: Dep,
+            val sparse: String? = null,
+            val subdir: String? = null,
+            val only: List<String>? = null,
+            val optional: Boolean = false,
+            val hasGitScm: Boolean = false,
+        )
+
+        /** The dep this tuple describes, or `null` when Mix would not fetch it here. */
+        private fun Options.resolve(isDependency: Boolean): Dep? {
+            if (isDependency) {
+                // An `in_umbrella:` dep of a dependency is an app of *that* umbrella, never a module
+                // of this project, so it cannot be wired here either.
+                if (dep.type == Type.MODULE) return null
+                if (optional || (only != null && PROD_ENVIRONMENT !in only)) return null
+            }
+
+            return if (hasGitScm && dep.type == Type.LIBRARY) {
+                dep.copy(path = listOfNotNull(dep.path, sparse, subdir).joinToString("/"))
+            } else {
+                dep
+            }
+        }
+
+        /**
+         * The environments an `only:` names, or `null` when the value cannot be read.
+         *
+         * Unreadable means unrestricted. Dropping a dep that is physically present costs resolution
+         * and completion, while keeping one Mix never fetches costs an empty placeholder library -
+         * so every shape this cannot parse, including a quoted atom, keeps the dep.
+         */
+        private fun environments(keywordValue: Quotable): List<String>? =
+            when (keywordValue) {
+                is ElixirAtom -> keywordValue.name?.let { listOf(it) }
+                is ElixirList ->
+                    keywordValue.children.stripAccessExpressions().map { element ->
+                        (element as? ElixirAtom)?.name ?: return null
+                    }
+                else -> null
+            }
+
+        private fun isTrue(keywordValue: Quotable): Boolean =
+            keywordValue is ElixirAtomKeyword && keywordValue.text == "true"
+
+        private fun stringBody(keywordValue: Quotable): String? =
+            (keywordValue as? ElixirLine)?.body?.text
+
+        private const val PROD_ENVIRONMENT = "prod"
+
+        /**
+         * The options of a dep tuple, whether or not they are wrapped in a list.
+         *
+         * `{:dep, "~> 1.0", optional: true}` and `{:dep, "~> 1.0", [optional: true]}` are the same
+         * declaration and both are written in the wild - `ecto` brackets neither, `db_connection`
+         * brackets its `optional:`. Only the bare form was read, so the bracketed one silently had
+         * every option ignored, `path:` and `in_umbrella:` included.
+         */
+        private fun keywords(optionsElement: PsiElement): ElixirKeywords? =
+            optionsElement as? ElixirKeywords
+                ?: (optionsElement as? ElixirList)
+                    ?.children
+                    ?.singleOrNull()
+                    ?.stripAccessExpression() as? ElixirKeywords
 
         private val logger by lazy { com.intellij.openapi.diagnostic.Logger.getInstance(Dep::class.java) }
 

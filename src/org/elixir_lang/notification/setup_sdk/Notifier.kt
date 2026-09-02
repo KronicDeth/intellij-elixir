@@ -214,6 +214,18 @@ object Notifier {
             .notify(project)
     }
 
+    fun dependencyLibrarySyncScheduled(project: Project) {
+        NotificationGroupManager
+            .getInstance()
+            .getNotificationGroup("Elixir")
+            .createNotification(
+                "Syncing Elixir dependency libraries",
+                "Rescanning every content root's deps and _build",
+                NotificationType.INFORMATION
+            )
+            .notify(project)
+    }
+
     fun mixDepsInstallError(project: Project, moduleName: String, errorMessage: String) {
         NotificationGroupManager
             .getInstance()

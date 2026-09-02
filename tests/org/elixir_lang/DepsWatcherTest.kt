@@ -13,6 +13,7 @@ import org.elixir_lang.mix.library.CONSOLIDATED_LIBRARY_SUFFIX
 import org.elixir_lang.mix.sync.MixDepsSyncService
 import org.elixir_lang.mix.sync.MixSyncTestHelpers.drainDirectly
 import org.elixir_lang.mix.sync.SyncRequest
+import org.elixir_lang.mix.sync.contentRootToken
 import org.elixir_lang.mix.sync.scopedDepLibraryName
 import org.elixir_lang.psi.ElixirTuple
 
@@ -473,7 +474,10 @@ class DepsWatcherTest : PlatformTestCase() {
      * The content root is the grandparent of the dep directory (<contentRoot>/deps/<depName>).
      */
     private fun depLibraryName(depRoot: VirtualFile): String =
-        scopedDepLibraryName(depRoot.parent?.parent?.url ?: "", depRoot.name)
+        scopedDepLibraryName(
+            depRoot.parent?.parent?.url?.let { contentRootToken(project, it) } ?: "",
+            depRoot.name,
+        )
 
     private fun classRootUrls(libraryName: String): kotlin.collections.List<String> {
         val library = LibraryTablesRegistrar.getInstance().getLibraryTable(project).getLibraryByName(libraryName)

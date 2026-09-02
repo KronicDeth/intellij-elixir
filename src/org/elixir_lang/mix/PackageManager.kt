@@ -21,6 +21,9 @@ class PackageManager : org.elixir_lang.PackageManager {
     override val fileName: String = org.elixir_lang.mix.Project.MIX_EXS
     override fun depGatherer(): DepGatherer = org.elixir_lang.mix.DepGatherer()
 
+    override fun depGatherer(isDependency: Boolean): DepGatherer =
+        org.elixir_lang.mix.DepGatherer(isDependency)
+
     override fun depsStatus(project: Project, packageVirtualFile: VirtualFile, sdk: Sdk?): DepsStatusResult {
         if (sdk == null) {
             return DepsStatusResult.Error("No Elixir SDK configured for Mix")

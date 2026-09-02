@@ -18,6 +18,7 @@ import com.intellij.psi.PsiManager
 import org.elixir_lang.jps.shared.ElixirSdkTypeId
 import org.elixir_lang.jps.shared.ErlangSdkTypeId
 import org.elixir_lang.mix.library.CONSOLIDATED_LIBRARY_SUFFIX
+import org.elixir_lang.mix.sync.scopedLibraryNameToken
 
 /**
  * Lifts an Elixir/Erlang SDK "ebin" class root node in External Libraries to the application
@@ -70,7 +71,7 @@ internal class ElixirSdkLibraryTreeStructureProvider : TreeStructureProvider, Du
                         when {
                             libName?.endsWith(CONSOLIDATED_LIBRARY_SUFFIX) == true ->
                                 ConsolidatedLibraryNode(node, settings)
-                            libName != null && " [file:///" in libName ->
+                            libName != null && scopedLibraryNameToken(libName) != null ->
                                 ScopedDepLibraryNode(node, settings)
                             else -> node
                         }
@@ -244,11 +245,12 @@ private class ConsolidatedLibraryNode(
 }
 
 /**
- * Wraps a scoped dep [NamedLibraryElementNode] whose name contains a `[file:///...]` suffix,
+ * Wraps a scoped dep [NamedLibraryElementNode] whose name carries a `[<scope>]` suffix,
  * overriding [update] to display the dep name without the verbose URL and instead show the
  * content root directory as a grey location string.
  *
- * Example: `"phoenix [file:///project/apps/my_app]"` → displays as `phoenix` with `(my_app)` in grey.
+ * Example: `"phoenix [apps/my_app]"` displays as `phoenix` with `my_app` in grey; a dep scoped to
+ * the project root displays as `phoenix` alone.
  */
 private class ScopedDepLibraryNode(
     wrapped: NamedLibraryElementNode,
@@ -257,11 +259,18 @@ private class ScopedDepLibraryNode(
     override fun update(presentation: PresentationData) {
         super.update(presentation)
         val name = presentation.presentableText ?: return
-        val bracketIdx = name.indexOf(" [file:///")
-        if (bracketIdx < 0) return
+        // Parsed through the naming helper rather than by matching a literal prefix: the scope
+        // token is a project-relative path, and only falls back to a `file://` URL where no
+        // relative path can express it.
+        val token = scopedLibraryNameToken(name) ?: return
+        val bracketIdx = name.indexOf(" [")
+        if (bracketIdx <= 0) return
         presentation.presentableText = name.substring(0, bracketIdx)
-        // Show only the final path segment of the content root URL as the location hint
-        val url = name.substring(bracketIdx + 2, name.length - 1)
-        presentation.locationString = url.trimEnd('/').substringAfterLast('/')
+        // Final segment only, as a location hint. The project's own root is "." and needs no hint -
+        // every dep without one sits there.
+        presentation.locationString = token
+            .trimEnd('/')
+            .substringAfterLast('/')
+            .takeUnless { it == "." || it.isEmpty() }
     }
 }

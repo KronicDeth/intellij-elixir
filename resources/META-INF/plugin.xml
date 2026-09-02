@@ -34,6 +34,7 @@
 
         <postStartupActivity implementation="org.elixir_lang.sdk.SdkTableListenerStartupActivity"/>
         <postStartupActivity implementation="org.elixir_lang.mix.DepsCheckerStartupActivity"/>
+        <postStartupActivity implementation="org.elixir_lang.mix.sync.MixLibraryReconcileStartupActivity"/>
 
         <!--        <errorHandler implementation="org.elixir_lang.errorreport.Submitter"/>-->
         <errorHandler implementation="com.intellij.diagnostic.JetBrainsMarketplaceErrorReportSubmitter"/>
@@ -525,8 +526,8 @@
             <separator/>
             <add-to-group group-id="HelpMenu" anchor="last"/>
         </group>
-        <group id="LangElixir.SdkActions">
-            <separator/>
+        <group id="LangElixir.SdkActions" popup="true" compact="true" text="Elixir"
+               icon="org.elixir_lang.Icons.LANGUAGE">
             <action id="Elixir.OpenElixirSdkSettings"
                     class="org.elixir_lang.action.OpenElixirSdkSettingsAction"
                     text="Configure Elixir SDKs"
@@ -550,13 +551,22 @@
                     text="Install Mix Deps (hex, rebar, deps.get, deps.compile)"
                     icon="org.elixir_lang.mix.configuration.Icons.TYPE"
                     description="Installs hex, rebar, fetches Mix deps, and compiles them"/>
+            <action id="Elixir.SyncDependencyLibraries"
+                    class="org.elixir_lang.action.SyncDependencyLibrariesAction"
+                    text="Sync Dependency Libraries"
+                    icon="AllIcons.Actions.Refresh"
+                    description="Rescans every content root's deps and _build to sync its Mix dep libraries">
+                <synonym text="Rebuild Mix Libraries"/>
+                <synonym text="Mix Libraries"/>
+                <synonym text="External Libraries"/>
+                <synonym text="Refresh Dependencies"/>
+            </action>
             <separator/>
             <action id="Elixir.ReconfigureModuleSetup"
                     class="org.elixir_lang.action.ReconfigureModuleSetupAction"
                     text="Reconfigure Elixir Module Setup"
                     icon="AllIcons.Actions.Refresh"
                     description="Apply canonical folder marks and fix module SDK references for all Elixir modules"/>
-            <separator/>
             <add-to-group group-id="ToolsMenu" anchor="last"/>
         </group>
         <group id="Internal.Elixir" popup="true" internal="true" compact="true" text="Elixir">

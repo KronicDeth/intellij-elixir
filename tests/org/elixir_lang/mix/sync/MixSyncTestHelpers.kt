@@ -27,7 +27,7 @@ internal object MixSyncTestHelpers {
      * [com.intellij.openapi.application.readAction] / [com.intellij.openapi.application.edtWriteAction])
      * and would deadlock if invoked via plain [runBlocking] from the EDT test thread.
      */
-    fun <T> runSuspendOnPooledThread(block: suspend () -> T): T {
+    fun <T> runSuspendOnPooledThread(timeoutMillis: Long = 10_000L, block: suspend () -> T): T {
         var result: T? = null
         var error: Throwable? = null
         val done = AtomicBoolean(false)
@@ -42,10 +42,10 @@ internal object MixSyncTestHelpers {
             }
             done.set(true)
         }
-        val deadline = System.currentTimeMillis() + 10_000L
+        val deadline = System.currentTimeMillis() + timeoutMillis
         while (!done.get()) {
             if (System.currentTimeMillis() >= deadline) {
-                throw AssertionError("runSuspendOnPooledThread timed out after 10 s")
+                throw AssertionError("runSuspendOnPooledThread timed out after ${timeoutMillis} ms")
             }
             PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
         }

@@ -3,7 +3,7 @@ package org.elixir_lang.mix.sync
 import junit.framework.TestCase
 
 /**
- * Unit tests for [scopedLibraryNameContentRootUrl], the inverse of [scopedDepLibraryName].
+ * Unit tests for [scopedLibraryNameToken], the inverse of [scopedDepLibraryName].
  *
  * The parser guards stale-entry pruning: a wrong parse can misclassify an invalid placeholder
  * entry scoped to a CURRENT content root as stale and delete it, so the edge cases here matter.
@@ -12,12 +12,12 @@ class ScopedLibraryNameTest : TestCase() {
 
     fun testRoundTripsScopedDepLibraryName() {
         val url = "file:///home/dev/workspace/my_project"
-        assertEquals(url, scopedLibraryNameContentRootUrl(scopedDepLibraryName(url, "phoenix")))
+        assertEquals(url, scopedLibraryNameToken(scopedDepLibraryName(url, "phoenix")))
     }
 
     fun testRoundTripsWslUrl() {
         val url = "file:////wsl.localhost/Ubuntu-24.04/home/dev/workspace/my_project"
-        assertEquals(url, scopedLibraryNameContentRootUrl(scopedDepLibraryName(url, "ecto")))
+        assertEquals(url, scopedLibraryNameToken(scopedDepLibraryName(url, "ecto")))
     }
 
     /**
@@ -28,23 +28,47 @@ class ScopedLibraryNameTest : TestCase() {
      */
     fun testRoundTripsUrlContainingBracketMarker() {
         val url = "file:///home/dev/work [old]/my_project"
-        assertEquals(url, scopedLibraryNameContentRootUrl(scopedDepLibraryName(url, "phoenix")))
+        assertEquals(url, scopedLibraryNameToken(scopedDepLibraryName(url, "phoenix")))
+    }
+
+    /**
+     * The relative form is what reaches version control, so a regression here is a regression in
+     * whether `.idea` can be shared between clones.
+     */
+    fun testRoundTripsRelativeToken() {
+        assertEquals("apps/child", scopedLibraryNameToken(scopedDepLibraryName("apps/child", "phoenix")))
+    }
+
+    fun testRoundTripsProjectRootToken() {
+        assertEquals(".", scopedLibraryNameToken(scopedDepLibraryName(".", "phoenix")))
+    }
+
+    fun testRoundTripsSiblingToken() {
+        assertEquals("../shared_lib", scopedLibraryNameToken(scopedDepLibraryName("../shared_lib", "phoenix")))
+    }
+
+    /**
+     * The "no owning root known" fallback must stay distinct from the project root's `"."`, or
+     * every rootless module's placeholder would be scoped to the project root.
+     */
+    fun testRoundTripsEmptyToken() {
+        assertEquals("", scopedLibraryNameToken(scopedDepLibraryName("", "phoenix")))
     }
 
     fun testUnscopedNameReturnsNull() {
-        assertNull(scopedLibraryNameContentRootUrl("phoenix"))
+        assertNull(scopedLibraryNameToken("phoenix"))
     }
 
     fun testConsolidatedLibraryNameReturnsNull() {
-        assertNull(scopedLibraryNameContentRootUrl("my_project (consolidated)"))
+        assertNull(scopedLibraryNameToken("my_project (consolidated)"))
     }
 
     fun testNameWithMarkerButNoClosingBracketReturnsNull() {
-        assertNull(scopedLibraryNameContentRootUrl("phoenix [file:///home/dev/my_project"))
+        assertNull(scopedLibraryNameToken("phoenix [file:///home/dev/my_project"))
     }
 
     fun testNameStartingWithMarkerReturnsNull() {
         // markerIndex == 0 means there is no dep-name prefix - not a scoped name.
-        assertNull(scopedLibraryNameContentRootUrl(" [file:///home/dev/my_project]"))
+        assertNull(scopedLibraryNameToken(" [file:///home/dev/my_project]"))
     }
 }

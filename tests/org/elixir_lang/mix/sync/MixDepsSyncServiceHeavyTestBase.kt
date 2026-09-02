@@ -132,5 +132,5 @@ abstract class MixDepsSyncServiceHeavyTestBase : HeavyPlatformTestCase() {
      * pumping its event queue. Delegates to [MixSyncTestHelpers.runSuspendOnPooledThread].
      */
     protected fun <T> runSuspendOnPooledThread(block: suspend () -> T): T =
-        MixSyncTestHelpers.runSuspendOnPooledThread(block)
+        MixSyncTestHelpers.runSuspendOnPooledThread(block = block)
 }

@@ -24,10 +24,12 @@ class DepTest : PlatformTestCase() {
      * named constants are misspellings that widely installed packages ship, referenced by name rather
      * than spelled out so a future reader does not "correct" them.
      *
-     * `sparse` and `subdir` are on [Dep.from]'s ignored list but are deliberately absent here,
-     * because they do not belong on it: `Mix.SCM.Git` joins each onto the dep's destination, so Mix
-     * checks the dep out at `deps/<name>/<option>`. Adding either here would assert that the current
-     * answer is correct. Tracked on #3928; when it is fixed they join the handled options below.
+     * `sparse` and `subdir` are absent because they are not path-neutral - `Mix.SCM.Git` joins each
+     * onto the dep's destination. They are handled options, covered by their own cases below.
+     *
+     * `only` and `optional` stay here because neither moves the dep, but they are no longer *merely*
+     * path-neutral: inside a dependency's own `mix.exs` either can drop the dep entirely, which is
+     * what the `isDependency` cases below assert.
      */
     private val pathNeutralOptions = listOf(
         "allow_pre", "app", "branch", "commit", "compile", "depth", "env", "git", "github", "hex",
@@ -78,11 +80,203 @@ class DepTest : PlatformTestCase() {
         assertEquals(Dep.Type.MODULE, deps.single()?.type)
     }
 
+    // ---------------------------------------------------------------------
+    // `sparse:` / `subdir:` - both join onto the dep's destination
+    // ---------------------------------------------------------------------
+
+    fun testSparseAppendsToDepsPath() {
+        val (deps, errorTitles) = depsFrom("{:d, git: \"u\", sparse: \"s\"}")
+
+        assertEmpty("`sparse` is handled, so it must not be reported", errorTitles)
+        assertEquals("deps/d/s", deps.single()?.path)
+    }
+
+    fun testSubdirAppendsToDepsPath() {
+        val (deps, errorTitles) = depsFrom("{:d, git: \"u\", subdir: \"sd\"}")
+
+        assertEmpty("`subdir` is handled, so it must not be reported", errorTitles)
+        assertEquals("deps/d/sd", deps.single()?.path)
+    }
+
+    fun testSparseAndSubdirBothAppend() {
+        val (deps, _) = depsFrom("{:d, git: \"u\", sparse: \"s\", subdir: \"sd\"}")
+
+        assertEquals("deps/d/s/sd", deps.single()?.path)
+    }
+
+    /**
+     * `Mix.SCM.Git.accepts_options` pipes `sparse_opts()` then `subdir_opts()`, so the order is
+     * Mix's, not the source's. Written reversed so inheriting the fold's order fails.
+     */
+    fun testSparseIsAppliedBeforeSubdirWhateverTheSourceOrder() {
+        val (deps, _) = depsFrom("{:d, git: \"u\", subdir: \"sd\", sparse: \"s\"}")
+
+        assertEquals("deps/d/s/sd", deps.single()?.path)
+    }
+
+    fun testSubdirAppliesToAGithubDep() {
+        val (deps, _) = depsFrom("{:d, github: \"o/r\", subdir: \"sd\"}")
+
+        assertEquals("deps/d/sd", deps.single()?.path)
+    }
+
+    /**
+     * `Mix.SCM.Git.accepts_options` returns nil without `git:`/`github:`, so `Mix.SCM.Path` wins and
+     * sets the destination from `path:` alone - `subdir` never applies.
+     */
+    fun testSubdirIsIgnoredForAPathDep() {
+        val (deps, _) = depsFrom("{:d, path: \"vendor/d\", subdir: \"sd\"}")
+
+        assertEquals("vendor/d", deps.single()?.path)
+    }
+
+    fun testSubdirIsIgnoredWithoutAnScmOption() {
+        val (deps, _) = depsFrom("{:d, subdir: \"sd\"}")
+
+        assertEquals("deps/d", deps.single()?.path)
+    }
+
+    fun testSubdirIsIgnoredForAnInUmbrellaDep() {
+        val (deps, _) = depsFrom("{:d, in_umbrella: true, subdir: \"sd\"}")
+
+        assertEquals("apps/d", deps.single()?.path)
+        assertEquals(Dep.Type.MODULE, deps.single()?.type)
+    }
+
+    /** A non-literal value cannot be read, so it is a no-op - as `path:` already treats a call. */
+    fun testNonLiteralSubdirIsANoOp() {
+        val (deps, _) = depsFrom("{:d, git: \"u\", subdir: helper()}")
+
+        assertEquals("deps/d", deps.single()?.path)
+    }
+
+    // ---------------------------------------------------------------------
+    // `only:` / `optional:` inside a dependency's own mix.exs
+    // ---------------------------------------------------------------------
+
+    fun testEnvironmentRestrictedDepOfADepIsDropped() {
+        val (deps, _) = depsFrom("{:d, \"~> 1.0\", only: [:test]}", isDependency = true)
+
+        assertNull("`only:` excluding :prod must drop the dep", deps.single())
+    }
+
+    fun testSingleAtomEnvironmentRestrictedDepOfADepIsDropped() {
+        val (deps, _) = depsFrom("{:d, \"~> 1.0\", only: :test}", isDependency = true)
+
+        assertNull("The single-atom `only:` form must drop the dep too", deps.single())
+    }
+
+    fun testOptionalDepOfADepIsDropped() {
+        val (deps, _) = depsFrom("{:d, \"~> 1.0\", optional: true}", isDependency = true)
+
+        assertNull("`optional: true` must drop the dep", deps.single())
+    }
+
+    /** The two gates are independent: clearing the environment one does not rescue an optional dep. */
+    fun testOptionalDepOfADepIsDroppedEvenWhenOnlyIncludesProd() {
+        val (deps, _) = depsFrom("{:d, \"~> 1.0\", optional: true, only: [:prod]}", isDependency = true)
+
+        assertNull("`optional: true` must drop the dep whatever `only:` says", deps.single())
+    }
+
+    fun testProdOnlyDepOfADepIsKept() {
+        val (deps, _) = depsFrom("{:d, \"~> 1.0\", only: [:prod]}", isDependency = true)
+
+        assertEquals("deps/d", deps.single()?.path)
+    }
+
+    fun testDepOfADepIsKeptWhenOnlyIncludesProdAmongOthers() {
+        val (deps, _) = depsFrom("{:d, \"~> 1.0\", only: [:dev, :prod]}", isDependency = true)
+
+        assertEquals("deps/d", deps.single()?.path)
+    }
+
+    fun testOptionalFalseDepOfADepIsKept() {
+        val (deps, _) = depsFrom("{:d, \"~> 1.0\", optional: false}", isDependency = true)
+
+        assertEquals("deps/d", deps.single()?.path)
+    }
+
+    /**
+     * Every `only:` shape the plugin cannot read must keep the dep. Dropping one that is physically
+     * present costs resolution and completion; keeping one Mix never fetches costs an empty
+     * placeholder library, which is the status quo.
+     */
+    fun testUnreadableOnlyValuesKeepTheDep() {
+        val unreadable = listOf(
+            "only: :\"prod\"",
+            "only: true",
+            "only: @envs",
+            "only: Mix.env()",
+            "only: [:dev] ++ other()",
+        )
+
+        unreadable.forEach { option ->
+            val (deps, _) = depsFrom("{:d, \"~> 1.0\", $option}", isDependency = true)
+
+            assertEquals("`$option` cannot be read, so the dep must be kept", "deps/d", deps.single()?.path)
+        }
+    }
+
+    // ---------------------------------------------------------------------
+    // Options written as an explicit list
+    // ---------------------------------------------------------------------
+
+    /**
+     * `{:dep, "~> 1.0", [optional: true]}` is the same declaration as one without the brackets, and
+     * packages in the wild write both - `db_connection` brackets its `optional:` where `ecto` does
+     * not. Every option was dropped for the bracketed form, so nothing below was ever read.
+     */
+    fun testBracketedOptionalIsHonoured() {
+        val (deps, _) = depsFrom("{:d, \"~> 1.0\", [optional: true]}", isDependency = true)
+
+        assertNull("Bracketed `optional: true` must drop the dep", deps.single())
+    }
+
+    fun testBracketedOnlyIsHonoured() {
+        val (deps, _) = depsFrom("{:d, \"~> 1.0\", [only: [:test]]}", isDependency = true)
+
+        assertNull("Bracketed `only:` excluding :prod must drop the dep", deps.single())
+    }
+
+    fun testBracketedPathIsHonoured() {
+        val (deps, errorTitles) = depsFrom("{:d, [path: \"../d\"]}")
+
+        assertEmpty("`path` is handled, bracketed or not", errorTitles)
+        assertEquals("../d", deps.single()?.path)
+    }
+
+    fun testBracketedInUmbrellaIsHonoured() {
+        val (deps, _) = depsFrom("{:d, [in_umbrella: true]}")
+
+        assertEquals("apps/d", deps.single()?.path)
+        assertEquals(Dep.Type.MODULE, deps.single()?.type)
+    }
+
+    fun testBracketedSubdirIsHonoured() {
+        val (deps, _) = depsFrom("{:d, [git: \"u\", subdir: \"sd\"]}")
+
+        assertEquals("deps/d/sd", deps.single()?.path)
+    }
+
+    /** An unknown option must still be reported when bracketed, or the tripwire has a blind spot. */
+    fun testBracketedUnknownOptionIsReported() {
+        val (_, errorTitles) = depsFrom("{:d, \"~> 1.0\", [not_a_mix_dep_option: true]}")
+
+        assertEquals(
+            listOf(
+                "Don't know if Mix.Dep option `not_a_mix_dep_option` is important for determining " +
+                        "location of dependency"
+            ),
+            errorTitles
+        )
+    }
+
     /**
      * Parses [depTuples] as the `deps` of a `mix.exs` and runs [Dep.from] over each tuple, returning
      * the deps in source order alongside the title of every error [Dep] logged.
      */
-    private fun depsFrom(depTuples: String): Pair<List<Dep?>, List<String>> {
+    private fun depsFrom(depTuples: String, isDependency: Boolean = false): Pair<List<Dep?>, List<String>> {
         val (deps, loggedErrors) = captureLoggedErrors {
             val psiFile = myFixture.configureByText(
                 "mix.exs",
@@ -99,7 +293,7 @@ class DepTest : PlatformTestCase() {
                 """.trimIndent()
             )
 
-            PsiTreeUtil.findChildrenOfType(psiFile, ElixirTuple::class.java).map { Dep.from(it) }
+            PsiTreeUtil.findChildrenOfType(psiFile, ElixirTuple::class.java).map { Dep.from(it, isDependency) }
         }
 
         return Pair(
