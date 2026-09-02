@@ -6,6 +6,9 @@
 
 ### Enhancements
 
+- [#3983](https://github.com/KronicDeth/intellij-elixir/pull/3983) [@sh41](https://github.com/sh41)
+  - **Elixir's `Tools` menu actions are grouped under `Tools > Elixir`.**
+
 - [#3954](https://github.com/KronicDeth/intellij-elixir/pull/3954) [@sh41](https://github.com/sh41)
   - **`~E` sigils now get EEx highlighting and completion.** `~H` injected HEEx and `~L` injected EEx,
     but Phoenix.HTML's own `~E` fell through to no injection at all, leaving the template as plain

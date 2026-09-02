@@ -525,8 +525,8 @@
             <separator/>
             <add-to-group group-id="HelpMenu" anchor="last"/>
         </group>
-        <group id="LangElixir.SdkActions">
-            <separator/>
+        <group id="LangElixir.SdkActions" popup="true" compact="true" text="Elixir"
+               icon="org.elixir_lang.Icons.LANGUAGE">
             <action id="Elixir.OpenElixirSdkSettings"
                     class="org.elixir_lang.action.OpenElixirSdkSettingsAction"
                     text="Configure Elixir SDKs"
@@ -556,7 +556,6 @@
                     text="Reconfigure Elixir Module Setup"
                     icon="AllIcons.Actions.Refresh"
                     description="Apply canonical folder marks and fix module SDK references for all Elixir modules"/>
-            <separator/>
             <add-to-group group-id="ToolsMenu" anchor="last"/>
         </group>
         <group id="Internal.Elixir" popup="true" internal="true" compact="true" text="Elixir">
