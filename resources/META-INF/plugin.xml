@@ -550,6 +550,16 @@
                     text="Install Mix Deps (hex, rebar, deps.get, deps.compile)"
                     icon="org.elixir_lang.mix.configuration.Icons.TYPE"
                     description="Installs hex, rebar, fetches Mix deps, and compiles them"/>
+            <action id="Elixir.SyncDependencyLibraries"
+                    class="org.elixir_lang.action.SyncDependencyLibrariesAction"
+                    text="Sync Dependency Libraries"
+                    icon="AllIcons.Actions.Refresh"
+                    description="Rescans every content root's deps and _build to sync its Mix dep libraries">
+                <synonym text="Rebuild Mix Libraries"/>
+                <synonym text="Mix Libraries"/>
+                <synonym text="External Libraries"/>
+                <synonym text="Refresh Dependencies"/>
+            </action>
             <separator/>
             <action id="Elixir.ReconfigureModuleSetup"
                     class="org.elixir_lang.action.ReconfigureModuleSetupAction"

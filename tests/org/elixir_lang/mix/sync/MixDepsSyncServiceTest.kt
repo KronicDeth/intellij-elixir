@@ -1381,6 +1381,30 @@ class MixDepsSyncServiceTest : PlatformTestCase() {
 
 
     // ------------------------------------------------------------------
+    // Sync Dependency Libraries action
+    // ------------------------------------------------------------------
+
+    /**
+     * The action is the only way a user can force a full rescan: nothing else enqueues
+     * [SyncRequest.All] outside first-time project configuration, and `mix deps.get` on already
+     * fetched deps changes nothing on disk, so it produces no VFS events either.
+     */
+    fun testSyncDependencyLibrariesAction_enqueuesAll() {
+        val service = project.service<MixDepsSyncService>()
+        service.clearPendingForTesting()
+        assertEquals(0, service.pendingCount)
+
+        org.elixir_lang.action.SyncDependencyLibrariesAction().actionPerformed(
+            com.intellij.testFramework.TestActionEvent.createTestEvent(
+                com.intellij.openapi.actionSystem.impl.SimpleDataContext
+                    .getProjectContext(project)
+            )
+        )
+
+        assertEquals("The action must enqueue exactly one request", 1, service.pendingCount)
+        service.clearPendingForTesting()
+    }
+    // ------------------------------------------------------------------
     // contentRootToken
     // ------------------------------------------------------------------
 

@@ -17,6 +17,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.elixir_lang.mix.library.CONSOLIDATED_LIBRARY_SUFFIX
 import org.elixir_lang.mix.sync.MixDepsSyncService.Companion.LOG
+import org.elixir_lang.util.awaitJpsProjectLoaded
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -77,6 +78,15 @@ class MixDepsSyncService(private val project: Project, cs: CoroutineScope) {
             syncFlow
                 .debounce(DEBOUNCE_MS.milliseconds)
                 .collect {
+                    // The `DelayedProjectSynchronizer` applies the on-disk `.iml` files after the
+                    // workspace model is restored from cache (5-13s on WSL), and anything committed
+                    // before it lands is silently overwritten - a sync that reports success and
+                    // leaves nothing behind. Sync Dependency Libraries is `isDumbAware`, so a user
+                    // can invoke it inside that window, which is exactly when libraries look
+                    // wrong enough to reach for it. Gating the one collector covers every producer.
+                    awaitJpsProjectLoaded(project)
+                    if (project.isDisposed) return@collect
+
                     supervisorScope {
                         val drainAttempt = async { drain() }
 
