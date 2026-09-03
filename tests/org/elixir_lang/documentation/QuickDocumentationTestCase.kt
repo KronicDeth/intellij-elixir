@@ -1,7 +1,6 @@
 package org.elixir_lang.documentation
 
 import com.intellij.lang.documentation.ide.IdeDocumentationTargetProvider
-import com.intellij.platform.backend.documentation.impl.computeDocumentationBlocking
 import org.elixir_lang.PlatformTestCase
 
 /**
@@ -19,32 +18,6 @@ import org.elixir_lang.PlatformTestCase
  */
 @Suppress("UnstableApiUsage")
 abstract class QuickDocumentationTestCase : PlatformTestCase() {
-    /**
-     * Renders Quick Documentation for the current caret exactly as pressing Ctrl+Q would, or returns
-     * `null` when the IDE would show no documentation (no target resolved, or no docs for the
-     * resolved target).
-     *
-     * Uses the v2 documentation-target API ([IdeDocumentationTargetProvider] +
-     * [computeDocumentationBlocking]) - the same entry point the platform's own Quick Doc tests use
-     * (e.g. Kotlin's `AbstractFirQuickDocTest`) - rather than the removed-for-`v2`
-     * `DocumentationManager`.
-     */
-    protected fun quickDocumentationAtCaret(): String? {
-        val editor = myFixture.editor
-        val file = myFixture.file
-        val offset = editor.caretModel.offset
-        val target = IdeDocumentationTargetProvider.getInstance(project)
-            .documentationTargets(editor, file, offset)
-            .firstOrNull()
-            ?: return null
-        // DocumentationTarget is @ApiStatus.OverrideOnly, so calling createPointer() on the
-        // interface-typed target trips the OverrideOnly inspection. The call is unavoidable and
-        // sanctioned: it dispatches to the concrete platform target's override, and the @TestOnly
-        // helper's contract is `computeDocumentationBlocking(target.createPointer())` - the exact
-        // form the platform's own Quick Doc tests (Kotlin AbstractFirQuickDocTest, DevKit
-        // XmlDescriptorDocumentationProviderTest) use.
-        @Suppress("OverrideOnly")
-        val pointer = target.createPointer()
-        return computeDocumentationBlocking(pointer)?.html
-    }
+    /** @see quickDocumentationAtCaret */
+    protected fun quickDocumentationAtCaret(): String? = myFixture.quickDocumentationAtCaret(project)
 }

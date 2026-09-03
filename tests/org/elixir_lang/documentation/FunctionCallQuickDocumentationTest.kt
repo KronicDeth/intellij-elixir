@@ -133,6 +133,22 @@ class FunctionCallQuickDocumentationTest : QuickDocumentationTestCase() {
         )
     }
 
+    /**
+     * A `def`'s `@doc` documents the clause's own name identifier, not every identifier inside the
+     * clause. Without that distinction anything in a documented function's body would inherit its
+     * `@doc`.
+     */
+    fun testQuickDocOnVariableInsideDocumentedFunctionDoesNotShowItsAtDoc() {
+        myFixture.configureByFiles("variable_in_documented_function_body.ex")
+
+        val documentation = quickDocumentationAtCaret()
+
+        assertFalse(
+            "A variable in a documented function's body should not inherit its @doc, got: $documentation",
+            documentation.orEmpty().contains("Adds two numbers together")
+        )
+    }
+
     override fun getTestDataPath(): String =
         "testData/org/elixir_lang/documentation/local_function_quick_doc"
 }

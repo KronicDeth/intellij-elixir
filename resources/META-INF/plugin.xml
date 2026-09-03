@@ -140,11 +140,6 @@
             implementationClass="org.elixir_lang.heex.inspections.HTMLInspectionSuppressor"
         />
 
-        <!-- Quick Docs on a component tag: widens the resolved name identifier to its def/defp. -->
-        <platform.backend.documentation.psiTargetProvider
-            implementation="org.elixir_lang.heex.documentation.HeexComponentDocumentationTargetProvider"
-        />
-
         <!-- Mix related extensions -->
         <configurationType implementation="org.elixir_lang.mix.configuration.Type"/>
 
