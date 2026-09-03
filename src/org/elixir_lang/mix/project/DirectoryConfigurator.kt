@@ -113,7 +113,7 @@ class DirectoryConfigurator : DirectoryProjectConfigurator.AsyncDirectoryProject
     }
 
     private suspend fun configureDescendantOtpApp(rootProject: Project, otpApp: OtpApp) {
-        if (System.getProperty("idea.platform.prefix") == "GoLand" || !ProjectAttachProcessor.canAttachToProject()) {
+        if (!ProjectAttachProcessor.canAttachToProject()) {
             return
         }
 
