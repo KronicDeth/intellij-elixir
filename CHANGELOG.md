@@ -61,6 +61,13 @@
 
 ### Bug Fixes
 
+- [#3998](https://github.com/KronicDeth/intellij-elixir/pull/3998) [@sh41](https://github.com/sh41)
+  - **Completion offers the Elixir and Erlang standard libraries again in WebStorm, RubyMine,
+    PyCharm, GoLand and CLion.** `String`, `Application`, `:math` and everything else that ships
+    with the SDK were missing from the popup even when the SDK was set up correctly. Existing
+    projects are repaired when they next open.
+    Fixes [#3486](https://github.com/KronicDeth/intellij-elixir/issues/3486).
+
 - [#3993](https://github.com/KronicDeth/intellij-elixir/pull/3993) [@sh41](https://github.com/sh41)
   - **Function names are offered after a `.` even when another statement follows it.** Fixes [#3219](https://github.com/KronicDeth/intellij-elixir/issues/3219).
 

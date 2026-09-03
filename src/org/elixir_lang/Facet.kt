@@ -6,6 +6,7 @@ import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.rootManager
 import com.intellij.openapi.projectRoots.ProjectJdkTable
 import com.intellij.openapi.projectRoots.Sdk
+import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.roots.libraries.LibraryTable
 import org.elixir_lang.facet.Configuration
 
@@ -58,9 +59,26 @@ class Facet(
                 }
         }
 
+        /**
+         * The module library that stands in for [sdk] on a small IDE, carrying the SDK's own roots.
+         *
+         * Both root types are copied. `CLASSES` covers the compiled `ebin` directories, but Elixir's
+         * stubs are indexed from `.ex` sources rather than `.beam`, so `defmodule` declarations for
+         * the standard library live under `SOURCES` - without those, an assigned SDK still completes
+         * nothing.
+         */
         private fun addElixirSDK(moduleLibraryTable: LibraryTable, sdk: Sdk) {
-            moduleLibraryTable.createLibrary(sdk.name)
+            moduleLibraryTable.createLibrary(sdk.name).modifiableModel.apply {
+                for (rootType in ROOT_TYPES) {
+                    sdk.rootProvider.getUrls(rootType).forEach { addRoot(it, rootType) }
+                }
+
+                commit()
+            }
         }
+
+        /** The SDK root types carried onto the module library, in the order they are copied. */
+        private val ROOT_TYPES = listOf(OrderRootType.CLASSES, OrderRootType.SOURCES)
 
         fun sdks(): kotlin.collections.List<Sdk> =
             ProjectJdkTable
