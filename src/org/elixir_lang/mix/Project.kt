@@ -27,7 +27,9 @@ import java.io.File
 
 object Project {
     const val MIX_EXS = "mix.exs"
-    private val LOG = Logger.getInstance(Project::class.java)
+    // Qualified because an explicit import outranks a declaration in the same file: the bare name
+    // resolves to the imported com.intellij.openapi.project.Project.
+    private val LOG = Logger.getInstance(org.elixir_lang.mix.Project::class.java)
 
     fun addSourceDirToContent(
         content: ContentEntry,
@@ -199,11 +201,14 @@ object Project {
      * through: the New Project wizard and the New Module wizard via
      * [org.elixir_lang.module.ElixirModuleBuilder], and the import wizard and project-open
      * processor via [createModulesForOtpApps].
+     *
+     * `CompilerModuleExtension` ships with the Java plugin, so it is absent in a small IDE such as
+     * RubyMine - where there is no `<exclude-output/>` to suppress in the first place.
      */
     private fun clearExcludeOutput(modifiableRootModel: ModifiableRootModel) {
         modifiableRootModel
             .getModuleExtension(CompilerModuleExtension::class.java)
-            .setExcludeOutput(false)
+            ?.setExcludeOutput(false)
     }
 
     /**

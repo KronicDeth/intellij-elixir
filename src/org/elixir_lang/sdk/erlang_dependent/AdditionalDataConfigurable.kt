@@ -492,6 +492,8 @@ class AdditionalDataConfigurable(
     }
 
     companion object {
-        private val LOG = Logger.getInstance(AdditionalDataConfigurable::class.java)
+        // Qualified because an explicit import outranks a declaration in the same file: the bare
+        // name resolves to the imported com.intellij.openapi.projectRoots.AdditionalDataConfigurable.
+        private val LOG = Logger.getInstance(org.elixir_lang.sdk.erlang_dependent.AdditionalDataConfigurable::class.java)
     }
 }

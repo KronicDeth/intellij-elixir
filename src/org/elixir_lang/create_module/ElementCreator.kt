@@ -22,7 +22,9 @@ class ElementCreator(project: Project, private val directory: PsiDirectory, priv
     override fun getActionName(newName: String): String = NEW_ELIXIR_MODULE
 }
 
-private val LOGGER = Logger.getInstance(ElementCreator::class.java);
+// Qualified because an explicit import outranks a declaration in the same file: the bare name
+// resolves to the imported com.intellij.ide.actions.ElementCreator.
+private val LOGGER = Logger.getInstance(org.elixir_lang.create_module.ElementCreator::class.java);
 
 /**
  * @link com.intellij.ide.actions.CreateTemplateInPackageAction#checkOrCreate
