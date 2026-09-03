@@ -27,7 +27,9 @@ import java.io.File
 
 object Project {
     const val MIX_EXS = "mix.exs"
-    private val LOG = Logger.getInstance(Project::class.java)
+    // Qualified because an explicit import outranks a declaration in the same file: the bare name
+    // resolves to the imported com.intellij.openapi.project.Project.
+    private val LOG = Logger.getInstance(org.elixir_lang.mix.Project::class.java)
 
     fun addSourceDirToContent(
         content: ContentEntry,
