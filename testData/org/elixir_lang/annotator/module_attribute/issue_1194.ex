@@ -1,0 +1,1 @@
+@type marker :: <error descr="Char Lists and Strings aren't allowed in types">'='</error> | <error descr="Char Lists and Strings aren't allowed in types">'/'</error> | <error descr="Char Lists and Strings aren't allowed in types">'|'</error> | <error descr="Char Lists and Strings aren't allowed in types">''</error>

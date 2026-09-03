@@ -323,9 +323,10 @@ public class ElixirWslSdkTest extends PlatformTestCase {
     }
 
     /**
-     * Erlang SDK file chooser descriptor is properly configured.
+     * Erlang SDK file chooser descriptor is properly configured. This asserts the descriptor's shape
+     * only; what it accepts as a WSL home is pinned by {@code CliToolWslSafeTest}.
      */
-    public void testErlangSdkFileChooser_ValidatesWslPaths() {
+    public void testErlangSdkFileChooser_ChoosesFoldersNotFiles() {
         // Given: Erlang SDK file chooser descriptor
         org.elixir_lang.sdk.erlang.Type erlangSdkType = new org.elixir_lang.sdk.erlang.Type();
         com.intellij.openapi.fileChooser.FileChooserDescriptor descriptor =

@@ -6,6 +6,7 @@ import org.elixir_lang.PlatformTestCase
 import org.elixir_lang.psi.CallDefinitionClause.enclosingModularMacroCall
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.structure_view.element.CallDefinitionClause
+import org.elixir_lang.structure_view.element.CallDefinitionHead
 
 class GotoSymbolContributorTest : PlatformTestCase() {
     private fun gotoSymbolContributor(): GotoSymbolContributor {
@@ -91,6 +92,24 @@ class GotoSymbolContributorTest : PlatformTestCase() {
 
         val modular = CallDefinitionClause.enclosingModular(call)
         assertNotNull(modular)
+    }
+
+    /**
+     * A second head for the same module/name/arity is what sends the list through
+     * `Any.isDecompiled()`, whose `else` branch throws `NotImplementedError` for any type it has no
+     * case for. Nothing else pins the `CallDefinitionHead` case.
+     */
+    fun testIssue1603() {
+        myFixture.configureByFile("issue_1603.ex")
+        val gotoSymbolContributor = gotoSymbolContributor()
+        val itemsByName = gotoSymbolContributor.getItemsByName(
+                "collide",
+                "coll",
+                myFixture.project,
+                false
+        )
+
+        assertEquals(2, itemsByName.filterIsInstance<CallDefinitionHead>().size)
     }
 
     @RequiresReadLock

@@ -314,6 +314,67 @@ fun CodeInsightTestFixture.completeSoleCandidateAtCaret(): String {
 }
 
 /**
+ * What one completion gesture did: the candidates offered ([candidates], `null` when no popup opened)
+ * and the document [text] afterwards.
+ *
+ * Both halves are needed to tell the three outcomes apart. [completionStringsAtCaret] alone cannot:
+ * it returns `null` both when nothing was offered *and* when a lone candidate auto-inserted, and a
+ * test that flattens those passes when the editor silently rewrote the user's code.
+ */
+data class CompletionAttempt(val candidates: List<String>?, val text: String)
+
+/**
+ * Drives completion at the caret and reports both what was offered and what the document became, for
+ * callers that must distinguish "the popup offered nothing" from "a lone candidate auto-inserted".
+ * Assertions that only care about one half want [completionStringsAtCaret] or
+ * [completeSoleCandidateAtCaret] instead.
+ */
+fun CodeInsightTestFixture.completionAttemptAtCaret(): CompletionAttempt {
+    complete(CompletionType.BASIC)
+
+    return CompletionAttempt(lookupElementStrings, file.text)
+}
+
+/**
+ * Accepts the completion candidate named [lookupString] at the caret with [completionChar] and returns
+ * the resulting document text - the whole user action, popup through to insertion.
+ *
+ * Asserting on the offered strings stops one step short of what the user sees: a candidate can be
+ * offered under a lookup string that inserts something else, or over a replacement range that does not
+ * cover what it replaces, and no assertion over [completionStringsAtCaret] can catch either.
+ */
+fun CodeInsightTestFixture.completeCandidateAtCaret(
+    lookupString: String,
+    completionChar: Char = '\t'
+): String {
+    acceptCompletionCandidate(lookupString, completionChar)
+
+    return file.text
+}
+
+/**
+ * Selects the candidate named [lookupString] from an open lookup and finishes it with [completionChar].
+ *
+ * The lookup is finished directly rather than by typing the character, because that is what the editor
+ * does: an open lookup consumes the keystroke, so `TypedHandler` never runs. The candidate is selected
+ * explicitly rather than relying on the lookup's ordering, so a test pins the popup rather than which
+ * candidate happened to sort first. The fixture must offer more than one candidate, or the lookup
+ * auto-inserts and there is nothing to accept.
+ */
+private fun CodeInsightTestFixture.acceptCompletionCandidate(lookupString: String, completionChar: Char) {
+    val candidates = completeBasic()
+        ?: throw AssertionError("Expected a completion lookup to open, but a single candidate was auto-inserted")
+    val candidate = candidates.firstOrNull { it.lookupString == lookupString }
+        ?: throw AssertionError(
+            "Expected a '$lookupString' completion candidate, got ${candidates.map { it.lookupString }}"
+        )
+
+    (lookup as LookupImpl).currentItem = candidate
+
+    finishLookup(completionChar)
+}
+
+/**
  * The [PsiUsage]s the Find Usages tool window would display for the search target resolved at the
  * caret (including the declaration usage; empty when the caret resolves to no unambiguous target).
  *
@@ -510,30 +571,17 @@ fun CodeInsightTestFixture.parameterInfoPopupAfterTyping(charTyped: Char): Param
  * Accepts the completion candidate named [lookupString] with [completionChar], the way a user finishes a
  * name from the lookup rather than typing it out.
  *
- * The lookup is finished directly rather than by typing the character, because that is what the editor
- * does: an open lookup consumes the keystroke, so `TypedHandler` - and with it the platform's own
- * `(`-and-`,` auto-popup - never runs. Typing the character into the fixture instead reaches
- * `TypedHandler` and quietly exercises the path that already works, which is the difference between a
- * test that catches this and one that does not.
- *
- * The candidate is selected explicitly rather than relying on the lookup's ordering, so the test pins the
- * popup rather than which candidate happened to sort first. The fixture must offer more than one
- * candidate, or the lookup auto-inserts and there is nothing to accept.
+ * Shares [acceptCompletionCandidate] with [completeCandidateAtCaret], so the popup is finished the way
+ * the editor finishes it: an open lookup consumes the keystroke, so `TypedHandler` - and with it the
+ * platform's own `(`-and-`,` auto-popup - never runs. Typing the character into the fixture instead
+ * reaches `TypedHandler` and quietly exercises the path that already works, which is the difference
+ * between a test that catches this and one that does not.
  */
 fun CodeInsightTestFixture.parameterInfoPopupAfterAcceptingCompletion(
     lookupString: String,
     completionChar: Char = '\t'
 ): ParameterInfoPopup? = parameterInfoPopupAfter {
-    val candidates = completeBasic()
-        ?: throw AssertionError("Expected a completion lookup to open, but a single candidate was auto-inserted")
-    val candidate = candidates.firstOrNull { it.lookupString == lookupString }
-        ?: throw AssertionError(
-            "Expected a '$lookupString' completion candidate, got ${candidates.map { it.lookupString }}"
-        )
-
-    (lookup as LookupImpl).currentItem = candidate
-
-    finishLookup(completionChar)
+    acceptCompletionCandidate(lookupString, completionChar)
 }
 
 /**

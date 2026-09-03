@@ -190,6 +190,14 @@ class RenameMatrixTest : PlatformTestCase() {
     /** `with {:ok, renamee} <- ...` binding and body use. */
     fun testVariableWith() = doTestFromEveryOccurrence("variable_with", "renamee", "fresh", expectedCarets = 2)
 
+    /**
+     * One name bound twice across two map patterns of the same clause head, where the second
+     * binding matches against the first rather than introducing a new one. Both occurrences are the
+     * same variable and must rename together from either caret.
+     */
+    fun testVariableMapPatternRepeated() =
+        doTestFromEveryOccurrence("variable_map_pattern_repeated", "renamee", "fresh", expectedCarets = 2)
+
     // -- Types ------------------------------------------------------------------------------
 
     /** `@type` declaration and its references inside a `@spec`. */

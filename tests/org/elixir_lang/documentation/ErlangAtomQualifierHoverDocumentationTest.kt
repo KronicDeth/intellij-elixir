@@ -1,5 +1,6 @@
 package org.elixir_lang.documentation
 
+import com.intellij.lang.documentation.DocumentationMarkup
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.newvfs.impl.VfsRootAccess
 import org.elixir_lang.beam.BeamLibraryFixture
@@ -53,6 +54,29 @@ class ErlangAtomQualifierHoverDocumentationTest : QuickDocumentationTestCase() {
 
         assertTrue("Expected module definition for :queue", hover!!.contains("<i>module</i> <b>:queue</b>"))
         assertTrue("Expected function doc body", hover.contains("Inserts"))
+    }
+
+    /**
+     * Rendering a function whose docs chunk carries `deprecated` metadata once threw
+     * `kotlin.NotImplementedError` from a bare `TODO()` (issue #2412), until "Implement Deprecated
+     * metadata handling for docs from BEAM files" shipped in v13.1.1. `:queue.lait/1` supplies that
+     * metadata as an `OtpErlangBinary`, the one shape the renderer converts rather than logs for.
+     */
+    fun testDeprecatedFunctionHoverShowsDeprecatedSection() {
+        myFixture.configureByFiles("deprecated_function_hover.ex")
+
+        val hover = quickDocumentationAtCaret()
+        assertNotNull("Hover documentation is null", hover)
+
+        assertTrue("Expected module definition for :queue", hover!!.contains("<i>module</i> <b>:queue</b>"))
+        assertTrue(
+            "Expected a Deprecated section header for :queue.lait/1",
+            hover.contains(DocumentationMarkup.SECTION_HEADER_START + "Deprecated")
+        )
+        assertTrue(
+            "Expected the deprecation text from the docs chunk metadata",
+            hover.contains("queue:lait/1 is deprecated")
+        )
     }
 
     private fun addBeamLibrary() {

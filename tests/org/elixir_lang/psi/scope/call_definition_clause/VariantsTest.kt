@@ -41,6 +41,26 @@ class VariantsTest : PlatformTestCase() {
     }
 
     /**
+     * A guard defined with `defguard`/`defguardp` is offered where a guard is actually used - in the
+     * `when` clause of a sibling definition in the same module.
+     */
+    fun testGuard() {
+        myFixture.configureByFile("guard.ex")
+        val variants = myFixture.complete(CompletionType.BASIC).orEmpty().toList()
+
+        assertRenderedVariant(
+            variants,
+            lookupString = "is_even_number",
+            expectedTailText = "(value) when rem(value, 2) == 0 (guard.ex defmodule GuardVariants)"
+        )
+        assertRenderedVariant(
+            variants,
+            lookupString = "is_even_tuple",
+            expectedTailText = "(value) when rem(tuple_size(value), 2) == 0 (guard.ex defmodule GuardVariants)"
+        )
+    }
+
+    /**
      * Finds the completion [LookupElement] whose lookup string is [lookupString], renders it, and
      * asserts its item text equals [lookupString] and its tail text equals [expectedTailText].
      */

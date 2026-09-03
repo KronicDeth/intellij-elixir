@@ -4,6 +4,7 @@ import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.projectRoots.ProjectJdkTable
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl
+import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar
 import com.intellij.testFramework.common.runAll
 import org.elixir_lang.PlatformTestCase
@@ -131,6 +132,46 @@ class ElixirSdksConfigurableTest : PlatformTestCase() {
                 listOf("Elixir Listener A", "Elixir Listener B").forEach { name ->
                     libraryTable.getLibraryByName(name)?.let { libraryTable.removeLibrary(it) }
                 }
+            }
+        }
+    }
+
+    fun testSdkAddedReusesExistingApplicationLibrary() {
+        val configurable = ElixirSdksConfigurable()
+        configurable.createComponent()
+        configurable.reset()
+
+        val libraryTable = LibraryTablesRegistrar.getInstance().libraryTable
+        try {
+            // An application library left over from an earlier add/remove cycle, carrying a root the
+            // SDK about to be added does not have.
+            WriteAction.run<Throwable> {
+                libraryTable.createLibrary("Elixir Reused").modifiableModel.apply {
+                    addRoot("temp:///stale", OrderRootType.CLASSES)
+                    commit()
+                }
+            }
+
+            // Regression: this used to throw
+            // "IllegalStateException: Application library named Elixir Reused already exists" - sdkAdded
+            // called createLibrary unconditionally, and the platform refuses a name that already has one.
+            service().getModel().addSdk(ProjectJdkImpl("Elixir Reused", ElixirSdkType.instance))
+
+            assertEquals(
+                "the existing library must be reused, not duplicated",
+                1,
+                libraryTable.libraries.count { it.name == "Elixir Reused" },
+            )
+            // The roots are replaced rather than appended, so the stale one is gone - which also means
+            // this test fails if sdkAdded stops mirroring altogether.
+            assertEmpty(
+                "stale roots must be replaced by the SDK's own",
+                libraryTable.getLibraryByName("Elixir Reused")!!.getUrls(OrderRootType.CLASSES).toList(),
+            )
+        } finally {
+            configurable.disposeUIResources()
+            WriteAction.run<Throwable> {
+                libraryTable.getLibraryByName("Elixir Reused")?.let { libraryTable.removeLibrary(it) }
             }
         }
     }
