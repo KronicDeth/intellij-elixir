@@ -19,8 +19,26 @@ object SourceFileDocsHelper {
     fun fetchDocs(element: PsiElement): FetchedDocs? = when (element) {
         is AtUnqualifiedNoParenthesesCall<*> -> fetchDocs(element)
         is Call -> fetchDocs(element)
-        else -> null
+        else -> documentedCallDefinitionClause(element)?.let(::fetchDocs)
     }
+
+    /**
+     * The `def`/`defp` clause [element] names, when [element] is that clause's own name identifier.
+     *
+     * Resolution hands out the name identifier rather than the clause where a `PsiNamedElement` is
+     * wanted - `HeexComponentResolver.declarationTarget` does, so Rename and Go To Declaration land
+     * on the name - and the resulting element reaches Quick Docs unchanged.
+     *
+     * The nearest [Call] ancestor of a name identifier is the head's argument-list wrapper
+     * (`button(assigns)`), so the walk continues to the first call definition clause. Requiring the
+     * clause's name identifier to be [element] is what keeps the clause's `@doc` off everything else
+     * inside it.
+     */
+    private fun documentedCallDefinitionClause(element: PsiElement): Call? =
+        generateSequence(element.parent) { it.parent }
+            .filterIsInstance<Call>()
+            .firstOrNull { CallDefinitionClause.`is`(it) }
+            ?.takeIf { CallDefinitionClause.nameIdentifier(it) == element }
 
     private fun fetchDocs(moduleAttribute: AtUnqualifiedNoParenthesesCall<*>): FetchedDocs? =
         when (moduleAttribute.atIdentifier.identifierName()) {

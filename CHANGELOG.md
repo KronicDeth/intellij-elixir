@@ -265,6 +265,12 @@
 
 ### Threading / Platform Hygiene
 
+- [#4002](https://github.com/KronicDeth/intellij-elixir/pull/4002) [@sh41](https://github.com/sh41)
+  - **Quick Docs on a HEEx component tag no longer uses an internal platform API.** A `def`/`defp`
+    clause's own name identifier now resolves to that clause's documentation, so the tag's resolved
+    target renders through the platform's default documentation target instead of one built with
+    `com.intellij.lang.documentation.psi.UtilKt.createPsiDocumentationTarget`.
+
 - [#3950](https://github.com/KronicDeth/intellij-elixir/pull/3950) [@sh41](https://github.com/sh41)
   - **The formatter's `Block` is clean under IntelliJ's inspections** - 18 warnings down to 3. Four
     nullable-node dereferences now state the `AbstractBlock` non-null invariant,
