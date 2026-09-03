@@ -61,6 +61,10 @@
 
 ### Bug Fixes
 
+- [#4001](https://github.com/KronicDeth/intellij-elixir/pull/4001) [@sh41](https://github.com/sh41)
+  - **A Mix project opened in a small IDE is configured as an Elixir project again.** Fixes [#3999](https://github.com/KronicDeth/intellij-elixir/issues/3999).
+  - **A Mix app below the opened directory is attached to the project again**, in RubyMine and other small IDEs that support attaching.
+
 - [#3998](https://github.com/KronicDeth/intellij-elixir/pull/3998) [@sh41](https://github.com/sh41)
   - **Completion offers the Elixir and Erlang standard libraries again in WebStorm, RubyMine,
     PyCharm, GoLand and CLion.** `String`, `Application`, `:math` and everything else that ships
