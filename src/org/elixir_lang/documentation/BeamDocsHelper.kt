@@ -8,8 +8,6 @@ import com.intellij.psi.ResolveState
 import org.elixir_lang.beam.Beam
 import org.elixir_lang.beam.psi.Module
 import org.elixir_lang.beam.psi.impl.CallDefinitionImpl
-import org.elixir_lang.errorreport.Logger
-import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
 import org.elixir_lang.psi.Definition
 import org.elixir_lang.psi.call.MaybeExported
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.Attribute
@@ -68,13 +66,8 @@ object BeamDocsHelper {
                             }
                         }
                     }
-                    // types are only generated for builtins, so no docs
-                    is AtUnqualifiedNoParenthesesCall<*> -> null
-                    else -> {
-                        Logger.error(BeamDocsHelper.javaClass, "Don't know how to fetch docs", element)
-
-                        null
-                    }
+                    // Only modules and exported definitions carry docs; a type or anything else has none
+                    else -> null
                 }
             }
         }
