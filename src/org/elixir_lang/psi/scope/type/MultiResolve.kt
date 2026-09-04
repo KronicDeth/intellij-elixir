@@ -6,7 +6,6 @@ import com.intellij.psi.ResolveState
 import com.intellij.psi.util.PsiTreeUtil
 import org.elixir_lang.beam.psi.impl.ModuleImpl
 import org.elixir_lang.beam.psi.impl.TypeDefinitionImpl
-import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.qualification.Qualified
@@ -163,11 +162,8 @@ private constructor(private val name: String,
                     }
                 }
                 is ElixirVariable -> executeOnParameter(parameter, parameter.name, state)
-                else -> {
-                    Logger.error(MultiResolve::class.java, "Don't know how to get name of parameter", parameter)
-
-                    true
-                }
+                // Anything else names no type variable; keep walking.
+                else -> true
             }
     }
 

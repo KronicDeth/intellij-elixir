@@ -61,6 +61,11 @@
 
 ### Bug Fixes
 
+- [#4014](https://github.com/KronicDeth/intellij-elixir/pull/4014) [@sh41](https://github.com/sh41)
+  - **Resolving a variable or type no longer reports an error for code shapes the resolver does not
+    declare from**, such as a `do` block met on the walk or a `@type` head with a literal argument.
+    Refs [#3985](https://github.com/KronicDeth/intellij-elixir/issues/3985).
+
 - [#4007](https://github.com/KronicDeth/intellij-elixir/pull/4007) [@sh41](https://github.com/sh41)
   - **Typing a heredoc's opening `"""` now closes it at the same indentation.** Fixes [#806](https://github.com/KronicDeth/intellij-elixir/issues/806).
 

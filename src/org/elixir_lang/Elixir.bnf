@@ -90,14 +90,11 @@
     functionName
     functionNameElement
     getDoBlock
-    getName
-    getNameIdentifier
     hasDoBlockOrKeyword
     isCalling
     isCallingMacro
     leftOperand
     moduleName
-    operator
     primaryArguments
     primaryArity
     processDeclarations
@@ -655,7 +652,6 @@ noParenthesesKeywordPair ::= keywordKeyColon noParenthesesExpression
                              {
                                implements = "org.elixir_lang.psi.QuotableKeywordPair"
                                methods = [
-                                 getKeywordKey
                                  getKeywordValue
                                  quote
                                ]
@@ -711,7 +707,6 @@ heredoc ::= HEREDOC_PROMOTER EOL
                   addFragmentCodePoints
                   addHexadecimalEscapeSequenceCodePoints
                   createLiteralTextEscaper
-                  getHeredocLineList
                   isCharList
                   isValidHost
                   quote
@@ -1456,7 +1451,6 @@ noParenthesesOneArgument ::= noParenthesesKeywords | // @see https://github.com/
                                methods = [
                                  arguments
                                  isModuleName
-                                 processDeclarations
                                  quoteArguments
                                ]
                              }
@@ -1908,19 +1902,7 @@ stabNoParenthesesSignature ::= noParenthesesArguments
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L430-L432
  */
 stabParenthesesSignature ::= parenthesesArguments (whenInfixOperator expression)?
-                             {
-                               implements = [
-                                 "org.elixir_lang.psi.Quotable"
-                                 "org.elixir_lang.psi.operation.When"
-                               ]
-                               methods = [
-                                 getNameIdentifier
-                                 leftOperand
-                                 operator
-                                 quote
-                                 rightOperand
-                               ]
-                             }
+                             { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 stabInfixOperator ::= STAB_OPERATOR
                       {
@@ -2859,7 +2841,6 @@ keywordPair ::=  keywordKeyColon containerExpression
                  {
                    implements = "org.elixir_lang.psi.QuotableKeywordPair"
                    methods = [
-                     getKeywordKey
                      getKeywordValue
                      quote
                    ]

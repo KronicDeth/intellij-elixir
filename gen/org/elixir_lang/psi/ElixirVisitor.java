@@ -700,7 +700,6 @@ public class ElixirVisitor extends PsiElementVisitor {
 
   public void visitStabParenthesesSignature(@NotNull ElixirStabParenthesesSignature o) {
     visitQuotable(o);
-    // visitWhen(o);
   }
 
   public void visitStructOperation(@NotNull ElixirStructOperation o) {

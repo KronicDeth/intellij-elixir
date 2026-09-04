@@ -5,7 +5,6 @@ import com.intellij.psi.ResolveState
 import com.intellij.psi.util.PsiTreeUtil
 import org.elixir_lang.NameArityInterval
 import org.elixir_lang.beam.psi.impl.CallDefinitionImpl
-import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.CallDefinitionClause.nameArityInterval
 import org.elixir_lang.psi.call.Call
@@ -92,11 +91,8 @@ private constructor(
                                             modularResultResult.isValidResult,
                                             state
                                         )
-                                        else -> {
-                                            Logger.error(javaClass,
-                                                         "Don't know how to add resolve results for delegation",
-                                                         modularResultResultElement)
-                                        }
+                                        // Anything else is not a definition a delegation can target.
+                                        else -> Unit
                                     }
                                 }
 

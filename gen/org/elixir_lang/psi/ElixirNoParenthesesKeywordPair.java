@@ -20,10 +20,6 @@ public interface ElixirNoParenthesesKeywordPair extends QuotableKeywordPair {
   @Nullable
   ElixirNoParenthesesManyStrictNoParenthesesExpression getNoParenthesesManyStrictNoParenthesesExpression();
 
-  //WARNING: getKeywordKey(...) is skipped
-  //matching getKeywordKey(ElixirNoParenthesesKeywordPair, ...)
-  //methods are not found in ElixirPsiImplUtil
-
   @NotNull Quotable getKeywordValue();
 
   @NotNull OtpErlangObject quote();
