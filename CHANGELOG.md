@@ -62,7 +62,8 @@
 ### Bug Fixes
 
 - [#4005](https://github.com/KronicDeth/intellij-elixir/pull/4005) [@sh41](https://github.com/sh41)
-  - **The IDE no longer freezes for seconds at a time while a terminal produces output.** Fixes [#4004](https://github.com/KronicDeth/intellij-elixir/issues/4004).
+  - **The IDE no longer freezes while a terminal produces output.** Fixes [#4004](https://github.com/KronicDeth/intellij-elixir/issues/4004).
+  - **A Windows path printed with its drive letter now links from the drive letter.**
 
 - [#4001](https://github.com/KronicDeth/intellij-elixir/pull/4001) [@sh41](https://github.com/sh41)
   - **A Mix project opened in a small IDE is configured as an Elixir project again.** Fixes [#3999](https://github.com/KronicDeth/intellij-elixir/issues/3999).

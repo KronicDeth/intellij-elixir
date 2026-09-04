@@ -25,16 +25,18 @@ public final class FileReferenceFilter implements Filter {
     static final String COMPILATION_ERROR_PATH = PATH_MACROS + ":" + LINE_MACROS;
     private static final String COLUMN_MACROS = "$COLUMN$";
     /**
-     * The lookbehind and possessive {@code *} keep this linear, and a console hands it every line it
-     * prints. The path class is closed over ordinary text, so without the lookbehind every offset on
-     * an unmatchable line starts an attempt that rescans the rest of it; no match is lost, because
-     * one found inside a run is always found at that run's start too. The possessive stops the
-     * leading whitespace being re-split against the class, which also accepts a space.
+     * Keeps the match linear on a line that cannot match: the lookbehind drops start offsets that
+     * would only rescan the same run, and the possessive stops leading whitespace being re-split
+     * against a class that also accepts a space.
+     *
+     * <p>The drive-letter prefix and lookahead exist because {@code :} is not in the path class, so
+     * {@code C:} could otherwise be neither captured nor started from.
      *
      * <p>Assumes {@link #PATH_MACROS} opens the expression, as {@link #COMPILATION_ERROR_PATH} does.
      */
     private static final String FILE_PATH_REGEXP =
-            "(?<![\\s0-9 a-z_A-Z\\-\\\\./])\\s*+([0-9 a-z_A-Z\\-\\\\./]+)";
+            "(?:(?<![\\s0-9 a-z_A-Z\\-\\\\./])|(?=[A-Za-z]:[\\\\/]))"
+                    + "\\s*+((?:[A-Za-z]:)?[0-9 a-z_A-Z\\-\\\\./]+)";
     private static final String NUMBER_REGEXP = "([0-9]+)";
 
     private final int myColumnMatchGroup;
@@ -108,9 +110,8 @@ public final class FileReferenceFilter implements Filter {
     @Nullable
     @Override
     public Result applyFilter(@NotNull String line, int entireLength) {
-        // A write waiting behind this read action holds up the EDT until the match ends, and Matcher
-        // polls nothing itself, so the sequence it reads does - as RegexpFilter's does. Letting the
-        // cancellation out lets the non-blocking read action retry, so the line still gets linked.
+        // Matcher polls nothing itself, so the sequence it reads does, as RegexpFilter's does. The
+        // cancellation is left to propagate so the non-blocking read action retries.
         Matcher matcher = myPattern.matcher(StringPattern.newBombedCharSequence(line));
         Result result = null;
 
@@ -127,7 +128,7 @@ public final class FileReferenceFilter implements Filter {
 
                 for (VirtualFile virtualFile : virtualFileCollection) {
                     resultItemList.add(
-                            new ResultItem(
+                            new AboveGenericFileLinks(
                                     highlightStartOffset,
                                     highlightEndOffset,
                                     new OpenFileHyperlinkInfo(myProject, virtualFile, fileLine, fileColumn)

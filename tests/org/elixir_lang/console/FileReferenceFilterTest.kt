@@ -6,8 +6,11 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.progress.EmptyProgressIndicator
 import com.intellij.openapi.progress.ProcessCanceledException
+import com.intellij.openapi.editor.markup.HighlighterLayer
 import com.intellij.openapi.progress.ProgressManager
+import com.intellij.openapi.vfs.LocalFileSystem
 import org.elixir_lang.PlatformTestCase
+import java.io.File
 import java.util.concurrent.Callable
 import java.util.concurrent.TimeUnit
 
@@ -84,10 +87,7 @@ class FileReferenceFilterTest : PlatformTestCase() {
         assertEmpty(applyFilter("{Gald.Phase, :init, 1, [file: 'lib/gald/phase.ex', line: 54]}"))
     }
 
-    /**
-     * The path class accepts spaces. Pinned because dropping the space is the cheapest-looking cure
-     * for the backtracking below, and it would stop linking every path like this one.
-     */
+    /** Pinned because dropping the space from the path class would be a tempting cure below. */
     fun testLinksAPathContainingSpaces() {
         val file = myFixture.addFileToProject("my app/lib/some file.ex", "defmodule Some.File do\nend\n")
 
@@ -98,10 +98,39 @@ class FileReferenceFilterTest : PlatformTestCase() {
     }
 
     /**
-     * A line the expression cannot match still has to be cheap. The three shapes fail for different
-     * reasons - retrying at every offset makes any long line quadratic, and `\s*` competing with the
-     * path class for the same space makes an indented one cubic - so a cure for one can leave the
-     * others hanging. Each ends in a bare colon, so it fails late rather than early.
+     * On Windows the drive letter's colon is not in the path class, so the match used to start after
+     * it and resolve nothing. Written to disk because only a real file is found by an absolute path.
+     */
+    fun testLinksAnAbsolutePathIncludingAnyDriveLetter() {
+        val file = File(project.basePath!!, "drive_letter.ex")
+        file.parentFile.mkdirs()
+        file.writeText("defmodule DriveLetter do\nend\n")
+        val virtualFile = requireNotNull(LocalFileSystem.getInstance().refreshAndFindFileByIoFile(file))
+        val line = "${file.absolutePath}:7: DriveLetter.boom/0"
+
+        val items = applyFilter(line)
+
+        assertEquals("Expected the absolute path to link, got: $items", 1, items.size)
+        val item = items.single()
+        assertEquals("The whole path must be highlighted, drive letter included", 0, item.highlightStartOffset)
+        assertEquals(virtualFile, (item.hyperlinkInfo as FileHyperlinkInfo).descriptor!!.file)
+    }
+
+    /** The terminal's own bare-path link is registered first and wins a tie; ours knows the line. */
+    fun testOutranksTheTerminalsOwnGenericFileLink() {
+        myFixture.addFileToProject("lib/gald/turn.ex", "defmodule Gald.Turn do\nend\n")
+
+        val item = applyFilter("lib/gald/turn.ex:38: Gald.Turn.handle_cast/2").single()
+
+        assertTrue(
+            "Layer ${item.highlighterLayer} must beat the terminal's ${HighlighterLayer.HYPERLINK}",
+            item.highlighterLayer > HighlighterLayer.HYPERLINK
+        )
+    }
+
+    /**
+     * The three shapes fail differently - retrying at every offset is quadratic, `\s*` competing
+     * with the path class for a space is cubic - so a cure for one can leave the others hanging.
      */
     fun testDoesNotBacktrackOnAnIndentedLine() {
         assertRejectsWithinBudget(" ".repeat(1000) + "a".repeat(1000) + ":")
@@ -116,10 +145,9 @@ class FileReferenceFilterTest : PlatformTestCase() {
     }
 
     /**
-     * A write waiting behind the filter's read action stalls the EDT until the match ends, and
-     * `Matcher` polls nothing itself. The indicator is started before being cancelled because
-     * `runProcess` starts one that is not running and `EmptyProgressIndicator.start` clears the
-     * cancellation. The line clears 1024 characters, which is how often the bombed sequence checks.
+     * Started before being cancelled because `runProcess` starts an indicator that is not running
+     * and `EmptyProgressIndicator.start` clears the cancellation. The line clears 1024 characters,
+     * which is how often the bombed sequence checks.
      */
     fun testAbortsWhenTheProgressIndicatorIsCancelled() {
         val line = " ".repeat(2000) + ":"
