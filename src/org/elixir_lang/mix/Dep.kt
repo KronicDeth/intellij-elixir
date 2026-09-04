@@ -203,11 +203,8 @@ data class Dep(val application: String, val path: String, val type: Type = Type.
             atom.line?.let { name(it) }
                 ?: atom.node.lastChildNode.text
 
-        private fun name(line: ElixirLine): String? {
-            Logger.error(logger, "Don't know how to convert ${line.text} to dep name", line.parent)
-
-            return null
-        }
+        // A quoted atom, `:"my-dep"`, names the dep by its string body
+        private fun name(line: ElixirLine): String? = line.body?.text
 
         private fun putPath(dep: Dep, keywordValue: Quotable): Dep {
             val strippedKeywordValue = keywordValue.stripAccessExpression()
@@ -215,11 +212,8 @@ data class Dep(val application: String, val path: String, val type: Type = Type.
             return when (strippedKeywordValue) {
                 is ElixirLine -> putPath(dep, strippedKeywordValue)
                 is Call -> putPath(dep, strippedKeywordValue)
-                else -> {
-                    Logger.error(logger, "Don't know how to convert ${keywordValue.text} to path", keywordValue.parent)
-
-                    dep
-                }
+                // Anything else cannot be read as a path either, and leaves the dep where it was
+                else -> dep
             }
         }
 
