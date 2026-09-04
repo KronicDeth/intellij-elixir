@@ -6,6 +6,7 @@ import com.intellij.execution.filters.OpenFileHyperlinkInfo;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.patterns.StringPattern;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -23,7 +24,17 @@ public final class FileReferenceFilter implements Filter {
     /** The expression a formatted frame's {@code path:line} is read with. */
     static final String COMPILATION_ERROR_PATH = PATH_MACROS + ":" + LINE_MACROS;
     private static final String COLUMN_MACROS = "$COLUMN$";
-    private static final String FILE_PATH_REGEXP = "\\s*([0-9 a-z_A-Z\\-\\\\./]+)";
+    /**
+     * The lookbehind and possessive {@code *} keep this linear, and a console hands it every line it
+     * prints. The path class is closed over ordinary text, so without the lookbehind every offset on
+     * an unmatchable line starts an attempt that rescans the rest of it; no match is lost, because
+     * one found inside a run is always found at that run's start too. The possessive stops the
+     * leading whitespace being re-split against the class, which also accepts a space.
+     *
+     * <p>Assumes {@link #PATH_MACROS} opens the expression, as {@link #COMPILATION_ERROR_PATH} does.
+     */
+    private static final String FILE_PATH_REGEXP =
+            "(?<![\\s0-9 a-z_A-Z\\-\\\\./])\\s*+([0-9 a-z_A-Z\\-\\\\./]+)";
     private static final String NUMBER_REGEXP = "([0-9]+)";
 
     private final int myColumnMatchGroup;
@@ -97,7 +108,10 @@ public final class FileReferenceFilter implements Filter {
     @Nullable
     @Override
     public Result applyFilter(@NotNull String line, int entireLength) {
-        Matcher matcher = myPattern.matcher(line);
+        // A write waiting behind this read action holds up the EDT until the match ends, and Matcher
+        // polls nothing itself, so the sequence it reads does - as RegexpFilter's does. Letting the
+        // cancellation out lets the non-blocking read action retry, so the line still gets linked.
+        Matcher matcher = myPattern.matcher(StringPattern.newBombedCharSequence(line));
         Result result = null;
 
         if (matcher.find()) {

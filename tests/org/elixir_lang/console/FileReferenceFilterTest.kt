@@ -2,9 +2,14 @@ package org.elixir_lang.console
 
 import com.intellij.execution.filters.FileHyperlinkInfo
 import com.intellij.execution.filters.Filter
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ReadAction
+import com.intellij.openapi.progress.EmptyProgressIndicator
+import com.intellij.openapi.progress.ProcessCanceledException
+import com.intellij.openapi.progress.ProgressManager
 import org.elixir_lang.PlatformTestCase
 import java.util.concurrent.Callable
+import java.util.concurrent.TimeUnit
 
 /**
  * Characterises the console filter that has linked compiler errors and formatted stack frames since
@@ -79,6 +84,72 @@ class FileReferenceFilterTest : PlatformTestCase() {
         assertEmpty(applyFilter("{Gald.Phase, :init, 1, [file: 'lib/gald/phase.ex', line: 54]}"))
     }
 
+    /**
+     * The path class accepts spaces. Pinned because dropping the space is the cheapest-looking cure
+     * for the backtracking below, and it would stop linking every path like this one.
+     */
+    fun testLinksAPathContainingSpaces() {
+        val file = myFixture.addFileToProject("my app/lib/some file.ex", "defmodule Some.File do\nend\n")
+
+        val items = applyFilter("  my app/lib/some file.ex:3: anonymous fn/2")
+
+        assertEquals("Expected the spaced path to link, got: $items", 1, items.size)
+        assertEquals(file.virtualFile, (items.single().hyperlinkInfo as FileHyperlinkInfo).descriptor!!.file)
+    }
+
+    /**
+     * A line the expression cannot match still has to be cheap. The three shapes fail for different
+     * reasons - retrying at every offset makes any long line quadratic, and `\s*` competing with the
+     * path class for the same space makes an indented one cubic - so a cure for one can leave the
+     * others hanging. Each ends in a bare colon, so it fails late rather than early.
+     */
+    fun testDoesNotBacktrackOnAnIndentedLine() {
+        assertRejectsWithinBudget(" ".repeat(1000) + "a".repeat(1000) + ":")
+    }
+
+    fun testDoesNotBacktrackOnAWhitespaceOnlyLine() {
+        assertRejectsWithinBudget(" ".repeat(2000) + ":")
+    }
+
+    fun testDoesNotBacktrackOnALineWithoutSpaces() {
+        assertRejectsWithinBudget("a".repeat(32000) + ":")
+    }
+
+    /**
+     * A write waiting behind the filter's read action stalls the EDT until the match ends, and
+     * `Matcher` polls nothing itself. The indicator is started before being cancelled because
+     * `runProcess` starts one that is not running and `EmptyProgressIndicator.start` clears the
+     * cancellation. The line clears 1024 characters, which is how often the bombed sequence checks.
+     */
+    fun testAbortsWhenTheProgressIndicatorIsCancelled() {
+        val line = " ".repeat(2000) + ":"
+        val indicator = EmptyProgressIndicator().apply { start(); cancel() }
+        val filter = FileReferenceFilter(project, FileReferenceFilter.COMPILATION_ERROR_PATH)
+
+        val thrown = ApplicationManager.getApplication().executeOnPooledThread<Throwable?> {
+            try {
+                ProgressManager.getInstance().runProcess({ filter.applyFilter(line, line.length) }, indicator)
+                null
+            } catch (t: Throwable) {
+                t
+            }
+        }.get(30, TimeUnit.SECONDS)
+
+        assertInstanceOf(thrown, ProcessCanceledException::class.java)
+    }
+
+    private fun assertRejectsWithinBudget(line: String) {
+        val start = System.nanoTime()
+        val items = applyFilter(line)
+        val elapsedMillis = (System.nanoTime() - start) / 1_000_000
+
+        assertEmpty("Expected a line ending in a bare colon not to link, got: $items", items)
+        assertTrue(
+            "Matching ${line.length} characters took ${elapsedMillis}ms, budget is ${BUDGET_MILLIS}ms",
+            elapsedMillis < BUDGET_MILLIS
+        )
+    }
+
     private fun applyFilter(line: String): List<Filter.ResultItem> =
         ReadAction.nonBlocking(
             Callable {
@@ -86,4 +157,9 @@ class FileReferenceFilterTest : PlatformTestCase() {
                     .applyFilter(line, line.length)
             }
         ).executeSynchronously()?.resultItems.orEmpty()
+
+    companion object {
+        /** Wide on purpose: a working expression takes about a millisecond, a backtracking one seconds. */
+        private const val BUDGET_MILLIS = 1_000L
+    }
 }
