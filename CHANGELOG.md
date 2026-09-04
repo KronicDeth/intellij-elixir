@@ -279,6 +279,11 @@
 
 ### Build / CI
 
+- [#PR](https://github.com/KronicDeth/intellij-elixir/pull/PR) [@sh41](https://github.com/sh41)
+  - **CI now caches Gradle's build and configuration caches, and no longer rebuilds Elixir from
+    source on the Windows leg.** The dependency cache stays off deliberately: it is gigabytes to save
+    seconds.
+
 - [#4003](https://github.com/KronicDeth/intellij-elixir/pull/4003) [@sh41](https://github.com/sh41)
   - **Plugin verification now fails on an internal platform API usage that is not on the approved list.**
 

@@ -148,6 +148,9 @@ already-installed pair. The `resolveElixirErlangSdks` task looks in this order a
 It then exports `ELIXIR_LANG_ELIXIR_PATH`, `ELIXIR_EBIN_DIRECTORY`, `ELIXIR_VERSION`, `ERLANG_SDK_HOME`
 and a `PATH` prefix to every test task, so you never set those by hand.
 
+CI takes row 1 for both, via `setup-env`. Row 2 does not work for Elixir on `windows-2025` and the
+runners have no mise, so otherwise the Windows leg falls to row 4 on every run.
+
 The **expected** versions come from [mise](https://mise.jdx.dev), which this project requires:
 
 ```sh

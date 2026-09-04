@@ -174,4 +174,12 @@ runs:
       run: |
         echo "OTP_RELEASE=${{ steps.resolve.outputs.otp-version }}" >> $GITHUB_ENV
         echo "ERLANG_SDK_HOME=$(erl -eval 'io:format("~s", [code:root_dir()]).' -noshell -run init stop)" >> $GITHUB_ENV
-
+        # Counterpart of ERLANG_SDK_HOME, and it is the Windows leg that needs it: the resolver's
+        # `elixir` PATH shell-out fails on windows-2025 and the runners have no mise, so it fell
+        # through to downloading Elixir and running `make` - 65 s of the 80 s `Build quoter` step,
+        # into a directory the quoter cache does not cover. Guarded because setup-beam exports
+        # INSTALL_DIR_FOR_ELIXIR but does not declare it as an output; unset or wrong just restores
+        # the old fall-through.
+        if [ -n "${INSTALL_DIR_FOR_ELIXIR:-}" ]; then
+          echo "ELIXIR_SDK_HOME=$INSTALL_DIR_FOR_ELIXIR" >> $GITHUB_ENV
+        fi
