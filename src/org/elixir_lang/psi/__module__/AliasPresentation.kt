@@ -17,6 +17,6 @@ class AliasPresentation(private val __MODULE__Call: Call) : ItemPresentation {
     }
 
     private val _presentableText by lazy {
-        "alias ${UnaliasedName.unaliasedName(__MODULE__Call as PsiNamedElement)}"
+        UnaliasedName.unaliasedName(__MODULE__Call as PsiNamedElement)?.let { "alias $it" } ?: __MODULE__Call.text
     }
 }

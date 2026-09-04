@@ -2,7 +2,6 @@ package org.elixir_lang.reference.module
 
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiNamedElement
-import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function
@@ -47,15 +46,8 @@ object UnaliasedName {
 
                 is ElixirAtom -> ":${element.name}"
                 is QualifiableAlias -> element.name
-                else -> {
-                    Logger.error(
-                        javaClass,
-                        "Don't know how to search down below ${element.javaClass} for unaliased name",
-                        element
-                    )
-
-                    "?"
-                }
+                // Anything else, such as a string, names no module
+                else -> null
             }
 
     private fun unaliasedName(qualifiableAlias: QualifiableAlias): String? =

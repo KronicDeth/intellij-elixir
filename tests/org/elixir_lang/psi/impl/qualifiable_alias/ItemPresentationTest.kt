@@ -37,6 +37,20 @@ class ItemPresentationTest : PlatformTestCase() {
         assertEquals("alias Prefix", presentableText)
     }
 
+    /**
+     * `As` in `alias "Foo", as: As` has no module to be unaliased to. Its presentation falls back to the
+     * alias's own name rather than printing a placeholder, and asking for it is not an error.
+     */
+    fun testGetPresentableTextForAliasOfSomethingThatIsNotAModule() {
+        myFixture.configureByText("string_alias.ex", "alias \"Foo\", as: A<caret>s\n")
+        val elixirAlias = myFixture.file.findElementAt(myFixture.caretOffset)!!.parent as ElixirAlias
+
+        val (presentableText, errors) = captureLoggedErrors { elixirAlias.presentation!!.presentableText }
+
+        assertEmpty("presenting an alias of a non-module is not an error", errors)
+        assertEquals("As", presentableText)
+    }
+
     override fun getTestDataPath(): String =
         "testData/org/elixir_lang/psi/impl/qualifiable_alias/item_presentation"
 }
