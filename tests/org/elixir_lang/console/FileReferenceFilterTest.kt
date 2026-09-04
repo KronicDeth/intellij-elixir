@@ -2,9 +2,18 @@ package org.elixir_lang.console
 
 import com.intellij.execution.filters.FileHyperlinkInfo
 import com.intellij.execution.filters.Filter
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ReadAction
+import com.intellij.openapi.progress.EmptyProgressIndicator
+import com.intellij.openapi.progress.ProcessCanceledException
+import com.intellij.openapi.editor.markup.HighlighterLayer
+import com.intellij.openapi.progress.ProgressManager
+import com.intellij.openapi.vfs.LocalFileSystem
+import com.intellij.testFramework.DumbModeTestUtils
 import org.elixir_lang.PlatformTestCase
+import java.io.File
 import java.util.concurrent.Callable
+import java.util.concurrent.TimeUnit
 
 /**
  * Characterises the console filter that has linked compiler errors and formatted stack frames since
@@ -79,6 +88,139 @@ class FileReferenceFilterTest : PlatformTestCase() {
         assertEmpty(applyFilter("{Gald.Phase, :init, 1, [file: 'lib/gald/phase.ex', line: 54]}"))
     }
 
+    /** Pinned because dropping the space from the path class would be a tempting cure below. */
+    fun testLinksAPathContainingSpaces() {
+        val file = myFixture.addFileToProject("my app/lib/some file.ex", "defmodule Some.File do\nend\n")
+
+        val items = applyFilter("  my app/lib/some file.ex:3: anonymous fn/2")
+
+        assertEquals("Expected the spaced path to link, got: $items", 1, items.size)
+        assertEquals(file.virtualFile, (items.single().hyperlinkInfo as FileHyperlinkInfo).descriptor!!.file)
+    }
+
+    /**
+     * On Windows the drive letter's colon is not in the path class, so the match used to start after
+     * it and resolve nothing. Written to disk because only a real file is found by an absolute path.
+     */
+    fun testLinksAnAbsolutePathIncludingAnyDriveLetter() {
+        val file = File(project.basePath!!, "drive_letter.ex")
+        file.parentFile.mkdirs()
+        file.writeText("defmodule DriveLetter do\nend\n")
+        val virtualFile = requireNotNull(LocalFileSystem.getInstance().refreshAndFindFileByIoFile(file))
+        val line = "${file.absolutePath}:7: DriveLetter.boom/0"
+
+        val items = applyFilter(line)
+
+        assertEquals("Expected the absolute path to link, got: $items", 1, items.size)
+        val item = items.single()
+        assertEquals("The whole path must be highlighted, drive letter included", 0, item.highlightStartOffset)
+        assertEquals(virtualFile, (item.hyperlinkInfo as FileHyperlinkInfo).descriptor!!.file)
+    }
+
+    /**
+     * The suffix search reads [com.intellij.psi.search.FilenameIndex] through a lookup that tolerates
+     * dumb mode, so it answers rather than throwing. Pinned because the filter is
+     * [com.intellij.openapi.project.DumbAware] on the strength of it.
+     */
+    fun testResolvesASuffixPathWhileIndexing() {
+        val file = myFixture.addFileToProject("lib/gald/turn.ex", "defmodule Gald.Turn do\nend\n")
+
+        val items = DumbModeTestUtils.computeInDumbModeSynchronously<List<Filter.ResultItem>>(project) {
+            applyFilter("gald/turn.ex:1: whatever")
+        }
+
+        assertEquals("Expected the suffix match to resolve while indexing, got: $items", 1, items.size)
+        assertEquals(file.virtualFile, (items.single().hyperlinkInfo as FileHyperlinkInfo).descriptor!!.file)
+    }
+
+    /** The path-as-written branch is pure VFS, so it still links while an index is being built. */
+    fun testLinksAnAbsolutePathWhileIndexing() {
+        val file = File(project.basePath!!, "dumb_mode.ex")
+        file.parentFile.mkdirs()
+        file.writeText("defmodule DumbMode do\nend\n")
+        val virtualFile = requireNotNull(LocalFileSystem.getInstance().refreshAndFindFileByIoFile(file))
+        val line = "${file.absolutePath}:3: DumbMode.boom/0"
+
+        val items = DumbModeTestUtils.computeInDumbModeSynchronously<List<Filter.ResultItem>>(project) {
+            applyFilter(line)
+        }
+
+        assertEquals("Expected the absolute path to link while indexing, got: $items", 1, items.size)
+        assertEquals(virtualFile, (items.single().hyperlinkInfo as FileHyperlinkInfo).descriptor!!.file)
+    }
+
+    /** Pins the offsets, which are computed from the match groups rather than from the path text. */
+    fun testHighlightsExactlyThePathAndItsLine() {
+        myFixture.addFileToProject("lib/gald/turn.ex", "defmodule Gald.Turn do\nend\n")
+        val line = "    (gald) lib/gald/turn.ex:38: Gald.Turn.handle_cast/2"
+
+        val item = applyFilter(line).single()
+
+        assertEquals("lib/gald/turn.ex:38", line.substring(item.highlightStartOffset, item.highlightEndOffset))
+    }
+
+    /** The terminal's own bare-path link is registered first and wins a tie; ours knows the line. */
+    fun testOutranksTheTerminalsOwnGenericFileLink() {
+        myFixture.addFileToProject("lib/gald/turn.ex", "defmodule Gald.Turn do\nend\n")
+
+        val item = applyFilter("lib/gald/turn.ex:38: Gald.Turn.handle_cast/2").single()
+
+        assertTrue(
+            "Layer ${item.highlighterLayer} must beat the terminal's ${HighlighterLayer.HYPERLINK}",
+            item.highlighterLayer > HighlighterLayer.HYPERLINK
+        )
+    }
+
+    /**
+     * The three shapes fail differently - retrying at every offset is quadratic, `\s*` competing
+     * with the path class for a space is cubic - so a cure for one can leave the others hanging.
+     */
+    fun testDoesNotBacktrackOnAnIndentedLine() {
+        assertRejectsWithinBudget(" ".repeat(1000) + "a".repeat(1000) + ":")
+    }
+
+    fun testDoesNotBacktrackOnAWhitespaceOnlyLine() {
+        assertRejectsWithinBudget(" ".repeat(2000) + ":")
+    }
+
+    fun testDoesNotBacktrackOnALineWithoutSpaces() {
+        assertRejectsWithinBudget("a".repeat(32000) + ":")
+    }
+
+    /**
+     * Started before being cancelled because `runProcess` starts an indicator that is not running
+     * and `EmptyProgressIndicator.start` clears the cancellation. The line clears 1024 characters,
+     * which is how often the bombed sequence checks.
+     */
+    fun testAbortsWhenTheProgressIndicatorIsCancelled() {
+        val line = " ".repeat(2000) + ":"
+        val indicator = EmptyProgressIndicator().apply { start(); cancel() }
+        val filter = FileReferenceFilter(project, FileReferenceFilter.COMPILATION_ERROR_PATH)
+
+        val thrown = ApplicationManager.getApplication().executeOnPooledThread<Throwable?> {
+            try {
+                ProgressManager.getInstance().runProcess({ filter.applyFilter(line, line.length) }, indicator)
+                null
+            } catch (t: Throwable) {
+                t
+            }
+        }.get(30, TimeUnit.SECONDS)
+
+        assertInstanceOf(thrown, ProcessCanceledException::class.java)
+    }
+
+    private fun assertRejectsWithinBudget(line: String) {
+        val start = System.nanoTime()
+        val items = applyFilter(line)
+        val elapsedMillis = (System.nanoTime() - start) / 1_000_000
+
+        assertEmpty("Expected a line ending in a bare colon not to link, got: $items", items)
+        assertTrue(
+            "Matching ${line.length} characters took ${elapsedMillis}ms, budget is ${BUDGET_MILLIS}ms",
+            elapsedMillis < BUDGET_MILLIS
+        )
+    }
+
     private fun applyFilter(line: String): List<Filter.ResultItem> =
         ReadAction.nonBlocking(
             Callable {
@@ -86,4 +228,9 @@ class FileReferenceFilterTest : PlatformTestCase() {
                     .applyFilter(line, line.length)
             }
         ).executeSynchronously()?.resultItems.orEmpty()
+
+    companion object {
+        /** Wide on purpose: a working expression takes about a millisecond, a backtracking one seconds. */
+        private const val BUDGET_MILLIS = 1_000L
+    }
 }

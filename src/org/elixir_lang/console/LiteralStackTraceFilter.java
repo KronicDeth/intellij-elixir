@@ -4,7 +4,7 @@ import com.intellij.execution.filters.Filter;
 import com.intellij.execution.filters.HyperlinkInfo;
 import com.intellij.execution.filters.HyperlinkInfoFactory;
 import com.intellij.execution.filters.OpenFileHyperlinkInfo;
-import com.intellij.openapi.editor.markup.HighlighterLayer;
+import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
@@ -59,7 +59,7 @@ import java.util.regex.Pattern;
  * - it is zero in the terminal by construction, and a console added later that behaves like the
  * terminal gets the safe branch without anyone having to notice it exists.
  */
-final class LiteralStackTraceFilter implements Filter {
+final class LiteralStackTraceFilter implements Filter, DumbAware {
     /**
      * The path and its number, together on one line. A stack trace's {@code file:} is a charlist, so
      * Elixir 1.14 and earlier inspect it as {@code 'lib/x.ex'} and 1.15 and later as the sigil
@@ -242,37 +242,6 @@ final class LiteralStackTraceFilter implements Filter {
         );
 
         return resultItems;
-    }
-
-    /**
-     * A link that outranks the terminal's own bare-path link over the same text.
-     *
-     * <p>The reworked terminal registers {@code TerminalGenericFileFilter} ahead of every plugin's
-     * filters and builds the composite with {@code setForceUseAllFilters(true)}, so both run and both
-     * mark up the same path. Its link is an invisible one - Ctrl to follow - and opens the file at
-     * line 1, because all it sees is a path with no {@code :line} after it. Ours knows the number
-     * from the keyword list beside it.
-     *
-     * <p>Both default to {@link HighlighterLayer#HYPERLINK}, and an exact-range tie goes to whichever
-     * was added first, which is the terminal's. {@link FileReferenceFilter} never notices because its
-     * match covers {@code path:line} and so is a wider range than the bare path. One layer up is
-     * enough.
-     *
-     * <p>It applies to every link this filter makes, including a wrapped path linked to the top of
-     * the file, where the terminal's own link would have gone to the same place. Distinguishing the
-     * two would buy nothing and would make the layer depend on which branch produced the link.
-     */
-    private static final class AboveGenericFileLinks extends ResultItem {
-        private AboveGenericFileLinks(int highlightStartOffset,
-                                      int highlightEndOffset,
-                                      @NotNull HyperlinkInfo hyperlinkInfo) {
-            super(highlightStartOffset, highlightEndOffset, hyperlinkInfo);
-        }
-
-        @Override
-        public int getHighlighterLayer() {
-            return HighlighterLayer.HYPERLINK + 1;
-        }
     }
 
     /**
