@@ -1,14 +1,18 @@
 package org.elixir_lang.psi.operation;
 
 import org.elixir_lang.psi.Quotable;
+import org.elixir_lang.psi.call.Call;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * A binary operator with a left operand, operator, and right operand
+ * A binary operator with a left operand, operator, and right operand.
+ *
+ * Every infix operation is also a {@link Call} of its operator, so a static overload keyed on an
+ * {@code Infix} subtype is more specific than one keyed on {@code Call} and javac can pick it.
  *
  * Created by kadie.enheduanna.inanna on 3/18/15.
  */
-public interface Infix extends Operation {
+public interface Infix extends Operation, Call {
   /**
    * @return {@code null} if there was an error in element (such as when user is till typing it) and so the Pratt Parser
    *   error handling matches {@code partialLeft PsiElementError operand rightOperand}.  {@code partialLeft} is not

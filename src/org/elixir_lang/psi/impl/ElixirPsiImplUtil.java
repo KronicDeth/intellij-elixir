@@ -620,17 +620,39 @@ public class ElixirPsiImplUtil {
     }
 
     @RequiresReadLock
+    public static boolean processDeclarations(@NotNull final And and,
+                                              @NotNull PsiScopeProcessor processor,
+                                              @NotNull ResolveState state,
+                                              PsiElement lastParent,
+                                              @NotNull PsiElement place) {
+        return ProcessDeclarationsImpl.processDeclarations(and, processor, state, lastParent, place);
+    }
+
+    @RequiresReadLock
     public static boolean processDeclarations(@NotNull final Call call,
                                               @NotNull PsiScopeProcessor processor,
                                               @NotNull ResolveState state,
                                               PsiElement lastParent,
                                               @NotNull PsiElement place) {
-        return switch (call) {
-            case And and -> ProcessDeclarationsImpl.processDeclarations(and, processor, state, lastParent, place);
-            case Match match -> ProcessDeclarationsImpl.processDeclarations(match, processor, state, lastParent, place);
-            case Type type -> ProcessDeclarationsImpl.processDeclarations(type, processor, state);
-            default -> ProcessDeclarationsImpl.processDeclarations(call, processor, state, lastParent, place);
-        };
+        return ProcessDeclarationsImpl.processDeclarations(call, processor, state, lastParent, place);
+    }
+
+    @RequiresReadLock
+    public static boolean processDeclarations(@NotNull final Match match,
+                                              @NotNull PsiScopeProcessor processor,
+                                              @NotNull ResolveState state,
+                                              PsiElement lastParent,
+                                              @NotNull PsiElement place) {
+        return ProcessDeclarationsImpl.processDeclarations(match, processor, state, lastParent, place);
+    }
+
+    @RequiresReadLock
+    public static boolean processDeclarations(@NotNull final Type type,
+                                              @NotNull PsiScopeProcessor processor,
+                                              @NotNull ResolveState state,
+                                              PsiElement lastParent,
+                                              @NotNull PsiElement place) {
+        return ProcessDeclarationsImpl.processDeclarations(type, processor, state);
     }
 
     public static boolean processDeclarations(@NotNull final ElixirAlias alias,
