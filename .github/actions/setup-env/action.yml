@@ -34,10 +34,25 @@ inputs:
     description: 'Skip building searchable options (faster builds, but users cannot search settings). Use false for release builds.'
     required: false
     default: 'true'
+  free-disk-space:
+    description: |
+      Reclaim ~20 GiB of preinstalled toolchains before building. Off because the runner already
+      reports 87 G free of 146 G before the reclaim, against a build that uses roughly 10 G - so it
+      only bought 26-225 s of cost per Linux leg, 269 s on the worst observed. Turn it on for a
+      caller that genuinely needs the space.
+    required: false
+    default: 'false'
   free-docker-images:
     description: 'Remove Docker images during disk space cleanup. Set to false when later steps use Docker container actions.'
     required: false
     default: 'true'
+  gradle-encryption-key:
+    description: |
+      Base64 AES key (`openssl rand -base64 16`, stored as the GRADLE_ENCRYPTION_KEY secret) without
+      which gradle/actions caches no configuration-cache data. A composite action cannot read
+      `secrets`, so callers pass it; empty - as on fork pull requests - skips only that data.
+    required: false
+    default: ''
 
 runs:
   using: composite
@@ -67,12 +82,20 @@ runs:
       id: free-disk-space
       ## Windows runners appear to have plenty of free space on D:
       ## and this action doesn't work on Windows.
-      if: runner.os == 'Linux'
+      if: runner.os == 'Linux' && inputs.free-disk-space == 'true'
       uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
       with:
         tool-cache: false
         large-packages: false
         docker-images: ${{ inputs.free-docker-images == 'true' }}
+
+    # Stands in for the before/after `df` the reclaim prints itself, so the leg still reports its
+    # starting headroom with the reclaim off. Linux-only for the same reason the reclaim is.
+    - name: Report disk space
+      id: report-disk-space
+      if: runner.os == 'Linux' && inputs.free-disk-space != 'true'
+      shell: bash
+      run: df -h
 
     # Keyed on the JBR major version so matrix legs on different Java levels (21 vs 25)
     # cannot restore each other's runtime. No prefix restore-keys on purpose: a partial
@@ -129,11 +152,22 @@ runs:
         fi
         echo "ORG_GRADLE_PROJECT_skipSearchableOptions=$SKIP_SEARCHABLE_OPTIONS" >> $GITHUB_ENV
 
+    # The excluded dirs are the expensive, worthless half: a build scan measured the whole 1.4 GiB
+    # download at 15 s, and the Gradle-home cache is keyed per job, so caching it across 13 jobs
+    # would exhaust the 10 GB limit on its own. What is left is the build cache - 11.9 MiB, and 0 of
+    # 229 work units hit before this. Excludes filter the Gradle User Home only, so they cannot
+    # affect the configuration-cache data that cache-encryption-key covers. cache-read-only keeps
+    # its default, which writes only from the default branch.
     - name: Setup Gradle
       id: setup-gradle
       uses: gradle/actions/setup-gradle@v6
       with:
-        cache-disabled: true
+        cache-disabled: false
+        # `caches/<gradle-version>/transforms` on Gradle 9, not `caches/transforms-*`.
+        gradle-home-cache-excludes: |
+          caches/modules-2
+          caches/*/transforms
+        cache-encryption-key: ${{ inputs.gradle-encryption-key }}
         # avoid async in shutdown until https://github.com/nodejs/node/pull/61999 lands in the action runner's JS version.
         add-job-summary-as-pr-comment: 'never'
         build-scan-publish: ${{ inputs.build-scan-publish }}
@@ -156,3 +190,12 @@ runs:
       run: |
         echo "OTP_RELEASE=${{ steps.resolve.outputs.otp-version }}" >> $GITHUB_ENV
         echo "ERLANG_SDK_HOME=$(erl -eval 'io:format("~s", [code:root_dir()]).' -noshell -run init stop)" >> $GITHUB_ENV
+        # Counterpart of ERLANG_SDK_HOME, and it is the Windows leg that needs it: the resolver's
+        # `elixir` PATH shell-out fails on windows-2025 and the runners have no mise, so it fell
+        # through to downloading Elixir and running `make` - 65 s of the 80 s `Build quoter` step,
+        # into a directory the quoter cache does not cover. Guarded because setup-beam exports
+        # INSTALL_DIR_FOR_ELIXIR but does not declare it as an output; unset or wrong just restores
+        # the old fall-through.
+        if [ -n "${INSTALL_DIR_FOR_ELIXIR:-}" ]; then
+          echo "ELIXIR_SDK_HOME=$INSTALL_DIR_FOR_ELIXIR" >> $GITHUB_ENV
+        fi

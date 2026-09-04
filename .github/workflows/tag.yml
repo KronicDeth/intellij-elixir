@@ -187,6 +187,7 @@ jobs:
         uses: ./.github/actions/setup-env
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          gradle-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
           skip-searchable-options: 'false'
 
       - name: Build with Gradle (canary)
