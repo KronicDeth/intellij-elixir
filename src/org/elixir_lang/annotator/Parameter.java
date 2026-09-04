@@ -4,7 +4,6 @@ import com.intellij.psi.NavigatablePsiElement;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
-import org.elixir_lang.errorreport.Logger;
 import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.operation.InMatch;
@@ -58,10 +57,6 @@ public class Parameter {
         }
 
         return notNull;
-    }
-
-    private static void error(@NotNull String message, @NotNull PsiElement element) {
-        Logger.error(Parameter.class, message + " (when element class is " + element.getClass().getName() + ")", element);
     }
 
     @Contract(pure = true)
@@ -188,7 +183,7 @@ public class Parameter {
                 parent instanceof QualifiedMultipleAliases) {
             parameterizedParameter = new Parameter(parameter.entrance);
         } else {
-            error("Don't know how to check if parameter", parent);
+            // Anything else cannot hold a parameter either
             parameterizedParameter = new Parameter(parameter.entrance);
         }
 
