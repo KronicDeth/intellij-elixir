@@ -8,6 +8,7 @@ import com.intellij.openapi.editor.highlighter.HighlighterIterator;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
+import com.intellij.util.DocumentUtil;
 import org.elixir_lang.lexer.StackFrame;
 import org.elixir_lang.psi.ElixirTypes;
 import org.jetbrains.annotations.Nullable;
@@ -50,7 +51,11 @@ public class QuoteHandler implements MultiCharQuoteHandler {
 
                         if (terminator != null) {
                             if (terminator.length() >= 3) {
-                                closingQuote = "\n" + terminator;
+                                /* A heredoc terminator's column is the dedent applied to the body, and the platform
+                                   inserts this text verbatim without reformatting, so indent it here. */
+                                closingQuote = "\n" +
+                                        DocumentUtil.getIndent(document, highlighterIterator.getStart()) +
+                                        terminator;
                             } else {
                                 closingQuote = terminator;
                             }
