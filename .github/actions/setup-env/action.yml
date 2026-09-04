@@ -34,6 +34,14 @@ inputs:
     description: 'Skip building searchable options (faster builds, but users cannot search settings). Use false for release builds.'
     required: false
     default: 'true'
+  free-disk-space:
+    description: |
+      Reclaim ~20 GiB of preinstalled toolchains before building. Off because the runner already
+      reports 87 G free of 146 G before the reclaim, against a build that uses roughly 10 G - so it
+      only bought 26-225 s of cost per Linux leg, 269 s on the worst observed. Turn it on for a
+      caller that genuinely needs the space.
+    required: false
+    default: 'false'
   free-docker-images:
     description: 'Remove Docker images during disk space cleanup. Set to false when later steps use Docker container actions.'
     required: false
@@ -74,12 +82,20 @@ runs:
       id: free-disk-space
       ## Windows runners appear to have plenty of free space on D:
       ## and this action doesn't work on Windows.
-      if: runner.os == 'Linux'
+      if: runner.os == 'Linux' && inputs.free-disk-space == 'true'
       uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
       with:
         tool-cache: false
         large-packages: false
         docker-images: ${{ inputs.free-docker-images == 'true' }}
+
+    # Stands in for the before/after `df` the reclaim prints itself, so the leg still reports its
+    # starting headroom with the reclaim off. Linux-only for the same reason the reclaim is.
+    - name: Report disk space
+      id: report-disk-space
+      if: runner.os == 'Linux' && inputs.free-disk-space != 'true'
+      shell: bash
+      run: df -h
 
     # Keyed on the JBR major version so matrix legs on different Java levels (21 vs 25)
     # cannot restore each other's runtime. No prefix restore-keys on purpose: a partial

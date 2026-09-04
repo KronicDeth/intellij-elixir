@@ -367,6 +367,15 @@ jobs:
           overwrite: true
           if-no-files-found: 'warn'
 
+      # Last step on purpose: the build only grows, so this is the job's low-water mark. It decides
+      # whether setup-env's `Free Disk Space` is worth 26-225 s per Linux leg to reclaim 20 GiB - if
+      # what is left here comfortably exceeds that, the reclaim is pure cost. Nothing today reports
+      # free space at all.
+      - name: Report free disk space
+        id: report-disk-space
+        if: always()
+        run: df -h
+
   build-plugin:
     runs-on: ubuntu-22.04
     timeout-minutes: 30
@@ -437,6 +446,12 @@ jobs:
           # Same 30 days as the zip above, for the same reason: this is the copy a human downloads to
           # install a PR build, and storage costs nothing on a public repository.
           retention-days: 30
+
+      # Same low-water-mark reading as the test legs above, for the other job that runs a build.
+      - name: Report free disk space
+        id: report-disk-space
+        if: always()
+        run: df -h
 
   # Fanned out over one job per product x version by a reusable workflow, verifying the artifact
   # build-plugin uploaded. Kept separate so the verification machinery - and the reasons it runs one
