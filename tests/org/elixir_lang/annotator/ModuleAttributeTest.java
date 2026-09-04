@@ -200,16 +200,13 @@ public class ModuleAttributeTest extends PlatformTestCase {
      * stopped reporting at all. If captures gain a branch, swap the fixture for another unclassifiable
      * construct rather than deleting this.
      */
-    public void testUnclassifiableTypeElementIsReported() {
-        myFixture.configureByFile("capture_in_type.ex");
-
-        List<LoggedError> reported = loggedErrors();
-
-        assertFalse(
-                "Expected an unclassifiable element in a type to be reported, but nothing was logged",
-                reported.isEmpty()
-        );
-        assertEquals("Cannot highlight types", reported.get(0).getTitle());
+    /**
+     * A construct the annotator does not colour keeps its default colour, and that is not an error.
+     * A capture is such a construct: it can appear in a type while one is being written, and the
+     * annotator has nothing to say about it.
+     */
+    public void testCaptureInTypeIsNotReported() {
+        assertNoTypeHighlightingError("capture_in_type.ex");
     }
 
     /*
