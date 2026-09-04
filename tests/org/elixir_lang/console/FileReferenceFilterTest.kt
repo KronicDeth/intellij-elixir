@@ -116,6 +116,16 @@ class FileReferenceFilterTest : PlatformTestCase() {
         assertEquals(virtualFile, (item.hyperlinkInfo as FileHyperlinkInfo).descriptor!!.file)
     }
 
+    /** Pins the offsets, which are computed from the match groups rather than from the path text. */
+    fun testHighlightsExactlyThePathAndItsLine() {
+        myFixture.addFileToProject("lib/gald/turn.ex", "defmodule Gald.Turn do\nend\n")
+        val line = "    (gald) lib/gald/turn.ex:38: Gald.Turn.handle_cast/2"
+
+        val item = applyFilter(line).single()
+
+        assertEquals("lib/gald/turn.ex:38", line.substring(item.highlightStartOffset, item.highlightEndOffset))
+    }
+
     /** The terminal's own bare-path link is registered first and wins a tie; ours knows the line. */
     fun testOutranksTheTerminalsOwnGenericFileLink() {
         myFixture.addFileToProject("lib/gald/turn.ex", "defmodule Gald.Turn do\nend\n")

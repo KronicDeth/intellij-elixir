@@ -16,14 +16,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * https://github.com/ignatov/intellij-erlang/blob/master/src/org/intellij/erlang/console/FileReferenceFilter.java
+ * <a href="https://github.com/ignatov/intellij-erlang/blob/master/src/org/intellij/erlang/console/FileReferenceFilter.java">...</a>
  */
 public final class FileReferenceFilter implements Filter {
     static final String LINE_MACROS = "$LINE$";
     static final String PATH_MACROS = "$FILE_PATH$";
     /** The expression a formatted frame's {@code path:line} is read with. */
     static final String COMPILATION_ERROR_PATH = PATH_MACROS + ":" + LINE_MACROS;
-    private static final String COLUMN_MACROS = "$COLUMN$";
     /**
      * Keeps the match linear on a line that cannot match: the lookbehind drops start offsets that
      * would only rescan the same run, and the possessive stops leading whitespace being re-split
@@ -39,7 +38,6 @@ public final class FileReferenceFilter implements Filter {
                     + "\\s*+((?:[A-Za-z]:)?[0-9 a-z_A-Z\\-\\\\./]+)";
     private static final String NUMBER_REGEXP = "([0-9]+)";
 
-    private final int myColumnMatchGroup;
     private final int myFileMatchGroup;
     private final int myLineMatchGroup;
     private final Pattern myPattern;
@@ -54,24 +52,21 @@ public final class FileReferenceFilter implements Filter {
 
         int filePathIndex = expression.indexOf(PATH_MACROS);
         int lineIndex = expression.indexOf(LINE_MACROS);
-        int columnIndex = expression.indexOf(COLUMN_MACROS);
 
         if (filePathIndex == -1) {
             throw new InvalidExpressionException("Expression must contain " + PATH_MACROS + " marcos.");
         }
+
+        // Both are required because the highlight runs from the path's group to the line's.
+        if (lineIndex == -1) {
+            throw new InvalidExpressionException("Expression must contain " + LINE_MACROS + " marcos.");
+        }
+
         TreeMap<Integer, String> map = new TreeMap<>();
         map.put(filePathIndex, PATH_MACROS);
+        map.put(lineIndex, LINE_MACROS);
         String regex = StringUtil.replace(expression, PATH_MACROS, FILE_PATH_REGEXP);
-
-        if (lineIndex != -1) {
-            regex = StringUtil.replace(regex, LINE_MACROS, NUMBER_REGEXP);
-            map.put(lineIndex, LINE_MACROS);
-        }
-
-        if (columnIndex != -1) {
-            regex = StringUtil.replace(regex, COLUMN_MACROS, NUMBER_REGEXP);
-            map.put(columnIndex, COLUMN_MACROS);
-        }
+        regex = StringUtil.replace(regex, LINE_MACROS, NUMBER_REGEXP);
 
         // The block below determines the registers based on the sorted map.
         int count = 0;
@@ -83,14 +78,11 @@ public final class FileReferenceFilter implements Filter {
                 filePathIndex = count;
             } else if (LINE_MACROS.equals(s)) {
                 lineIndex = count;
-            } else if (COLUMN_MACROS.equals(s)) {
-                columnIndex = count;
             }
         }
 
         myFileMatchGroup = filePathIndex;
         myLineMatchGroup = lineIndex;
-        myColumnMatchGroup = columnIndex;
         myPattern = Pattern.compile(regex, Pattern.MULTILINE);
     }
 
@@ -119,19 +111,19 @@ public final class FileReferenceFilter implements Filter {
             String filePath = matcher.group(myFileMatchGroup);
             Collection<VirtualFile> virtualFileCollection = SourceFileResolver.resolve(myProject, filePath);
 
-            if (virtualFileCollection.size() > 0) {
+            if (!virtualFileCollection.isEmpty()) {
                 List<ResultItem> resultItemList = new ArrayList<>(virtualFileCollection.size());
-                int highlightStartOffset = entireLength - line.length() + matcher.start(1);
-                int highlightEndOffset = highlightStartOffset + matcher.end(matcher.groupCount()) - matcher.start(1);
+                int lineStartOffset = entireLength - line.length();
+                int highlightStartOffset = lineStartOffset + matcher.start(myFileMatchGroup);
+                int highlightEndOffset = lineStartOffset + matcher.end(myLineMatchGroup);
                 int fileLine = matchGroupToNumber(matcher, myLineMatchGroup);
-                int fileColumn = matchGroupToNumber(matcher, myColumnMatchGroup);
 
                 for (VirtualFile virtualFile : virtualFileCollection) {
                     resultItemList.add(
                             new AboveGenericFileLinks(
                                     highlightStartOffset,
                                     highlightEndOffset,
-                                    new OpenFileHyperlinkInfo(myProject, virtualFile, fileLine, fileColumn)
+                                    new OpenFileHyperlinkInfo(myProject, virtualFile, fileLine)
                             )
                     );
                 }
