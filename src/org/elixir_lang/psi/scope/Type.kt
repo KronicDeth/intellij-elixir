@@ -10,7 +10,6 @@ import com.intellij.psi.util.isAncestor
 import org.elixir_lang.beam.psi.impl.CallDefinitionImpl
 import org.elixir_lang.beam.psi.impl.ModuleImpl
 import org.elixir_lang.beam.psi.impl.TypeDefinitionImpl
-import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.Module
 import org.elixir_lang.psi.ModuleAttribute.isTypeSpecName
@@ -48,11 +47,8 @@ abstract class Type : PsiScopeProcessor {
             is ModuleImpl<*> -> execute(element, state)
             is TypeDefinitionImpl<*> -> execute(element, state)
             is CallDefinitionImpl<*> -> true
-            else -> {
-                error("Don't know how process element as type", element)
-
-                true
-            }
+            // Anything else declares no type; keep walking.
+            else -> true
         }
 
 
@@ -163,7 +159,8 @@ abstract class Type : PsiScopeProcessor {
                     }
                 }
 
-                else -> TODO()
+                // A single-target reference cannot name a `defprotocol` to walk; keep walking.
+                else -> true
             }
         } ?: true
 
@@ -212,12 +209,6 @@ abstract class Type : PsiScopeProcessor {
                 true
             }
         } ?: true
-
-    companion object {
-        fun error(title: String, element: PsiElement) {
-            Logger.error(Type::class.java, title, element)
-        }
-    }
 }
 
 internal fun PsiElement.ancestorTypeSpec(): AtUnqualifiedNoParenthesesCall<*>? =
@@ -281,11 +272,8 @@ internal fun PsiElement.ancestorTypeSpec(): AtUnqualifiedNoParenthesesCall<*>? =
         is QualifiableAlias,
         -> null
 
-        else -> {
-            Logger.error(PsiElement::class.java, "Don't know how to find ancestorTypeSpec", this)
-
-            null
-        }
+        // Anything else is not a shape a type specification is written in.
+        else -> null
     }
 
 val OPTIONALITIES = arrayOf("optional", "required")

@@ -151,14 +151,14 @@ class Variants : CallDefinitionClause() {
         element.finalArguments()?.first()?.stripAccessExpression()?.let { it as? ElixirAtom }?.node?.lastChildNode?.text?.let { prefix ->
             val suffix = element.functionName()!!.removePrefix("embed_")
             val name = "${prefix}_${suffix}"
+            // `Generator.isEmbed` admits only these two names.
+            val renderer = when (suffix) {
+                "template" -> org.elixir_lang.code_insight.lookup.element_renderer.mix.generator.EmbedTemplate(name)
+                "text" -> org.elixir_lang.code_insight.lookup.element_renderer.mix.generator.EmbedText(name)
+                else -> null
+            } ?: return true
 
             lookupElementByPsiElementName.computeIfAbsent(element to name) { (element, name) ->
-                val renderer = when (suffix) {
-                    "template" ->  org.elixir_lang.code_insight.lookup.element_renderer.mix.generator.EmbedTemplate(name)
-                    "text" -> org.elixir_lang.code_insight.lookup.element_renderer.mix.generator.EmbedText(name)
-                    else -> TODO()
-                }
-
                 LookupElementBuilder
                         .createWithSmartPointer(name, element)
                         .withRenderer(renderer)

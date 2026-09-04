@@ -1,12 +1,9 @@
 package org.elixir_lang.psi.scope
 
-import com.intellij.lang.parser.GeneratedParserUtilBase
 import com.intellij.openapi.util.Key
 import com.intellij.psi.*
-import com.intellij.psi.impl.source.tree.LeafPsiElement
 import com.intellij.psi.scope.PsiScopeProcessor
 import com.intellij.psi.util.PsiTreeUtil
-import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.CallDefinitionClause
 import org.elixir_lang.psi.CallDefinitionClause.head
@@ -25,7 +22,6 @@ import org.elixir_lang.psi.operation.Normalized.operatorIndex
 import org.elixir_lang.psi.operation.Type
 import org.elixir_lang.psi.operation.infix.Normalized
 import org.elixir_lang.psi.scope.WhileIn.whileIn
-import org.elixir_lang.reference.Callable
 import org.elixir_lang.resolvesToMacro
 import org.elixir_lang.structure_view.element.CallDefinitionHead.Companion.strip
 import org.elixir_lang.structure_view.element.Delegation
@@ -74,36 +70,8 @@ abstract class Variable : PsiScopeProcessor {
                 /* KeywordLists happen in map, struct and {@code do: <body>} matches, while KeywordKey happens only in
                    bindQuoted */
                 is QuotableKeywordList -> execute(element, state)
-                else -> {
-                    if (!(element is AtOperation ||  // a module attribute reference
-                                    element is AtUnqualifiedBracketOperation ||  // a module attribute reference with access
-                                    element is HeredocLiteral ||
-                                    element is BracketOperation ||  /* an anonymous function is a new scope, so it can't be used to declare a variable.  This won't ever
-                           be hit if the element is declared in the {@code fn} signature because that upward resolution
-                           from resolveVariable stops before this level */
-                                    element is ElixirAnonymousFunction ||
-                                    element is ElixirAtom ||
-                                    element is ElixirAtomKeyword ||
-                                    element is ElixirCharToken ||
-                                    element is ElixirDecimalFloat ||
-                                    element is ElixirEmptyParentheses ||
-                                    element is ElixirEndOfExpression ||
-                                    // type variable in a type restriction guard
-                                    element is ElixirKeywordKey ||
-                                    // noParenthesesManyStrictNoParenthesesExpression exists only to be marked as an error
-                                    element is ElixirNoParenthesesManyStrictNoParenthesesExpression ||
-                                    element is LeafPsiElement ||
-                                    element is Line ||
-                                    element is PsiErrorElement ||
-                                    element is PsiWhiteSpace ||
-                                    element is QualifiableAlias ||
-                                    element is WholeNumber ||
-                                element.node?.elementType == GeneratedParserUtilBase.DUMMY_BLOCK)) {
-                        Logger.error(Callable::class.java, "Don't know how to resolve variable in match", element)
-                    }
-
-                    true
-                }
+                // Anything else declares no variable; keep walking.
+                else -> true
             }
 
     override fun <T> getHint(hintKey: Key<T>): T? = null
