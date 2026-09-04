@@ -279,6 +279,9 @@
 
 ### Build / CI
 
+- [#4003](https://github.com/KronicDeth/intellij-elixir/pull/4003) [@sh41](https://github.com/sh41)
+  - **Plugin verification now fails on an internal platform API usage that is not on the approved list.**
+
 - [#3994](https://github.com/KronicDeth/intellij-elixir/pull/3994) [@sh41](https://github.com/sh41)
   - **A pull request build's plugin artifact is now stamped with a commit that exists.**
 

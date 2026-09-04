@@ -25,6 +25,7 @@
       - [Which versions CI tests against](#which-versions-ci-tests-against)
         - [Widening Elixir support](#widening-elixir-support)
         - [Reading a leg in the checks list](#reading-a-leg-in-the-checks-list)
+      - [Internal API usages](#internal-api-usages)
       - [Working with a different Elixir/OTP version](#working-with-a-different-elixirotp-version)
     - [From IntelliJ IDEA](#from-intellij-idea)
       - [Running the plugin in a specific IDE](#running-the-plugin-in-a-specific-ide)
@@ -459,6 +460,25 @@ The status text names the reason: `tests failed` with a count beside it, versus
 `failed at compile` where the counts cover only what ran. For *which* tests failed, follow a row
 to its `Test Results (...)` check or read the **Failed tests** summary on the leg's own job - the
 comment deals in counts only.
+
+#### Internal API usages
+
+JetBrains have agreed to ignore the internal platform APIs listed in
+`.github/internal-api-usages-allowlist.txt`. **Any other internal API usage blocks the plugin from being
+published**, so `.github/scripts/check-internal-api-usages.js` fails any verification leg that reports
+one.
+
+**The allowlist records that agreement; it does not suppress a warning.** Adding a line does not make a
+usage publishable - that needs a new agreement with JetBrains, and removing the usage is the better
+answer. A **moved usage** (an approved API called from code the allowlist does not name) is the exception:
+the ceiling is unchanged, so just replace the line with the reported one, which pastes in verbatim.
+
+To check a local run - `verifyPlugin` covers more IDEs than CI, so it may report more:
+
+```sh
+REPORTS_DIR=build/reports/pluginVerifier VERIFY_OUTCOME=success \
+  node .github/scripts/check-internal-api-usages.js
+```
 
 #### Working with a different Elixir/OTP version
 

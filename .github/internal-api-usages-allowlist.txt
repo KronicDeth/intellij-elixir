@@ -1,0 +1,36 @@
+# The IntelliJ Platform internal APIs this plugin is allowed to use.
+#
+# A CEILING, not a lint baseline: JetBrains have agreed to ignore exactly these in the plugin's
+# Marketplace verification, and anything else blocks publishing. Adding a line does NOT make a usage
+# publishable - that needs a new agreement with JetBrains first. Removing the usage is the better answer.
+#
+# Enforced per verification leg by .github/scripts/check-internal-api-usages.js.
+#
+# FORMAT: one entry per line, # comments ignored. An entry is a verifier report line minus its trailing
+# "This <kind> is marked with @...Internal ..." sentence and its parameter names - both drift, so both
+# are normalized away on each side. A raw report line can be pasted in verbatim.
+#
+# Entries name the plugin code too, deliberately: a second usage site of an approved API still raises the
+# count and blocks publishing. Moving that code means updating its line, with the ceiling unchanged.
+
+# --- Compiled-PSI mirror for decompiled .beam -----------------------------------------------------
+# BeamFileImpl must override getCachedMirror or the daemon never highlights decompiled .beam; there is
+# no public equivalent. IJPL-252078 asks for @ApiStatus.OverrideOnly instead.
+Internal method com.intellij.psi.PsiCompiledElement.getCachedMirror() : com.intellij.psi.PsiElement is overridden in class org.elixir_lang.beam.psi.BeamFileImpl
+
+# --- Code-insight context propagation onto that mirror --------------------------------------------
+# Only the setter needs the impl; everything else goes through the public CodeInsightContextManager,
+# which is what holds this to two entries. See the KDoc on propagateCodeInsightContextTo.
+Internal class com.intellij.codeInsight.multiverse.CodeInsightContextManagerImpl is referenced in org.elixir_lang.beam.psi.BeamFileImpl.propagateCodeInsightContextTo(PsiFile) : void
+Internal method com.intellij.codeInsight.multiverse.CodeInsightContextManagerImpl.setCodeInsightContext(com.intellij.psi.FileViewProvider, com.intellij.codeInsight.multiverse.CodeInsightContext) : void is invoked in org.elixir_lang.beam.psi.BeamFileImpl.propagateCodeInsightContextTo(PsiFile) : void
+
+# --- Awaiting the JPS project model before changing module or SDK configuration --------------------
+# The replacement is itself internal and absent from build 253, so migrating would relocate the finding,
+# not remove it. Five entries for one call site: a Kotlin Companion access compiles to a field read, an
+# interface reference and the call. Watch IJPL-249625 and IJPL-241069; see the KDoc on
+# awaitJpsProjectLoaded, the single place to change.
+Internal interface com.intellij.workspaceModel.ide.JpsProjectLoadingManager is referenced in org.elixir_lang.util.JpsProjectModelKt.awaitJpsProjectLoaded(Project, Continuation) : Object
+Internal class com.intellij.workspaceModel.ide.JpsProjectLoadingManager.Companion is referenced in org.elixir_lang.util.JpsProjectModelKt.awaitJpsProjectLoaded(Project, Continuation) : Object
+Internal field com.intellij.workspaceModel.ide.JpsProjectLoadingManager.Companion : com.intellij.workspaceModel.ide.JpsProjectLoadingManager.Companion is accessed in org.elixir_lang.util.JpsProjectModelKt.awaitJpsProjectLoaded(Project, Continuation) : Object
+Internal method com.intellij.workspaceModel.ide.JpsProjectLoadingManager.Companion.getInstance(com.intellij.openapi.project.Project) : com.intellij.workspaceModel.ide.JpsProjectLoadingManager is invoked in org.elixir_lang.util.JpsProjectModelKt.awaitJpsProjectLoaded(Project, Continuation) : Object
+Internal method com.intellij.workspaceModel.ide.JpsProjectLoadingManager.jpsProjectLoaded(java.lang.Runnable) : void is invoked in org.elixir_lang.util.JpsProjectModelKt.awaitJpsProjectLoaded(Project, Continuation) : Object
