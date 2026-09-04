@@ -135,6 +135,7 @@ jobs:
           idea-version: ${{ matrix.idea-version }}
           java-version: ${{ matrix.java-version }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          gradle-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
           build-scan-publish: 'true'
           skip-searchable-options: 'true'
 
@@ -398,6 +399,7 @@ jobs:
         with:
           setup-elixir: false
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          gradle-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
           skip-searchable-options: 'true'
 
       - name: Build Plugin
