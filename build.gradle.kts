@@ -526,8 +526,12 @@ intellijPlatform {
 
     pluginVerification {
         // Match CI failure levels: only fail on compatibility problems and invalid plugin.
-        // INTERNAL_API_USAGES is excluded because the verifier flags ComponentManager methods
-        // referenced indirectly via service/extension registration bytecode, not our source code.
+        // INTERNAL_API_USAGES is excluded because it is all-or-nothing: it would fail on the usages
+        // JetBrains have agreed to ignore. Those are capped by .github/internal-api-usages-allowlist.txt,
+        // which CI enforces; to check a local run against it (broader IDE set than CI, so it can report
+        // more):
+        //   REPORTS_DIR=build/reports/pluginVerifier VERIFY_OUTCOME=success \
+        //     node .github/scripts/check-internal-api-usages.js
         // See https://platform.jetbrains.com/t/stricter-plugin-verification-in-intellij-platform-gradle-plugin-2-15-0/4169
         failureLevel.set(
             listOf(

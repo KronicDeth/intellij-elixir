@@ -64,7 +64,9 @@ on:
       # see what it would cost - do not add them to the default until it is zero:
       #   MISSING_DEPENDENCIES - RubyMine fails it, because the verifier does not understand "optional"
       #     dependencies.
-      #   INTERNAL_API_USAGES - the plugin still has some; they have to be resolved first.
+      #   INTERNAL_API_USAGES - all-or-nothing, and the verifier has no per-usage allowlist, so it would
+      #     fail on the usages JetBrains have agreed to ignore. Enforced instead by the
+      #     `Check internal API usages against the allowlist` step.
       failure-levels:
         description: 'Passed to the verifier action. The list of failure levels you want to set. Any set and found will cause this action to fail. One of COMPATIBILITY_WARNINGS, COMPATIBILITY_PROBLEMS, DEPRECATED_API_USAGES, EXPERIMENTAL_API_USAGES, INTERNAL_API_USAGES, OVERRIDE_ONLY_API_USAGES, NON_EXTENDABLE_API_USAGES, PLUGIN_STRUCTURE_WARNINGS, MISSING_DEPENDENCIES, INVALID_PLUGIN, NOT_DYNAMIC, whitespace-separated.'
         required: false
@@ -184,6 +186,22 @@ jobs:
             || fromJson(format('{{"include":[{{"product":"{0}","version":"{1}"}}]}}', inputs.product, inputs.version)) }}
 
     steps:
+      # Only the internal API gate needs the repository. MUST be first: checkout clears the workspace
+      # unless it is already a clone of this repo, so later it would delete the staged plugin zip.
+      - name: Checkout the internal API allowlist
+        id: checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # The head commit, as `build-plugin` uses: the allowlist must come from the same commit as the
+          # zip. `github.ref` on a pull request is the synthesised merge ref, whose base may have removed
+          # an entry the head-built zip still needs.
+          ref: ${{ github.event.pull_request.head.sha || github.ref }}
+          persist-credentials: false
+          sparse-checkout: |
+            .github/internal-api-usages-allowlist.txt
+            .github/scripts
+          sparse-checkout-cone-mode: false
+
       # Every source lands a zip in build/distributions, which is the verifier action's default
       # plugin-location (resolved relative to the workspace), so nothing downstream varies.
       - name: Download plugin distribution (this run)
@@ -297,6 +315,21 @@ jobs:
           if [ -n "$log_file" ] && [ -f "$log_file" ]; then
             cat "$log_file"
           fi
+
+      # Runs on every path, dispatch included: a one-off run is asking whether that zip passes TODAY's
+      # approved list. Placed BEFORE Upload Verify Reports so that step's `failure()` still uploads the
+      # report naming the usage - on `pull_request` its `inputs` are empty, so `failure()` is the only
+      # thing that uploads.
+      - name: Check internal API usages against the allowlist
+        id: internal-api-usages
+        if: ${{ !cancelled() }}
+        env:
+          REPORTS_DIR: ${{ steps.verify.outputs.verification-reports-dir }}
+          # `outcome`, not `failure()`: a leg that never downloaded its plugin is `skipped` and a timed-out
+          # one is `cancelled`; the script only demands reports when verification actually succeeded.
+          VERIFY_OUTCOME: ${{ steps.verify.outcome }}
+          LEG: ${{ matrix.product }} ${{ matrix.version }}
+        run: node .github/scripts/check-internal-api-usages.js
 
       # One invocation per job, so the action's fixed verification_result.log name needs no
       # per-product copy - the artifact name carries the product and version instead.
