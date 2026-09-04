@@ -3,6 +3,7 @@ package org.elixir_lang.console;
 import com.intellij.execution.filters.Filter;
 import com.intellij.execution.filters.InvalidExpressionException;
 import com.intellij.execution.filters.OpenFileHyperlinkInfo;
+import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -18,7 +19,7 @@ import java.util.regex.Pattern;
 /**
  * <a href="https://github.com/ignatov/intellij-erlang/blob/master/src/org/intellij/erlang/console/FileReferenceFilter.java">...</a>
  */
-public final class FileReferenceFilter implements Filter {
+public final class FileReferenceFilter implements Filter, DumbAware {
     static final String LINE_MACROS = "$LINE$";
     static final String PATH_MACROS = "$FILE_PATH$";
     /** The expression a formatted frame's {@code path:line} is read with. */

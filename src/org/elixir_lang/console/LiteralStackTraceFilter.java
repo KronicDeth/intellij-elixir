@@ -4,6 +4,7 @@ import com.intellij.execution.filters.Filter;
 import com.intellij.execution.filters.HyperlinkInfo;
 import com.intellij.execution.filters.HyperlinkInfoFactory;
 import com.intellij.execution.filters.OpenFileHyperlinkInfo;
+import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
@@ -58,7 +59,7 @@ import java.util.regex.Pattern;
  * - it is zero in the terminal by construction, and a console added later that behaves like the
  * terminal gets the safe branch without anyone having to notice it exists.
  */
-final class LiteralStackTraceFilter implements Filter {
+final class LiteralStackTraceFilter implements Filter, DumbAware {
     /**
      * The path and its number, together on one line. A stack trace's {@code file:} is a charlist, so
      * Elixir 1.14 and earlier inspect it as {@code 'lib/x.ex'} and 1.15 and later as the sigil

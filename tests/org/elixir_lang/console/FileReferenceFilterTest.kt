@@ -9,6 +9,7 @@ import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.editor.markup.HighlighterLayer
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.vfs.LocalFileSystem
+import com.intellij.testFramework.DumbModeTestUtils
 import org.elixir_lang.PlatformTestCase
 import java.io.File
 import java.util.concurrent.Callable
@@ -114,6 +115,38 @@ class FileReferenceFilterTest : PlatformTestCase() {
         val item = items.single()
         assertEquals("The whole path must be highlighted, drive letter included", 0, item.highlightStartOffset)
         assertEquals(virtualFile, (item.hyperlinkInfo as FileHyperlinkInfo).descriptor!!.file)
+    }
+
+    /**
+     * The suffix search reads [com.intellij.psi.search.FilenameIndex] through a lookup that tolerates
+     * dumb mode, so it answers rather than throwing. Pinned because the filter is
+     * [com.intellij.openapi.project.DumbAware] on the strength of it.
+     */
+    fun testResolvesASuffixPathWhileIndexing() {
+        val file = myFixture.addFileToProject("lib/gald/turn.ex", "defmodule Gald.Turn do\nend\n")
+
+        val items = DumbModeTestUtils.computeInDumbModeSynchronously<List<Filter.ResultItem>>(project) {
+            applyFilter("gald/turn.ex:1: whatever")
+        }
+
+        assertEquals("Expected the suffix match to resolve while indexing, got: $items", 1, items.size)
+        assertEquals(file.virtualFile, (items.single().hyperlinkInfo as FileHyperlinkInfo).descriptor!!.file)
+    }
+
+    /** The path-as-written branch is pure VFS, so it still links while an index is being built. */
+    fun testLinksAnAbsolutePathWhileIndexing() {
+        val file = File(project.basePath!!, "dumb_mode.ex")
+        file.parentFile.mkdirs()
+        file.writeText("defmodule DumbMode do\nend\n")
+        val virtualFile = requireNotNull(LocalFileSystem.getInstance().refreshAndFindFileByIoFile(file))
+        val line = "${file.absolutePath}:3: DumbMode.boom/0"
+
+        val items = DumbModeTestUtils.computeInDumbModeSynchronously<List<Filter.ResultItem>>(project) {
+            applyFilter(line)
+        }
+
+        assertEquals("Expected the absolute path to link while indexing, got: $items", 1, items.size)
+        assertEquals(virtualFile, (items.single().hyperlinkInfo as FileHyperlinkInfo).descriptor!!.file)
     }
 
     /** Pins the offsets, which are computed from the match groups rather than from the path text. */

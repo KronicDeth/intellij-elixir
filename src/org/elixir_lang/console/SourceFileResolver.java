@@ -54,10 +54,10 @@ final class SourceFileResolver {
      * <p>Empty when nothing matches - a path naming a file nothing indexed can be found for, or one
      * whose extension {@link #PATTERN_FILENAME} does not accept.
      *
-     * <p>Requires a read action for the {@link FilenameIndex} lookup, and indexes to be built. Both
-     * are the platform's to provide: it runs console filters inside
-     * {@code ReadAction.nonBlocking}, and skips a filter that is not {@code DumbAware} while
-     * indexing.
+     * <p>Requires a read action, which the platform provides by running console filters inside
+     * {@code ReadAction.nonBlocking}. It does not require indexes to be built: the
+     * {@link FilenameIndex} lookup answers during dumb mode rather than throwing, returning whatever
+     * has been indexed so far, which is why both filters are {@code DumbAware}.
      */
     @NotNull
     @RequiresReadLock
