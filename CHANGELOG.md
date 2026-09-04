@@ -61,6 +61,9 @@
 
 ### Bug Fixes
 
+- [#4007](https://github.com/KronicDeth/intellij-elixir/pull/4007) [@sh41](https://github.com/sh41)
+  - **Typing a heredoc's opening `"""` now closes it at the same indentation.** Fixes [#806](https://github.com/KronicDeth/intellij-elixir/issues/806).
+
 - [#4005](https://github.com/KronicDeth/intellij-elixir/pull/4005) [@sh41](https://github.com/sh41)
   - **The IDE no longer freezes while a terminal produces output.** Fixes [#4004](https://github.com/KronicDeth/intellij-elixir/issues/4004).
   - **A Windows path printed with its drive letter now links from the drive letter.**
