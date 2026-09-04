@@ -124,9 +124,8 @@ open class ChooseByNameContributor(private val stubIndexKey: StubIndexKey<String
         enclosingModularByCall: EnclosingModularByCall,
         call: Call
     ) {
-        enclosingModularByCall.putNew(call)?.let { Callback(it, call) }?.run {
-            items.add(this)
-        } ?: error("Cannot find enclosing Modular for Callback", call)
+        // A callback outside any module has nowhere to be listed
+        enclosingModularByCall.putNew(call)?.let { items.add(Callback(it, call)) }
     }
 
     private fun getItemsFromCallDefinitionClause(
@@ -140,12 +139,8 @@ open class ChooseByNameContributor(private val stubIndexKey: StubIndexKey<String
                 val time = CallDefinitionClause.time(call)
                 val modular = enclosingModularByCall.putNew(call)
 
-                if (modular == null) {
-                    // don't throw an error if really EEX, but has wrong extension
-                    if (!call.text.contains("<%=")) {
-                        error("Cannot find enclosing Modular", call)
-                    }
-                } else {
+                // A definition outside any module has nowhere to be listed
+                if (modular != null) {
                     for (arity in arityInterval.closed()) {
                         val tuple = CallDefinition.Tuple(modular, time, name, arity)
                         callDefinitionByTuple.computeIfAbsent(tuple) { (modular, time, name, arity) ->
@@ -196,11 +191,7 @@ open class ChooseByNameContributor(private val stubIndexKey: StubIndexKey<String
 
                     val callDefinitionHead = CallDefinitionHead(callDefinition, visibility, call)
                     items.add(callDefinitionHead)
-                } else {
-                    error("Call for CallDefinitionHead does not have function name", call)
                 }
-            } else {
-                error("Cannot find enclosing Modular for Delegation call", delegationCall)
             }
         } else {
             error("Cannot find enclosing delegation call for CallDefinitionHead", call)
@@ -212,16 +203,12 @@ open class ChooseByNameContributor(private val stubIndexKey: StubIndexKey<String
         enclosingModularByCall: EnclosingModularByCall,
         call: Call
     ) {
+        // A specification outside any module has nowhere to be listed
         enclosingModularByCall.putNew(call)?.let { modular ->
-            CallDefinitionSpecification(
-                modular,
-                call as AtUnqualifiedNoParenthesesCall<*>,
-                false,
-                Timed.Time.RUN
-            ).run {
-                items.add(this)
-            }
-        } ?: error("Cannot find enclosing Modular for CallDefinitionSpecification", call)
+            items.add(
+                CallDefinitionSpecification(modular, call as AtUnqualifiedNoParenthesesCall<*>, false, Timed.Time.RUN)
+            )
+        }
     }
 
     private fun getItemsFromImplementation(
