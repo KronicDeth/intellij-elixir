@@ -90,14 +90,11 @@
     functionName
     functionNameElement
     getDoBlock
-    getName
-    getNameIdentifier
     hasDoBlockOrKeyword
     isCalling
     isCallingMacro
     leftOperand
     moduleName
-    operator
     primaryArguments
     primaryArity
     processDeclarations
@@ -655,7 +652,6 @@ noParenthesesKeywordPair ::= keywordKeyColon noParenthesesExpression
                              {
                                implements = "org.elixir_lang.psi.QuotableKeywordPair"
                                methods = [
-                                 getKeywordKey
                                  getKeywordValue
                                  quote
                                ]
@@ -711,7 +707,6 @@ heredoc ::= HEREDOC_PROMOTER EOL
                   addFragmentCodePoints
                   addHexadecimalEscapeSequenceCodePoints
                   createLiteralTextEscaper
-                  getHeredocLineList
                   isCharList
                   isValidHost
                   quote
@@ -1456,7 +1451,6 @@ noParenthesesOneArgument ::= noParenthesesKeywords | // @see https://github.com/
                                methods = [
                                  arguments
                                  isModuleName
-                                 processDeclarations
                                  quoteArguments
                                ]
                              }
@@ -2859,7 +2853,6 @@ keywordPair ::=  keywordKeyColon containerExpression
                  {
                    implements = "org.elixir_lang.psi.QuotableKeywordPair"
                    methods = [
-                     getKeywordKey
                      getKeywordValue
                      quote
                    ]

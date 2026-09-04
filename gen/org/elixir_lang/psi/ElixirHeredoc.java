@@ -30,10 +30,6 @@ public interface ElixirHeredoc extends HeredocLiteral, Quote {
 
   @NotNull LiteralTextEscaper<? extends PsiLanguageInjectionHost> createLiteralTextEscaper();
 
-  //WARNING: getHeredocLineList(...) is skipped
-  //matching getHeredocLineList(ElixirHeredoc, ...)
-  //methods are not found in ElixirPsiImplUtil
-
   boolean isCharList();
 
   boolean isValidHost();

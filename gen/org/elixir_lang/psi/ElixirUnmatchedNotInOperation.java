@@ -29,14 +29,6 @@ public interface ElixirUnmatchedNotInOperation extends ElixirUnmatchedExpression
 
   @Nullable ElixirDoBlock getDoBlock();
 
-  //WARNING: getName(...) is skipped
-  //matching getName(ElixirUnmatchedNotInOperation, ...)
-  //methods are not found in ElixirPsiImplUtil
-
-  //WARNING: getNameIdentifier(...) is skipped
-  //matching getNameIdentifier(ElixirUnmatchedNotInOperation, ...)
-  //methods are not found in ElixirPsiImplUtil
-
   @RequiresReadLock
   boolean hasDoBlockOrKeyword();
 
@@ -55,10 +47,6 @@ public interface ElixirUnmatchedNotInOperation extends ElixirUnmatchedExpression
   @Nullable Quotable leftOperand();
 
   @Nullable String moduleName();
-
-  //WARNING: operator(...) is skipped
-  //matching operator(ElixirUnmatchedNotInOperation, ...)
-  //methods are not found in ElixirPsiImplUtil
 
   @RequiresReadLock
   @NotNull PsiElement[] primaryArguments();
