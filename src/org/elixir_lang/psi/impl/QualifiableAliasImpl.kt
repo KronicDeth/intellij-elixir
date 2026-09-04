@@ -5,7 +5,6 @@ import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.util.isAncestor
-import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Module.KERNEL
@@ -182,39 +181,12 @@ object QualifiableAliasImpl {
             is Call -> {
                 val modularSet = strippedQualifier.maybeModularNameToModulars()
 
-                when (modularSet.size) {
-                    0 -> {
-                        Logger.error(
-                            QualifiableAlias::class.java,
-                            "Don't know how to prepend qualifier when call resolves to no modulars",
-                            context
-                        )
-
-                        "?"
-                    }
-
-                    1 -> modularSet.single().name ?: "?"
-                    else -> {
-                        Logger.error(
-                            QualifiableAlias::class.java,
-                            "Don't know how to prepend qualifier when call resolves to more than one modular",
-                            context
-                        )
-
-                        "?"
-                    }
-                }
+                // A qualifier that resolves to no module, or to more than one, is a placeholder segment
+                modularSet.singleOrNull()?.name ?: "?"
             }
 
-            else -> {
-                Logger.error(
-                    QualifiableAlias::class.java,
-                    "Don't know how to prepend qualifier",
-                    context
-                )
-
-                "?"
-            }
+            // Anything else names no module either
+            else -> "?"
         }
 
     private fun prependQualifiers(ancestor: PsiElement, previousAncestor: PsiElement, accumulator: String): String =
@@ -263,16 +235,12 @@ object QualifiableAliasImpl {
                         "${qualifierName(qualifier, ancestor)}.${accumulator}"
                     }
                 } else {
-                    Logger.error(QualifiableAlias::class.java, "Don't know how to prepend qualifier", ancestor)
-
+                    // A qualified alias still missing its qualifier while being typed
                     "?.${accumulator}"
                 }
             }
 
-            else -> {
-                Logger.error(QualifiableAlias::class.java, "Don't know how to prepend qualifier", ancestor)
-
-                "?.${accumulator}"
-            }
+            // Any other container ends qualification, as every container named above does
+            else -> accumulator
         }
 }

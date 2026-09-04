@@ -119,15 +119,8 @@ object ProcessDeclarationsImpl {
             is Call,
                 // Fixes #2577
             is ElixirTuple -> true
-            else -> {
-                Logger.error(
-                    restrictions::class.java,
-                    "Don't know how find type variable restrictions",
-                    restrictions
-                )
-
-                true
-            }
+            // Anything else restricts no type variable; keep walking
+            else -> true
         }
 
     /**
