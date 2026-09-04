@@ -136,6 +136,8 @@ private object From : NameArityRangeWalker("from", 1..2) {
                     "limit", "lock", "offset", "prefix", "preload", "union", "union_all", "update",
                     "windows" -> true
 
+                    // Ecto's `from/2` keywords are a finite, documented set and a new one may declare
+                    // bindings, so an unlisted key is reported rather than passed over.
                     else -> {
                         // https://github.com/KronicDeth/intellij-elixir/issues/3171
                         // Missing list around preload arguments
@@ -155,15 +157,8 @@ private object From : NameArityRangeWalker("from", 1..2) {
             }
             // middle of typing like in Issue #2915
             is UnqualifiedNoArgumentsCall<*> -> true
-            else -> {
-                Logger.error(
-                    logger,
-                    "Don't kow how to find reference variables in keyword arguments of from/2",
-                    fromKeywords
-                )
-
-                true
-            }
+            // Pinned or unquoted options, or an argument still being typed, declare no binding
+            else -> true
         }
 }
 
@@ -264,11 +259,8 @@ private object WithCTE : NameArityRangeWalker("with_cte", 3..3) {
                 else -> true
             }
 
-            else -> {
-                Logger.error(logger, "Don't know how to walk with_cte list", list)
-
-                true
-            }
+            // A bracketed or pinned option list declares no binding
+            else -> true
         }
 }
 
@@ -325,11 +317,8 @@ object Query : ModuleWalker(
             is UnqualifiedNoArgumentsCall<*> ->
                 inReference.resolvedFinalArity() != 0 || keepProcessing(inReference, state)
 
-            else -> {
-                Logger.error(logger, "Don't know how to find reference variables in Ecto query", inReference)
-
-                true
-            }
+            // A pinned source or a left operand still being typed declares no binding
+            else -> true
         }
 
     internal fun executeOnBinding(
@@ -386,31 +375,16 @@ object Query : ModuleWalker(
                             // `a` in `{^assoc, a}`
                             && executeOnBinding(elements[1], state, keepProcessing)
                 } else {
-                    Logger.error(
-                        logger,
-                        "Don't know how to find reference variables in binding tuple when arity is not 2",
-                        element
-                    )
-
+                    // Ecto rejects any other tuple, and one is typed part-way through; it binds nothing
                     true
                 }
             }
 
             is UnqualifiedNoArgumentsCall<*> -> element.resolvedFinalArity() != 0 || keepProcessing(element, state)
-            is ElixirUnmatchedUnaryOperation -> {
-                // pinned variable, not a reference binding
-                if (element.unaryPrefixOperator.text != "^") {
-                    Logger.error(logger, "Don't know how to find reference variables in binding", element)
-                }
-
-                true
-            }
-
-            else -> {
-                Logger.error(logger, "Don't know how to find reference variables in binding", element)
-
-                true
-            }
+            // A pinned variable is a use, not a binding, and no other prefix operator binds either
+            is ElixirUnmatchedUnaryOperation -> true
+            // Anything else in a binding position binds nothing
+            else -> true
         }
 
 
