@@ -353,12 +353,15 @@ class VariableSymbol(
             }
 
         @RequiresReadLock
+        /* Only the nearest match decides: `y = (x = 1)` and `y = "#{x = 1}"` declare `x` on the left of the inner
+           match although the inner match sits on the right of the outer one. */
         private fun isInMatchRightOperand(element: PsiElement): Boolean =
             generateSequence(element) { it.parent }
                 .filterIsInstance<Match>()
-                .any { match ->
+                .firstOrNull()
+                ?.let { match ->
                     match.rightOperand()?.let { right -> PsiTreeUtil.isAncestor(right, element, false) } == true
-                }
+                } == true
 
         @RequiresReadLock
         private fun isPinnedSite(element: PsiElement): Boolean =

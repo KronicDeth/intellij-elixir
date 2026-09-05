@@ -305,71 +305,11 @@ class Callable : PsiReferenceBase<Call>, PsiPolyVariantReference {
         @Contract(pure = true)
         @JvmStatic
         tailrec fun isVariable(ancestor: PsiElement): Boolean =
-            when (ancestor) {
-                is ElixirInterpolation,
-                    // bound quoted variable name in {@code quote bind_quoted: [name: value] do ... end}
-                is ElixirKeywordKey,
-                is ElixirStabNoParenthesesSignature,
-                    /* if a StabOperation is encountered before ElixirStabNoParenthesesSignature or
-                       ElixirStabParenthesesSignature, then must have come from body */
-                is ElixirStabOperation,
-                is ElixirStabParenthesesSignature,
-                is InMatch,
-                is Match ->
-                    true
-
-                is ElixirAccessExpression,
-                    /* an anonymous function is only reached when its stab has no `->`, which is a syntax error,
-                       but it can also occur during typing, so try searching above it */
-                is ElixirAnonymousFunction,
-                is ElixirAssociations,
-                is ElixirAssociationsBase,
-                is ElixirBitString,
-                is ElixirBlockItem,
-                is ElixirBlockList,
-                is ElixirBracketArguments,
-                is ElixirContainerAssociationOperation,
-                is ElixirDoBlock,
-                is ElixirEex,
-                is ElixirEexTag,
-                is ElixirKeywordPair,
-                is ElixirKeywords,
-                is ElixirList,
-                is ElixirMapArguments,
-                is ElixirMapConstructionArguments,
-                is ElixirMapOperation,
-                is ElixirMapUpdateArguments,
-                    /* parenthesesArguments can be used in @spec other type declarations, so may not be variable
-                       until ancestor call is checked */
-                is ElixirMatchedParenthesesArguments,
-                    /* Happens when tuple is after `MyAlias.` when add qualified call above line with pre-existing
-                       tuple */
-                is ElixirMultipleAliases,
-                is ElixirNoParenthesesOneArgument,
-                is ElixirNoParenthesesArguments,
-                is ElixirNoParenthesesKeywordPair,
-                is ElixirNoParenthesesKeywords,
-                    /* ElixirNoParenthesesManyStrictNoParenthesesExpression and ElixirNoParenthesesStrict indicates
-                       a syntax error, but it can also occur during typing, so try searching above the syntax error
-                       to resolve whether a variable */
-                is ElixirNoParenthesesManyStrictNoParenthesesExpression,
-                is ElixirNoParenthesesStrict,
-                is ElixirParenthesesArguments,
-                is ElixirParentheticalStab,
-                is ElixirStab,
-                is ElixirStabBody,
-                is ElixirStructOperation,
-                is ElixirTuple,
-                is ElixirVariable,
-                is QualifiedAlias,
-                is Type ->
-                    isVariable(ancestor.parent)
-
-                is Call -> // MUST be after any operations because operations also implement Call
-                    isVariable(ancestor)
-
-                // Anything else cannot hold a variable declaration
-                else -> false
+            when (VariableWalk.classify(ancestor)) {
+                VariableWalk.Bucket.DECLARES -> true
+                VariableWalk.Bucket.TRANSPARENT -> isVariable(ancestor.parent)
+                VariableWalk.Bucket.CALL -> isVariable(ancestor as Call)
+                VariableWalk.Bucket.STOP, VariableWalk.Bucket.LEAF -> false
             }
 
         @RequiresReadLock
@@ -529,62 +469,12 @@ class Callable : PsiReferenceBase<Call>, PsiPolyVariantReference {
             }
 
         private tailrec fun variableUseScope(ancestor: PsiElement): LocalSearchScope =
-            when (ancestor) {
-                is ElixirAccessExpression,
-                is ElixirAssociations,
-                is ElixirAssociationsBase,
-                is ElixirBitString,
-                is ElixirBlockItem,
-                is ElixirBlockList,
-                is ElixirContainerAssociationOperation,
-                is ElixirDoBlock,
-                is ElixirKeywordPair,
-                is ElixirKeywords,
-                is ElixirList,
-                is ElixirMapArguments,
-                is ElixirMapConstructionArguments,
-                is ElixirMapOperation,
-                is ElixirMatchedParenthesesArguments,
-                is ElixirNoParenthesesOneArgument,
-                is ElixirNoParenthesesArguments,
-                is ElixirNoParenthesesKeywordPair,
-                is ElixirNoParenthesesKeywords,
-                is ElixirParenthesesArguments,
-                is ElixirParentheticalStab,
-                is ElixirStab,
-                is ElixirStabBody,
-                is ElixirStabNoParenthesesSignature,
-                is ElixirStabParenthesesSignature,
-                is ElixirStructOperation,
-                is ElixirTuple,
-                is InMatch,
-                is Type,
-                is UnqualifiedNoArgumentsCall<*> ->
-                    variableUseScope(ancestor.parent)
-
-                is ElixirStabOperation,
-                is QualifiedAlias ->
-                    LocalSearchScope(ancestor)
-
-                is Match ->
-                    variableUseScope(ancestor)
-
-                is Call ->
-                    variableUseScope(ancestor)
-
-                is ElixirMapUpdateArguments,
-                is ElixirEexTag,
-                is ElixirInterpolation,
-                    /* reaching the file root means the walk passed no scope that could declare the variable,
-                       as happens for a match operator outside any comprehension - a syntax error, but also a
-                       state code passes through while being typed */
-                is PsiFile ->
-                    /* no variable can be declared inside these classes, so this is a variable usage missing a
-                       declaration, so it has no use scope */
-                    LocalSearchScope.EMPTY
-
-                // Anything else cannot declare a variable either, so a use there has no scope
-                else -> LocalSearchScope.EMPTY
+            when (VariableUseScopeWalk.classify(ancestor)) {
+                VariableUseScopeWalk.Bucket.PARENT -> variableUseScope(ancestor.parent)
+                VariableUseScopeWalk.Bucket.SELF -> LocalSearchScope(ancestor)
+                VariableUseScopeWalk.Bucket.MATCH -> variableUseScope(ancestor as Match)
+                VariableUseScopeWalk.Bucket.CALL -> variableUseScope(ancestor as Call)
+                VariableUseScopeWalk.Bucket.EMPTY, VariableUseScopeWalk.Bucket.LEAF -> LocalSearchScope.EMPTY
             }
     }
 }
