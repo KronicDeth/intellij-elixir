@@ -7,7 +7,10 @@ import org.elixir_lang.psi.call.CanonicallyNamed
 import org.elixir_lang.psi.call.MaybeExported
 import org.elixir_lang.structure_view.element.Timed.Time
 
-interface CallDefinition : CanonicallyNamed, MaybeExported, NamedElement, PsiCompiledElement {
+interface CallDefinition : BeamSymbol, MaybeExported {
+    /** The decompiled module this definition belongs to. */
+    override fun getParent(): Module
+
     val time: Time
     val nameArityInterval: NameArityInterval
 }
