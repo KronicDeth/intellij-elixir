@@ -69,7 +69,9 @@ class MultiResolve(private val name: String, private val incompleteCode: Boolean
                                                 .put(LAST_BINDING_KEY, element)
                                 )
 
-                                if (!preboundResolveResultList.isNotEmpty()) {
+                                /* An earlier binding makes this occurrence a read, so it is not a result itself. Without
+                                   one it falls through and answers for itself, as a declaration would. */
+                                if (preboundResolveResultList.isNotEmpty()) {
                                     if (!incompleteCode && validResult) {
                                         val validPreboundResolveResultList =  preboundResolveResultList.filter { it.isValidResult }
 

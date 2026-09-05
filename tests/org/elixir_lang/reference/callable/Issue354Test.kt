@@ -29,19 +29,16 @@ class Issue354Test : PlatformTestCase() {
         val psiPolyVariantReference = reference as PsiPolyVariantReference
 
         val resolveResults = psiPolyVariantReference.multiResolve(true)
-        assertEquals(resolveResults.size, 2)
 
-        val firstResolveResult = resolveResults[0]
-        assertTrue(firstResolveResult.isValidResult)
-        val firstElement = firstResolveResult.element
-        assertNotNull(firstElement)
-        assertEquals("%{line: line, port: port} = context", firstElement!!.parent.text)
+        /* `%{line: line, port: port} = context` reads `context`; it binds nothing, so the parameter is the only
+           declaration the later use resolves to. */
+        assertEquals(1, resolveResults.size)
 
-        val secondResolveResult = resolveResults[1]
-        assertTrue(secondResolveResult.isValidResult)
-        val secondElement = secondResolveResult.element
-        assertNotNull(secondElement)
-        assertEquals("context = %{backend: true}", secondElement!!.parent.text)
+        val resolveResult = resolveResults[0]
+        assertTrue(resolveResult.isValidResult)
+        val element = resolveResult.element
+        assertNotNull(element)
+        assertEquals("context = %{backend: true}", element!!.parent.text)
     }
 
     /*
