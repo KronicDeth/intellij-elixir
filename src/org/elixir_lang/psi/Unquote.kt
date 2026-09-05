@@ -74,7 +74,8 @@ object Unquote {
     private tailrec fun treeWalkUpUnquotedVariable(unquoted: PsiElement,
                                                    resolveState: ResolveState,
                                                    keepProcessing: (PsiElement, ResolveState) -> Boolean): Boolean {
-        val parent = unquoted.parent
+        // a detached element binds nothing above
+        val parent = unquoted.parent ?: return true
 
         return when (UnquotedVariableWalk.classify(parent)) {
             UnquotedVariableWalk.Bucket.MATCH -> {
