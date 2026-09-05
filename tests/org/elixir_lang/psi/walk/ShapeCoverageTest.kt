@@ -4,6 +4,8 @@ import junit.framework.TestCase
 import org.elixir_lang.psi.ElixirFile
 import org.elixir_lang.psi.ElixirMatchedExpression
 import org.elixir_lang.psi.ElixirTuple
+import org.elixir_lang.reference.VariableUseScopeWalk
+import org.elixir_lang.reference.VariableWalk
 
 /** Holds each walk's [Classifier] against the grammar, so a new rule fails here until it is given a bucket. */
 class ShapeCoverageTest : TestCase() {
@@ -14,6 +16,10 @@ class ShapeCoverageTest : TestCase() {
         assertTrue(ElixirTuple::class.java in shapes)
         assertFalse(ElixirMatchedExpression::class.java in shapes)
     }
+
+    fun testVariableWalkNamesEveryShape() = assertCovers(VariableWalk.classifier)
+
+    fun testVariableUseScopeWalkNamesEveryShape() = assertCovers(VariableUseScopeWalk.classifier)
 
     private fun <B : Enum<B>> assertCovers(classifier: Classifier<B>) {
         val shapes = GrammarShapes.CONCRETE + ElixirFile::class.java
