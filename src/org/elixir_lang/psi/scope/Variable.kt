@@ -42,6 +42,10 @@ abstract class Variable : PsiScopeProcessor {
                 is ElixirParentheticalStab, is ElixirStab, is ElixirStabBody, is ElixirTuple -> {
                     execute(element.children, state)
                 }
+                // a match inside `#{}` binds for the code after the string, so look through the string to it
+                is Line, is HeredocLiteral, is HeredocLineable, is Body, is ElixirInterpolation -> {
+                    execute(element.children, state)
+                }
                 is ElixirContainerAssociationOperation -> execute(element, state)
                 is ElixirMapArguments -> execute(element, state)
                 is ElixirMapOperation -> execute(element, state)
