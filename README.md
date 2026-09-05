@@ -1,3 +1,4 @@
+
 Table of Contents[![Backers on Open Collective](https://opencollective.com/intellij-elixir/backers/badge.svg)](#backers)[![Sponsors on Open Collective](https://opencollective.com/intellij-elixir/sponsors/badge.svg)](#sponsors)
 =================
 
