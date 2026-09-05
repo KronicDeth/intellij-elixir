@@ -119,10 +119,10 @@ class ModuleImpl<T : ModuleStub<*>?>(private val stub: T) : ModuleElementImpl(),
         return element.psi.let { it as? Call }?.getModuleName() ?: "<unknown module>"
     }
 
-    fun callDefinitions(): Array<CallDefinitionImpl<*>> =
+    override fun callDefinitions(): Array<CallDefinitionImpl<*>> =
         stub!!.getChildrenByType(ModuleStubElementTypes.CALL_DEFINITION, emptyArray())
 
-    fun typeDefinitions(): Array<TypeDefinitionImpl<*>> =
+    override fun typeDefinitions(): Array<TypeDefinitionImpl<*>> =
         stub!!.getChildrenByType(ModuleStubElementTypes.TYPE_DEFINITION, emptyArray())
 
     /**
