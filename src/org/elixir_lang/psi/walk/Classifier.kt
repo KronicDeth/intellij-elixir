@@ -9,7 +9,8 @@ import java.util.concurrent.ConcurrentHashMap
  * bucket names gets [fallback].
  *
  * A scan of the lists costs a few hundred nanoseconds per ancestor, so the answer is cached per runtime class in a
- * map this object owns, which dies with the plugin. A `ClassValue` would outlive the plugin class loader.
+ * map this object owns. The map dies with the plugin, where a `ClassValue` would outlive its class loader; in return
+ * it pins every class it has seen for the plugin's life, which is bounded to the Elixir PSI and the files it sits in.
  */
 class Classifier<B : Enum<B>>(buckets: List<Pair<B, List<Class<*>>>>, val fallback: B) {
     class Entry<B>(val shape: Class<*>, val bucket: B)
