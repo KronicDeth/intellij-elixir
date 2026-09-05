@@ -64,8 +64,8 @@ object Unquote {
                 if (CallDefinitionClause.`is`(unquoted)) {
                     Using.treeWalkUp(unquoted, null, unquotedResolveState, keepProcessing)
                 } else {
+                    // The walk's answer is dropped, so a consumer's stop signal does not end the loop here
                     treeWalkUpUnquotedVariable(unquoted, unquotedResolveState, keepProcessing)
-                    // a variable
 
                     true
                 }
@@ -73,42 +73,36 @@ object Unquote {
 
     private tailrec fun treeWalkUpUnquotedVariable(unquoted: PsiElement,
                                                    resolveState: ResolveState,
-                                                   keepProcessing: (PsiElement, ResolveState) -> Boolean): Boolean =
-            when (val parent = unquoted.parent) {
-                is Match -> {
-                    // variable = ...
-                    if (parent.leftOperand() == unquoted) {
-                        parent.rightOperand()?.let { value ->
-                            treeWalkUpValue(value, resolveState, keepProcessing)
-                        } ?: true
-                    }
-                    // ... = variable: a use, which binds nothing further up
-                    else {
-                        true
-                    }
+                                                   keepProcessing: (PsiElement, ResolveState) -> Boolean): Boolean {
+        // a detached element binds nothing above
+        val parent = unquoted.parent ?: return true
+
+        return when (UnquotedVariableWalk.classify(parent)) {
+            UnquotedVariableWalk.Bucket.MATCH -> {
+                val match = parent as Match
+
+                // variable = ...
+                if (match.leftOperand() == unquoted) {
+                    match.rightOperand()?.let { value ->
+                        treeWalkUpValue(value, resolveState, keepProcessing)
+                    } ?: true
                 }
-                // ...: variable, such as `do: block` in macro parameters
-                is ElixirKeywordPair -> true
-                // (..., parameter)
-                is ElixirParenthesesArguments -> true
-                // Transparent wrappers: keep walking upward
-                is ElixirTuple,
-                is ElixirAccessExpression,
-                is ElixirStabBody,
-                is ElixirStab,
-                is QuotableArguments,
-                is QuotableKeywordList,
-                is Call -> treeWalkUpUnquotedVariable(parent, resolveState, keepProcessing)
-                // Anything else, the file included, binds nothing the unquote could see
-                else -> true
+                // ... = variable: a use, which binds nothing further up
+                else {
+                    true
+                }
             }
+            UnquotedVariableWalk.Bucket.RECURSE -> treeWalkUpUnquotedVariable(parent, resolveState, keepProcessing)
+            UnquotedVariableWalk.Bucket.STOP, UnquotedVariableWalk.Bucket.UNFOLLOWED, UnquotedVariableWalk.Bucket.LEAF -> true
+        }
+    }
 
     private fun treeWalkUpValue(value: PsiElement,
                                 resolveState: ResolveState,
                                 keepProcessing: (PsiElement, ResolveState) -> Boolean): Boolean =
             when (value) {
                 is Call -> treeWalkUpValue(value, resolveState, keepProcessing)
-                // A literal, container or operation has no definitions to walk into
+                // A literal or container value is not walked into, so a quote destructured out of one is not found
                 else -> true
             }
 
