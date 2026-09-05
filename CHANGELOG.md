@@ -61,6 +61,17 @@
 
 ### Bug Fixes
 
+- [#4027](https://github.com/KronicDeth/intellij-elixir/pull/4027) [@sh41](https://github.com/sh41)
+  - **A variable bound inside string interpolation, such as `x` in `_ = "#{x = 1}"`, can be found,
+    renamed and navigated to from the code after the string**; a bare `"#{name}"` now resolves as
+    `name` would outside the string. Along the way: Ctrl+Click on a read on the right of a match
+    (`y = variable`, `y = [variable]`) navigates to the declaration instead of showing the read's own
+    usages, and a variable bound on the left of an inner match inside an outer one (`_ = (x = 1)`)
+    has a declaration to find and rename.
+    Fixes [#4023](https://github.com/KronicDeth/intellij-elixir/issues/4023).
+    Refs [#4019](https://github.com/KronicDeth/intellij-elixir/issues/4019),
+    [#4020](https://github.com/KronicDeth/intellij-elixir/pull/4020).
+
 - [#4020](https://github.com/KronicDeth/intellij-elixir/pull/4020) [@sh41](https://github.com/sh41)
   - **Variables and parameters no longer report an error for a code shape the resolver does not name**,
     such as `@1[key]`, and a variable bound inside an `fn` still missing its `->` or inside a map
