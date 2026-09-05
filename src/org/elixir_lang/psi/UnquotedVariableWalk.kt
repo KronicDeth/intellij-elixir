@@ -26,8 +26,9 @@ object UnquotedVariableWalk {
         listOf(
             Bucket.MATCH to listOf(Match::class.java),
             Bucket.STOP to listOf(
-                // `...: variable`, such as `do: block` in macro parameters
+                // `...: variable`, such as `do: block` in macro parameters, with or without parentheses
                 ElixirKeywordPair::class.java,
+                ElixirNoParenthesesKeywordPair::class.java,
                 // `(..., parameter)`
                 ElixirParenthesesArguments::class.java,
                 ElixirInterpolation::class.java,
@@ -65,7 +66,6 @@ object UnquotedVariableWalk {
                 ElixirMapArguments::class.java,
                 ElixirMapOperation::class.java,
                 ElixirMatchedParenthesesArguments::class.java,
-                ElixirNoParenthesesKeywordPair::class.java,
                 ElixirParentheticalStab::class.java,
                 ElixirStructOperation::class.java,
                 ElixirTuple::class.java,
