@@ -4,6 +4,7 @@ import com.intellij.psi.search.LocalSearchScope
 import com.intellij.psi.util.PsiTreeUtil
 import org.elixir_lang.PlatformTestCase
 import org.elixir_lang.psi.UnqualifiedNoArgumentsCall
+import org.elixir_lang.psi.operation.Match
 import org.elixir_lang.reference.Callable
 
 /**
@@ -23,6 +24,8 @@ class VariableUseScopeThroughIncompleteFnTest : PlatformTestCase() {
         val (useScope, errors) = captureLoggedErrors { Callable.variableUseScope(variable) }
 
         assertEmpty(errors)
-        assertNotSame(LocalSearchScope.EMPTY, useScope)
+        // the statement that binds it, and whatever follows it in the file
+        val statement = PsiTreeUtil.getTopmostParentOfType(variable, Match::class.java)!!
+        assertEquals(LocalSearchScope(statement), useScope)
     }
 }
