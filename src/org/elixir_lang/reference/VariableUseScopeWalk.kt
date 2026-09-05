@@ -70,10 +70,7 @@ object VariableUseScopeWalk {
                 Type::class.java,
                 UnqualifiedNoArgumentsCall::class.java
             ),
-            Bucket.SELF to listOf(
-                ElixirStabOperation::class.java,
-                QualifiedAlias::class.java
-            ),
+            Bucket.SELF to listOf(ElixirStabOperation::class.java),
             Bucket.MATCH to listOf(Match::class.java),
             Bucket.CALL to listOf(Call::class.java),
             Bucket.EMPTY to listOf(
@@ -87,7 +84,8 @@ object VariableUseScopeWalk {
                 AtUnqualifiedBracketOperation::class.java,
                 AtNumericBracketOperation::class.java,
                 BracketOperation::class.java,
-                QualifiedMultipleAliases::class.java
+                QualifiedMultipleAliases::class.java,
+                QualifiedAlias::class.java
             ),
             Bucket.LEAF to Leaves.SHAPES + listOf(
                 // A keyword key is a bare atom

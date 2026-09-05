@@ -9,7 +9,6 @@ import org.elixir_lang.psi.ElixirMapUpdateArguments
 import org.elixir_lang.psi.ElixirMatchedExpression
 import org.elixir_lang.psi.ElixirTuple
 import org.elixir_lang.psi.ElixirVariable
-import org.elixir_lang.psi.QualifiedAlias
 import org.elixir_lang.annotator.ParameterWalk
 import org.elixir_lang.psi.UnquotedVariableWalk
 import org.elixir_lang.reference.VariableUseScopeWalk
@@ -43,9 +42,7 @@ class ShapeCoverageTest : TestCase() {
             // update arguments cannot be a pattern, so nothing is declared through them
             ElixirMapUpdateArguments::class.java,
             // an element `isVariable` starts from, never an ancestor
-            ElixirVariable::class.java,
-            // a variable qualifying an alias is searched inside the alias only
-            QualifiedAlias::class.java
+            ElixirVariable::class.java
         )
     )
 

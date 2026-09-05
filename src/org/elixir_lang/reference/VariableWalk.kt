@@ -83,7 +83,6 @@ object VariableWalk {
                 ElixirStructOperation::class.java,
                 ElixirTuple::class.java,
                 ElixirVariable::class.java,
-                QualifiedAlias::class.java,
                 Type::class.java
             ),
             Bucket.CALL to listOf(Call::class.java),
@@ -94,6 +93,8 @@ object VariableWalk {
                 AtOperation::class.java,
                 BracketOperation::class.java,
                 QualifiedMultipleAliases::class.java,
+                // an alias must expand to an atom at compile time, so its qualifier is never a variable
+                QualifiedAlias::class.java,
                 // the walk passed no scope that could declare the variable
                 PsiFile::class.java
             ),

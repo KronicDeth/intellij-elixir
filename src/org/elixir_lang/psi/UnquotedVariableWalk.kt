@@ -38,10 +38,10 @@ object UnquotedVariableWalk {
                 AtUnqualifiedBracketOperation::class.java,
                 AtNumericBracketOperation::class.java,
                 BracketOperation::class.java,
-                QualifiedMultipleAliases::class.java
+                QualifiedMultipleAliases::class.java,
+                QualifiedAlias::class.java
             ),
             Bucket.UNFOLLOWED to listOf(
-                QualifiedAlias::class.java,
                 ElixirAnonymousFunction::class.java,
                 ElixirAssociations::class.java,
                 ElixirAssociationsBase::class.java,
