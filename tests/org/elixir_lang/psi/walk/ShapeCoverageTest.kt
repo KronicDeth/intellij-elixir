@@ -5,7 +5,6 @@ import org.elixir_lang.psi.ElixirEexTag
 import org.elixir_lang.psi.ElixirFile
 import org.elixir_lang.psi.ElixirInterpolation
 import org.elixir_lang.psi.ElixirKeywordKey
-import org.elixir_lang.psi.ElixirMapUpdateArguments
 import org.elixir_lang.psi.ElixirMatchedExpression
 import org.elixir_lang.psi.ElixirTuple
 import org.elixir_lang.psi.ElixirVariable
@@ -39,8 +38,6 @@ class ShapeCoverageTest : TestCase() {
         listOf(
             // a tag's variables are not searched above the tag, pinned by Issue1831Test
             ElixirEexTag::class.java,
-            // update arguments cannot be a pattern, so nothing is declared through them
-            ElixirMapUpdateArguments::class.java,
             // an element `isVariable` starts from, never an ancestor
             ElixirVariable::class.java
         )

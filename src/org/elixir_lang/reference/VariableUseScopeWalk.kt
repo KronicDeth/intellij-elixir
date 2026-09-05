@@ -44,6 +44,8 @@ object VariableUseScopeWalk {
                 ElixirMapArguments::class.java,
                 ElixirMapConstructionArguments::class.java,
                 ElixirMapOperation::class.java,
+                // a match in an update's value binds for the code after the map, as anywhere in an expression
+                ElixirMapUpdateArguments::class.java,
                 ElixirMatchedParenthesesArguments::class.java,
                 ElixirNoParenthesesOneArgument::class.java,
                 ElixirNoParenthesesArguments::class.java,
@@ -74,7 +76,6 @@ object VariableUseScopeWalk {
             Bucket.MATCH to listOf(Match::class.java),
             Bucket.CALL to listOf(Call::class.java),
             Bucket.EMPTY to listOf(
-                ElixirMapUpdateArguments::class.java,
                 ElixirEexTag::class.java,
                 ElixirInterpolation::class.java,
                 // the walk passed no scope that could declare the variable, as for a match outside any block
