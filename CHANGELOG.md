@@ -64,7 +64,8 @@
 - [#4020](https://github.com/KronicDeth/intellij-elixir/pull/4020) [@sh41](https://github.com/sh41)
   - **Variables and parameters no longer report an error for a code shape the resolver does not name**,
     such as `@1[key]`, and a variable bound inside an `fn` still missing its `->` or inside a map
-    update can be found and renamed.
+    update can be found and renamed. An identifier qualifying an alias, as in `x.Foo`, is no longer
+    treated as a variable.
     Refs [#3985](https://github.com/KronicDeth/intellij-elixir/issues/3985),
     [#4019](https://github.com/KronicDeth/intellij-elixir/issues/4019).
 
