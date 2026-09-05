@@ -11,7 +11,7 @@ import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.testFramework.common.runAll
 import org.elixir_lang.PlatformTestCase
 import org.elixir_lang.beam.BeamLibraryFixture
-import org.elixir_lang.beam.psi.impl.CallDefinitionImpl
+import org.elixir_lang.beam.psi.CallDefinition as BeamCallDefinition
 import java.io.File
 
 /**
@@ -19,15 +19,15 @@ import java.io.File
  *
  * Three fixed bugs:
  *
- * 1. **`Variants.execute(CallDefinitionImpl<*>)`** was a no-op: the always-false `element is Named`
+ * 1. **`Variants.execute(BeamCallDefinition)`** was a no-op: the always-false `element is Named`
  *    guard meant exported BEAM functions never appeared in unqualified scope-walk completion after
  *    `import SomeBeamModule`.  Tested by [testBeamExportedFunctionAppearsInUnqualifiedCompletion].
  *
- * 2. **`element_renderer.CallDefinitionClause`** had no branch for `CallDefinitionImpl`, so the
+ * 2. **`element_renderer.CallDefinitionClause`** had no branch for `BeamCallDefinition`, so the
  *    tail text (arity) was missing from BEAM completion items.  Tested by
  *    [testBeamExportedFunctionRendersWithArity].
  *
- * 3. The same renderer set no icon for `CallDefinitionImpl`, so BEAM items rendered without the
+ * 3. The same renderer set no icon for `BeamCallDefinition`, so BEAM items rendered without the
  *    function/macro + visibility icon that source items get.  Tested by
  *    [testBeamExportedFunctionRendersWithIcon].
  *
@@ -73,7 +73,7 @@ class BeamCallDefinitionClauseTest : PlatformTestCase() {
     /**
      * Adds this suite's own `ebin/Elixir.Code.beam` as a library CLASSES root.
      * `ebin/` contains only the `.beam` file (its companion `code.ex` lives in `lib/`, which is
-     * NOT added here), so completion resolves through `CallDefinitionImpl` stubs rather than source
+     * NOT added here), so completion resolves through `BeamCallDefinition` stubs rather than source
      * PSI.  Uses the test method name to produce a unique library name, avoiding collisions across
      * tests in the same light-project instance.
      */
@@ -126,7 +126,7 @@ class BeamCallDefinitionClauseTest : PlatformTestCase() {
     /**
      * When both the source (`code.ex`) and decompiled (`Elixir.Code.beam`) forms of the `Code`
      * module are in scope, UNQUALIFIED completion after `import Code` must NOT offer the BEAM
-     * (`CallDefinitionImpl`) variants alongside the source clauses - exactly like resolution
+     * (`BeamCallDefinition`) variants alongside the source clauses - exactly like resolution
      * prefers source over decompiled (see PreferSourceOverDecompiledTest).
      *
      * Regression guard for the source-over-decompiled preference at the *module-alias resolution*
@@ -136,7 +136,7 @@ class BeamCallDefinitionClauseTest : PlatformTestCase() {
      * the `Code` alias via `QualifiableAlias.maybeModularNameToModulars` -> `reference.multiResolve`,
      * which returns only the source `defmodule Code` when source exists.  As a result the walk takes
      * the source `executeOnCallDefinitionClause(Call)` path and never reaches
-     * `Variants.execute(CallDefinitionImpl<*>)` for `Code`, so no BEAM lookup elements are produced.
+     * `Variants.execute(BeamCallDefinition)` for `Code`, so no BEAM lookup elements are produced.
      *
      * This test should fail only if that alias-resolution preference regresses (e.g. the alias
      * starts resolving to both the source and BEAM modulars), which would let BEAM duplicates leak
@@ -155,7 +155,7 @@ class BeamCallDefinitionClauseTest : PlatformTestCase() {
             stringToQuotedElements.isEmpty()
         )
 
-        val beamElements = stringToQuotedElements.filter { it.psiElement is CallDefinitionImpl<*> }
+        val beamElements = stringToQuotedElements.filter { it.psiElement is BeamCallDefinition }
         assertTrue(
             "Unqualified completion offered BEAM-decompiled 'string_to_quoted' variants " +
                 "(${beamElements.size}) even though source code.ex is in scope; source should be " +
@@ -166,10 +166,10 @@ class BeamCallDefinitionClauseTest : PlatformTestCase() {
 
     /**
      * Exported functions from a BEAM module must appear in UNQUALIFIED completion after
-     * `import Code`.  This exercises `Variants.execute(CallDefinitionImpl<*>)` - the method
+     * `import Code`.  This exercises `Variants.execute(BeamCallDefinition)` - the method
      * that was previously a no-op due to the always-false `element is Named` guard.
      *
-     * Without the fix, the scope walker visits each `CallDefinitionImpl` from the imported
+     * Without the fix, the scope walker visits each `BeamCallDefinition` from the imported
      * BEAM module but returns `true` without adding it to the lookup, so no BEAM functions
      * appear in unqualified completion.  With the fix, exported functions are added.
      *
@@ -194,7 +194,7 @@ class BeamCallDefinitionClauseTest : PlatformTestCase() {
      * The lookup element for a BEAM-decompiled function must render with `/arity` tail text.
      *
      * This verifies the fix in `element_renderer.CallDefinitionClause` that adds a
-     * `renderCallDefinitionImpl` branch, since `CallDefinitionImpl` is not a `Call` and the
+     * `renderCallDefinitionImpl` branch, since `BeamCallDefinition` is not a `Call` and the
      * pre-fix code path left the tail text empty for BEAM elements.
      */
     fun testBeamExportedFunctionRendersWithArity() {

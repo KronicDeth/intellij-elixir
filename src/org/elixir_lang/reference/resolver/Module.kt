@@ -114,7 +114,7 @@ object Module : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Modul
                     /**
                      * Don't use `namedElement.navigationElement` as it triggers decompiling of the whole module,
                      * which will parse the whole Module text, which is overkill to get the module's name that is
-                     * available in the `ModuleImpl` alone.
+                     * available in the `BeamModule` alone.
                      */
                     resolveResultList.add(VisitedElementSetResolveResult(namedElement))
                 }

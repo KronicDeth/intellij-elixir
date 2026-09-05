@@ -5,7 +5,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveState
 import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.Name
-import org.elixir_lang.beam.psi.impl.ModuleImpl
+import org.elixir_lang.beam.psi.Module as BeamModule
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.call.macroChildCallSequence
 import org.elixir_lang.psi.impl.call.macroChildCalls
@@ -25,7 +25,7 @@ object Modular {
     ): Boolean =
         when (modular) {
             is Call -> callDefinitionClauseCallWhile(modular, resolveState, function)
-            is ModuleImpl<*> -> callDefinitionClauseCallWhile(modular, resolveState, function)
+            is BeamModule -> callDefinitionClauseCallWhile(modular, resolveState, function)
             else -> true
         }
 
@@ -87,7 +87,7 @@ object Modular {
     ): AccumulatorContinue<R> =
         when (modular) {
             is Call -> callDefinitionClauseCallFoldWhile(modular, functionName, initial, foldWhile)
-            is ModuleImpl<*> -> callDefinitionClauseCallFoldWhile(modular, functionName, initial, foldWhile)
+            is BeamModule -> callDefinitionClauseCallFoldWhile(modular, functionName, initial, foldWhile)
             else -> AccumulatorContinue(initial, true)
         }
 
@@ -112,7 +112,7 @@ object Modular {
         }
 
     inline fun <R> callDefinitionClauseCallFoldWhile(
-        modular: ModuleImpl<*>,
+        modular: BeamModule,
         functionName: Name,
         initial: R,
         foldWhile: (PsiElement, Name, ArityInterval, R) -> AccumulatorContinue<R>

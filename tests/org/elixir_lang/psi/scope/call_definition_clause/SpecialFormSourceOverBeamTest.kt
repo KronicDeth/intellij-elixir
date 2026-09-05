@@ -10,7 +10,7 @@ import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.testFramework.common.runAll
 import org.elixir_lang.PlatformTestCase
 import org.elixir_lang.beam.BeamLibraryFixture
-import org.elixir_lang.beam.psi.impl.CallDefinitionImpl
+import org.elixir_lang.beam.psi.CallDefinition as BeamCallDefinition
 import java.io.File
 
 /**
@@ -23,7 +23,7 @@ import java.io.File
  * (the real mise/SDK layout), each macro was offered twice.
  *
  * These tests pin both fixture scenarios:
- *  - only the decompiled BEAM present -> each macro offered once (from the `CallDefinitionImpl` stub);
+ *  - only the decompiled BEAM present -> each macro offered once (from the `BeamCallDefinition` stub);
  *  - source `special_forms.ex` present alongside the BEAM -> source is preferred, the BEAM variants are
  *    dropped, and each macro is still offered exactly once (no duplicate).
  *
@@ -136,7 +136,7 @@ class SpecialFormSourceOverBeamTest : PlatformTestCase() {
 
     /**
      * Source and BEAM both in scope (the real mise/SDK layout): the source `special_forms.ex` clauses
-     * are preferred, the decompiled `CallDefinitionImpl` variants are dropped, and each macro is still
+     * are preferred, the decompiled `BeamCallDefinition` variants are dropped, and each macro is still
      * offered exactly once - the fix for the IDE duplicate.
      *
      * Special forms are offered like any other implicitly-imported macro: they come from the normal
@@ -156,7 +156,7 @@ class SpecialFormSourceOverBeamTest : PlatformTestCase() {
             )
         )
 
-        val beamVariants = elements.filter { it.psiElement is CallDefinitionImpl<*> }
+        val beamVariants = elements.filter { it.psiElement is BeamCallDefinition }
         assertTrue(
             "Unqualified completion offered decompiled BEAM special-form variants " +
                 "(${beamVariants.map { it.lookupString }}) even though source special_forms.ex is in " +

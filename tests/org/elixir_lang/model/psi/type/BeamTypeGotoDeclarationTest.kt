@@ -8,7 +8,7 @@ import java.io.File
 /**
  * Behavioural Go To Declaration coverage for types defined in decompiled BEAM modules: remote Erlang
  * library types (`:queue.queue/0`) and the built-in types faked onto `:erlang` (`integer/0`). Unlike
- * source `@type`s these resolve to `TypeDefinitionImpl` decompiled PSI, so they exercise the branch of
+ * source `@type`s these resolve to `BeamTypeDefinition` decompiled PSI, so they exercise the branch of
  * the type reference that navigates into the `.beam` mirror rather than a source attribute.
  */
 class BeamTypeGotoDeclarationTest : BeamLibraryTestCase() {

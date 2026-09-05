@@ -4,8 +4,8 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveResult
 import com.intellij.psi.ResolveState
 import com.intellij.psi.util.PsiTreeUtil
-import org.elixir_lang.beam.psi.impl.ModuleImpl
-import org.elixir_lang.beam.psi.impl.TypeDefinitionImpl
+import org.elixir_lang.beam.psi.Module as BeamModule
+import org.elixir_lang.beam.psi.TypeDefinition as BeamTypeDefinition
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.qualification.Qualified
@@ -60,14 +60,14 @@ private constructor(private val name: String,
                 }
             } ?: true
 
-    override fun execute(typeDefinitionImpl: TypeDefinitionImpl<*>, state: ResolveState): Boolean {
-        val name = typeDefinitionImpl.name
+    override fun execute(typeDefinition: BeamTypeDefinition, state: ResolveState): Boolean {
+        val name = typeDefinition.name
 
         return if (name.startsWith(this.name)) {
-            val arity = typeDefinitionImpl.arity
+            val arity = typeDefinition.arity
             val validResult = name == this.name && arity == this.arity
 
-            resolveResultOrderedSet.add(typeDefinitionImpl, "$name/$arity", validResult, state.visitedElementSet())
+            resolveResultOrderedSet.add(typeDefinition, "$name/$arity", validResult, state.visitedElementSet())
 
             keepProcessing()
         } else {
@@ -199,7 +199,7 @@ private constructor(private val name: String,
             val maxScope = entrance.containingFile
             val entranceResolveState = resolveState.put(ElixirPsiImplUtil.ENTRANCE, entrance).putInitialVisitedElement(entrance)
 
-            if (entrance is ModuleImpl<*>) {
+            if (entrance is BeamModule) {
                 multiResolve.execute(entrance, entranceResolveState)
             } else {
                 PsiTreeUtil.treeWalkUp(multiResolve, entrance, maxScope, entranceResolveState)

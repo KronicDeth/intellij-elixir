@@ -9,7 +9,7 @@ import com.intellij.psi.ResolveResult
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
 import com.intellij.util.concurrency.annotations.RequiresReadLock
-import org.elixir_lang.beam.psi.impl.TypeDefinitionImpl
+import org.elixir_lang.beam.psi.TypeDefinition as BeamTypeDefinition
 import org.elixir_lang.psi.NamedElement
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.qualification.Qualified
@@ -39,7 +39,7 @@ class TypeReference(
          * Resolves [call] to the [TypeSymbol]s of the `@type`/`@typep`/`@opaque` definition(s) it names. Both source
          * definitions and decompiled BEAM definitions (`:queue.queue/0` from the Erlang stdlib, or a built-in like
          * `integer/0` faked onto `:erlang`) are covered: a source definition is already a `@type` [Call], while a
-         * decompiled [TypeDefinitionImpl] exposes the equivalent `@type` [Call] as its
+         * decompiled [BeamTypeDefinition] exposes the equivalent `@type` [Call] as its
          * [navigationElement][com.intellij.psi.PsiElement.getNavigationElement] (the decompiled `.beam` mirror), so
          * both flow through the same [TypeSymbol.fromTypeAttribute] pipeline and compare equal by module/name/arity.
          */
@@ -57,7 +57,7 @@ class TypeReference(
                 .mapNotNull { result ->
                     when (val element = result.element) {
                         is Call -> element
-                        is TypeDefinitionImpl<*> -> element.navigationElement as? Call
+                        is BeamTypeDefinition -> element.navigationElement as? Call
                         else -> null
                     }
                 }
@@ -69,7 +69,7 @@ class TypeReference(
 
         /**
          * Whether [call] resolves to any type definition, used by the unresolvable-type inspection to decide whether
-         * a name is a real type. More lenient than [resolveSymbols]: it counts a decompiled [TypeDefinitionImpl] as a
+         * a name is a real type. More lenient than [resolveSymbols]: it counts a decompiled [BeamTypeDefinition] as a
          * type on its own, without requiring the decompiled `.beam` mirror to expose a usable `@type` [Call], so the
          * inspection never false-flags a genuinely defined BEAM type even if its mirror cannot be rendered.
          */
@@ -82,7 +82,7 @@ class TypeReference(
                 .any { result ->
                     when (val element = result.element) {
                         is Call -> TypeElement.`is`(element)
-                        is TypeDefinitionImpl<*> -> true
+                        is BeamTypeDefinition -> true
                         else -> false
                     }
                 }
