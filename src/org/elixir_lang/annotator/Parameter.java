@@ -119,6 +119,10 @@ public class Parameter {
     private static Parameter putParameterized(@NotNull final Parameter parameter, @NotNull final PsiElement ancestor) {
         PsiElement parent = ancestor.getParent();
 
+        if (parent == null) {
+            return new Parameter(parameter.entrance);
+        }
+
         return switch (ParameterWalk.classify(parent)) {
             case RECURSE -> putParameterized(parameter, parent);
             case CALL -> putParameterized(parameter, (Call) parent);
