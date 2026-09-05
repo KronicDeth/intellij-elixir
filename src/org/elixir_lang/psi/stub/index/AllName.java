@@ -16,7 +16,7 @@ public class AllName extends StringStubIndexExtension<NamedElement> {
     // 9 - `Definition.MODULE_ATTRIBUTE` added
     // 10 - `Definition.VARIABLE` added
     // 11 - `TypeDefinitionImpl` added
-    public static final int VERSION = 10;
+    public static final int VERSION = 11;
 
     @Override
     public int getVersion() {
