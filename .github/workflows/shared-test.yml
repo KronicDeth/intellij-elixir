@@ -118,9 +118,14 @@ jobs:
     # setup-beam put on PATH. They are the only source of the expected versions here: the runners have
     # no mise, so resolveElixirErlangSdks fails outright without them, and a value that disagrees with
     # PATH sends the resolver into a doomed from-source build.
+    #
+    # kotlin.incremental=false: every leg compiles from scratch, so the incremental-compilation
+    # bookkeeping (build history, lookup caches) is overhead with no later build to pay it back. A
+    # -P rather than gradle.properties, whose hash keys the quoter cache below.
     env:
       GRADLE_FLAGS: >-
         -Dorg.gradle.console=plain --stacktrace
+        -Pkotlin.incremental=false
         -PelixirVersion=${{ matrix.beam.elixir }}
         -PotpVersion=${{ matrix.beam.otp }}
 
@@ -418,9 +423,11 @@ jobs:
           gradle-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
           skip-searchable-options: 'true'
 
+      # kotlin.incremental=false for the same reason as the test legs' GRADLE_FLAGS: a from-scratch
+      # build has nothing to reuse the incremental bookkeeping for.
       - name: Build Plugin
         id: build-plugin
-        run: ./gradlew buildPlugin
+        run: ./gradlew buildPlugin -Pkotlin.incremental=false
 
       # The verify job below consumes this: a fixed artifact name, so a matrix leg does not have to
       # know the version-stamped name used for the human-facing upload further down.
