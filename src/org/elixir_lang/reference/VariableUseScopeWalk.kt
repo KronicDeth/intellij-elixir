@@ -57,6 +57,15 @@ object VariableUseScopeWalk {
                 ElixirStabParenthesesSignature::class.java,
                 ElixirStructOperation::class.java,
                 ElixirTuple::class.java,
+                /* `isVariable` looks through these, so a variable found through them must have a scope. Bracket
+                   arguments, multiple aliases and an EEx template reach a stop above; an `fn` without `->` and the
+                   no-parentheses syntax errors are met while typing. */
+                ElixirAnonymousFunction::class.java,
+                ElixirBracketArguments::class.java,
+                ElixirEex::class.java,
+                ElixirMultipleAliases::class.java,
+                ElixirNoParenthesesManyStrictNoParenthesesExpression::class.java,
+                ElixirNoParenthesesStrict::class.java,
                 InMatch::class.java,
                 Type::class.java,
                 UnqualifiedNoArgumentsCall::class.java
@@ -78,15 +87,7 @@ object VariableUseScopeWalk {
                 AtUnqualifiedBracketOperation::class.java,
                 AtNumericBracketOperation::class.java,
                 BracketOperation::class.java,
-                QualifiedMultipleAliases::class.java,
-                ElixirBracketArguments::class.java,
-                ElixirMultipleAliases::class.java,
-                // Syntax errors met while typing: `fn` without `->`, nested no-parentheses calls, `def (a, b)`
-                ElixirAnonymousFunction::class.java,
-                ElixirNoParenthesesManyStrictNoParenthesesExpression::class.java,
-                ElixirNoParenthesesStrict::class.java,
-                // An EEx template is scoped by its tags, answered above
-                ElixirEex::class.java
+                QualifiedMultipleAliases::class.java
             ),
             Bucket.LEAF to Leaves.SHAPES + listOf(
                 // A keyword key is a bare atom
