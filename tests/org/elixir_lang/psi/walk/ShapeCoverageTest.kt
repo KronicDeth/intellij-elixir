@@ -6,7 +6,8 @@ import org.elixir_lang.psi.ElixirFile
 import org.elixir_lang.psi.ElixirInterpolation
 import org.elixir_lang.psi.ElixirKeywordKey
 import org.elixir_lang.psi.ElixirMatchedExpression
-import org.elixir_lang.psi.ElixirTuple
+import org.elixir_lang.psi.ElixirUnmatchedExpression
+import org.elixir_lang.psi.impl.ElixirTupleImpl
 import org.elixir_lang.psi.ElixirVariable
 import org.elixir_lang.annotator.ParameterWalk
 import org.elixir_lang.psi.UnquotedVariableWalk
@@ -19,8 +20,12 @@ class ShapeCoverageTest : TestCase() {
         val shapes = GrammarShapes.CONCRETE
 
         assertTrue("only ${shapes.size} shapes; the visitor filter is wrong", shapes.size >= 150)
-        assertTrue(ElixirTuple::class.java in shapes)
-        assertFalse(ElixirMatchedExpression::class.java in shapes)
+        assertTrue(ElixirTupleImpl::class.java in shapes)
+        // the two `extends` bases are the only interfaces the parser never instantiates
+        assertEquals(
+            listOf(ElixirMatchedExpression::class.java, ElixirUnmatchedExpression::class.java),
+            GrammarShapes.DROPPED
+        )
     }
 
     fun testVariableWalkNamesEveryShape() = assertCovers(VariableWalk.classifier)
@@ -60,7 +65,7 @@ class ShapeCoverageTest : TestCase() {
         val closed = GrammarShapes.CONCRETE.filter {
             UnquotedVariableWalk.classifier.classify(it) == UnquotedVariableWalk.Bucket.UNFOLLOWED &&
                 VariableWalk.classifier.classify(it) !in setOf(VariableWalk.Bucket.TRANSPARENT, VariableWalk.Bucket.DECLARES)
-        }.map { it.simpleName }
+        }.map { GrammarShapes.name(it) }
 
         assertTrue("stops, not unfollowed:\n  ${closed.joinToString("\n  ")}", closed.isEmpty())
     }
@@ -73,22 +78,22 @@ class ShapeCoverageTest : TestCase() {
         val shapes = GrammarShapes.CONCRETE.filter { VariableWalk.classifier.classify(it) == variable }
         val (excepted, checked) = shapes.partition { shape -> exceptions.any { it.isAssignableFrom(shape) } }
 
-        val disagreeing = checked.filter { VariableUseScopeWalk.classifier.classify(it) !in useScope }.map { it.simpleName }
+        val disagreeing = checked.filter { VariableUseScopeWalk.classifier.classify(it) !in useScope }.map { GrammarShapes.name(it) }
         val expected = useScope.joinToString("/")
         assertTrue("$variable in isVariable but not $expected in variableUseScope:\n  ${disagreeing.joinToString("\n  ")}", disagreeing.isEmpty())
 
-        val stale = excepted.filter { VariableUseScopeWalk.classifier.classify(it) in useScope }.map { it.simpleName }
+        val stale = excepted.filter { VariableUseScopeWalk.classifier.classify(it) in useScope }.map { GrammarShapes.name(it) }
         assertTrue("no longer exceptions:\n  ${stale.joinToString("\n  ")}", stale.isEmpty())
     }
 
     private fun <B : Enum<B>> assertCovers(classifier: Classifier<B>) {
         val shapes = GrammarShapes.CONCRETE + ElixirFile::class.java
 
-        val unnamed = shapes.filter { classifier.winner(it) == null }.map { it.simpleName }
+        val unnamed = shapes.filter { classifier.winner(it) == null }.map { GrammarShapes.name(it) }
         assertTrue("no bucket names:\n  ${unnamed.joinToString("\n  ")}", unnamed.isEmpty())
 
         val winners = shapes.mapNotNull { classifier.winner(it) }.toSet()
-        val dead = classifier.entries.filter { it !in winners }.map { "${it.shape.simpleName} (${it.bucket})" }
+        val dead = classifier.entries.filter { it !in winners }.map { "${GrammarShapes.name(it.shape)} (${it.bucket})" }
         assertTrue("no shape reaches these entries first:\n  ${dead.joinToString("\n  ")}", dead.isEmpty())
     }
 }
