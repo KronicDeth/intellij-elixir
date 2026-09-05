@@ -36,6 +36,17 @@ class VariableFindUsagesTest : PlatformTestCase() {
         assertEquals(1, nonDeclarationUsageCount("usages_variable_declaration.ex"))
     }
 
+    fun testFindUsagesOnVariableDeclaredInInterpolationFindsLaterRead() {
+        // `_ = "#{variable = 1}"` binds `variable` for the code after the string, as a match anywhere else does.
+        assertEquals(1, nonDeclarationUsageCount("usages_variable_declared_in_interpolation.ex"))
+    }
+
+    fun testFindUsagesOnVariableDeclaredInNestedMatchFindsLaterRead() {
+        // `_ = (variable = 1)` declares `variable` on the left of the inner match, although the inner match sits on
+        // the right of the outer one.
+        assertEquals(1, nonDeclarationUsageCount("usages_variable_declared_in_nested_match.ex"))
+    }
+
     fun testFindUsagesOnVariableDeclarationIgnoresSameNameInOtherModule() {
         assertEquals(1, nonDeclarationUsageCount("usages_variable_same_name_other_module.ex"))
     }
@@ -120,6 +131,33 @@ class VariableFindUsagesTest : PlatformTestCase() {
         val target = myFixture.gotoDeclarationDestinationAtCaret()
         assertNotNull("Go To Declaration should navigate to variable declaration", target)
         assertEquals("variable", target!!.text)
+    }
+
+    fun testGoToDeclarationFromLaterUseNavigatesIntoInterpolation() {
+        myFixture.configureByFiles("goto_declaration_variable_declared_in_interpolation.ex")
+        val target = myFixture.gotoDeclarationDestinationAtCaret()
+        assertNotNull("Go To Declaration should navigate to the declaration inside the interpolation", target)
+        assertEquals("variable", target!!.text)
+    }
+
+    fun testGoToDeclarationFromUseInsideInterpolationNavigatesToDeclaration() {
+        myFixture.configureByFiles("goto_declaration_variable_used_in_interpolation.ex")
+        val target = myFixture.gotoDeclarationDestinationAtCaret()
+        assertNotNull("Go To Declaration should navigate to the declaration before the string", target)
+        assertEquals("variable", target!!.text)
+    }
+
+    fun testCtrlClickOnMatchRhsVariableUsageChoosesGotoDeclaration() {
+        // `y = variable` reads `variable`; the gesture must navigate to its declaration, not show the read's own usages.
+        assertCtrlClickChoosesGotoDeclaration("goto_declaration_variable_usage_match_rhs.ex")
+    }
+
+    fun testCtrlClickOnMatchRhsVariableUsageInListChoosesGotoDeclaration() {
+        assertCtrlClickChoosesGotoDeclaration("goto_declaration_variable_usage_match_rhs_list.ex")
+    }
+
+    fun testCtrlClickOnMatchRhsVariableUsageInInterpolationChoosesGotoDeclaration() {
+        assertCtrlClickChoosesGotoDeclaration("goto_declaration_variable_usage_match_rhs_interpolation.ex")
     }
 
     fun testCtrlClickOnPinnedMatchRhsVariableChoosesGotoDeclaration() {

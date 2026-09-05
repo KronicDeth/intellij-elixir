@@ -198,6 +198,18 @@ class RenameMatrixTest : PlatformTestCase() {
     fun testVariableMapPatternRepeated() =
         doTestFromEveryOccurrence("variable_map_pattern_repeated", "renamee", "fresh", expectedCarets = 2)
 
+    /** A binding inside string interpolation, `_ = "#{renamee = 1}"`, and its read after the string. */
+    fun testVariableInterpolationBinding() =
+        doTestFromEveryOccurrence("variable_interpolation_binding", "renamee", "fresh", expectedCarets = 2)
+
+    /** A binding on the left of an inner match that sits on the right of an outer one, `_ = (renamee = 1)`. */
+    fun testVariableNestedMatchBinding() =
+        doTestFromEveryOccurrence("variable_nested_match_binding", "renamee", "fresh", expectedCarets = 2)
+
+    /** Reads on the right of a match: bare, inside a list and inside string interpolation. */
+    fun testVariableMatchRhsRead() =
+        doTestFromEveryOccurrence("variable_match_rhs_read", "renamee", "fresh", expectedCarets = 4)
+
     // -- Types ------------------------------------------------------------------------------
 
     /** `@type` declaration and its references inside a `@spec`. */
