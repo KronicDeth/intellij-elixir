@@ -61,6 +61,8 @@
 
 ### Bug Fixes
 
+- [#4016](https://github.com/KronicDeth/intellij-elixir/pull/4016) [@sh41](https://github.com/sh41)
+  - **Go To Symbol now finds types defined in a decompiled `.beam` instead of crashing.** Fixes [#4000](https://github.com/KronicDeth/intellij-elixir/issues/4000).
 - [#4014](https://github.com/KronicDeth/intellij-elixir/pull/4014) [@sh41](https://github.com/sh41)
   - **Resolving a variable or type no longer reports an error for code shapes the resolver does not
     declare from**, such as a `do` block met on the walk or a `@type` head with a literal argument.
