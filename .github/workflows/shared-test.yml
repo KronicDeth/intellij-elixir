@@ -20,6 +20,13 @@ on:
         required: false
         type: boolean
         default: true
+    # A called workflow sees only the secrets it is handed, so release.yml and tag.yml pass this
+    # explicitly. On pull_request and workflow_dispatch the same `secrets.GRADLE_ENCRYPTION_KEY`
+    # expression resolves from the repository directly. Optional: a fork pull request has no secrets
+    # and setup-env documents what an empty key costs.
+    secrets:
+      GRADLE_ENCRYPTION_KEY:
+        required: false
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -111,13 +118,39 @@ jobs:
     # setup-beam put on PATH. They are the only source of the expected versions here: the runners have
     # no mise, so resolveElixirErlangSdks fails outright without them, and a value that disagrees with
     # PATH sends the resolver into a doomed from-source build.
+    #
+    # kotlin.incremental=false: every leg compiles from scratch, so the incremental-compilation
+    # bookkeeping (build history, lookup caches) is overhead with no later build to pay it back. A
+    # -P rather than gradle.properties, whose hash keys the quoter cache below.
     env:
       GRADLE_FLAGS: >-
         -Dorg.gradle.console=plain --stacktrace
+        -Pkotlin.incremental=false
         -PelixirVersion=${{ matrix.beam.elixir }}
         -PotpVersion=${{ matrix.beam.otp }}
 
     steps:
+      # On hosted Windows runners C: is a remote-backed OS disk and D: the local SSD, an order of
+      # magnitude apart in IOPS (actions/runner-images#8755). The workspace, RUNNER_TEMP and - via
+      # gradle/actions - the Gradle home already live on D:. The process TEMP/TMP do not: they point
+      # into the C: user profile, and on Windows every JVM derives java.io.tmpdir from them, so the
+      # Gradle and Kotlin daemons and the test JVM's per-test temp directories all land on the slow
+      # disk. Pointing both at RUNNER_TEMP moves them. 8.3 short-name generation is queried and, if
+      # on for D:, switched off for files created from here on; it costs an extra lookup and write
+      # per file in large directories. Runs before the checkout so nothing is written first.
+      - name: Put temp files on the fast drive
+        id: windows-temp
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          "TEMP=$env:RUNNER_TEMP" >> $env:GITHUB_ENV
+          "TMP=$env:RUNNER_TEMP" >> $env:GITHUB_ENV
+          $state = (fsutil 8dot3name query D:) -join ' '
+          Write-Host $state
+          if ($state -match 'enabled') {
+            fsutil 8dot3name set D: 1
+          }
+
       - name: Checkout
         id: checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -411,9 +444,11 @@ jobs:
           gradle-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
           skip-searchable-options: 'true'
 
+      # kotlin.incremental=false for the same reason as the test legs' GRADLE_FLAGS: a from-scratch
+      # build has nothing to reuse the incremental bookkeeping for.
       - name: Build Plugin
         id: build-plugin
-        run: ./gradlew buildPlugin
+        run: ./gradlew buildPlugin -Pkotlin.incremental=false
 
       # The verify job below consumes this: a fixed artifact name, so a matrix leg does not have to
       # know the version-stamped name used for the human-facing upload further down.

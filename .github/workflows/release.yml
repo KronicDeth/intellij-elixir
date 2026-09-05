@@ -6,6 +6,11 @@ on:
 jobs:
   test-and-verify:
     uses: ./.github/workflows/shared-test.yml
+    # A called workflow sees only the secrets it is handed; without this the key is empty on every
+    # push to main, the one place the cache is written from. Explicit rather than `secrets: inherit`,
+    # which zizmor's secrets-inherit audit flags.
+    secrets:
+      GRADLE_ENCRYPTION_KEY: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
   release:
     needs: [ test-and-verify ]
