@@ -4,7 +4,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveState
 import com.intellij.psi.util.PsiTreeUtil
 import org.elixir_lang.NameArityInterval
-import org.elixir_lang.beam.psi.impl.CallDefinitionImpl
+import org.elixir_lang.beam.psi.CallDefinition as BeamCallDefinition
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.CallDefinitionClause.nameArityInterval
 import org.elixir_lang.psi.call.Call
@@ -40,7 +40,7 @@ private constructor(
                     ?.let { addIfNameOrArityToResolveResults(element, it, state) }
                     ?: true
 
-    override fun execute(element: CallDefinitionImpl<*>, state: ResolveState): Boolean =
+    override fun execute(element: BeamCallDefinition, state: ResolveState): Boolean =
         addIfNameOrArityToResolveResults(element, element.nameArityInterval, state)
 
     override fun executeOnCallback(element: AtUnqualifiedNoParenthesesCall<*>, state: ResolveState): Boolean =
@@ -85,7 +85,7 @@ private constructor(
                                             modularResultResult.isValidResult,
                                             state
                                         )
-                                        is CallDefinitionImpl<*> -> addToResolveResults(
+                                        is BeamCallDefinition -> addToResolveResults(
                                             modularResultResultElement,
                                             nameInDefiningModule,
                                             modularResultResult.isValidResult,
@@ -170,13 +170,13 @@ private constructor(
         return addIfNameOrArityToResolveResults(call, name, validArity, state)
     }
 
-    private fun addIfNameOrArityToResolveResults(callDefinitionImpl: CallDefinitionImpl<*>,
+    private fun addIfNameOrArityToResolveResults(callDefinition: BeamCallDefinition,
                                                  nameArityInterval: NameArityInterval,
                                                  state: ResolveState): Boolean {
         val name = nameArityInterval.name
         val validArity = resolvedPrimaryArity in nameArityInterval.arityInterval
 
-        return addIfNameOrArityToResolveResults(callDefinitionImpl, name, validArity, state)
+        return addIfNameOrArityToResolveResults(callDefinition, name, validArity, state)
     }
 
     private fun addIfNameOrArityToResolveResults(call: Call, name: String, validArity: Boolean, state: ResolveState): Boolean =
@@ -189,7 +189,7 @@ private constructor(
                 true
             }
 
-    private fun addIfNameOrArityToResolveResults(callDefinitionImpl: CallDefinitionImpl<*>,
+    private fun addIfNameOrArityToResolveResults(callDefinition: BeamCallDefinition,
                                                  name: String,
                                                  validArity: Boolean,
                                                  state: ResolveState) : Boolean =
@@ -197,7 +197,7 @@ private constructor(
             (this.name != null && name.startsWith(this.name))) {
             val validResult = validArity && name == this.name
 
-            addToResolveResults(callDefinitionImpl, name, validResult, state)
+            addToResolveResults(callDefinition, name, validResult, state)
         } else {
             true
         }
@@ -218,11 +218,11 @@ private constructor(
                 keepProcessing()
             } ?: true
 
-    private fun addToResolveResults(callDefinitionImpl: CallDefinitionImpl<*>,
+    private fun addToResolveResults(callDefinition: BeamCallDefinition,
                                     name: String,
                                     validResult: Boolean,
                                     state: ResolveState): Boolean {
-        resolveResultOrderedSet.add(callDefinitionImpl, name, validResult, state.visitedElementSet())
+        resolveResultOrderedSet.add(callDefinition, name, validResult, state.visitedElementSet())
 
         return keepProcessing()
     }

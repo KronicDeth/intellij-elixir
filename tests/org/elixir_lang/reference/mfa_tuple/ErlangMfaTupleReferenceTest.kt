@@ -3,7 +3,7 @@ package org.elixir_lang.reference.mfa_tuple
 import com.intellij.model.psi.PsiSymbolReferenceService
 import com.intellij.psi.util.PsiTreeUtil
 import org.elixir_lang.beam.BeamLibraryTestCase
-import org.elixir_lang.beam.psi.impl.CallDefinitionImpl
+import org.elixir_lang.beam.psi.CallDefinition as BeamCallDefinition
 import org.elixir_lang.model.psi.atom.AtomReference
 import org.elixir_lang.psi.ElixirAtom
 import java.io.File
@@ -39,9 +39,9 @@ class ErlangMfaTupleReferenceTest : BeamLibraryTestCase() {
         assertNotNull("Valid resolve result has null element", element)
         assertTrue(
             "Expected BEAM CallDefinitionImpl, got ${element?.javaClass?.simpleName}",
-            element is CallDefinitionImpl<*>
+            element is BeamCallDefinition
         )
-        val resolvedName = (element as CallDefinitionImpl<*>).nameArityInterval.name
+        val resolvedName = (element as BeamCallDefinition).nameArityInterval.name
         assertEquals("sqrt", resolvedName)
     }
 
@@ -55,9 +55,9 @@ class ErlangMfaTupleReferenceTest : BeamLibraryTestCase() {
         assertNotNull("resolve() returned null for Erlang MFA {:math, :sqrt, 1}", resolved)
         assertTrue(
             "Expected BEAM CallDefinitionImpl, got ${resolved?.javaClass?.simpleName}",
-            resolved is CallDefinitionImpl<*>
+            resolved is BeamCallDefinition
         )
-        assertEquals("sqrt", (resolved as CallDefinitionImpl<*>).nameArityInterval.name)
+        assertEquals("sqrt", (resolved as BeamCallDefinition).nameArityInterval.name)
     }
 
     /**

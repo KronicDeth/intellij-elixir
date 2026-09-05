@@ -11,7 +11,7 @@ import com.intellij.openapi.util.TextRange
 import com.intellij.psi.*
 import org.elixir_lang.model.psi.variable.VariableSymbol
 import org.elixir_lang.ElixirSyntaxHighlighter
-import org.elixir_lang.beam.psi.impl.CallDefinitionImpl
+import org.elixir_lang.beam.psi.CallDefinition as BeamCallDefinition
 import org.elixir_lang.psi.AtOperation
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
 import org.elixir_lang.psi.CallDefinitionClause
@@ -206,7 +206,7 @@ internal class Callable : Annotator, DumbAware {
     private fun callHighlight(resolved: PsiElement, previousCallHighlight: CallHighlight?): CallHighlight? =
         when (resolved) {
             is Call -> callHighlight(resolved, previousCallHighlight)
-            is CallDefinitionImpl<*> -> callHighlight(resolved, previousCallHighlight)
+            is BeamCallDefinition -> callHighlight(resolved, previousCallHighlight)
             else ->
                 when (VariableSymbol.classify(resolved)) {
                     VariableSymbol.Kind.IGNORED ->
@@ -228,7 +228,7 @@ internal class Callable : Annotator, DumbAware {
                 }
         }
 
-    private fun callHighlight(resolved: CallDefinitionImpl<*>, previousCallHighlight: CallHighlight?): CallHighlight {
+    private fun callHighlight(resolved: BeamCallDefinition, previousCallHighlight: CallHighlight?): CallHighlight {
         val referrerTextAttributesKeys = when (resolved.time) {
             Timed.Time.COMPILE -> referrerTextAttributesKeys(
                 resolved,
@@ -393,7 +393,7 @@ internal class Callable : Annotator, DumbAware {
             predefinedTextAttributesKeys: Array<TextAttributesKey>
         ): Array<TextAttributesKey> =
             when (psiElement) {
-                is CallDefinitionImpl<*> -> if (psiElement.parent.name in PREDEFINED_LOCATION_STRING_SET) {
+                is BeamCallDefinition -> if (psiElement.parent.name in PREDEFINED_LOCATION_STRING_SET) {
                     predefinedTextAttributesKeys
                 } else {
                     null

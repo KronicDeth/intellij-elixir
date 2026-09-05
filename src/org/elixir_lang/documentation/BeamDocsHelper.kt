@@ -7,6 +7,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveState
 import org.elixir_lang.beam.Beam
 import org.elixir_lang.beam.psi.Module
+import org.elixir_lang.beam.psi.CallDefinition as BeamCallDefinition
 import org.elixir_lang.beam.psi.impl.CallDefinitionImpl
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
@@ -100,12 +101,13 @@ object BeamDocsHelper {
     /**
      * Returns the list of BEAM documentation "kind" strings to try when looking up docs for [element].
      *
-     * For [CallDefinitionImpl] elements, the stub's [Definition] tells us whether this is a function or macro.
+     * For [BeamCallDefinition] elements, the stub's [Definition] tells us whether this is a function or macro.
      * The preferred kind is tried first, but we fall back to the other kind in case the BEAM docs
      * use a different categorization than expected (e.g. guards stored as macros).
      */
     private fun kindForElement(element: MaybeExported): List<String> =
         when (element) {
+            // The stub, not the model: Definition is a stub-level detail with no interface counterpart.
             is CallDefinitionImpl<*> -> when (element.stub.definition) {
                 Definition.PUBLIC_MACRO, Definition.PRIVATE_MACRO -> listOf("macro", "function")
                 Definition.PUBLIC_FUNCTION, Definition.PRIVATE_FUNCTION -> listOf("function", "macro")

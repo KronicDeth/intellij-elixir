@@ -5,7 +5,7 @@ import com.intellij.psi.PsiNamedElement
 import com.intellij.psi.ResolveState
 import com.intellij.psi.util.PsiTreeUtil
 import org.elixir_lang.PlatformTestCase
-import org.elixir_lang.beam.psi.impl.TypeDefinitionImpl
+import org.elixir_lang.beam.psi.TypeDefinition as BeamTypeDefinition
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
 import org.elixir_lang.psi.ElixirDoBlock
 import org.elixir_lang.psi.ElixirFile
@@ -32,7 +32,7 @@ class UnhandledElementTest : PlatformTestCase() {
             override fun executeOnType(definition: AtUnqualifiedNoParenthesesCall<*>, state: ResolveState) = true
             override fun executeOnParameter(parameter: PsiElement, state: ResolveState) = true
             override fun keepProcessing() = true
-            override fun execute(typeDefinitionImpl: TypeDefinitionImpl<*>, state: ResolveState) = true
+            override fun execute(typeDefinition: BeamTypeDefinition, state: ResolveState) = true
         }
 
         assertKeepsWalkingSilently(processor)

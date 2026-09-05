@@ -5,8 +5,9 @@ import com.intellij.navigation.NavigationItem
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiElementResolveResult
 import org.elixir_lang.beam.psi.BeamFileImpl
-import org.elixir_lang.beam.psi.impl.CallDefinitionImpl
-import org.elixir_lang.beam.psi.impl.ModuleImpl
+import org.elixir_lang.beam.psi.CallDefinition as BeamCallDefinition
+import org.elixir_lang.beam.psi.Module as BeamModule
+import org.elixir_lang.beam.psi.TypeDefinition as BeamTypeDefinition
 import org.elixir_lang.structure_view.element.*
 import org.elixir_lang.structure_view.element.modular.Modular
 import org.elixir_lang.structure_view.element.modular.Module
@@ -164,10 +165,11 @@ class SourcePreferredItems {
     fun toTypedArray(): Array<NavigationItem> {
         val navigationItemList =
             modularListByName.values.flatten().map { it as NavigationItem } +
-                    moduleImplListByName.values.flatten() +
+                    beamModuleListByName.values.flatten() +
+                    beamTypeDefinitionListByName.values.flatten() +
                     callDefinitionClauseListByArityByNameByModularName.values.flatMap { it.values.flatMap { it.values.flatten() } } +
                     callDefinitionListByArityByNameByModularName.values.flatMap { it.values.flatMap { it.values.flatten() } } +
-                    callDefinitionImplListByArityByNameByModularName.values.flatMap {
+                    beamCallDefinitionListByArityByNameByModularName.values.flatMap {
                         it.values.flatMap { it.values.flatten() }
                     } +
                     callDefinitionSpecificationList +
@@ -184,29 +186,46 @@ class SourcePreferredItems {
             .toTypedArray()
     }
 
-    fun add(element: ModuleImpl<*>) {
-        moduleImplListByName.compute(element.name) { _, currentModuleImplList ->
-            if (currentModuleImplList != null) {
-                currentModuleImplList.add(element)
+    fun add(element: BeamModule) {
+        beamModuleListByName.compute(element.name) { _, currentBeamModuleList ->
+            if (currentBeamModuleList != null) {
+                currentBeamModuleList.add(element)
 
-                currentModuleImplList
+                currentBeamModuleList
             } else {
                 mutableListOf(element)
             }
         }
     }
 
-    fun add(element: CallDefinitionImpl<*>) {
+    /**
+     * Keyed by name, not name and arity: a type name can carry several arities - `@type queue` and
+     * `@opaque queue(item)` - and both belong in the results for the name typed. Like the other decompiled
+     * overloads it applies no source preference, leaving that to [toTypedArray]'s `distinctBy`.
+     */
+    fun add(element: BeamTypeDefinition) {
+        beamTypeDefinitionListByName.compute(element.name) { _, currentBeamTypeDefinitionList ->
+            if (currentBeamTypeDefinitionList != null) {
+                currentBeamTypeDefinitionList.add(element)
+
+                currentBeamTypeDefinitionList
+            } else {
+                mutableListOf(element)
+            }
+        }
+    }
+
+    fun add(element: BeamCallDefinition) {
         val modularName = element.parent.name
-        val callDefinitionImplListByArityByName =
-            callDefinitionImplListByArityByNameByModularName.computeIfAbsent(modularName) { mutableMapOf() }
+        val beamCallDefinitionListByArityByName =
+            beamCallDefinitionListByArityByNameByModularName.computeIfAbsent(modularName) { mutableMapOf() }
         val nameArityInterval = element.nameArityInterval
-        val callDefinitionImplListByArity =
-            callDefinitionImplListByArityByName.computeIfAbsent(nameArityInterval.name) { mutableMapOf() }
+        val beamCallDefinitionListByArity =
+            beamCallDefinitionListByArityByName.computeIfAbsent(nameArityInterval.name) { mutableMapOf() }
 
         for (arity in nameArityInterval.arityInterval.closed()) {
-            val callDefinitionImplList = callDefinitionImplListByArity.computeIfAbsent(arity) { mutableListOf() }
-            callDefinitionImplList.add(element)
+            val beamCallDefinitionList = beamCallDefinitionListByArity.computeIfAbsent(arity) { mutableListOf() }
+            beamCallDefinitionList.add(element)
         }
     }
 
@@ -217,11 +236,12 @@ class SourcePreferredItems {
     private val callDefinitionHeadListByArityByNameByModularName =
         mutableMapOf<ModularName, MutableMap<Name, MutableMap<Arity, MutableList<CallDefinitionHead>>>>()
     private val callDefinitionSpecificationList = mutableListOf<CallDefinitionSpecification>()
-    private val callDefinitionImplListByArityByNameByModularName =
-        mutableMapOf<ModularName, MutableMap<Name, MutableMap<Arity, MutableList<CallDefinitionImpl<*>>>>>()
+    private val beamCallDefinitionListByArityByNameByModularName =
+        mutableMapOf<ModularName, MutableMap<Name, MutableMap<Arity, MutableList<BeamCallDefinition>>>>()
     private val callbackList = mutableListOf<Callback>()
     private val modularListByName = mutableMapOf<Name, MutableList<Modular>>()
-    private val moduleImplListByName = mutableMapOf<Name, MutableList<ModuleImpl<*>>>()
+    private val beamModuleListByName = mutableMapOf<Name, MutableList<BeamModule>>()
+    private val beamTypeDefinitionListByName = mutableMapOf<Name, MutableList<BeamTypeDefinition>>()
 }
 
 private fun Any.isDecompiled(): Boolean =

@@ -14,7 +14,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveState
 import com.intellij.psi.SmartPsiElementPointer
 import org.elixir_lang.Icons
-import org.elixir_lang.beam.psi.impl.ModuleImpl
+import org.elixir_lang.beam.psi.Module as BeamModule
 import org.elixir_lang.psi.CallDefinitionClause
 import org.elixir_lang.psi.CallDefinitionClause.enclosingModularMacroCall
 import org.elixir_lang.psi.Implementation
@@ -87,7 +87,7 @@ class Implementation : LineMarkerProvider {
                                             }
                                         }
 
-                                    is ModuleImpl<*> ->
+                                    is BeamModule ->
                                         for (callDefinition in defprotocol.callDefinitions()) {
                                             val protocolNameArityInterval = callDefinition.nameArityInterval
 

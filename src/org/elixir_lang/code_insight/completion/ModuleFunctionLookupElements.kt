@@ -3,7 +3,7 @@ package org.elixir_lang.code_insight.completion
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.psi.PsiElement
-import org.elixir_lang.beam.psi.impl.ModuleImpl
+import org.elixir_lang.beam.psi.Module as BeamModule
 import org.elixir_lang.code_insight.preferFunctionHeads
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.call.macroChildCalls
@@ -17,7 +17,7 @@ import org.elixir_lang.psi.CallDefinitionClause as CallDefinitionClausePsi
  * (exported) functions are offered because a remote / MFA dispatch (`Mod.fun(...)`,
  * `apply(Mod, :fun, args)`, `{Mod, :fun, arity}`) can never reach a private function - a private
  * function is callable only through a local unqualified call inside its own module. Handles both
- * source modules ([Call]) and BEAM-decompiled modules ([ModuleImpl]); any other element type yields
+ * source modules ([Call]) and BEAM-decompiled modules ([BeamModule]); any other element type yields
  * nothing.
  *
  * @param appendParentheses when `true` (qualified `Mod.<caret>` call completion) the inserted name is
@@ -33,14 +33,14 @@ fun callDefinitionClauseLookupElements(
     appendParentheses: Boolean = true
 ): Iterable<LookupElement> = when (scope) {
     is Call -> callDefinitionClauseLookupElements(scope, appendParentheses)
-    is ModuleImpl<*> -> callDefinitionClauseLookupElements(scope, appendParentheses)
+    is BeamModule -> callDefinitionClauseLookupElements(scope, appendParentheses)
     else -> emptyList()
 }
 
 /**
  * The remote-completion [LookupElement]s offered by the set of [modulars] a modular name resolved to
  * (via [org.elixir_lang.psi.impl.maybeModularNameToModulars]). Source modules ([Call]) are preferred
- * over BEAM-decompiled stubs ([ModuleImpl]) so a module available in both forms is not offered twice.
+ * over BEAM-decompiled stubs ([BeamModule]) so a module available in both forms is not offered twice.
  *
  * @see callDefinitionClauseLookupElements for the per-modular contract and [appendParentheses].
  */
@@ -65,11 +65,12 @@ private fun callDefinitionClauseLookupElements(scope: Call, appendParentheses: B
     }
 }
 
-private fun callDefinitionClauseLookupElements(moduleImpl: ModuleImpl<*>, appendParentheses: Boolean): Iterable<LookupElement> =
+private fun callDefinitionClauseLookupElements(moduleImpl: BeamModule, appendParentheses: Boolean): Iterable<LookupElement> =
     moduleImpl.callDefinitions()
         .filter { it.isExported }
-        .map { callDefinition ->
-            lookupElement(callDefinition.exportedName(), callDefinition, appendParentheses)
+        .mapNotNull { callDefinition ->
+            // MaybeExported documents exportedName() as null only when isExported() is false.
+            callDefinition.exportedName()?.let { lookupElement(it, callDefinition, appendParentheses) }
         }
 
 private fun lookupElement(name: String, element: PsiElement, appendParentheses: Boolean): LookupElement =
