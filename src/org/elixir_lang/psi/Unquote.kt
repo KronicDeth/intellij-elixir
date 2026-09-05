@@ -73,35 +73,28 @@ object Unquote {
 
     private tailrec fun treeWalkUpUnquotedVariable(unquoted: PsiElement,
                                                    resolveState: ResolveState,
-                                                   keepProcessing: (PsiElement, ResolveState) -> Boolean): Boolean =
-            when (val parent = unquoted.parent) {
-                is Match -> {
-                    // variable = ...
-                    if (parent.leftOperand() == unquoted) {
-                        parent.rightOperand()?.let { value ->
-                            treeWalkUpValue(value, resolveState, keepProcessing)
-                        } ?: true
-                    }
-                    // ... = variable: a use, which binds nothing further up
-                    else {
-                        true
-                    }
+                                                   keepProcessing: (PsiElement, ResolveState) -> Boolean): Boolean {
+        val parent = unquoted.parent
+
+        return when (UnquotedVariableWalk.classify(parent)) {
+            UnquotedVariableWalk.Bucket.MATCH -> {
+                val match = parent as Match
+
+                // variable = ...
+                if (match.leftOperand() == unquoted) {
+                    match.rightOperand()?.let { value ->
+                        treeWalkUpValue(value, resolveState, keepProcessing)
+                    } ?: true
                 }
-                // ...: variable, such as `do: block` in macro parameters
-                is ElixirKeywordPair -> true
-                // (..., parameter)
-                is ElixirParenthesesArguments -> true
-                // Transparent wrappers: keep walking upward
-                is ElixirTuple,
-                is ElixirAccessExpression,
-                is ElixirStabBody,
-                is ElixirStab,
-                is QuotableArguments,
-                is QuotableKeywordList,
-                is Call -> treeWalkUpUnquotedVariable(parent, resolveState, keepProcessing)
-                // Anything else, the file included, binds nothing the unquote could see
-                else -> true
+                // ... = variable: a use, which binds nothing further up
+                else {
+                    true
+                }
             }
+            UnquotedVariableWalk.Bucket.RECURSE -> treeWalkUpUnquotedVariable(parent, resolveState, keepProcessing)
+            UnquotedVariableWalk.Bucket.STOP, UnquotedVariableWalk.Bucket.LEAF -> true
+        }
+    }
 
     private fun treeWalkUpValue(value: PsiElement,
                                 resolveState: ResolveState,

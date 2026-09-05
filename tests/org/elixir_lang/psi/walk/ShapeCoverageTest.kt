@@ -5,6 +5,7 @@ import org.elixir_lang.psi.ElixirFile
 import org.elixir_lang.psi.ElixirMatchedExpression
 import org.elixir_lang.psi.ElixirTuple
 import org.elixir_lang.annotator.ParameterWalk
+import org.elixir_lang.psi.UnquotedVariableWalk
 import org.elixir_lang.reference.VariableUseScopeWalk
 import org.elixir_lang.reference.VariableWalk
 
@@ -23,6 +24,8 @@ class ShapeCoverageTest : TestCase() {
     fun testVariableUseScopeWalkNamesEveryShape() = assertCovers(VariableUseScopeWalk.classifier)
 
     fun testParameterWalkNamesEveryShape() = assertCovers(ParameterWalk.classifier)
+
+    fun testUnquotedVariableWalkNamesEveryShape() = assertCovers(UnquotedVariableWalk.classifier)
 
     private fun <B : Enum<B>> assertCovers(classifier: Classifier<B>) {
         val shapes = GrammarShapes.CONCRETE + ElixirFile::class.java
