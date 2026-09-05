@@ -51,6 +51,7 @@
       - [Add Additional Text Attributes to plugin](#add-additional-text-attributes-to-plugin)
   - [Building](#building)
     - [Plugin version scheme](#plugin-version-scheme)
+    - [Remote build cache](#remote-build-cache)
     - [Documentation](#documentation)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -733,6 +734,44 @@ Three consequences worth knowing:
 - If `git` is unavailable the version falls back to a build-clock stamp with no commit. The two are
   told apart by the commit: a lone timestamp is a build time, a timestamp followed by a commit is that
   commit's time.
+
+### Remote build cache
+
+CI shares Gradle build outputs through a remote build cache on Cloudflare R2 (bucket
+`intellij-elixir-gh-cache`), configured in `settings.gradle.kts`. It exists because the GitHub Actions
+cache cannot do this job: gradle/actions stores the local build cache as one tarball per job, written
+only from `main`, so nothing a pull request builds ever reaches another job. With the remote, a job
+that would produce the same outputs as an earlier trusted build - `compileKotlin`, `compileJava`, the
+jps modules, any cacheable task - restores them instead of rebuilding.
+
+Who can do what:
+
+| Context | Credentials | Mode |
+|---|---|---|
+| Push to `main`, tag build, pull request from a branch in this repository | `R2_ACCESS_KEY_ID` and `R2_SECRET_ACCESS_KEY` secrets | S3 API, read and push |
+| Fork or Dependabot pull request | none; GitHub withholds secrets | anonymous HTTP read through `GRADLE_REMOTE_CACHE_PUBLIC_URL` once the bucket has a public domain; until then no remote cache |
+| Developer machine | none by default | no remote cache; the local build cache stays on |
+
+The secrets are a Cloudflare **Account API token** with *Object Read & Write* permission scoped to that
+one bucket (R2 -> Manage API tokens -> Account API Tokens). To rotate it, create the new token, run
+`gh secret set R2_ACCESS_KEY_ID --repo KronicDeth/intellij-elixir` and the same for
+`R2_SECRET_ACCESS_KEY` (each prompts for the value on stdin), then revoke the old token. The account
+id and bucket name in `settings.gradle.kts` are not secrets: nothing reads or writes through the S3
+endpoint without the token, and the public domain is read-only by construction.
+
+Objects live under the `v1/` prefix and a bucket lifecycle rule deletes them 30 days after upload.
+Bump the prefix in `settings.gradle.kts` to abandon every existing entry at once.
+
+To read the cache on your own machine, export `GRADLE_REMOTE_CACHE_PUBLIC_URL` (the workflow's value,
+once it is set) or an *Object Read only* token as `R2_ACCESS_KEY_ID`/`R2_SECRET_ACCESS_KEY`; off CI the
+S3 mode never pushes. `--rerun-tasks` bypasses the cache for one invocation.
+
+Two workflow details worth knowing. `release.yml` and `tag.yml` hand the secrets to `shared-test.yml`
+explicitly, because a called workflow sees only what it is passed and `secrets: inherit` trips
+zizmor. And the AWS SDK's default CRC32 checksums are switched off with
+`AWS_REQUEST_CHECKSUM_CALCULATION` / `AWS_RESPONSE_CHECKSUM_VALIDATION` set to `WHEN_REQUIRED`,
+because R2 does not implement them. A store failure on a trusted job fails that job; that is
+deliberate, since a silently dead cache is worse than a red build.
 
 ### Documentation
 

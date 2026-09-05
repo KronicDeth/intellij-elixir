@@ -20,6 +20,17 @@ on:
         required: false
         type: boolean
         default: true
+    # A called workflow sees only the secrets it is handed, so release.yml and tag.yml pass these
+    # explicitly. On pull_request and workflow_dispatch the same `secrets.*` expressions resolve from
+    # the repository directly. None is required: a fork pull request has none of them, and the build
+    # degrades to the read-only remote cache path described at the env block below.
+    secrets:
+      GRADLE_ENCRYPTION_KEY:
+        required: false
+      R2_ACCESS_KEY_ID:
+        required: false
+      R2_SECRET_ACCESS_KEY:
+        required: false
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -35,6 +46,23 @@ permissions:
 defaults:
   run:
     shell: bash
+
+# Remote build cache (settings.gradle.kts). Only the test and build-plugin jobs run Gradle; the
+# verify legs ignore this. The trust model is GitHub's own: the two R2 secrets exist for pushes to
+# the default branch, tag builds and pull requests from branches in this repository, and are empty
+# for fork and Dependabot pull requests, which therefore never push. Never switch this workflow to
+# pull_request_target to "fix" that - it would hand the write credentials to untrusted code.
+env:
+  R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+  R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+  # Anonymous read path for fork pull requests, which the S3 endpoint cannot offer. Empty until the
+  # bucket has a public domain: a custom domain on the Cloudflare zone is the supported option, the
+  # managed r2.dev subdomain is rate-limited and documented as development-only. Must end with the
+  # object prefix and a slash, e.g. https://gradle-cache.example.org/v1/
+  GRADLE_REMOTE_CACHE_PUBLIC_URL: ''
+  # The AWS SDK v2 sends CRC32 full-object checksums by default; R2 does not implement them.
+  AWS_REQUEST_CHECKSUM_CALCULATION: WHEN_REQUIRED
+  AWS_RESPONSE_CHECKSUM_VALIDATION: WHEN_REQUIRED
 
 jobs:
   # test-results.yml needs the event payload of this run to publish results

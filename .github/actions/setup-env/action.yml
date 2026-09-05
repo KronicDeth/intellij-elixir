@@ -152,21 +152,31 @@ runs:
         fi
         echo "ORG_GRADLE_PROJECT_skipSearchableOptions=$SKIP_SEARCHABLE_OPTIONS" >> $GITHUB_ENV
 
-    # The excluded dirs are the expensive, worthless half: a build scan measured the whole 1.4 GiB
-    # download at 15 s, and the Gradle-home cache is keyed per job, so caching it across 13 jobs
-    # would exhaust the 10 GB limit on its own. What is left is the build cache - 11.9 MiB, and 0 of
-    # 229 work units hit before this. Excludes filter the Gradle User Home only, so they cannot
-    # affect the configuration-cache data that cache-encryption-key covers. cache-read-only keeps
-    # its default, which writes only from the default branch.
+    # What is cached from the Gradle User Home, and what deliberately is not:
+    #   caches/modules-2 - downloaded dependencies, ~1.4 GiB with the IDE zip - IS cached. The
+    #     enhanced provider stores dependency jars as content-addressed entries shared by every job
+    #     that uses them, so this costs one copy per IDE version, not one per leg. The old exclusion
+    #     dated from when the whole Gradle home was a single tarball per job and 13 jobs' worth would
+    #     have exhausted the 10 GB repository limit.
+    #   caches/*/transforms - the extracted IDE - is not deduplicated, and restoring ~1.5 GiB from the
+    #     GitHub cache measures no faster than extracting the zip again, so it stays excluded. It is
+    #     `caches/<gradle-version>/transforms` on Gradle 9, not `caches/transforms-*`.
+    #   caches/build-cache-1 - the local build cache - is excluded because build outputs now live in
+    #     the remote build cache configured in settings.gradle.kts, which every job reads and trusted
+    #     jobs push to; tarring the local directory as well would only duplicate it in a form no other
+    #     job can use.
+    # Excludes filter the Gradle User Home only, so they cannot affect the configuration-cache data
+    # that cache-encryption-key covers. cache-read-only keeps its default, which writes only from the
+    # default branch: a pull request's writes are scoped to its merge ref and nothing else can
+    # restore them.
     - name: Setup Gradle
       id: setup-gradle
       uses: gradle/actions/setup-gradle@v6
       with:
         cache-disabled: false
-        # `caches/<gradle-version>/transforms` on Gradle 9, not `caches/transforms-*`.
         gradle-home-cache-excludes: |
-          caches/modules-2
           caches/*/transforms
+          caches/build-cache-1
         cache-encryption-key: ${{ inputs.gradle-encryption-key }}
         # avoid async in shutdown until https://github.com/nodejs/node/pull/61999 lands in the action runner's JS version.
         add-job-summary-as-pr-comment: 'never'
