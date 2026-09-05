@@ -88,7 +88,7 @@ sealed interface GtduNavigation {
  * (it too front-runs the EP providers), but returns only the *branch decision* (`GTD`/`SU`/`null`). It
  * throws away the *resolved destination*, which the beam bug demands: the failure mode is "the gesture
  * decides GTD but resolves onto the coarse self-named definition, i.e. navigates nowhere". The coarse
- * `TypeDefinitionImpl`/`CallDefinitionImpl` spans the WHOLE definition, so a caret-position read after
+ * `BeamTypeDefinition`/`BeamCallDefinition` spans the WHOLE definition, so a caret-position read after
  * `performEditorAction` cannot tell "went nowhere (self)" from "landed on the definition" - it stayed
  * green with the fix removed. Only the resolved [GtduTarget.destination] leaf distinguishes broken from
  * fixed; capturing it is why this reaches past the public hook into the internal result tree.

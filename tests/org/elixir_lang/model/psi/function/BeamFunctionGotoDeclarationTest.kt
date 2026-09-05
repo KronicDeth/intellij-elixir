@@ -9,7 +9,7 @@ import org.elixir_lang.code_insight.nonDeclarationUsageCountAtCaret
 
 /**
  * Behavioural Go To Declaration and Find Usages coverage for functions defined in decompiled BEAM modules, e.g.
- * `:queue.new/0` from the Erlang stdlib. Unlike source `def`s these resolve to `CallDefinitionImpl` decompiled PSI,
+ * `:queue.new/0` from the Erlang stdlib. Unlike source `def`s these resolve to `BeamCallDefinition` decompiled PSI,
  * so they exercise the branch of the call reference that navigates into the `.beam` mirror rather than a source clause.
  */
 class BeamFunctionGotoDeclarationTest : BeamLibraryTestCase() {

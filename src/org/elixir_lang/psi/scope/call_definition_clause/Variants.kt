@@ -7,7 +7,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveState
 import com.intellij.psi.util.PsiTreeUtil
 import org.elixir_lang.annotator.Parameter
-import org.elixir_lang.beam.psi.impl.CallDefinitionImpl
+import org.elixir_lang.beam.psi.CallDefinition as BeamCallDefinition
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.Named
@@ -40,7 +40,7 @@ class Variants : CallDefinitionClause() {
         return true
     }
 
-    override fun execute(element: CallDefinitionImpl<*>, state: ResolveState): Boolean {
+    override fun execute(element: BeamCallDefinition, state: ResolveState): Boolean {
         // BEAM-decompiled call definitions are never the entrance clause (which is always source),
         // so the entrance guard from executeOnCallDefinitionClause does not apply here.
         if (element.isExported()) {
@@ -50,8 +50,10 @@ class Variants : CallDefinitionClause() {
         return true
     }
 
-    private fun addCallDefinitionToLookupElementByPsiElement(element: CallDefinitionImpl<*>) {
-        val name = element.exportedName()
+    private fun addCallDefinitionToLookupElementByPsiElement(element: BeamCallDefinition) {
+        // MaybeExported documents exportedName() as null only when isExported() is false, which the
+        // sole caller checks.
+        val name = element.exportedName() ?: return
 
         lookupElementByPsiElementName.computeIfAbsent(element to name) { (el, n) ->
             LookupElementBuilder.createWithSmartPointer(n, el)

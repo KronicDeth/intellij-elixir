@@ -7,9 +7,9 @@ import com.intellij.usageView.UsageViewNodeTextLocation
 import com.intellij.usageView.UsageViewShortNameLocation
 import com.intellij.usageView.UsageViewTypeLocation
 import org.elixir_lang.annotator.Parameter
-import org.elixir_lang.beam.psi.impl.CallDefinitionImpl
-import org.elixir_lang.beam.psi.impl.ModuleImpl
-import org.elixir_lang.beam.psi.impl.TypeDefinitionImpl
+import org.elixir_lang.beam.psi.CallDefinition as BeamCallDefinition
+import org.elixir_lang.beam.psi.Module as BeamModule
+import org.elixir_lang.beam.psi.TypeDefinition as BeamTypeDefinition
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function.ALIAS
 import org.elixir_lang.psi.call.name.Module.KERNEL
@@ -34,9 +34,9 @@ internal class ElementDescriptionProvider : com.intellij.psi.ElementDescriptionP
             is ElixirKeywordKey -> getElementDescription(element, location)
             is ElixirVariable -> getElementDescription(element, location)
             is MaybeModuleName -> getElementDescription(element, location)
-            is ModuleImpl<*> -> getElementDescription(element, location)
-            is TypeDefinitionImpl<*> -> getElementDescription(element, location)
-            is CallDefinitionImpl<*> -> getElementDescription(element, location)
+            is BeamModule -> getElementDescription(element, location)
+            is BeamTypeDefinition -> getElementDescription(element, location)
+            is BeamCallDefinition -> getElementDescription(element, location)
             else -> null
         }
 
@@ -138,7 +138,7 @@ internal class ElementDescriptionProvider : com.intellij.psi.ElementDescriptionP
         return elementDescription
     }
 
-    private fun getElementDescription(moduleImpl: ModuleImpl<*>, location: ElementDescriptionLocation): String? =
+    private fun getElementDescription(moduleImpl: BeamModule, location: ElementDescriptionLocation): String? =
         when (location) {
             UsageViewNodeTextLocation.INSTANCE -> "defmodule ${moduleImpl.name}"
             UsageViewLongNameLocation.INSTANCE, UsageViewShortNameLocation.INSTANCE -> moduleImpl.name
@@ -147,7 +147,7 @@ internal class ElementDescriptionProvider : com.intellij.psi.ElementDescriptionP
         }
 
     private fun getElementDescription(
-        typeDefinitionImpl: TypeDefinitionImpl<*>,
+        typeDefinitionImpl: BeamTypeDefinition,
         location: ElementDescriptionLocation
     ): String? =
         when (location) {
@@ -164,7 +164,7 @@ internal class ElementDescriptionProvider : com.intellij.psi.ElementDescriptionP
         }
 
     private fun getElementDescription(
-        callDefinitionImpl: CallDefinitionImpl<*>,
+        callDefinitionImpl: BeamCallDefinition,
         location: ElementDescriptionLocation
     ): String? =
         when (location) {

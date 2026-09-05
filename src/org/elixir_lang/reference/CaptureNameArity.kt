@@ -9,7 +9,7 @@ import com.intellij.psi.PsiReferenceBase
 import com.intellij.psi.ResolveResult
 import com.intellij.psi.ResolveState
 import com.intellij.psi.impl.source.resolve.ResolveCache
-import org.elixir_lang.beam.psi.impl.CallDefinitionImpl
+import org.elixir_lang.beam.psi.CallDefinition as BeamCallDefinition
 import org.elixir_lang.code_insight.completion.callDefinitionClauseLookupElements
 import org.elixir_lang.psi.CallDefinitionClause
 import org.elixir_lang.psi.call.Call
@@ -74,7 +74,7 @@ class CaptureNameArity(element: NonNumeric, val nameElement: Call, val arity: Ar
     private fun Iterable<LookupElement>.ofRequestedArity(): List<LookupElement> = filter { lookupElement ->
         val nameArityInterval = when (val candidate = lookupElement.psiElement) {
             is Call -> CallDefinitionClause.nameArityInterval(candidate, ResolveState.initial())
-            is CallDefinitionImpl<*> -> candidate.nameArityInterval
+            is BeamCallDefinition -> candidate.nameArityInterval
             else -> null
         }
 

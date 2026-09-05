@@ -9,8 +9,8 @@ import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
 import com.intellij.psi.util.isAncestor
 import org.elixir_lang.EEx
-import org.elixir_lang.beam.psi.impl.CallDefinitionImpl
-import org.elixir_lang.beam.psi.impl.ModuleImpl
+import org.elixir_lang.beam.psi.CallDefinition as BeamCallDefinition
+import org.elixir_lang.beam.psi.Module as BeamModule
 import org.elixir_lang.ecto.query.WindowAPI
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.*
@@ -44,8 +44,8 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
     override fun execute(element: PsiElement, state: ResolveState): Boolean =
         when (element) {
             is Call -> execute(element, state)
-            is ModuleImpl<*> -> execute(element, state)
-            is CallDefinitionImpl<*> -> execute(element, state)
+            is BeamModule -> execute(element, state)
+            is BeamCallDefinition -> execute(element, state)
             is ElixirFile -> execute(element, state)
             else -> true
         }
@@ -217,12 +217,12 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
             true
         }
 
-    private fun execute(element: ModuleImpl<*>, state: ResolveState): Boolean =
+    private fun execute(element: BeamModule, state: ResolveState): Boolean =
         whileIn(element.callDefinitions()) {
             execute(it, state)
         }
 
-    protected abstract fun execute(element: CallDefinitionImpl<*>, state: ResolveState): Boolean
+    protected abstract fun execute(element: BeamCallDefinition, state: ResolveState): Boolean
 
     private fun executeOnUnknownMacroCall(macroCall: Call, state: ResolveState): Boolean =
         if (macroCall.isAncestor(state.get(ENTRANCE), strict = true)) {
@@ -315,7 +315,7 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
                             )
                         }
                     }
-                    is ModuleImpl<*> -> whileIn(namedElement.callDefinitions()) {
+                    is BeamModule -> whileIn(namedElement.callDefinitions()) {
                         execute(it, state)
                     }
                     else -> true
@@ -325,11 +325,11 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
 
     /**
      * Returns the [NamedElement]s for [moduleName] within [scope] to walk, preferring source [Call]s
-     * over decompiled [ModuleImpl] beam stubs: when the module is available as source, the beam stubs
+     * over decompiled [BeamModule] beam stubs: when the module is available as source, the beam stubs
      * are dropped entirely so a module present in both forms is not visited twice.
      *
      * Dropping the beam stubs matters for Variants-style completion, where [keepProcessing] is always
-     * `true`, so a source [Call] and its [ModuleImpl] beam counterpart would otherwise both be visited
+     * `true`, so a source [Call] and its [BeamModule] beam counterpart would otherwise both be visited
      * and offer every definition twice (e.g. each `Kernel.SpecialForms` macro). For resolution, where
      * [keepProcessing] stops after the first result, the surviving source [Call]s are still ordered
      * first so the walk short-circuits on source before any beam stub (which are now only present when

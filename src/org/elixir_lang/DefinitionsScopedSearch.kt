@@ -6,8 +6,8 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveState
 import com.intellij.psi.search.searches.DefinitionsScopedSearch
 import com.intellij.util.Processor
-import org.elixir_lang.beam.psi.impl.CallDefinitionImpl
-import org.elixir_lang.beam.psi.impl.ModuleImpl
+import org.elixir_lang.beam.psi.CallDefinition as BeamCallDefinition
+import org.elixir_lang.beam.psi.Module as BeamModule
 import org.elixir_lang.psi.CallDefinitionClause
 import org.elixir_lang.psi.CallDefinitionClause.enclosingModularMacroCall
 import org.elixir_lang.psi.Protocol
@@ -40,8 +40,8 @@ internal class DefinitionsScopedSearch :
     private fun processQuery(psiElement: PsiElement, consumer: Processor<in PsiElement>) {
         when (psiElement) {
             is Call -> processQuery(psiElement, consumer)
-            is ModuleImpl<*> -> processQuery(psiElement, consumer)
-            is CallDefinitionImpl<*> -> processQuery(psiElement, consumer)
+            is BeamModule -> processQuery(psiElement, consumer)
+            is BeamCallDefinition -> processQuery(psiElement, consumer)
         }
     }
 
@@ -96,7 +96,7 @@ internal class DefinitionsScopedSearch :
                                     }
                                 }
 
-                                is ModuleImpl<*> -> {
+                                is BeamModule -> {
                                     for (callDefinition in defimpl.callDefinitions()) {
                                         ProgressManager.checkCanceled()
 
@@ -125,13 +125,13 @@ internal class DefinitionsScopedSearch :
         }
     }
 
-    private fun processQuery(moduleImpl: ModuleImpl<*>, consumer: Processor<in PsiElement>) {
+    private fun processQuery(moduleImpl: BeamModule, consumer: Processor<in PsiElement>) {
         if (Protocol.`is`(moduleImpl)) {
             Protocol.processImplementations(moduleImpl, consumer)
         }
     }
 
-    private fun processQuery(callDefinitionImpl: CallDefinitionImpl<*>, consumer: Processor<in PsiElement>) {
+    private fun processQuery(callDefinitionImpl: BeamCallDefinition, consumer: Processor<in PsiElement>) {
         val moduleImpl = callDefinitionImpl.parent
 
         if (Protocol.`is`(moduleImpl)) {
@@ -166,7 +166,7 @@ internal class DefinitionsScopedSearch :
                             }
                         }
                     }
-                    is ModuleImpl<*> ->
+                    is BeamModule ->
                         for (callDefinition in defimpl.callDefinitions()) {
                             ProgressManager.checkCanceled()
 

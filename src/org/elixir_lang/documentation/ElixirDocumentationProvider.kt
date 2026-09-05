@@ -16,7 +16,7 @@ import org.elixir_lang.beam.chunk.beam_documentation.docs.documented.Hidden
 import org.elixir_lang.beam.chunk.beam_documentation.docs.documented.MarkdownByLanguage
 import org.elixir_lang.beam.chunk.beam_documentation.docs.documented.None
 import org.elixir_lang.beam.psi.BeamFileImpl
-import org.elixir_lang.beam.psi.impl.CallDefinitionImpl
+import org.elixir_lang.beam.psi.CallDefinition as BeamCallDefinition
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.CallDefinitionClause.enclosingModularMacroCall
 import org.elixir_lang.psi.ModuleAttribute.isDocumentationName
@@ -314,7 +314,7 @@ internal class ElixirDocumentationProvider : DocumentationProvider {
                     // Prefer source Call elements (CallDefinitionClause), fall back to BEAM stubs (CallDefinitionImpl)
                     fun bestMatch(elements: List<PsiElement>): PsiElement? =
                         elements.filterIsInstance<Call>().firstOrNull { CallDefinitionClause.`is`(it) }
-                            ?: elements.filterIsInstance<CallDefinitionImpl<*>>().firstOrNull()
+                            ?: elements.filterIsInstance<BeamCallDefinition>().firstOrNull()
 
                     // If no exact arity match (validResult), fall back to results with an exact name match
                     // from the same module (e.g., Enum.map/2 when call site has wrong arity).
@@ -326,7 +326,7 @@ internal class ElixirDocumentationProvider : DocumentationProvider {
                             .mapNotNull(ResolveResult::getElement)
                             .filter { element ->
                                 when (element) {
-                                    is CallDefinitionImpl<*> -> element.exportedName() == callName
+                                    is BeamCallDefinition -> element.exportedName() == callName
                                     is Call -> CallDefinitionClause.nameArityInterval(element, ResolveState.initial())
                                         ?.name == callName
 

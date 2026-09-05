@@ -5,7 +5,7 @@ import com.intellij.model.psi.PsiSymbolReference
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.util.concurrency.annotations.RequiresReadLock
-import org.elixir_lang.beam.psi.impl.CallDefinitionImpl
+import org.elixir_lang.beam.psi.CallDefinition as BeamCallDefinition
 import org.elixir_lang.model.psi.protocol.ProtocolFunction
 import org.elixir_lang.psi.CallDefinitionClause
 import org.elixir_lang.psi.call.Call
@@ -52,7 +52,7 @@ class FunctionCallReference(
                     // the equivalent clause as its navigation element (the `.beam` mirror), so both flow through the
                     // same `FunctionSymbol.fromClause` pipeline and compare equal by module/name/arity/macro.
                     is Call -> element
-                    is CallDefinitionImpl<*> -> element.navigationElement as? Call
+                    is BeamCallDefinition -> element.navigationElement as? Call
                     else -> null
                 }
             }

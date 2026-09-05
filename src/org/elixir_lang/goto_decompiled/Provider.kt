@@ -8,7 +8,7 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.ResolveState
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
-import org.elixir_lang.beam.psi.impl.ModuleImpl
+import org.elixir_lang.beam.psi.Module as BeamModule
 import org.elixir_lang.psi.CallDefinitionClause.nameArityInterval
 import org.elixir_lang.psi.Definition
 import org.elixir_lang.psi.Modular
@@ -119,7 +119,7 @@ class Provider : GotoRelatedProvider() {
                 scope,
                 NamedElement::class.java
         ).mapNotNull { namedElement ->
-            (namedElement as? ModuleImpl<*>)
+            (namedElement as? BeamModule)
                     ?.navigationElement
                     ?.let { it as Call }
         }.toSet()

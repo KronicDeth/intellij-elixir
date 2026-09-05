@@ -7,9 +7,9 @@ import com.intellij.psi.scope.PsiScopeProcessor
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
 import com.intellij.psi.util.isAncestor
-import org.elixir_lang.beam.psi.impl.CallDefinitionImpl
-import org.elixir_lang.beam.psi.impl.ModuleImpl
-import org.elixir_lang.beam.psi.impl.TypeDefinitionImpl
+import org.elixir_lang.beam.psi.CallDefinition as BeamCallDefinition
+import org.elixir_lang.beam.psi.Module as BeamModule
+import org.elixir_lang.beam.psi.TypeDefinition as BeamTypeDefinition
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.Module
 import org.elixir_lang.psi.ModuleAttribute.isTypeSpecName
@@ -44,9 +44,9 @@ abstract class Type : PsiScopeProcessor {
             is ElixirStructOperation, is ElixirTuple, is QualifiableAlias, is WholeNumber
             -> false
 
-            is ModuleImpl<*> -> execute(element, state)
-            is TypeDefinitionImpl<*> -> execute(element, state)
-            is CallDefinitionImpl<*> -> true
+            is BeamModule -> execute(element, state)
+            is BeamTypeDefinition -> execute(element, state)
+            is BeamCallDefinition -> true
             // Anything else declares no type; keep walking.
             else -> true
         }
@@ -86,7 +86,7 @@ abstract class Type : PsiScopeProcessor {
             }
         }
 
-    private fun execute(moduleImpl: ModuleImpl<*>, state: ResolveState): Boolean =
+    private fun execute(moduleImpl: BeamModule, state: ResolveState): Boolean =
         if (moduleImpl.isAncestor(state.get(ENTRANCE), false)) {
             whileIn(moduleImpl.typeDefinitions()) {
                 execute(it, state)
@@ -95,7 +95,7 @@ abstract class Type : PsiScopeProcessor {
             true
         }
 
-    protected abstract fun execute(typeDefinitionImpl: TypeDefinitionImpl<*>, state: ResolveState): Boolean
+    protected abstract fun execute(typeDefinition: BeamTypeDefinition, state: ResolveState): Boolean
 
     private fun execute(
         atUnqualifiedNoParenthesesCall: AtUnqualifiedNoParenthesesCall<*>,
@@ -132,8 +132,8 @@ abstract class Type : PsiScopeProcessor {
                 GlobalSearchScope.allScope(project),
                 NamedElement::class.java
             ) { modular ->
-                // use `ModuleImpl` to only use decompiled
-                if (modular is ModuleImpl<*>) {
+                // use `BeamModule` to only use decompiled
+                if (modular is BeamModule) {
                     // reset the resolve state as only `defmodule` that is an ancestor of entrance will be walked
                     execute(
                         modular,

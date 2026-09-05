@@ -11,7 +11,7 @@ import java.io.File
  * Uses a real `math.beam` file (Erlang stdlib) as a library class root to exercise
  * the BEAM decompilation → stub indexing → atom reference resolution path.
  *
- * The BEAM-decompiled `ModuleImpl` must not be filtered out by the `as? Call` cast
+ * The BEAM-decompiled `BeamModule` must not be filtered out by the `as? Call` cast
  * in `PsiReference.maybeModularNameToModulars()`.
  */
 class ErlangAtomQualifierTest : BeamLibraryTestCase() {
