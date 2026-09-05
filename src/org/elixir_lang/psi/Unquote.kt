@@ -64,8 +64,8 @@ object Unquote {
                 if (CallDefinitionClause.`is`(unquoted)) {
                     Using.treeWalkUp(unquoted, null, unquotedResolveState, keepProcessing)
                 } else {
+                    // The walk's answer is dropped, so a consumer's stop signal does not end the loop here
                     treeWalkUpUnquotedVariable(unquoted, unquotedResolveState, keepProcessing)
-                    // a variable
 
                     true
                 }
