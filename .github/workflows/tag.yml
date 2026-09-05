@@ -164,6 +164,12 @@ jobs:
     needs: [ validate-tag ]
     if: ${{ !inputs.skip_tests }}
     uses: ./.github/workflows/shared-test.yml
+    # A called workflow sees only the secrets it is handed. Explicit rather than `secrets: inherit`,
+    # which zizmor's secrets-inherit audit flags.
+    secrets:
+      GRADLE_ENCRYPTION_KEY: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
 
   release:
     needs: [ validate-tag, test-and-verify ]
@@ -175,6 +181,14 @@ jobs:
     timeout-minutes: 30
     permissions:
       contents: write
+    # Remote build cache credentials (settings.gradle.kts): this job's compileKotlin/compileJava
+    # match the entries the test-and-verify legs just pushed, and it pushes its own. The checksum
+    # variables keep the AWS SDK from sending CRC32 checksums Cloudflare R2 does not implement.
+    env:
+      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      AWS_REQUEST_CHECKSUM_CALCULATION: WHEN_REQUIRED
+      AWS_RESPONSE_CHECKSUM_VALIDATION: WHEN_REQUIRED
     steps:
       - name: Checkout
         id: checkout
