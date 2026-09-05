@@ -5,7 +5,6 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.IncorrectOperationException
 import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.Name
-import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.module.PutAttribute
 import org.elixir_lang.module.RegisterAttribute
 import org.elixir_lang.psi.*
@@ -139,25 +138,20 @@ object PsiNamedElementImpl {
                     newFunctionNameElementCall.functionNameElement()!!.node
                 }
 
-                else -> {
-                    Logger.error(javaClass, "Don't know how to replace function name", named)
-
-                    nameNode
-                }
+                else -> throw IncorrectOperationException(
+                    "Cannot rename a call named by ${functionNameElement.node.elementType}"
+                )
             }
 
             val newNameElementType = newNameNode.elementType
 
-            if (nameElementType == newNameElementType) {
-                val node = nameNode.treeParent
-                node.replaceChild(nameNode, newNameNode)
-            } else {
-                Logger.error(
-                    javaClass,
-                    "New name node elementType (${newNameElementType}) does not match old name node elementType (${nameElementType})",
-                    named
+            if (nameElementType != newNameElementType) {
+                throw IncorrectOperationException(
+                    "New name node elementType ($newNameElementType) does not match old name node elementType ($nameElementType)"
                 )
             }
+
+            nameNode.treeParent.replaceChild(nameNode, newNameNode)
         }
 
         return named

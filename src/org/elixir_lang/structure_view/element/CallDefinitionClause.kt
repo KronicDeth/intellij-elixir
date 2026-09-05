@@ -124,13 +124,8 @@ class CallDefinitionClause(val callDefinition: CallDefinition, call: Call) :
                 } else if (org.elixir_lang.psi.CallDefinitionClause.`is`(quoteEnclosingMacroCall)) {
                     val callDefinitionClause = CallDefinitionClause.fromCall(quoteEnclosingMacroCall)
 
-                    if (callDefinitionClause == null) {
-                        Logger.error(
-                            CallDefinitionClause::class.java,
-                            "Cannot construct CallDefinitionClause from quote's enclosing macro call",
-                            quoteEnclosingMacroCall
-                        )
-                    } else {
+                    // A headless `defmacro` has no clause to hang the quote on yet
+                    if (callDefinitionClause != null) {
                         quote = Quote(
                             callDefinitionClause,
                             enclosingMacroCall

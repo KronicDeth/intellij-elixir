@@ -99,7 +99,8 @@ class MultiResolve internal constructor(private val name: String, private val in
     private fun addUnaliasedNamedElementsToResolveResultList(match: PsiNamedElement,
                                                              namePartList: List<String>,
                                                              visitedElementSet: Set<PsiElement>) {
-        val unaliasedName = unaliasedName(match, namePartList)
+        // An alias of something that is not a module resolves to nothing
+        val unaliasedName = unaliasedName(match, namePartList) ?: return
 
         val project = match.project
 
@@ -166,11 +167,11 @@ class MultiResolve internal constructor(private val name: String, private val in
             return multiResolve.resolveResults()
         }
 
-        private fun unaliasedName(match: PsiNamedElement, namePartList: List<String>): String {
-            val matchUnaliasedName = UnaliasedName.unaliasedName(match)
+        private fun unaliasedName(match: PsiNamedElement, namePartList: List<String>): String? {
+            val matchUnaliasedName = UnaliasedName.unaliasedName(match) ?: return null
 
             val unaliasedNamePartList = ArrayList<String>(namePartList.size)
-            unaliasedNamePartList.add(matchUnaliasedName!!)
+            unaliasedNamePartList.add(matchUnaliasedName)
 
             for (i in 1 until namePartList.size) {
                 unaliasedNamePartList.add(namePartList[i])

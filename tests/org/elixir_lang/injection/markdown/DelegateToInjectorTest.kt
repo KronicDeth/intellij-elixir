@@ -195,6 +195,33 @@ class DelegateToInjectorTest : PlatformTestCase() {
         )
     }
 
+    /**
+     * ExDoc lets `@doc` carry any metadata key, and a doc value can be any expression. Neither an
+     * unlisted key such as `tags:` nor a `<>` concatenation is prose to inject Markdown into, and
+     * neither is an error: the injector names what it injects and passes over the rest.
+     */
+    fun testUnlistedMetadataKeyAndValueShapeAreNotReported() {
+        myFixture.configureByFile("unlisted_metadata.ex")
+
+        val (_, loggedErrors) = captureLoggedErrors {
+            myFixture.doHighlighting()
+        }
+
+        assertEmpty(
+            "The markdown Injector must pass over documentation it does not inject into",
+            loggedErrors.filter { it.category.contains("elixir_lang.injection.markdown.Injector") }
+        )
+
+        val tagsDoc = PsiTreeUtil.findChildrenOfType(myFixture.file, AtUnqualifiedNoParenthesesCall::class.java)
+            .single { it.text.contains("tags:") }
+        val injectedLanguageManager = InjectedLanguageManager.getInstance(myFixture.project)
+        val markdownInjected = PsiTreeUtil.collectElements(tagsDoc) { true }
+            .flatMap { element -> injectedLanguageManager.getInjectedPsiFiles(element).orEmpty() }
+            .filter { it.first.language == MarkdownLanguage.INSTANCE }
+
+        assertEmpty("`tags:` is metadata, not Markdown prose", markdownInjected)
+    }
+
     fun testCodeBlockTrailingEndIsInjectedWithElixir() {
         myFixture.configureByFile("trailing_end_code_block.ex")
 

@@ -6,7 +6,6 @@ import com.intellij.psi.impl.source.resolve.ResolveCache
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.search.searches.ReferencesSearch
 import com.intellij.psi.stubs.StubIndex
-import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.leex.reference.Assign
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.Modular.callDefinitionClauseCallFoldWhile
@@ -312,11 +311,8 @@ object Assign : ResolveCache.PolyVariantResolver<ReferenceAssign> {
                 }
             }
 
-            else -> {
-                error("Cannot resolve assign in call definition clause expression", expression)
-
-                AccumulatorContinue(initial, true)
-            }
+            // Anything else assigns nothing; keep looking
+            else -> AccumulatorContinue(initial, true)
         }
 
     private fun resolveInAssign2Argument(
@@ -371,11 +367,8 @@ object Assign : ResolveCache.PolyVariantResolver<ReferenceAssign> {
 
             is QuotableKeywordPair -> resolveInAssign2Argument(assign, incompleteCode, expression.keywordKey, initial)
             is ElixirUnmatchedUnqualifiedNoArgumentsCall -> initial
-            else -> {
-                error("Cannot resolve assign in assign/2 argument", expression)
-
-                initial
-            }
+            // Anything else names no assign
+            else -> initial
         }
 
     private fun resolveInAtomArgument(
@@ -406,11 +399,8 @@ object Assign : ResolveCache.PolyVariantResolver<ReferenceAssign> {
                 null
             } ?: initial
 
-            else -> {
-                error("Cannot resolve assign in atom argument", expression)
-
-                initial
-            }
+            // A key that is not an atom names no assign
+            else -> initial
         }
 
     private fun resolveInLiveComponentCalls(
@@ -528,11 +518,8 @@ object Assign : ResolveCache.PolyVariantResolver<ReferenceAssign> {
             }
             // function calls are the source of the socket, don't resolve through the function call
             is Call -> resolveSocketAsOtherNamedElement(assign, incompleteCode, expression, initial)
-            else -> {
-                error("Cannot resolve assign in @myself expression", expression)
-
-                AccumulatorContinue(initial, true)
-            }
+            // Anything else is not a socket; keep looking
+            else -> AccumulatorContinue(initial, true)
         }
 
     private fun resolveSocketAsOtherNamedElement(
@@ -686,11 +673,8 @@ object Assign : ResolveCache.PolyVariantResolver<ReferenceAssign> {
             }
 
             is ElixirEndOfExpression -> AccumulatorContinue(initial, true)
-            else -> {
-                error("Cannot resolve assign in to_rendered expression", expression)
-
-                AccumulatorContinue(initial, true)
-            }
+            // Anything else assigns nothing; keep looking
+            else -> AccumulatorContinue(initial, true)
         }
 
     private fun resolveLiveAction(assign: Assign, incompleteCode: Boolean): AccumulatorContinue<List<ResolveResult>> {
@@ -779,12 +763,8 @@ object Assign : ResolveCache.PolyVariantResolver<ReferenceAssign> {
                 }
             }
 
-            is Arrow, is AtOperation, is ElixirAtomKeyword, is Pipe, is Two -> AccumulatorContinue(initial, true)
-            is Operation -> {
-                error("Cannot resolve assign in operation for @myself", expression)
-
-                AccumulatorContinue(initial, true)
-            }
+            // No operation assigns
+            is Operation -> AccumulatorContinue(initial, true)
 
             is Call -> {
                 val arguments = expression.finalArguments()
@@ -874,11 +854,8 @@ object Assign : ResolveCache.PolyVariantResolver<ReferenceAssign> {
                 } ?: AccumulatorContinue(initial, true)
             }
 
-            else -> {
-                error("Cannot resolve assign for  @myself", expression)
-
-                AccumulatorContinue(initial, true)
-            }
+            // Anything else assigns nothing; keep looking
+            else -> AccumulatorContinue(initial, true)
         }
 
     private fun resolveInCallDefinitionClause(
@@ -907,9 +884,5 @@ object Assign : ResolveCache.PolyVariantResolver<ReferenceAssign> {
         return element.containingFile.originalFile.virtualFile?.let { elementVirtualFile ->
             LibraryScopeCache.getInstance(project).getLibraryScope(elementVirtualFile)
         } ?: GlobalSearchScope.allScope(project)
-    }
-
-    fun error(title: String, element: PsiElement) {
-        Logger.error(Assign::class.java, title, element)
     }
 }

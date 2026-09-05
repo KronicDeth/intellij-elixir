@@ -15,7 +15,6 @@ import com.intellij.usageView.UsageViewTypeLocation
 import com.intellij.util.IncorrectOperationException
 import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.annotator.Parameter
-import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.ElementDescriptionProvider.Companion.VARIABLE_USAGE_VIEW_TYPE_LOCATION_ELEMENT_DESCRIPTION
 import org.elixir_lang.psi.call.Call
@@ -369,17 +368,8 @@ class Callable : PsiReferenceBase<Call>, PsiPolyVariantReference {
                 is Call -> // MUST be after any operations because operations also implement Call
                     isVariable(ancestor)
 
-                else -> {
-                    if (!(ancestor is AtUnqualifiedBracketOperation ||
-                                ancestor is AtOperation ||
-                                ancestor is BracketOperation ||
-                                ancestor is PsiFile ||
-                                ancestor is QualifiedMultipleAliases)
-                    ) {
-                        error("Don't know how to check if variable", ancestor)
-                    }
-                    false
-                }
+                // Anything else cannot hold a variable declaration
+                else -> false
             }
 
         @RequiresReadLock
@@ -427,10 +417,6 @@ class Callable : PsiReferenceBase<Call>, PsiPolyVariantReference {
         @JvmStatic
         fun variableUseScope(match: UnqualifiedNoArgumentsCall<*>): LocalSearchScope =
             variableUseScope(match as PsiElement)
-
-        private fun error(message: String, element: PsiElement) {
-            Logger.error(Callable::class.java, message, element)
-        }
 
         /**
          * Searches downward from `ancestor`, only returning true if `element` is a type, unit, size or
@@ -597,10 +583,8 @@ class Callable : PsiReferenceBase<Call>, PsiPolyVariantReference {
                        declaration, so it has no use scope */
                     LocalSearchScope.EMPTY
 
-                else -> {
-                    error("Don't know how to find variable use scope", ancestor)
-                    LocalSearchScope.EMPTY
-                }
+                // Anything else cannot declare a variable either, so a use there has no scope
+                else -> LocalSearchScope.EMPTY
             }
     }
 }

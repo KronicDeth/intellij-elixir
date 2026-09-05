@@ -58,23 +58,13 @@ class Injector : MultiHostInjector {
             is ElixirAtomKeyword -> Unit
 
             is ElixirLine -> injectMarkdownInQuote(registrar, documentation)
-            is QuotableKeywordPair -> {
-                when (val key = documentation.keywordKey.text) {
-                    "deprecated" -> getLanguagesToInjectInQuote(registrar, documentation.keywordValue)
-                    "authors", "delegate_to", "group", "guard", "request_body", "responses", "since", "type" -> Unit
-                    else -> {
-                        Logger.error(
-                            javaClass,
-                            "Do not know whether to inject Markdown in documentation key $key",
-                            documentation
-                        )
-                    }
-                }
+            // `deprecated:` is the one metadata key whose value is prose; any other key is data
+            is QuotableKeywordPair -> if (documentation.keywordKey.text == "deprecated") {
+                getLanguagesToInjectInQuote(registrar, documentation.keywordValue)
             }
 
-            else -> {
-                Logger.error(javaClass, "Do not know whether to inject Markdown in documentation", documentation)
-            }
+            // Any other value shape is not prose to inject into
+            else -> Unit
         }
     }
 

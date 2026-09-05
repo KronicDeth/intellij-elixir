@@ -141,6 +141,20 @@ class UnaliasedNameTest : PlatformTestCase() {
     // -------------------------------------------------------------------------
 
     /** Navigates from the caret token to the immediately enclosing [ElixirAlias]. */
+    /**
+     * `As` in `alias "Foo", as: As`. The first argument is a string, which names no module, so there is
+     * no unaliased name: `null`, not a placeholder, and not an error.
+     */
+    fun testUnnameableFirstArgumentHasNoUnaliasedName() {
+        myFixture.configureByFile("string_alias.ex")
+        val asAlias = caretElixirAlias()
+
+        val (unaliased, errors) = captureLoggedErrors { unaliasedName(asAlias) }
+
+        assertEmpty("an alias of something that is not a module is not an error", errors)
+        assertNull(unaliased)
+    }
+
     private fun caretElixirAlias(): ElixirAlias {
         val element = myFixture.file.findElementAt(myFixture.caretOffset)
         assertNotNull("Expected an element at the caret", element)

@@ -125,10 +125,6 @@ internal class ModuleAttribute : Annotator, DumbAware {
     /*
      * Private Instance Methods
      */
-    private fun cannotHighlightTypes(element: PsiElement) {
-        error("Cannot highlight types", element)
-    }
-
     private fun error(userMessage: String, element: PsiElement) {
         Logger.error(this.javaClass, userMessage, element)
     }
@@ -219,13 +215,9 @@ internal class ModuleAttribute : Annotator, DumbAware {
                                 leftOperand,
                                 annotationHolder
                             )
-                        } else if (leftOperand !is ElixirMatchedUnqualifiedNoArgumentsCall) {
-                            cannotHighlightTypes(leftOperand)
                         }
                     } else if (leftOperand is ElixirAtomKeyword) {
                         highlightTypeName(leftOperand, annotationHolder)
-                    } else if (leftOperand != null) {
-                        cannotHighlightTypes(leftOperand)
                     }
 
                     val rightOperand: PsiElement? = grandChild.rightOperand()
@@ -329,9 +321,8 @@ internal class ModuleAttribute : Annotator, DumbAware {
                     // typing the parentheses before the relative name and before name like `@type String.()`
                 is DotCall<*> -> Unit
 
-                else -> {
-                    cannotHighlightTypes(grandChild)
-                }
+                // Anything else is not a type the annotator colours
+                else -> Unit
             }
         }
     }
@@ -486,11 +477,8 @@ internal class ModuleAttribute : Annotator, DumbAware {
                 )
             }
 
-            else -> {
-                if (psiElement !is ElixirAtomKeyword) {
-                    error("Cannot highlight types and type parameter declarations", psiElement)
-                }
-            }
+            // Anything else declares no type parameter
+            else -> Unit
         }
     }
 
@@ -594,8 +582,6 @@ internal class ModuleAttribute : Annotator, DumbAware {
                                     leftMostFunctionNameTextAttributesKey,
                                     typeParameterNameSet
                                 )
-                            } else {
-                                cannotHighlightTypes(strippedTypeOperationLeftOperand)
                             }
                         }
 
@@ -619,11 +605,8 @@ internal class ModuleAttribute : Annotator, DumbAware {
                         )
                     }
 
-                    else -> {
-                        if (leftOperand != null) {
-                            cannotHighlightTypes(leftOperand)
-                        }
-                    }
+                    // Anything else is not a specification head the annotator colours
+                    else -> Unit
                 }
 
                 if (rightOperand != null) {
@@ -777,15 +760,8 @@ internal class ModuleAttribute : Annotator, DumbAware {
                 )
             }
 
-            is UnqualifiedNoParenthesesCall<*> -> {
-                highlightTypesAndSpecificationTypeParameterDeclarations(
-                    psiElement
-                )
-            }
-
-            else -> {
-                error("Cannot highlight types and specification type parameter declarations", psiElement)
-            }
+            // Anything else declares no specification type parameter
+            else -> Unit
         }
     }
 
@@ -816,17 +792,6 @@ internal class ModuleAttribute : Annotator, DumbAware {
                 annotationHolder,
                 functionNameElement.textRange,
                 ElixirSyntaxHighlighter.TYPE_PARAMETER
-            )
-        }
-    }
-
-    private fun highlightTypesAndSpecificationTypeParameterDeclarations(
-        unqualifiedNoParenthesesCall: UnqualifiedNoParenthesesCall<*>,
-    ) {
-        if (!`is`(unqualifiedNoParenthesesCall)) {
-            error(
-                "Cannot highlight types and specification type parameter declarations in UnqualifiedNoParenthesesCall that is not a call definition clause",
-                unqualifiedNoParenthesesCall
             )
         }
     }
@@ -863,8 +828,6 @@ internal class ModuleAttribute : Annotator, DumbAware {
                     }
                 }
             }
-        } else {
-            cannotHighlightTypes(decimalFloat)
         }
 
         if (message == null) {
@@ -957,8 +920,6 @@ internal class ModuleAttribute : Annotator, DumbAware {
                 annotationHolder,
                 typeTextAttributesKey
             )
-        } else if (children.size != 3) {
-            error("Cannot highlight types and type parameter usages", stabParenthesesSignature)
         }
     }
 
@@ -1105,7 +1066,7 @@ internal class ModuleAttribute : Annotator, DumbAware {
             is ElixirBitString,
             is ElixirCharToken,
             // Every base highlights as an ordinary number, so match the supertype rather than
-            // enumerating them; enumerating left hexadecimal and octal reaching cannotHighlightTypes.
+            // enumerating them; enumerating left hexadecimal and octal uncoloured.
             is WholeNumber,
                 // Fixes #2583
             is ElixirEmptyParentheses,
@@ -1179,7 +1140,8 @@ internal class ModuleAttribute : Annotator, DumbAware {
                 typeTextAttributesKey
             )
 
-            else -> cannotHighlightTypes(psiElement)
+            // Anything else is not a type the annotator colours
+            else -> Unit
         }
     }
 
@@ -1438,10 +1400,8 @@ internal class ModuleAttribute : Annotator, DumbAware {
                 specificationTypeParameterNameSet(psiElement)
             }
 
-            else -> {
-                error("Cannot extract specification type parameter name set", psiElement)
-                emptySet<String>()
-            }
+            // Anything else names no specification type parameter
+            else -> emptySet()
         }
 
     private fun specificationTypeParameterNameSet(psiElements: Array<PsiElement>): Set<String?> =
@@ -1458,18 +1418,10 @@ internal class ModuleAttribute : Annotator, DumbAware {
             setOf(it)
         } ?: emptySet<String>()
 
+    // A definition clause head names its type parameters through `when`, not here
     private fun specificationTypeParameterNameSet(
-        unqualifiedNoParenthesesCall: UnqualifiedNoParenthesesCall<*>,
-    ): Set<String?> {
-        if (!`is`(unqualifiedNoParenthesesCall)) {
-            error(
-                "Cannot extract specification type parameter name set from " +
-                        "unqualifiedNoParenthesesCall that is a not a call definition clause",
-                unqualifiedNoParenthesesCall
-            )
-        }
-        return emptySet<String>()
-    }
+        @Suppress("UNUSED_PARAMETER") unqualifiedNoParenthesesCall: UnqualifiedNoParenthesesCall<*>,
+    ): Set<String?> = emptySet()
 
     /**
      * Assume bare aliases are incorrectly capitalized type parameters, say from someone's that's used to generics
@@ -1496,8 +1448,8 @@ internal class ModuleAttribute : Annotator, DumbAware {
             }
         }
 
+        // Any other tuple names no type parameter
         if (typeParameterNameSet == null) {
-            error("Cannot extract type type parameter name set", tuple)
             typeParameterNameSet = emptySet()
         }
 
@@ -1532,10 +1484,8 @@ internal class ModuleAttribute : Annotator, DumbAware {
                See https://github.com/KronicDeth/intellij-elixir/issues/1835 */
             is QualifiedNoArgumentsCall<*> -> emptySet()
 
-            else -> {
-                error("Cannot extract type type parameter name set", psiElement)
-                emptySet<String>()
-            }
+            // Anything else names no type parameter
+            else -> emptySet()
         }
 
     private fun typeTypeParameterNameSet(psiElements: Array<PsiElement>): Set<String> =

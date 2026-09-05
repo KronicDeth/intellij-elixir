@@ -35,7 +35,7 @@ class ItemPresentation(private val qualifiableAlias: QualifiableAlias) : ItemPre
             when (ancestor) {
                 is Call ->
                         if (ancestor.isCalling(KERNEL, ALIAS)) {
-                            "alias ${UnaliasedName.unaliasedName(qualifiableAlias)}"
+                            UnaliasedName.unaliasedName(qualifiableAlias)?.let { "alias $it" } ?: qualifiableAlias.name
                         } else {
                             qualifiableAlias.fullyQualifiedName()
                         }
@@ -47,9 +47,10 @@ class ItemPresentation(private val qualifiableAlias: QualifiableAlias) : ItemPre
                     getPresentableText(ancestor.parent)
                 is QuotableKeywordPair -> {
                     if (ancestor.hasKeywordKey("as")) {
-                        aliasFirstArgument(ancestor)?.let { aliasFirstArgument ->
-                            "alias ${UnaliasedName.unaliasedName(aliasFirstArgument)}, as: ${qualifiableAlias.name}"
-                        } ?: qualifiableAlias.name
+                        aliasFirstArgument(ancestor)
+                            ?.let { UnaliasedName.unaliasedName(it) }
+                            ?.let { "alias $it, as: ${qualifiableAlias.name}" }
+                            ?: qualifiableAlias.name
                     } else {
                         null
                     }

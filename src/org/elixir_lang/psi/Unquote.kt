@@ -5,7 +5,6 @@ import com.intellij.psi.PsiPolyVariantReference
 import com.intellij.psi.ResolveResult
 import com.intellij.psi.ResolveState
 import com.intellij.util.concurrency.annotations.RequiresReadLock
-import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function.UNQUOTE
 import org.elixir_lang.psi.call.name.Module.KERNEL
@@ -83,30 +82,13 @@ object Unquote {
                             treeWalkUpValue(value, resolveState, keepProcessing)
                         } ?: true
                     }
-                    // ... = variable
+                    // ... = variable: a use, which binds nothing further up
                     else {
-                        Logger.error(
-                                Unquote::class.java,
-                                "Don't know how to walk unquoted variable parent",
-                                parent
-                        )
-
                         true
                     }
                 }
-                // ...: variable
-                is ElixirKeywordPair -> if (parent.keywordKey.name == "do") {
-                    // `do: variable`, such as `do: block` in macro parameters
-                    true
-                } else {
-                    Logger.error(
-                            Unquote::class.java,
-                            "Don't know how to walk unquoted variable parent",
-                            parent
-                    )
-
-                    true
-                }
+                // ...: variable, such as `do: block` in macro parameters
+                is ElixirKeywordPair -> true
                 // (..., parameter)
                 is ElixirParenthesesArguments -> true
                 // Transparent wrappers: keep walking upward
@@ -117,17 +99,8 @@ object Unquote {
                 is QuotableArguments,
                 is QuotableKeywordList,
                 is Call -> treeWalkUpUnquotedVariable(parent, resolveState, keepProcessing)
-                // Stop quietly at file boundary
-                is com.intellij.psi.PsiFile -> true
-                else -> {
-                    Logger.error(
-                            Unquote::class.java,
-                            "Don't know how to walk unquoted variable parent",
-                            parent
-                    )
-
-                    true
-                }
+                // Anything else, the file included, binds nothing the unquote could see
+                else -> true
             }
 
     private fun treeWalkUpValue(value: PsiElement,
@@ -135,15 +108,8 @@ object Unquote {
                                 keepProcessing: (PsiElement, ResolveState) -> Boolean): Boolean =
             when (value) {
                 is Call -> treeWalkUpValue(value, resolveState, keepProcessing)
-                else -> {
-                    Logger.error(
-                            Unquote::class.java,
-                            "Don't know how to walk unquoted variable value",
-                            value
-                    )
-
-                    true
-                }
+                // A literal, container or operation has no definitions to walk into
+                else -> true
             }
 
     private fun treeWalkUpValue(value: Call,

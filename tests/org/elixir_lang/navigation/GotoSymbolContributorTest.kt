@@ -35,6 +35,40 @@ class GotoSymbolContributorTest : PlatformTestCase() {
      * Tests
      */
 
+    /**
+     * A `def`, `@spec` or `@callback` outside any module is legal in a script, but there is no module
+     * to list it under, so Go to Symbol has no entry for it. That is not an error.
+     */
+    fun testDefinitionsOutsideAModuleHaveNoEntry() {
+        myFixture.configureByFile("top_level_definitions.exs")
+        val gotoSymbolContributor = gotoSymbolContributor()
+
+        val (items, errors) = captureLoggedErrors {
+            listOf("foo", "f", "g").flatMap { name ->
+                gotoSymbolContributor.getItemsByName(name, name, myFixture.project, false).toList()
+            }
+        }
+
+        assertEmpty("a definition with no enclosing module is not an error", errors)
+        assertEmpty("a definition with no enclosing module has nowhere to be listed", items)
+    }
+
+    /**
+     * A `defmacro` still missing its head has no name to construct a clause from, so a `def` in the
+     * `quote` inside it has no enclosing modular yet. That is a macro being typed, not an error.
+     */
+    fun testDefinitionInsideHeadlessMacroQuoteHasNoEntry() {
+        myFixture.configureByFile("headless_macro_quote.ex")
+        val gotoSymbolContributor = gotoSymbolContributor()
+
+        val (items, errors) = captureLoggedErrors {
+            gotoSymbolContributor.getItemsByName("foo", "foo", myFixture.project, false).toList()
+        }
+
+        assertEmpty("a headless macro is not an error", errors)
+        assertEmpty("a definition quoted in a headless macro has nowhere to be listed", items)
+    }
+
     fun testIssue472() {
         myFixture.configureByFile("issue_472.ex")
         val gotoSymbolContributor = gotoSymbolContributor()

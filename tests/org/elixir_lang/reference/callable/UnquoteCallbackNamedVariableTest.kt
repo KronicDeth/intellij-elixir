@@ -42,10 +42,34 @@ class UnquoteCallbackNamedVariableTest : PlatformTestCase() {
         }
 
         assertEmpty(
-            "Logger.error should not be called for unquoted variable parent in $displayName",
+            "Logger.error should not be called for unquoted variable in $displayName",
             loggedErrors.filter {
-                it.title?.contains("Don't know how to walk unquoted variable parent") == true
+                it.title?.contains("Don't know how to walk unquoted variable") == true
             }
+        )
+    }
+
+    /**
+     * The unquoted variable is bound to a string literal rather than to a call. A literal has no
+     * declarations to walk into, so the walk stops there without comment.
+     */
+    fun testUnquoteVariableBoundToLiteral() {
+        testNoErrorLogged(
+            "unquote_variable_bound_to_literal",
+            "unquote_variable_bound_to_literal.ex",
+            "variable bound to a literal"
+        )
+    }
+
+    /**
+     * The unquoted variable is declared as the value of a keyword parameter, `docs_uri: docs_uri`, so
+     * its parent is a keyword pair whose key is not `do`. A parameter declares nothing further up.
+     */
+    fun testUnquoteVariableFromKeywordParameter() {
+        testNoErrorLogged(
+            "unquote_variable_from_keyword_parameter",
+            "unquote_variable_from_keyword_parameter.ex",
+            "variable from a keyword parameter"
         )
     }
 

@@ -65,6 +65,28 @@ class DepTest : PlatformTestCase() {
         assertEquals("An unknown option must still leave the accumulated dep", "deps/my_dep", deps.single()?.path)
     }
 
+    /**
+     * A quoted atom is a legal dep name: `{:"my-dep", "~> 1.0"}` checks out under `deps/my-dep`. The
+     * quoting was reported as an unconvertible name and the dep dropped, so nothing under it resolved.
+     */
+    fun testQuotedAtomNameIsTheDepName() {
+        val (deps, errorTitles) = depsFrom("{:\"my-dep\", \"~> 1.0\"}")
+
+        assertEmpty("A quoted atom is an ordinary dep name", errorTitles)
+        assertEquals("deps/my-dep", deps.single()?.path)
+    }
+
+    /**
+     * A `path:` value the plugin cannot read as a string leaves the dep where it was, exactly as a
+     * `path:` given by a call does; it is not something to report.
+     */
+    fun testUnreadablePathValueLeavesDepsPath() {
+        val (deps, errorTitles) = depsFrom("{:my_dep, path: ~s(../my_dep)}")
+
+        assertEmpty("An unreadable `path` value is not an error", errorTitles)
+        assertEquals("deps/my_dep", deps.single()?.path)
+    }
+
     fun testPathOptionReplacesDepsPath() {
         val (deps, errorTitles) = depsFrom("{:my_dep, path: \"../my_dep\"}")
 
