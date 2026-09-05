@@ -130,6 +130,28 @@ jobs:
         -PotpVersion=${{ matrix.beam.otp }}
 
     steps:
+      # The Windows leg is the critical path of every run and slower than Linux at every step. It
+      # writes tens of thousands of files - the checkout, the extracted IDE, Kotlin and Java class
+      # output, the test sandbox, the quoter build - and Defender's real-time scanning inspects each
+      # one as it lands. Exclude the directories that receive them, and the JVM and Erlang processes
+      # that write them, before anything is written: an exclusion does nothing for a file already
+      # scanned, which is why this precedes the checkout. The status line is the evidence: should a
+      # future image report RealTimeProtectionEnabled=False, the step is inert and can go.
+      # continue-on-error because this is an optimisation - a cmdlet refused by tamper protection or
+      # an image without Defender must not take the leg down.
+      - name: Exclude build paths from Defender real-time scanning
+        id: defender-exclusions
+        if: runner.os == 'Windows'
+        continue-on-error: true
+        shell: pwsh
+        run: |
+          $status = Get-MpComputerStatus
+          Write-Host "RealTimeProtectionEnabled=$($status.RealTimeProtectionEnabled) IsTamperProtected=$($status.IsTamperProtected)"
+          $paths = @($env:GITHUB_WORKSPACE, $env:RUNNER_TEMP, $env:RUNNER_TOOL_CACHE, (Join-Path $env:USERPROFILE '.gradle'))
+          Add-MpPreference -ExclusionPath $paths
+          Add-MpPreference -ExclusionProcess 'java.exe', 'erl.exe'
+          Write-Host "Excluded: $($paths -join ', ')"
+
       - name: Checkout
         id: checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
