@@ -9,6 +9,7 @@ import org.elixir_lang.psi.operation.Match
 import org.elixir_lang.psi.operation.Type
 import org.elixir_lang.psi.walk.Classifier
 import org.elixir_lang.psi.walk.Leaves
+import org.elixir_lang.psi.walk.StringParts
 
 /** The ancestors that decide a variable's use scope, for [Callable.variableUseScope]. */
 object VariableUseScopeWalk {
@@ -38,6 +39,8 @@ object VariableUseScopeWalk {
                 ElixirBlockList::class.java,
                 ElixirContainerAssociationOperation::class.java,
                 ElixirDoBlock::class.java,
+                // a match in an interpolation binds for the code after the string, as anywhere in an expression
+                ElixirInterpolation::class.java,
                 ElixirKeywordPair::class.java,
                 ElixirKeywords::class.java,
                 ElixirList::class.java,
@@ -71,13 +74,12 @@ object VariableUseScopeWalk {
                 InMatch::class.java,
                 Type::class.java,
                 UnqualifiedNoArgumentsCall::class.java
-            ),
+            ) + StringParts.SHAPES,
             Bucket.SELF to listOf(ElixirStabOperation::class.java),
             Bucket.MATCH to listOf(Match::class.java),
             Bucket.CALL to listOf(Call::class.java),
             Bucket.EMPTY to listOf(
                 ElixirEexTag::class.java,
-                ElixirInterpolation::class.java,
                 // the walk passed no scope that could declare the variable, as for a match outside any block
                 PsiFile::class.java,
                 // A lookup, module attribute or alias list binds nothing

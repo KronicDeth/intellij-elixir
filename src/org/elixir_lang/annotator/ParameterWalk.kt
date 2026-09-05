@@ -7,6 +7,7 @@ import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.operation.When
 import org.elixir_lang.psi.walk.Classifier
 import org.elixir_lang.psi.walk.Leaves
+import org.elixir_lang.psi.walk.StringParts
 
 /** The ancestors that decide whether an identifier is a parameter, for [Parameter.putParameterized]. */
 object ParameterWalk {
@@ -81,7 +82,9 @@ object ParameterWalk {
                 PsiFile::class.java,
                 QualifiedAlias::class.java,
                 QualifiedMultipleAliases::class.java
-            ),
+            ) +
+                // a pattern cannot interpolate, so nothing in a string is a parameter
+                StringParts.SHAPES,
             Bucket.LEAF to Leaves.SHAPES + listOf(
                 // A keyword key is a bare atom
                 ElixirKeywordKey::class.java,

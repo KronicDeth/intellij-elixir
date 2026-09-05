@@ -23,12 +23,7 @@ object Leaves {
         ElixirHexadecimalEscapePrefix::class.java,
         ElixirEscapedHeredocTerminator::class.java,
         ElixirEscapedLineTerminator::class.java,
-        /* The parts of a string, char list, heredoc or sigil. An expression in them sits inside an ElixirInterpolation,
-           which every walk answers first. */
-        Body::class.java,
-        Line::class.java,
-        HeredocLineable::class.java,
-        HeredocLiteral::class.java,
+        // The token-only parts of a heredoc or sigil; the parts that can hold an interpolation are in StringParts.
         ElixirHeredocPrefix::class.java,
         ElixirHeredocLinePrefix::class.java,
         ElixirSigilModifiers::class.java,

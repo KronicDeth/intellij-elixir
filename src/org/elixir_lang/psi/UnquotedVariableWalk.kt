@@ -6,6 +6,7 @@ import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.operation.Match
 import org.elixir_lang.psi.walk.Classifier
 import org.elixir_lang.psi.walk.Leaves
+import org.elixir_lang.psi.walk.StringParts
 
 /** The parents of an unquoted variable that lead to the value it carries, for [Unquote]. */
 object UnquotedVariableWalk {
@@ -41,7 +42,9 @@ object UnquotedVariableWalk {
                 BracketOperation::class.java,
                 QualifiedMultipleAliases::class.java,
                 QualifiedAlias::class.java
-            ),
+            ) +
+                // a declaration inside `#{}` meets its match before the string, so a string above binds nothing to follow
+                StringParts.SHAPES,
             Bucket.UNFOLLOWED to listOf(
                 ElixirAnonymousFunction::class.java,
                 ElixirEex::class.java,

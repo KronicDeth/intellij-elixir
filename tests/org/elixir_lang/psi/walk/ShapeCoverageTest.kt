@@ -3,7 +3,6 @@ package org.elixir_lang.psi.walk
 import junit.framework.TestCase
 import org.elixir_lang.psi.ElixirEexTag
 import org.elixir_lang.psi.ElixirFile
-import org.elixir_lang.psi.ElixirInterpolation
 import org.elixir_lang.psi.ElixirKeywordKey
 import org.elixir_lang.psi.ElixirMatchedExpression
 import org.elixir_lang.psi.ElixirUnmatchedExpression
@@ -53,8 +52,6 @@ class ShapeCoverageTest : TestCase() {
         VariableWalk.Bucket.DECLARES,
         VariableUseScopeWalk.Bucket.entries.toSet() - VariableUseScopeWalk.Bucket.EMPTY - VariableUseScopeWalk.Bucket.LEAF,
         listOf(
-            // identifiers in an interpolation are uses; nothing is declared there
-            ElixirInterpolation::class.java,
             // an element `isVariable` starts from, never an ancestor
             ElixirKeywordKey::class.java
         )

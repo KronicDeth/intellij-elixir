@@ -9,6 +9,7 @@ import org.elixir_lang.psi.operation.Match
 import org.elixir_lang.psi.operation.Type
 import org.elixir_lang.psi.walk.Classifier
 import org.elixir_lang.psi.walk.Leaves
+import org.elixir_lang.psi.walk.StringParts
 
 /** The ancestors that decide whether an identifier is a variable, for [Callable.isVariable]. */
 object VariableWalk {
@@ -28,7 +29,6 @@ object VariableWalk {
     val classifier = Classifier(
         listOf(
             Bucket.DECLARES to listOf(
-                ElixirInterpolation::class.java,
                 // bound quoted variable name in `quote bind_quoted: [name: value] do ... end`
                 ElixirKeywordKey::class.java,
                 ElixirStabNoParenthesesSignature::class.java,
@@ -54,6 +54,8 @@ object VariableWalk {
                 ElixirDoBlock::class.java,
                 ElixirEex::class.java,
                 ElixirEexTag::class.java,
+                // `"#{x = 1}"` binds `x` for the code after the string, so an interpolation is decided by what is above it
+                ElixirInterpolation::class.java,
                 ElixirKeywordPair::class.java,
                 ElixirKeywords::class.java,
                 ElixirList::class.java,
@@ -84,7 +86,7 @@ object VariableWalk {
                 ElixirTuple::class.java,
                 ElixirVariable::class.java,
                 Type::class.java
-            ),
+            ) + StringParts.SHAPES,
             Bucket.CALL to listOf(Call::class.java),
             Bucket.STOP to listOf(
                 AtUnqualifiedBracketOperation::class.java,
