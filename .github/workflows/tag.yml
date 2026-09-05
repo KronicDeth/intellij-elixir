@@ -164,6 +164,10 @@ jobs:
     needs: [ validate-tag ]
     if: ${{ !inputs.skip_tests }}
     uses: ./.github/workflows/shared-test.yml
+    # A called workflow sees only the secrets it is handed. Explicit rather than `secrets: inherit`,
+    # which zizmor's secrets-inherit audit flags.
+    secrets:
+      GRADLE_ENCRYPTION_KEY: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
   release:
     needs: [ validate-tag, test-and-verify ]

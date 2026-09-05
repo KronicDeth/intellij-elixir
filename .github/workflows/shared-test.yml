@@ -20,6 +20,13 @@ on:
         required: false
         type: boolean
         default: true
+    # A called workflow sees only the secrets it is handed, so release.yml and tag.yml pass this
+    # explicitly. On pull_request and workflow_dispatch the same `secrets.GRADLE_ENCRYPTION_KEY`
+    # expression resolves from the repository directly. Optional: a fork pull request has no secrets
+    # and setup-env documents what an empty key costs.
+    secrets:
+      GRADLE_ENCRYPTION_KEY:
+        required: false
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
