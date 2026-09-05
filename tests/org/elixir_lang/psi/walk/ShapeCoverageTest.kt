@@ -19,8 +19,19 @@ class ShapeCoverageTest : TestCase() {
     fun testTheVisitorEnumeratesTheGeneratedSurface() {
         val shapes = GrammarShapes.CONCRETE
 
-        assertTrue("only ${shapes.size} shapes; the visitor filter is wrong", shapes.size >= 150)
         assertTrue(ElixirTupleImpl::class.java in shapes)
+        /* The visitor also has an overload per hand-written marker interface and for the platform's. Pinning them by
+           name means a generated interface the prefix no longer matches shows up here rather than vanishing. */
+        assertEquals(
+            listOf(
+                "Arguments", "AssociationOperation", "Atomable", "Body", "Digits", "EscapeSequence",
+                "EscapedHexadecimalDigits", "HeredocLineable", "HeredocLiteral", "Interpolated", "Literal",
+                "MaybeModuleName", "Named", "NamedElement", "NavigatablePsiElement", "Operator", "PsiElement",
+                "Quotable", "QuotableArguments", "QuotableKeywordList", "QuotableKeywordPair", "SigilHeredocLiteral",
+                "Unquoted", "WholeNumber"
+            ),
+            GrammarShapes.SKIPPED.map { it.simpleName }
+        )
         // the two `extends` bases are the only interfaces the parser never instantiates
         assertEquals(
             listOf(ElixirMatchedExpression::class.java, ElixirUnmatchedExpression::class.java),

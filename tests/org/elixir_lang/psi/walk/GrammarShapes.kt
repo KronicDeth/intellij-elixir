@@ -4,14 +4,20 @@ import org.elixir_lang.psi.ElixirVisitor
 import java.lang.reflect.Modifier
 
 object GrammarShapes {
-    /** Every generated PSI interface, read from the visitor GrammarKit maintains. */
-    val INTERFACES: List<Class<*>> by lazy {
+    /** Every interface the visitor GrammarKit maintains has an overload for. */
+    private val VISITED: List<Class<*>> by lazy {
         ElixirVisitor::class.java.declaredMethods
             .filter { it.parameterCount == 1 }
             .map { it.parameterTypes[0] }
-            .filter { it.isInterface && it.name.startsWith("org.elixir_lang.psi.Elixir") }
+            .filter { it.isInterface }
             .sortedBy { it.simpleName }
     }
+
+    /** The generated PSI interfaces: the visited interfaces the grammar's class prefix names. */
+    val INTERFACES: List<Class<*>> by lazy { VISITED.filter { isGenerated(it) } }
+
+    /** The visited interfaces that are not generated: the hand-written markers rules implement, and the platform's. */
+    val SKIPPED: List<Class<*>> by lazy { VISITED.filterNot { isGenerated(it) } }
 
     /**
      * The implementation class of every interface the parser can instantiate. Production classifies an element's
@@ -29,6 +35,8 @@ object GrammarShapes {
 
     /** The interface name a shape is known by, for messages. */
     fun name(impl: Class<*>): String = impl.simpleName.removeSuffix("Impl")
+
+    private fun isGenerated(shape: Class<*>): Boolean = shape.name.startsWith("org.elixir_lang.psi.Elixir")
 
     private fun impl(shape: Class<*>): Class<*>? =
         try {
