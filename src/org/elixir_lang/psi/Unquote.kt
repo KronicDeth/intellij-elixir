@@ -101,7 +101,7 @@ object Unquote {
                                 keepProcessing: (PsiElement, ResolveState) -> Boolean): Boolean =
             when (value) {
                 is Call -> treeWalkUpValue(value, resolveState, keepProcessing)
-                // A literal, container or operation has no definitions to walk into
+                // A literal or container value is not walked into, so a quote destructured out of one is not found
                 else -> true
             }
 
