@@ -130,27 +130,26 @@ jobs:
         -PotpVersion=${{ matrix.beam.otp }}
 
     steps:
-      # The Windows leg is the critical path of every run and slower than Linux at every step. It
-      # writes tens of thousands of files - the checkout, the extracted IDE, Kotlin and Java class
-      # output, the test sandbox, the quoter build - and Defender's real-time scanning inspects each
-      # one as it lands. Exclude the directories that receive them, and the JVM and Erlang processes
-      # that write them, before anything is written: an exclusion does nothing for a file already
-      # scanned, which is why this precedes the checkout. The status line is the evidence: should a
-      # future image report RealTimeProtectionEnabled=False, the step is inert and can go.
-      # continue-on-error because this is an optimisation - a cmdlet refused by tamper protection or
-      # an image without Defender must not take the leg down.
-      - name: Exclude build paths from Defender real-time scanning
-        id: defender-exclusions
+      # On hosted Windows runners C: is a remote-backed OS disk and D: the local SSD, an order of
+      # magnitude apart in IOPS (actions/runner-images#8755). The workspace, RUNNER_TEMP and - via
+      # gradle/actions - the Gradle home already live on D:. The process TEMP/TMP do not: they point
+      # into the C: user profile, and on Windows every JVM derives java.io.tmpdir from them, so the
+      # Gradle and Kotlin daemons and the test JVM's per-test temp directories all land on the slow
+      # disk. Pointing both at RUNNER_TEMP moves them. 8.3 short-name generation is queried and, if
+      # on for D:, switched off for files created from here on; it costs an extra lookup and write
+      # per file in large directories. Runs before the checkout so nothing is written first.
+      - name: Put temp files on the fast drive
+        id: windows-temp
         if: runner.os == 'Windows'
-        continue-on-error: true
         shell: pwsh
         run: |
-          $status = Get-MpComputerStatus
-          Write-Host "RealTimeProtectionEnabled=$($status.RealTimeProtectionEnabled) IsTamperProtected=$($status.IsTamperProtected)"
-          $paths = @($env:GITHUB_WORKSPACE, $env:RUNNER_TEMP, $env:RUNNER_TOOL_CACHE, (Join-Path $env:USERPROFILE '.gradle'))
-          Add-MpPreference -ExclusionPath $paths
-          Add-MpPreference -ExclusionProcess 'java.exe', 'erl.exe'
-          Write-Host "Excluded: $($paths -join ', ')"
+          "TEMP=$env:RUNNER_TEMP" >> $env:GITHUB_ENV
+          "TMP=$env:RUNNER_TEMP" >> $env:GITHUB_ENV
+          $state = (fsutil 8dot3name query D:) -join ' '
+          Write-Host $state
+          if ($state -match 'enabled') {
+            fsutil 8dot3name set D: 1
+          }
 
       - name: Checkout
         id: checkout
