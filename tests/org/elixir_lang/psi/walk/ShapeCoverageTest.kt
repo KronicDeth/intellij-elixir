@@ -61,6 +61,16 @@ class ShapeCoverageTest : TestCase() {
         )
     )
 
+    /** An unquote container left unfollowed is only open if a variable can be declared through it. */
+    fun testUnfollowedUnquoteContainersCanDeclareAVariable() {
+        val closed = GrammarShapes.CONCRETE.filter {
+            UnquotedVariableWalk.classifier.classify(it) == UnquotedVariableWalk.Bucket.UNFOLLOWED &&
+                VariableWalk.classifier.classify(it) !in setOf(VariableWalk.Bucket.TRANSPARENT, VariableWalk.Bucket.DECLARES)
+        }.map { it.simpleName }
+
+        assertTrue("stops, not unfollowed:\n  ${closed.joinToString("\n  ")}", closed.isEmpty())
+    }
+
     private fun assertAgree(
         variable: VariableWalk.Bucket,
         useScope: Set<VariableUseScopeWalk.Bucket>,
@@ -70,7 +80,8 @@ class ShapeCoverageTest : TestCase() {
         val (excepted, checked) = shapes.partition { shape -> exceptions.any { it.isAssignableFrom(shape) } }
 
         val disagreeing = checked.filter { VariableUseScopeWalk.classifier.classify(it) !in useScope }.map { it.simpleName }
-        assertTrue("$variable in isVariable but not ${useScope.joinToString("/")} in variableUseScope:\n  ${disagreeing.joinToString("\n  ")}", disagreeing.isEmpty())
+        val expected = useScope.joinToString("/")
+        assertTrue("$variable in isVariable but not $expected in variableUseScope:\n  ${disagreeing.joinToString("\n  ")}", disagreeing.isEmpty())
 
         val stale = excepted.filter { VariableUseScopeWalk.classifier.classify(it) in useScope }.map { it.simpleName }
         assertTrue("no longer exceptions:\n  ${stale.joinToString("\n  ")}", stale.isEmpty())

@@ -92,7 +92,7 @@ object Unquote {
                 }
             }
             UnquotedVariableWalk.Bucket.RECURSE -> treeWalkUpUnquotedVariable(parent, resolveState, keepProcessing)
-            UnquotedVariableWalk.Bucket.STOP, UnquotedVariableWalk.Bucket.LEAF -> true
+            UnquotedVariableWalk.Bucket.STOP, UnquotedVariableWalk.Bucket.UNFOLLOWED, UnquotedVariableWalk.Bucket.LEAF -> true
         }
     }
 

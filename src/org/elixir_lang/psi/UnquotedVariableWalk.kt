@@ -12,11 +12,10 @@ object UnquotedVariableWalk {
     enum class Bucket {
         /** `variable = value` binds the variable, so follow the value. A match is a call, so this comes first. */
         MATCH,
-        /**
-         * Nothing to follow: a parameter or keyword value binds nothing above, and the other containers are not
-         * walked into yet. Parentheses arguments are `QuotableArguments`, so this comes before `RECURSE`.
-         */
+        /** Nothing to follow. Parentheses arguments are `QuotableArguments`, so this comes before `RECURSE`. */
         STOP,
+        /** A container a variable can be declared through, which this walk does not enter yet. Answers as `STOP`. */
+        UNFOLLOWED,
         /** A wrapper the value passes through, so ask the parent. */
         RECURSE,
         /** Cannot hold an expression at all, so nothing is bound through it. */
@@ -34,13 +33,15 @@ object UnquotedVariableWalk {
                 ElixirInterpolation::class.java,
                 // nothing above the file binds
                 PsiFile::class.java,
-                // Containers the walk does not follow
+                // no variable is declared through a lookup, module attribute or alias list
                 AtOperation::class.java,
                 AtUnqualifiedBracketOperation::class.java,
                 AtNumericBracketOperation::class.java,
                 BracketOperation::class.java,
+                QualifiedMultipleAliases::class.java
+            ),
+            Bucket.UNFOLLOWED to listOf(
                 QualifiedAlias::class.java,
-                QualifiedMultipleAliases::class.java,
                 ElixirAnonymousFunction::class.java,
                 ElixirAssociations::class.java,
                 ElixirAssociationsBase::class.java,
