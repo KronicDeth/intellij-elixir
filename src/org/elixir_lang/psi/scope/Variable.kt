@@ -144,8 +144,12 @@ abstract class Variable : PsiScopeProcessor {
                 }
                 match.isCallingMacro(Module.KERNEL, Function.FOR) ||
                         match.isCallingMacro(Module.KERNEL, "with") -> {
-                    match.finalArguments()?.let { finalArguments ->
-                        val entrance = state.get(ElixirPsiImplUtil.ENTRANCE)
+                    val entrance = state.get(ElixirPsiImplUtil.ENTRANCE)
+
+                    // what `for` and `with` bind does not leave them, so from outside they declare nothing
+                    if (entrance != null && !PsiTreeUtil.isAncestor(match, entrance, false)) {
+                        true
+                    } else match.finalArguments()?.let { finalArguments ->
                         /* if the entrance isn't in the arguments, then it is part of the block and so search should start from
                        from the last argument */
                         var entranceArgumentIndex = finalArguments.size - 1
@@ -241,9 +245,8 @@ abstract class Variable : PsiScopeProcessor {
                                            @see https://github.com/elixir-lang/elixir/blob/0c9e72c8d7be3ee502c43762e0ccbbf244198aeb/lib/elixir/lib/stream/reducers.ex#L7 */
                                 match.finalArguments()?.let { execute(it, state) }
                             }
-                            else -> {
-                                null
-                            }
+                            // a function's arguments are values, but a match inside one, `f(x = 1)`, binds after it
+                            else -> match.finalArguments()?.let { execute(it, state.put(DECLARING_SCOPE, false)) }
                         }
                     } else {
                         null
