@@ -9,6 +9,7 @@ import com.intellij.model.search.SearchRequest
 import com.intellij.openapi.project.Project
 import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.psi.ElixirVariable
+import org.elixir_lang.psi.UnqualifiedBracketOperation
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.operation.Match
 
@@ -19,10 +20,8 @@ internal class VariableReferenceProvider : PsiSymbolReferenceProvider {
         element: PsiExternalReferenceHost,
         hints: PsiSymbolReferenceHints
     ): Collection<PsiSymbolReference> {
-        if (element !is Call && element !is ElixirVariable) return emptyList()
         val host = when (element) {
-            is ElixirVariable -> element
-            is Call -> element
+            is ElixirVariable, is Call, is UnqualifiedBracketOperation -> element
             else -> return emptyList()
         }
         if (host is Match) return emptyList()
