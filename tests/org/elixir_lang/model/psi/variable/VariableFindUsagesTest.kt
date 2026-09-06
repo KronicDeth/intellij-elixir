@@ -36,6 +36,12 @@ class VariableFindUsagesTest : PlatformTestCase() {
         assertEquals(1, nonDeclarationUsageCount("usages_variable_declaration.ex"))
     }
 
+    fun testFindUsagesOnVariableDeclaredInNestedMatchFindsLaterRead() {
+        // `_ = (variable = 1)` declares `variable` on the left of the inner match, although the inner match sits on
+        // the right of the outer one.
+        assertEquals(1, nonDeclarationUsageCount("usages_variable_declared_in_nested_match.ex"))
+    }
+
     fun testFindUsagesOnVariableDeclarationIgnoresSameNameInOtherModule() {
         assertEquals(1, nonDeclarationUsageCount("usages_variable_same_name_other_module.ex"))
     }

@@ -30,6 +30,7 @@ import org.elixir_lang.psi.ElixirVariable
 import org.elixir_lang.psi.QuotableKeywordPair
 import org.elixir_lang.psi.CallDefinitionClause
 import org.elixir_lang.psi.operation.InMatch
+import org.elixir_lang.psi.scope.MatchRead
 import org.elixir_lang.psi.operation.Match
 import org.elixir_lang.psi.UnaryOperation
 import org.elixir_lang.psi.UnqualifiedNoArgumentsCall
@@ -306,12 +307,9 @@ class VariableSymbol(
             // declares a variable for the clause body without any `=` Match.
             if (isInsideStabSignature(element)) return true
 
-            val match = generateSequence(element) { it.parent }
-                .filterIsInstance<Match>()
-                .firstOrNull()
-                ?: return false
-
-            return match.leftOperand()?.let { left -> PsiTreeUtil.isAncestor(left, element, false) } ?: false
+            /* isDeclaration has already ruled out a read on the right of a match, so any enclosing match binds the
+               element: on its left, or on its right when the match is itself a pattern. */
+            return generateSequence(element) { it.parent }.takeWhile { it !is PsiFile }.filterIsInstance<Match>().any()
         }
 
         /**
@@ -378,12 +376,8 @@ class VariableSymbol(
             }
 
         @RequiresReadLock
-        private fun isInMatchRightOperand(element: PsiElement): Boolean =
-            generateSequence(element) { it.parent }
-                .filterIsInstance<Match>()
-                .any { match ->
-                    match.rightOperand()?.let { right -> PsiTreeUtil.isAncestor(right, element, false) } == true
-                }
+        // the resolver applies the same rule, so what it finds as a binding is a declaration here
+        private fun isInMatchRightOperand(element: PsiElement): Boolean = MatchRead.`is`(element)
 
         @RequiresReadLock
         private fun isPinnedSite(element: PsiElement): Boolean =
