@@ -58,6 +58,9 @@ jobs:
           # Qodana imports the Gradle project; it never runs the quoter, so the BEAM toolchain is
           # dead weight here.
           setup-elixir: 'false'
+          # Qodana's headless import resolves configurations the test matrix does not, so it must
+          # never write cache entries no other job can restore.
+          cache-read-only: 'true'
 
       - name: Qodana Scan
         id: qodana
