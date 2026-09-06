@@ -15,11 +15,19 @@ import com.intellij.find.usages.impl.buildQuery
 import com.intellij.find.usages.impl.searchTargets
 import com.intellij.model.psi.impl.targetSymbols
 import com.intellij.refactoring.rename.api.RenameTarget
+import com.intellij.refactoring.rename.impl.FileUpdates
+import com.intellij.refactoring.rename.impl.RenameOptions
+import com.intellij.refactoring.rename.impl.TextOptions
+import com.intellij.refactoring.rename.impl.buildQuery
+import com.intellij.refactoring.rename.impl.prepareRename
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ReadAction
+import com.intellij.openapi.application.runReadAction
+import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
@@ -30,6 +38,7 @@ import com.intellij.testFramework.PlatformTestUtil
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import junit.framework.TestCase.assertNull
 import junit.framework.TestCase.assertTrue
+import kotlinx.coroutines.runBlocking
 import java.util.concurrent.Callable
 
 /**
@@ -440,6 +449,37 @@ fun CodeInsightTestFixture.renameTargetAtCaret(newName: String) {
     val target = targets.singleOrNull()
         ?: throw AssertionError("Expected exactly one rename target at the caret, got ${targets.size}: $targets")
     renameTarget(target, newName)
+}
+
+/**
+ * Renames [target] to [newName] through the same production steps as [CodeInsightTestFixture.renameTarget],
+ * without that entry point's wait: `renameAndWait` launches the rename as a coroutine and then polls it from the
+ * EDT, dispatching events and sleeping 10 ms per turn, so each rename costs several such turns (measured at
+ * 55-60 ms against about 3 ms of work). Here the same [buildQuery] search runs to completion on a pooled thread
+ * under a read action, the same [prepareRename] turns the usages into file updates, and the same
+ * [FileUpdates.doUpdate] applies them in a write command, so the document ends up as the platform's drive
+ * leaves it. What is left out is the progress title, the undoable action and the preview, none of which touch
+ * the text. Worth it only for a test that renames thousands of times; elsewhere prefer [renameTargetAtCaret].
+ */
+fun CodeInsightTestFixture.renameTargetDirectly(target: RenameTarget, newName: String) {
+    val application = ApplicationManager.getApplication()
+    val options = RenameOptions(
+        TextOptions(commentStringOccurrences = true, textOccurrences = true),
+        runReadAction { target.maximalSearchScope } ?: GlobalSearchScope.projectScope(project)
+    )
+    // prepareRename insists on running outside a read action, and its inner read actions need a pooled thread
+    val (fileUpdates, modelUpdate) = application.executeOnPooledThread(Callable {
+        val usages = ReadAction.nonBlocking(Callable {
+            buildQuery(project, target, options).findAll()
+        }).executeSynchronously()
+        runBlocking { prepareRename(usages, newName) }
+    }).get()
+    WriteCommandAction.writeCommandAction(project).run<Throwable> {
+        modelUpdate?.updateModel(newName)
+        fileUpdates?.doUpdate()
+        // committing under the same write lock forestalls the background commit the change would otherwise queue
+        PsiDocumentManager.getInstance(project).commitAllDocuments()
+    }
 }
 
 /**

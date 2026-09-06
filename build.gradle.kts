@@ -1010,6 +1010,10 @@ tasks.named<Test>("test") {
     inputs.property("quoterNodeName", quoterNodeName)
     inputs.property("quoterClientNodeName", quoterClientNodeName)
 
+    // The variable oracle corpus narrows itself to the fixtures matching this regex; a different subset is a
+    // different run, or the task reports the previous subset's results as this one's.
+    inputs.property("elixirOracleCases", System.getenv("ELIXIR_ORACLE_CASES") ?: "")
+
     // The parsing tests are JUnit 3 (com.intellij.testFramework.ParsingTestCase -> TestCase),
     // discovered by the JUnit 4 runner.
     useJUnit()
