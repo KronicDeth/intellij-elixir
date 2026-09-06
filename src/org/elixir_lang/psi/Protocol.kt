@@ -8,8 +8,8 @@ import com.intellij.psi.stubs.StubIndex
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.Processor
 import com.intellij.util.concurrency.annotations.RequiresReadLock
-import org.elixir_lang.beam.psi.impl.CallDefinitionImpl
-import org.elixir_lang.beam.psi.impl.ModuleImpl
+import org.elixir_lang.beam.psi.CallDefinition as BeamCallDefinition
+import org.elixir_lang.beam.psi.Module as BeamModule
 import org.elixir_lang.beam.psi.stubs.ModuleStub
 import org.elixir_lang.beam.psi.stubs.ModuleStubElementTypes
 import org.elixir_lang.psi.call.Call
@@ -23,14 +23,14 @@ object Protocol {
     fun `is`(call: Call): Boolean =
         call.isCallingMacro(org.elixir_lang.psi.call.name.Module.KERNEL, Function.DEFPROTOCOL, 2)
 
-    fun `is`(moduleImpl: ModuleImpl<*>): Boolean =
+    fun `is`(moduleImpl: BeamModule): Boolean =
         moduleImpl.callDefinitions().any { callDefinitionImpl ->
             callDefinitionImpl.name == "__protocol__" && callDefinitionImpl.exportedArity(ResolveState.initial()) == 1
         }
 
     fun `is`(moduleStub: ModuleStub<*>): Boolean =
         moduleStub
-            .getChildrenByType(ModuleStubElementTypes.CALL_DEFINITION, emptyArray<CallDefinitionImpl<*>>())
+            .getChildrenByType(ModuleStubElementTypes.CALL_DEFINITION, emptyArray<BeamCallDefinition>())
             .any { callDefinition ->
                 callDefinition.name == "__protocol__" && callDefinition.exportedArity(ResolveState.initial()) == 1
             }
@@ -70,7 +70,7 @@ object Protocol {
         processImplementations(defprotocol.project, Module.name(defprotocol), consumer)
     }
 
-    fun processImplementations(defprotocol: ModuleImpl<*>, consumer: Processor<in PsiElement>) {
+    fun processImplementations(defprotocol: BeamModule, consumer: Processor<in PsiElement>) {
         processImplementations(defprotocol.project, defprotocol.name, consumer)
     }
 

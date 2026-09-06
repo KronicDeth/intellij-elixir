@@ -7,6 +7,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.psi.PsiElement;
 import com.intellij.ui.RowIcon;
 import org.elixir_lang.Icons;
+import org.elixir_lang.beam.psi.CallDefinition;
 import org.elixir_lang.call.Visibility;
 import org.elixir_lang.psi.call.Call;
 import org.jetbrains.annotations.NotNull;
@@ -116,16 +117,13 @@ public class CallDefinitionClause extends com.intellij.codeInsight.lookup.Lookup
     private void renderPsiElement(@NotNull PsiElement psiElement, @NotNull LookupElementPresentation presentation) {
         if (psiElement instanceof Call) {
             renderCall((Call) psiElement, presentation);
-        } else if (psiElement instanceof org.elixir_lang.beam.psi.impl.CallDefinitionImpl) {
-            renderCallDefinitionImpl(
-                    (org.elixir_lang.beam.psi.impl.CallDefinitionImpl<?>) psiElement,
-                    presentation
-            );
+        } else if (psiElement instanceof CallDefinition) {
+            renderBeamCallDefinition((CallDefinition) psiElement, presentation);
         }
     }
 
-    private void renderCallDefinitionImpl(
-            @NotNull org.elixir_lang.beam.psi.impl.CallDefinitionImpl<?> callDefinition,
+    private void renderBeamCallDefinition(
+            @NotNull CallDefinition callDefinition,
             @NotNull LookupElementPresentation presentation) {
         int arity = callDefinition.getNameArityInterval().getArityInterval().getMinimum();
         presentation.appendTailText("/" + arity, true);

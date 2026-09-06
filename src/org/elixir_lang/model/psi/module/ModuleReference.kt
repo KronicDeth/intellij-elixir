@@ -41,7 +41,7 @@ class ModuleReference(
                     // A module that exists only as compiled `.beam` resolves to the coarse stub element;
                     // its navigationElement is the `defmodule` Call in the decompiled mirror, which the
                     // source pipeline below accepts (same pattern as TypeReference/FunctionCallReference).
-                    is org.elixir_lang.beam.psi.impl.ModuleImpl<*> -> element.navigationElement as? Call
+                    is org.elixir_lang.beam.psi.Module -> element.navigationElement as? Call
                     else -> null
                 }
             }

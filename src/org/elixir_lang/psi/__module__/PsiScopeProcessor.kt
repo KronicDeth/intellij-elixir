@@ -8,7 +8,7 @@ import com.intellij.psi.ResolveState
 import com.intellij.psi.scope.PsiScopeProcessor
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
-import org.elixir_lang.beam.psi.impl.CallDefinitionImpl
+import org.elixir_lang.beam.psi.CallDefinition as BeamCallDefinition
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.CallDefinitionClause.enclosingModularMacroCall
 import org.elixir_lang.psi.call.Call
@@ -45,9 +45,9 @@ class PsiScopeProcessor(val call: Call, val useCall: Call?) : PsiScopeProcessor 
                                 GlobalSearchScope.allScope(project),
                                 NamedElement::class.java
                             ) { namedElement ->
-                                if (namedElement is CallDefinitionImpl<*>) {
+                                if (namedElement is BeamCallDefinition) {
                                     namedElement.parent.let { module ->
-                                        if (module.name == "Kernel.SpecialForms" && namedElement.stub.callDefinitionClauseHeadArity() == 0) {
+                                        if (module.name == "Kernel.SpecialForms" && namedElement.exportedArity(state) == 0) {
                                             resolveResultList.add(PsiElementResolveResult(namedElement))
                                         }
                                     }

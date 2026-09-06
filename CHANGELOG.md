@@ -61,6 +61,9 @@
 
 ### Bug Fixes
 
+- [#4016](https://github.com/KronicDeth/intellij-elixir/pull/4016) [@sh41](https://github.com/sh41)
+  - **Go To Symbol now finds types defined in a decompiled `.beam` instead of crashing.** Fixes [#4000](https://github.com/KronicDeth/intellij-elixir/issues/4000).
+
 - [#4015](https://github.com/KronicDeth/intellij-elixir/pull/4015) [@sh41](https://github.com/sh41)
   - **Resolving, highlighting, documentation and Go to Symbol no longer report an error for code
     shapes they do not model**, such as an unlisted `@doc` metadata key, a pinned Ecto query option,

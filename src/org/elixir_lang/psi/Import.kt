@@ -11,8 +11,8 @@ import com.intellij.util.Function
 import org.elixir_lang.Arity
 import org.elixir_lang.Name
 import org.elixir_lang.NameArityInterval
-import org.elixir_lang.beam.psi.impl.CallDefinitionImpl
-import org.elixir_lang.beam.psi.impl.ModuleImpl
+import org.elixir_lang.beam.psi.CallDefinition as BeamCallDefinition
+import org.elixir_lang.beam.psi.Module as BeamModule
 import org.elixir_lang.model.psi.FunctionArityKeywordPair
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function.IMPORT
@@ -77,7 +77,7 @@ object Import {
     ): Boolean =
         when (importedModular) {
             is Call -> treeWalkUpImportedModular(importedModular, filter, resolveState, keepProcessing)
-            is ModuleImpl<*> -> treeWalkUpImportedModular(importedModular, filter, resolveState, keepProcessing)
+            is BeamModule -> treeWalkUpImportedModular(importedModular, filter, resolveState, keepProcessing)
             else -> true
         }
 
@@ -97,7 +97,7 @@ object Import {
             ?: true
 
     private fun treeWalkUpImportedModular(
-        importedModular: ModuleImpl<*>,
+        importedModular: BeamModule,
         filter: (NameArityInterval) -> Boolean,
         resolveState: ResolveState,
         keepProcessing: (PsiElement, ResolveState) -> Boolean
@@ -144,7 +144,7 @@ object Import {
 
     private fun treeWalkUpImportedModularChildExpression(
         filter: (NameArityInterval) -> Boolean,
-        importedCall: CallDefinitionImpl<*>,
+        importedCall: BeamCallDefinition,
         resolveState: ResolveState,
         keepProcessing: (PsiElement, ResolveState) -> Boolean
     ): Boolean {

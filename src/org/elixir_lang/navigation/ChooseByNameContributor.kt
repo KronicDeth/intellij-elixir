@@ -9,8 +9,7 @@ import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
 import com.intellij.psi.stubs.StubIndexKey
 import com.intellij.util.ArrayUtil
-import org.elixir_lang.beam.psi.impl.CallDefinitionImpl
-import org.elixir_lang.beam.psi.impl.ModuleImpl
+import org.elixir_lang.beam.psi.BeamSymbol
 import org.elixir_lang.call.Visibility
 import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
@@ -72,9 +71,12 @@ open class ChooseByNameContributor(private val stubIndexKey: StubIndexKey<String
                         callDefinitionByTuple,
                         element
                     )
-                is ModuleImpl<*> -> items.add(element)
-                is CallDefinitionImpl<*> -> items.add(element)
-                else -> TODO("Unknown element: ${element.javaClass.name} in ChooseByNameContributor")
+                is BeamSymbol -> items.add(element)
+                // `AllName.KEY` is keyed by the open `NamedElement`, so Kotlin cannot prove this
+                // unreachable, though its only writers are the three `BeamSymbol` stub types and the
+                // source one, whose PSI is always a `Call`. It reports index-versus-contributor drift
+                // without failing the whole result.
+                else -> error("Unknown element: ${element.javaClass.name} in ChooseByNameContributor", element)
             }
         }
 

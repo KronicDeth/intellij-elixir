@@ -6,8 +6,8 @@ import com.intellij.psi.ResolveState
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
 import com.intellij.util.concurrency.annotations.RequiresReadLock
-import org.elixir_lang.beam.psi.impl.CallDefinitionImpl
-import org.elixir_lang.beam.psi.impl.ModuleImpl
+import org.elixir_lang.beam.psi.CallDefinition as BeamCallDefinition
+import org.elixir_lang.beam.psi.Module as BeamModule
 import org.elixir_lang.psi.CallDefinitionClause.nameArityInterval
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.call.name.Function.*
@@ -32,7 +32,10 @@ object Using {
     ): Boolean =
         when (using) {
             is Call -> treeWalkUp(using, use, resolveState, keepProcessing)
-            is CallDefinitionImpl<*> -> TODO()
+            /* Unreachable while `isDefiner` compares a decompiled definition's always-null `name`, which leaves
+               `definers` empty for a beam module. Giving `CallDefinitionImpl` a `getName()` arms this, so the two
+               have to change together. */
+            is BeamCallDefinition -> TODO()
             else -> true
         }
 
@@ -233,7 +236,7 @@ object Using {
     fun definers(modular: PsiElement): Sequence<PsiElement> =
         when (modular) {
             is Call -> definers(modular)
-            is ModuleImpl<*> -> definers(modular)
+            is BeamModule -> definers(modular)
             else -> emptySequence()
         }
 
@@ -243,7 +246,7 @@ object Using {
             .macroChildCallSequence()
             .filter { isDefiner(it) }
 
-    fun definers(moduleImpl: ModuleImpl<*>): Sequence<CallDefinitionImpl<*>> =
+    fun definers(moduleImpl: BeamModule): Sequence<BeamCallDefinition> =
         moduleImpl
             .callDefinitions()
             .asSequence()
@@ -265,7 +268,7 @@ object Using {
     fun isCaseTemplate(modular: PsiElement, resolveState: ResolveState): Boolean {
         if (resolveState.hasBeenVisited(modular)) return false
         return when (modular) {
-            is ModuleImpl<*> -> modular.name == EXUNIT_CASE_TEMPLATE
+            is BeamModule -> modular.name == EXUNIT_CASE_TEMPLATE
             is Call -> {
                 val updatedState = resolveState.putVisitedElement(modular)
                 modular.name == EXUNIT_CASE_TEMPLATE ||
@@ -314,7 +317,7 @@ object Using {
                 }
                 ?: false
 
-    private fun isDefiner(callDefinitionImpl: CallDefinitionImpl<*>): Boolean =
+    private fun isDefiner(callDefinitionImpl: BeamCallDefinition): Boolean =
         callDefinitionImpl.time == Timed.Time.COMPILE &&
                 callDefinitionImpl.name == USING &&
                 callDefinitionImpl.exportedArity(ResolveState.initial()) == ARITY
