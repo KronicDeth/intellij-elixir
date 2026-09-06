@@ -34,44 +34,45 @@ abstract class Variable : PsiScopeProcessor {
      * @return false to stop processing.
      */
     override fun execute(element: PsiElement, state: ResolveState): Boolean =
-            when (element) {
-                is Addition, is And -> executeNonDeclaringScopeInfix(element, state)
-                is ElixirAccessExpression, is ElixirAssociations, is ElixirAssociationsBase, is ElixirBitString,
-                is ElixirEexTag, is ElixirList, is ElixirMapConstructionArguments, is ElixirMultipleAliases,
-                is ElixirNoParenthesesArguments, is ElixirNoParenthesesOneArgument, is ElixirParenthesesArguments,
-                is ElixirParentheticalStab, is ElixirStab, is ElixirStabBody, is ElixirTuple -> {
-                    execute(element.children, state)
+            // compiled elements don't have variables
+            if (element is PsiCompiledElement) {
+                false
+            } else {
+                when (VariableDescent.classify(element)) {
+                    VariableDescent.Bucket.NON_DECLARING_INFIX -> executeNonDeclaringScopeInfix(element as Infix, state)
+                    VariableDescent.Bucket.CHILDREN -> execute(element.children, state)
+                    VariableDescent.Bucket.BRACKET -> execute((element as BracketOperation).bracketArguments, state)
+                    VariableDescent.Bucket.AT_BRACKET ->
+                        execute((element as AtUnqualifiedBracketOperation).bracketArguments, state)
+                    VariableDescent.Bucket.CONTAINER_ASSOCIATION ->
+                        execute(element as ElixirContainerAssociationOperation, state)
+                    VariableDescent.Bucket.MAP_ARGUMENTS -> execute(element as ElixirMapArguments, state)
+                    VariableDescent.Bucket.MAP_OPERATION -> execute(element as ElixirMapOperation, state)
+                    VariableDescent.Bucket.WHEN -> execute(element as ElixirMatchedWhenOperation, state)
+                    VariableDescent.Bucket.STAB_OPERATION -> execute(element as ElixirStabOperation, state)
+                    VariableDescent.Bucket.STAB_NO_PARENTHESES_SIGNATURE ->
+                        execute(element as ElixirStabNoParenthesesSignature, state)
+                    VariableDescent.Bucket.STAB_PARENTHESES_SIGNATURE ->
+                        execute(element as ElixirStabParenthesesSignature, state)
+                    VariableDescent.Bucket.STRUCT_OPERATION -> execute(element as ElixirStructOperation, state)
+                    VariableDescent.Bucket.VARIABLE -> executeOnVariable(element as PsiNamedElement, state)
+                    VariableDescent.Bucket.IN -> execute(element as In, state)
+                    VariableDescent.Bucket.IN_MATCH -> execute(element as InMatch, state)
+                    VariableDescent.Bucket.MATCH -> execute(element as Match, state)
+                    VariableDescent.Bucket.INFIX -> execute(element as Infix, state)
+                    VariableDescent.Bucket.TYPE -> execute(element as Type, state)
+                    VariableDescent.Bucket.UNARY -> execute(element as UnaryOperation, state)
+                    VariableDescent.Bucket.MAYBE_VARIABLE ->
+                        executeOnMaybeVariable(element as UnqualifiedNoArgumentsCall<*>, state)
+                    VariableDescent.Bucket.CALL -> execute(element as Call, state)
+                    VariableDescent.Bucket.QUALIFIED_MULTIPLE_ALIASES ->
+                        execute(element as QualifiedMultipleAliases, state)
+                    VariableDescent.Bucket.KEYWORD_LIST -> execute(element as QuotableKeywordList, state)
+                    // stop at file.  No reason to look in directories
+                    VariableDescent.Bucket.FILE -> false
+                    // declares no variable; keep walking
+                    VariableDescent.Bucket.STOP, VariableDescent.Bucket.LEAF -> true
                 }
-                is ElixirContainerAssociationOperation -> execute(element, state)
-                is ElixirMapArguments -> execute(element, state)
-                is ElixirMapOperation -> execute(element, state)
-                is ElixirMatchedWhenOperation -> execute(element, state)
-                is ElixirStabOperation -> execute(element, state)
-                is ElixirStabNoParenthesesSignature -> execute(element, state)
-                is ElixirStabParenthesesSignature -> execute(element, state)
-                is ElixirStructOperation -> execute(element, state)
-                is ElixirVariable -> executeOnVariable(element as PsiNamedElement, state)
-                is In -> execute(element, state)
-                // MUST be before Call as InMatch is a Call
-                is InMatch -> execute(element, state)
-                is Match -> execute(element, state)
-                is Pipe, is Ternary, is Two -> execute(element, state)
-                is Type -> execute(element, state)
-                is UnaryOperation -> execute(element, state)
-                is UnqualifiedNoArgumentsCall<*> -> executeOnMaybeVariable(element, state)
-                is Call -> execute(element, state)
-                /* Occurs when qualified call occurs over a line with assignment to a tuple, such as
-                   `Qualifier.\n{:ok, value} = call()` */
-                is QualifiedMultipleAliases -> execute(element, state)
-                // stop at file.  No reason to look in directories
-                is PsiFile -> false
-                // compiled elements don't have variables
-                is PsiCompiledElement -> false
-                /* KeywordLists happen in map, struct and {@code do: <body>} matches, while KeywordKey happens only in
-                   bindQuoted */
-                is QuotableKeywordList -> execute(element, state)
-                // Anything else declares no variable; keep walking.
-                else -> true
             }
 
     override fun <T> getHint(hintKey: Key<T>): T? = null
@@ -266,13 +267,12 @@ abstract class Variable : PsiScopeProcessor {
     }
 
     /**
-     * Only checks [ElixirMapArguments.getMapConstructionArguments] and not
-     * [ElixirMapArguments.getMapUpdateArguments] since an update is not valid in a pattern match.
+     * A construction may be a pattern, so what it holds declares. An update is a value, so what it holds reads, but a
+     * match inside it still binds for the code after the map.
      */
     private fun execute(match: ElixirMapArguments, state: ResolveState): Boolean =
-            match.mapConstructionArguments?.let {
-                execute(it, state)
-            } ?: true
+            (match.mapConstructionArguments?.let { execute(it, state) } ?: true) &&
+                    (match.mapUpdateArguments?.let { execute(it.children, state.put(DECLARING_SCOPE, false)) } ?: true)
 
     private fun execute(match: ElixirMapOperation, state: ResolveState): Boolean =
             execute(match.mapArguments, state)
