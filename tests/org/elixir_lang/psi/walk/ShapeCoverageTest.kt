@@ -6,7 +6,6 @@ import org.elixir_lang.psi.ElixirBlockItem
 import org.elixir_lang.psi.ElixirBlockList
 import org.elixir_lang.psi.ElixirDoBlock
 import org.elixir_lang.psi.ElixirEex
-import org.elixir_lang.psi.ElixirEexTag
 import org.elixir_lang.psi.ElixirFile
 import org.elixir_lang.psi.ElixirKeywordPair
 import org.elixir_lang.psi.ElixirMapUpdateArguments
@@ -190,8 +189,6 @@ class ShapeCoverageTest : TestCase() {
         VariableWalk.Bucket.TRANSPARENT,
         setOf(VariableUseScopeWalk.Bucket.PARENT),
         listOf(
-            // a tag's variables are not searched above the tag, pinned by Issue1831Test
-            ElixirEexTag::class.java,
             // an element `isVariable` starts from, never an ancestor
             ElixirVariable::class.java
         )

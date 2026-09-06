@@ -284,11 +284,11 @@ object ShapeTable {
             typeDescent = TypeDescent.Bucket.PASS,
             typeAscent = TypeAscent.Bucket.NONE,
         ),
-        // a tag's variables are not searched above the tag
+        // a template is one expression, so a tag is a statement in it and its variables are searched above the tag
         Row(
             ElixirEexTag::class.java,
             variable = VariableWalk.Bucket.TRANSPARENT,
-            useScope = VariableUseScopeWalk.Bucket.EMPTY,
+            useScope = VariableUseScopeWalk.Bucket.PARENT,
             parameter = ParameterWalk.Bucket.RECURSE,
             unquote = UnquotedVariableWalk.Bucket.UNFOLLOWED,
             descent = VariableDescent.Bucket.CHILDREN,

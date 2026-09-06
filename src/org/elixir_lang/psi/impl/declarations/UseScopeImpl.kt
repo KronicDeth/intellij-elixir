@@ -7,7 +7,6 @@ import com.intellij.psi.PsiWhiteSpace
 import com.intellij.psi.search.LocalSearchScope
 import com.intellij.psi.search.SearchScope
 import com.intellij.util.concurrency.annotations.RequiresReadLock
-import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.ModuleAttribute.isNonReferencing
 import org.elixir_lang.psi.call.Call
@@ -16,10 +15,9 @@ import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.impl.call.CallImpl.hasDoBlockOrKeyword
 import org.elixir_lang.psi.impl.call.macroDefinitionClauseForArgument
 import org.elixir_lang.psi.impl.moduleWithDependentsScope
+import org.elixir_lang.psi.scope.variable.BindingPattern
 import org.elixir_lang.psi.stub.type.call.Stub.isModular
 import org.elixir_lang.reference.Callable.Companion.isBitStreamSegmentOption
-import org.elixir_lang.reference.Callable.Companion.isParameter
-import org.elixir_lang.reference.Callable.Companion.isParameterWithDefault
 import org.elixir_lang.reference.Callable.Companion.isVariable
 import org.elixir_lang.reference.Callable.Companion.variableUseScope
 import org.elixir_lang.structure_view.element.Delegation
@@ -74,7 +72,6 @@ object UseScopeImpl {
      * @see {@link com.intellij.psi.search.PsiSearchHelper.getUseScope
      */
     @RequiresReadLock
-    @Contract(pure = true)
     @JvmStatic
     fun get(unqualifiedNoArgumentsCall: UnqualifiedNoArgumentsCall<*>): SearchScope {
         val useScope: SearchScope
@@ -82,8 +79,8 @@ object UseScopeImpl {
         if (isBitStreamSegmentOption(unqualifiedNoArgumentsCall)) {
             // Bit Stream Segment Options aren't variables or even real functions, so no use scope
             useScope = LocalSearchScope.EMPTY
-        } else if (isParameter(unqualifiedNoArgumentsCall) || isParameterWithDefault(unqualifiedNoArgumentsCall)) {
-            var ancestor = unqualifiedNoArgumentsCall.parent
+        } else if (BindingPattern.of(unqualifiedNoArgumentsCall) != null) {
+            var ancestor: PsiElement = unqualifiedNoArgumentsCall.parent
 
             while (true) {
                 ProgressManager.checkCanceled()
@@ -112,15 +109,11 @@ object UseScopeImpl {
                        without one. */
                     break
                 } else if (ancestor is PsiFile) {
-                    Logger.error(
-                        UnqualifiedNoArgumentsCall::class.java,
-                        "Use scope for parameter not found before reaching file scope",
-                        unqualifiedNoArgumentsCall
-                    )
-                    break
+                    // a pattern with nothing to scope it, `x <- list` alone at the top level while typing
+                    return variableUseScope(unqualifiedNoArgumentsCall)
                 }
 
-                ancestor = ancestor.parent
+                ancestor = ancestor.parent ?: return LocalSearchScope.EMPTY
             }
 
             useScope = LocalSearchScope(ancestor)
