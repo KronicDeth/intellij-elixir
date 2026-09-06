@@ -1,5 +1,6 @@
 package org.elixir_lang.sdk.erlang
 
+import com.intellij.openapi.util.io.FileUtil
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import java.io.File
 
@@ -45,7 +46,7 @@ class TypeSourcePathsTest : BasePlatformTestCase() {
 
     /** A home with no `lib` at all is not an error - an SDK can be pointed anywhere. */
     fun testTakesNothingFromAHomeWithoutLib() {
-        val home = createTempDir("erlang-home-empty").absolutePath
+        val home = FileUtil.createTempDirectory("erlang-home-empty", null).absolutePath
 
         assertEmpty(Type.sourcePaths(home))
     }
@@ -55,7 +56,7 @@ class TypeSourcePathsTest : BasePlatformTestCase() {
      * `src` beside its `ebin`.
      */
     private fun erlangHome(vararg applications: Pair<String, Boolean>): String {
-        val home = createTempDir("erlang-home")
+        val home = FileUtil.createTempDirectory("erlang-home", null)
 
         for ((application, hasSrc) in applications) {
             val applicationDirectory = File(home, "lib${File.separator}$application")
