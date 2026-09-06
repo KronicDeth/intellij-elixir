@@ -48,6 +48,11 @@ internal object MixSyncTestHelpers {
                 throw AssertionError("runSuspendOnPooledThread timed out after ${timeoutMillis} ms")
             }
             PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
+            // Pumping without pause keeps the EDT permanently inside a prioritized activity, which
+            // makes CoreProgressManager park the pooled thread for 1ms at every checkCanceled().
+            if (!done.get()) {
+                Thread.sleep(1)
+            }
         }
         error?.let { throw it }
         @Suppress("UNCHECKED_CAST")
