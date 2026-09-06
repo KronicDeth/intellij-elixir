@@ -7,7 +7,6 @@ import com.intellij.psi.scope.PsiScopeProcessor
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
 import com.intellij.psi.util.isAncestor
-import org.elixir_lang.beam.psi.CallDefinition as BeamCallDefinition
 import org.elixir_lang.beam.psi.Module as BeamModule
 import org.elixir_lang.beam.psi.TypeDefinition as BeamTypeDefinition
 import org.elixir_lang.psi.*
@@ -20,8 +19,6 @@ import org.elixir_lang.psi.impl.call.macroChildCalls
 import org.elixir_lang.psi.impl.call.whileInStabBodyChildExpressions
 import org.elixir_lang.psi.impl.identifierName
 import org.elixir_lang.psi.impl.whileInChildExpressions
-import org.elixir_lang.psi.operation.Pipe
-import org.elixir_lang.psi.operation.Type
 import org.elixir_lang.psi.operation.When
 import org.elixir_lang.psi.scope.WhileIn.whileIn
 import org.elixir_lang.psi.stub.index.ModularName
@@ -29,26 +26,18 @@ import org.elixir_lang.psi.stub.type.call.Stub.isModular
 
 abstract class Type : PsiScopeProcessor {
     override fun execute(element: PsiElement, state: ResolveState): Boolean =
-        when (element) {
-            // typing a module attribute on line above a pre-existing one
-            is AtOperation -> execute(element, state)
-            is Call -> execute(element, state)
-            // Anonymous function type siganture
-            is ElixirStabParenthesesSignature -> execute(element, state)
-            // Anonymous function type siganture
-            is ElixirStabNoParenthesesSignature -> execute(element, state)
-            // type variable in a `when key: type`
-            is ElixirKeywordKey -> executeOnParameter(element, state)
-            is ElixirNoParenthesesOneArgument, is ElixirAccessExpression -> executeOnChildren(element, state)
-            is ElixirAtom, is ElixirFile, is ElixirLine, is ElixirList, is ElixirParentheticalStab,
-            is ElixirStructOperation, is ElixirTuple, is QualifiableAlias, is WholeNumber
-            -> false
-
-            is BeamModule -> execute(element, state)
-            is BeamTypeDefinition -> execute(element, state)
-            is BeamCallDefinition -> true
-            // Anything else declares no type; keep walking.
-            else -> true
+        when (TypeDescent.classify(element)) {
+            TypeDescent.Bucket.AT_OPERATION -> execute(element as AtOperation, state)
+            TypeDescent.Bucket.CALL -> execute(element as Call, state)
+            TypeDescent.Bucket.STAB_PARENTHESES_SIGNATURE -> execute(element as ElixirStabParenthesesSignature, state)
+            TypeDescent.Bucket.STAB_NO_PARENTHESES_SIGNATURE ->
+                execute(element as ElixirStabNoParenthesesSignature, state)
+            TypeDescent.Bucket.PARAMETER -> executeOnParameter(element, state)
+            TypeDescent.Bucket.CHILDREN -> executeOnChildren(element, state)
+            TypeDescent.Bucket.HALT -> false
+            TypeDescent.Bucket.BEAM_MODULE -> execute(element as BeamModule, state)
+            TypeDescent.Bucket.BEAM_TYPE_DEFINITION -> execute(element as BeamTypeDefinition, state)
+            TypeDescent.Bucket.BEAM_CALL_DEFINITION, TypeDescent.Bucket.PASS, TypeDescent.Bucket.LEAF -> true
         }
 
 
@@ -211,69 +200,13 @@ abstract class Type : PsiScopeProcessor {
         } ?: true
 }
 
-internal fun PsiElement.ancestorTypeSpec(): AtUnqualifiedNoParenthesesCall<*>? =
-    when (this) {
-        is AtUnqualifiedNoParenthesesCall<*> -> {
-            val identifierName = this.atIdentifier.identifierName()
-
-            if (isTypeSpecName(identifierName)) {
-                this
-            } else {
-                null
-            }
-        }
-
-        is Arguments,
-        is ElixirAccessExpression,
-        is ElixirKeywords,
-        is ElixirKeywordPair,
-        is ElixirMatchedParenthesesArguments,
-        is Pipe,
-        is ElixirStructOperation,
-            // <variable>.<tuple> while typing
-        is QualifiedMultipleAliases,
-            // <tuple> while typing after `<variable>.`
-        is ElixirMultipleAliases,
-        is ElixirNoParenthesesArguments,
-        is ElixirNoParenthesesKeywords,
-        is ElixirNoParenthesesKeywordPair,
-        is ElixirNoParenthesesManyStrictNoParenthesesExpression,
-            // For function type
-        is ElixirParentheticalStab, is ElixirStab, is ElixirStabBody, is ElixirStabOperation, is ElixirStabNoParenthesesSignature, is ElixirStabParenthesesSignature,
-            // containers
-        is ElixirList, is ElixirTuple,
-            // maps
-        is ElixirMapOperation, is ElixirMapArguments, is ElixirMapConstructionArguments,
-        is ElixirAssociations, is ElixirAssociationsBase, is ElixirContainerAssociationOperation,
-            // types
-        is Type, is Call,
-        -> parent.ancestorTypeSpec()
-        // `@callback(unquote(spec))`
-        is AtOperation,
-            // `fn` anonymous function type just uses parentheses and `->`, like `(type1, type2 -> type3)`
-        is ElixirAnonymousFunction,
-            // BitStrings use `::` like types, but cannot contain type parameters or declarations
-        is ElixirBitString,
-            // Types can't be declared inside of bracket operations where they would be used as keys
-        is BracketOperation, is ElixirBracketArguments,
-            // Types cannot be declared in `else`, `rescue`, or `after`
-        is ElixirBlockList, is ElixirBlockItem,
-        is ElixirDoBlock,
-            // No types in EEx
-        is ElixirEex, is ElixirEexTag,
-            // No types in interpolation
-        is ElixirInterpolation,
-            // Map updates aren't used in type specifications unlike `ElixirMapConstructionArguments`
-        is ElixirMapUpdateArguments,
-            // `@{:__aliases__, _meta, _args}` in `defmacro @{:__aliases__, _meta, _args} do...`
-            // types can't be defined at the file level and must be inside modules.
-        is ElixirFile,
-            // __MODULE__.* does not matter that it is in a type
-        is QualifiableAlias,
-        -> null
-
-        // Anything else is not a shape a type specification is written in.
-        else -> null
+internal tailrec fun PsiElement.ancestorTypeSpec(): AtUnqualifiedNoParenthesesCall<*>? =
+    when (TypeAscent.classify(this)) {
+        TypeAscent.Bucket.SPEC ->
+            (this as AtUnqualifiedNoParenthesesCall<*>).takeIf { isTypeSpecName(it.atIdentifier.identifierName()) }
+        // a detached element has no spec above it
+        TypeAscent.Bucket.PARENT -> (parent ?: return null).ancestorTypeSpec()
+        TypeAscent.Bucket.NONE, TypeAscent.Bucket.LEAF -> null
     }
 
 val OPTIONALITIES = arrayOf("optional", "required")
