@@ -4,6 +4,14 @@
 
 ### Breaking changes
 
+- **The minimum supported IDE is now 2026.1 (build 261.22158.277), raised from 2025.3.** The plugin
+  ships against 2026.1.5 and supports 2026.1 through 2026.2. Update to a 2026.1 or newer IDE to keep
+  receiving plugin updates.
+
+  > 2026.1 was released in March 2026, 2026.2 was released in July 2026.
+
+  This allows us to integrate with Mise plugin directly for example, which is only available in 2026.1 (261) and later.
+
 ### Enhancements
 
 - [#3983](https://github.com/KronicDeth/intellij-elixir/pull/3983) [@sh41](https://github.com/sh41)

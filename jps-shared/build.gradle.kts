@@ -14,11 +14,11 @@ tasks.testClasses {
     enabled = false
 }
 
-// Restricts stdlib references to what 2025.3 (minimumSupported) bundles - the root project's
+// Restricts stdlib references to what 2026.1 (minimumSupported) bundles - the root project's
 // own copy of this (build.gradle.kts) doesn't reach this separate project.
 tasks.withType<KotlinJvmCompile>().configureEach {
     compilerOptions {
-        apiVersion = KotlinVersion.KOTLIN_2_2
+        apiVersion = KotlinVersion.KOTLIN_2_3
     }
 }
 

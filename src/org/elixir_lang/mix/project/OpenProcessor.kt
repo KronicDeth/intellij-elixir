@@ -1,7 +1,6 @@
 package org.elixir_lang.mix.project
 
 import com.intellij.ide.util.projectWizard.WizardContext
-import com.intellij.openapi.application.EDT
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.progress.coroutineToIndicator
 import com.intellij.openapi.vfs.VirtualFile
@@ -51,13 +50,11 @@ class OpenProcessor : ProjectOpenProcessorBase<Builder>() {
         // Store pre-scanned results in the builder
         builder.setPreScannedApps(projectRoot, foundApps)
 
-        // Ensure EDT context for runBlockingModalWithRawProgressReporter in IntelliJ 2025.3
-        // We need .EDT here..
-        // See: https://github.com/JetBrains/intellij-community/commit/59da423bd3fef56a7929838fb9bfeee5beae8785
-        @Suppress("ObsoleteDispatchersEdt")
-        return withContext(Dispatchers.EDT) {
-            super.openProjectAsync(virtualFile, projectToClose, forceOpenInNewFrame)
-        }
+        // The platform's ProjectOpenProcessorBase.openProjectAsync dispatches to the EDT itself on
+        // 2026.1+ (it wraps its EDT-bound work in withContext(Dispatchers.EDT) and uses
+        // withRawProgressReporter), so the old caller-side EDT hop for 2025.3's
+        // runBlockingModalWithRawProgressReporter is no longer needed.
+        return super.openProjectAsync(virtualFile, projectToClose, forceOpenInNewFrame)
     }
 
     override fun doQuickImport(file: VirtualFile, wizardContext: WizardContext): Boolean {

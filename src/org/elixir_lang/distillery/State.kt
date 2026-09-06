@@ -8,7 +8,7 @@ import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.process.ProcessHandler
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.execution.runners.ProgramRunner
-import com.intellij.terminal.TerminalExecutionConsole
+import com.intellij.terminal.TerminalExecutionConsoleBuilder
 import org.elixir_lang.notification.setup_sdk.Notifier
 import org.elixir_lang.run.ElixirProcessHandler
 import org.elixir_lang.run.WslSafeCommandLineState
@@ -22,9 +22,8 @@ class State(environment: ExecutionEnvironment, configuration: Configuration) :
 
         return if (configuration.pty) {
             val processHandler = startProcess()
-            // Keep direct TerminalExecutionConsole constructor for 253 compatibility;
-            // TerminalExecutionConsoleBuilder is not available across our supported baseline yet.
-            val console = TerminalExecutionConsole(project, processHandler)
+            val console = TerminalExecutionConsoleBuilder(project).build()
+            console.attachToProcess(processHandler)
             processHandler.startNotify()
 
             DefaultExecutionResult(console, processHandler)

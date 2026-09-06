@@ -30,18 +30,17 @@ import com.intellij.xdebugger.XDebugSession
 import com.intellij.xdebugger.XDebuggerManager
 
 class Runner : GenericProgramRunner<RunnerSettings>() {
-    override fun doExecute(state: RunProfileState, environment: ExecutionEnvironment): RunContentDescriptor =
+    override fun doExecute(state: RunProfileState, environment: ExecutionEnvironment): RunContentDescriptor? =
             XDebuggerManager
                     .getInstance(environment.project)
-                    // Keep startSession() for 253 compatibility; XDebugSessionBuilder is not
-                    // available across our supported baseline yet.
-                    .startSession(
-                            environment,
+                    .newSessionBuilder(
                             object : XDebugProcessStarter() {
                                 override fun start(session: XDebugSession): com.intellij.xdebugger.XDebugProcess =
                                         Process(session, environment)
                             }
                     )
+                    .environment(environment)
+                    .startSession()
                     .runContentDescriptor
 
     override fun getRunnerId(): String = ELIXIR_DEBUG_RUNNER_ID
