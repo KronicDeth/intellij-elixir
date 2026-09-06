@@ -296,13 +296,13 @@ object ShapeTable {
             typeDescent = TypeDescent.Bucket.PASS,
             typeAscent = TypeAscent.Bucket.NONE,
         ),
-        // `do: block` binds nothing further up for an unquote; read through its list by the descents
+        // `%{key: name}` is a pattern to climb out of; `do: block` reaches no match, and pairing drops it there
         Row(
             ElixirKeywordPair::class.java,
             variable = VariableWalk.Bucket.TRANSPARENT,
             useScope = VariableUseScopeWalk.Bucket.PARENT,
             parameter = ParameterWalk.Bucket.RECURSE,
-            unquote = UnquotedVariableWalk.Bucket.STOP,
+            unquote = UnquotedVariableWalk.Bucket.RECURSE,
             descent = VariableDescent.Bucket.STOP,
             typeDescent = TypeDescent.Bucket.PASS,
             typeAscent = TypeAscent.Bucket.PARENT,

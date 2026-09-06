@@ -4,8 +4,9 @@ import com.intellij.psi.PsiElement
 import org.elixir_lang.psi.walk.ShapeTable
 
 /**
- * The parents of an unquoted variable that lead to the value it carries, for [Unquote]. Following a declaration out of
- * a container to its match over-approximates: every name destructured from one value claims that value's definitions.
+ * The parents of an unquoted variable that lead to the value it carries, for [Unquote]. A container is climbed through
+ * to reach the match; [Destructure] then pairs the declaration with the value at its own position wherever it can take
+ * the right-hand side apart, so a name destructured from one value does not claim the whole of it.
  */
 object UnquotedVariableWalk {
     enum class Bucket {

@@ -10,6 +10,8 @@ import org.elixir_lang.psi.call.name.Function.UNQUOTE
 import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.call.qualification.Qualified
 import org.elixir_lang.psi.impl.call.finalArguments
+import org.elixir_lang.psi.impl.childExpressions
+import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.psi.operation.Match
 import org.elixir_lang.psi.scope.WhileIn.whileIn
 
@@ -65,13 +67,18 @@ object Unquote {
                     Using.treeWalkUp(unquoted, null, unquotedResolveState, keepProcessing)
                 } else {
                     // The walk's answer is dropped, so a consumer's stop signal does not end the loop here
-                    treeWalkUpUnquotedVariable(unquoted, unquotedResolveState, keepProcessing)
+                    treeWalkUpUnquotedVariable(unquoted, unquoted, unquotedResolveState, keepProcessing)
 
                     true
                 }
             }
 
+    /**
+     * [declaration] is the variable the walk started from, so [Destructure] can pair it with the value at its own
+     * position once a [Match] is reached; [unquoted] is the current hop, whose own position is lost as the walk climbs.
+     */
     private tailrec fun treeWalkUpUnquotedVariable(unquoted: PsiElement,
+                                                   declaration: PsiElement,
                                                    resolveState: ResolveState,
                                                    keepProcessing: (PsiElement, ResolveState) -> Boolean): Boolean {
         // a detached element binds nothing above
@@ -81,18 +88,13 @@ object Unquote {
             UnquotedVariableWalk.Bucket.MATCH -> {
                 val match = parent as Match
 
-                // variable = ...
-                if (match.leftOperand() == unquoted) {
-                    match.rightOperand()?.let { value ->
-                        treeWalkUpValue(value, resolveState, keepProcessing)
-                    } ?: true
-                }
-                // ... = variable: a use, which binds nothing further up
-                else {
-                    true
+                // empty for `... = variable`, or for two sides that do not line up: neither binds anything further up
+                whileIn(Destructure.valuesAt(match.leftOperand(), match.rightOperand(), declaration)) { value ->
+                    treeWalkUpValue(value, resolveState, keepProcessing)
                 }
             }
-            UnquotedVariableWalk.Bucket.RECURSE -> treeWalkUpUnquotedVariable(parent, resolveState, keepProcessing)
+            UnquotedVariableWalk.Bucket.RECURSE ->
+                treeWalkUpUnquotedVariable(parent, declaration, resolveState, keepProcessing)
             UnquotedVariableWalk.Bucket.STOP,
             UnquotedVariableWalk.Bucket.UNFOLLOWED,
             UnquotedVariableWalk.Bucket.LEAF -> true
@@ -104,9 +106,31 @@ object Unquote {
                                 keepProcessing: (PsiElement, ResolveState) -> Boolean): Boolean =
             when (value) {
                 is Call -> treeWalkUpValue(value, resolveState, keepProcessing)
-                // A literal or container value is not walked into, so a quote destructured out of one is not found
+                // the compiler expands a list literal's elements, so a list of fragments defines each of them
+                is ElixirList -> treeWalkUpFragments(value, resolveState, keepProcessing)
+                // Only a two-element tuple is a quoted literal. `{:__block__, [], [fragment]}` splices too, but that
+                // needs the node's shape read rather than its size, and is not modelled.
+                is ElixirTuple ->
+                    value.takeIf { it.childExpressions().count() == 2 }
+                            ?.let { tuple -> treeWalkUpFragments(tuple, resolveState, keepProcessing) }
+                            ?: true
                 else -> true
             }
+
+    /** Each element of [container] read as a fragment. Marked visited first: a fragment can answer this container. */
+    private fun treeWalkUpFragments(container: PsiElement,
+                                    resolveState: ResolveState,
+                                    keepProcessing: (PsiElement, ResolveState) -> Boolean): Boolean =
+            container
+                    .takeUnlessHasBeenVisited(resolveState)
+                    ?.let { entered ->
+                        val enteredResolveState = resolveState.putVisitedElement(entered)
+
+                        whileIn(entered.childExpressions().toList()) { fragment ->
+                            treeWalkUpValue(fragment.stripAccessExpression(), enteredResolveState, keepProcessing)
+                        }
+                    }
+                    ?: true
 
     private fun treeWalkUpValue(value: Call,
                                 resolveState: ResolveState,
