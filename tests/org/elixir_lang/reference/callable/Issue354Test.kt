@@ -6,6 +6,10 @@ import com.intellij.psi.impl.source.tree.LeafPsiElement
 import org.elixir_lang.PlatformTestCase
 import org.elixir_lang.psi.call.Call
 
+/**
+ * `context` on the right of `%{line: line, port: port} = context` reads the parameter, so a later `context` resolves
+ * to the parameter alone and not to that read as a rebinding.
+ */
 class Issue354Test : PlatformTestCase() {
     fun testLoggerLogstashBackend() {
         myFixture.configureByFile("logger_logstash_backend.ex")
@@ -29,19 +33,11 @@ class Issue354Test : PlatformTestCase() {
         val psiPolyVariantReference = reference as PsiPolyVariantReference
 
         val resolveResults = psiPolyVariantReference.multiResolve(true)
-        assertEquals(resolveResults.size, 2)
+        assertEquals(1, resolveResults.size)
 
-        val firstResolveResult = resolveResults[0]
-        assertTrue(firstResolveResult.isValidResult)
-        val firstElement = firstResolveResult.element
-        assertNotNull(firstElement)
-        assertEquals("%{line: line, port: port} = context", firstElement!!.parent.text)
-
-        val secondResolveResult = resolveResults[1]
-        assertTrue(secondResolveResult.isValidResult)
-        val secondElement = secondResolveResult.element
-        assertNotNull(secondElement)
-        assertEquals("context = %{backend: true}", secondElement!!.parent.text)
+        val resolveResult = resolveResults[0]
+        assertTrue(resolveResult.isValidResult)
+        assertEquals("context = %{backend: true}", resolveResult.element!!.parent.text)
     }
 
     /*
