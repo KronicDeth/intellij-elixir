@@ -6,7 +6,7 @@ version: "1.0"
 linter: qodana-jvm-community
 projectJDK: "21"
 profile:
-  name: qodana.recommended
+  path: .qodana/qodana.profile.yaml
 # qodana.recommended disables every inspection outside a 23-category allowlist, and "Plugin DevKit"
 # is not on it - so the inspections that matter most for a plugin have to be named one by one.
 include:
@@ -22,6 +22,13 @@ include:
   - name: CancellationCheckInLoops
   - name: LightServiceMustBeFinal
   - name: NonDefaultConstructor
+  - name: ObsoleteDispatchersEdt
+  - name: CanBeDumbAware
+  - name: CallingMethodShouldBeRequiresBlockingContext
+  - name: ExtensionClassShouldBeFinalAndNonPublic
+  - name: OptionalDependencyViaDependsTag
+  - name: PathAnnotationInspection
+  - name: SerializableCtor
 exclude:
   - name: All
     paths:

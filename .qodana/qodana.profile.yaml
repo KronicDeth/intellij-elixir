@@ -1,0 +1,18 @@
+# Project inspection profile for Qodana.
+#
+# qodana.yml can enable an inspection but cannot configure one, and ThreadingConcurrency reports
+# nothing at all until its options are set - which is why a deliberately unannotated caller of a
+# @RequiresReadLock method passed CI while the IDE flagged it as an error. The options below match
+# .idea/inspectionProfiles/Project_Default.xml, which is gitignored and so was never shared with
+# CI or with other contributors.
+baseProfile: qodana.recommended
+
+inspections:
+  - inspection: ThreadingConcurrency
+    enabled: true
+    options:
+      requiresReadLockInsideRequiresEdt: true
+      requiresWriteLockInsideRequiresEdt: true
+      # The one that matters: off by default, and the only thing that reports a public method
+      # missing an annotation its callees require.
+      checkMissingAnnotations: true
