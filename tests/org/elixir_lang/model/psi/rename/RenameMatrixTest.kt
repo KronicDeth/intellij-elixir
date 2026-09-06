@@ -198,9 +198,17 @@ class RenameMatrixTest : PlatformTestCase() {
     fun testVariableMapPatternRepeated() =
         doTestFromEveryOccurrence("variable_map_pattern_repeated", "renamee", "fresh", expectedCarets = 2)
 
+    /** A binding inside string interpolation, `_ = "#{renamee = 1}"`, and its read after the string. */
+    fun testVariableInterpolationBinding() =
+        doTestFromEveryOccurrence("variable_interpolation_binding", "renamee", "fresh", expectedCarets = 2)
+
     /** A binding on the left of an inner match that sits on the right of an outer one, `_ = (renamee = 1)`. */
     fun testVariableNestedMatchBinding() =
         doTestFromEveryOccurrence("variable_nested_match_binding", "renamee", "fresh", expectedCarets = 2)
+
+    /** A `for` generator read inside a generated test's name, `test "handles #{renamee}"`, and in its body. */
+    fun testVariableComprehensionTestName() =
+        doTestFromEveryOccurrence("variable_comprehension_test_name", "renamee", "fresh", expectedCarets = 3)
 
     /** A case pattern binding inside `result = case … do … end`: a pattern, although right of a match. */
     fun testVariableCasePatternInMatch() =
@@ -225,6 +233,10 @@ class RenameMatrixTest : PlatformTestCase() {
     /** A `with` clause's argument under a match, `result = with {:ok, v} <- fetch(renamee)`, is a read too. */
     fun testVariableWithArgumentInMatch() =
         doTestFromEveryOccurrence("variable_with_argument_in_match", "renamee", "fresh", expectedCarets = 2)
+
+    /** A read inside string interpolation in a call argument, `IO.puts("Hello #{renamee}")`. */
+    fun testVariableInterpolationArgumentRead() =
+        doTestFromEveryOccurrence("variable_interpolation_argument_read", "renamee", "fresh", expectedCarets = 2)
 
     /** Reads on the right of a match: bare, inside a list and inside string interpolation. */
     fun testVariableMatchRhsRead() =

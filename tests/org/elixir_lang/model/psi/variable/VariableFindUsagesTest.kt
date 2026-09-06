@@ -36,6 +36,22 @@ class VariableFindUsagesTest : PlatformTestCase() {
         assertEquals(1, nonDeclarationUsageCount("usages_variable_declaration.ex"))
     }
 
+    fun testFindUsagesOnVariableDeclaredInInterpolationFindsLaterRead() {
+        // `_ = "#{variable = 1}"` binds `variable` for the code after the string, as a match anywhere else does.
+        assertEquals(1, nonDeclarationUsageCount("usages_variable_declared_in_interpolation.ex"))
+    }
+
+    fun testFindUsagesOnVariableDeclarationFindsReadInsideInterpolationArgument() {
+        // `IO.puts("#{variable}")` is a read like `IO.puts(variable)`; neither is "a variable" to the syntactic walk,
+        // and both resolve to the declaration.
+        assertEquals(1, nonDeclarationUsageCount("usages_variable_read_in_interpolation_argument.ex"))
+    }
+
+    fun testFindUsagesOnComprehensionGeneratorFindsReadInGeneratedTestName() {
+        // `test "handles #{variable}"` reads the generator; the string is a macro argument, not a pattern.
+        assertEquals(2, nonDeclarationUsageCount("usages_comprehension_generator_read_in_test_name.ex"))
+    }
+
     fun testFindUsagesOnVariableDeclaredInNestedMatchFindsLaterRead() {
         // `_ = (variable = 1)` declares `variable` on the left of the inner match, although the inner match sits on
         // the right of the outer one.
@@ -128,6 +144,29 @@ class VariableFindUsagesTest : PlatformTestCase() {
         assertEquals("variable", target!!.text)
     }
 
+    fun testGoToDeclarationFromLaterUseNavigatesIntoInterpolation() {
+        myFixture.configureByFiles("goto_declaration_variable_declared_in_interpolation.ex")
+        val target = myFixture.gotoDeclarationDestinationAtCaret()
+        assertNotNull("Go To Declaration should navigate to the declaration inside the interpolation", target)
+        assertEquals("variable", target!!.text)
+    }
+
+    fun testGoToDeclarationFromLaterUseNavigatesIntoQuotedAtom() =
+        assertGotoDeclarationNavigatesToVariable("goto_declaration_variable_declared_in_quoted_atom.ex")
+
+    fun testGoToDeclarationFromLaterUseNavigatesIntoQuotedKeywordKey() =
+        assertGotoDeclarationNavigatesToVariable("goto_declaration_variable_declared_in_quoted_keyword_key.ex")
+
+    fun testGoToDeclarationFromLaterUseNavigatesIntoMapUpdate() =
+        assertGotoDeclarationNavigatesToVariable("goto_declaration_variable_declared_in_map_update.ex")
+
+    fun testGoToDeclarationFromUseInsideInterpolationNavigatesToDeclaration() {
+        myFixture.configureByFiles("goto_declaration_variable_used_in_interpolation.ex")
+        val target = myFixture.gotoDeclarationDestinationAtCaret()
+        assertNotNull("Go To Declaration should navigate to the declaration before the string", target)
+        assertEquals("variable", target!!.text)
+    }
+
     fun testCtrlClickOnMatchRhsVariableUsageChoosesGotoDeclaration() {
         // `y = variable` reads `variable`; the gesture must navigate to its declaration, not show the read's own usages.
         assertCtrlClickChoosesGotoDeclaration("goto_declaration_variable_usage_match_rhs.ex")
@@ -135,6 +174,10 @@ class VariableFindUsagesTest : PlatformTestCase() {
 
     fun testCtrlClickOnMatchRhsVariableUsageInListChoosesGotoDeclaration() {
         assertCtrlClickChoosesGotoDeclaration("goto_declaration_variable_usage_match_rhs_list.ex")
+    }
+
+    fun testCtrlClickOnMatchRhsVariableUsageInInterpolationChoosesGotoDeclaration() {
+        assertCtrlClickChoosesGotoDeclaration("goto_declaration_variable_usage_match_rhs_interpolation.ex")
     }
 
     fun testCtrlClickOnPinnedMatchRhsVariableChoosesGotoDeclaration() {
@@ -188,6 +231,13 @@ class VariableFindUsagesTest : PlatformTestCase() {
     private fun nonDeclarationUsageCount(vararg files: String): Int {
         myFixture.configureByFiles(*files)
         return myFixture.nonDeclarationUsageCountAtCaret(project)
+    }
+
+    private fun assertGotoDeclarationNavigatesToVariable(fileName: String) {
+        myFixture.configureByFiles(fileName)
+        val target = myFixture.gotoDeclarationDestinationAtCaret()
+        assertNotNull("Go To Declaration should navigate to the declaration", target)
+        assertEquals("variable", target!!.text)
     }
 
     private fun assertCtrlClickChoosesGotoDeclaration(fileName: String) {
