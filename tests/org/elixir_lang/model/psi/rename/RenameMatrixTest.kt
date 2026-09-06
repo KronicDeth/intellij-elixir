@@ -226,6 +226,10 @@ class RenameMatrixTest : PlatformTestCase() {
     fun testVariableWithArgumentInMatch() =
         doTestFromEveryOccurrence("variable_with_argument_in_match", "renamee", "fresh", expectedCarets = 2)
 
+    /** Reads on the right of a match: bare, inside a list and inside string interpolation. */
+    fun testVariableMatchRhsRead() =
+        doTestFromEveryOccurrence("variable_match_rhs_read", "renamee", "fresh", expectedCarets = 4)
+
     // -- Types ------------------------------------------------------------------------------
 
     /** `@type` declaration and its references inside a `@spec`. */

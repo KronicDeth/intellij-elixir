@@ -16,6 +16,7 @@ import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.previousSiblingExpression
 import org.elixir_lang.psi.impl.ProcessDeclarationsImpl.DECLARING_SCOPE
 import org.elixir_lang.psi.operation.Match
+import org.elixir_lang.psi.scope.MatchRead
 import org.elixir_lang.psi.scope.MultiResolve.keepProcessing
 import org.elixir_lang.psi.scope.Variable
 import org.elixir_lang.psi.scope.VisitedElementSetResolveResult
@@ -41,6 +42,13 @@ class MultiResolve(private val name: String, private val incompleteCode: Boolean
     private fun addToResolveResultList(element: PsiElement, state: ResolveState, validResult: Boolean) {
         if (state.get(DECLARING_SCOPE) == false) return
 
+        /* A pattern binds, so it answers for itself, whatever match it sits under; `MatchRead` is the same rule the
+           symbol model applies, so what the resolver files is what Find Usages and rename call a declaration. */
+        if (!MatchRead.`is`(element)) {
+            resolveResultList.add(VisitedElementSetResolveResult(element, validResult, state.visitedElementSet()))
+            return
+        }
+
         /* A read on the right of `=` declares its name only if nothing above binds it, so its earlier bindings are
            looked up: not when this is that lookup meeting the read again, and not for a prefix-named read, which is
            a candidate for incomplete code and never a declaration of the searched name. */
@@ -54,7 +62,8 @@ class MultiResolve(private val name: String, private val incompleteCode: Boolean
 
         if (bound.isNotEmpty()) {
             resolveResultList.addAll(bound)
-        } else {
+        } else if (!element.isEquivalentTo(state.get(ENTRANCE))) {
+            // an unbound read stands in as the declaration for the reads after it, but never for itself
             resolveResultList.add(VisitedElementSetResolveResult(element, validResult, state.visitedElementSet()))
         }
         // a prefix-named earlier variable is a candidate for incomplete code, whether or not the read is bound
