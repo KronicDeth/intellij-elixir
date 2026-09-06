@@ -32,6 +32,9 @@ object Using {
     ): Boolean =
         when (using) {
             is Call -> treeWalkUp(using, use, resolveState, keepProcessing)
+            /* Unreachable while `isDefiner` compares a decompiled definition's always-null `name`, which leaves
+               `definers` empty for a beam module. Giving `CallDefinitionImpl` a `getName()` arms this, so the two
+               have to change together. */
             is BeamCallDefinition -> TODO()
             else -> true
         }
