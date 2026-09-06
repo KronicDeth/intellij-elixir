@@ -312,11 +312,17 @@ class Callable : PsiReferenceBase<Call>, PsiPolyVariantReference {
 
         @Contract(pure = true)
         @JvmStatic
-        tailrec fun isVariable(ancestor: PsiElement): Boolean =
+        fun isVariable(element: PsiElement): Boolean =
+            /* The key of `quote bind_quoted: [name: value] do ... end` is the bound variable itself, so it answers
+               before the walk; met as an ancestor, a quoted key `["#{name}": 1]` is looked through like a string. */
+            element is ElixirKeywordKey || isVariableFrom(element)
+
+        @Contract(pure = true)
+        private tailrec fun isVariableFrom(ancestor: PsiElement): Boolean =
             when (VariableWalk.classify(ancestor)) {
                 VariableWalk.Bucket.DECLARES -> true
                 // a detached element has nothing above it to declare a variable
-                VariableWalk.Bucket.TRANSPARENT -> isVariable(ancestor.parent ?: return false)
+                VariableWalk.Bucket.TRANSPARENT -> isVariableFrom(ancestor.parent ?: return false)
                 VariableWalk.Bucket.CALL -> isVariable(ancestor as Call)
                 VariableWalk.Bucket.STOP, VariableWalk.Bucket.LEAF -> false
             }
@@ -477,7 +483,7 @@ class Callable : PsiReferenceBase<Call>, PsiPolyVariantReference {
 
                     // _ is an "ignored" not a variable
                     if (name == null || name != IGNORED) {
-                        call.parent?.let { isVariable(it) } ?: false
+                        call.parent?.let { isVariableFrom(it) } ?: false
                     } else {
                         false
                     }
@@ -492,7 +498,7 @@ class Callable : PsiReferenceBase<Call>, PsiPolyVariantReference {
                    cases of exactly that. Which kind this is cannot be told from the syntax, so
                    resolve it. */
                 call is UnqualifiedParenthesesCall<*> -> resolvesToMacro(call)
-                else -> call.parent?.let { isVariable(it) } ?: false
+                else -> call.parent?.let { isVariableFrom(it) } ?: false
             }
 
         private fun variableUseScope(call: Call): LocalSearchScope =

@@ -13,8 +13,6 @@ import org.elixir_lang.psi.ElixirMatchedParenthesesArguments
 import org.elixir_lang.psi.ElixirNoParenthesesKeywordPair
 import org.elixir_lang.psi.ElixirNoParenthesesManyStrictNoParenthesesExpression
 import org.elixir_lang.psi.ElixirNoParenthesesStrict
-import org.elixir_lang.psi.ElixirInterpolation
-import org.elixir_lang.psi.ElixirKeywordKey
 import org.elixir_lang.psi.ElixirMatchedExpression
 import org.elixir_lang.psi.ElixirUnmatchedExpression
 import org.elixir_lang.psi.ElixirUnmatchedGreaterThanOrEqualToOnePointSixCaptureNonNumericOperation
@@ -199,12 +197,7 @@ class ShapeCoverageTest : TestCase() {
         VariableWalk.Bucket.DECLARES,
         VariableUseScopeWalk.Bucket.entries.toSet() -
             setOf(VariableUseScopeWalk.Bucket.EMPTY, VariableUseScopeWalk.Bucket.LEAF),
-        listOf(
-            // identifiers in an interpolation are uses; nothing is declared there
-            ElixirInterpolation::class.java,
-            // an element `isVariable` starts from, never an ancestor
-            ElixirKeywordKey::class.java
-        )
+        emptyList()
     )
 
     /** An unquote container left unfollowed is only open if a variable can be declared through it. */

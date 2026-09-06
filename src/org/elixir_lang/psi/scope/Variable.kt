@@ -41,6 +41,11 @@ abstract class Variable : PsiScopeProcessor {
                 when (VariableDescent.classify(element)) {
                     VariableDescent.Bucket.NON_DECLARING_INFIX -> executeNonDeclaringScopeInfix(element as Infix, state)
                     VariableDescent.Bucket.CHILDREN -> execute(element.children, state)
+                    /* A bare identifier inside a string is a read even when the string is a macro argument, so the
+                       pass stops declaring; a match inside starts it again for its own operands. A part with no `#`
+                       cannot hold an interpolation, so a long heredoc costs one visit. */
+                    VariableDescent.Bucket.CHILDREN_READING ->
+                        !element.textContains('#') || execute(element.children, state.put(DECLARING_SCOPE, false))
                     VariableDescent.Bucket.BRACKET -> execute((element as BracketOperation).bracketArguments, state)
                     VariableDescent.Bucket.AT_BRACKET ->
                         execute((element as AtUnqualifiedBracketOperation).bracketArguments, state)
@@ -366,8 +371,9 @@ abstract class Variable : PsiScopeProcessor {
         }
     }
 
+    // a quoted key can hold an interpolation, so it is visited like the value
     private fun execute(match: QuotableKeywordPair, state: ResolveState): Boolean =
-            execute(match.keywordValue, state)
+            execute(match.keywordKey, state) && execute(match.keywordValue, state)
 
     private fun execute(match: Type, state: ResolveState): Boolean =
             executeLeftOperand(match, state)

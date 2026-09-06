@@ -19,6 +19,9 @@ object VariableDescent {
         NON_DECLARING_INFIX(Infix::class.java),
         /** A container whose children are read in turn. */
         CHILDREN(PsiElement::class.java),
+        /** A string, quoted atom or quoted keyword key: a match inside `#{}` binds for the code after it, but a bare
+         *  identifier inside is a read, so the children are read with declaring off. */
+        CHILDREN_READING(PsiElement::class.java),
         /** Bracket access: the arguments are read, the receiver is a value. */
         BRACKET(BracketOperation::class.java),
         AT_BRACKET(AtUnqualifiedBracketOperation::class.java),
