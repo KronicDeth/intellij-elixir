@@ -176,6 +176,18 @@ class RenameMatrixTest : PlatformTestCase() {
     fun testVariableComprehension() =
         doTestFromEveryOccurrence("variable_comprehension", "renamee", "fresh", expectedCarets = 2)
 
+    /** A read in a `when` guard is a read of the binding outside the clause, not a binding of the clause's pattern. */
+    fun testVariableGuardRead() =
+        doTestFromEveryOccurrence("variable_guard_read", "renamee", "fresh", expectedCarets = 2)
+
+    /** An `fn` written as a `cond` clause's body binds its parameter like any other `fn`. */
+    fun testVariableCondFnParameter() =
+        doTestFromEveryOccurrence("variable_cond_fn_parameter", "renamee", "fresh", expectedCarets = 2)
+
+    /** A definition inside a matched `quote` binds its parameter for its own body, not for the match. */
+    fun testVariableQuotedDefParameter() =
+        doTestFromEveryOccurrence("variable_quoted_def_parameter", "renamee", "fresh", expectedCarets = 2)
+
     /**
      * A rebinding inside an `fn` BODY is the same variable as the one it rebinds, unlike an `fn`
      * PARAMETER of the same name, which shadows it.
