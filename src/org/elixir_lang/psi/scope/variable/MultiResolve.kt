@@ -123,6 +123,17 @@ class MultiResolve(private val name: String, private val incompleteCode: Boolean
                         ?: nameInAnyQuote(entrance, name, incompleteCode)
             }
 
+        /**
+         * The declarations of [name] that a read placed just before [declaration]'s match resolves to: what an
+         * assignment there rebinds. Empty when [declaration] is not bound by a match.
+         */
+        fun earlierBindings(name: String, declaration: PsiElement): List<PsiElement> {
+            val match = PsiTreeUtil.getContextOfType(declaration, Match::class.java) ?: return emptyList()
+
+            return resolveBefore(name, false, match, declaration, ResolveState.initial())
+                .mapNotNull { result -> result.element.takeIf { result.isValidResult } }
+        }
+
         fun resolveInScope(name: String,
                            incompleteCode: Boolean,
                            entrance: PsiElement,
