@@ -61,6 +61,22 @@
 
 ### Bug Fixes
 
+- [#4020](https://github.com/KronicDeth/intellij-elixir/pull/4020) [@sh41](https://github.com/sh41)
+  - **Variable resolution, Find Usages and rename no longer report errors or miss bindings for code
+    shapes they did not model.** Fixes [#4019](https://github.com/KronicDeth/intellij-elixir/issues/4019).
+  - **A variable read on the right of `=` resolves to its earlier binding instead of to itself.**
+    Fixes [#354](https://github.com/KronicDeth/intellij-elixir/issues/354).
+  - **Rename and Find Usages of a rebound variable follow the chain the resolver sees: not into a
+    preceding branch, and across top-level statements.**
+  - **A read in a `when` guard, a pinned name in a pattern, and the subject of `case` or `if` are
+    reads, so rename carries them with the variable they read instead of leaving them behind.**
+  - **What `for` and `with` bind stays inside them, and a match inside a function's arguments,
+    `f(x = 1)`, binds `x` after the call.**
+  - **A variable bound inside string interpolation, such as `x` in `"#{x = 1}"`, can be found, renamed
+    and navigated to from the code after the string.** Fixes [#4023](https://github.com/KronicDeth/intellij-elixir/issues/4023).
+  - **Find Usages and rename of a variable bound in an EEx tag reach its uses in the tags after it.**
+    Fixes [#3970](https://github.com/KronicDeth/intellij-elixir/issues/3970).
+
 - [#4016](https://github.com/KronicDeth/intellij-elixir/pull/4016) [@sh41](https://github.com/sh41)
   - **Go To Symbol now finds types defined in a decompiled `.beam` instead of crashing.** Fixes [#4000](https://github.com/KronicDeth/intellij-elixir/issues/4000).
 
