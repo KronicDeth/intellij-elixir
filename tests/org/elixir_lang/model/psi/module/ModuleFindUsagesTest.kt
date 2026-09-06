@@ -75,6 +75,25 @@ class ModuleFindUsagesTest : PlatformTestCase() {
         assertEquals(2, nonDeclarationUsageCount("usages_aliased_short_name.ex"))
     }
 
+    /**
+     * `defmodule Declaration do alias Declaration end` - a module aliased to itself - reports the one
+     * alias site once, not twice.
+     *
+     * The alias is both a reference to the module and lexically inside it, so a search that reaches it
+     * by both routes can report the same range twice. `Issue354Test`'s sibling in the old
+     * `FindUsagesTest` asserted exactly that duplicate: two usages, both at offset 33, both `ALIAS`.
+     * That test was deleted when Find Usages moved to the symbol pipeline and nothing replaced it, so
+     * the fixtures it used were left orphaned in `testData/org/elixir_lang/find_usages`.
+     */
+    fun testFindUsagesOnSelfAliasedModuleReportsTheAliasOnce() {
+        assertEquals(1, nonDeclarationUsageCount("usages_self_alias_from_declaration.ex"))
+    }
+
+    /** Same file, caret on the alias rather than the declaration: still one usage, not two. */
+    fun testFindUsagesFromSelfAliasSiteReportsTheAliasOnce() {
+        assertEquals(1, nonDeclarationUsageCount("usages_self_alias_from_alias.ex"))
+    }
+
     // ── Helpers ─────────────────────────────────────────────────────────────────────────────────
 
     /**
