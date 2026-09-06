@@ -12,7 +12,6 @@ import com.intellij.psi.util.PsiTreeUtil
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.ex_unit.Assertions
-import org.elixir_lang.psi.impl.ElixirPsiImplUtil
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.previousSiblingExpression
 import org.elixir_lang.psi.impl.ProcessDeclarationsImpl.DECLARING_SCOPE
@@ -40,58 +39,48 @@ class MultiResolve(private val name: String, private val incompleteCode: Boolean
     }
 
     private fun addToResolveResultList(element: PsiElement, state: ResolveState, validResult: Boolean) {
-        val declaringScope = state.get<Boolean>(DECLARING_SCOPE)
+        if (state.get(DECLARING_SCOPE) == false) return
 
-        if (declaringScope == null || declaringScope) {
-            val lastBinding = state.get(LAST_BINDING_KEY)
-            var added = false
+        /* A read on the right of `=` declares its name only if nothing above binds it, so its earlier bindings are
+           looked up: not when this is that lookup meeting the read again, and not for a prefix-named read, which is
+           a candidate for incomplete code and never a declaration of the searched name. */
+        val lastBinding = state.get(LAST_BINDING_KEY)
+        val earlier = if (validResult && (lastBinding == null || !element.isEquivalentTo(lastBinding))) {
+            earlierBindingResults(name, incompleteCode, element, state)
+        } else {
+            emptyList()
+        }
+        val bound = earlier.filter { it.isValidResult }
 
-            /* if LAST_BINDING_KEY is set, then we're checking if a right-hand match is bound higher up, so an effective
-               recursive call.  If the recursive call got the same result, stop the recursion by not checking for
-               rebinding */
-            if (lastBinding == null || !element.isEquivalentTo(lastBinding)) {
-                PsiTreeUtil.getContextOfType(element, Match::class.java)?.let { matchAncestor ->
-                    matchAncestor.rightOperand()?.let { rightOperand ->
-                        /* right-hand match can only be declarative if it is not already bound, so need to try to
-                           resolve further up to try to find if {@code element} is already bound */
-                        if (PsiTreeUtil.isAncestor(rightOperand, element, false)) {
-                            // previous sibling or parent to search for earlier binding
-                            previousExpression(matchAncestor, state)?.let { expression ->
-                                val preboundResolveResultList = resolveInScope(
-                                        name,
-                                        incompleteCode,
-                                        expression,
-                                        ResolveState
-                                                .initial()
-                                                .put(ElixirPsiImplUtil.ENTRANCE, matchAncestor)
-                                                .putInitialVisitedElement(matchAncestor)
-                                                .putVisitedElements(state)
-                                                .put(LAST_BINDING_KEY, element)
-                                )
+        if (bound.isNotEmpty()) {
+            resolveResultList.addAll(bound)
+        } else {
+            resolveResultList.add(VisitedElementSetResolveResult(element, validResult, state.visitedElementSet()))
+        }
+        // a prefix-named earlier variable is a candidate for incomplete code, whether or not the read is bound
+        if (incompleteCode) {
+            resolveResultList.addAll(earlier.filter { !it.isValidResult })
+        }
+    }
 
-                                if (!preboundResolveResultList.isNotEmpty()) {
-                                    if (!incompleteCode && validResult) {
-                                        val validPreboundResolveResultList =  preboundResolveResultList.filter { it.isValidResult }
+    /** The results of resolving [name] just before the match [element] sits on the right of; empty elsewhere. */
+    private fun earlierBindingResults(
+        name: String,
+        incompleteCode: Boolean,
+        element: PsiElement,
+        state: ResolveState
+    ): List<VisitedElementSetResolveResult> {
+        val match = PsiTreeUtil.getContextOfType(element, Match::class.java) ?: return emptyList()
+        val rightOperand = match.rightOperand() ?: return emptyList()
+        // a pattern on the right, an `fn` parameter or a clause head, binds afresh rather than reading
+        val pattern = BindingPattern.of(element)
 
-                                        if (validPreboundResolveResultList.isNotEmpty()) {
-                                            resolveResultList.addAll(validPreboundResolveResultList)
-                                            added = true
-                                        }
-                                    } else {
-                                        resolveResultList.addAll(preboundResolveResultList)
-                                        added = true
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            // either non-right match declaration or recursive call didn't find a rebinding
-            if (!added) {
-                resolveResultList.add(VisitedElementSetResolveResult(element, validResult, state.visitedElementSet()))
-            }
+        return if (PsiTreeUtil.isAncestor(rightOperand, element, false) &&
+            (pattern == null || !PsiTreeUtil.isAncestor(rightOperand, pattern, false))
+        ) {
+            resolveBefore(name, incompleteCode, match, element, state)
+        } else {
+            emptyList()
         }
     }
 
@@ -107,6 +96,24 @@ class MultiResolve(private val name: String, private val incompleteCode: Boolean
     companion object {
         private val LAST_BINDING_KEY = Key<PsiElement>("LAST_BINDING_KEY")
 
+        /** Resolves [name] from just before [match], as a read there would, on behalf of [element] inside it. */
+        private fun resolveBefore(
+            name: String,
+            incompleteCode: Boolean,
+            match: Match,
+            element: PsiElement,
+            state: ResolveState
+        ): List<VisitedElementSetResolveResult> {
+            val expression = previousExpression(match, state) ?: return emptyList()
+            val searchState = ResolveState.initial()
+                .put(ENTRANCE, match)
+                .putInitialVisitedElement(match)
+                .putVisitedElements(state)
+                .put(LAST_BINDING_KEY, element)
+
+            return resolveInScope(name, incompleteCode, expression, searchState)
+        }
+
         fun resolveResultList(name: String,
                               incompleteCode: Boolean,
                               entrance: PsiElement): List<VisitedElementSetResolveResult> =
@@ -119,6 +126,18 @@ class MultiResolve(private val name: String, private val incompleteCode: Boolean
                         .takeIf { set -> set.any(ResolveResult::isValidResult) }
                         ?: nameInAnyQuote(entrance, name, incompleteCode)
             }
+
+        /**
+         * The declarations of [name] that a read placed just before [declaration]'s match resolves to: what an
+         * assignment there rebinds. Empty when [declaration] is not bound by a match.
+         */
+        fun earlierBindings(name: String, declaration: PsiElement): List<PsiElement> {
+            val match = PsiTreeUtil.getContextOfType(declaration, Match::class.java) ?: return emptyList()
+            val state = ResolveState.initial().put(ENTRANCE, match).putInitialVisitedElement(match)
+
+            return resolveBefore(name, false, match, declaration, state)
+                .mapNotNull { result -> result.element.takeIf { result.isValidResult } }
+        }
 
         fun resolveInScope(name: String,
                            incompleteCode: Boolean,
