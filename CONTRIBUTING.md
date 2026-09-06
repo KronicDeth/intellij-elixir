@@ -188,7 +188,7 @@ listed above yourself.
 - **Erlang/OTP** and **Elixir**: **required for running tests** (not just building), at the versions
   [above](#elixir-and-erlang). Install both with `mise install`, or install them yourself and put
   `erl`/`erl.exe` and `elixir` on `PATH`, or point `ERLANG_SDK_HOME`/`ELIXIR_SDK_HOME` at them.
-- **JetBrains Runtime**: **21** for IDEA 2025.3 and 2026.1, **25** for 2026.2 and later.
+- **JetBrains Runtime**: **21** for IDEA 2026.1, **25** for 2026.2 and later.
   `build.gradle.kts` picks the bytecode level from the platform build number (262+ → 25), and
   `javac --release` validates the platform JARs against it, so the wrong JDK fails the compile rather
   than producing a bad build. `mise install` provisions the pinned JBR.
@@ -375,6 +375,11 @@ JBR level each needs and the products to verify them against) and the Elixir/OTP
 Edit that one file to add or bump a version: the test legs, the plugin verifier's IDE lists, and the
 release build's default platform are all derived from it.
 
+Three places in this document quote that data rather than deriving it - the JBR levels under
+[Windows Development Setup](#prerequisites), and the worked check names under
+[Reading a leg in the checks list](#reading-a-leg-in-the-checks-list). Nothing keeps them in sync, so
+update them in the same commit as `.github/ci-versions.json`.
+
 Tests always run against IntelliJ IDEA. The legs are every declared IDEA version on Ubuntu with
 `beam.baseline`, plus one leg per `beam.additional` pair on the minimum supported IDEA, plus
 `beam.baseline` on Windows.
@@ -433,14 +438,14 @@ the phase it died in, so you can tell those apart.
 ##### Reading a leg in the checks list
 
 Each leg is named after the axis its group varies, so the part that distinguishes it survives the
-checks list's truncation: `test (IDEA 2026.2)`, `test (1.19.5+28.1)` (Elixir + OTP),
-`test (Win25, IDEA 2025.3.6)`. The same name is used for the leg's `Test Results (...)` check, so a
+checks list's truncation: `test (IDEA 2026.2.2)`, `test (1.19.5+28.4)` (Elixir + OTP),
+`test (Win25, IDEA 2026.1.5)`. The same name is used for the leg's `Test Results (...)` check, so a
 row in one list maps to the other without translating.
 
 A leg that stopped **before its tests ran** says so in the name:
 
 ```
-Test Results (1.19.5+28.1, INCOMPLETE - failed at compile)
+Test Results (1.19.5+28.4, INCOMPLETE - failed at compile)
 ```
 
 That matters because the check's own title only ever describes the result files it found - a leg that

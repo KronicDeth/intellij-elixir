@@ -5,7 +5,6 @@ import com.intellij.application.options.CodeStyleAbstractPanel
 import com.intellij.application.options.IndentOptionsEditor
 import com.intellij.application.options.SmartIndentOptionsEditor
 import com.intellij.lang.Language
-import com.intellij.openapi.util.BuildNumber
 import com.intellij.psi.codeStyle.*
 import com.intellij.psi.codeStyle.LanguageCodeStyleSettingsProvider
 import com.intellij.psi.codeStyle.CodeStyleSettingsCustomizable.*

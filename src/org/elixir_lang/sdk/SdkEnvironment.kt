@@ -6,6 +6,7 @@ import com.intellij.openapi.roots.ui.configuration.projectRoot.ProjectSdksModel
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.platform.eel.EelDescriptor
 import com.intellij.platform.eel.provider.getEelDescriptor
+import com.intellij.platform.eel.provider.getResolvedEelMachine
 import org.elixir_lang.sdk.wsl.wslCompat
 import java.nio.file.FileSystemNotFoundException
 import java.nio.file.InvalidPathException
@@ -25,12 +26,13 @@ import java.nio.file.Path
  * from the wizard's directory with the public (experimental) Path.getEelDescriptor(), and
  * matching SDKs are re-added via the public ProjectSdksModel.addSdk() in [syncTargetSdks].
  *
- * Environments are compared by [EelDescriptor] equality rather than by EelMachine, because no
- * machine API spans the supported builds (EelDescriptor.machine exists only in 2025.3,
- * getResolvedEelMachine() only in 2026.1+) while Path.getEelDescriptor() is binary-stable across
- * all of them. WSL descriptor equality includes the UNC root, so the path is normalized with
- * WslCompatService.canonicalizeWslPrefix first to make `\\wsl$\<distro>` and
- * `\\wsl.localhost\<distro>` resolve to the same descriptor.
+ * Environments are compared by EelMachine, resolved from the descriptor with
+ * getResolvedEelMachine(), because that is what the internal syncSdks(EelMachine) this replicates
+ * keys on. Descriptor equality is finer: it includes the UNC root, so `\\wsl$\<distro>` and
+ * `\\wsl.localhost\<distro>` are different descriptors but one machine. The path is still
+ * normalized with WslCompatService.canonicalizeWslPrefix first, because Path.of needs it to parse
+ * the UNC form at all. Comparison is permissive when either machine cannot be resolved, so SDK
+ * validation stays the deciding factor.
  */
 @Suppress("UnstableApiUsage")
 object SdkEnvironment {
@@ -69,10 +71,10 @@ object SdkEnvironment {
      * either environment cannot be determined, so SDK validation stays the deciding factor.
      */
     fun sdkVisibleFor(targetDescriptor: EelDescriptor?, sdk: Sdk): Boolean {
-        if (targetDescriptor == null) return true
-        val descriptor = sdkDescriptor(sdk) ?: return true
+        val targetMachine = targetDescriptor?.getResolvedEelMachine() ?: return true
+        val machine = sdkDescriptor(sdk)?.getResolvedEelMachine() ?: return true
 
-        return descriptor == targetDescriptor
+        return machine == targetMachine
     }
 
     /**
@@ -82,13 +84,13 @@ object SdkEnvironment {
      * and apply() treats SDKs already present in ProjectJdkTable as updates, not additions.
      */
     fun syncTargetSdks(sdksModel: ProjectSdksModel, targetDescriptor: EelDescriptor?) {
-        if (targetDescriptor == null) return
+        val targetMachine = targetDescriptor?.getResolvedEelMachine() ?: return
         val projectSdks = sdksModel.projectSdks
 
         for (sdk in ProjectJdkTable.getInstance().allJdks) {
             if (projectSdks.containsKey(sdk) || projectSdks.containsValue(sdk)) continue
 
-            if (sdkDescriptor(sdk) == targetDescriptor) {
+            if (sdkDescriptor(sdk)?.getResolvedEelMachine() == targetMachine) {
                 sdksModel.addSdk(sdk)
             }
         }
