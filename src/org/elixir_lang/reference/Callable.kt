@@ -15,6 +15,7 @@ import com.intellij.usageView.UsageViewTypeLocation
 import com.intellij.util.IncorrectOperationException
 import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.annotator.Parameter
+import org.elixir_lang.model.psi.variable.VariableSymbol
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.ElementDescriptionProvider.Companion.VARIABLE_USAGE_VIEW_TYPE_LOCATION_ELEMENT_DESCRIPTION
 import org.elixir_lang.psi.call.Call
@@ -305,71 +306,12 @@ class Callable : PsiReferenceBase<Call>, PsiPolyVariantReference {
         @Contract(pure = true)
         @JvmStatic
         tailrec fun isVariable(ancestor: PsiElement): Boolean =
-            when (ancestor) {
-                is ElixirInterpolation,
-                    // bound quoted variable name in {@code quote bind_quoted: [name: value] do ... end}
-                is ElixirKeywordKey,
-                is ElixirStabNoParenthesesSignature,
-                    /* if a StabOperation is encountered before ElixirStabNoParenthesesSignature or
-                       ElixirStabParenthesesSignature, then must have come from body */
-                is ElixirStabOperation,
-                is ElixirStabParenthesesSignature,
-                is InMatch,
-                is Match ->
-                    true
-
-                is ElixirAccessExpression,
-                    /* an anonymous function is only reached when its stab has no `->`, which is a syntax error,
-                       but it can also occur during typing, so try searching above it */
-                is ElixirAnonymousFunction,
-                is ElixirAssociations,
-                is ElixirAssociationsBase,
-                is ElixirBitString,
-                is ElixirBlockItem,
-                is ElixirBlockList,
-                is ElixirBracketArguments,
-                is ElixirContainerAssociationOperation,
-                is ElixirDoBlock,
-                is ElixirEex,
-                is ElixirEexTag,
-                is ElixirKeywordPair,
-                is ElixirKeywords,
-                is ElixirList,
-                is ElixirMapArguments,
-                is ElixirMapConstructionArguments,
-                is ElixirMapOperation,
-                is ElixirMapUpdateArguments,
-                    /* parenthesesArguments can be used in @spec other type declarations, so may not be variable
-                       until ancestor call is checked */
-                is ElixirMatchedParenthesesArguments,
-                    /* Happens when tuple is after `MyAlias.` when add qualified call above line with pre-existing
-                       tuple */
-                is ElixirMultipleAliases,
-                is ElixirNoParenthesesOneArgument,
-                is ElixirNoParenthesesArguments,
-                is ElixirNoParenthesesKeywordPair,
-                is ElixirNoParenthesesKeywords,
-                    /* ElixirNoParenthesesManyStrictNoParenthesesExpression and ElixirNoParenthesesStrict indicates
-                       a syntax error, but it can also occur during typing, so try searching above the syntax error
-                       to resolve whether a variable */
-                is ElixirNoParenthesesManyStrictNoParenthesesExpression,
-                is ElixirNoParenthesesStrict,
-                is ElixirParenthesesArguments,
-                is ElixirParentheticalStab,
-                is ElixirStab,
-                is ElixirStabBody,
-                is ElixirStructOperation,
-                is ElixirTuple,
-                is ElixirVariable,
-                is QualifiedAlias,
-                is Type ->
-                    isVariable(ancestor.parent)
-
-                is Call -> // MUST be after any operations because operations also implement Call
-                    isVariable(ancestor)
-
-                // Anything else cannot hold a variable declaration
-                else -> false
+            when (VariableWalk.classify(ancestor)) {
+                VariableWalk.Bucket.DECLARES -> true
+                // a detached element has nothing above it to declare a variable
+                VariableWalk.Bucket.TRANSPARENT -> isVariable(ancestor.parent ?: return false)
+                VariableWalk.Bucket.CALL -> isVariable(ancestor as Call)
+                VariableWalk.Bucket.STOP, VariableWalk.Bucket.LEAF -> false
             }
 
         @RequiresReadLock
@@ -414,9 +356,42 @@ class Callable : PsiReferenceBase<Call>, PsiPolyVariantReference {
                 null
             }
 
+        /**
+         * A declaration is scoped by the walk above it. A use is scoped by that walk and by the scope of every
+         * declaration it reads and of their chain roots: a use scope must hold every reference, and the walk from
+         * a use starts at the use's own statement, after the declaration's.
+         */
+        @RequiresReadLock
         @JvmStatic
-        fun variableUseScope(match: UnqualifiedNoArgumentsCall<*>): LocalSearchScope =
-            variableUseScope(match as PsiElement)
+        fun variableUseScope(call: UnqualifiedNoArgumentsCall<*>): LocalSearchScope {
+            val own = variableUseScope(call, call)
+
+            return if (VariableSymbol.isDeclaration(call)) {
+                own
+            } else {
+                declarationsRead(call).fold(own) { scope, declaration ->
+                    (UseScopeImpl.get(declaration) as? LocalSearchScope)?.let { scope.including(it) } ?: scope
+                }
+            }
+        }
+
+        /** Both scopes' elements, in text order, less any inside another; the platform's union climbs to parents. */
+        private fun LocalSearchScope.including(other: LocalSearchScope): LocalSearchScope {
+            val elements = scope.toList() + other.scope
+
+            return elements
+                .filterNot { element -> elements.any { it !== element && PsiTreeUtil.isAncestor(it, element, true) } }
+                .sortedBy { it.textRange.startOffset }
+                .let { LocalSearchScope(it.toTypedArray()) }
+        }
+
+        /** The declarations [use] resolves to, through the cached reference, and their chain roots. */
+        private fun declarationsRead(use: UnqualifiedNoArgumentsCall<*>): List<UnqualifiedNoArgumentsCall<*>> =
+            ((use as PsiElement).reference as? PsiPolyVariantReference)?.multiResolve(false).orEmpty()
+                .mapNotNull { it.element as? UnqualifiedNoArgumentsCall<*> }
+                .filter { VariableSymbol.isDeclaration(it) }
+                .flatMap { listOfNotNull(it, VariableSymbol.fromDeclaration(it)?.chainRootDeclaration()) }
+                .distinct()
 
         /**
          * Searches downward from `ancestor`, only returning true if `element` is a type, unit, size or
@@ -465,7 +440,7 @@ class Callable : PsiReferenceBase<Call>, PsiPolyVariantReference {
 
                     // _ is an "ignored" not a variable
                     if (name == null || name != IGNORED) {
-                        call.parent.let { isVariable(it) }
+                        call.parent?.let { isVariable(it) } ?: false
                     } else {
                         false
                     }
@@ -480,12 +455,12 @@ class Callable : PsiReferenceBase<Call>, PsiPolyVariantReference {
                    cases of exactly that. Which kind this is cannot be told from the syntax, so
                    resolve it. */
                 call is UnqualifiedParenthesesCall<*> -> resolvesToMacro(call)
-                else -> call.parent.let { isVariable(it) }
+                else -> call.parent?.let { isVariable(it) } ?: false
             }
 
         private fun variableUseScope(call: Call): LocalSearchScope =
             when (selector(call)) {
-                UseScopeImpl.UseScopeSelector.PARENT -> variableUseScope(call.parent)
+                UseScopeImpl.UseScopeSelector.PARENT -> scopeAbove(call)
                 UseScopeImpl.UseScopeSelector.SELF -> LocalSearchScope(call)
                 UseScopeImpl.UseScopeSelector.SELF_AND_FOLLOWING_SIBLINGS -> {
                     val selfAndFollowingSiblingList = ArrayList<PsiElement>()
@@ -502,7 +477,8 @@ class Callable : PsiReferenceBase<Call>, PsiPolyVariantReference {
             }
 
         private fun variableUseScope(match: Match): LocalSearchScope =
-            match.parent.let { parent ->
+            // a detached match has nothing above it to scope the variable
+            (match.parent ?: return LocalSearchScope.EMPTY).let { parent ->
                 when (parent) {
                     is ElixirEexTag, is ElixirStabBody -> {
                         val ancestor = PsiTreeUtil.getContextOfType(
@@ -515,7 +491,7 @@ class Callable : PsiReferenceBase<Call>, PsiPolyVariantReference {
                         )
 
                         if (ancestor is ElixirParentheticalStab) {
-                            variableUseScope(parent)
+                            variableUseScope(match, parent)
                         } else {
                             /* all non-ElixirParentheticalStab are block-like and so could have multiple statements after the match
                                where the match variable is used */
@@ -523,68 +499,25 @@ class Callable : PsiReferenceBase<Call>, PsiPolyVariantReference {
                         }
                     }
 
-                    is PsiFile -> match.selfAndFollowingSiblingsSearchScope()
-                    else -> variableUseScope(parent)
+                    else -> scopeAbove(match)
                 }
             }
 
-        private tailrec fun variableUseScope(ancestor: PsiElement): LocalSearchScope =
-            when (ancestor) {
-                is ElixirAccessExpression,
-                is ElixirAssociations,
-                is ElixirAssociationsBase,
-                is ElixirBitString,
-                is ElixirBlockItem,
-                is ElixirBlockList,
-                is ElixirContainerAssociationOperation,
-                is ElixirDoBlock,
-                is ElixirKeywordPair,
-                is ElixirKeywords,
-                is ElixirList,
-                is ElixirMapArguments,
-                is ElixirMapConstructionArguments,
-                is ElixirMapOperation,
-                is ElixirMatchedParenthesesArguments,
-                is ElixirNoParenthesesOneArgument,
-                is ElixirNoParenthesesArguments,
-                is ElixirNoParenthesesKeywordPair,
-                is ElixirNoParenthesesKeywords,
-                is ElixirParenthesesArguments,
-                is ElixirParentheticalStab,
-                is ElixirStab,
-                is ElixirStabBody,
-                is ElixirStabNoParenthesesSignature,
-                is ElixirStabParenthesesSignature,
-                is ElixirStructOperation,
-                is ElixirTuple,
-                is InMatch,
-                is Type,
-                is UnqualifiedNoArgumentsCall<*> ->
-                    variableUseScope(ancestor.parent)
+        // a detached element has nothing above it to scope the variable
+        private fun scopeAbove(element: PsiElement): LocalSearchScope =
+            element.parent?.let { variableUseScope(element, it) } ?: LocalSearchScope.EMPTY
 
-                is ElixirStabOperation,
-                is QualifiedAlias ->
-                    LocalSearchScope(ancestor)
-
-                is Match ->
-                    variableUseScope(ancestor)
-
-                is Call ->
-                    variableUseScope(ancestor)
-
-                is ElixirMapUpdateArguments,
-                is ElixirEexTag,
-                is ElixirInterpolation,
-                    /* reaching the file root means the walk passed no scope that could declare the variable,
-                       as happens for a match operator outside any comprehension - a syntax error, but also a
-                       state code passes through while being typed */
-                is PsiFile ->
-                    /* no variable can be declared inside these classes, so this is a variable usage missing a
-                       declaration, so it has no use scope */
-                    LocalSearchScope.EMPTY
-
-                // Anything else cannot declare a variable either, so a use there has no scope
-                else -> LocalSearchScope.EMPTY
+        /** The scope [ancestor] gives the variable below it, reached through [child], its direct child. */
+        private tailrec fun variableUseScope(child: PsiElement, ancestor: PsiElement): LocalSearchScope =
+            when (VariableUseScopeWalk.classify(ancestor)) {
+                // a detached element has nothing above it to scope the variable
+                VariableUseScopeWalk.Bucket.PARENT ->
+                    variableUseScope(ancestor, ancestor.parent ?: return LocalSearchScope.EMPTY)
+                VariableUseScopeWalk.Bucket.SELF -> LocalSearchScope(ancestor)
+                VariableUseScopeWalk.Bucket.FOLLOWING -> child.selfAndFollowingSiblingsSearchScope()
+                VariableUseScopeWalk.Bucket.MATCH -> variableUseScope(ancestor as Match)
+                VariableUseScopeWalk.Bucket.CALL -> variableUseScope(ancestor as Call)
+                VariableUseScopeWalk.Bucket.EMPTY, VariableUseScopeWalk.Bucket.LEAF -> LocalSearchScope.EMPTY
             }
     }
 }

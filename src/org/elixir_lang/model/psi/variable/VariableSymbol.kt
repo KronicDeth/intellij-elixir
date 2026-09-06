@@ -91,10 +91,12 @@ class VariableSymbol(
         NavigationRequest.sourceNavigationRequest(file, range)
 
     override val maximalSearchScope: SearchScope?
-        @RequiresReadLock get() {
-            val declaration = declarationCall() as? UnqualifiedNoArgumentsCall<*> ?: return null
-            return UseScopeImpl.get(chainRootDeclaration(declaration))
-        }
+        @RequiresReadLock get() = chainRootDeclaration()?.let { UseScopeImpl.get(it) }
+
+    /** The chain root of the declaration this symbol stands on, or `null` when it stands on none. */
+    @RequiresReadLock
+    fun chainRootDeclaration(): UnqualifiedNoArgumentsCall<*>? =
+        (declarationCall() as? UnqualifiedNoArgumentsCall<*>)?.let { chainRootDeclaration(it) }
 
     /**
      * This variable's identity for search and rename: its chain root, as a symbol.

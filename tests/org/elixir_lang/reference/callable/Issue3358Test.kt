@@ -1,6 +1,5 @@
 package org.elixir_lang.reference.callable
 
-import com.intellij.psi.search.LocalSearchScope
 import org.elixir_lang.PlatformTestCase
 import org.elixir_lang.psi.UnqualifiedNoArgumentsCall
 import org.elixir_lang.reference.Callable.Companion.variableUseScope
@@ -14,9 +13,12 @@ class Issue3358Test : PlatformTestCase() {
                 .parent
                 .parent
         assertInstanceOf(callable, UnqualifiedNoArgumentsCall::class.java)
+        /* `<-` outside a comprehension is a syntax error, but as a bare top-level statement it is scoped from its
+           statement like any other; the error report this issue was about is gone either way */
+        assertSame(myFixture.file, callable.parent.parent)
         assertEquals(
-                LocalSearchScope.EMPTY,
-                variableUseScope((callable as UnqualifiedNoArgumentsCall<*>))
+            listOf("room <- level_id"),
+            variableUseScope(callable as UnqualifiedNoArgumentsCall<*>).scope.map { it.text }
         )
     }
 
