@@ -22,6 +22,7 @@ import org.elixir_lang.psi.operation.Normalized.operatorIndex
 import org.elixir_lang.psi.operation.Type
 import org.elixir_lang.psi.operation.infix.Normalized
 import org.elixir_lang.psi.scope.WhileIn.whileIn
+import org.elixir_lang.psi.scope.variable.BindingPattern
 import org.elixir_lang.resolvesToMacro
 import org.elixir_lang.structure_view.element.CallDefinitionHead.Companion.strip
 import org.elixir_lang.structure_view.element.Delegation
@@ -40,12 +41,13 @@ abstract class Variable : PsiScopeProcessor {
             } else {
                 when (VariableDescent.classify(element)) {
                     VariableDescent.Bucket.NON_DECLARING_INFIX -> executeNonDeclaringScopeInfix(element as Infix, state)
-                    VariableDescent.Bucket.CHILDREN -> execute(element.children, state)
+                    VariableDescent.Bucket.CHILDREN -> execute(readingOrder(element.children, element), state)
                     /* A bare identifier inside a string is a read even when the string is a macro argument, so the
                        pass stops declaring; a match inside starts it again for its own operands. A part with no `#`
                        cannot hold an interpolation, so a long heredoc costs one visit. */
                     VariableDescent.Bucket.CHILDREN_READING ->
-                        !element.textContains('#') || execute(element.children, state.put(DECLARING_SCOPE, false))
+                        !element.textContains('#') ||
+                            execute(element.children.reversedArray(), state.put(DECLARING_SCOPE, false))
                     VariableDescent.Bucket.BRACKET -> execute((element as BracketOperation).bracketArguments, state)
                     VariableDescent.Bucket.AT_BRACKET ->
                         execute((element as AtUnqualifiedBracketOperation).bracketArguments, state)
@@ -276,11 +278,13 @@ abstract class Variable : PsiScopeProcessor {
 
     /**
      * A construction may be a pattern, so what it holds declares. An update is a value, so what it holds reads, but a
-     * match inside it still binds for the code after the map.
+     * match inside it still binds for the code after the map, the last to bind a name winning.
      */
     private fun execute(match: ElixirMapArguments, state: ResolveState): Boolean =
             (match.mapConstructionArguments?.let { execute(it, state) } ?: true) &&
-                    (match.mapUpdateArguments?.let { execute(it.children, state.put(DECLARING_SCOPE, false)) } ?: true)
+                    (match.mapUpdateArguments?.let {
+                        execute(it.children.reversedArray(), state.put(DECLARING_SCOPE, false))
+                    } ?: true)
 
     private fun execute(match: ElixirMapOperation, state: ResolveState): Boolean =
             execute(match.mapArguments, state)
@@ -366,10 +370,22 @@ abstract class Variable : PsiScopeProcessor {
     private fun execute(match: QuotableKeywordList, state: ResolveState): Boolean {
         val keywordPairList = match.quotableKeywordPairList()
 
-        return whileIn(keywordPairList) {
+        return whileIn(readingOrder(keywordPairList, match)) {
             execute(it, state)
         }
     }
+
+    /**
+     * The order the resolver reads [container]'s [parts] in. Elixir evaluates a value's parts left to right, so the
+     * last to bind a name is the one in scope after the value, and they are read last first. A pattern binds a name
+     * once however often it writes it, and its first writing is the binding, so a pattern's parts keep their order.
+     * One part has no order, so the container is not asked which it is.
+     */
+    private fun readingOrder(parts: Array<PsiElement>, container: PsiElement): Array<PsiElement> =
+        if (parts.size < 2 || BindingPattern.binds(container)) parts else parts.reversedArray()
+
+    private fun <T> readingOrder(parts: List<T>, container: PsiElement): List<T> =
+        if (parts.size < 2 || BindingPattern.binds(container)) parts else parts.asReversed()
 
     // a quoted key can hold an interpolation, so it is visited like the value
     private fun execute(match: QuotableKeywordPair, state: ResolveState): Boolean =

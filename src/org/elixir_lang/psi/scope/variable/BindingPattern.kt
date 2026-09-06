@@ -52,6 +52,40 @@ object BindingPattern {
     }
 
     /**
+     * Whether [element] sits where writing a name binds it: in a pattern that binds afresh, or on the binding side
+     * of a match, where a match inside a pattern binds both its sides. Elsewhere a name is read and only a match
+     * inside binds. The resolver's state cannot tell: its declaring flag is on for both sides of a match, so an
+     * unbound read on the right still files itself, and unset for a statement on its own. One walk, ending at the
+     * statement's body, as the descent asks this of every container with parts to order.
+     */
+    @RequiresReadLock
+    fun binds(element: PsiElement): Boolean {
+        var child: PsiElement = element
+
+        for (ancestor in generateSequence(element.parent) { it.parent }) {
+            ProgressManager.checkCanceled()
+            when (ancestor) {
+                is PsiFile, is ElixirDoBlock -> return false
+                is ElixirStabBody -> return headlessFunction(ancestor) != null
+                is When -> if (ancestor.rightOperand().holds(child)) return false
+                is UnaryOperation ->
+                    if (ancestor.operator().text == "^" && ancestor.operand().holds(child)) return false
+                // on the right of a match, an enclosing pattern still binds: `%{a: t = {x, x}} = map`
+                is Match -> if (ancestor.leftOperand().holds(child)) return true
+                is InMatch -> return ancestor.leftOperand().holds(child)
+                is ElixirStabNoParenthesesSignature, is ElixirStabParenthesesSignature ->
+                    return !isCondClauseHead(ancestor)
+                is ElixirAnonymousFunction -> return true
+                is Call ->
+                    if (CallDefinitionClause.`is`(ancestor)) return CallDefinitionClause.head(ancestor).holds(child)
+            }
+            child = ancestor
+        }
+
+        return false
+    }
+
+    /**
      * Whether [element] is the value of a match, and so a read: it sits on the right of the nearest match, and that
      * match is not itself inside a pattern, where both sides bind: `%{a: [_ | _] = x} = map` binds `x`.
      */

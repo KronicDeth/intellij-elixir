@@ -246,6 +246,18 @@ class RenameMatrixTest : PlatformTestCase() {
     fun testVariableWithArgumentInMatch() =
         doTestFromEveryOccurrence("variable_with_argument_in_match", "renamee", "fresh", expectedCarets = 2)
 
+    /** A binding inside a list that is a statement on its own, `[renamee = 1]`, and its read after it. */
+    fun testVariableBareListBinding() =
+        doTestFromEveryOccurrence("variable_bare_list_binding", "renamee", "fresh", expectedCarets = 2)
+
+    /** A binding inside a string that is a statement on its own, `"#{renamee = 1}"`. */
+    fun testVariableBareStringBinding() =
+        doTestFromEveryOccurrence("variable_bare_string_binding", "renamee", "fresh", expectedCarets = 2)
+
+    /** A binding inside a call's arguments, `IO.puts(renamee = 1)`, and its read after the call. */
+    fun testVariableCallArgumentBinding() =
+        doTestFromEveryOccurrence("variable_call_argument_binding", "renamee", "fresh", expectedCarets = 2)
+
     /** A read inside string interpolation in a call argument, `IO.puts("Hello #{renamee}")`. */
     fun testVariableInterpolationArgumentRead() =
         doTestFromEveryOccurrence("variable_interpolation_argument_read", "renamee", "fresh", expectedCarets = 2)

@@ -160,6 +160,15 @@ class VariableFindUsagesTest : PlatformTestCase() {
     fun testGoToDeclarationFromLaterUseNavigatesIntoMapUpdate() =
         assertGotoDeclarationNavigatesToVariable("goto_declaration_variable_declared_in_map_update.ex")
 
+    fun testGoToDeclarationFromLaterUseNavigatesIntoBareList() =
+        assertGotoDeclarationNavigatesToVariable("goto_declaration_variable_declared_in_bare_list.ex")
+
+    fun testGoToDeclarationFromLaterUseNavigatesIntoBareString() =
+        assertGotoDeclarationNavigatesToVariable("goto_declaration_variable_declared_in_bare_string.ex")
+
+    fun testGoToDeclarationFromLaterUseNavigatesIntoCallArgument() =
+        assertGotoDeclarationNavigatesToVariable("goto_declaration_variable_declared_in_call_argument.ex")
+
     fun testGoToDeclarationFromUseInsideInterpolationNavigatesToDeclaration() {
         myFixture.configureByFiles("goto_declaration_variable_used_in_interpolation.ex")
         val target = myFixture.gotoDeclarationDestinationAtCaret()
