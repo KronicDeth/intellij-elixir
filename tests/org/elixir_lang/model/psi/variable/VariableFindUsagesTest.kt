@@ -128,6 +128,15 @@ class VariableFindUsagesTest : PlatformTestCase() {
         assertEquals("variable", target!!.text)
     }
 
+    fun testCtrlClickOnMatchRhsVariableUsageChoosesGotoDeclaration() {
+        // `y = variable` reads `variable`; the gesture must navigate to its declaration, not show the read's own usages.
+        assertCtrlClickChoosesGotoDeclaration("goto_declaration_variable_usage_match_rhs.ex")
+    }
+
+    fun testCtrlClickOnMatchRhsVariableUsageInListChoosesGotoDeclaration() {
+        assertCtrlClickChoosesGotoDeclaration("goto_declaration_variable_usage_match_rhs_list.ex")
+    }
+
     fun testCtrlClickOnPinnedMatchRhsVariableChoosesGotoDeclaration() {
         assertCtrlClickChoosesGotoDeclaration("goto_declaration_pin_match_rhs.ex")
     }

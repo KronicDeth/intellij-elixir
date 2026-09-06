@@ -41,6 +41,13 @@ class MultiResolve(private val name: String, private val incompleteCode: Boolean
     private fun addToResolveResultList(element: PsiElement, state: ResolveState, validResult: Boolean) {
         if (state.get(DECLARING_SCOPE) == false) return
 
+        /* A pattern binds what it writes, so it answers for itself whatever match it sits under; the symbol model
+           applies the same rule, so what the resolver files is what Find Usages and rename call a declaration. */
+        if (!BindingPattern.isMatchRead(element)) {
+            resolveResultList.add(VisitedElementSetResolveResult(element, validResult, state.visitedElementSet()))
+            return
+        }
+
         /* A read on the right of `=` declares its name only if nothing above binds it, so its earlier bindings are
            looked up: not when this is that lookup meeting the read again, and not for a prefix-named read, which is
            a candidate for incomplete code and never a declaration of the searched name. */
@@ -54,7 +61,8 @@ class MultiResolve(private val name: String, private val incompleteCode: Boolean
 
         if (bound.isNotEmpty()) {
             resolveResultList.addAll(bound)
-        } else {
+        } else if (!element.isEquivalentTo(state.get(ENTRANCE))) {
+            // an unbound read stands in as the declaration for the reads after it, but never for itself
             resolveResultList.add(VisitedElementSetResolveResult(element, validResult, state.visitedElementSet()))
         }
         // a prefix-named earlier variable is a candidate for incomplete code, whether or not the read is bound
@@ -72,12 +80,8 @@ class MultiResolve(private val name: String, private val incompleteCode: Boolean
     ): List<VisitedElementSetResolveResult> {
         val match = PsiTreeUtil.getContextOfType(element, Match::class.java) ?: return emptyList()
         val rightOperand = match.rightOperand() ?: return emptyList()
-        // a pattern on the right, an `fn` parameter or a clause head, binds afresh rather than reading
-        val pattern = BindingPattern.of(element)
 
-        return if (PsiTreeUtil.isAncestor(rightOperand, element, false) &&
-            (pattern == null || !PsiTreeUtil.isAncestor(rightOperand, pattern, false))
-        ) {
+        return if (PsiTreeUtil.isAncestor(rightOperand, element, false)) {
             resolveBefore(name, incompleteCode, match, element, state)
         } else {
             emptyList()
