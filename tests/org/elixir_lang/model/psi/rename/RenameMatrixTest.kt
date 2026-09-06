@@ -210,6 +210,34 @@ class RenameMatrixTest : PlatformTestCase() {
     fun testVariableMapPatternRepeated() =
         doTestFromEveryOccurrence("variable_map_pattern_repeated", "renamee", "fresh", expectedCarets = 2)
 
+    /** A binding on the left of an inner match that sits on the right of an outer one, `_ = (renamee = 1)`. */
+    fun testVariableNestedMatchBinding() =
+        doTestFromEveryOccurrence("variable_nested_match_binding", "renamee", "fresh", expectedCarets = 2)
+
+    /** A case pattern binding inside `result = case … do … end`: a pattern, although right of a match. */
+    fun testVariableCasePatternInMatch() =
+        doTestFromEveryOccurrence("variable_case_pattern_in_match", "renamee", "fresh", expectedCarets = 2)
+
+    /** An `fn` parameter inside `f = fn renamee -> … end`. */
+    fun testVariableFnParameterInMatch() =
+        doTestFromEveryOccurrence("variable_fn_parameter_in_match", "renamee", "fresh", expectedCarets = 2)
+
+    /** `%{a: [_ | _] = renamee} = map`: the inner match sits in the outer pattern, so both its sides bind. */
+    fun testVariableMatchInsidePattern() =
+        doTestFromEveryOccurrence("variable_match_inside_pattern", "renamee", "fresh", expectedCarets = 2)
+
+    /** `def run(%{} = renamee)`: a match in a definition head binds both sides. */
+    fun testVariableMatchInsideHead() =
+        doTestFromEveryOccurrence("variable_match_inside_head", "renamee", "fresh", expectedCarets = 2)
+
+    /** The enumerable of a generator under a match, `result = for item <- renamee`, is a read of the parameter. */
+    fun testVariableComprehensionEnumerableInMatch() =
+        doTestFromEveryOccurrence("variable_comprehension_enumerable_in_match", "renamee", "fresh", expectedCarets = 2)
+
+    /** A `with` clause's argument under a match, `result = with {:ok, v} <- fetch(renamee)`, is a read too. */
+    fun testVariableWithArgumentInMatch() =
+        doTestFromEveryOccurrence("variable_with_argument_in_match", "renamee", "fresh", expectedCarets = 2)
+
     // -- Types ------------------------------------------------------------------------------
 
     /** `@type` declaration and its references inside a `@spec`. */
