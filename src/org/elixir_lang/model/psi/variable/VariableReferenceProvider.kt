@@ -25,10 +25,14 @@ internal class VariableReferenceProvider : PsiSymbolReferenceProvider {
             else -> return emptyList()
         }
         if (host is Match) return emptyList()
-        if (VariableSymbol.isDeclaration(host)) return emptyList()
-        if (VariableReference.resolveSymbols(host).isEmpty()) return emptyList()
         val nameElement = VariableSymbol.nameIdentifierElement(host) ?: return emptyList()
         val rangeInElement = nameElement.textRange.shiftLeft(host.textRange.startOffset)
+        // The service drops references that do not contain the hinted offset, so a caret outside the name (every
+        // enclosing call of a declaration, walked on the way up to the file) is answered without resolving.
+        val offsetInElement = hints.offsetInElement
+        if (offsetInElement >= 0 && !rangeInElement.containsOffset(offsetInElement)) return emptyList()
+        if (VariableSymbol.isDeclaration(host)) return emptyList()
+        if (VariableReference.resolveSymbols(host).isEmpty()) return emptyList()
 
         return listOf(VariableReference(host, rangeInElement))
     }
