@@ -61,6 +61,10 @@
 
 ### Bug Fixes
 
+- [#4027](https://github.com/KronicDeth/intellij-elixir/pull/4027) [@sh41](https://github.com/sh41)
+  - **A variable bound inside string interpolation, such as `x` in `"#{x = 1}"`, can be found, renamed
+    and navigated to from the code after the string.** Fixes [#4023](https://github.com/KronicDeth/intellij-elixir/issues/4023).
+
 - [#4020](https://github.com/KronicDeth/intellij-elixir/pull/4020) [@sh41](https://github.com/sh41)
   - **Variable resolution, Find Usages and rename no longer report errors or miss bindings for code
     shapes they did not model.** Fixes [#4019](https://github.com/KronicDeth/intellij-elixir/issues/4019).
