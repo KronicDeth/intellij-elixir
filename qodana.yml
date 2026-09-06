@@ -1,13 +1,38 @@
 # Qodana configuration:
 # https://www.jetbrains.com/help/qodana/qodana-yaml.html
 version: "1.0"
-linter: jetbrains/qodana-jvm-community:2026.2
+# Linter NAME, not a docker image: the image form is the pre-2025.2 legacy syntax and forces a
+# container, which would make CI unable to run in native mode.
+linter: qodana-jvm-community
 projectJDK: "21"
 profile:
-  name: qodana.recommended
+  path: .qodana/qodana.profile.yaml
+# qodana.recommended disables every inspection outside a 23-category allowlist, and "Plugin DevKit"
+# is not on it - so the inspections that matter most for a plugin have to be named one by one.
+include:
+  - name: ThreadingConcurrency
+  - name: MissingRecentApi
+  - name: PluginXmlValidity
+  - name: IncorrectServiceRetrieving
+  - name: PotentialDeadlockInServiceInitialization
+  - name: IncorrectCancellationExceptionHandling
+  - name: ComponentNotRegistered
+  - name: IncorrectParentDisposable
+  - name: ApplicationServiceAsStaticFinalFieldOrProperty
+  - name: CancellationCheckInLoops
+  - name: LightServiceMustBeFinal
+  - name: NonDefaultConstructor
+  - name: ObsoleteDispatchersEdt
+  - name: CanBeDumbAware
+  - name: CallingMethodShouldBeRequiresBlockingContext
+  - name: ExtensionClassShouldBeFinalAndNonPublic
+  - name: OptionalDependencyViaDependsTag
+  - name: PathAnnotationInspection
+  - name: SerializableCtor
 exclude:
   - name: All
     paths:
       - .qodana
       - cache
       - testData
+      - gen

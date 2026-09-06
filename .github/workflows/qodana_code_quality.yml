@@ -1,0 +1,94 @@
+name: Qodana
+
+# Static analysis on pull requests. Two choices are load-bearing here:
+#
+#   1. Native mode (--within-docker false). The container form gives Qodana its own Gradle home, a
+#      second multi-GB copy of a tree CI already caches. This repository is over GitHub's 10 GB
+#      Actions cache quota, so that second copy would evict the test matrix's gradle-dependencies
+#      entries. Native mode reuses the Gradle home setup-env warms, and skips a 4.15 GB image pull.
+#      It requires qodana.yml's `linter:` to be a linter NAME - an image value takes a legacy code
+#      path that forces a container regardless of this flag.
+#   2. Advisory only. The project has ~1300 findings, so any absolute quality gate fails on day one
+#      and a permanently red check gets ignored. continue-on-error keeps the signal without the
+#      false alarm; add failThreshold or a baseline to qodana.yml when the numbers justify it.
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  # the action's PR summary comment
+  pull-requests: write
+  # inline annotations on the diff
+  checks: write
+  # SARIF upload to code scanning
+  security-events: write
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  qodana:
+    name: Qodana
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # Qodana analyses the PR head rather than the merge commit, and pr-mode diffs against the
+          # base, so it needs the full history.
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup Build Environment
+        id: setup-env
+        uses: ./.github/actions/setup-env
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          gradle-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+          # Qodana imports the Gradle project; it never runs the quoter, so the BEAM toolchain is
+          # dead weight here.
+          setup-elixir: 'false'
+          # Qodana's headless import resolves configurations the test matrix does not, so it must
+          # never write cache entries no other job can restore.
+          cache-read-only: 'true'
+
+      - name: Qodana Scan
+        id: qodana
+        # Advisory: findings must never fail the check. See the header.
+        continue-on-error: true
+        uses: JetBrains/qodana-action@10be11607eb323a180e2b76b26c9c5cdceac3e77 # v2026.2.1
+        with:
+          args: "--linter qodana-jvm-community --within-docker false"
+          # Only the files the PR touches, which is the whole reason this is affordable per-PR.
+          pr-mode: true
+          # Deliberately off: Qodana's cache is multi-GB and the repository is already over the
+          # 10 GB Actions quota. The cost is re-downloading the IDE distribution each run.
+          use-caches: false
+          upload-result: true
+          artifact-name: qodana-report
+          post-pr-comment: true
+          use-annotations: true
+          push-fixes: 'none'
+
+      - name: Upload SARIF to code scanning
+        id: upload-sarif
+        # Attempted for fork PRs too, rather than skipped. upload-sarif is documented to reach an
+        # endpoint that does not require `security-events: write`, but that is not something this
+        # repository has exercised - so try the upload and let it fail harmlessly if the token is
+        # too weak, instead of guessing and reporting nothing.
+        if: always()
+        continue-on-error: true
+        uses: github/codeql-action/upload-sarif@cdf488f595d80d6e07e03d4674febd5ab45fa938 # v4
+        with:
+          sarif_file: ${{ runner.temp }}/qodana/results/qodana.sarif.json
+          category: qodana
