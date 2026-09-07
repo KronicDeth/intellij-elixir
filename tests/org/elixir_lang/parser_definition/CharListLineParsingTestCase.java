@@ -11,7 +11,7 @@ public class CharListLineParsingTestCase extends ParsingTestCase {
     }
 
     public void testEmptyUnicodeEscapeSequence() {
-        assertParsedAndQuotedAroundError();
+        assertParsedAndQuotedAroundErrorOrRaise("Elixir.ArgumentError");
     }
 
     public void testEnclosedHexEscapeSequence() {

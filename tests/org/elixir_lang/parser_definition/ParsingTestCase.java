@@ -92,6 +92,33 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
         }
     }
 
+    /** Mirror of {@link #assertParsedAndQuotedCorrectlyBefore}: the quoter rejects it *below* {@code dialect}. */
+    protected void assertParsedAndQuotedCorrectlyFrom(QuotingDialect dialect) {
+        assertParsedAndQuotedCorrectlyFrom(dialect, true);
+    }
+
+    protected void assertParsedAndQuotedCorrectlyFrom(QuotingDialect dialect, boolean checkResult) {
+        doTest(checkResult);
+
+        if (QuotingDialectResolver.dialectFor(myFile).compareTo(dialect) < 0) {
+            assertQuotedAroundError();
+        } else {
+            assertWithoutLocalError();
+            assertQuotedCorrectly();
+        }
+    }
+
+    /**
+     * As {@link #assertParsedAndQuotedAroundError}, where the rejection is a raise below 1.12.0 and an
+     * error tuple from it. No threshold: every supported version rejects, only the manner moved.
+     */
+    protected void assertParsedAndQuotedAroundErrorOrRaise(String expectedException) {
+        doTest(true);
+
+        assertInstanceOf(ElixirPsiImplUtil.quote(myFile), OtpErlangObject.class);
+        Quoter.assertErrorOrRaise(myFile, expectedException);
+    }
+
     protected void assertParsedWithErrors() {
         assertParsedWithErrors(true);
     }

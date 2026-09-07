@@ -93,6 +93,7 @@ object ParentImpl {
         return addStringCodePoints(codePointList, string)
     }
 
+    @RequiresReadLock
     @JvmStatic
     fun addEscapedEOL(
         parent: Parent,
@@ -100,10 +101,12 @@ object ParentImpl {
     ): List<Int> {
         val codePointList: MutableList<Int> = ensureCodePointList(maybeCodePointList)
 
-        if (parent is Sigil) {
-            for (codePoint in codePoints("\\\n")) {
-                codePointList.add(codePoint)
-            }
+        // See QuotingDialect.V1_12; `~S` and plain strings are the same in every version, and only a
+        // sigil reaches dialectFor - atom resolution calls this too.
+        if (parent is Sigil &&
+            (parent !is Interpolated || dialectFor(parent).keepsEscapedNewlineInExtractedBuffer)
+        ) {
+            codePointList.addAll(codePoints("\\\n"))
         }
 
         return codePointList
@@ -121,9 +124,7 @@ object ParentImpl {
             child.psi.lastChild.text
         }
 
-        for (codePoint in codePoints(text)) {
-            codePointList.add(codePoint)
-        }
+        codePointList.addAll(codePoints(text))
 
         return codePointList
     }

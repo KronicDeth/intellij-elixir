@@ -1801,6 +1801,7 @@ public class ElixirPsiImplUtil {
         return ParentImpl.addEscapedCharacterCodePoints(parent, codePointList, child);
     }
 
+    @RequiresReadLock
     @NotNull
     public static List<Integer> addEscapedEOL(@NotNull Parent parent,
                                               @Nullable List<Integer> maybeCodePointList,
@@ -1808,6 +1809,7 @@ public class ElixirPsiImplUtil {
         return ParentImpl.addEscapedEOL(parent, maybeCodePointList);
     }
 
+    @RequiresReadLock
     @NotNull
     public static List<Integer> addEscapedTerminator(@NotNull Parent parent,
                                                      @Nullable List<Integer> maybeCodePointList,

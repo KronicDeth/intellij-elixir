@@ -6,6 +6,11 @@ import org.elixir_lang.psi.quoting.QuotingDialect;
  * Created by kadie.enheduanna.inanna on 8/8/14.
  */
 public class StringHeredocParsingTestCase extends ParsingTestCase {
+    /** A heredoc opening on an interpolation - see QuotingDialect.V1_12. */
+    public void testInterpolationFirst() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     public void testEmpty() {
         assertParsedAndQuotedAroundError();
     }
@@ -27,7 +32,7 @@ public class StringHeredocParsingTestCase extends ParsingTestCase {
     }
 
     public void testWhitespaceEndPrefix() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectlyFrom(QuotingDialect.V1_12);
     }
 
     @Override

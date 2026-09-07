@@ -14,6 +14,7 @@ import com.ericsson.otp.erlang.OtpErlangList;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.psi.LiteralTextEscaper;
 import com.intellij.psi.PsiLanguageInjectionHost;
+import com.intellij.util.concurrency.annotations.RequiresReadLock;
 
 public class ElixirLineImpl extends ASTWrapperPsiElement implements ElixirLine {
 
@@ -43,11 +44,13 @@ public class ElixirLineImpl extends ASTWrapperPsiElement implements ElixirLine {
   }
 
   @Override
+  @RequiresReadLock
   public @NotNull List<Integer> addEscapedEOL(@Nullable List<Integer> maybeCodePointList, @NotNull ASTNode child) {
     return ElixirPsiImplUtil.addEscapedEOL(this, maybeCodePointList, child);
   }
 
   @Override
+  @RequiresReadLock
   public @NotNull List<Integer> addEscapedTerminator(@Nullable List<Integer> maybeCodePointList, @NotNull ASTNode child) {
     return ElixirPsiImplUtil.addEscapedTerminator(this, maybeCodePointList, child);
   }

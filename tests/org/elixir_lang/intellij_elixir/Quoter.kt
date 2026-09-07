@@ -38,6 +38,30 @@ object Quoter {
 
     private const val UNAVAILABLE_REASON_VARIABLE = "QUOTER_UNAVAILABLE_REASON"
 
+    /**
+     * As [assertError], but a raise counts as rejection too - it arrives as [OtpErlangExit] because
+     * the call links the mbox to the server. Expected, not fatal: the quoter is supervised and each
+     * [quote] takes a fresh mbox. An exit that is not a raise still fails, via [daemonDied], and a
+     * raise of some other exception fails too, so an unrelated crash cannot pass as a rejection.
+     */
+    @JvmStatic
+    fun assertErrorOrRaise(file: PsiFile, expectedException: String) {
+        val text = file.text
+        try {
+            val quotedMessage = quote(text)
+            assertMessageReceived(quotedMessage)
+            val status = quotedMessage!!.elementAt(0) as OtpErlangAtom
+            Assert.assertEquals("error", status.atomValue())
+        } catch (e: IOException) {
+            throw RuntimeException(e)
+        } catch (e: OtpErlangDecodeException) {
+            throw RuntimeException(e)
+        } catch (e: OtpErlangExit) {
+            val raised = e.raisedException() ?: daemonDied(e)
+            Assert.assertEquals("quoter raised the wrong exception", expectedException, raised)
+        }
+    }
+
     @JvmStatic
     fun assertError(file: PsiFile) {
         val text = file.text
@@ -52,7 +76,7 @@ object Quoter {
         } catch (e: OtpErlangDecodeException) {
             throw RuntimeException(e)
         } catch (e: OtpErlangExit) {
-            throw RuntimeException(e)
+            daemonDied(e)
         }
     }
 
@@ -73,13 +97,47 @@ object Quoter {
         if (System.getenv(AVAILABLE_VARIABLE) != "false") return
 
         val reason = System.getenv(UNAVAILABLE_REASON_VARIABLE) ?: "no reason recorded"
+
+        throw AssertionError("${quoterPreamble("unavailable")}: $reason\nThis test needs the reference quoter; the rest of the suite does not.")
+    }
+
+    /**
+     * What a `{reason, stacktrace}` exit was raised with, or null when the exit is not a raise -
+     * [org.elixir_lang.GenericServer.call] reports an unreachable server with an atom reason, which
+     * says nothing about the code under test.
+     *
+     * An Elixir exception answers its `__struct__`; an Erlang one - `badarg`, `function_clause` -
+     * answers the reason term, because the tokenizer can fail that way on an old release and it is
+     * still the construct being rejected, not the toolchain.
+     */
+    private fun OtpErlangExit.raisedException(): String? {
+        val reason = reason() as? OtpErlangTuple ?: return null
+        if (reason.arity() != 2 || reason.elementAt(1) !is OtpErlangList) return null
+
+        val thrown = reason.elementAt(0)
+        val struct = (thrown as? OtpErlangMap)?.get(OtpErlangAtom("__struct__"))
+
+        return (struct as? OtpErlangAtom)?.atomValue() ?: thrown.toString()
+    }
+
+    /**
+     * The daemon died mid-run, which [assertAvailable] cannot catch - it reads a marker written
+     * before the run. Reported in the same words so both read alike.
+     */
+    private fun daemonDied(e: OtpErlangExit): Nothing {
+        val raised = e.raisedException()
+            ?: throw AssertionError("${quoterPreamble("died")}: ${e.reason()}\nThis test needs the reference quoter; the rest of the suite does not.", e)
+
+        // A raise is the code being rejected, not the toolchain failing, so say so - pointing the
+        // reader at the daemon here sends them after the wrong thing.
+        throw AssertionError("intellij_elixir raised $raised, use assertErrorOrRaise if this Elixir rejects the construct that way: ${e.reason()}", e)
+    }
+
+    private fun quoterPreamble(state: String): String {
         val elixirVersion = System.getenv("ELIXIR_VERSION").orEmpty().ifEmpty { "unknown" }
         val otpVersion = System.getenv("ERLANG_VERSION").orEmpty().ifEmpty { "unknown" }
 
-        throw AssertionError(
-            "Quoter daemon unavailable for Elixir $elixirVersion / OTP $otpVersion: $reason\n" +
-                "This test needs the reference quoter; the rest of the suite does not."
-        )
+        return "Quoter daemon $state for Elixir $elixirVersion / OTP $otpVersion"
     }
 
     @Contract("null -> fail")
@@ -129,7 +187,7 @@ object Quoter {
         } catch (e: OtpErlangDecodeException) {
             throw RuntimeException(e)
         } catch (e: OtpErlangExit) {
-            throw RuntimeException(e)
+            daemonDied(e)
         }
     }
 
