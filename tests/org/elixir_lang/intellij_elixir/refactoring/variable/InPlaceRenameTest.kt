@@ -59,4 +59,28 @@ class InPlaceRenameTest : InPlaceSymbolRenameTestCase() {
 
         myFixture.checkResultByFile("variable_used_usage.ex", "variable_used_after.ex", false)
     }
+
+    fun testVariableDeclaredInInterpolationDeclarationInPlaceRename() {
+        myFixture.configureByFiles("variable_declared_in_interpolation_declaration.ex")
+
+        inPlaceRenameAtCaret("renamed")
+
+        myFixture.checkResultByFile("variable_declared_in_interpolation_declaration.ex", "variable_declared_in_interpolation_after.ex", false)
+    }
+
+    fun testVariableReadInsideInterpolationArgumentInPlaceRename() {
+        myFixture.configureByFiles("variable_read_in_interpolation_argument_usage.ex")
+
+        inPlaceRenameAtCaret("renamed")
+
+        myFixture.checkResultByFile("variable_read_in_interpolation_argument_usage.ex", "variable_read_in_interpolation_argument_after.ex", false)
+    }
+
+    fun testVariableDeclaredInInterpolationUsageInPlaceRename() {
+        myFixture.configureByFiles("variable_declared_in_interpolation_usage.ex")
+
+        inPlaceRenameAtCaret("renamed")
+
+        myFixture.checkResultByFile("variable_declared_in_interpolation_usage.ex", "variable_declared_in_interpolation_after.ex", false)
+    }
 }

@@ -9,6 +9,7 @@ import com.intellij.model.search.SearchRequest
 import com.intellij.openapi.project.Project
 import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.psi.ElixirVariable
+import org.elixir_lang.psi.UnqualifiedBracketOperation
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.operation.Match
 
@@ -19,17 +20,19 @@ internal class VariableReferenceProvider : PsiSymbolReferenceProvider {
         element: PsiExternalReferenceHost,
         hints: PsiSymbolReferenceHints
     ): Collection<PsiSymbolReference> {
-        if (element !is Call && element !is ElixirVariable) return emptyList()
         val host = when (element) {
-            is ElixirVariable -> element
-            is Call -> element
+            is ElixirVariable, is Call, is UnqualifiedBracketOperation -> element
             else -> return emptyList()
         }
         if (host is Match) return emptyList()
-        if (VariableSymbol.isDeclaration(host)) return emptyList()
-        if (VariableReference.resolveSymbols(host).isEmpty()) return emptyList()
         val nameElement = VariableSymbol.nameIdentifierElement(host) ?: return emptyList()
         val rangeInElement = nameElement.textRange.shiftLeft(host.textRange.startOffset)
+        // The service drops references that do not contain the hinted offset, so a caret outside the name (every
+        // enclosing call of a declaration, walked on the way up to the file) is answered without resolving.
+        val offsetInElement = hints.offsetInElement
+        if (offsetInElement >= 0 && !rangeInElement.containsOffset(offsetInElement)) return emptyList()
+        if (VariableSymbol.isDeclaration(host)) return emptyList()
+        if (VariableReference.resolveSymbols(host).isEmpty()) return emptyList()
 
         return listOf(VariableReference(host, rangeInElement))
     }

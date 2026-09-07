@@ -2,12 +2,9 @@ package org.elixir_lang.annotator;
 
 import com.intellij.psi.NavigatablePsiElement;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.call.Call;
-import org.elixir_lang.psi.operation.InMatch;
-import org.elixir_lang.psi.operation.When;
 import org.elixir_lang.structure_view.element.Delegation;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -120,74 +117,18 @@ public class Parameter {
     @Contract(pure = true)
     @NotNull
     private static Parameter putParameterized(@NotNull final Parameter parameter, @NotNull final PsiElement ancestor) {
-        Parameter parameterizedParameter;
         PsiElement parent = ancestor.getParent();
 
-        /* MUST be before `Call` because `When` operations are `Call` implementations too in all cases even though
-           `When` is not a subinterface. */
-        if (parent instanceof When) {
-            parameterizedParameter = putParameterized(parameter, parent);
-        } else if (parent instanceof Call) {
-            parameterizedParameter = putParameterized(parameter, (Call) parent);
-        } else if (parent instanceof AtOperation ||
-                parent instanceof ElixirAccessExpression ||
-                parent instanceof ElixirAssociations ||
-                parent instanceof ElixirAssociationsBase ||
-                parent instanceof ElixirEex ||
-                parent instanceof ElixirEexTag ||
-                parent instanceof ElixirBitString ||
-                parent instanceof ElixirBracketArguments ||
-                parent instanceof ElixirContainerAssociationOperation ||
-                parent instanceof ElixirKeywordPair ||
-                parent instanceof ElixirKeywords ||
-                parent instanceof ElixirList ||
-                parent instanceof ElixirMapArguments ||
-                parent instanceof ElixirMapConstructionArguments ||
-                parent instanceof ElixirMapOperation ||
-                parent instanceof ElixirMatchedParenthesesArguments ||
-                parent instanceof ElixirNoParenthesesArguments ||
-                parent instanceof ElixirNoParenthesesKeywordPair ||
-                parent instanceof ElixirNoParenthesesKeywords ||
-                /* ElixirNoParenthesesManyStrictNoParenthesesExpression indicates a syntax error where no parentheses
-                   calls are nested, so it's invalid, but try to still resolve parameters to have highlighting */
-                parent instanceof ElixirNoParenthesesManyStrictNoParenthesesExpression ||
-                parent instanceof ElixirNoParenthesesOneArgument ||
-                /* handles `(conn, %{})` in `def (conn, %{})`, which can occur in def templates.
-                   See https://github.com/KronicDeth/intellij-elixir/issues/367#issuecomment-244214975 */
-                parent instanceof ElixirNoParenthesesStrict ||
-                parent instanceof ElixirParenthesesArguments ||
-                parent instanceof ElixirParentheticalStab ||
-                parent instanceof ElixirStab ||
-                parent instanceof ElixirStabNoParenthesesSignature ||
-                parent instanceof ElixirStabBody ||
-                parent instanceof ElixirStabOperation ||
-                parent instanceof ElixirStabParenthesesSignature ||
-                parent instanceof ElixirStructOperation ||
-                parent instanceof ElixirTuple) {
-            parameterizedParameter = putParameterized(parameter, parent);
-        } else if (parent instanceof ElixirAnonymousFunction) {
-            parameterizedParameter = putParameterized(parameter, (ElixirAnonymousFunction) parent);
-        } else if (parent instanceof InMatch) {
-            parameterizedParameter = putParameterized(parameter, parent);
-        } else if (parent instanceof AtUnqualifiedBracketOperation ||
-                parent instanceof BracketOperation ||
-                parent instanceof ElixirBlockItem ||
-                parent instanceof ElixirDoBlock ||
-                parent instanceof ElixirInterpolation ||
-                parent instanceof ElixirMapUpdateArguments ||
-                parent instanceof ElixirMultipleAliases ||
-                parent instanceof ElixirHeredocLineBody ||
-                parent instanceof ElixirLineBody ||
-                parent instanceof PsiFile ||
-                parent instanceof QualifiedAlias ||
-                parent instanceof QualifiedMultipleAliases) {
-            parameterizedParameter = new Parameter(parameter.entrance);
-        } else {
-            // Anything else cannot hold a parameter either
-            parameterizedParameter = new Parameter(parameter.entrance);
+        if (parent == null) {
+            return new Parameter(parameter.entrance);
         }
 
-        return parameterizedParameter;
+        return switch (ParameterWalk.classify(parent)) {
+            case RECURSE -> putParameterized(parameter, parent);
+            case CALL -> putParameterized(parameter, (Call) parent);
+            case ANONYMOUS_FUNCTION -> putParameterized(parameter, (ElixirAnonymousFunction) parent);
+            case STOP, LEAF -> new Parameter(parameter.entrance);
+        };
     }
 
     /*

@@ -23,6 +23,7 @@ import org.elixir_lang.psi.mix.Generator
 import org.elixir_lang.psi.operation.*
 import org.elixir_lang.psi.operation.infix.Position
 import org.elixir_lang.psi.operation.infix.Triple
+import org.elixir_lang.psi.scope.Variable
 import org.elixir_lang.psi.scope.WhileIn.whileIn
 import org.elixir_lang.structure_view.element.Callback
 import org.elixir_lang.structure_view.element.Delegation
@@ -169,6 +170,18 @@ object ProcessDeclarationsImpl {
                 Query.isChild(call, state) -> {
                     processor.execute(call, state)
                 }
+                /* Any other call's arguments are values, so what they hold is read, but a match inside one binds a
+                   variable for the code after the call, `IO.puts(x = 1)` then `x`, and for the arguments after it,
+                   which Elixir evaluates left to right. A read inside an argument therefore sees only the arguments
+                   before its own, the last of them to bind a name wins, and a call met as an ancestor is not walked
+                   past that point. Only the variable resolver reads arguments; a type or module walk finds nothing in
+                   a value. */
+                processor is Variable -> call.finalArguments()?.let { arguments ->
+                    val reading = state.put(DECLARING_SCOPE, false)
+                    val before = arguments.takeWhile { !PsiTreeUtil.isAncestor(it, place, false) }
+
+                    whileIn(before.asReversed()) { processor.execute(it, reading) }
+                } ?: true
                 else -> true
             }
         } else {
@@ -434,11 +447,25 @@ object ProcessDeclarationsImpl {
         sequence
             .filter { !createsNewScope(it) }
             .map {
-                it.processDeclarations(processor, state, lastParent, place)
+                /* A call decides what it declares through its own `processDeclarations`, and so do a template's
+                   tags and the alias shapes. A container that is a statement on its own, `[x = 1]` or
+                   `"#{x = 1}"`, has none, so the variable resolver reads its children instead; every other walk keeps
+                   the shape's own answer. */
+                if (answersForItself(it) || processor !is Variable) {
+                    it.processDeclarations(processor, state, lastParent, place)
+                } else {
+                    processor.execute(it, state)
+                }
             }
             .takeWhile { it }
             .lastOrNull()
             ?: true
+
+    /** The shapes with a `processDeclarations` of their own, the overloads above. */
+    private fun answersForItself(element: PsiElement): Boolean =
+        element is Call || element is ElixirEex || element is ElixirEexTag || element is ElixirStabBody ||
+            element is ElixirStabOperation || element is ElixirAlias || element is QualifiedAlias ||
+            element is ElixirMultipleAliases
 
     private fun processDeclarationsRecursively(
         psiElement: PsiElement,

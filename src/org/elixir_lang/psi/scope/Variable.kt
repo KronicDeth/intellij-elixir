@@ -22,6 +22,7 @@ import org.elixir_lang.psi.operation.Normalized.operatorIndex
 import org.elixir_lang.psi.operation.Type
 import org.elixir_lang.psi.operation.infix.Normalized
 import org.elixir_lang.psi.scope.WhileIn.whileIn
+import org.elixir_lang.psi.scope.variable.BindingPattern
 import org.elixir_lang.resolvesToMacro
 import org.elixir_lang.structure_view.element.CallDefinitionHead.Companion.strip
 import org.elixir_lang.structure_view.element.Delegation
@@ -34,44 +35,51 @@ abstract class Variable : PsiScopeProcessor {
      * @return false to stop processing.
      */
     override fun execute(element: PsiElement, state: ResolveState): Boolean =
-            when (element) {
-                is Addition, is And -> executeNonDeclaringScopeInfix(element, state)
-                is ElixirAccessExpression, is ElixirAssociations, is ElixirAssociationsBase, is ElixirBitString,
-                is ElixirEexTag, is ElixirList, is ElixirMapConstructionArguments, is ElixirMultipleAliases,
-                is ElixirNoParenthesesArguments, is ElixirNoParenthesesOneArgument, is ElixirParenthesesArguments,
-                is ElixirParentheticalStab, is ElixirStab, is ElixirStabBody, is ElixirTuple -> {
-                    execute(element.children, state)
+            // compiled elements don't have variables
+            if (element is PsiCompiledElement) {
+                false
+            } else {
+                when (VariableDescent.classify(element)) {
+                    VariableDescent.Bucket.NON_DECLARING_INFIX -> executeNonDeclaringScopeInfix(element as Infix, state)
+                    VariableDescent.Bucket.CHILDREN -> execute(readingOrder(element.children, element), state)
+                    /* A bare identifier inside a string is a read even when the string is a macro argument, so the
+                       pass stops declaring; a match inside starts it again for its own operands. A part with no `#`
+                       cannot hold an interpolation, so a long heredoc costs one visit. */
+                    VariableDescent.Bucket.CHILDREN_READING ->
+                        !element.textContains('#') ||
+                            execute(element.children.reversedArray(), state.put(DECLARING_SCOPE, false))
+                    VariableDescent.Bucket.BRACKET -> execute((element as BracketOperation).bracketArguments, state)
+                    VariableDescent.Bucket.AT_BRACKET ->
+                        execute((element as AtUnqualifiedBracketOperation).bracketArguments, state)
+                    VariableDescent.Bucket.CONTAINER_ASSOCIATION ->
+                        execute(element as ElixirContainerAssociationOperation, state)
+                    VariableDescent.Bucket.MAP_ARGUMENTS -> execute(element as ElixirMapArguments, state)
+                    VariableDescent.Bucket.MAP_OPERATION -> execute(element as ElixirMapOperation, state)
+                    VariableDescent.Bucket.WHEN -> execute(element as ElixirMatchedWhenOperation, state)
+                    VariableDescent.Bucket.STAB_OPERATION -> execute(element as ElixirStabOperation, state)
+                    VariableDescent.Bucket.STAB_NO_PARENTHESES_SIGNATURE ->
+                        execute(element as ElixirStabNoParenthesesSignature, state)
+                    VariableDescent.Bucket.STAB_PARENTHESES_SIGNATURE ->
+                        execute(element as ElixirStabParenthesesSignature, state)
+                    VariableDescent.Bucket.STRUCT_OPERATION -> execute(element as ElixirStructOperation, state)
+                    VariableDescent.Bucket.VARIABLE -> executeOnVariable(element as PsiNamedElement, state)
+                    VariableDescent.Bucket.IN -> execute(element as In, state)
+                    VariableDescent.Bucket.IN_MATCH -> execute(element as InMatch, state)
+                    VariableDescent.Bucket.MATCH -> execute(element as Match, state)
+                    VariableDescent.Bucket.INFIX -> execute(element as Infix, state)
+                    VariableDescent.Bucket.TYPE -> execute(element as Type, state)
+                    VariableDescent.Bucket.UNARY -> execute(element as UnaryOperation, state)
+                    VariableDescent.Bucket.MAYBE_VARIABLE ->
+                        executeOnMaybeVariable(element as UnqualifiedNoArgumentsCall<*>, state)
+                    VariableDescent.Bucket.CALL -> execute(element as Call, state)
+                    VariableDescent.Bucket.QUALIFIED_MULTIPLE_ALIASES ->
+                        execute(element as QualifiedMultipleAliases, state)
+                    VariableDescent.Bucket.KEYWORD_LIST -> execute(element as QuotableKeywordList, state)
+                    // stop at file.  No reason to look in directories
+                    VariableDescent.Bucket.FILE -> false
+                    // declares no variable; keep walking
+                    VariableDescent.Bucket.STOP, VariableDescent.Bucket.LEAF -> true
                 }
-                is ElixirContainerAssociationOperation -> execute(element, state)
-                is ElixirMapArguments -> execute(element, state)
-                is ElixirMapOperation -> execute(element, state)
-                is ElixirMatchedWhenOperation -> execute(element, state)
-                is ElixirStabOperation -> execute(element, state)
-                is ElixirStabNoParenthesesSignature -> execute(element, state)
-                is ElixirStabParenthesesSignature -> execute(element, state)
-                is ElixirStructOperation -> execute(element, state)
-                is ElixirVariable -> executeOnVariable(element as PsiNamedElement, state)
-                is In -> execute(element, state)
-                // MUST be before Call as InMatch is a Call
-                is InMatch -> execute(element, state)
-                is Match -> execute(element, state)
-                is Pipe, is Ternary, is Two -> execute(element, state)
-                is Type -> execute(element, state)
-                is UnaryOperation -> execute(element, state)
-                is UnqualifiedNoArgumentsCall<*> -> executeOnMaybeVariable(element, state)
-                is Call -> execute(element, state)
-                /* Occurs when qualified call occurs over a line with assignment to a tuple, such as
-                   `Qualifier.\n{:ok, value} = call()` */
-                is QualifiedMultipleAliases -> execute(element, state)
-                // stop at file.  No reason to look in directories
-                is PsiFile -> false
-                // compiled elements don't have variables
-                is PsiCompiledElement -> false
-                /* KeywordLists happen in map, struct and {@code do: <body>} matches, while KeywordKey happens only in
-                   bindQuoted */
-                is QuotableKeywordList -> execute(element, state)
-                // Anything else declares no variable; keep walking.
-                else -> true
             }
 
     override fun <T> getHint(hintKey: Key<T>): T? = null
@@ -144,8 +152,12 @@ abstract class Variable : PsiScopeProcessor {
                 }
                 match.isCallingMacro(Module.KERNEL, Function.FOR) ||
                         match.isCallingMacro(Module.KERNEL, "with") -> {
-                    match.finalArguments()?.let { finalArguments ->
-                        val entrance = state.get(ElixirPsiImplUtil.ENTRANCE)
+                    val entrance = state.get(ElixirPsiImplUtil.ENTRANCE)
+
+                    // what `for` and `with` bind does not leave them, so from outside they declare nothing
+                    if (entrance != null && !PsiTreeUtil.isAncestor(match, entrance, false)) {
+                        true
+                    } else match.finalArguments()?.let { finalArguments ->
                         /* if the entrance isn't in the arguments, then it is part of the block and so search should start from
                        from the last argument */
                         var entranceArgumentIndex = finalArguments.size - 1
@@ -241,9 +253,8 @@ abstract class Variable : PsiScopeProcessor {
                                            @see https://github.com/elixir-lang/elixir/blob/0c9e72c8d7be3ee502c43762e0ccbbf244198aeb/lib/elixir/lib/stream/reducers.ex#L7 */
                                 match.finalArguments()?.let { execute(it, state) }
                             }
-                            else -> {
-                                null
-                            }
+                            // a function's arguments are values, but a match inside one, `f(x = 1)`, binds after it
+                            else -> match.finalArguments()?.let { execute(it, state.put(DECLARING_SCOPE, false)) }
                         }
                     } else {
                         null
@@ -266,13 +277,14 @@ abstract class Variable : PsiScopeProcessor {
     }
 
     /**
-     * Only checks [ElixirMapArguments.getMapConstructionArguments] and not
-     * [ElixirMapArguments.getMapUpdateArguments] since an update is not valid in a pattern match.
+     * A construction may be a pattern, so what it holds declares. An update is a value, so what it holds reads, but a
+     * match inside it still binds for the code after the map, the last to bind a name winning.
      */
     private fun execute(match: ElixirMapArguments, state: ResolveState): Boolean =
-            match.mapConstructionArguments?.let {
-                execute(it, state)
-            } ?: true
+            (match.mapConstructionArguments?.let { execute(it, state) } ?: true) &&
+                    (match.mapUpdateArguments?.let {
+                        execute(it.children.reversedArray(), state.put(DECLARING_SCOPE, false))
+                    } ?: true)
 
     private fun execute(match: ElixirMapOperation, state: ResolveState): Boolean =
             execute(match.mapArguments, state)
@@ -358,13 +370,26 @@ abstract class Variable : PsiScopeProcessor {
     private fun execute(match: QuotableKeywordList, state: ResolveState): Boolean {
         val keywordPairList = match.quotableKeywordPairList()
 
-        return whileIn(keywordPairList) {
+        return whileIn(readingOrder(keywordPairList, match)) {
             execute(it, state)
         }
     }
 
+    /**
+     * The order the resolver reads [container]'s [parts] in. Elixir evaluates a value's parts left to right, so the
+     * last to bind a name is the one in scope after the value, and they are read last first. A pattern binds a name
+     * once however often it writes it, and its first writing is the binding, so a pattern's parts keep their order.
+     * One part has no order, so the container is not asked which it is.
+     */
+    private fun readingOrder(parts: Array<PsiElement>, container: PsiElement): Array<PsiElement> =
+        if (parts.size < 2 || BindingPattern.binds(container)) parts else parts.reversedArray()
+
+    private fun <T> readingOrder(parts: List<T>, container: PsiElement): List<T> =
+        if (parts.size < 2 || BindingPattern.binds(container)) parts else parts.asReversed()
+
+    // a quoted key can hold an interpolation, so it is visited like the value
     private fun execute(match: QuotableKeywordPair, state: ResolveState): Boolean =
-            execute(match.keywordValue, state)
+            execute(match.keywordKey, state) && execute(match.keywordValue, state)
 
     private fun execute(match: Type, state: ResolveState): Boolean =
             executeLeftOperand(match, state)

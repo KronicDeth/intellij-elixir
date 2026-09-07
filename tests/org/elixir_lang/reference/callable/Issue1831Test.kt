@@ -1,18 +1,16 @@
 package org.elixir_lang.reference.callable
 
 import com.intellij.psi.PsiErrorElement
-import com.intellij.psi.search.LocalSearchScope
-import com.intellij.psi.search.SearchScope
+import com.intellij.psi.search.PsiSearchScopeUtil
 import com.intellij.psi.util.PsiTreeUtil
 import org.elixir_lang.PlatformTestCase
 import org.elixir_lang.psi.ElixirFile
 import org.elixir_lang.psi.call.Call
 
 /**
- * A variable used inside an EEx tag has no declaration to find, so its use scope is empty.
- * `Callable.variableUseScope` reaches that answer by recognising the `ElixirEexTag` it walks up onto;
- * without that case the tag fell through to the catch-all and the plugin reported
- * `Don't know how to find variable use scope` at the user instead.
+ * A variable used inside an EEx tag is scoped like one in any block, and finding that scope reports nothing.
+ * `Callable.variableUseScope` walks up onto the `ElixirEexTag`; without a case for it the tag fell through to the
+ * catch-all and the plugin reported `Don't know how to find variable use scope` at the user instead.
  *
  * #1831, #1849, #1851, #1772 and #3004 all report exactly that, every one naming
  * `org.elixir_lang.psi.impl.ElixirEexTagImpl` as the element class.
@@ -22,9 +20,9 @@ class Issue1831Test : PlatformTestCase() {
      * A bare `<%= subject %>`, whose parent is the tag itself, so the walk lands on it immediately.
      * Run in both extensions because #1849 and #1851 differ in that and nothing else.
      */
-    fun testBareTagVariableHasEmptyUseScope() {
+    fun testBareTagVariableHasAUseScope() {
         for (extension in listOf("eex", "leex")) {
-            assertEmptyUseScopeAndNoError(
+            assertUseScopeHoldsCallAndNoError(
                 "index.html.$extension",
                 condBlockAround("""<%= subj<caret>ect %>""")
             )
@@ -32,16 +30,16 @@ class Issue1831Test : PlatformTestCase() {
     }
 
     /** The qualifier of a call, so the walk climbs the dot call before it reaches the tag. */
-    fun testQualifierOfCallInTagHasEmptyUseScope() {
-        assertEmptyUseScopeAndNoError(
+    fun testQualifierOfCallInTagHasAUseScope() {
+        assertUseScopeHoldsCallAndNoError(
             "tokens.html.eex",
             condBlockAround("""<%= tok<caret>en.transaction %>""")
         )
     }
 
     /** An argument to a call, so the walk passes through that call before it reaches the tag. */
-    fun testVariableArgumentInTagHasEmptyUseScope() {
-        assertEmptyUseScopeAndNoError(
+    fun testVariableArgumentInTagHasAUseScope() {
+        assertUseScopeHoldsCallAndNoError(
             "filters.html.eex",
             condBlockAround("""<%= text_input @f, fie<caret>ld %>""")
         )
@@ -60,13 +58,13 @@ class Issue1831Test : PlatformTestCase() {
         """<%= cond do %><% true -> %><p>$tag</p><% end %>"""
 
     /**
-     * Asserts that the call at the caret has an empty use scope and that reaching that answer logged
-     * nothing.
+     * Asserts that the call at the caret has a use scope holding the call and that reaching that answer
+     * logged nothing.
      *
-     * Both halves matter: the catch-all returns `LocalSearchScope.EMPTY` too and merely complains on
-     * the way, so a test asserting only the scope would pass against the defect.
+     * Both halves matter: the catch-all merely complains on the way, so a test asserting only the scope
+     * would pass against the defect.
      */
-    private fun assertEmptyUseScopeAndNoError(fileName: String, text: String) {
+    private fun assertUseScopeHoldsCallAndNoError(fileName: String, text: String) {
         myFixture.configureByText(fileName, text)
 
         val elixirRoot = myFixture.file.viewProvider.allFiles.filterIsInstance<ElixirFile>().first()
@@ -87,10 +85,9 @@ class Issue1831Test : PlatformTestCase() {
                 "Callable.variableUseScope rather than reaching its catch-all.",
             loggedErrors.filter { it.category.contains("elixir_lang.reference.Callable") }
         )
-        assertSame(
-            "a variable in an EEx tag should have no use scope, since it has no declaration to find",
-            LocalSearchScope.EMPTY,
-            useScope as SearchScope
+        assertTrue(
+            "a variable in an EEx tag is outside its own use scope",
+            PsiSearchScopeUtil.isInScope(useScope, call!!)
         )
     }
 }

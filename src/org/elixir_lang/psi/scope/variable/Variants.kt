@@ -7,6 +7,7 @@ import com.intellij.psi.PsiNamedElement
 import com.intellij.psi.ResolveState
 import com.intellij.psi.util.PsiTreeUtil
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil
+import org.elixir_lang.psi.impl.ProcessDeclarationsImpl.DECLARING_SCOPE
 import org.elixir_lang.psi.putInitialVisitedElement
 import org.elixir_lang.psi.scope.Variable
 
@@ -20,6 +21,9 @@ class Variants : Variable() {
      * @return `false`, as all variables should be found.  Prefix filtering will be done later by IDEA core.
      */
     override fun executeOnVariable(match: PsiNamedElement, state: ResolveState): Boolean {
+        // a name met while reading a value is not a binding to offer; its binding, if any, is met on its own
+        if (state.get(DECLARING_SCOPE) == false) return true
+
         val declaration = match.reference?.resolve() ?: match
         val name = (declaration as? PsiNamedElement)?.name ?: match.name
 

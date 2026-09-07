@@ -7,6 +7,7 @@ import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
 import org.elixir_lang.psi.CallDefinitionClause
+import org.elixir_lang.psi.UnqualifiedBracketOperation
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.operation.Match
 import com.intellij.util.concurrency.annotations.RequiresReadLock
@@ -29,7 +30,7 @@ class VariableReference(
         fun resolveSymbols(element: PsiElement): Collection<VariableSymbol> {
             val name = VariableSymbol.variableName(element) ?: return emptyList()
             val entrances = sequenceOf(
-                (element as? Call) ?: (element.parent as? Call),
+                (element as? Call) ?: (element as? UnqualifiedBracketOperation) ?: (element.parent as? Call),
                 generateSequence(element) { it.parent }.filterIsInstance<Match>().firstOrNull()
             ).filterNotNull().distinct()
 

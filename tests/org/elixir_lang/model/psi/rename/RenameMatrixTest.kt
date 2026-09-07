@@ -176,6 +176,18 @@ class RenameMatrixTest : PlatformTestCase() {
     fun testVariableComprehension() =
         doTestFromEveryOccurrence("variable_comprehension", "renamee", "fresh", expectedCarets = 2)
 
+    /** A read in a `when` guard is a read of the binding outside the clause, not a binding of the clause's pattern. */
+    fun testVariableGuardRead() =
+        doTestFromEveryOccurrence("variable_guard_read", "renamee", "fresh", expectedCarets = 2)
+
+    /** An `fn` written as a `cond` clause's body binds its parameter like any other `fn`. */
+    fun testVariableCondFnParameter() =
+        doTestFromEveryOccurrence("variable_cond_fn_parameter", "renamee", "fresh", expectedCarets = 2)
+
+    /** A definition inside a matched `quote` binds its parameter for its own body, not for the match. */
+    fun testVariableQuotedDefParameter() =
+        doTestFromEveryOccurrence("variable_quoted_def_parameter", "renamee", "fresh", expectedCarets = 2)
+
     /**
      * A rebinding inside an `fn` BODY is the same variable as the one it rebinds, unlike an `fn`
      * PARAMETER of the same name, which shadows it.
@@ -197,6 +209,62 @@ class RenameMatrixTest : PlatformTestCase() {
      */
     fun testVariableMapPatternRepeated() =
         doTestFromEveryOccurrence("variable_map_pattern_repeated", "renamee", "fresh", expectedCarets = 2)
+
+    /** A binding inside string interpolation, `_ = "#{renamee = 1}"`, and its read after the string. */
+    fun testVariableInterpolationBinding() =
+        doTestFromEveryOccurrence("variable_interpolation_binding", "renamee", "fresh", expectedCarets = 2)
+
+    /** A binding on the left of an inner match that sits on the right of an outer one, `_ = (renamee = 1)`. */
+    fun testVariableNestedMatchBinding() =
+        doTestFromEveryOccurrence("variable_nested_match_binding", "renamee", "fresh", expectedCarets = 2)
+
+    /** A `for` generator read inside a generated test's name, `test "handles #{renamee}"`, and in its body. */
+    fun testVariableComprehensionTestName() =
+        doTestFromEveryOccurrence("variable_comprehension_test_name", "renamee", "fresh", expectedCarets = 3)
+
+    /** A case pattern binding inside `result = case … do … end`: a pattern, although right of a match. */
+    fun testVariableCasePatternInMatch() =
+        doTestFromEveryOccurrence("variable_case_pattern_in_match", "renamee", "fresh", expectedCarets = 2)
+
+    /** An `fn` parameter inside `f = fn renamee -> … end`. */
+    fun testVariableFnParameterInMatch() =
+        doTestFromEveryOccurrence("variable_fn_parameter_in_match", "renamee", "fresh", expectedCarets = 2)
+
+    /** `%{a: [_ | _] = renamee} = map`: the inner match sits in the outer pattern, so both its sides bind. */
+    fun testVariableMatchInsidePattern() =
+        doTestFromEveryOccurrence("variable_match_inside_pattern", "renamee", "fresh", expectedCarets = 2)
+
+    /** `def run(%{} = renamee)`: a match in a definition head binds both sides. */
+    fun testVariableMatchInsideHead() =
+        doTestFromEveryOccurrence("variable_match_inside_head", "renamee", "fresh", expectedCarets = 2)
+
+    /** The enumerable of a generator under a match, `result = for item <- renamee`, is a read of the parameter. */
+    fun testVariableComprehensionEnumerableInMatch() =
+        doTestFromEveryOccurrence("variable_comprehension_enumerable_in_match", "renamee", "fresh", expectedCarets = 2)
+
+    /** A `with` clause's argument under a match, `result = with {:ok, v} <- fetch(renamee)`, is a read too. */
+    fun testVariableWithArgumentInMatch() =
+        doTestFromEveryOccurrence("variable_with_argument_in_match", "renamee", "fresh", expectedCarets = 2)
+
+    /** A binding inside a list that is a statement on its own, `[renamee = 1]`, and its read after it. */
+    fun testVariableBareListBinding() =
+        doTestFromEveryOccurrence("variable_bare_list_binding", "renamee", "fresh", expectedCarets = 2)
+
+    /** A binding inside a string that is a statement on its own, `"#{renamee = 1}"`. */
+    fun testVariableBareStringBinding() =
+        doTestFromEveryOccurrence("variable_bare_string_binding", "renamee", "fresh", expectedCarets = 2)
+
+    /** A binding inside a call's arguments, `IO.puts(renamee = 1)`, and its read after the call. */
+    fun testVariableCallArgumentBinding() =
+        doTestFromEveryOccurrence("variable_call_argument_binding", "renamee", "fresh", expectedCarets = 2)
+
+    /** A read inside string interpolation in a call argument, `IO.puts("Hello #{renamee}")`. */
+    fun testVariableInterpolationArgumentRead() =
+        doTestFromEveryOccurrence("variable_interpolation_argument_read", "renamee", "fresh", expectedCarets = 2)
+
+    /** Reads on the right of a match: bare, inside a list and inside string interpolation. */
+    fun testVariableMatchRhsRead() =
+        doTestFromEveryOccurrence("variable_match_rhs_read", "renamee", "fresh", expectedCarets = 4)
 
     // -- Types ------------------------------------------------------------------------------
 

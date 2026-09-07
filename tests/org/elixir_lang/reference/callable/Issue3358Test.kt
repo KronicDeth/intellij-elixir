@@ -14,9 +14,12 @@ class Issue3358Test : PlatformTestCase() {
                 .parent
                 .parent
         assertInstanceOf(callable, UnqualifiedNoArgumentsCall::class.java)
+        /* `<-` outside a comprehension is a syntax error, but as a bare top-level statement it is scoped from its
+           statement like any other; the error report this issue was about is gone either way */
+        assertSame(myFixture.file, callable.parent.parent)
         assertEquals(
-                LocalSearchScope.EMPTY,
-                variableUseScope((callable as UnqualifiedNoArgumentsCall<*>))
+            listOf("room <- level_id"),
+            (variableUseScope(callable as UnqualifiedNoArgumentsCall<*>) as LocalSearchScope).scope.map { it.text }
         )
     }
 
