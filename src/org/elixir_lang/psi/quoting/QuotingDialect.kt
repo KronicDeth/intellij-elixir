@@ -19,9 +19,22 @@ package org.elixir_lang.psi.quoting
  */
 enum class QuotingDialect {
     /**
-     * Everything before Elixir 1.15.0: no bracket or interpolation metadata, and `...` quotes as a
-     * variable. Named for the oldest version this plugin's CI covers, but it is the floor, not a
-     * point - 1.14.5 resolves here too.
+     * Everything before Elixir 1.13.0. The floor - nothing resolves below it - and the oldest
+     * version this plugin's CI covers.
+     */
+    V1_11,
+
+    /**
+     * Elixir 1.13.0 unescapes an escaped terminator inside a sigil heredoc, so `\"""` quotes as
+     * `"""` where 1.12.3 and earlier keep the backslash and quote as `\"""`.
+     *
+     * elixir-lang/elixir `ffd891a34` added the `[$\\, Last, Last, Last | Rest]` clause to
+     * `elixir_interpolation:extract/8`, first released in v1.13.0. Not conditioned on the
+     * interpolation flag, so `~s` and `~S` alike; a plain heredoc reaches the same text through
+     * `unescape_tokens` and a sigil line's terminator was already unescaped in v1.12.3.
+     *
+     * 1.14.5 resolves here too: below 1.15.0 there is no bracket or interpolation metadata, and
+     * `...` quotes as a variable.
      */
     V1_13,
 
@@ -116,6 +129,9 @@ enum class QuotingDialect {
      */
     V1_20;
 
+    /** `\"""` in a `~S"""` heredoc - the terminator alone, rather than backslash and terminator. */
+    val unescapesSigilHeredocTerminator: Boolean get() = this >= V1_13
+
     /** `[1, 2][0]` and friends - the `bracket_expr -> access_expr bracket_arg` production. */
     val emitsFromBracketsOnBracketedExpression: Boolean get() = this >= V1_15
 
@@ -209,7 +225,8 @@ enum class QuotingDialect {
                 numbers >= Triple(1, 16, 2) -> V1_16_2
                 numbers >= Triple(1, 16, 0) -> V1_16_0
                 numbers >= Triple(1, 15, 0) -> V1_15
-                else -> V1_13
+                numbers >= Triple(1, 13, 0) -> V1_13
+                else -> V1_11
             }
         }
 

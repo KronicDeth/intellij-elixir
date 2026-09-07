@@ -1812,7 +1812,7 @@ public class ElixirPsiImplUtil {
     public static List<Integer> addEscapedTerminator(@NotNull Parent parent,
                                                      @Nullable List<Integer> maybeCodePointList,
                                                      @NotNull ASTNode child) {
-        return ParentImpl.addEscapedTerminator(maybeCodePointList, child);
+        return ParentImpl.addEscapedTerminator(parent, maybeCodePointList, child);
     }
 
     @NotNull

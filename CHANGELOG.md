@@ -48,7 +48,7 @@
     version directory, `/usr` or `/usr/local`.
 
 - [#3914](https://github.com/KronicDeth/intellij-elixir/pull/3914) [@sh41](https://github.com/sh41)
-  - **Elixir 1.13 through 1.20 are now fully supported**, including syntax whose meaning changed
+  - **Elixir 1.12 through 1.20 are now fully supported**, including syntax whose meaning changed
     between releases.
   - **`.beam` files compiled by OTP 24 through 29 decompile to valid Elixir.**
 
