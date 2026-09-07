@@ -44,8 +44,9 @@ class FunctionCallReference(
         // Delegate to the legacy Callable scope-walker, which understands qualified calls,
         // unqualified calls within the lexical scope, captures, imports, etc.
         val callArity = call.resolvedFinalArity()
-        val clauses = Callable(call).multiResolve(false)
+        val resolved = Callable(call).multiResolve(false)
             .filter { it.isValidResult }
+        val clauses = resolved
             .mapNotNull { result ->
                 when (val element = result.element) {
                     // A source `def`/`defmacro` clause is already a `Call`, while a decompiled beam function exposes
@@ -69,8 +70,18 @@ class FunctionCallReference(
         // Clauses directly inside a `defprotocol` are owned by ProtocolFunction, not FunctionSymbol
         // (FunctionSymbol.fromClause returns empty for them). A qualified protocol call
         // `Protocol.function(args)` therefore resolves here.
-        return clauses
+        val protocolFunctions = clauses
             .flatMap { ProtocolFunction.fromClause(it) }
+            .filter { it.arity == callArity }
+        if (protocolFunctions.isNotEmpty()) return protocolFunctions
+
+        // Last, the `defdelegate` head itself. It declares a function of that name and arity in its own
+        // module whether or not `to:` resolves, so when nothing else matched - an unresolvable target, or
+        // one whose module is not on the path yet - it is still somewhere to go, and the alternative is a
+        // gesture that silently does nothing. It ranks last so a resolvable target always wins.
+        return resolved
+            .mapNotNull { it.element as? Call }
+            .flatMap { FunctionSymbol.fromDelegation(it) }
             .filter { it.arity == callArity }
     }
 }

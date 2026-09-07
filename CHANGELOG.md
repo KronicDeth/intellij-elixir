@@ -70,6 +70,11 @@
 
 ### Bug Fixes
 
+- [#4039](https://github.com/KronicDeth/intellij-elixir/pull/4039) [@sh41](https://github.com/sh41)
+  - **Go To Declaration, autocomplete and Quick Documentation now work for functions declared with
+    `defdelegate`, including delegations into compiled modules such as `Map.values/1`.** Fixes
+    [#1613](https://github.com/KronicDeth/intellij-elixir/issues/1613).
+
 - [#4020](https://github.com/KronicDeth/intellij-elixir/pull/4020) [@sh41](https://github.com/sh41)
   - **Variable resolution, Find Usages and rename no longer report errors or miss bindings for code
     shapes they did not model.** Fixes [#4019](https://github.com/KronicDeth/intellij-elixir/issues/4019).

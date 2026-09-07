@@ -10,6 +10,9 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveResult
 import org.elixir_lang.navigation.isDecompiled
+import org.elixir_lang.psi.call.Call
+import org.elixir_lang.structure_view.element.Delegation
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 
 object Resolver {
     fun <T : ResolveResult> preferred(
@@ -56,9 +59,9 @@ object Resolver {
         list: List<T>,
         listElementToPsiElement: (listElement: T) -> U?
     ): List<T> =
-        filterUnderSameModule(elementInModule, list, listElementToPsiElement)
-            .takeIf(List<T>::isNotEmpty)
-            ?: list
+        preferFiltered(list, listElementToPsiElement) {
+            filterUnderSameModule(elementInModule, it, listElementToPsiElement)
+        }
 
     private fun <T : ResolveResult> preferSourceElement(resolveResultList: List<T>): List<T> =
         preferSource(resolveResultList, ResolveResult::getElement)
@@ -70,7 +73,30 @@ object Resolver {
         list: List<T>,
         listElementToPsiElement: (listElement: T) -> U?
     ): List<T> =
-        filterSource(list, listElementToPsiElement).takeIf(List<T>::isNotEmpty) ?: list
+        preferFiltered(list, listElementToPsiElement) { filterSource(it, listElementToPsiElement) }
+
+    /**
+     * Narrows [list] with [filter], keeping the whole list when the narrowed one is empty *or* holds
+     * nothing but `defdelegate` heads.
+     *
+     * A head names a function without defining one, so it must not stand in for the target it points
+     * at - which is what both preferences would otherwise keep when the target is decompiled or lives
+     * outside the calling module.
+     */
+    private fun <T, U : PsiElement> preferFiltered(
+        list: List<T>,
+        listElementToPsiElement: (listElement: T) -> U?,
+        filter: (List<T>) -> List<T>
+    ): List<T> =
+        filter(list)
+            .takeIf { filtered ->
+                filtered.isNotEmpty() && !filtered.all { isDelegation(listElementToPsiElement(it)) }
+            }
+            ?: list
+
+    @RequiresReadLock
+    private fun isDelegation(element: PsiElement?): Boolean =
+        (element as? Call)?.let { Delegation.`is`(it) } ?: false
 
     private fun <T : ResolveResult> filterIsValidResult(resolveResultList: List<T>): List<T> =
         resolveResultList.filter(ResolveResult::isValidResult)
