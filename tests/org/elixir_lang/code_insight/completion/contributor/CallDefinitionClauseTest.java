@@ -203,6 +203,32 @@ public class CallDefinitionClauseTest extends PlatformTestCase {
         assertCompletionOffersExactly(myFixture.getLookupElementStrings(), "public_function1", "public_function2");
     }
 
+    public void testQualifiedFunctionOfferedWhenAQualifiedCallFollows() {
+        myFixture.configureByFiles("sibling_qualified_call_usage.ex", "public_function_declaration.ex");
+        myFixture.complete(CompletionType.BASIC, 1);
+
+        assertCompletionOffersExactly(myFixture.getLookupElementStrings(), "public_function1", "public_function2");
+    }
+
+    /**
+     * A trailing dot binds to a following *alias*, but not to a following atom: Elixir rejects
+     * {@code "Enum.\n:maps.values(%{})"} outright, so the original file's tree comes from error recovery
+     * rather than from the two statements being joined.
+     */
+    public void testQualifiedFunctionOfferedWhenAnAtomQualifiedCallFollows() {
+        myFixture.configureByFiles("atom_call_follows_usage.ex", "public_function_declaration.ex");
+        myFixture.complete(CompletionType.BASIC, 1);
+
+        assertCompletionOffersExactly(myFixture.getLookupElementStrings(), "public_function1", "public_function2");
+    }
+
+    public void testQualifiedFunctionOfferedForANestedQualifierWhenAQualifiedCallFollows() {
+        myFixture.configureByFiles("nested_qualifier_usage.ex", "public_function_declaration.ex");
+        myFixture.complete(CompletionType.BASIC, 1);
+
+        assertCompletionOffersExactly(myFixture.getLookupElementStrings(), "public_function1", "public_function2");
+    }
+
     public void testQualifiedFunctionOfferedWhenAnotherStatementFollowsInBlock() {
         myFixture.configureByFiles("following_statement_usage.ex", "following_statement_declaration.ex");
         myFixture.complete(CompletionType.BASIC, 1);

@@ -81,6 +81,13 @@
   - **An `alias` naming a module that does not exist no longer crashes the IDE with a
     `StackOverflowError`.** Fixes [#3978](https://github.com/KronicDeth/intellij-elixir/issues/3978).
 
+- [#4042](https://github.com/KronicDeth/intellij-elixir/pull/4042) [@sh41](https://github.com/sh41)
+  - **Completing after `Mod.` now offers the module's functions where another qualified call follows the
+    caret, in a struct's field value, and for declarations written below a bare `Mod.` in the same module,
+    and no longer offers them in the first argument of an `alias`, `import`, `require`, `use`,
+    `defmodule`, `defimpl` or `defprotocol`.** Fixes
+    [#4041](https://github.com/KronicDeth/intellij-elixir/issues/4041).
+
 - [#4039](https://github.com/KronicDeth/intellij-elixir/pull/4039) [@sh41](https://github.com/sh41)
   - **Go To Declaration, autocomplete and Quick Documentation now work for functions declared with
     `defdelegate`, including delegations into compiled modules such as `Map.values/1`.** Fixes
