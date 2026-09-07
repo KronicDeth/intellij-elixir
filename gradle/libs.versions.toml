@@ -14,8 +14,8 @@
 # minimumSupported floor - this compiler must be able to emit whatever JVM bytecode target the
 # newest tested platform needs (compileKotlin's javaVersionStr can reach "25", and
 # JvmTarget.JVM_25 doesn't exist before Kotlin 2.3.20). Stdlib compliance with the floor is a
-# separate concern, held by apiVersion = KotlinVersion.KOTLIN_2_2 in build.gradle.kts (and
-# jps-shared's own copy of it), independent of which compiler/stdlib artifact this pin resolves.
+# separate concern, held by the apiVersion pin in build.gradle.kts (and jps-shared's own copy of
+# it), independent of which compiler/stdlib artifact this pin resolves.
 # kotlin.stdlib.default.dependency = false must be set in gradle.properties
 kotlin = "2.4.0"
 

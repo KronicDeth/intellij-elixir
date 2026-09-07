@@ -179,8 +179,8 @@ class ElixirSdkForModuleStepTest : PlatformTestCase() {
 
     fun testSdkDescriptorIsNullForUnparseableHomePath() {
         // A NUL character is rejected by Path.of() on every platform. The SDK is mocked rather
-        // than registered because on 2025.3 ProjectJdkTable.addJdk() itself parses the home path
-        // and rejects the NUL before sdkDescriptor() could ever see it.
+        // than registered because ProjectJdkTable.addJdk() itself parses the home path and
+        // rejects the NUL before sdkDescriptor() could ever see it.
         val sdk = Mockito.mock(Sdk::class.java)
         Mockito.`when`(sdk.homePath).thenReturn("\u0000invalid")
 

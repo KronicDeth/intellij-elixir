@@ -73,7 +73,7 @@ class CodeGenerationPanel(settings: CodeStyleSettings) : CodeStyleAbstractPanel(
     override fun createHighlighter(colors: EditorColorsScheme): EditorHighlighter {
         // EditorHighlighterFactory rather than FileTypeEditorHighlighterProviders.forFileType():
         // 2026.2 added a covariant forFileType override declared on the class itself, so bytecode
-        // compiled against 2026.2 references a method that does not exist on 2025.3/2026.1
+        // compiled against 2026.2 references a method that does not exist on 2026.1
         // (NoSuchMethodError). EditorHighlighterFactory has the same signature in all supported
         // builds and routes through the same provider EP.
         return EditorHighlighterFactory.getInstance().createEditorHighlighter(getFileType(), colors, null)

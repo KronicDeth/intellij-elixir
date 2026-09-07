@@ -25,8 +25,8 @@ Internal class com.intellij.codeInsight.multiverse.CodeInsightContextManagerImpl
 Internal method com.intellij.codeInsight.multiverse.CodeInsightContextManagerImpl.setCodeInsightContext(com.intellij.psi.FileViewProvider, com.intellij.codeInsight.multiverse.CodeInsightContext) : void is invoked in org.elixir_lang.beam.psi.BeamFileImpl.propagateCodeInsightContextTo(PsiFile) : void
 
 # --- Awaiting the JPS project model before changing module or SDK configuration --------------------
-# The replacement is itself internal and absent from build 253, so migrating would relocate the finding,
-# not remove it. Five entries for one call site: a Kotlin Companion access compiles to a field read, an
+# The replacement is itself internal, so migrating would relocate the finding, not remove it. Five
+# entries for one call site: a Kotlin Companion access compiles to a field read, an
 # interface reference and the call. Watch IJPL-249625 and IJPL-241069; see the KDoc on
 # awaitJpsProjectLoaded, the single place to change.
 Internal interface com.intellij.workspaceModel.ide.JpsProjectLoadingManager is referenced in org.elixir_lang.util.JpsProjectModelKt.awaitJpsProjectLoaded(Project, Continuation) : Object

@@ -136,7 +136,7 @@ val actualPlatformVersion: String = if (useDynamicEapVersion) {
     project.property("platformVersion").toString()
 }
 
-// IntelliJ Platform 262 (2026.2) ships JARs compiled for Java 25, and 253/261 are Java 21.
+// IntelliJ Platform 262 (2026.2) ships JARs compiled for Java 25, and 261 is Java 21.
 // `javac --release` validates the class-file version of everything on the compile classpath,
 // so the Java level must follow the platform being built against -- a fixed level cannot
 // serve both 261 and 262.
@@ -156,7 +156,7 @@ val platformBuildNumber: Int = actualPlatformVersion
     .let { parts ->
         val major = parts[0].toIntOrNull() ?: 0
         when {
-            // Marketing version, e.g. "2026.2" or "2025.3.6" -> 262, 253
+            // Marketing version, e.g. "2026.2" or "2026.1.5" -> 262, 261
             major >= 2000 -> (major - 2000) * 10 + (parts.getOrNull(1)?.toIntOrNull() ?: 0)
             // Already a build number, e.g. "262.8665.258"
             else -> major
@@ -644,10 +644,10 @@ tasks.withType<KotlinJvmCompile>().configureEach {
     compilerOptions {
         jvmTarget = JvmTarget.valueOf("JVM_$javaVersionStr")
         freeCompilerArgs.add("-jvm-default=enable")
-        // Restricts stdlib references to what 2025.3 (minimumSupported) bundles, independent of
+        // Restricts stdlib references to what 2026.1 (minimumSupported) bundles, independent of
         // the newer compiler in gradle/libs.versions.toml's kotlin entry. Doesn't cover
         // jps-shared - a separate project, its own tasks.withType block needed there too.
-        apiVersion = KotlinVersion.KOTLIN_2_2
+        apiVersion = KotlinVersion.KOTLIN_2_3
     }
 }
 

@@ -14,20 +14,22 @@ import kotlinx.coroutines.suspendCancellableCoroutine
  * assigning a missing Elixir SDK - is overwritten when the sync applies the persisted state. Callers that read or
  * mutate authoritative module/SDK configuration from an automated startup activity must await this gate first.
  *
- * ## Why the deprecated, internal [JpsProjectLoadingManager]?
+ * ## Why the internal [JpsProjectLoadingManager]?
  *
- * [JpsProjectLoadingManager] is `@ApiStatus.Internal` **and** `@Deprecated` in favour of
- * `com.intellij.platform.backend.workspace.impl.WorkspaceModelInternal.awaitSynchronizationWithJpsModel`. We do not
- * migrate, because for a Marketplace plugin the replacement is no better:
+ * [JpsProjectLoadingManager] is `@ApiStatus.Internal` across the supported range, and on 262 it is additionally
+ * `@Deprecated` in favour of
+ * `com.intellij.platform.backend.workspace.impl.WorkspaceModelInternal.awaitSynchronizationWithJpsModel` - hence the
+ * `DEPRECATION` suppression below, which 261 does not need but 262 does. We do not migrate, because for a
+ * Marketplace plugin the replacement is no better:
  *
  * - It is `@ApiStatus.Experimental` declared on the `@ApiStatus.Internal WorkspaceModelInternal` interface, so it is
  *   itself an internal API - switching would relocate the plugin-verifier internal-API violation, not remove it.
  * - It requires a `(workspaceModel as WorkspaceModelInternal)` cast (the platform confirms the cast is safe, but it
  *   is still internal surface).
- * - It is absent from our minimum supported build 253 (verified against tag `idea/253.28294.334`); calling it there
- *   throws `NoSuchMethodError`.
+ * - It is absent from our minimum supported build 261: it was introduced by IJPL-240839 after the 261 branch cut
+ *   and first ships in 262 (verified against tag `idea/261.22158.277`). Calling it there throws `NoSuchMethodError`.
  *
- * [JpsProjectLoadingManager] works across the whole supported range (253 → 261+) and is the mechanism the platform
+ * [JpsProjectLoadingManager] works across the whole supported range (261 → 262) and is the mechanism the platform
  * itself endorses for the "automated startup activity that may change project configuration" case - which is exactly
  * this one (see the IJPL-249625 discussion). The JetBrains PyCharm plugin uses it for the same purpose.
  *

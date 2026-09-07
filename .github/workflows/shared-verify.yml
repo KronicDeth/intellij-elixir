@@ -41,7 +41,7 @@ on:
           - mps
         default: ideaIU
       version:
-        description: 'Marketing version, e.g. 2026.2 or 2025.3.6.'
+        description: 'Marketing version, e.g. 2026.2 or 2026.1.5.'
         required: true
         type: string
       plugin:
@@ -167,8 +167,8 @@ jobs:
   verify:
     # The word `verify` is deliberately absent: the check name for a reusable workflow is
     # `<caller job name> / <callee job name>`, the caller job has no name: so its id `verify` is used,
-    # and the checks graph truncates around 24-27 characters - `verify / verify (ideaIU, 2025...` spent
-    # its whole budget saying verify twice. `verify / ideaIU 2025.3.6` fits.
+    # and the checks graph truncates around 24-27 characters - `verify / verify (ideaIU, 2026...` spent
+    # its whole budget saying verify twice. `verify / ideaIU 2026.1.5` fits.
     name: ${{ matrix.product }} ${{ matrix.version }}
     runs-on: ubuntu-22.04
     timeout-minutes: 30

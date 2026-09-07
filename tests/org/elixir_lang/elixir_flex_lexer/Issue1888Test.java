@@ -4,11 +4,19 @@ import com.intellij.lexer.Lexer;
 import com.intellij.testFramework.LexerTestCase;
 import org.elixir_lang.ElixirLexer;
 
+/**
+ * {@code checkCorrectRestart} is called explicitly because {@code doTest} only performs it
+ * implicitly on platform 262 - see the KDoc on
+ * {@link org.elixir_lang.heex.lexer.RestartabilityTest}. Without it this class's effective
+ * coverage would differ across the CI legs in .github/ci-versions.json.
+ */
 public class Issue1888Test extends LexerTestCase {
     public void testAtom() {
-        doTest("defmodule MyModule do\n" +
-                        "  def my_function([:list_atom], :argument_atom)\n" +
-                        "end\n",
+        String text = "defmodule MyModule do\n" +
+                "  def my_function([:list_atom], :argument_atom)\n" +
+                "end\n";
+
+        doTest(text,
                 "identifier ('defmodule')\n" +
                         "WHITE_SPACE (' ')\n" +
                         "Alias ('MyModule')\n" +
@@ -32,12 +40,15 @@ public class Issue1888Test extends LexerTestCase {
                         "WHITE_SPACE ('\\n')\n" +
                         "end ('end')\n" +
                         "\\\\n, \\\\r\\\\n ('\\n')");
+        checkCorrectRestart(text);
     }
 
     public void testColumn() {
-        doTest("defmodule MyModule do\n" +
-                        "  def my_function([:list_atom], :)\n" +
-                        "end\n",
+        String text = "defmodule MyModule do\n" +
+                "  def my_function([:list_atom], :)\n" +
+                "end\n";
+
+        doTest(text,
                         "identifier ('defmodule')\n" +
                         "WHITE_SPACE (' ')\n" +
                         "Alias ('MyModule')\n" +
@@ -60,6 +71,7 @@ public class Issue1888Test extends LexerTestCase {
                         "WHITE_SPACE ('\\n')\n" +
                         "end ('end')\n" +
                         "\\\\n, \\\\r\\\\n ('\\n')");
+        checkCorrectRestart(text);
     }
 
     @Override

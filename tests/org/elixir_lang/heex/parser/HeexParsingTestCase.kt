@@ -25,8 +25,8 @@ import org.elixir_lang.psi.EexDataAstFactory
 /**
  * Multi-root parsing tests for HEEx (`.html.heex`, three PSI roots: HEEx, HTML, Elixir).
  * Registration recipe copied from `MarkdownParsingTestCase` - the platform's own in-repo example
- * of a template language + HTML data root ParsingTestCase (verified byte-identical on this
- * plugin's minimum supported platform, 2025.3.6 / build 253, and on master).
+ * of a template language + HTML data root ParsingTestCase (verified byte-identical against build
+ * 253 and on master).
  *
  * `checkAllPsiRoots()` defaults to `true` on the platform base class, so `checkResult` writes one
  * expected tree per `provider.getLanguages()` entry, named `<testName>.<LanguageID>.txt`.
