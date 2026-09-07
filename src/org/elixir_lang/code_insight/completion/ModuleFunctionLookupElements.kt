@@ -15,6 +15,7 @@ import org.elixir_lang.structure_view.element.CallDefinitionHead
 import org.elixir_lang.structure_view.element.Delegation
 import org.elixir_lang.psi.CallDefinitionClause as CallDefinitionClausePsi
 import org.elixir_lang.code_insight.lookup.element_renderer.Delegation as DelegationRenderer
+import org.elixir_lang.code_insight.completion.insert_handler.CallDefinitionClause as CallDefinitionClauseInsertHandler
 
 /**
  * The function-name [LookupElement]s a modular ([scope]) offers when completing a **remote**
@@ -72,7 +73,7 @@ private fun callDefinitionClauseLookupElements(scope: Call, appendParentheses: B
     val clauseNames = clauseLookupElements.map { (name, _) -> name }.toSet()
 
     return clauseLookupElements.map { (_, lookupElement) -> lookupElement } +
-        delegationLookupElements(childCalls, clauseNames)
+        delegationLookupElements(childCalls, clauseNames, appendParentheses)
 }
 
 /**
@@ -81,10 +82,14 @@ private fun callDefinitionClauseLookupElements(scope: Call, appendParentheses: B
  * `Delegation.is` and `CallDefinitionClause.is` are disjoint, so delegates need their own pass or they
  * are never offered. Names already in [clauseNames] are skipped so a `def` keeps its richer
  * presentation; visibility is not filtered because there is no `defdelegatep`.
+ *
+ * [appendParentheses] is threaded through so a delegate inserts `Mod.values()` and opens parameter
+ * info like a `def`, and stays a bare name for an MFA atom, where a name is not a call.
  */
 private fun delegationLookupElements(
     childCalls: Array<Call>,
-    clauseNames: Set<String>
+    clauseNames: Set<String>,
+    appendParentheses: Boolean
 ): List<LookupElement> =
     childCalls
         .filter { Delegation.`is`(it) }
@@ -102,6 +107,7 @@ private fun delegationLookupElements(
             LookupElementBuilder
                 .createWithSmartPointer(name, delegation)
                 .withRenderer(DelegationRenderer(name))
+                .let { if (appendParentheses) it.withInsertHandler(CallDefinitionClauseInsertHandler.INSTANCE) else it }
         }
 
 private fun callDefinitionClauseLookupElements(moduleImpl: BeamModule, appendParentheses: Boolean): Iterable<LookupElement> =
