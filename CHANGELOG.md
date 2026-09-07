@@ -344,6 +344,12 @@
 
 ### Threading / Platform Hygiene
 
+- [#4062](https://github.com/KronicDeth/intellij-elixir/pull/4062) [@sh41](https://github.com/sh41)
+  - **The Erlang SDK's OTP-mismatch warning is detected without holding the settings dialog's read
+    lock.** Refs [#3955](https://github.com/KronicDeth/intellij-elixir/issues/3955).
+  - **The Elixir SDK's compiled-against OTP release is read once per install**, rather than on every
+    Erlang SDK selection in the settings dialog.
+
 - [#4002](https://github.com/KronicDeth/intellij-elixir/pull/4002) [@sh41](https://github.com/sh41)
   - **Quick Docs on a HEEx component tag no longer uses an internal platform API.** A `def`/`defp`
     clause's own name identifier now resolves to that clause's documentation, so the tag's resolved

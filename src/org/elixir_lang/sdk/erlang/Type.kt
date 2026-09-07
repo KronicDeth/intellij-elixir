@@ -264,6 +264,10 @@ class Type : SdkType(ErlangSdkTypeId.ERLANG_SDK_TYPE_ID) {
      * The platform calls this override from the EDT (e.g. in the SDK settings dialog).
      * [runWithEdtGuard] ensures [ErlangVersionDetector.detectRelease] (which asserts a background
      * thread) is never called directly on the EDT.
+     *
+     * It does not drop read access either, so this remains exposed to #3955 should a caller ever
+     * invoke it from inside a read action. It cannot move to a coroutine: the platform needs a
+     * value back synchronously.
      */
     override fun getVersionString(sdkHome: String): String? {
         val release = runWithEdtGuard("Detecting Erlang SDK…") { ErlangVersionDetector.detectRelease(sdkHome) }
