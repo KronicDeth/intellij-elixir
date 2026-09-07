@@ -57,6 +57,27 @@ class Issue1613RemoteCompletionTest : PlatformTestCase() {
         )
     }
 
+    /**
+     * The caret with another statement after it, which the suite already treats as a separate case for
+     * ordinary clauses (`testQualifiedFunctionOfferedWhenAnotherStatementFollowsInBlock`) because the
+     * trailing dot parses differently there.
+     */
+    fun testDelegatedFunctionOfferedWhenAnotherStatementFollowsInBlock() {
+        myFixture.configureByFiles(
+            "defdelegate_following_statement_usage.ex",
+            "defdelegate_declaration.ex"
+        )
+        myFixture.complete(CompletionType.BASIC, 1)
+
+        val lookupElementStrings = myFixture.lookupElementStrings
+
+        assertNotNull("Completion lookup not shown", lookupElementStrings)
+        assertTrue(
+            "Remote completion should offer values/1 with a following statement, got: $lookupElementStrings",
+            lookupElementStrings!!.contains("values")
+        )
+    }
+
     override fun getTestDataPath(): String =
         "testData/org/elixir_lang/code_insight/completion/contributor/call_definition_clause"
 }
