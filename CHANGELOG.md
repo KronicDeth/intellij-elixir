@@ -325,6 +325,14 @@
 
 ### Build / CI
 
+- [#4034](https://github.com/KronicDeth/intellij-elixir/pull/4034) [@sh41](https://github.com/sh41)
+  - **The test matrix runs against 2026.2.2 again, with `com.intellij.modules.ultimate` off the test
+    classpath.** In IU-262.10315.125 that bundled plugin's classes are obfuscated into a package
+    `lib/product-backend.jar` already occupies, and a test classpath is flat, so its
+    `postStartupActivity` resolved to an unrelated interface and every test that opened a project
+    failed. Obfuscated names are re-rolled per build, so the exclusion is permanent rather than
+    version-gated.
+
 - [#4006](https://github.com/KronicDeth/intellij-elixir/pull/4006) [@sh41](https://github.com/sh41)
   - **CI is faster: Gradle's build and configuration caches are kept, Elixir is no longer rebuilt from
     source on the Windows leg, and the runners no longer reclaim disk space they were not short of.**
