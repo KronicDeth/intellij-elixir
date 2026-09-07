@@ -1,19 +1,15 @@
 package org.elixir_lang.code_insight.completion.contributor
 
 import com.intellij.codeInsight.completion.CompletionType
+import com.intellij.codeInsight.lookup.LookupElementPresentation
 import org.elixir_lang.PlatformTestCase
 
 /**
  * Remote (qualified) completion must offer a function declared only by `defdelegate`.
  *
- * `Delegation.is` and `CallDefinitionClause.is` are disjoint predicates - `defdelegate` is not one of
- * the heads `isFunction`/`isMacro`/`isGuard` test - so the `CallDefinitionClause.is` filter in
+ * `Delegation.is` and `CallDefinitionClause.is` are disjoint, so the clause filter in
  * `ModuleFunctionLookupElements` drops every delegate. The fixture reproduces the reported contrast:
- * `merge` is offered anyway because a sibling `def merge/3` clears the filter under the same name,
- * while `values`, declared only as a delegate, is offered by nothing.
- *
- * The `BeamModule` branch has no such filter, but source modulars are preferred over BEAM-decompiled
- * stubs, so for any module whose source is on disk the unfiltered branch is never the one taken.
+ * `merge` clears the filter via a sibling `def merge/3`, `values` is only ever a delegate.
  */
 class Issue1613RemoteCompletionTest : PlatformTestCase() {
     fun testDelegatedFunctionOfferedInRemoteCompletion() {
@@ -75,6 +71,27 @@ class Issue1613RemoteCompletionTest : PlatformTestCase() {
         assertTrue(
             "Remote completion should offer values/1 with a following statement, got: $lookupElementStrings",
             lookupElementStrings!!.contains("values")
+        )
+    }
+
+    /**
+     * A delegated function must show its signature like any other, or it reads as broken sitting next
+     * to entries that have one. The shared delegation renderer now appends the head's parameters;
+     * `testIssue2122` pins the same shape for local completion.
+     */
+    fun testDelegatedFunctionRendersItsHeadSignature() {
+        myFixture.configureByFiles("defdelegate_usage.ex", "defdelegate_declaration.ex")
+        myFixture.complete(CompletionType.BASIC, 1)
+
+        val values = myFixture.lookupElements.orEmpty().first { lookupElement ->
+            LookupElementPresentation().also(lookupElement::renderElement).itemText == "values"
+        }
+        val presentation = LookupElementPresentation().also(values::renderElement)
+
+        assertEquals("values", presentation.itemText)
+        assertTrue(
+            "Expected the delegate's parameters in the tail, got: ${presentation.tailText}",
+            presentation.tailText.orEmpty().startsWith("(map)")
         )
     }
 
