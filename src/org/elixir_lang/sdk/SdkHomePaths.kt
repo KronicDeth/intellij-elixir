@@ -3,6 +3,7 @@ package org.elixir_lang.sdk
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.diagnostic.trace
 import com.intellij.openapi.util.Version
+import com.intellij.openapi.util.io.FileUtil
 import org.elixir_lang.jps.shared.sdk.SdkPaths
 import org.elixir_lang.sdk.wsl.wslCompat
 import java.io.File
@@ -419,20 +420,63 @@ object SdkHomePaths {
             return
         }
 
-        val children = nameDirectory.listFiles() ?: return
+        // Sorted: listFiles() order is unspecified, and it decides an exact tie in
+        // preferredHomeDirectory - so without this the name shown for an install varies by machine.
+        val children = nameDirectory.listFiles()?.sortedBy { it.name } ?: return
+
+        // mise publishes a version alias per prefix - 26, 26.2 and 26.2.5 all symlink to 26.2.5.21 -
+        // which canonicalizePath resolves to one home, so a key carrying the directory name offers
+        // that install once per alias.
+        val childByHomePath = LinkedHashMap<String, Pair<String, File>>()
+
         for (child in children) {
-                LOGGER.trace { "$child: Scanning" }
-            if (child.isDirectory) {
-                val homePath = wslCompat.canonicalizePath(versionPathToHomePath(child).absolutePath)
-                // The version names the directory scanned, not the home inside it: a transform that
-                // descends (Homebrew's `lib/<tool>`) would otherwise read the tool name as a version.
-                val versionString = child.name
-                val version = parseVersion(versionString)
-                val key = SdkHomeKey(version, versionString, source, homePath)
-                LOGGER.trace { "$child: Adding $key" }
-                homePathByVersion[key] = homePath
+            LOGGER.trace { "$child: Scanning" }
+            if (!child.isDirectory) continue
+
+            val homePath = wslCompat.canonicalizePath(versionPathToHomePath(child).absolutePath)
+            val groupingKey = FileUtil.toSystemIndependentName(homePath)
+            val incumbent = childByHomePath[groupingKey]
+
+            if (incumbent == null || preferredHomeDirectory(child, incumbent.second, groupingKey) === child) {
+                childByHomePath[groupingKey] = homePath to child
             }
         }
+
+        for ((homePath, child) in childByHomePath.values) {
+            // The version names the directory scanned, not the home inside it: a transform that
+            // descends (Homebrew's `lib/<tool>`) would otherwise read the tool name as a version.
+            val versionString = child.name
+            val version = parseVersion(versionString)
+            val key = SdkHomeKey(version, versionString, source, homePath)
+            LOGGER.trace { "$child: Adding $key" }
+            homePathByVersion[key] = homePath
+        }
+    }
+
+    /**
+     * Picks which of two directories resolving to the same home, named by [groupingKey], should
+     * name it.
+     *
+     * The parse rule runs first because [mergeSystemShare] drops an [UNKNOWN_VERSION] key outright,
+     * so an unparseable winner loses the install rather than merely sorting it last - and the home's
+     * own final segment can be the unparseable one. Note [UNKNOWN_VERSION] is `0.0.0`, so `0latest`
+     * counts as unparseable.
+     *
+     * Then the name matching the home's final segment, which for a version-manager alias is the
+     * concrete install. Length breaks a remaining tie, and scan order an exact one.
+     */
+    private fun preferredHomeDirectory(candidate: File, incumbent: File, groupingKey: String): File {
+        val candidateParses = parseVersion(candidate.name) != UNKNOWN_VERSION
+        val incumbentParses = parseVersion(incumbent.name) != UNKNOWN_VERSION
+        if (candidateParses != incumbentParses) return if (candidateParses) candidate else incumbent
+
+        // Split the normalised key, not the raw home: a backslash the raw form carried is not a
+        // separator off Windows, which would hide the final segment and stop this rule firing.
+        val homeName = groupingKey.substringAfterLast('/')
+        if (candidate.name == homeName) return candidate
+        if (incumbent.name == homeName) return incumbent
+
+        return if (candidate.name.length > incumbent.name.length) candidate else incumbent
     }
 
     private fun parseVersion(versionString: String): Version {

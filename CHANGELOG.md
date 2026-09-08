@@ -89,6 +89,8 @@
     [#4041](https://github.com/KronicDeth/intellij-elixir/issues/4041).
 
 - [#4062](https://github.com/KronicDeth/intellij-elixir/pull/4062) [@sh41](https://github.com/sh41)
+  - **A version manager's SDK is offered once instead of once per version alias.** mise publishes
+    `26`, `26.2` and `26.2.5` alongside `26.2.5.21`, which listed the same install four times.
   - **A file that is not a BEAM no longer raises an IDE error report.** Any `*.beam` reaches the
     decompiler on its name alone, so a placeholder or a half-written file blamed the plugin.
   - **A corrupt BEAM file no longer crashes indexing.**
