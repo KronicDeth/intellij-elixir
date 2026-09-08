@@ -109,14 +109,19 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
     }
 
     /**
-     * As {@link #assertParsedAndQuotedAroundError}, where the rejection is a raise below 1.12.0 and an
-     * error tuple from it. No threshold: every supported version rejects, only the manner moved.
+     * As {@link #assertParsedAndQuotedAroundError}: every supported version rejects, but below
+     * {@code dialect} it raises {@code expectedException} rather than answering an error tuple.
      */
-    protected void assertParsedAndQuotedAroundErrorOrRaise(String expectedException) {
+    protected void assertParsedAndQuotedAroundErrorOrRaise(QuotingDialect dialect, String expectedException) {
         doTest(true);
 
         assertInstanceOf(ElixirPsiImplUtil.quote(myFile), OtpErlangObject.class);
-        Quoter.assertErrorOrRaise(myFile, expectedException);
+
+        if (QuotingDialectResolver.dialectFor(myFile).compareTo(dialect) < 0) {
+            Quoter.assertRaise(myFile, expectedException);
+        } else {
+            Quoter.assertError(myFile);
+        }
     }
 
     protected void assertParsedWithErrors() {
