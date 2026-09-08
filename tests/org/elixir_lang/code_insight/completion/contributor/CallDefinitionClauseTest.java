@@ -74,12 +74,13 @@ public class CallDefinitionClauseTest extends PlatformTestCase {
         assertNotNull(lookupElements);
         lookupElements[0].renderElement(lookupElementPresentation);
         assertEquals("source", lookupElementPresentation.getItemText());
-        assertEquals(" (defdelegate.ex defmodule Defdelegate)", lookupElementPresentation.getTailText());
+        // A delegation is presented like any other declaration: head parameters, then location.
+        assertEquals("() (defdelegate.ex defmodule Defdelegate)", lookupElementPresentation.getTailText());
 
         lookupElementPresentation = new LookupElementPresentation();
         lookupElements[1].renderElement(lookupElementPresentation);
         assertEquals("source_as", lookupElementPresentation.getItemText());
-        assertEquals(" (defdelegate.ex defmodule Defdelegate)", lookupElementPresentation.getTailText());
+        assertEquals("() (defdelegate.ex defmodule Defdelegate)", lookupElementPresentation.getTailText());
 
         lookupElementPresentation = new LookupElementPresentation();
         lookupElements[2].renderElement(lookupElementPresentation);

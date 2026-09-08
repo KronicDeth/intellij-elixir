@@ -106,14 +106,12 @@ class ParameterInfo : ParameterInfoHandler<Arguments, Any> {
 
                                 disabled = finalArguments.size <= currentParameterIndex
                             }
-                        } else {
-                            TODO()
                         }
                     }
                 }
-            } else {
-                TODO()
             }
+            // Any other item kind leaves the builder empty and renders as "<no parameters>" below; a
+            // hint is not worth a crash.
 
             if (stringBuilder.isEmpty()) {
                 stringBuilder.append("<no parameters>")

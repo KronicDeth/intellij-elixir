@@ -10,6 +10,7 @@ import org.elixir_lang.beam.chunk.beam_documentation.docs.documented.MarkdownByL
 import org.elixir_lang.beam.term.inspect
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall
 import org.elixir_lang.psi.CallDefinitionClause
+import org.elixir_lang.structure_view.element.Delegation
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.identifierName
@@ -104,7 +105,10 @@ private fun callDefinitionAttributeListByName(callDefinitionCall: Call): Map<Str
     callDefinitionCall
         .prevSiblingSequence()
         .drop(1)
-        .takeWhile { it !is Call || !CallDefinitionClause.`is`(it) }
+        // A defdelegate ends the run of attributes belonging to whatever follows it, exactly as a def
+        // does. Without it the walk runs past any number of delegations and attaches an @doc written
+        // for one of them to a later, undocumented definition.
+        .takeWhile { it !is Call || !(CallDefinitionClause.`is`(it) || Delegation.`is`(it)) }
         .filterIsInstance<AtUnqualifiedNoParenthesesCall<*>>()
         .filter { CALL_DEFINITION_ATTRIBUTE_NAME_SET.contains(it.atIdentifier.identifierName()) }
         .groupBy { it.atIdentifier.identifierName() }

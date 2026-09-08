@@ -30,6 +30,7 @@ import org.elixir_lang.psi.stub.type.call.Stub.isModular
 import org.elixir_lang.reference.CaptureNameArity
 import org.elixir_lang.reference.Resolver
 import org.elixir_lang.structure_view.element.Callback
+import org.elixir_lang.structure_view.element.Delegation
 import org.intellij.markdown.html.HtmlGenerator
 import org.intellij.markdown.parser.MarkdownParser
 import java.util.function.Consumer
@@ -311,9 +312,16 @@ internal class ElixirDocumentationProvider : DocumentationProvider {
                         .filter(ResolveResult::isValidResult)
                         .mapNotNull(ResolveResult::getElement)
 
-                    // Prefer source Call elements (CallDefinitionClause), fall back to BEAM stubs (CallDefinitionImpl)
+                    // A defdelegate carrying its own @doc outranks what it delegates to: the delegating
+                    // module is saying what the function means here, which is why the @doc was written.
+                    // One without its own @doc is skipped so the to: target's documentation shows.
+                    // Otherwise prefer source Call elements (CallDefinitionClause), falling back to BEAM
+                    // stubs (CallDefinitionImpl).
                     fun bestMatch(elements: List<PsiElement>): PsiElement? =
-                        elements.filterIsInstance<Call>().firstOrNull { CallDefinitionClause.`is`(it) }
+                        elements
+                            .filterIsInstance<Call>()
+                            .firstOrNull { Delegation.`is`(it) && SourceFileDocsHelper.fetchDocs(it) != null }
+                            ?: elements.filterIsInstance<Call>().firstOrNull { CallDefinitionClause.`is`(it) }
                             ?: elements.filterIsInstance<BeamCallDefinition>().firstOrNull()
 
                     // If no exact arity match (validResult), fall back to results with an exact name match

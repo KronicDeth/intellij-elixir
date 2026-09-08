@@ -9,7 +9,13 @@ import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.call.macroChildCalls
 import org.elixir_lang.code_insight.lookup.element.CallDefinitionClause as CallDefinitionClauseLookupElement
 import org.elixir_lang.code_insight.lookup.element_renderer.CallDefinitionClause as CallDefinitionClauseRenderer
+import com.intellij.psi.ResolveState
+import org.elixir_lang.psi.impl.call.finalArguments
+import org.elixir_lang.structure_view.element.CallDefinitionHead
+import org.elixir_lang.structure_view.element.Delegation
 import org.elixir_lang.psi.CallDefinitionClause as CallDefinitionClausePsi
+import org.elixir_lang.code_insight.lookup.element_renderer.Delegation as DelegationRenderer
+import org.elixir_lang.code_insight.completion.insert_handler.CallDefinitionClause as CallDefinitionClauseInsertHandler
 
 /**
  * The function-name [LookupElement]s a modular ([scope]) offers when completing a **remote**
@@ -55,15 +61,54 @@ fun callDefinitionClauseLookupElements(
 }
 
 private fun callDefinitionClauseLookupElements(scope: Call, appendParentheses: Boolean): Iterable<LookupElement> {
-    val publicClauses = scope
-        .macroChildCalls()
+    val childCalls = scope.macroChildCalls()
+
+    val publicClauses = childCalls
         .filter { CallDefinitionClausePsi.`is`(it) }
         .filter { CallDefinitionClausePsi.isPublic(it) }
 
-    return preferFunctionHeads(publicClauses).map { (name, bestClause) ->
-        lookupElement(name, bestClause, appendParentheses)
+    val clauseLookupElements = preferFunctionHeads(publicClauses).map { (name, bestClause) ->
+        name to lookupElement(name, bestClause, appendParentheses)
     }
+    val clauseNames = clauseLookupElements.map { (name, _) -> name }.toSet()
+
+    return clauseLookupElements.map { (_, lookupElement) -> lookupElement } +
+        delegationLookupElements(childCalls, clauseNames, appendParentheses)
 }
+
+/**
+ * The [LookupElement]s for functions this module declares only with `defdelegate`.
+ *
+ * `Delegation.is` and `CallDefinitionClause.is` are disjoint, so delegates need their own pass or they
+ * are never offered. Names already in [clauseNames] are skipped so a `def` keeps its richer
+ * presentation; visibility is not filtered because there is no `defdelegatep`.
+ *
+ * [appendParentheses] is threaded through so a delegate inserts `Mod.values()` and opens parameter
+ * info like a `def`, and stays a bare name for an MFA atom, where a name is not a call.
+ */
+private fun delegationLookupElements(
+    childCalls: Array<Call>,
+    clauseNames: Set<String>,
+    appendParentheses: Boolean
+): List<LookupElement> =
+    childCalls
+        .filter { Delegation.`is`(it) }
+        .mapNotNull { delegation ->
+            delegation
+                .finalArguments()
+                ?.takeIf { it.size == 2 }
+                ?.let { arguments -> CallDefinitionHead.nameArityInterval(arguments[0], ResolveState.initial()) }
+                ?.name
+                ?.takeIf { it !in clauseNames }
+                ?.let { name -> name to delegation }
+        }
+        .distinctBy { (name, _) -> name }
+        .map { (name, delegation) ->
+            LookupElementBuilder
+                .createWithSmartPointer(name, delegation)
+                .withRenderer(DelegationRenderer(name))
+                .let { if (appendParentheses) it.withInsertHandler(CallDefinitionClauseInsertHandler.INSTANCE) else it }
+        }
 
 private fun callDefinitionClauseLookupElements(moduleImpl: BeamModule, appendParentheses: Boolean): Iterable<LookupElement> =
     moduleImpl.callDefinitions()

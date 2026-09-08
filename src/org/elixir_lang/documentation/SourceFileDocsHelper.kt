@@ -13,7 +13,10 @@ import org.elixir_lang.psi.impl.call.macroChildCallList
 import org.elixir_lang.psi.impl.identifierName
 import org.elixir_lang.psi.impl.siblingExpressions
 import org.elixir_lang.psi.stub.type.call.Stub
+import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.structure_view.element.CallDefinitionHead
+import org.elixir_lang.structure_view.element.Delegation
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 
 object SourceFileDocsHelper {
     fun fetchDocs(element: PsiElement): FetchedDocs? = when (element) {
@@ -149,6 +152,28 @@ object SourceFileDocsHelper {
                 }
             }
         }
+        Delegation.`is`(call) -> delegationDocs(call)
         else -> null
     }
+
+    /**
+     * The `@doc` written on a `defdelegate` itself, or `null` when it has none.
+     *
+     * A delegation's own `@doc` is the more specific answer, so it replaces the target's. Null rather
+     * than an empty document is what lets the caller fall through to the target.
+     */
+    @RequiresReadLock
+    private fun delegationDocs(call: Call): FetchedDocs? =
+        call
+            .finalArguments()
+            ?.takeIf { it.size == 2 }
+            ?.let { arguments ->
+                enclosingModularMacroCall(call)?.let { modular ->
+                    val module = (modular as? CanonicallyNamed)?.canonicalName().orEmpty()
+
+                    FetchedDocs.FunctionOrMacroDocumentation
+                        .fromCallDefinitionClauseCall(module, call, arguments[0])
+                        .takeIf { it.doc != null }
+                }
+            }
 }
