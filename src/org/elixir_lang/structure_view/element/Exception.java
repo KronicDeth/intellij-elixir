@@ -6,13 +6,11 @@ import com.intellij.psi.ElementDescriptionLocation;
 import com.intellij.psi.PsiElement;
 import com.intellij.usageView.UsageViewTypeLocation;
 import com.intellij.util.concurrency.annotations.RequiresReadLock;
-import org.elixir_lang.navigation.item_presentation.Parent;
 import org.elixir_lang.psi.ElixirAccessExpression;
 import org.elixir_lang.psi.ElixirList;
 import org.elixir_lang.psi.QuotableKeywordList;
 import org.elixir_lang.psi.QuotableKeywordPair;
 import org.elixir_lang.psi.call.Call;
-import org.elixir_lang.structure_view.element.modular.Modular;
 import org.elixir_lang.structure_view.element.structure.Structure;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -36,8 +34,6 @@ public class Exception extends Element<Call> {
 
     @Nullable
     private List<CallDefinition> callbacks = null;
-    @NotNull
-    private final Modular modular;
 
     /*
      * Static Methods
@@ -58,9 +54,8 @@ public class Exception extends Element<Call> {
      * Constructors
      */
 
-    public Exception(@NotNull Modular modular, @NotNull Call call) {
+    public Exception(@NotNull Call call) {
         super(call);
-        this.modular = modular;
     }
 
     /*
@@ -150,7 +145,7 @@ public class Exception extends Element<Call> {
         List<TreeElement> childList = new ArrayList<TreeElement>();
 
         childList.add(
-                new Structure(modular, navigationItem)
+                new Structure(navigationItem)
         );
 
         if (callbacks != null) {
@@ -168,23 +163,11 @@ public class Exception extends Element<Call> {
     @NotNull
     @Override
     public ItemPresentation getPresentation() {
-        Parent parentPresentation = (Parent) modular.getPresentation();
-        String location = parentPresentation.getLocatedPresentableText();
-        int lastIndex = location.lastIndexOf('.');
-        String parentLocation;
-        String name;
-
-        if (lastIndex != -1) {
-            parentLocation = location.substring(0, lastIndex);
-            name = location.substring(lastIndex + 1, location.length());
-        } else {
-            parentLocation = null;
-            name = location;
-        }
+        ModuleQualifiedName qualifiedName = ModuleQualifiedName.of(navigationItem, "exception");
 
         return new org.elixir_lang.navigation.item_presentation.Exception(
-                parentLocation,
-                name
+                qualifiedName.getLocation(),
+                qualifiedName.getName()
         );
     }
 

@@ -223,7 +223,8 @@ abstract class Module : PsiScopeProcessor {
 
 
     private fun executeOnModular(match: Named, state: ResolveState): Boolean =
-            if (state.get(ENTRANCE).containingFile.context == match) {
+            // No entrance means no file to have been injected into, so `match` cannot be its host.
+            if (state.get(ENTRANCE)?.containingFile?.context == match) {
                 executeOnViewModular(match, state)
             } else {
                 val keepProcessing = match.name?.let {

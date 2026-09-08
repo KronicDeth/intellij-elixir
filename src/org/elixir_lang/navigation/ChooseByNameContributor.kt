@@ -126,8 +126,10 @@ open class ChooseByNameContributor(private val stubIndexKey: StubIndexKey<String
         enclosingModularByCall: EnclosingModularByCall,
         call: Call
     ) {
-        // A callback outside any module has nowhere to be listed
-        enclosingModularByCall.putNew(call)?.let { items.add(Callback(it, call)) }
+        Callback.Kind.of(call)?.let { kind ->
+            // A callback outside any module has nowhere to be listed.
+            enclosingModularByCall.putNew(call)?.let { items.add(Callback(it, call, kind)) }
+        }
     }
 
     private fun getItemsFromCallDefinitionClause(

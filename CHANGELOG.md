@@ -70,6 +70,13 @@
 
 ### Bug Fixes
 
+- [#4065](https://github.com/KronicDeth/intellij-elixir/pull/4065) [@sh41](https://github.com/sh41)
+  - **A module's Structure View tree and its caret sync now come from one list, so an ExUnit `test`
+    written outside a `describe` gets its own node and an `EEx.function_from_*` node follows the
+    caret.** Fixes [#4056](https://github.com/KronicDeth/intellij-elixir/issues/4056).
+  - **A struct or exception in the Structure View is named after its module instead of part of the
+    file path.** Fixes [#4069](https://github.com/KronicDeth/intellij-elixir/issues/4069).
+
 - [#4039](https://github.com/KronicDeth/intellij-elixir/pull/4039) [@sh41](https://github.com/sh41)
   - **Go To Declaration, autocomplete and Quick Documentation now work for functions declared with
     `defdelegate`, including delegations into compiled modules such as `Map.values/1`.** Fixes

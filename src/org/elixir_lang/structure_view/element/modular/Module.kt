@@ -14,21 +14,17 @@ import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.NameArity
 import org.elixir_lang.navigation.item_presentation.Parent
 import org.elixir_lang.psi.ArityInterval
-import org.elixir_lang.psi.QuoteMacro
 import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE
 import org.elixir_lang.psi.impl.call.macroChildCalls
 import org.elixir_lang.psi.impl.enclosingMacroCall
 import org.elixir_lang.psi.impl.locationString
 import org.elixir_lang.psi.impl.stripAccessExpression
-import org.elixir_lang.psi.operation.Or
 import org.elixir_lang.psi.putInitialVisitedElement
+import org.elixir_lang.structure_view.ChildCall
 import org.elixir_lang.structure_view.element.*
-import org.elixir_lang.structure_view.element.Quote
 import org.elixir_lang.structure_view.element.call_definition_by_name_arity.FunctionByNameArity
 import org.elixir_lang.structure_view.element.call_definition_by_name_arity.MacroByNameArity
-import org.elixir_lang.structure_view.element.ex_unit.case.Describe
-import org.elixir_lang.structure_view.element.structure.Structure
 import org.elixir_lang.structure_view.node_provider.Used
 import org.jetbrains.annotations.Contract
 import java.util.*
@@ -129,39 +125,18 @@ open class Module(protected val parent: Modular?, call: Call) : Element<Call>(ca
                 val overridableSet = HashSet<Overridable>()
                 val useSet = HashSet<org.elixir_lang.structure_view.element.Use>()
 
-                while (!childCallQueue.isEmpty()) {
-                    val childCall = childCallQueue.remove()
+                val accumulator = ChildCall.Accumulator(
+                        modular,
+                        treeElementList,
+                        functionByNameArity,
+                        macroByNameArity,
+                        overridableSet,
+                        useSet,
+                        childCallQueue
+                )
 
-                    when {
-                        childCall is Or -> childCallQueue.addAll(orChildCallList(childCall as Or))
-                        Callback.`is`(childCall) -> treeElementList.add(Callback(modular, childCall))
-                        Delegation.`is`(childCall) -> functionByNameArity.addDelegationToTreeElementList(childCall)
-                        org.elixir_lang.psi.Exception.`is`(childCall) -> functionByNameArity.exception = Exception(modular, childCall)
-                        org.elixir_lang.psi.CallDefinitionClause.isFunction(childCall) -> functionByNameArity.addClausesToCallDefinition(childCall)
-                        CallDefinitionSpecification.`is`(childCall) -> functionByNameArity.addSpecificationToCallDefinition(childCall)
-                        org.elixir_lang.EEx.isFunctionFrom(childCall, resolveState) -> treeElementList.add(EExFunctionFrom(modular, childCall))
-                        org.elixir_lang.psi.Implementation.`is`(childCall) -> treeElementList.add(Implementation(modular, childCall))
-                        org.elixir_lang.psi.CallDefinitionClause.isMacro(childCall) -> macroByNameArity.addClausesToCallDefinition(childCall)
-                        org.elixir_lang.psi.Module.`is`(childCall) -> treeElementList.add(Module(modular, childCall))
-                        Overridable.`is`(childCall) -> {
-                            val overridable = Overridable(modular, childCall)
-                            overridableSet.add(overridable)
-                            treeElementList.add(overridable)
-                        }
-                        org.elixir_lang.psi.Protocol.`is`(childCall) -> treeElementList.add(Protocol(modular, childCall))
-                        QuoteMacro.`is`(childCall) -> treeElementList.add(Quote(modular, childCall))
-                        Structure.`is`(childCall) -> treeElementList.add(Structure(modular, childCall))
-                        Type.`is`(childCall) -> treeElementList.add(Type.fromCall(modular, childCall))
-                        org.elixir_lang.psi.Use.`is`(childCall) -> {
-                            val use = org.elixir_lang.structure_view.element.Use(modular, childCall)
-                            useSet.add(use)
-                            treeElementList.add(use)
-                        }
-                        org.elixir_lang.psi.ex_unit.Case.isDescribe(childCall, ResolveState.initial()) ->
-                            treeElementList.add(Describe(childCall))
-                        Unknown.`is`(childCall) -> // Should always be last since it will match all macro calls
-                            treeElementList.add(Unknown(modular, childCall))
-                    }
+                while (!childCallQueue.isEmpty()) {
+                    ChildCall.build(accumulator, childCallQueue.remove(), resolveState)
                 }
 
                 for (overridable in overridableSet) {
@@ -198,19 +173,6 @@ open class Module(protected val parent: Modular?, call: Call) : Element<Call>(ca
             return treeElements ?: emptyArray()
         }
 
-        private fun orChildCallList(or: Or): List<Call> {
-            val childCallList = ArrayList<Call>()
-
-            (or.leftOperand() as? Call)?.run {
-                childCallList.add(this)
-            }
-
-            (or.rightOperand() as? Call)?.run {
-                childCallList.add(this)
-            }
-
-            return childCallList
-        }
     }
 
 }

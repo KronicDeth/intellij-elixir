@@ -21,8 +21,32 @@ import org.elixir_lang.structure_view.element.Timed.Time
 import org.elixir_lang.structure_view.element.modular.Modular
 import org.jetbrains.annotations.Contract
 
-class Callback(private val modular: Modular, navigationItem: Call) :
+class Callback(private val modular: Modular, navigationItem: Call, private val kind: Kind) :
     Element<AtUnqualifiedNoParenthesesCall<*>>(navigationItem as AtUnqualifiedNoParenthesesCall<*>), Timed {
+    /** The module attributes a callback node can be built from. */
+    enum class Kind {
+        CALLBACK,
+        MACROCALLBACK;
+
+        val time: Time
+            get() = when (this) {
+                CALLBACK -> Time.RUN
+                MACROCALLBACK -> Time.COMPILE
+            }
+
+        companion object {
+            fun of(moduleAttributeName: String): Kind? =
+                when (moduleAttributeName) {
+                    "@callback" -> CALLBACK
+                    "@macrocallback" -> MACROCALLBACK
+                    else -> null
+                }
+
+            fun of(call: Call): Kind? =
+                (call as? AtUnqualifiedNoParenthesesCall<*>)?.let { of(ElixirPsiImplUtil.moduleAttributeName(it)) }
+        }
+    }
+
     /**
      * A callback's [.getPresentation] is a [NameArity] like a [CallDefinition], so like a call
      * definition, it's children are the specifications and clauses, since the callback has no clauses, the only child
@@ -70,20 +94,7 @@ class Callback(private val modular: Modular, navigationItem: Call) :
         )
     }
 
-    /**
-     * When the defined call is usable
-     *
-     * @return [Time.COMPILE] for compile time (`defmacro`, `defmacrop`);
-     * [Time.RUN] for run time `def`, `defp`)
-     */
-    override fun time(): Time =
-        ElixirPsiImplUtil.moduleAttributeName(navigationItem).let { moduleAttributeName ->
-            when (moduleAttributeName) {
-                "@callback" -> Time.RUN
-                "@macrocallback" -> Time.COMPILE
-                else -> TODO("Unknown callback $moduleAttributeName")
-            }
-        }
+    override fun time(): Time = kind.time
 
     companion object {
         @JvmStatic
@@ -106,12 +117,10 @@ class Callback(private val modular: Modular, navigationItem: Call) :
                 ?.let { specificationHeadCall(it) }
 
         @Contract(pure = true)
-        fun `is`(call: Call): Boolean =
-            (call as? AtUnqualifiedNoParenthesesCall<*>)?.let {
-                val moduleAttributeName = ElixirPsiImplUtil.moduleAttributeName(it)
+        fun `is`(call: Call): Boolean = Kind.of(call) != null
 
-                moduleAttributeName == "@callback" || moduleAttributeName == "@macrocallback"
-            } ?: false
+        fun fromCall(modular: Modular, call: Call): Callback? =
+            Kind.of(call)?.let { kind -> Callback(modular, call, kind) }
 
         /**
          * `true` if [element] is (within) the name/head of an enclosing `@callback`/`@macrocallback`,
@@ -132,8 +141,8 @@ class Callback(private val modular: Modular, navigationItem: Call) :
 
         @RequiresReadLock
         fun fromCall(call: Call): Callback? =
-            enclosingModular(call)?.let { modular ->
-                Callback(modular, call)
+            Kind.of(call)?.let { kind ->
+                enclosingModular(call)?.let { modular -> Callback(modular, call, kind) }
             }
 
         @Contract(pure = true)
