@@ -251,7 +251,7 @@ beam/dist.c:5678:15: error: two or more data types in declaration specifiers
                        ^~~~
 ```
 
-As the project still uses OTP 24, which uses a local variable named bool in beam/dist.c, which was legal C in 2022... but is not legal C now, because GCC 15 switched its default C standard to C23, which makes bool a reserved built-in type name. ArchLinux (btw) ships GCC 16.1.1, Deian 13 seems to be 14.2.0.
+OTP 24 uses a local variable named bool in beam/dist.c, which was legal C in 2022... but is not legal C now, because GCC 15 switched its default C standard to C23, which makes bool a reserved built-in type name. ArchLinux (btw) ships GCC 16.1.1, Deian 13 seems to be 14.2.0. The pin is OTP 29, so this only bites when building an older OTP - the 1.11.4 and 1.12.3 legs are on OTP 24.
 
 You can work around this by forcing an older C standard, for example:
 
@@ -402,22 +402,27 @@ resolved versions - so a bad declaration is diagnosable locally rather than from
 
 | | Elixir | OTP | Status |
 |---|---|---|---|
-| `beam.baseline` | 1.13.4 | 24.3.4.6 | **supported** - must be green |
-| `beam.additional` | later minors, plus pairs covering an OTP major no other leg covers | see the file | **supported** when the entry has no `continue-on-error`, otherwise informational |
+| `beam.baseline` | 1.20.4 | 29.0.6 | **supported** - must be green |
+| `beam.additional` | the rest of the window either side of the baseline, plus pairs covering an OTP major no other leg covers | see the file | **supported** when the entry has no `continue-on-error`, otherwise informational |
+
+`beam.baseline` is the newest supported pair, and the one every IDEA leg and the Windows leg run.
+`beam.additional` covers the rest of the window, which reaches back to 1.11.4: `builds.hex.pm`
+publishes OTP for `ubuntu-22.04` only from 24.2, and 1.11.4 is the oldest Elixir that runs on OTP 24,
+so nothing below it can be tested.
 
 `beam.additional` is not one-entry-per-Elixir-minor: a pair may exist to cover an **OTP major** no other
 pair covers, because most of the decompiled surface is Erlang and the BEAM chunk formats track OTP
-rather than Elixir. So the same Elixir can appear twice with different OTPs - `1.13.4` currently does.
-For such a leg, prefer the cleanest in-window Elixir so it isolates the OTP surface instead of
-inheriting a quoting backlog.
+rather than Elixir. So the same Elixir can appear twice with different OTPs. Put a new Elixir on the
+newest OTP major it supports, so a failure is about the Elixir; give a new OTP an Elixir that already
+has a green leg, so a failure is about the OTP.
 
 Check which OTP an Elixir supports against the
 [compatibility table](https://elixir.hexdocs.pm/compatibility-and-deprecations.html) - it accounts for
-support added in patch releases, e.g. 1.14 is "23 - 25 (and Erlang/OTP 26 from v1.14.5)". Within that
-range, prefer the version's `recommended_otp` from
-[`elixir-versions.yml`](https://github.com/elixir-lang/elixir-lang.github.com/blob/main/_data/elixir-versions.yml),
-or the highest supported OTP where none is declared. Don't use that file's `otp_versions` list to
-decide the range: it is per-minor and misses patch-level additions.
+support added in patch releases, e.g. 1.14 is "23 - 25 (and Erlang/OTP 26 from v1.14.5)". Don't use the
+`otpVersions` list in
+[`elixir-versions`](https://github.com/elixir-lang/elixir-lang.github.com/tree/main/src/content/elixir-versions)
+to decide the range: it is per-minor, misses patch-level additions, and is published only from v1.15.
+Only the current stable minor declares a `recommendedOtp`, and it is not the rule here either.
 
 ##### Widening Elixir support
 
