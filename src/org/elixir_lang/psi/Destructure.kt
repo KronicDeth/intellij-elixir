@@ -4,10 +4,12 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiPolyVariantReference
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.concurrency.annotations.RequiresReadLock
+import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.childExpressions
 import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.psi.operation.Match
 import org.elixir_lang.psi.operation.Pipe
+import org.elixir_lang.psi.walk.ShapeTable
 
 /**
  * Correlates a position in a match's pattern with the value at the same position on the right, so a name bound by
@@ -45,7 +47,7 @@ object Destructure {
 
         if (!sameShapeAs(strippedPattern, strippedValue)) {
             // two containers of different kinds are a match that raises, so nothing is bound
-            if (isContainer(strippedValue)) {
+            if (bucket(strippedValue) != Bucket.OPAQUE) {
                 return emptyList()
             }
 
@@ -58,9 +60,9 @@ object Destructure {
             }
         }
 
-        val (nextPattern, nextValue) = descend(strippedPattern, strippedValue, declaration) ?: return emptyList()
-
-        return valuesAt(nextPattern, nextValue, declaration, followed)
+        return descend(strippedPattern, strippedValue, declaration).flatMap { (nextPattern, nextValue) ->
+            valuesAt(nextPattern, nextValue, declaration, followed)
+        }
     }
 
     private data class Bound(val value: PsiElement, val followed: Set<PsiElement>)
@@ -91,84 +93,104 @@ object Destructure {
             }
             .orEmpty()
 
-    /** The shapes [descend] can take apart, and so the ones whose kind has to agree for the match to bind at all. */
-    private fun isContainer(element: PsiElement): Boolean =
-        element is ElixirTuple || element is ElixirList || element is ElixirMapOperation
+    /**
+     * How a shape can be taken apart by a match. Read from [ShapeTable], so a new grammar shape fails
+     * `ShapeCoverageTest` until somebody classifies it rather than defaulting silently.
+     */
+    enum class Bucket {
+        /** Positions matched by index; `[h | t]` matches any list at least as long as its heads. */
+        LIST,
+        /** Positions matched by index, counting a trailing keyword list as the single element it is. */
+        TUPLE,
+        /** Keys, of which the pattern may name a subset. */
+        MAP,
+        /** One key and its value, as a keyword list's elements are. */
+        KEYWORD_PAIR,
+        /** Cannot be taken apart here, so a name in the pattern may carry whatever it holds. */
+        OPAQUE
+    }
+
+    val classifier = ShapeTable.column(Bucket.OPAQUE) { it.destructure }
+
+    private fun bucket(element: PsiElement): Bucket = classifier.classify(element)
 
     private fun sameShapeAs(pattern: PsiElement, value: PsiElement): Boolean =
-        when (pattern) {
-            is ElixirTuple -> value is ElixirTuple
-            is ElixirList -> value is ElixirList
-            is ElixirMapOperation -> value is ElixirMapOperation
-            else -> false
-        }
+        bucket(pattern).let { it != Bucket.OPAQUE && it == bucket(value) }
 
-    /** The pair one level in from [pattern] and [value] that still contains [declaration]. */
+    /** The pair one level in from [pattern] and [value] that still contains [declaration], or none. */
     private fun descend(
         pattern: PsiElement,
         value: PsiElement,
         declaration: PsiElement
-    ): Pair<PsiElement, PsiElement>? =
-        when (pattern) {
-            is ElixirMapOperation -> (value as? ElixirMapOperation)?.let { byKey(pattern, it, declaration) }
-            else -> byPosition(pattern, value, declaration)
+    ): List<Pair<PsiElement, PsiElement>> =
+        when (bucket(pattern)) {
+            Bucket.MAP -> byKey(pattern, value, declaration)
+            Bucket.LIST, Bucket.TUPLE -> byPosition(pattern, value, declaration)
+            Bucket.KEYWORD_PAIR -> byPairedKey(pattern, value, declaration)
+            // `sameShapeAs` has already answered false, so `valuesAt` never descends into one
+            Bucket.OPAQUE -> emptyList()
         }
 
     private fun byPosition(
         pattern: PsiElement,
         value: PsiElement,
         declaration: PsiElement
-    ): Pair<PsiElement, PsiElement>? {
-        val (heads, tail) = positions(pattern)
-        val (valueElements, valueTail) = positions(value)
+    ): List<Pair<PsiElement, PsiElement>> {
+        val (heads, tail) = positions(pattern) ?: return emptyList()
+        val (valueElements, valueTail) = positions(value) ?: return emptyList()
 
         // a cons on the right leaves the value's length unknown; conservative, since `[x] = [h | t]` matches only
         // when `t` is empty
         if (valueTail != null) {
-            return null
+            return emptyList()
         }
 
         // `[h | t]` matches any list at least as long as its heads; without a tail the lengths have to agree exactly
         val linesUp = if (tail == null) heads.size == valueElements.size else heads.size <= valueElements.size
 
         if (!linesUp) {
-            return null
+            return emptyList()
         }
 
-        // the rest of a list is not an element of it, so a name bound by `t` finds no index here and answers nothing
         val index = heads.indexOfFirst { PsiTreeUtil.isAncestor(it, declaration, false) }
 
-        return if (index == -1) {
-            null
-        } else {
-            heads[index] to valueElements[index]
+        if (index != -1) {
+            return listOf(heads[index] to valueElements[index])
         }
+
+        // `[h | t]`'s tail binds nothing - issue #4067; `valuesAt`'s KDoc records why, and a test pins it
+        return emptyList()
     }
 
     /** The positions of a tuple or list: those matched by index, and the one `[h | t]` binds the rest to. */
     private data class Positions(val heads: List<PsiElement>, val tail: PsiElement?)
 
-    private fun positions(container: PsiElement): Positions {
+    private fun positions(container: PsiElement): Positions? {
         val elements = elements(container)
+
+        if (bucket(container) != Bucket.LIST) {
+            return Positions(elements, null)
+        }
+
         // `[a, b | t]` parses as the elements before `b | t`, then one pipe operation carrying the last two positions
         val cons = elements.lastOrNull()?.stripAccessExpression() as? Pipe ?: return Positions(elements, null)
-        val head = cons.leftOperand() ?: return Positions(elements, null)
+        // null, not a fixed-length reading: a half-typed cons would otherwise be less conservative than a whole one
+        val head = cons.leftOperand() ?: return null
+        val tail = cons.rightOperand() ?: return null
 
-        return Positions(elements.dropLast(1) + head, cons.rightOperand())
+        return Positions(elements.dropLast(1) + head, tail)
     }
 
     /**
-     * A container's elements as Elixir counts them. `containerArguments` is a private rule, so they are its own child
-     * expressions - except that it collapses a trailing keyword list into one `keywords` child, where Elixir sees one
-     * element per pair: `[value, k: 1, j: 2]` is a list of three.
+     * A container's elements as Elixir counts them: `containerArguments` is private, so they are its own child
+     * expressions, except that a trailing keyword list is one child but one element per pair.
      */
     private fun elements(container: PsiElement): List<PsiElement> =
         container.childExpressions().toList().flatMap { child ->
             val stripped = child.stripAccessExpression()
 
-            // The list rule only: `[q, k: 1, j: 2]` is a list of three, but `{q, k: 1, j: 2}` is a tuple of two, whose
-            // second element is the whole keyword list. `QuotableImpl.quote` draws the same distinction.
-            if (container is ElixirList && stripped is ElixirKeywords) {
+            // `[q, k: 1, j: 2]` is a list of three but `{q, k: 1, j: 2}` a tuple of two, as `QuotableImpl.quote` has it
+            if (bucket(container) == Bucket.LIST && stripped is ElixirKeywords) {
                 stripped.keywordPairList
             } else {
                 listOf(child)
@@ -177,17 +199,43 @@ object Destructure {
 
     /** A map pattern names a subset of the value's keys, so the sides are paired by key rather than by position. */
     private fun byKey(
-        pattern: ElixirMapOperation,
-        value: ElixirMapOperation,
+        pattern: PsiElement,
+        value: PsiElement,
         declaration: PsiElement
-    ): Pair<PsiElement, PsiElement>? {
+    ): List<Pair<PsiElement, PsiElement>> {
         val (key, patternElement) = entries(pattern)
             .firstOrNull { (_, element) -> PsiTreeUtil.isAncestor(element, declaration, false) }
-            ?: return null
+            ?: return emptyList()
         // a duplicate key takes its last value - `%{a: 1, a: 2}` is `%{a: 2}` - so the last entry is the binding one
-        val valueElement = entries(value).lastOrNull { (valueKey, _) -> valueKey == key }?.second ?: return null
+        val valueElement =
+            entries(value).lastOrNull { (valueKey, _) -> valueKey == key }?.second ?: return emptyList()
 
-        return patternElement to valueElement
+        return listOf(patternElement to valueElement)
+    }
+
+    /**
+     * A keyword list is a list of pairs, so its pairs line up by position and must then agree on the key. A pair
+     * spelled as a tuple, `[{:a, x}] = [a: value]`, does match in Elixir but binds nothing here.
+     */
+    private fun byPairedKey(
+        pattern: PsiElement,
+        value: PsiElement,
+        declaration: PsiElement
+    ): List<Pair<PsiElement, PsiElement>> {
+        val patternPair = pattern as? ElixirKeywordPair ?: return emptyList()
+        val valuePair = value as? ElixirKeywordPair ?: return emptyList()
+
+        if (key(patternPair.keywordKey) != key(valuePair.keywordKey)) {
+            return emptyList()
+        }
+
+        val patternValue = patternPair.keywordValue
+
+        return if (PsiTreeUtil.isAncestor(patternValue, declaration, false)) {
+            listOf(patternValue as PsiElement to valuePair.keywordValue as PsiElement)
+        } else {
+            emptyList()
+        }
     }
 
     /**
@@ -196,8 +244,9 @@ object Destructure {
      * it names are known here - the ones it inherits from `base` are not, so they pair with nothing, as an absent key
      * does.
      */
-    private fun entries(mapOperation: ElixirMapOperation): List<Pair<String, PsiElement>> {
-        val mapArguments = mapOperation.mapArguments
+    private fun entries(element: PsiElement): List<Pair<String, PsiElement>> {
+        // the only shape in the `MAP` bucket; a wider one would answer no keys rather than throw
+        val mapArguments = (element as? ElixirMapOperation)?.mapArguments ?: return emptyList()
         val constructionArguments = mapArguments.mapConstructionArguments
         val updateArguments = mapArguments.mapUpdateArguments
         val associationsBase =

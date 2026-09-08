@@ -62,6 +62,22 @@ class UnquoteDestructuredBindingTest : PlatformTestCase() {
     fun testConsTailDestructuredAgainDoesNotClaimTheWrongElement() =
         assertDoesNotResolve("[_h | t] = [:first, $QUOTE, :last]\n    [_p, x] = t")
 
+    /** A keyword list is a list of pairs, so its pairs line up by position and then agree on the key. */
+    fun testQuoteInAKeywordListPatternResolves() = assertResolves("[a: x] = [a: $QUOTE]")
+
+    /** A cons whose tail is still being typed must not read as a fixed-length list, which a whole one does not. */
+    fun testHalfTypedConsOnTheValueSideDoesNotResolve() = assertDoesNotResolve("[x] = [$QUOTE | ]")
+
+    /** The same on the pattern side, against a one-element value so length alone does not answer it. */
+    fun testHalfTypedConsOnThePatternSideDoesNotResolve() = assertDoesNotResolve("[x | ] = [$QUOTE]")
+
+    /** The completed form of that, which does bind: `[x | rest] = [:only]` gives `rest == []`. */
+    fun testCompleteConsAgainstAOneElementListResolves() = assertResolves("[x | _rest] = [$QUOTE]")
+
+    fun testHalfTypedKeywordPairDoesNotResolve() = assertDoesNotResolve("[a: x] = [a:")
+
+    fun testHalfTypedMatchDoesNotResolve() = assertDoesNotResolve("[a: x] =")
+
     /** Lining up is not enough - a pair whose key differs matches nothing. */
     fun testKeywordListPatternWithAnotherKeyDoesNotResolve() = assertDoesNotResolve("[b: x] = [a: $QUOTE]")
 

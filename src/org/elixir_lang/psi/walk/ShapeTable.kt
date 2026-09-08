@@ -33,7 +33,8 @@ object ShapeTable {
         val unquote: UnquotedVariableWalk.Bucket? = null,
         val descent: VariableDescent.Bucket? = null,
         val typeDescent: TypeDescent.Bucket? = null,
-        val typeAscent: TypeAscent.Bucket? = null
+        val typeAscent: TypeAscent.Bucket? = null,
+        val destructure: Destructure.Bucket? = null
     )
 
     val ROWS: List<Row> = listOf(
@@ -47,6 +48,7 @@ object ShapeTable {
             descent = VariableDescent.Bucket.STAB_NO_PARENTHESES_SIGNATURE,
             typeDescent = TypeDescent.Bucket.STAB_NO_PARENTHESES_SIGNATURE,
             typeAscent = TypeAscent.Bucket.PARENT,
+            destructure = Destructure.Bucket.OPAQUE,
         ),
         Row(
             ElixirStabOperation::class.java,
@@ -57,6 +59,7 @@ object ShapeTable {
             descent = VariableDescent.Bucket.STAB_OPERATION,
             typeDescent = TypeDescent.Bucket.PASS,
             typeAscent = TypeAscent.Bucket.PARENT,
+            destructure = Destructure.Bucket.OPAQUE,
         ),
         Row(
             ElixirStabParenthesesSignature::class.java,
@@ -67,6 +70,7 @@ object ShapeTable {
             descent = VariableDescent.Bucket.STAB_PARENTHESES_SIGNATURE,
             typeDescent = TypeDescent.Bucket.STAB_PARENTHESES_SIGNATURE,
             typeAscent = TypeAscent.Bucket.PARENT,
+            destructure = Destructure.Bucket.OPAQUE,
         ),
         Row(
             InMatch::class.java,
@@ -91,6 +95,7 @@ object ShapeTable {
             descent = VariableDescent.Bucket.STOP,
             typeDescent = TypeDescent.Bucket.PASS,
             typeAscent = TypeAscent.Bucket.NONE,
+            destructure = Destructure.Bucket.OPAQUE,
         ),
         Row(
             Type::class.java,
@@ -100,7 +105,11 @@ object ShapeTable {
             typeAscent = TypeAscent.Bucket.PARENT,
         ),
         Row(When::class.java, parameter = ParameterWalk.Bucket.RECURSE),
-        Row(ElixirMatchedWhenOperation::class.java, descent = VariableDescent.Bucket.WHEN),
+        Row(
+            ElixirMatchedWhenOperation::class.java,
+            descent = VariableDescent.Bucket.WHEN,
+            destructure = Destructure.Bucket.OPAQUE
+        ),
         Row(In::class.java, descent = VariableDescent.Bucket.IN),
 
         // operations and lookups
@@ -113,6 +122,7 @@ object ShapeTable {
             descent = VariableDescent.Bucket.CHILDREN,
             typeDescent = TypeDescent.Bucket.PASS,
             typeAscent = TypeAscent.Bucket.NONE,
+            destructure = Destructure.Bucket.OPAQUE,
         ),
         // a match inside `m[...]` binds afterwards, so the brackets are read; the receiver is a value
         Row(
@@ -124,6 +134,7 @@ object ShapeTable {
             descent = VariableDescent.Bucket.BRACKET,
             typeDescent = TypeDescent.Bucket.PASS,
             typeAscent = TypeAscent.Bucket.NONE,
+            destructure = Destructure.Bucket.OPAQUE,
         ),
         Row(
             AtUnqualifiedBracketOperation::class.java,
@@ -134,6 +145,7 @@ object ShapeTable {
             descent = VariableDescent.Bucket.AT_BRACKET,
             typeDescent = TypeDescent.Bucket.PASS,
             typeAscent = TypeAscent.Bucket.NONE,
+            destructure = Destructure.Bucket.OPAQUE,
         ),
         // `@1[key]`, a lookup on a number, binds nothing
         Row(
@@ -145,6 +157,7 @@ object ShapeTable {
             descent = VariableDescent.Bucket.STOP,
             typeDescent = TypeDescent.Bucket.PASS,
             typeAscent = TypeAscent.Bucket.NONE,
+            destructure = Destructure.Bucket.OPAQUE,
         ),
         Row(
             AtOperation::class.java,
@@ -155,6 +168,7 @@ object ShapeTable {
             descent = VariableDescent.Bucket.STOP,
             typeDescent = TypeDescent.Bucket.AT_OPERATION,
             typeAscent = TypeAscent.Bucket.NONE,
+            destructure = Destructure.Bucket.OPAQUE,
         ),
         Row(Addition::class.java, descent = VariableDescent.Bucket.NON_DECLARING_INFIX),
         Row(And::class.java, descent = VariableDescent.Bucket.NON_DECLARING_INFIX),
@@ -182,6 +196,7 @@ object ShapeTable {
             descent = VariableDescent.Bucket.CALL,
             typeDescent = TypeDescent.Bucket.CALL,
             typeAscent = TypeAscent.Bucket.PARENT,
+            destructure = Destructure.Bucket.OPAQUE,
         ),
 
         // containers, arguments and blocks
@@ -196,6 +211,7 @@ object ShapeTable {
             descent = VariableDescent.Bucket.CHILDREN_READING,
             typeDescent = TypeDescent.Bucket.PASS,
             typeAscent = TypeAscent.Bucket.NONE,
+            destructure = Destructure.Bucket.OPAQUE,
         ),
         Row(
             ElixirAccessExpression::class.java,
@@ -206,6 +222,7 @@ object ShapeTable {
             descent = VariableDescent.Bucket.CHILDREN,
             typeDescent = TypeDescent.Bucket.CHILDREN,
             typeAscent = TypeAscent.Bucket.PARENT,
+            destructure = Destructure.Bucket.OPAQUE,
         ),
         Row(
             ElixirAssociations::class.java,
@@ -216,6 +233,7 @@ object ShapeTable {
             descent = VariableDescent.Bucket.CHILDREN,
             typeDescent = TypeDescent.Bucket.PASS,
             typeAscent = TypeAscent.Bucket.PARENT,
+            destructure = Destructure.Bucket.OPAQUE,
         ),
         Row(
             ElixirAssociationsBase::class.java,
@@ -226,6 +244,7 @@ object ShapeTable {
             descent = VariableDescent.Bucket.CHILDREN,
             typeDescent = TypeDescent.Bucket.PASS,
             typeAscent = TypeAscent.Bucket.PARENT,
+            destructure = Destructure.Bucket.OPAQUE,
         ),
         Row(
             ElixirBitString::class.java,
@@ -236,6 +255,7 @@ object ShapeTable {
             descent = VariableDescent.Bucket.CHILDREN,
             typeDescent = TypeDescent.Bucket.PASS,
             typeAscent = TypeAscent.Bucket.NONE,
+            destructure = Destructure.Bucket.OPAQUE,
         ),
         Row(
             ElixirBlockItem::class.java,
@@ -246,6 +266,7 @@ object ShapeTable {
             descent = VariableDescent.Bucket.STOP,
             typeDescent = TypeDescent.Bucket.PASS,
             typeAscent = TypeAscent.Bucket.NONE,
+            destructure = Destructure.Bucket.OPAQUE,
         ),
         Row(
             ElixirBlockList::class.java,
@@ -255,6 +276,7 @@ object ShapeTable {
             descent = VariableDescent.Bucket.STOP,
             typeDescent = TypeDescent.Bucket.PASS,
             typeAscent = TypeAscent.Bucket.NONE,
+            destructure = Destructure.Bucket.OPAQUE,
         ),
         Row(
             ElixirContainerAssociationOperation::class.java,
@@ -265,6 +287,7 @@ object ShapeTable {
             descent = VariableDescent.Bucket.CONTAINER_ASSOCIATION,
             typeDescent = TypeDescent.Bucket.PASS,
             typeAscent = TypeAscent.Bucket.PARENT,
+            destructure = Destructure.Bucket.OPAQUE,
         ),
         Row(
             ElixirDoBlock::class.java,
@@ -274,6 +297,7 @@ object ShapeTable {
             descent = VariableDescent.Bucket.STOP,
             typeDescent = TypeDescent.Bucket.PASS,
             typeAscent = TypeAscent.Bucket.NONE,
+            destructure = Destructure.Bucket.OPAQUE,
         ),
         Row(
             ElixirEex::class.java,
@@ -284,6 +308,7 @@ object ShapeTable {
             descent = VariableDescent.Bucket.STOP,
             typeDescent = TypeDescent.Bucket.PASS,
             typeAscent = TypeAscent.Bucket.NONE,
+            destructure = Destructure.Bucket.OPAQUE,
         ),
         // a template is one expression, so a tag is a statement in it and its variables are searched above the tag
         Row(
@@ -295,6 +320,7 @@ object ShapeTable {
             descent = VariableDescent.Bucket.CHILDREN,
             typeDescent = TypeDescent.Bucket.PASS,
             typeAscent = TypeAscent.Bucket.NONE,
+            destructure = Destructure.Bucket.OPAQUE,
         ),
         // `%{key: name}` is a pattern to climb out of; `do: block` reaches no match, and pairing drops it there
         Row(
@@ -306,6 +332,7 @@ object ShapeTable {
             descent = VariableDescent.Bucket.STOP,
             typeDescent = TypeDescent.Bucket.PASS,
             typeAscent = TypeAscent.Bucket.PARENT,
+            destructure = Destructure.Bucket.KEYWORD_PAIR,
         ),
         Row(
             ElixirKeywords::class.java,
@@ -314,6 +341,10 @@ object ShapeTable {
             parameter = ParameterWalk.Bucket.RECURSE,
             typeDescent = TypeDescent.Bucket.PASS,
             typeAscent = TypeAscent.Bucket.PARENT,
+            /* A list's trailing keywords are expanded into their pairs, which carry the `KEYWORD_PAIR` bucket. A
+               tuple's are not - `{_a, k: 1}` leaves this whole in a pattern position - and pairing it would need a
+               keyword list read as a list of pairs, which is not modelled. */
+            destructure = Destructure.Bucket.OPAQUE,
         ),
         Row(
             ElixirList::class.java,
@@ -324,6 +355,7 @@ object ShapeTable {
             descent = VariableDescent.Bucket.CHILDREN,
             typeDescent = TypeDescent.Bucket.HALT,
             typeAscent = TypeAscent.Bucket.PARENT,
+            destructure = Destructure.Bucket.LIST,
         ),
         Row(
             ElixirMapArguments::class.java,
@@ -334,6 +366,7 @@ object ShapeTable {
             descent = VariableDescent.Bucket.MAP_ARGUMENTS,
             typeDescent = TypeDescent.Bucket.PASS,
             typeAscent = TypeAscent.Bucket.PARENT,
+            destructure = Destructure.Bucket.OPAQUE,
         ),
         Row(
             ElixirMapConstructionArguments::class.java,
@@ -343,6 +376,7 @@ object ShapeTable {
             descent = VariableDescent.Bucket.CHILDREN,
             typeDescent = TypeDescent.Bucket.PASS,
             typeAscent = TypeAscent.Bucket.PARENT,
+            destructure = Destructure.Bucket.OPAQUE,
         ),
         Row(
             ElixirMapOperation::class.java,
@@ -353,6 +387,7 @@ object ShapeTable {
             descent = VariableDescent.Bucket.MAP_OPERATION,
             typeDescent = TypeDescent.Bucket.PASS,
             typeAscent = TypeAscent.Bucket.PARENT,
+            destructure = Destructure.Bucket.MAP,
         ),
         // an update is a value, read through its map arguments; a match inside binds afterwards
         Row(
@@ -364,6 +399,7 @@ object ShapeTable {
             descent = VariableDescent.Bucket.STOP,
             typeDescent = TypeDescent.Bucket.PASS,
             typeAscent = TypeAscent.Bucket.NONE,
+            destructure = Destructure.Bucket.OPAQUE,
         ),
         Row(
             ElixirMatchedParenthesesArguments::class.java,
@@ -374,6 +410,7 @@ object ShapeTable {
             descent = VariableDescent.Bucket.STOP,
             typeDescent = TypeDescent.Bucket.PASS,
             typeAscent = TypeAscent.Bucket.PARENT,
+            destructure = Destructure.Bucket.OPAQUE,
         ),
         Row(
             ElixirNoParenthesesOneArgument::class.java,
@@ -382,6 +419,7 @@ object ShapeTable {
             parameter = ParameterWalk.Bucket.RECURSE,
             descent = VariableDescent.Bucket.CHILDREN,
             typeDescent = TypeDescent.Bucket.CHILDREN,
+            destructure = Destructure.Bucket.OPAQUE,
         ),
         Row(
             ElixirNoParenthesesArguments::class.java,
@@ -391,6 +429,7 @@ object ShapeTable {
             descent = VariableDescent.Bucket.CHILDREN,
             typeDescent = TypeDescent.Bucket.PASS,
             typeAscent = TypeAscent.Bucket.PARENT,
+            destructure = Destructure.Bucket.OPAQUE,
         ),
         Row(
             ElixirNoParenthesesKeywordPair::class.java,
@@ -401,6 +440,7 @@ object ShapeTable {
             descent = VariableDescent.Bucket.STOP,
             typeDescent = TypeDescent.Bucket.PASS,
             typeAscent = TypeAscent.Bucket.PARENT,
+            destructure = Destructure.Bucket.OPAQUE,
         ),
         Row(
             ElixirNoParenthesesKeywords::class.java,
@@ -409,6 +449,7 @@ object ShapeTable {
             parameter = ParameterWalk.Bucket.RECURSE,
             typeDescent = TypeDescent.Bucket.PASS,
             typeAscent = TypeAscent.Bucket.PARENT,
+            destructure = Destructure.Bucket.OPAQUE,
         ),
         Row(
             ElixirNoParenthesesManyStrictNoParenthesesExpression::class.java,
@@ -419,6 +460,7 @@ object ShapeTable {
             descent = VariableDescent.Bucket.STOP,
             typeDescent = TypeDescent.Bucket.PASS,
             typeAscent = TypeAscent.Bucket.PARENT,
+            destructure = Destructure.Bucket.OPAQUE,
         ),
         // syntax errors met while typing; the ascents look above them, the descents do not enter
         Row(
@@ -428,6 +470,7 @@ object ShapeTable {
             parameter = ParameterWalk.Bucket.RECURSE,
             descent = VariableDescent.Bucket.STOP,
             typeDescent = TypeDescent.Bucket.PASS,
+            destructure = Destructure.Bucket.OPAQUE,
         ),
         Row(
             ElixirParenthesesArguments::class.java,
@@ -437,6 +480,7 @@ object ShapeTable {
             unquote = UnquotedVariableWalk.Bucket.STOP,
             descent = VariableDescent.Bucket.CHILDREN,
             typeDescent = TypeDescent.Bucket.PASS,
+            destructure = Destructure.Bucket.OPAQUE,
         ),
         Row(
             ElixirParentheticalStab::class.java,
@@ -447,6 +491,7 @@ object ShapeTable {
             descent = VariableDescent.Bucket.CHILDREN,
             typeDescent = TypeDescent.Bucket.HALT,
             typeAscent = TypeAscent.Bucket.PARENT,
+            destructure = Destructure.Bucket.OPAQUE,
         ),
         Row(
             ElixirStab::class.java,
@@ -457,6 +502,7 @@ object ShapeTable {
             descent = VariableDescent.Bucket.CHILDREN,
             typeDescent = TypeDescent.Bucket.PASS,
             typeAscent = TypeAscent.Bucket.PARENT,
+            destructure = Destructure.Bucket.OPAQUE,
         ),
         Row(
             ElixirStabBody::class.java,
@@ -467,6 +513,7 @@ object ShapeTable {
             descent = VariableDescent.Bucket.CHILDREN,
             typeDescent = TypeDescent.Bucket.PASS,
             typeAscent = TypeAscent.Bucket.PARENT,
+            destructure = Destructure.Bucket.OPAQUE,
         ),
         Row(
             ElixirStructOperation::class.java,
@@ -477,6 +524,8 @@ object ShapeTable {
             descent = VariableDescent.Bucket.STRUCT_OPERATION,
             typeDescent = TypeDescent.Bucket.HALT,
             typeAscent = TypeAscent.Bucket.PARENT,
+            // a struct's keys are a map's, but `%Foo{} = %Bar{}` raises, so pairing has to compare the names first
+            destructure = Destructure.Bucket.OPAQUE,
         ),
         Row(
             ElixirTuple::class.java,
@@ -487,6 +536,7 @@ object ShapeTable {
             descent = VariableDescent.Bucket.CHILDREN,
             typeDescent = TypeDescent.Bucket.HALT,
             typeAscent = TypeAscent.Bucket.PARENT,
+            destructure = Destructure.Bucket.TUPLE,
         ),
         Row(QuotableArguments::class.java, unquote = UnquotedVariableWalk.Bucket.RECURSE),
         Row(
@@ -494,7 +544,7 @@ object ShapeTable {
             unquote = UnquotedVariableWalk.Bucket.RECURSE,
             descent = VariableDescent.Bucket.KEYWORD_LIST,
         ),
-        Row(ElixirLine::class.java, typeDescent = TypeDescent.Bucket.HALT),
+        Row(ElixirLine::class.java, typeDescent = TypeDescent.Bucket.HALT, destructure = Destructure.Bucket.OPAQUE),
         Row(Arguments::class.java, typeAscent = TypeAscent.Bucket.PARENT),
 
         // aliases
@@ -508,6 +558,7 @@ object ShapeTable {
             descent = VariableDescent.Bucket.CHILDREN,
             typeDescent = TypeDescent.Bucket.PASS,
             typeAscent = TypeAscent.Bucket.PARENT,
+            destructure = Destructure.Bucket.OPAQUE,
         ),
         // `Qualifier.` typed above a tuple pattern; the resolver declares through it
         Row(
@@ -519,6 +570,7 @@ object ShapeTable {
             descent = VariableDescent.Bucket.QUALIFIED_MULTIPLE_ALIASES,
             typeDescent = TypeDescent.Bucket.PASS,
             typeAscent = TypeAscent.Bucket.PARENT,
+            destructure = Destructure.Bucket.OPAQUE,
         ),
         // an alias must expand to an atom at compile time, so its qualifier is never a variable
         Row(
@@ -528,6 +580,7 @@ object ShapeTable {
             parameter = ParameterWalk.Bucket.STOP,
             unquote = UnquotedVariableWalk.Bucket.STOP,
             descent = VariableDescent.Bucket.STOP,
+            destructure = Destructure.Bucket.OPAQUE,
         ),
         leaf(ElixirAlias::class.java, typeDescent = null, typeAscent = null),
         Row(QualifiableAlias::class.java, typeDescent = TypeDescent.Bucket.HALT, typeAscent = TypeAscent.Bucket.NONE),
@@ -544,6 +597,7 @@ object ShapeTable {
             descent = VariableDescent.Bucket.CHILDREN_READING,
             typeDescent = TypeDescent.Bucket.PARAMETER,
             typeAscent = TypeAscent.Bucket.LEAF,
+            destructure = Destructure.Bucket.OPAQUE,
         ),
         // the token `isVariable` starts from; never an ancestor
         Row(
@@ -555,6 +609,7 @@ object ShapeTable {
             descent = VariableDescent.Bucket.VARIABLE,
             typeDescent = TypeDescent.Bucket.PASS,
             typeAscent = TypeAscent.Bucket.LEAF,
+            destructure = Destructure.Bucket.OPAQUE,
         ),
         leaf(Operator::class.java),
         leaf(Digits::class.java),
@@ -578,6 +633,7 @@ object ShapeTable {
             parameter = ParameterWalk.Bucket.STOP,
             unquote = UnquotedVariableWalk.Bucket.STOP,
             descent = VariableDescent.Bucket.STOP,
+            destructure = Destructure.Bucket.OPAQUE,
         ),
         Row(
             ElixirLiteralSigilHeredoc::class.java,
@@ -586,6 +642,7 @@ object ShapeTable {
             parameter = ParameterWalk.Bucket.STOP,
             unquote = UnquotedVariableWalk.Bucket.STOP,
             descent = VariableDescent.Bucket.STOP,
+            destructure = Destructure.Bucket.OPAQUE,
         ),
         Row(
             Body::class.java,
@@ -596,6 +653,7 @@ object ShapeTable {
             descent = VariableDescent.Bucket.CHILDREN_READING,
             typeDescent = TypeDescent.Bucket.LEAF,
             typeAscent = TypeAscent.Bucket.LEAF,
+            destructure = Destructure.Bucket.OPAQUE,
         ),
         Row(
             Line::class.java,
@@ -606,6 +664,7 @@ object ShapeTable {
             descent = VariableDescent.Bucket.CHILDREN_READING,
             typeDescent = TypeDescent.Bucket.LEAF,
             typeAscent = TypeAscent.Bucket.LEAF,
+            destructure = Destructure.Bucket.OPAQUE,
         ),
         Row(
             HeredocLineable::class.java,
@@ -616,6 +675,7 @@ object ShapeTable {
             descent = VariableDescent.Bucket.CHILDREN_READING,
             typeDescent = TypeDescent.Bucket.LEAF,
             typeAscent = TypeAscent.Bucket.LEAF,
+            destructure = Destructure.Bucket.OPAQUE,
         ),
         Row(
             HeredocLiteral::class.java,
@@ -626,6 +686,7 @@ object ShapeTable {
             descent = VariableDescent.Bucket.CHILDREN_READING,
             typeDescent = TypeDescent.Bucket.LEAF,
             typeAscent = TypeAscent.Bucket.LEAF,
+            destructure = Destructure.Bucket.OPAQUE,
         ),
         leaf(ElixirHeredocPrefix::class.java),
         leaf(ElixirHeredocLinePrefix::class.java),
@@ -641,6 +702,7 @@ object ShapeTable {
             descent = VariableDescent.Bucket.CHILDREN_READING,
             typeDescent = TypeDescent.Bucket.HALT,
             typeAscent = TypeAscent.Bucket.LEAF,
+            destructure = Destructure.Bucket.OPAQUE,
         ),
         leaf(ElixirAtomKeyword::class.java),
         leaf(ElixirAtIdentifier::class.java),
@@ -655,6 +717,7 @@ object ShapeTable {
             descent = VariableDescent.Bucket.STOP,
             typeDescent = TypeDescent.Bucket.LEAF,
             typeAscent = TypeAscent.Bucket.LEAF,
+            destructure = Destructure.Bucket.OPAQUE,
         ),
         leaf(ElixirBlockIdentifier::class.java),
         leaf(ElixirEmptyParentheses::class.java),
@@ -669,7 +732,12 @@ object ShapeTable {
             unquote = UnquotedVariableWalk.Bucket.STOP,
             descent = VariableDescent.Bucket.FILE,
         ),
-        Row(ElixirFile::class.java, typeDescent = TypeDescent.Bucket.HALT, typeAscent = TypeAscent.Bucket.NONE)
+        Row(
+            ElixirFile::class.java,
+            typeDescent = TypeDescent.Bucket.HALT,
+            typeAscent = TypeAscent.Bucket.NONE,
+            destructure = Destructure.Bucket.OPAQUE
+        )
     )
 
     /** A token-only shape: a leaf to every walk unless the type walks say otherwise. */
@@ -685,7 +753,8 @@ object ShapeTable {
         unquote = UnquotedVariableWalk.Bucket.LEAF,
         descent = VariableDescent.Bucket.LEAF,
         typeDescent = typeDescent,
-        typeAscent = typeAscent
+        typeAscent = typeAscent,
+        destructure = Destructure.Bucket.OPAQUE
     )
 
     /** A walk's classifier: the rows that name a bucket in its column, in table order. */
