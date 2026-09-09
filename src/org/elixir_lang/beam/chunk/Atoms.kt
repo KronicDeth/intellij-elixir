@@ -16,6 +16,9 @@ class Atoms private constructor(private val atomList: List<Atom>) {
      * @param index 1-based index.  1 is reserved for {#link moduleName}
      */
     fun getOrNull(index: Int): Atom? = atomList.getOrNull(index - 1)
+
+    /** An index as a chunk stores it, an unsigned int, so one beyond `Int.MAX_VALUE` is past the table too. */
+    fun getOrNull(index: Long): Atom? = if (index in 1..atomList.size) atomList[(index - 1).toInt()] else null
     fun moduleName(): String? = atomList.getOrNull(0)?.string
     fun size(): Int = atomList.size
 

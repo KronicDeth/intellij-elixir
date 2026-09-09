@@ -1,15 +1,12 @@
 package org.elixir_lang.beam
 
 import org.elixir_lang.PlatformTestCase
-import org.elixir_lang.beam.Beam.Companion.from
 import org.elixir_lang.beam.chunk.CallDefinitions.Companion.macroNameAritySortedSetByMacro
 import org.elixir_lang.psi.call.name.Function.DEF
 import org.elixir_lang.psi.call.name.Function.DEFP
 import org.junit.Assert
-import java.io.BufferedInputStream
-import java.io.DataInputStream
 import java.io.File
-import java.io.FileInputStream
+import java.util.SortedSet
 
 /**
  * Two kinds of coverage for the BEAM chunk parser:
@@ -54,14 +51,9 @@ class BeamTest : PlatformTestCase() {
     fun testElixirInterpolation_otp_28() = assertElixirInterpolation(fixtureDir("elixir-1.19.5-otp-28"))
 
     private fun assertElixirKernel(ebinDirectory: File) {
-        val beam = beamIn(ebinDirectory, "Elixir.Kernel")
-        Assert.assertNotNull(beam)
-        val atoms = beam!!.atoms()
-        Assert.assertNotNull(atoms)
-        Assert.assertEquals("Elixir.Kernel", atoms!!.moduleName())
-        val callDefinitionCount: Int = beam.callDefinitionsList(atoms).map { it.size() }.sum()
+        val (moduleName, callDefinitionCount, macroNameAritySortedSetByMacro) = readIn(ebinDirectory, "Elixir.Kernel")
+        Assert.assertEquals("Elixir.Kernel", moduleName)
         Assert.assertTrue("There are no callDefinitions", callDefinitionCount > 0)
-        val macroNameAritySortedSetByMacro = macroNameAritySortedSetByMacro(beam, atoms)
         val macroNameArityCount: Int =
             macroNameAritySortedSetByMacro.map { (_, macroNameAritySortedSet) -> macroNameAritySortedSet.size }.sum()
         assertEquals("There are nameless callDefinitions", callDefinitionCount, macroNameArityCount)
@@ -74,14 +66,10 @@ class BeamTest : PlatformTestCase() {
     }
 
     private fun assertElixirInterpolation(ebinDirectory: File) {
-        val beam = beamIn(ebinDirectory, "elixir_interpolation")
-        Assert.assertNotNull(beam)
-        val atoms = beam!!.atoms()
-        Assert.assertNotNull(atoms)
-        Assert.assertEquals("elixir_interpolation", atoms!!.moduleName())
-        val callDefinitionCount: Int = beam.callDefinitionsList(atoms).map { it.size() }.sum()
+        val (moduleName, callDefinitionCount, macroNameAritySortedSetByMacro) =
+            readIn(ebinDirectory, "elixir_interpolation")
+        Assert.assertEquals("elixir_interpolation", moduleName)
         Assert.assertTrue("There are no callDefinitions", callDefinitionCount > 0)
-        val macroNameAritySortedSetByMacro = macroNameAritySortedSetByMacro(beam, atoms)
         val macroNameArityCount: Int =
             macroNameAritySortedSetByMacro.map { (_, macroNameAritySortedSet) -> macroNameAritySortedSet.size }.sum()
         Assert.assertEquals("There are nameless callDefinitions", callDefinitionCount, macroNameArityCount)
@@ -116,7 +104,21 @@ class BeamTest : PlatformTestCase() {
     private fun fixtureDir(pair: String): File =
         File("testData/org/elixir_lang/beam/parser/$pair")
 
-    private fun beamIn(ebinDirectory: File, baseName: String): Beam? =
-        DataInputStream(BufferedInputStream(FileInputStream(File(ebinDirectory, "$baseName.beam"))))
-            .use { from(it, File(ebinDirectory, "$baseName.beam").path) }
+    /** Asserts outside the read: a failed assertion inside one would be contained as a corrupt BEAM. */
+    private fun readIn(
+        ebinDirectory: File,
+        baseName: String,
+    ): Triple<String?, Int, Map<String, SortedSet<MacroNameArity>>> {
+        val file = File(ebinDirectory, "$baseName.beam")
+        val read = BeamReader.read(file.readBytes(), file.path) { reader ->
+            Triple(
+                reader.atoms?.moduleName(),
+                listOfNotNull(reader.exports, reader.locals).sumOf { it.size() },
+                macroNameAritySortedSetByMacro(reader),
+            )
+        }
+
+        Assert.assertNotNull("$baseName was not read as a BEAM", read)
+        return read!!
+    }
 }

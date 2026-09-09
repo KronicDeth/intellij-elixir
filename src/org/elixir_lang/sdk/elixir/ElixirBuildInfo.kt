@@ -4,7 +4,7 @@ import com.ericsson.otp.erlang.OtpErlangBinary
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.util.Key
 import com.intellij.util.concurrency.ThreadingAssertions
-import org.elixir_lang.beam.Beam
+import org.elixir_lang.beam.BeamReader
 import java.io.File
 import org.elixir_lang.beam.chunk.code.operation.Code as OpCode
 import org.elixir_lang.beam.term.Atom as BeamAtom
@@ -45,43 +45,46 @@ object ElixirBuildInfo {
         return try {
             val beamFile = File(canonicalHome, "lib/elixir/ebin/Elixir.System.beam")
             if (!beamFile.exists()) return null
-            val beam = Beam.from(beamFile.readBytes(), beamFile.path) ?: return null
-            val atoms = beam.atoms() ?: return null
-            val code = beam.code() ?: return null
-            val literals = beam.literals() ?: return null
-
-            val buildInfoIndex = (1..atoms.size()).firstOrNull { atoms.getOrNull(it)?.string == "build_info" } ?: return null
-            val otpReleaseIndex = (1..atoms.size()).firstOrNull { atoms.getOrNull(it)?.string == "otp_release" } ?: return null
-
-            var inBuildInfo = false
-            for (i in 0 until code.size()) {
-                val op = code[i]
-                when (op.code) {
-                    OpCode.FUNC_INFO -> {
-                        val func = op.termList.getOrNull(1) as? BeamAtom
-                        val arity = op.termList.getOrNull(2) as? BeamLiteral
-                        inBuildInfo = func?.index == buildInfoIndex && arity?.index == 0
-                    }
-                    OpCode.PUT_MAP_ASSOC, OpCode.PUT_MAP_EXACT -> {
-                        if (!inBuildInfo) continue
-                        val elements = (op.termList.getOrNull(4) as? BeamList)?.elements ?: continue
-                        var j = 0
-                        while (j < elements.size - 1) {
-                            if ((elements[j] as? BeamAtom)?.index == otpReleaseIndex) {
-                                val litIndex = (elements[j + 1] as? BeamLiteral)?.index ?: break
-                                return (literals[litIndex] as? OtpErlangBinary)
-                                    ?.let { String(it.binaryValue(), Charsets.UTF_8).trim() }
-                            }
-                            j += 2
-                        }
-                    }
-                    else -> {}
-                }
-            }
-            null
+            BeamReader.readResult(beamFile.readBytes(), beamFile.path, ::otpRelease)?.valueOrNull
         } catch (e: Exception) {
             LOG.debug("Could not read otp_release from Elixir.System.beam in $canonicalHome", e)
             null
         }
+    }
+
+    private fun otpRelease(reader: BeamReader): String? {
+        val atoms = reader.atoms ?: return null
+        val code = reader.code ?: return null
+        val literals = reader.literals ?: return null
+
+        val buildInfoIndex = (1..atoms.size()).firstOrNull { atoms.getOrNull(it)?.string == "build_info" } ?: return null
+        val otpReleaseIndex = (1..atoms.size()).firstOrNull { atoms.getOrNull(it)?.string == "otp_release" } ?: return null
+
+        var inBuildInfo = false
+        for (i in 0 until code.size()) {
+            val op = code[i]
+            when (op.code) {
+                OpCode.FUNC_INFO -> {
+                    val func = op.termList.getOrNull(1) as? BeamAtom
+                    val arity = op.termList.getOrNull(2) as? BeamLiteral
+                    inBuildInfo = func?.index == buildInfoIndex && arity?.index == 0
+                }
+                OpCode.PUT_MAP_ASSOC, OpCode.PUT_MAP_EXACT -> {
+                    if (!inBuildInfo) continue
+                    val elements = (op.termList.getOrNull(4) as? BeamList)?.elements ?: continue
+                    var j = 0
+                    while (j < elements.size - 1) {
+                        if ((elements[j] as? BeamAtom)?.index == otpReleaseIndex) {
+                            val litIndex = (elements[j + 1] as? BeamLiteral)?.index ?: break
+                            return (literals[litIndex] as? OtpErlangBinary)
+                                ?.let { String(it.binaryValue(), Charsets.UTF_8).trim() }
+                        }
+                        j += 2
+                    }
+                }
+                else -> {}
+            }
+        }
+        return null
     }
 }

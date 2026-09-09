@@ -4,9 +4,7 @@ import com.ericsson.otp.erlang.OtpErlangBinary
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.fileTypes.BinaryFileDecompiler
 import com.intellij.openapi.vfs.VirtualFile
-import org.elixir_lang.beam.Beam.Companion.from
 import org.elixir_lang.beam.MacroNameArity.MACRO_ORDER
-import org.elixir_lang.beam.chunk.Atoms
 import org.elixir_lang.beam.chunk.CallDefinitions
 import org.elixir_lang.beam.chunk.Chunk.TypeID
 import org.elixir_lang.beam.chunk.DebugInfo
@@ -30,7 +28,9 @@ import org.elixir_lang.psi.call.name.Module
 import java.util.*
 
 internal class Decompiler : BinaryFileDecompiler {
-    override fun decompile(virtualFile: VirtualFile): CharSequence = decompiled(from(virtualFile), virtualFile)
+    override fun decompile(virtualFile: VirtualFile): CharSequence =
+        BeamReader.read(virtualFile) { reader -> decompiled(reader, virtualFile) }
+            ?: (DECOMPILATION_ERROR + "BEAM format could not be read")
 }
 
 private val logger = Logger.getInstance(Decompiler::class.java)
@@ -43,51 +43,31 @@ private val HEADER_NAME_BY_MACRO: Map<String, String> = mapOf(
 
 private const val DECOMPILATION_ERROR = "# Decompilation Error: "
 
-private fun decompiled(beam: Beam?, virtualFile: VirtualFile): CharSequence {
-    val decompiled = StringBuilder()
-
-    return if (beam != null) {
-        val atoms = beam.atoms()
-        if (atoms != null) {
-            val moduleName = atoms.moduleName()
-            if (moduleName != null) {
-                val defmoduleArgument = defmoduleArgument(moduleName)
-                decompiled
-                    .append("# Source code recreated from a .beam file by IntelliJ Elixir\n")
-                    .append("defmodule ")
-                    .append(defmoduleArgument)
-                    .append(" do\n")
-                val documentation = beam.documentation()
-                    ?: Documentation.fromExternalChunk(virtualFile)
-
-                if (documentation != null) {
-                    documentation.moduleDocs?.englishDocs?.let { moduleDocs ->
-                        appendDocumentation(decompiled, "moduledoc", moduleDocs)
-                    }
-                }
-
-                val debugInfo = beam.debugInfo()
-
-                appendTypes(decompiled, moduleName, debugInfo, documentation)
-                appendCallDefinitions(decompiled, beam, atoms, debugInfo, documentation)
-                decompiled.append("end\n")
-            } else {
-                decompiled
-                    .append(DECOMPILATION_ERROR)
-                    .append("No module name found in ")
-                    .append(TypeID.ATOM)
-                    .append(" chunk in BEAM")
-            }
-        } else {
-            decompiled
-                .append(DECOMPILATION_ERROR)
-                .append("No ")
-                .append(TypeID.ATOM)
-                .append(" chunk found in BEAM")
+private fun decompiled(reader: BeamReader, virtualFile: VirtualFile): CharSequence {
+    val atoms = reader.atoms
+        ?: return DECOMPILATION_ERROR + when (val read = reader.atomsResult) {
+            is ReadResult.Unreadable -> read.reason
+            else -> "No " + TypeID.ATOM + " chunk found in BEAM"
         }
-    } else {
-        decompiled.append(DECOMPILATION_ERROR).append("BEAM format could not be read")
+    val moduleName = atoms.moduleName()
+        ?: return DECOMPILATION_ERROR + "No module name found in " + TypeID.ATOM + " chunk in BEAM"
+    val decompiled = StringBuilder()
+        .append("# Source code recreated from a .beam file by IntelliJ Elixir\n")
+        .append("defmodule ")
+        .append(defmoduleArgument(moduleName))
+        .append(" do\n")
+    val documentation = reader.documentation ?: Documentation.fromExternalChunk(virtualFile)
+
+    documentation?.moduleDocs?.englishDocs?.let { moduleDocs ->
+        appendDocumentation(decompiled, "moduledoc", moduleDocs)
     }
+
+    val debugInfo = reader.debugInfo
+
+    appendTypes(decompiled, moduleName, debugInfo, documentation)
+    appendCallDefinitions(decompiled, reader, debugInfo, documentation)
+
+    return decompiled.append("end\n")
 }
 
 private fun appendTypes(
@@ -318,12 +298,11 @@ private fun appendTypeDoc(
 
 private fun appendCallDefinitions(
     decompiled: StringBuilder,
-    beam: Beam,
-    atoms: Atoms,
+    reader: BeamReader,
     debugInfo: DebugInfo?,
     documentation: Documentation?
 ) {
-    val macroNameAritySortedSetByMacro = CallDefinitions.macroNameAritySortedSetByMacro(beam, atoms)
+    val macroNameAritySortedSetByMacro = CallDefinitions.macroNameAritySortedSetByMacro(reader)
     appendCallDefinitions(decompiled, macroNameAritySortedSetByMacro, debugInfo, documentation)
 }
 

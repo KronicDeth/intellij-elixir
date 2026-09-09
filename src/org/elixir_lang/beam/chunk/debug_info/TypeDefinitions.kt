@@ -1,6 +1,6 @@
 package org.elixir_lang.beam.chunk.debug_info
 
-import org.elixir_lang.beam.Beam
+import org.elixir_lang.beam.BeamReader
 import org.elixir_lang.beam.chunk.Atoms
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.AbstractCodeCompileOptions
 import org.elixir_lang.beam.chunk.debug_info.v1.erl_abstract_code.abstract_code_compiler_options.abstract_code.attribute.Type
@@ -15,7 +15,7 @@ import java.util.*
 object TypeDefinitions {
     fun visibilityNameAritySortedSetByVisibility(
         parentStub: ModuleStub<*>,
-        beam: Beam,
+        reader: BeamReader,
         atoms: Atoms
     ): Map<Visibility, SortedSet<VisibilityNameArity>> =
         when {
@@ -24,7 +24,7 @@ object TypeDefinitions {
             atoms.moduleName() == "erlang" -> builtinVisibilityNameAritySortedSetByVisibility()
             // Protocol type (`t`) definitions are handled specially during resolution, not as beam type stubs.
             Protocol.`is`(parentStub) -> emptyMap()
-            else -> abstractCodeVisibilityNameAritySortedSetByVisibility(beam)
+            else -> abstractCodeVisibilityNameAritySortedSetByVisibility(reader)
         }
 
     private fun builtinVisibilityNameAritySortedSetByVisibility(): Map<Visibility, SortedSet<VisibilityNameArity>> {
@@ -53,9 +53,9 @@ object TypeDefinitions {
      * Beams without Erlang abstract code (e.g. Elixir-compiled beams whose debug info is `elixir_erl`) get no type
      * stubs here; their types are not indexed for resolution, matching prior behavior.
      */
-    private fun abstractCodeVisibilityNameAritySortedSetByVisibility(beam: Beam):
+    private fun abstractCodeVisibilityNameAritySortedSetByVisibility(reader: BeamReader):
             Map<Visibility, SortedSet<VisibilityNameArity>> {
-        val abstractCodeCompileOptions = beam.debugInfo() as? AbstractCodeCompileOptions ?: return emptyMap()
+        val abstractCodeCompileOptions = reader.debugInfo as? AbstractCodeCompileOptions ?: return emptyMap()
 
         return abstractCodeCompileOptions
             .attributes

@@ -34,7 +34,7 @@ class FileEditor(
         val descriptor = PrevNextActionsDescriptor(IdeActions.ACTION_NEXT_EDITOR_TAB, IdeActions.ACTION_PREVIOUS_EDITOR_TAB)
         rootTabbedPane = TabbedPaneWrapper.createJbTabs(project, SwingConstants.TOP, descriptor, this)
 
-        Cache.from(virtualFile)?.let { cache ->
+        CachedBeamReader.from(virtualFile)?.let { cache ->
             cache.chunkCollection().forEach { chunk ->
                 addTab(rootTabbedPane, cache, chunk)
             }
@@ -68,7 +68,7 @@ class FileEditor(
 
     override fun setState(state: FileEditorState) {}
 
-    private fun addTab(tabbedPaneWrapper: TabbedPaneWrapper, cache: Cache, chunk: Chunk) {
+    private fun addTab(tabbedPaneWrapper: TabbedPaneWrapper, cache: CachedBeamReader, chunk: Chunk) {
         val typeID = chunk.typeID
         val component: JComponent = when (typeID) {
             Chunk.TypeID.ATOM.toString(), Chunk.TypeID.ATU8.toString() ->
@@ -95,7 +95,7 @@ class FileEditor(
             Chunk.TypeID.IMPT.toString() ->
                 JBScrollPane(Table(org.elixir_lang.beam.chunk.imports.Model(cache.imports)))
             Chunk.TypeID.LINE.toString() ->
-                TabbedPane(cache.lines!!)
+                TabbedPane(cache.lines)
             Chunk.TypeID.LITT.toString() ->
                 JBScrollPane(Table(org.elixir_lang.beam.chunk.literals.Model(cache.literals)))
             Chunk.TypeID.LOCT.toString() ->

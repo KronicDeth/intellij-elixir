@@ -2,7 +2,7 @@ package org.elixir_lang.beam.chunk.code
 
 import com.intellij.openapi.util.component1
 import com.intellij.openapi.util.component2
-import org.elixir_lang.beam.Cache
+import org.elixir_lang.beam.CachedBeamReader
 import org.elixir_lang.beam.chunk.Chunk.Companion.unsignedByte
 import org.elixir_lang.beam.chunk.code.operation.Code
 import org.elixir_lang.beam.chunk.code.operation.code.Argument
@@ -20,7 +20,7 @@ const val BITS_PER_BYTE = 8
  * https://github.com/erlang/otp/blob/OTP-20.2.2/lib/compiler/src/genop.tab
  */
 data class Operation(val code: Code, val termList: List<Term>) {
-    fun assembly(cache: Cache, options: org.elixir_lang.beam.chunk.Code.Options): String {
+    fun assembly(cache: CachedBeamReader, options: org.elixir_lang.beam.chunk.Code.Options): String {
 
         return when (code) {
             Code.ALLOCATE -> {
@@ -40,11 +40,10 @@ data class Operation(val code: Code, val termList: List<Term>) {
                         (termList[2] as? Literal)?.index?.let { bit_length ->
                             (termList[3] as? Literal)?.index?.let { start ->
                                 val length = (bit_length + BITS_PER_BYTE - 1) / BITS_PER_BYTE
-                                val end = start + length
                                 val poolLength = pool.length
 
-                                if (start <= poolLength && end <= poolLength) {
-                                    val string = pool.substring(start, end).replace("'", "\'")
+                                if (start in 0..poolLength && length in 0..poolLength - start) {
+                                    val string = pool.substring(start, start + length).replace("'", "\'")
 
                                     val argumentsAssembly = argumentsAssembly(
                                             code.arguments.zip(termList).take(2),
@@ -67,11 +66,10 @@ data class Operation(val code: Code, val termList: List<Term>) {
                     cache.strings?.pool?.let { pool ->
                         (termList[0] as? Literal)?.index?.let { length ->
                             (termList[1] as? Literal)?.index?.let { start ->
-                                val end = start + length
                                 val poolLength = pool.length
 
-                                if (start <= poolLength && end <= poolLength) {
-                                    val string = pool.substring(start, end).replace("'", "\'")
+                                if (start in 0..poolLength && length in 0..poolLength - start) {
+                                    val string = pool.substring(start, start + length).replace("'", "\'")
 
                                     "${code.function}('$string')"
                                 } else {
@@ -163,19 +161,19 @@ data class Operation(val code: Code, val termList: List<Term>) {
         } ?: "${code.function}(${argumentsAssembly(cache, options)})"
     }
 
-    private fun argumentsAssembly(cache: Cache, options: org.elixir_lang.beam.chunk.Code.Options): String =
+    private fun argumentsAssembly(cache: CachedBeamReader, options: org.elixir_lang.beam.chunk.Code.Options): String =
             argumentsAssembly(code.arguments.zip(termList), cache, options)
 
     private fun argumentsAssembly(
             argumentTermPairList: List<Pair<Argument, Term>>,
-            cache: Cache,
+            cache: CachedBeamReader,
             options: org.elixir_lang.beam.chunk.Code.Options
     ): String =
             argumentTermPairList.joinToString(", ") { (argument, term) ->
                 argument.assembly(term, cache, options)
             }
 
-    private fun labelReference(term: Term, cache: Cache): String? =
+    private fun labelReference(term: Term, cache: CachedBeamReader): String? =
         (term as? Label)?.let { label ->
             val code = cache.code!!
 

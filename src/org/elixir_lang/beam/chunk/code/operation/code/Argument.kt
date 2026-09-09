@@ -1,6 +1,6 @@
 package org.elixir_lang.beam.chunk.code.operation.code
 
-import org.elixir_lang.beam.Cache
+import org.elixir_lang.beam.CachedBeamReader
 import org.elixir_lang.beam.chunk.Code.Options
 import org.elixir_lang.beam.chunk.Code.Options.Companion.UNAMBIGUOUS
 import org.elixir_lang.beam.chunk.Code.Options.Inline
@@ -11,7 +11,7 @@ import org.elixir_lang.code.Identifier.inspectAsFunction
 import org.elixir_lang.utils.ElixirModulesUtil
 
 data class Argument(val name: String, val supportedOptions: Options = Options()) {
-    fun assembly(term: Term, cache: Cache, configuredOptions: Options): String {
+    fun assembly(term: Term, cache: CachedBeamReader, configuredOptions: Options): String {
         val nameAssembly = nameAssembly(configuredOptions)
         val valueAssembly = valueAssembly(term, cache, configuredOptions)
 
@@ -25,7 +25,7 @@ data class Argument(val name: String, val supportedOptions: Options = Options())
                 ""
             }
 
-    private fun valueAssembly(term: Term, cache: Cache, configuredOptions: Options): String {
+    private fun valueAssembly(term: Term, cache: CachedBeamReader, configuredOptions: Options): String {
         return when (term) {
             is AllocationList -> {
                 val allocationList = term.allocationList

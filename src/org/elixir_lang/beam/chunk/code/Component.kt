@@ -6,14 +6,14 @@ import com.intellij.openapi.project.Project
 import com.intellij.ui.TabbedPaneWrapper
 import com.intellij.ui.tabs.impl.JBEditorTabs
 import com.intellij.util.ui.components.BorderLayoutPanel
-import org.elixir_lang.beam.Cache
+import org.elixir_lang.beam.CachedBeamReader
 import org.elixir_lang.beam.assembly.Controls
 import org.elixir_lang.beam.assembly.file.Type
 import javax.swing.JComponent
 import javax.swing.event.ChangeEvent
 import javax.swing.event.ChangeListener
 
-class Component(private val cache: Cache, private val project: Project, tabbedPane: TabbedPaneWrapper) :
+class Component(private val cache: CachedBeamReader, private val project: Project, tabbedPane: TabbedPaneWrapper) :
         BorderLayoutPanel(), ChangeListener {
     init {
         tabbedPane.addChangeListener(this)

@@ -24,9 +24,9 @@ class Strings(val pool: String) {
                 .sortedBy { it.first }
                 .distinctBy { it }
                 .mapNotNull { (offset, length) ->
-                    val end = offset + length
-                    if (offset in 0..pool.length && end <= pool.length && length > 0) {
-                        Entry(offset, pool.substring(offset, end))
+                    // Both come from literals of up to Int.MAX_VALUE, so their sum can wrap.
+                    if (offset in 0..pool.length && length in 1..pool.length - offset) {
+                        Entry(offset, pool.substring(offset, offset + length))
                     } else {
                         null
                     }
