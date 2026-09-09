@@ -82,6 +82,10 @@
     `defdelegate`, including delegations into compiled modules such as `Map.values/1`.** Fixes
     [#1613](https://github.com/KronicDeth/intellij-elixir/issues/1613).
 
+- [#4031](https://github.com/KronicDeth/intellij-elixir/pull/4031) [@sh41](https://github.com/sh41)
+  - **A definition inside a quote bound by destructuring now resolves at the `unquote` or `use` that
+    splices it.** Fixes [#4025](https://github.com/KronicDeth/intellij-elixir/issues/4025).
+
 - [#4020](https://github.com/KronicDeth/intellij-elixir/pull/4020) [@sh41](https://github.com/sh41)
   - **Variable resolution, Find Usages and rename no longer report errors or miss bindings for code
     shapes they did not model.** Fixes [#4019](https://github.com/KronicDeth/intellij-elixir/issues/4019).

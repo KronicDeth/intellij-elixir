@@ -1,6 +1,7 @@
 package org.elixir_lang.psi.walk
 
 import junit.framework.TestCase
+import org.elixir_lang.psi.Destructure
 import org.elixir_lang.psi.ElixirAnonymousFunction
 import org.elixir_lang.psi.ElixirBlockItem
 import org.elixir_lang.psi.ElixirBlockList
@@ -67,6 +68,8 @@ class ShapeCoverageTest : TestCase() {
     fun testUnquotedVariableWalkNamesEveryShape() = assertCovers(UnquotedVariableWalk.classifier)
 
     fun testVariableDescentNamesEveryShape() = assertCovers(VariableDescent.classifier)
+
+    fun testDestructureNamesEveryShape() = assertCovers(Destructure.classifier)
 
     fun testTypeDescentNamesEveryShape() = assertCovers(
         TypeDescent.classifier,

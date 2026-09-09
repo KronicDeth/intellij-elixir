@@ -5,6 +5,7 @@ import com.intellij.psi.PsiPolyVariantReference
 import com.intellij.psi.ResolveState
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubIndex
+import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.beam.psi.CallDefinition as BeamCallDefinition
 import org.elixir_lang.beam.psi.Module as BeamModule
@@ -15,6 +16,7 @@ import org.elixir_lang.psi.call.name.Module.KERNEL
 import org.elixir_lang.psi.impl.call.finalArguments
 import org.elixir_lang.psi.impl.call.macroChildCallSequence
 import org.elixir_lang.psi.impl.call.stabBodyChildExpressions
+import org.elixir_lang.psi.impl.childExpressions
 import org.elixir_lang.psi.impl.maybeModularNameToModulars
 import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.psi.operation.Match
@@ -24,6 +26,7 @@ import org.elixir_lang.structure_view.element.Timed
 import org.elixir_lang.util.AccumulatorContinue
 
 object Using {
+    @RequiresReadLock
     fun treeWalkUp(
         using: PsiElement,
         use: Call?,
@@ -49,13 +52,16 @@ object Using {
         val statements = using.stabBodyChildExpressions(forward = false)?.toList() ?: return true
 
         return when (val last = statements.firstOrNull()?.stripAccessExpression()) {
-            // `[conditional, imports]` - the fragments a `__using__` splices into the caller
-            // (Phoenix.Component.__using__/1), usually variables bound earlier in the body.
+            // `[conditional, imports]` - the fragments a `__using__` splices (Phoenix.Component.__using__/1). Read
+            // via `childExpressions`, not `unmatchedExpressionList`, which omits a nested container's accessExpression.
             is ElixirList ->
-                whileIn(last.unmatchedExpressionList) { element ->
-                    treeWalkUpListElement(element, use, resolveState, keepProcessing)
-                }
-            is Match -> treeWalkUpValue(last.rightOperand(), use, resolveState, keepProcessing)
+                treeWalkUpFragments(last, last.childExpressions().toList(), use, resolveState, keepProcessing)
+            // `{conditional, imports}` returned bare; without its own arm the `else` reads an earlier statement
+            is ElixirTuple -> treeWalkUpValue(last, use, resolveState, keepProcessing)
+            // a `__using__` returns its last statement's value, so a match that raises defines nothing in the caller
+            is Match ->
+                !Destructure.matches(last.leftOperand(), last.rightOperand()) ||
+                        treeWalkUpValue(last.rightOperand(), use, resolveState, keepProcessing)
             else ->
                 statements
                     .filterIsInstance<Call>()
@@ -65,7 +71,7 @@ object Using {
         }
     }
 
-    /** A variable element resolves to its `variable = value` bindings; anything else is walked as is. */
+    /** A variable element resolves to its `pattern = value` bindings; anything else is walked as is. */
     private fun treeWalkUpListElement(
         element: PsiElement,
         use: Call?,
@@ -76,8 +82,7 @@ object Using {
             ?.multiResolve(false)
             ?.filter { it.isValidResult }
             ?.mapNotNull { it.element }
-            ?.mapNotNull { declaration -> (declaration.parent as? Match)?.takeIf { it.leftOperand() == declaration } }
-            ?.mapNotNull { binding -> binding.rightOperand() }
+            ?.flatMap { declaration -> boundValues(declaration) }
             .orEmpty()
 
         return if (boundValues.isEmpty()) {
@@ -87,16 +92,65 @@ object Using {
         }
     }
 
+    /**
+     * The values the enclosing `pattern = value` binds [declaration] to, however deeply the pattern destructures it.
+     */
+    private fun boundValues(declaration: PsiElement): List<PsiElement> =
+        PsiTreeUtil
+            .getParentOfType(declaration, Match::class.java)
+            ?.let { match -> Destructure.valuesAt(match.leftOperand(), match.rightOperand(), declaration) }
+            .orEmpty()
+
     private fun treeWalkUpValue(
         value: PsiElement?,
         use: Call?,
         resolveState: ResolveState,
         keepProcessing: (PsiElement, ResolveState) -> Boolean
     ): Boolean =
-        (value?.stripAccessExpression() as? Call)
-            ?.takeUnlessHasBeenVisited(resolveState)
-            ?.let { call -> treeWalkUpFromLastChildCall(call, use, resolveState, keepProcessing) }
+        when (val stripped = value?.stripAccessExpression()) {
+            is Call ->
+                stripped
+                    .takeUnlessHasBeenVisited(resolveState)
+                    ?.let { call -> treeWalkUpFromLastChildCall(call, use, resolveState, keepProcessing) }
+                    ?: true
+            is ElixirList ->
+                treeWalkUpFragments(stripped, stripped.childExpressions().toList(), use, resolveState, keepProcessing)
+            is ElixirTuple -> {
+                val fragments = stripped.childExpressions().toList()
+
+                // Only a two-element tuple is a quoted literal. `{:__block__, [], [fragment]}` splices too, but
+                // that needs the node's shape read rather than its size, and is not modelled.
+                if (fragments.size == 2) {
+                    treeWalkUpFragments(stripped, fragments, use, resolveState, keepProcessing)
+                } else {
+                    true
+                }
+            }
+            else -> true
+        }
+
+    /**
+     * Each element of [container] read as a fragment. Marked visited first: [Destructure] can answer a container
+     * again, so only the resolver's earlier-binding rule would otherwise stop that arriving back here.
+     */
+    private fun treeWalkUpFragments(
+        container: PsiElement,
+        fragments: List<PsiElement>,
+        use: Call?,
+        resolveState: ResolveState,
+        keepProcessing: (PsiElement, ResolveState) -> Boolean
+    ): Boolean =
+        container
+            .takeUnlessHasBeenVisited(resolveState)
+            ?.let { entered ->
+                val enteredResolveState = resolveState.putVisitedElement(entered)
+
+                whileIn(fragments) { fragment ->
+                    treeWalkUpListElement(fragment, use, enteredResolveState, keepProcessing)
+                }
+            }
             ?: true
+
     private fun treeWalkUpFromLastChildCall(
         lastChildCall: Call,
         useCall: Call?,
