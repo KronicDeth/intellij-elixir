@@ -155,8 +155,13 @@ class Injector : MultiHostInjector {
 
                 try {
                     registrar.addPlace(null, null, documentation, textRangeInQuote)
-                } catch (_: RuntimeExceptionWithAttachments) {
-                    Logger.error(javaClass, "Cannot inject markdown in Heredoc", documentation)
+                } catch (runtimeExceptionWithAttachments: RuntimeExceptionWithAttachments) {
+                    Logger.error(
+                        javaClass,
+                        "Cannot inject markdown in Heredoc",
+                        documentation,
+                        runtimeExceptionWithAttachments
+                    )
                 }
             }
         }

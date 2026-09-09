@@ -145,11 +145,12 @@ abstract class CallDefinitionClause : PsiScopeProcessor {
                     Import.treeWalkUp(element, state) { call, accResolveState ->
                         execute(call, accResolveState)
                     }
-                } catch (_: StackOverflowError) {
+                } catch (stackOverflowError: StackOverflowError) {
                     Logger.error(
                         CallDefinitionClause::class.java,
                         "StackOverflowError while processing import",
-                        element
+                        element,
+                        stackOverflowError
                     )
                 }
 

@@ -173,8 +173,13 @@ fun Call.finalArity(): Int? = secondaryArity() ?: primaryArity()
 @RequiresReadLock
 fun Call.finalArguments(): Array<PsiElement>? = try {
     (secondaryArguments() ?: primaryArguments())?.map { it!! }?.toTypedArray()
-} catch (_: NullPointerException) {
-    Logger.error(this.javaClass, "NullPointerException getting Call.finalArguments()", this)
+} catch (nullPointerException: NullPointerException) {
+    Logger.error(
+        this.javaClass,
+        "NullPointerException getting Call.finalArguments()",
+        this,
+        nullPointerException
+    )
     null
 }
 
