@@ -58,7 +58,10 @@ object Using {
                 treeWalkUpFragments(last, last.childExpressions().toList(), use, resolveState, keepProcessing)
             // `{conditional, imports}` returned bare; without its own arm the `else` reads an earlier statement
             is ElixirTuple -> treeWalkUpValue(last, use, resolveState, keepProcessing)
-            is Match -> treeWalkUpValue(last.rightOperand(), use, resolveState, keepProcessing)
+            // a `__using__` returns its last statement's value, so a match that raises defines nothing in the caller
+            is Match ->
+                !Destructure.matches(last.leftOperand(), last.rightOperand()) ||
+                        treeWalkUpValue(last.rightOperand(), use, resolveState, keepProcessing)
             else ->
                 statements
                     .filterIsInstance<Call>()
@@ -115,8 +118,8 @@ object Using {
             is ElixirTuple -> {
                 val fragments = stripped.childExpressions().toList()
 
-                // Only a two-element tuple is a quoted literal. Three is a call node whose arguments also expand, so
-                // `{:__block__, [], [fragment]}` splices too - that needs the shape read, not the arity, and is not.
+                // Only a two-element tuple is a quoted literal. `{:__block__, [], [fragment]}` splices too, but
+                // that needs the node's shape read rather than its size, and is not modelled.
                 if (fragments.size == 2) {
                     treeWalkUpFragments(stripped, fragments, use, resolveState, keepProcessing)
                 } else {

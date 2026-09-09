@@ -4,7 +4,6 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiPolyVariantReference
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.concurrency.annotations.RequiresReadLock
-import org.elixir_lang.psi.call.Call
 import org.elixir_lang.psi.impl.childExpressions
 import org.elixir_lang.psi.impl.stripAccessExpression
 import org.elixir_lang.psi.operation.Match
@@ -20,9 +19,8 @@ object Destructure {
      * The values [declaration] is bound to by `[pattern] = [value]`, empty when it is bound to nothing.
      *
      * A value this cannot take apart is answered whole to *every* position, so `[_, x] = fragments()` claims
-     * everything `fragments/0` returns. Deliberate: refusing it would cost `[x] = fragments()`, which is how a
-     * `__using__` usually reaches its fragments. A quote is the one exception, refused below. The `t` of `[h | t]`
-     * binds nothing - issue #4067.
+     * everything `fragments/0` returns; refusing it would cost `[x] = fragments()`, which is how a `__using__`
+     * usually reaches its fragments. The `t` of `[h | t]` binds nothing - issue #4067.
      */
     @RequiresReadLock
     fun valuesAt(pattern: PsiElement?, value: PsiElement?, declaration: PsiElement): List<PsiElement> =
@@ -63,6 +61,62 @@ object Destructure {
         return descend(strippedPattern, strippedValue, declaration).flatMap { (nextPattern, nextValue) ->
             valuesAt(nextPattern, nextValue, declaration, followed)
         }
+    }
+
+    /**
+     * Whether `[pattern] = [value]` can match at all, for a caller holding the whole match rather than a declaration
+     * inside it. `true` whenever this cannot tell - an unreadable side, an unmodelled shape.
+     */
+    @RequiresReadLock
+    fun matches(pattern: PsiElement?, value: PsiElement?): Boolean {
+        val strippedPattern = pattern?.stripAccessExpression() ?: return true
+        val strippedValue = value?.stripAccessExpression() ?: return true
+
+        if (bucket(strippedPattern) == Bucket.OPAQUE || bucket(strippedValue) == Bucket.OPAQUE) {
+            return true
+        }
+
+        if (!sameShapeAs(strippedPattern, strippedValue)) {
+            return oneShapeTwoSpellings(bucket(strippedPattern), bucket(strippedValue))
+        }
+
+        return when (bucket(strippedPattern)) {
+            Bucket.LIST, Bucket.TUPLE -> linesUp(strippedPattern, strippedValue)
+            Bucket.KEYWORD_PAIR -> keysAgree(strippedPattern, strippedValue)
+            // a `__using__` whose returned value holds a literal map never compiles, so judging one decides nothing
+            Bucket.MAP, Bucket.OPAQUE -> true
+        }
+    }
+
+    private fun keysAgree(pattern: PsiElement, value: PsiElement): Boolean {
+        val patternPair = pattern as? ElixirKeywordPair ?: return true
+        val valuePair = value as? ElixirKeywordPair ?: return true
+
+        return keysCanAgree(key(patternPair.keywordKey), key(valuePair.keywordKey)) &&
+                matches(patternPair.keywordValue, valuePair.keywordValue)
+    }
+
+    /** A key [key] could not read pairs with nothing when binding, but rules nothing out when judging a whole match. */
+    private fun keysCanAgree(pattern: String?, value: String?): Boolean =
+        pattern == null || value == null || pattern == value
+
+    /** Whether the buckets differ only in spelling - `{:a, x}` and `a: x` are one shape written two ways. */
+    private fun oneShapeTwoSpellings(pattern: Bucket, value: Bucket): Boolean =
+        (pattern == Bucket.KEYWORD_PAIR && value == Bucket.TUPLE) ||
+                (pattern == Bucket.TUPLE && value == Bucket.KEYWORD_PAIR)
+
+    private fun linesUp(pattern: PsiElement, value: PsiElement): Boolean {
+        val (heads, tail) = positions(pattern) ?: return true
+        val (valueElements, valueTail) = positions(value) ?: return true
+
+        // a cons on the right leaves the length unknown, so nothing is ruled out
+        if (valueTail != null) {
+            return true
+        }
+
+        val lengthAccepted = if (tail == null) heads.size == valueElements.size else heads.size <= valueElements.size
+
+        return lengthAccepted && heads.zip(valueElements).all { (head, element) -> matches(head, element) }
     }
 
     private data class Bound(val value: PsiElement, val followed: Set<PsiElement>)
@@ -206,6 +260,10 @@ object Destructure {
         val (key, patternElement) = entries(pattern)
             .firstOrNull { (_, element) -> PsiTreeUtil.isAncestor(element, declaration, false) }
             ?: return emptyList()
+        if (key == null) {
+            return emptyList()
+        }
+
         // a duplicate key takes its last value - `%{a: 1, a: 2}` is `%{a: 2}` - so the last entry is the binding one
         val valueElement =
             entries(value).lastOrNull { (valueKey, _) -> valueKey == key }?.second ?: return emptyList()
@@ -225,7 +283,9 @@ object Destructure {
         val patternPair = pattern as? ElixirKeywordPair ?: return emptyList()
         val valuePair = value as? ElixirKeywordPair ?: return emptyList()
 
-        if (key(patternPair.keywordKey) != key(valuePair.keywordKey)) {
+        val patternKey = key(patternPair.keywordKey) ?: return emptyList()
+
+        if (patternKey != key(valuePair.keywordKey)) {
             return emptyList()
         }
 
@@ -244,7 +304,7 @@ object Destructure {
      * it names are known here - the ones it inherits from `base` are not, so they pair with nothing, as an absent key
      * does.
      */
-    private fun entries(element: PsiElement): List<Pair<String, PsiElement>> {
+    private fun entries(element: PsiElement): List<Pair<String?, PsiElement>> {
         // the only shape in the `MAP` bucket; a wider one would answer no keys rather than throw
         val mapArguments = (element as? ElixirMapOperation)?.mapArguments ?: return emptyList()
         val constructionArguments = mapArguments.mapConstructionArguments
@@ -276,24 +336,33 @@ object Destructure {
     }
 
     /**
-     * A key's identity for pairing. `a:`, `:a`, `:"a"` and `"a":` are one atom; `"a" =>` is a binary and distinct. An
-     * escape sequence answers as written, so `"\x61":` fails to pair with `a:` though Elixir says they are equal.
+     * A key's identity for pairing, or `null` when the key cannot be read. `a:`, `:a`, `:"a"` and `"a":` are one atom;
+     * `"a" =>` is a binary and distinct.
      */
-    private fun key(element: PsiElement): String =
+    private fun key(element: PsiElement): String? =
         when (val stripped = element.stripAccessExpression()) {
-            is ElixirAtom -> stripped.line?.let(::quotedName) ?: "atom ${stripped.text.removePrefix(":")}"
-            is ElixirKeywordKey -> stripped.line?.let(::quotedName) ?: "atom ${stripped.text}"
+            is ElixirAtom -> name(stripped.line, stripped.text.removePrefix(":"))
+            is ElixirKeywordKey -> name(stripped.line, stripped.text)
             else -> "term ${stripped.text}"
         }
 
-    /** The atom a quoted key spells. Interpolation is unknowable here, so it gets an identity pairing with nothing. */
-    private fun quotedName(line: ElixirLine): String {
-        val body = line.lineBody
-
-        return if (body == null || PsiTreeUtil.findChildOfType(body, ElixirInterpolation::class.java) != null) {
-            "interpolated ${line.textOffset}"
+    /**
+     * The atom a key spells, read from [line] when it is quoted and taken as [unquoted] when it is not. `null` when an
+     * interpolation or an escape sequence hides what the quotes spell, since `"\x61":` is `a:` to Elixir.
+     */
+    private fun name(line: ElixirLine?, unquoted: String): String? =
+        if (line == null) {
+            "atom $unquoted"
         } else {
-            "atom ${body.text}"
+            line
+                .lineBody
+                ?.takeIf {
+                    PsiTreeUtil.findChildOfAnyType(
+                        it,
+                        ElixirInterpolation::class.java,
+                        EscapeSequence::class.java
+                    ) == null
+                }
+                ?.let { "atom ${it.text}" }
         }
-    }
 }

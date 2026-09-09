@@ -115,11 +115,17 @@ class UnquoteDestructuredBindingTest : PlatformTestCase() {
 
     /**
      * An interpolated key names an atom only known once the code runs, so it pairs with nothing. Elixir does bind
-     * here - `"#{:a}":` is the atom `a:` - so this records a deliberate under-approximation, not the language. It does
-     * not discriminate the interpolation branch: the two keys differ as plain text too. Nothing can, because an
-     * interpolated key in a *pattern* does not compile, so only the value side ever reaches that branch.
+     * here - `"#{:a}":` is the atom `a:` - so this records a deliberate under-approximation, not the language. The two
+     * keys differ as plain text too, so [UsingDestructuredBindingTest.testEscapedKeyResolves] is what
+     * discriminates the branch.
      */
     fun testInterpolatedKeyDoesNotResolve() = assertDoesNotResolve("%{a: x} = %{\"#{:a}\": $QUOTE}")
+
+    /** Two keys neither side can read stay unequal, rather than pairing with each other for being equally unknown. */
+    fun testUnreadableMapKeysDoNotResolve() = assertDoesNotResolve("""%{"\x61": x} = %{"\x62": $QUOTE}""")
+
+    /** The same on the keyword list path, which pairs its keys by position rather than by lookup. */
+    fun testUnreadableKeywordKeysDoNotResolve() = assertDoesNotResolve("""["\x61": x] = ["\x62": $QUOTE]""")
 
     /** A map update names its own keys, so one it names pairs exactly as a construction's does. */
     fun testQuoteBoundThroughAMapUpdateResolves() =
@@ -127,7 +133,7 @@ class UnquoteDestructuredBindingTest : PlatformTestCase() {
 
     /** A key the update does not name comes from `base`, which is unknown here, so it pairs with nothing. */
     fun testMapKeyInheritedByAnUpdateDoesNotResolve() =
-        assertDoesNotResolve("base = %{a: nil}\n    %{a: x} = %{base | b: $QUOTE}")
+        assertDoesNotResolve("base = %{a: nil, b: nil}\n    %{a: x} = %{base | b: $QUOTE}")
 
     /**
      * `unquote(x)` splices whatever `x` holds, and the compiler expands a list literal's elements, so a list of
@@ -151,10 +157,8 @@ class UnquoteDestructuredBindingTest : PlatformTestCase() {
     fun testQuoteBoundDirectlyResolves() = assertResolves("x = $QUOTE")
 
     /**
-     * A value the pairing cannot take apart is followed whole, which is all that reaches a quote returned by a call.
-     * Pairing narrows what a destructured name claims; it must not narrow it to nothing. This program compiles and
-     * binds: the map spelling of it would not, so it is not asserted - answering the whole of an unknown value is a
-     * policy, and a test for it should not depend on a fixture that raises.
+     * A value the pairing cannot take apart is followed whole, which is all that reaches a quote returned by a
+     * call. Pairing narrows what a destructured name claims; it must not narrow it to nothing.
      */
     fun testQuoteBoundThroughAnOpaqueValueResolves() = assertResolves("[x] = fragments()", FRAGMENTS)
 

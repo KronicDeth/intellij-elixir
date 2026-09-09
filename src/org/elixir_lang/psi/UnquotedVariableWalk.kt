@@ -14,7 +14,7 @@ object UnquotedVariableWalk {
         MATCH,
         /** Nothing to follow. Parentheses arguments are `QuotableArguments`, so this comes before `RECURSE`. */
         STOP,
-        /** A container a variable can be declared through, which this walk does not enter yet. Answers as `STOP`. */
+        /** A shape a variable could be declared through that this walk does not follow. Answers as `STOP`. */
         UNFOLLOWED,
         /** A wrapper the value passes through, so ask the parent. */
         RECURSE,
