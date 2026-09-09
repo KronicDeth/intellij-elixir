@@ -1,8 +1,10 @@
 package org.elixir_lang.code_insight.completion
 
+import com.intellij.codeInsight.completion.CompletionUtil
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiFile
 import org.elixir_lang.beam.psi.Module as BeamModule
 import org.elixir_lang.code_insight.preferFunctionHeads
 import org.elixir_lang.psi.call.Call
@@ -105,7 +107,7 @@ private fun delegationLookupElements(
         .distinctBy { (name, _) -> name }
         .map { (name, delegation) ->
             LookupElementBuilder
-                .createWithSmartPointer(name, delegation)
+                .createWithSmartPointer(name, delegation.inOriginalFile())
                 .withRenderer(DelegationRenderer(name))
                 .let { if (appendParentheses) it.withInsertHandler(CallDefinitionClauseInsertHandler.INSTANCE) else it }
         }
@@ -119,10 +121,38 @@ private fun callDefinitionClauseLookupElements(moduleImpl: BeamModule, appendPar
         }
 
 private fun lookupElement(name: String, element: PsiElement, appendParentheses: Boolean): LookupElement =
-    if (appendParentheses) {
-        CallDefinitionClauseLookupElement.createWithSmartPointer(name, element)
-    } else {
-        LookupElementBuilder
-            .createWithSmartPointer(name, element)
-            .withRenderer(CallDefinitionClauseRenderer(name))
+    element.inOriginalFile().let { originalElement ->
+        if (appendParentheses) {
+            CallDefinitionClauseLookupElement.createWithSmartPointer(name, originalElement)
+        } else {
+            LookupElementBuilder
+                .createWithSmartPointer(name, originalElement)
+                .withRenderer(CallDefinitionClauseRenderer(name))
+        }
     }
+
+/**
+ * [CompletionUtil.getOriginalOrSelf] hands back the copy rather than null when it cannot map, so a lookup
+ * element built from its result silently pins the throwaway file. It fails two ways here: the declaration
+ * enclosing the caret has a same-class node that runs past the translated end, and one the trailing dot
+ * swallowed has no node of its own at all.
+ */
+private fun PsiElement.inOriginalFile(): PsiElement {
+    val mapped = CompletionUtil.getOriginalOrSelf(this)
+    val copyFile = mapped.containingFile ?: return mapped
+
+    if (copyFile.isPhysical) return mapped
+
+    val startOffset = mapped.textRange?.startOffset ?: return mapped
+    val originalLeaf = copyFile.findElementAt(startOffset)
+        ?.let(CompletionUtil::getOriginalOrSelf)
+        ?.takeIf { it.containingFile?.isPhysical == true }
+        ?: return mapped
+    val originalOffset = originalLeaf.textRange.startOffset
+
+    val sameClass = generateSequence(originalLeaf) { it.parent }
+        .takeWhile { it !is PsiFile }
+        .firstOrNull { mapped.javaClass.isInstance(it) && it.textRange?.startOffset == originalOffset }
+
+    return sameClass ?: originalLeaf
+}

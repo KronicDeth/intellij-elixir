@@ -83,6 +83,37 @@ class ErlangModuleCompletionTest : BeamLibraryTestCase() {
     }
 
     /**
+     * `:math.<caret>` with nothing typed after the dot offers `sqrt` too.
+     *
+     * Distinct from the prefixed case above: the completion copy inserts an alias-shaped dummy
+     * identifier, and an atom followed by an alias is a syntax error in Elixir - `Code.string_to_quoted`
+     * rejects it with "atom cannot be followed by an alias". This grammar is more permissive than the
+     * language: `matchedQualifiedAlias ::= matchedExpression dotInfixOperator alias`
+     * and an atom is a `matchedExpression`, so `:math.<dummy>` still reduces to a qualified *alias* and is
+     * answered by the same branch as `Mod.<caret>`. `:math.s<caret>` reaches the qualified-call branch
+     * instead, because a lowercase dummy continues a call.
+     */
+    fun testErlangModuleFunctionsAreOfferedAfterABareAtomQualifier() {
+        myFixture.configureByText(
+            "test.ex",
+            """
+                defmodule Test do
+                  def run do
+                    :math.<caret>
+                  end
+                end
+            """.trimIndent()
+        )
+
+        val strings = myFixture.completionStringsAtCaret()
+        assertNotNull("No completion popup after the bare Erlang atom qualifier `:math.`", strings)
+        assertTrue(
+            "Expected `sqrt` among the completions after `:math.`, got: ${strings!!.sorted()}",
+            strings.contains("sqrt")
+        )
+    }
+
+    /**
      * `{:math, :s<caret>, 1}` offers `sqrt` - the MFA-tuple function atom against a BEAM module.
      * `ErlangMfaTupleReferenceTest` pins that this resolves; this pins that it completes.
      */
