@@ -2,11 +2,14 @@ package org.elixir_lang.reference.resolver
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.DumbService
+import com.intellij.openapi.diagnostic.ControlFlowException
+import kotlinx.coroutines.CancellationException
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiElementResolveResult
 import com.intellij.psi.ResolveResult
 import com.intellij.psi.impl.source.resolve.ResolveCache
 import com.intellij.psi.stubs.StubIndex
+import org.elixir_lang.errorreport.Logger
 import org.elixir_lang.psi.Alias
 import org.elixir_lang.psi.NamedElement
 import org.elixir_lang.psi.Require
@@ -84,9 +87,34 @@ object Module : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Modul
     }
 
     private fun resolveAll(element: PsiElement, name: String, incompleteCode: Boolean) =
-        resolveInScope(element, name, incompleteCode)
-            .takeIf { set -> set.any(ResolveResult::isValidResult) }
-            ?: multiResolveProject(element, name)
+        try {
+            resolveInScope(element, name, incompleteCode)
+                .takeIf { set -> set.any(ResolveResult::isValidResult) }
+                ?: multiResolveProject(element, name)
+        } catch (stackOverflowError: StackOverflowError) {
+            Logger.error(Module::class.java, "StackOverflowError when resolving Alias", element, stackOverflowError)
+
+            emptyList()
+        } catch (runtimeException: RuntimeException) {
+            // `RecursionManager` rewraps anything raised in its own unwinding, so an overflow can
+            // arrive with its cause nested. Cancellation is excluded per `tryCatchUtils.kt`.
+            if (runtimeException is ControlFlowException ||
+                runtimeException is CancellationException ||
+                generateSequence<Throwable>(runtimeException) { it.cause }
+                    .none { it is StackOverflowError }
+            ) {
+                throw runtimeException
+            }
+
+            Logger.error(
+                Module::class.java,
+                "StackOverflowError unwinding alias resolution",
+                element,
+                runtimeException
+            )
+
+            emptyList()
+        }
 
     private fun resolveInScope(element: PsiElement, name: String, incompleteCode: Boolean) =
         MultiResolve.resolveResults(name, incompleteCode, element)
