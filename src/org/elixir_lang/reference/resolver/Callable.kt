@@ -123,8 +123,13 @@ object Callable : ResolveCache.PolyVariantResolver<org.elixir_lang.reference.Cal
                 } else {
                     resolveUnqualified(element, name, resolvedPrimaryArity, incompleteCode)
                 }
-            } catch (_: StackOverflowError) {
-                Logger.error(Callable::class.java, "StackOverflowError when annotating Call", element)
+            } catch (stackOverflowError: StackOverflowError) {
+                Logger.error(
+                    Callable::class.java,
+                    "StackOverflowError when annotating Call",
+                    element,
+                    stackOverflowError
+                )
 
                 emptyList()
             }

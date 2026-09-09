@@ -1,6 +1,7 @@
 package org.elixir_lang.psi.scope.module
 
 import com.intellij.openapi.project.DumbService
+import com.intellij.openapi.util.RecursionManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiNamedElement
 import com.intellij.psi.ResolveState
@@ -125,26 +126,43 @@ class MultiResolve internal constructor(private val name: String, private val in
 
             // Transitive alias fallback: if stub lookup found nothing and match is a QualifiableAlias,
             // resolve it through the module scope to follow alias chains
-            // (e.g., `alias MyNamespace.Referenced; alias Referenced, as: Refd` — resolving `Refd` needs
+            // (e.g., `alias MyNamespace.Referenced; alias Referenced, as: Refd` - resolving `Refd` needs
             // to follow Referenced → MyNamespace.Referenced transitively)
             if (!found && match is QualifiableAlias) {
-                val transitiveResults = resolveResults(match.fullyQualifiedName(), incompleteCode, match)
-                for (result in transitiveResults) {
-                    val resolvedElement = result.element
-                    if (resolvedElement is NamedElement) {
-                        resolveResultOrderedSet.add(
-                            resolvedElement,
-                            resolvedElement.name ?: unaliasedName,
-                            result.isValidResult,
-                            visitedElementSet + result.visitedElementSet
-                        )
-                    }
+                addTransitiveResults(match, unaliasedName, visitedElementSet)
+            }
+        }
+    }
+
+    /**
+     * `memoize` is false because results accumulate into [resolveResultOrderedSet] as a side effect
+     * rather than being returned.
+     */
+    private fun addTransitiveResults(match: QualifiableAlias,
+                                     unaliasedName: String,
+                                     visitedElementSet: Set<PsiElement>) {
+        val searchedName = match.fullyQualifiedName()
+
+        RECURSION_GUARD.doPreventingRecursion(searchedName, false) {
+            for (result in resolveResults(searchedName, incompleteCode, match)) {
+                val resolvedElement = result.element
+
+                if (resolvedElement is NamedElement) {
+                    resolveResultOrderedSet.add(
+                        resolvedElement,
+                        resolvedElement.name ?: unaliasedName,
+                        result.isValidResult,
+                        visitedElementSet + result.visitedElementSet
+                    )
                 }
             }
         }
     }
 
     companion object {
+        private val RECURSION_GUARD =
+                RecursionManager.createGuard<String>("org.elixir_lang.psi.scope.module.MultiResolve")
+
         fun resolveResults(name: String,
                            incompleteCode: Boolean,
                            entrance: PsiElement): List<VisitedElementSetResolveResult> =

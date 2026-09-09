@@ -15,7 +15,12 @@ fun safeMultiResolve(reference: PsiPolyVariantReference, incompleteCode: Boolean
     try {
         reference.multiResolve(incompleteCode)
     } catch (stackOverflowError: StackOverflowError) {
-        Logger.error(PsiPolyVariantReference::class.java, "StackOverflow resolving reference", reference.element)
+        Logger.error(
+            PsiPolyVariantReference::class.java,
+            "StackOverflow resolving reference",
+            reference.element,
+            stackOverflowError
+        )
 
         emptyArray()
     }

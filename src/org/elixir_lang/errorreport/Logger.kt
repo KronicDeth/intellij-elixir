@@ -19,10 +19,11 @@ object Logger {
      * @param klass   Class whose logger to use
      * @param title   Title of error stored in [Throwable].
      * @param element element responsible for the error
+     * @param cause   omitting it leaves the report carrying a synthetic trace built from the title
      */
     @JvmStatic
-    fun error(klass: Class<*>, title: String, element: PsiElement) {
-        error(Logger.getInstance(klass), title, element)
+    fun error(klass: Class<*>, title: String, element: PsiElement, cause: Throwable? = null) {
+        error(Logger.getInstance(klass), title, element, cause)
     }
 
     fun error(klass: Class<*>, title: String, term: OtpErlangObject) {
@@ -36,13 +37,15 @@ object Logger {
      * @param logger  logger to which to log an error.
      * @param title   Title of error stored in [Throwable].
      * @param element element responsible for the error
+     * @param cause   omitting it leaves the report carrying a synthetic trace built from the title
      */
     fun error(
         logger: Logger,
         title: String,
-        element: PsiElement
+        element: PsiElement,
+        cause: Throwable? = null
     ) {
-        val throwable = Throwable(title)
+        val throwable = Throwable(title, cause)
         val containingFile = element.containingFile
         val message = message(containingFile, element)
         val virtualFile = containingFile.virtualFile
