@@ -19,7 +19,6 @@ import org.elixir_lang.psi.CallDefinitionClause.isPublicGuard
 import org.elixir_lang.psi.CallDefinitionClause.isPublicMacro
 import org.elixir_lang.psi.QuoteMacro
 import org.elixir_lang.psi.call.Call
-import org.elixir_lang.psi.impl.call.macroChildCalls
 import org.elixir_lang.psi.impl.enclosingMacroCall
 import org.elixir_lang.structure_view.element.modular.*
 import org.jetbrains.annotations.Contract
@@ -39,9 +38,7 @@ class CallDefinitionClause(val callDefinition: CallDefinition, call: Call) :
      */
 
     override fun getChildren(): Array<TreeElement> =
-        navigationItem.macroChildCalls().let {
-            childCallTreeElements(it)
-        } ?: emptyArray()
+        Body.treeElements(callDefinition.modular, { Quote(this, it) }, navigationItem)
 
     /**
      * Returns the presentation of the tree element.
@@ -62,29 +59,6 @@ class CallDefinitionClause(val callDefinition: CallDefinition, call: Call) :
      * `Visible.Visibility.PRIVATE` for private call definitions (`defp` and `defmacrop`).
      */
     override fun visibility(): Visibility = visibility
-
-    private fun addChildCall(treeElementList: MutableList<TreeElement>, childCall: Call) {
-        when {
-            org.elixir_lang.psi.Implementation.`is`(childCall) -> Implementation(callDefinition.modular, childCall)
-            org.elixir_lang.psi.Module.`is`(childCall) -> Module(callDefinition.modular, childCall)
-            QuoteMacro.`is`(childCall) -> Quote(this, childCall)
-            else -> null
-        }?.run {
-            treeElementList.add(this)
-        }
-    }
-
-    @Contract(pure = true)
-    private fun childCallTreeElements(childCalls: Array<Call>?): Array<TreeElement>? =
-        childCalls?.let {
-            val treeElementList = ArrayList<TreeElement>(it.size)
-
-            for (childCall in it) {
-                addChildCall(treeElementList, childCall)
-            }
-
-            treeElementList.toTypedArray()
-        }
 
     companion object {
         /**

@@ -5,11 +5,10 @@ import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.ElementDescriptionLocation;
 import com.intellij.psi.PsiElement;
 import com.intellij.usageView.UsageViewTypeLocation;
-import org.elixir_lang.navigation.item_presentation.Parent;
 import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.structure_view.element.Element;
-import org.elixir_lang.structure_view.element.modular.Modular;
+import org.elixir_lang.structure_view.element.ModuleQualifiedName;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -25,9 +24,6 @@ public class Structure extends Element<Call> {
     /*
      * Fields
      */
-
-    @NotNull
-    private final Modular modular;
 
     /*
      * Static Methods
@@ -52,9 +48,8 @@ public class Structure extends Element<Call> {
      * Constructors
      */
 
-    public Structure(@NotNull Modular modular, @NotNull Call call) {
+    public Structure(@NotNull Call call) {
         super(call);
-        this.modular = modular;
     }
 
     /*
@@ -115,21 +110,12 @@ public class Structure extends Element<Call> {
     @NotNull
     @Override
     public ItemPresentation getPresentation() {
-        Parent parentPresentation = (Parent) modular.getPresentation();
-        String location = parentPresentation.getLocatedPresentableText();
-        int lastIndex = location.lastIndexOf('.');
-        String parentLocation;
-        String name;
+        ModuleQualifiedName qualifiedName = ModuleQualifiedName.of(navigationItem, "struct");
 
-        if (lastIndex != -1) {
-            parentLocation = location.substring(0, lastIndex);
-            name = location.substring(lastIndex + 1, location.length());
-        } else {
-            parentLocation = null;
-            name = location;
-        }
-
-        return new org.elixir_lang.navigation.item_presentation.structure.Structure(parentLocation, name);
+        return new org.elixir_lang.navigation.item_presentation.structure.Structure(
+                qualifiedName.getLocation(),
+                qualifiedName.getName()
+        );
     }
 
     /*

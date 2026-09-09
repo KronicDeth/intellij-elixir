@@ -46,61 +46,23 @@ public class Implementation implements ItemPresentation, Parent {
      * an {@link ItemPresentation} and needs to act as the
      * {@link ItemPresentation#getLocationString()}.
      *
-     * @return {@link #getLocationString()} + "." + {@link #getPresentableText()} if {@link #getLocationString()} is not
-     * {@code null}; otherwise, {@link #getPresentableText()}.
+     * @return {@link #getLocationString()} + "." + {@link #getPresentableText()}
      */
     @NotNull
     @Override
     public String getLocatedPresentableText() {
-        String locatedPresentableText;
-        String locationString = getLocationString();
-
-        if (locationString != null) {
-            locatedPresentableText = locationString + "." + getPresentableText();
-        } else {
-            locatedPresentableText = getPresentableText();
-        }
-
-        return locatedPresentableText;
+        return getLocationString() + "." + getPresentableText();
     }
 
-    /**
-     * Returns the qualifier for the module created by the `defimpl` call.
-     *
-     * @return {@link #protocolName}.{@link #forName} without the last alias in {@link #forName}.
-     */
-    @Nullable
+    @NotNull
     @Override
     public String getLocationString() {
-        String[] aliases = forName.split(".");
-        StringBuilder locationStringBuilder = new StringBuilder(protocolName);
-
-        // length - 1 to exclude the final element of aliases
-        for (int i = 0; i < aliases.length - 1; i++) {
-            locationStringBuilder.append('.');
-            locationStringBuilder.append(aliases[i]);
-        }
-
-        return locationStringBuilder.toString();
+        return protocolName;
     }
 
-    /**
-     * Return the unqualified alias name of the module created by the `defimpl` call.
-     *
-     * @return final alias in {@link #forName}
-     */
-    @Nullable
+    @NotNull
     @Override
     public String getPresentableText() {
-        String[] aliases = forName.split(".");
-        String presentableText;
-
-        if (aliases.length == 0) {
-            presentableText = forName;
-        } else {
-            presentableText = aliases[aliases.length - 1];
-        }
-
-        return  presentableText;
+        return forName;
     }
 }

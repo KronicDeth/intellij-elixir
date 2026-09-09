@@ -91,7 +91,11 @@ private fun isBeingResolved(call: Call, state: ResolveState): Boolean =
 
 private fun qualifierIsBeingResolved(call: Call, state: ResolveState): Boolean =
         if (call is Qualified) {
-            call.qualifier().isAncestor(state.get(ElixirPsiImplUtil.ENTRANCE), strict = false)
+            // `isAncestor` rejects a null second argument, and a caller with no entrance has nothing
+            // for the guard to compare against.
+            state.get(ElixirPsiImplUtil.ENTRANCE)?.let { entrance ->
+                call.qualifier().isAncestor(entrance, strict = false)
+            } ?: false
         } else {
             false
         }

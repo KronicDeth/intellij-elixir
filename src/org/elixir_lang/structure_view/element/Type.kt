@@ -17,8 +17,7 @@ import org.elixir_lang.structure_view.element.modular.Modular
 class Type(
     private val modular: Modular,
     moduleAttributeDefinition: AtUnqualifiedNoParenthesesCall<*>,
-    private val opaque: Boolean,
-    private val visibility: Visibility
+    private val kind: Kind
 ) : Element<AtUnqualifiedNoParenthesesCall<*>?>(moduleAttributeDefinition), Visible {
 
     /**
@@ -40,18 +39,40 @@ class Type(
         return org.elixir_lang.navigation.item_presentation.Type(
             location,
             type(navigationItem!!),
-            opaque,
-            visibility
+            kind.isOpaque,
+            kind.visibility
         )
     }
 
-    /**
-     * The visibility of the element.
-     *
-     * @return [Visibility.PUBLIC] for `@type` and `@opaque`; [Visibility.PRIVATE] for
-     * `@typep`
-     */
-    override fun visibility(): Visibility = visibility
+    override fun visibility(): Visibility = kind.visibility
+
+    /** The module attributes a type node can be built from. */
+    enum class Kind {
+        OPAQUE,
+        TYPE,
+        TYPEP;
+
+        val isOpaque: Boolean get() = this == OPAQUE
+
+        val visibility: Visibility
+            get() = when (this) {
+                OPAQUE, TYPE -> Visibility.PUBLIC
+                TYPEP -> Visibility.PRIVATE
+            }
+
+        companion object {
+            fun of(moduleAttributeName: String): Kind? =
+                when (moduleAttributeName) {
+                    "@opaque" -> OPAQUE
+                    "@type" -> TYPE
+                    "@typep" -> TYPEP
+                    else -> null
+                }
+
+            fun of(call: Call): Kind? =
+                (call as? AtUnqualifiedNoParenthesesCall<*>)?.let { of(ElixirPsiImplUtil.moduleAttributeName(it)) }
+        }
+    }
 
     companion object {
         fun elementDescription(location: ElementDescriptionLocation): String? =
@@ -61,26 +82,13 @@ class Type(
                 null
             }
 
-        fun fromCall(modular: Modular, call: Call): Type =
-            fromAtUnqualifiedNoParenthesesCall(modular, call as AtUnqualifiedNoParenthesesCall<*>)
-
-        fun fromAtUnqualifiedNoParenthesesCall(
-            modular: Modular,
-            moduleAttributeDefinition: AtUnqualifiedNoParenthesesCall<*>
-        ): Type {
-            val moduleAttributeName = ElixirPsiImplUtil.moduleAttributeName(moduleAttributeDefinition)
-            val opaque = isOpaque(moduleAttributeName)
-            val visibility = visibility(moduleAttributeName)
-            return Type(modular, moduleAttributeDefinition, opaque, visibility)
-        }
+        fun fromCall(modular: Modular, call: Call): Type? =
+            Kind.of(call)?.let { kind ->
+                Type(modular, call as AtUnqualifiedNoParenthesesCall<*>, kind)
+            }
 
         @JvmStatic
-        fun `is`(call: Call): Boolean = if (call is AtUnqualifiedNoParenthesesCall<*>) {
-            val moduleAttributeName = ElixirPsiImplUtil.moduleAttributeName(call)
-            moduleAttributeName == "@opaque" || moduleAttributeName == "@type" || moduleAttributeName == "@typep"
-        } else {
-            false
-        }
+        fun `is`(call: Call): Boolean = Kind.of(call) != null
 
         fun isHead(element: PsiElement): Boolean {
             val attribute = PsiTreeUtil.getParentOfType(element, AtUnqualifiedNoParenthesesCall::class.java, false)
@@ -91,8 +99,6 @@ class Type(
 
             return PsiTreeUtil.isAncestor(head, element, false) || PsiTreeUtil.isAncestor(element, head, false)
         }
-
-        private fun isOpaque(moduleAttributeName: String): Boolean = moduleAttributeName == "@opaque"
 
         fun nameIdentifier(atUnqualifiedNoParenthesesCall: AtUnqualifiedNoParenthesesCall<*>): PsiElement? =
             specification(atUnqualifiedNoParenthesesCall)?.let { specificationType(it) }?.let { typeNameIdentifier(it) }
@@ -114,12 +120,5 @@ class Type(
             atUnqualifiedNoParenthesesCall.noParenthesesOneArgument.arguments().singleOrNull()?.let { it as? Call }
 
         private fun typeNameIdentifier(type: Call): PsiElement? = type.functionNameElement()
-
-        fun visibility(moduleAttributeName: String): Visibility =
-            when (moduleAttributeName) {
-                "@opaque", "@type" -> Visibility.PUBLIC
-                "@typep" -> Visibility.PRIVATE
-                else -> TODO()
-            }
     }
 }

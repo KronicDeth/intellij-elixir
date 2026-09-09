@@ -1,25 +1,15 @@
 package org.elixir_lang.structure_view.element.ex_unit.case
 
-import com.intellij.ide.util.treeView.smartTree.TreeElement
 import com.intellij.navigation.ItemPresentation
-import com.intellij.psi.ResolveState
 import org.elixir_lang.psi.call.Call
-import org.elixir_lang.structure_view.element.Element
-import org.elixir_lang.navigation.item_presentation.ex_unit.case.Describe
-import org.elixir_lang.psi.impl.call.stabBodyChildExpressions
+import org.elixir_lang.structure_view.element.modular.Modular
+import org.elixir_lang.structure_view.element.modular.Module
+import org.elixir_lang.navigation.item_presentation.ex_unit.case.Describe as DescribePresentation
 
-class Describe(call: Call) : Element<Call>(call) {
-    override fun getPresentation(): ItemPresentation = Describe(navigationItem)
-
-    override fun getChildren(): Array<TreeElement> =
-        navigationItem
-                .stabBodyChildExpressions()
-                .orEmpty()
-                .filterIsInstance<Call>()
-                .filter { org.elixir_lang.psi.ex_unit.Case.isTest(it, ResolveState.initial()) }
-                .map { call ->
-                    Test(call)
-                }
-                .toList()
-                .toTypedArray()
+/**
+ * `ExUnit.Case.describe/2` evaluates its block in the module body, so what a `describe` declares -
+ * a `defdelegate`, a `setup` - is compiled onto the case module. It shows what a `defmodule` shows.
+ */
+class Describe(parent: Modular, call: Call) : Module(parent, call) {
+    override fun getPresentation(): ItemPresentation = DescribePresentation(location(), navigationItem)
 }
