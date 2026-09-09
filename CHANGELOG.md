@@ -77,6 +77,10 @@
   - **A struct or exception in the Structure View is named after its module instead of part of the
     file path.** Fixes [#4069](https://github.com/KronicDeth/intellij-elixir/issues/4069).
 
+- [#4063](https://github.com/KronicDeth/intellij-elixir/pull/4063) [@sh41](https://github.com/sh41)
+  - **An `alias` naming a module that does not exist no longer crashes the IDE with a
+    `StackOverflowError`.** Fixes [#3978](https://github.com/KronicDeth/intellij-elixir/issues/3978).
+
 - [#4039](https://github.com/KronicDeth/intellij-elixir/pull/4039) [@sh41](https://github.com/sh41)
   - **Go To Declaration, autocomplete and Quick Documentation now work for functions declared with
     `defdelegate`, including delegations into compiled modules such as `Map.values/1`.** Fixes
