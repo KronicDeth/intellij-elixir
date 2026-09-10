@@ -4,10 +4,13 @@ package org.elixir_lang.psi.impl
 
 import com.ericsson.otp.erlang.*
 import com.intellij.lang.ASTNode
+import com.intellij.openapi.util.ModificationTracker
 import com.intellij.psi.*
 import com.intellij.psi.impl.source.tree.Factory
 import com.intellij.psi.tree.IElementType
 import com.intellij.psi.tree.TokenSet
+import com.intellij.psi.util.CachedValueProvider
+import com.intellij.psi.util.CachedValuesManager
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.ElixirLanguage
@@ -1600,7 +1603,35 @@ object QuotableImpl {
             OtpErlangTuple(arrayOf(key, value))
 
     /* Returns the 0-indexed line number for the element */
-    private fun lineNumber(node: ASTNode): Int = node.psi.document()!!.getLineNumber(node.startOffset)
+    private fun lineNumber(node: ASTNode): Int {
+        val psi = node.psi
+        val documentLine = psi.document()!!.getLineNumber(node.startOffset)
+        val uncounted = psi.containingFile?.let(::escapedNewlineInLiteralSigilLineOffsets) ?: return documentLine
+
+        if (uncounted.isEmpty() || dialectFor(psi).countsEscapedNewlineInLiteralSigilLine) return documentLine
+
+        return documentLine - uncounted.count { it < node.startOffset }
+    }
+
+    /** See QuotingDialect.V1_12. Cached per file, as every line in a quoted file asks. */
+    private fun escapedNewlineInLiteralSigilLineOffsets(file: PsiFile): IntArray =
+        CachedValuesManager.getCachedValue(file) {
+            val offsets = mutableListOf<Int>()
+
+            file.accept(object : PsiRecursiveElementWalkingVisitor() {
+                override fun visitElement(element: PsiElement) {
+                    if (element is ElixirEscapedEOL && element.parent?.parent.let { it is SigilLine && it !is Interpolated }) {
+                        offsets.add(element.textOffset)
+                    }
+
+                    super.visitElement(element)
+                }
+            })
+
+            // Not `file` itself: a physical PSI dependency asks for InjectedLanguageManager, which ParsingTestCase's
+            // mock project does not register.
+            CachedValueProvider.Result.create(offsets.toIntArray(), ModificationTracker { file.modificationStamp })
+        }
 
     private fun lineNumberKeywordTuple(node: ASTNode): OtpErlangTuple =
             keywordTuple(

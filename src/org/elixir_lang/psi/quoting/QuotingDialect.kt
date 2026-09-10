@@ -29,6 +29,11 @@ enum class QuotingDialect {
      * into `unescape_chars`, which sigil parts never reach; its deleted clauses were guarded on
      * `Interpol = true`, so `~S` is unaffected. `51d90f193` made the tokenizer strip a heredoc's
      * artificial leading newline after extraction rather than before. Both first released in v1.12.0.
+     *
+     * `51d90f193` also advanced the line past a `\` ending a line in a **non-interpolating** sigil. 1.11's
+     * `extract/8` took the two characters in its `[$\\, Char | Rest]` clause, which counts columns and no line, so
+     * in `~S(a\` + newline + `b) in x` everything after the sigil is one line lower. Read via
+     * [countsEscapedNewlineInLiteralSigilLine].
      */
     V1_12,
 
@@ -168,6 +173,9 @@ enum class QuotingDialect {
      * heredoc unescapes them away and is left with an empty segment.
      */
     val keepsEscapedNewlineInExtractedBuffer: Boolean get() = this >= V1_12
+
+    /** Whether a `\` ending a line in a non-interpolating sigil line advances the line of what follows. */
+    val countsEscapedNewlineInLiteralSigilLine: Boolean get() = this >= V1_12
 
     /** The leading `""` a heredoc gets when its first content is `#{...}`. */
     val emitsEmptyLeadingHeredocSegment: Boolean get() = this >= V1_12

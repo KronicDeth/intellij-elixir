@@ -150,6 +150,10 @@ class QuotingDialectTest {
         )
         assertEquals(
             listOf(false, true, true, true, true, true, true, true, true, true, true),
+            QuotingDialect.entries.map { it.countsEscapedNewlineInLiteralSigilLine }
+        )
+        assertEquals(
+            listOf(false, true, true, true, true, true, true, true, true, true, true),
             QuotingDialect.entries.map { it.emitsEmptyLeadingHeredocSegment }
         )
         assertEquals(
