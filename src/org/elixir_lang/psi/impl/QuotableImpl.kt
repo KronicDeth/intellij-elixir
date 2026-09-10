@@ -17,6 +17,7 @@ import org.elixir_lang.otpErlangList
 import org.elixir_lang.otpErlangTuple
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.IDENTIFIER_TOKEN_SET
+import org.elixir_lang.psi.impl.ParentImpl.RAW_BYTE_OFFSET
 import org.elixir_lang.psi.impl.ParentImpl.addChildTextCodePoints
 import org.elixir_lang.psi.impl.ParentImpl.elixirCharList
 import org.elixir_lang.psi.impl.ParentImpl.elixirString
@@ -1805,7 +1806,13 @@ object QuotableImpl {
                     val childElement = child.psi as ElixirInterpolation
                     quotedParentList.add(parent.quoteInterpolation(childElement))
                 } else if (elementType === ElixirTypes.QUOTE_HEXADECIMAL_ESCAPE_SEQUENCE || elementType === ElixirTypes.SIGIL_HEXADECIMAL_ESCAPE_SEQUENCE) {
-                    codePointList = parent.addHexadecimalEscapeSequenceCodePoints(codePointList, child)
+                    val escapedByte = (child.psi as? ElixirQuoteHexadecimalEscapeSequence)?.let { escapedByte(it) }
+
+                    codePointList = if (escapedByte != null) {
+                        (codePointList ?: mutableListOf()).apply { add(RAW_BYTE_OFFSET + escapedByte) }
+                    } else {
+                        parent.addHexadecimalEscapeSequenceCodePoints(codePointList, child)
+                    }
                 } else {
                     TODO("Can't quote " + child)
                 }
@@ -1826,6 +1833,18 @@ object QuotableImpl {
         }
 
         return quoted
+    }
+
+    /**
+     * `unescape_hex` appends one byte, so `"\xC3\xA9"` is `"é"`; Elixir 1.11's deprecated `\xH` and `\x{H*}` are code
+     * points. Not decided in [Parent.addHexadecimalEscapeSequenceCodePoints]: atom resolution builds a `String` from
+     * that list, which cannot hold [RAW_BYTE_OFFSET].
+     */
+    private fun escapedByte(sequence: ElixirQuoteHexadecimalEscapeSequence): Int? {
+        if (sequence.hexadecimalEscapePrefix.text != "\\x") return null
+        val digits = sequence.openHexadecimalEscapeSequence?.text?.takeIf { it.length == 2 } ?: return null
+
+        return digits.toInt(16).takeIf { it >= 0x80 }
     }
 
     @Contract(pure = true)

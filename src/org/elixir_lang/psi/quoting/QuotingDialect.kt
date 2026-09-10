@@ -40,11 +40,17 @@ enum class QuotingDialect {
      * `elixir_interpolation:extract/8`, first released in v1.13.0. Not conditioned on the
      * interpolation flag, so `~s` and `~S` alike; a plain heredoc reaches the same text through
      * `unescape_tokens` and a sigil line's terminator was already unescaped in v1.12.3.
-     *
-     * 1.14.5 resolves here too: below 1.15.0 there is no bracket or interpolation metadata, and
-     * `...` quotes as a variable.
      */
     V1_13,
+
+    /**
+     * Elixir 1.14.0 accepts `..` with no operands, as the nullary operator `{:.., meta, []}`; 1.13.4
+     * and earlier reject it.
+     *
+     * elixir-lang/elixir 6447f440d ("Add .. as a nullary operator that returns 0..-1//1", #11623),
+     * first released in v1.14.0.
+     */
+    V1_14,
 
     /**
      * Elixir 1.15.0 added `from_brackets: true` to the `Access.get/2` metadata, but only for the
@@ -124,6 +130,25 @@ enum class QuotingDialect {
      * Read via [mergesEnclosingParenMetadataOntoBlock].
      */
     V1_17,
+
+    /**
+     * Elixir 1.18.0 unescapes the name of a quoted remote call, so `foo."bar\nbaz"()` calls
+     * `:"bar\nbaz"` where 1.17.3 and earlier keep the backslash - and an invalid escape there, as in
+     * `a.'\xg'`, raises `MatchError` instead of being kept.
+     *
+     * elixir-lang/elixir e54b87c18 ("Fix formatter adding extra escapes to remote call functions",
+     * #13960) added `{ok, [UnescapedPart]} = unescape_tokens(...)` to `elixir_tokenizer:handle_dot`,
+     * first released in v1.18.0.
+     */
+    V1_18,
+
+    /**
+     * Elixir 1.19.0 answers `{:error, _}` where 1.18 raises for an invalid escape in a quoted
+     * remote-call name (`MatchError`; elixir-lang/elixir 41151190e, #14587) and for invalid UTF-8 in
+     * a charlist, as in `'\xFF'` (`UnicodeConversionError`; 71e1ddc64, #14666). Both first released
+     * in v1.19.0.
+     */
+    V1_19,
 
     /**
      * Elixir 1.20.0 added `line` metadata to two `__block__` forms that previously carried none: a
@@ -239,10 +264,13 @@ enum class QuotingDialect {
 
             return when {
                 numbers >= Triple(1, 20, 0) -> V1_20
+                numbers >= Triple(1, 19, 0) -> V1_19
+                numbers >= Triple(1, 18, 0) -> V1_18
                 numbers >= Triple(1, 17, 0) -> V1_17
                 numbers >= Triple(1, 16, 2) -> V1_16_2
                 numbers >= Triple(1, 16, 0) -> V1_16_0
                 numbers >= Triple(1, 15, 0) -> V1_15
+                numbers >= Triple(1, 14, 0) -> V1_14
                 numbers >= Triple(1, 13, 0) -> V1_13
                 numbers >= Triple(1, 12, 0) -> V1_12
                 else -> V1_11

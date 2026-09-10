@@ -5,6 +5,15 @@ import org.elixir_lang.psi.quoting.QuotingDialect
 class Issue4068TestCase : ParsingTestCase() {
     fun testStabWhenManyArguments() = assertParsedAndQuotedCorrectly()
 
+    fun testHexadecimalByteEscapeString() = assertParsedAndQuotedCorrectly(false)
+    fun testHexadecimalByteEscapeAfterMultibyte() = assertParsedAndQuotedCorrectly(false)
+    fun testHexadecimalByteEscapeHeredoc() = assertParsedAndQuotedCorrectly(false)
+    fun testHexadecimalByteEscapeCharList() =
+        assertParsedAndQuotedAroundErrorOrRaise(QuotingDialect.V1_19, "Elixir.UnicodeConversionError", false)
+    fun testHexadecimalByteEscapeUtf8String() = assertParsedAndQuotedCorrectly(false)
+    fun testHexadecimalByteEscapeUtf8CharList() = assertParsedAndQuotedCorrectly(false)
+    fun testHexadecimalByteEscapeInterpolated() = assertParsedAndQuotedCorrectly(false)
+
     fun testAtAmbiguousDualOperator() = assertParsedAndQuotedCorrectly(false)
     fun testAtAmbiguousUnaryPlus() = assertParsedAndQuotedCorrectly(false)
     fun testAmbiguousUnaryPlusTypeOperation() = assertParsedAndQuotedCorrectly(false)

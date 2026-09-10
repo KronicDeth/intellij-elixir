@@ -13,10 +13,10 @@ import org.junit.Test
  */
 class QuotingDialectTest {
     @Test
-    fun `1_13 and 1_14 have no bracket or interpolation metadata`() {
+    fun `a nullary range is accepted from 1_14_0`() {
         assertEquals(QuotingDialect.V1_13, QuotingDialect.of("1.13.4"))
-        assertEquals(QuotingDialect.V1_13, QuotingDialect.of("1.14.5"))
-        assertEquals(QuotingDialect.V1_13, QuotingDialect.of("1.14.99"))
+        assertEquals(QuotingDialect.V1_14, QuotingDialect.of("1.14.0"))
+        assertEquals(QuotingDialect.V1_14, QuotingDialect.of("1.14.5"))
     }
 
     /** Both 1.12.0 divergences share this threshold, so it is asserted on the versions either side. */
@@ -37,7 +37,7 @@ class QuotingDialectTest {
 
     @Test
     fun `from_brackets on a bracketed expression starts at 1_15_0`() {
-        assertEquals(QuotingDialect.V1_13, QuotingDialect.of("1.14.5"))
+        assertEquals(QuotingDialect.V1_14, QuotingDialect.of("1.14.5"))
         assertEquals(QuotingDialect.V1_15, QuotingDialect.of("1.15.0"))
         assertEquals(QuotingDialect.V1_15, QuotingDialect.of("1.15.8"))
     }
@@ -64,16 +64,28 @@ class QuotingDialectTest {
     }
 
     @Test
+    fun `a quoted remote call name is unescaped from 1_18_0`() {
+        assertEquals(QuotingDialect.V1_17, QuotingDialect.of("1.17.3"))
+        assertEquals(QuotingDialect.V1_18, QuotingDialect.of("1.18.0"))
+        assertEquals(QuotingDialect.V1_18, QuotingDialect.of("1.18.4"))
+    }
+
+    @Test
+    fun `invalid escapes and encodings are errors rather than raises from 1_19_0`() {
+        assertEquals(QuotingDialect.V1_18, QuotingDialect.of("1.18.4"))
+        assertEquals(QuotingDialect.V1_19, QuotingDialect.of("1.19.0"))
+        assertEquals(QuotingDialect.V1_19, QuotingDialect.of("1.19.5"))
+    }
+
+    @Test
     fun `do-block and empty-file blocks gain line metadata at 1_20_0`() {
-        assertEquals(QuotingDialect.V1_17, QuotingDialect.of("1.19.5"))
+        assertEquals(QuotingDialect.V1_19, QuotingDialect.of("1.19.5"))
         assertEquals(QuotingDialect.V1_20, QuotingDialect.of("1.20.0"))
         assertEquals(QuotingDialect.V1_20, QuotingDialect.of("1.20.2"))
     }
 
     @Test
     fun `versions after the newest threshold resolve to it`() {
-        assertEquals(QuotingDialect.V1_17, QuotingDialect.of("1.18.4"))
-        assertEquals(QuotingDialect.V1_17, QuotingDialect.of("1.19.5"))
         assertEquals(QuotingDialect.V1_20, QuotingDialect.of("1.20.3"))
         assertEquals(QuotingDialect.V1_20, QuotingDialect.of("2.0.0"))
     }
@@ -90,7 +102,7 @@ class QuotingDialectTest {
     fun `an absent patch counts as zero`() {
         assertEquals(QuotingDialect.V1_16_0, QuotingDialect.of("1.16"))
         assertEquals(QuotingDialect.V1_15, QuotingDialect.of("1.15"))
-        assertEquals(QuotingDialect.V1_13, QuotingDialect.of("1.14"))
+        assertEquals(QuotingDialect.V1_14, QuotingDialect.of("1.14"))
     }
 
     /** mise reports Elixir versions with the OTP build tag attached. */
@@ -98,7 +110,7 @@ class QuotingDialectTest {
     fun `a build tag is ignored`() {
         assertEquals(QuotingDialect.V1_13, QuotingDialect.of("1.13.4-otp-24"))
         assertEquals(QuotingDialect.V1_16_2, QuotingDialect.of("1.16.3-otp-26"))
-        assertEquals(QuotingDialect.V1_17, QuotingDialect.of("1.19.5-otp-28"))
+        assertEquals(QuotingDialect.V1_19, QuotingDialect.of("1.19.5-otp-28"))
     }
 
     /** The SDK's own version string, used when the canonical version has not been detected yet. */
@@ -133,39 +145,39 @@ class QuotingDialectTest {
     @Test
     fun `each divergence is on from its own threshold and stays on`() {
         assertEquals(
-            listOf(false, true, true, true, true, true, true, true),
+            listOf(false, true, true, true, true, true, true, true, true, true, true),
             QuotingDialect.entries.map { it.keepsEscapedNewlineInExtractedBuffer }
         )
         assertEquals(
-            listOf(false, true, true, true, true, true, true, true),
+            listOf(false, true, true, true, true, true, true, true, true, true, true),
             QuotingDialect.entries.map { it.emitsEmptyLeadingHeredocSegment }
         )
         assertEquals(
-            listOf(false, false, true, true, true, true, true, true),
+            listOf(false, false, true, true, true, true, true, true, true, true, true),
             QuotingDialect.entries.map { it.unescapesSigilHeredocTerminator }
         )
         assertEquals(
-            listOf(false, false, false, true, true, true, true, true),
+            listOf(false, false, false, false, true, true, true, true, true, true, true),
             QuotingDialect.entries.map { it.emitsFromBracketsOnBracketedExpression }
         )
         assertEquals(
-            listOf(false, false, false, false, true, true, true, true),
+            listOf(false, false, false, false, false, true, true, true, true, true, true),
             QuotingDialect.entries.map { it.emitsFromInterpolation }
         )
         assertEquals(
-            listOf(false, false, false, false, false, true, true, true),
+            listOf(false, false, false, false, false, false, true, true, true, true, true),
             QuotingDialect.entries.map { it.emitsFromBracketsOnEveryBracketForm }
         )
         assertEquals(
-            listOf(false, false, false, false, false, false, true, true),
+            listOf(false, false, false, false, false, false, false, true, true, true, true),
             QuotingDialect.entries.map { it.quotesEllipsisAsNullaryCall }
         )
         assertEquals(
-            listOf(false, false, false, false, false, false, true, true),
+            listOf(false, false, false, false, false, false, false, true, true, true, true),
             QuotingDialect.entries.map { it.quotesAmbiguousDualOperatorAsCall }
         )
         assertEquals(
-            listOf(false, false, false, false, false, false, false, true),
+            listOf(false, false, false, false, false, false, false, false, false, false, true),
             QuotingDialect.entries.map { it.emitsLineMetadataOnBlock }
         )
     }
@@ -178,7 +190,7 @@ class QuotingDialectTest {
     @Test
     fun `merging an enclosing paren's own metadata onto an already-block child is on only below 1_17`() {
         assertEquals(
-            listOf(true, true, true, true, true, true, false, false),
+            listOf(true, true, true, true, true, true, true, false, false, false, false),
             QuotingDialect.entries.map { it.mergesEnclosingParenMetadataOntoBlock }
         )
         assertEquals(true, QuotingDialect.of("1.16.3").mergesEnclosingParenMetadataOntoBlock)
@@ -207,7 +219,7 @@ class QuotingDialectTest {
     @Test
     fun `the unary block wrapper is on only below 1_15`() {
         assertEquals(
-            listOf(true, true, true, false, false, false, false, false),
+            listOf(true, true, true, true, false, false, false, false, false, false, false),
             QuotingDialect.entries.map { it.wrapsSolitaryUnaryNotInEveryBlock }
         )
         assertEquals(true, QuotingDialect.of("1.14.5").wrapsSolitaryUnaryNotInEveryBlock)
