@@ -2,12 +2,11 @@ package org.elixir_lang.beam.assembly
 
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.project.Project
-import com.intellij.psi.PsiDocumentManager
-import com.intellij.psi.PsiFileFactory
 import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.components.JBScrollPane
-import org.elixir_lang.beam.Cache
+import org.elixir_lang.beam.CachedBeamReader
 import org.elixir_lang.beam.chunk.Code
+import org.elixir_lang.beam.scratchDocument
 import org.elixir_lang.util.WriteActions
 import java.awt.event.ItemEvent.DESELECTED
 import java.awt.event.ItemEvent.SELECTED
@@ -16,7 +15,7 @@ import javax.swing.JPanel
 
 private const val DEFAULT_TEXT = "# Could not disassemble Code Chunk"
 
-class Controls(val cache: Cache, val project: Project): JBScrollPane() {
+class Controls(val cache: CachedBeamReader, val project: Project): JBScrollPane() {
     private var assemblyOptions: Code.Options = Code.Options(
             inline = Code.Options.Inline(
                     atoms = true,
@@ -33,10 +32,7 @@ class Controls(val cache: Cache, val project: Project): JBScrollPane() {
     val document: Document
 
     init {
-        val text = computeDocumentText()
-        val psiFile = PsiFileFactory.getInstance(project).createFileFromText(Language, text)
-
-        document = PsiDocumentManager.getInstance(project).getDocument(psiFile)!!
+        document = scratchDocument(project, Language, computeDocumentText())
 
         val scrollable = JPanel()
         scrollable.layout = BoxLayout(scrollable, BoxLayout.LINE_AXIS)
@@ -175,7 +171,7 @@ class Controls(val cache: Cache, val project: Project): JBScrollPane() {
         setViewportView(scrollable)
     }
 
-    private fun computeDocumentText() = cache.code?.assembly(cache, assemblyOptions) ?: DEFAULT_TEXT
+    private fun computeDocumentText() = cache.assembly(assemblyOptions) ?: DEFAULT_TEXT
 
     private fun setDocumentText() {
         val text = computeDocumentText()

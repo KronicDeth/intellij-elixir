@@ -1,19 +1,19 @@
 package org.elixir_lang.beam.chunk.code
 
 import com.intellij.openapi.editor.Document
-import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.project.Project
 import com.intellij.ui.TabbedPaneWrapper
 import com.intellij.ui.tabs.impl.JBEditorTabs
 import com.intellij.util.ui.components.BorderLayoutPanel
-import org.elixir_lang.beam.Cache
+import org.elixir_lang.beam.CachedBeamReader
 import org.elixir_lang.beam.assembly.Controls
 import org.elixir_lang.beam.assembly.file.Type
+import org.elixir_lang.beam.viewerEditor
 import javax.swing.JComponent
 import javax.swing.event.ChangeEvent
 import javax.swing.event.ChangeListener
 
-class Component(private val cache: Cache, private val project: Project, tabbedPane: TabbedPaneWrapper) :
+class Component(private val cache: CachedBeamReader, private val project: Project, tabbedPane: TabbedPaneWrapper) :
         BorderLayoutPanel(), ChangeListener {
     init {
         tabbedPane.addChangeListener(this)
@@ -36,7 +36,7 @@ class Component(private val cache: Cache, private val project: Project, tabbedPa
         addToCenter(editorComponent)
     }
 
-    private fun ensureChildrenAdded() {
+    internal fun ensureChildrenAdded() {
         if (!childrenAdded) {
             addChildren()
             childrenAdded = true
@@ -45,4 +45,4 @@ class Component(private val cache: Cache, private val project: Project, tabbedPa
 }
 
 private fun editorComponent(document: Document, project: Project): JComponent =
-        EditorFactory.getInstance().createEditor(document, project, Type, true).component
+        viewerEditor(document, project, Type).component

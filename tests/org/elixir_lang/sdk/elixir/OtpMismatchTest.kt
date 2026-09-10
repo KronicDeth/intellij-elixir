@@ -17,7 +17,7 @@ import java.util.concurrent.Callable
 /**
  * Tests for [ElixirSdkValidation.detectOtpMismatch].
  *
- * Two overloads are exercised:
+ * The overloads exercised here, and the trap in each:
  *  - `detectOtpMismatch(elixirSdk, erlangSdk)` - the explicit-pairing comparison. The Elixir OTP
  *    major is supplied via [ElixirBuildInfo.ELIXIR_OTP_MAJOR_KEY] user data (no `Elixir.System.beam`
  *    read); the Erlang OTP major is read from a real `<home>/releases/<N>/OTP_VERSION` file (see
@@ -27,6 +27,8 @@ import java.util.concurrent.Callable
  *    in the [ProjectJdkTable]) and honours the per-SDK suppress flag. It is `@RequiresBackgroundThread`
  *    and takes its own short internal read action for that resolution - callers must NOT wrap the
  *    whole call in an outer [ReadAction], which would hold the read lock across its file I/O too.
+ *  - `detectOtpMismatch(elixirHome, cachedElixirOtpMajor, erlangHome)` - the values overload the
+ *    settings dialog uses, taking everything it needs as data so it holds no `Sdk` across threads.
  *
  * Every call is dispatched off the EDT to satisfy the `@RequiresBackgroundThread` contract.
  */
@@ -113,6 +115,49 @@ class OtpMismatchTest : PlatformTestCase() {
     }
 
     // -------------------------------------------------------------------------
+    // detectOtpMismatch(elixirHome, cachedElixirOtpMajor, erlangHome) - values overload
+    //
+    // The settings dialog reads these three values on the EDT and passes them here, rather than
+    // handing the background thread the Sdk objects, which SdkEditor mutates under a write action.
+    //
+    // These two cases differ only in cachedElixirOtpMajor and are the pair that discriminates:
+    // together they pin that a supplied major is used as-is and that its absence is not silently
+    // substituted: the first fails an implementation that ignores the parameter or substitutes a
+    // different major, the second one that invents a value when none is available.
+    //
+    // Neither pins the on-disk read itself - both homes lack a BEAM, so a build that never read one
+    // would satisfy both. ElixirBuildInfoSweepTest covers that against the resolved SDK.
+    //
+    // Neither needs an Elixir SDK, so both run on every leg. The uncached path reaching a
+    // BEAM and producing a major is covered by ElixirBuildInfoSweepTest against the SDK the
+    // run resolved, which spans the whole CI matrix instead of one checked-in beam.
+    // -------------------------------------------------------------------------
+
+    fun testDetectOtpMismatchValues_usesSuppliedMajorWithoutReadingDisk() {
+        val elixirHome = createElixirHomeWithoutBeam()
+        val erlangHome = createErlangHome(major = "26", otpVersion = "26.2.5")
+
+        assertEquals(
+            "A supplied Elixir OTP major must be used as-is, with no Elixir.System.beam read",
+            "27" to "26",
+            detectValuesOnBackgroundThread(elixirHome, "27", erlangHome),
+        )
+    }
+
+    fun testDetectOtpMismatchValues_fallsBackToDiskWhenMajorNotCached() {
+        val elixirHome = createElixirHomeWithoutBeam()
+        val erlangHome = createErlangHome(major = "26", otpVersion = "26.2.5")
+
+        // Same homes as above. With no cached major the Elixir side must come from
+        // lib/elixir/ebin/Elixir.System.beam, which this home deliberately lacks, so the whole
+        // comparison declines rather than reporting a mismatch against a guessed major.
+        assertNull(
+            "With no cached major and no Elixir.System.beam, the comparison must return null",
+            detectValuesOnBackgroundThread(elixirHome, null, erlangHome),
+        )
+    }
+
+    // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------
 
@@ -129,6 +174,34 @@ class OtpMismatchTest : PlatformTestCase() {
         ApplicationManager.getApplication()
             .executeOnPooledThread(Callable { ElixirSdkValidation.detectOtpMismatch(elixirSdk) })
             .get()
+
+    private fun detectValuesOnBackgroundThread(
+        elixirHome: String,
+        cachedElixirOtpMajor: String?,
+        erlangHome: String,
+    ): Pair<String, String>? =
+        ApplicationManager.getApplication()
+            .executeOnPooledThread(
+                Callable {
+                    ElixirSdkValidation.detectOtpMismatch(
+                        elixirHome = elixirHome,
+                        cachedElixirOtpMajor = cachedElixirOtpMajor,
+                        erlangHome = erlangHome,
+                    )
+                },
+            )
+            .get()
+
+    /**
+     * Creates a real Elixir home with the `lib/elixir/ebin` layout present but no
+     * `Elixir.System.beam`, so the uncached path reaches the read and declines.
+     */
+    private fun createElixirHomeWithoutBeam(): String {
+        val home = FileUtil.createTempDirectory("elixir_home_no_beam", null).also { tempDirs.add(it) }
+        val ebin = File(home, "lib/elixir/ebin")
+        assertTrue("Failed to create $ebin", ebin.mkdirs())
+        return home.path
+    }
 
     private fun newElixirSdk(otpMajor: String): Sdk {
         val sdk = ProjectJdkImpl("Test Elixir SDK", Type.instance, "/fake/elixir/1.16", "")

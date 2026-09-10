@@ -1,6 +1,10 @@
 package org.elixir_lang.sdk.erlang_dependent
 
 import com.intellij.icons.AllIcons
+import com.intellij.openapi.application.ModalityState
+import com.intellij.openapi.application.UI
+import com.intellij.openapi.application.asContextElement
+import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.diagnostic.trace
 import com.intellij.openapi.options.ConfigurationException
@@ -13,16 +17,26 @@ import com.intellij.openapi.ui.ComboBox
 import com.intellij.openapi.util.Comparing
 import com.intellij.ui.SimpleListCellRenderer
 import com.intellij.ui.components.JBCheckBox
+import com.intellij.util.concurrency.ThreadingAssertions
+import com.intellij.util.concurrency.annotations.RequiresEdt
 import com.intellij.util.ui.JBUI
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.elixir_lang.debug
+import org.elixir_lang.sdk.elixir.ElixirBuildInfo
 import org.elixir_lang.sdk.elixir.ElixirErlangClasspath.addNewCodePathsFromInternErlangSdk
 import org.elixir_lang.sdk.elixir.ElixirErlangClasspath.removeCodePathsFromInternalErlangSdk
 import org.elixir_lang.sdk.elixir.ElixirSdkMutation
 import org.elixir_lang.sdk.elixir.ElixirSdkPathConfigurator
 import org.elixir_lang.sdk.elixir.ElixirSdkValidation
 import org.elixir_lang.sdk.elixir.ElixirSdkValidation.hasErlangClasspathInRoots
+import org.elixir_lang.util.ElixirAppCoroutineService
 import org.elixir_lang.util.WriteActions
-import org.elixir_lang.util.runWithEdtGuard
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
 import java.awt.event.ItemEvent
@@ -53,6 +67,19 @@ class AdditionalDataConfigurable(
             isVisible = false
         }
     private val sdkModelListener: SdkModel.Listener
+
+    /**
+     * Cancelling a detection cannot interrupt a read already inside the blocking filesystem calls,
+     * so they are serialised rather than merely superseded.
+     *
+     * Per instance, not per application: a home on a dead WSL distro can block indefinitely, and an
+     * application-wide limit would park every other editor's detection behind it.
+     */
+    private val otpDetectionDispatcher = Dispatchers.IO.limitedParallelism(1, "Elixir OTP mismatch detection")
+
+    private var otpMismatchJob: Job? = null
+
+    private var otpScope: CoroutineScope? = null
     private var elixirSdk: Sdk? = null
     private var modified = false
     private var freeze = false
@@ -402,8 +429,17 @@ class AdditionalDataConfigurable(
     }
 
     override fun disposeUIResources() {
+        otpMismatchJob = null
+        otpScope?.cancel()
+        otpScope = null
         sdkModel.removeListener(sdkModelListener)
     }
+
+    private fun otpScope(): CoroutineScope =
+        otpScope?.takeIf { it.isActive }
+            ?: service<ElixirAppCoroutineService>()
+                .supervisedChildScope("AdditionalDataConfigurable.otpMismatch")
+                .also { otpScope = it }
 
     private fun addErlangSdk(sdk: Sdk) {
         internalErlangSdksComboBoxModel.addElement(sdk)
@@ -446,33 +482,64 @@ class AdditionalDataConfigurable(
      * Computes whether the currently selected Erlang SDK's OTP major matches the OTP major that
      * the Elixir SDK was compiled against, and updates [otpMismatchWarningLabel] accordingly.
      *
-     * Delegates to [ElixirSdkValidation.detectOtpMismatch] which encapsulates the detection logic
-     * (cache check → BEAM file read → `OTP_VERSION` read). Uses [runWithEdtGuard] so the
-     * filesystem reads do not block the EDT.
+     * Runs on the application coroutine scope, not [org.elixir_lang.util.runWithEdtGuard]: the
+     * platform calls this from inside its own read action, and that helper would not drop it - see
+     * its KDoc.
+     *
+     * The combo box and the suppress checkbox both re-enter here, so a superseded result must not
+     * overwrite a newer one.
      *
      * Informational only - never prevents applying settings.
-     * Hidden when the suppress checkbox is checked.
      */
+    @RequiresEdt
     private fun updateOtpMismatchWarning() {
+        ThreadingAssertions.assertEventDispatchThread()
+
+        otpMismatchJob?.cancel()
+        otpMismatchJob = null
+
         val myElixirSdk = elixirSdk
         val selectedErlangSdk = internalErlangSdksComboBox.selectedItem as? Sdk
 
         if (myElixirSdk == null || selectedErlangSdk == null || suppressOtpMismatchWarningCheckBox.isSelected) {
-            otpMismatchWarningLabel.isVisible = false
+            hideOtpMismatchWarning()
             return
         }
 
-        val mismatch = runWithEdtGuard("Detecting OTP version compatibility...") {
-            ElixirSdkValidation.detectOtpMismatch(myElixirSdk, selectedErlangSdk)
-        }
+        // Read on the EDT: these are the dialog's editable copies, which SdkEditor commits to
+        // inside a write action on apply and reset.
+        val elixirHome = myElixirSdk.homePath ?: return hideOtpMismatchWarning()
+        val erlangHome = selectedErlangSdk.homePath ?: return hideOtpMismatchWarning()
+        // Always null here: the dialog gets a clone, and the key is on the registered SDK.
+        val cachedElixirOtpMajor = myElixirSdk.getUserData(ElixirBuildInfo.ELIXIR_OTP_MAJOR_KEY)
 
-        if (mismatch != null) {
-            otpMismatchWarningLabel.text =
-                    "Elixir SDK was compiled for OTP ${mismatch.first} but is paired with OTP ${mismatch.second}"
-            otpMismatchWarningLabel.isVisible = true
-        } else {
-            otpMismatchWarningLabel.isVisible = false
+        // This label's state is owned by the asynchronous detection below and is written once, when
+        // the result lands. Touching it here would repaint the row twice and, because GridBagLayout
+        // skips invisible components, reflow every row under it in between.
+        otpMismatchJob = otpScope().launch {
+            val mismatch = withContext(otpDetectionDispatcher) {
+                ElixirSdkValidation.detectOtpMismatch(
+                    elixirHome = elixirHome,
+                    cachedElixirOtpMajor = cachedElixirOtpMajor,
+                    erlangHome = erlangHome,
+                )
+            }
+
+            // Unqualified UI dispatch defaults to nonModal, which would hold the update until this
+            // modal dialog closes. any() is only legal because this block touches no PSI, VFS or
+            // project model - keep it that way.
+            withContext(Dispatchers.UI + ModalityState.any().asContextElement()) {
+                if (mismatch != null) {
+                    otpMismatchWarningLabel.text =
+                            "Elixir SDK was compiled for OTP ${mismatch.first} but is paired with OTP ${mismatch.second}"
+                }
+                otpMismatchWarningLabel.isVisible = mismatch != null
+            }
         }
+    }
+
+    private fun hideOtpMismatchWarning() {
+        otpMismatchWarningLabel.isVisible = false
     }
 
     private fun updateWarningLabel() {

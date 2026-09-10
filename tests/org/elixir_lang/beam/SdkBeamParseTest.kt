@@ -1,16 +1,13 @@
 package org.elixir_lang.beam
 
-import org.elixir_lang.beam.Beam.Companion.from
 import org.elixir_lang.beam.chunk.CallDefinitions.Companion.macroNameAritySortedSetByMacro
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
-import java.io.BufferedInputStream
-import java.io.DataInputStream
 import java.io.File
-import java.io.FileInputStream
 
 /**
  * Data-driven exhaustive coverage for the BEAM chunk parser: one test per `.beam` file shipped by
@@ -18,7 +15,7 @@ import java.io.FileInputStream
  * ships gets its own pass/fail, so a new Erlang/Elixir version's format/pattern issues surface here
  * (per-module) rather than in the wild.
  *
- * The parse path (`Beam.from` / atoms / call-definitions) is platform-free, so this is a plain
+ * The parse path (`BeamReader` / atoms / call-definitions) is platform-free, so this is a plain
  * JUnit 4 parameterized test rather than a PlatformTestCase - one lightweight instance per beam.
  * Version-specific *structural* assertions live in [BeamTest] against frozen fixtures.
  */
@@ -29,16 +26,19 @@ class SdkBeamParseTest(
 ) {
     @Test
     fun parses() {
-        val beam = DataInputStream(BufferedInputStream(FileInputStream(beamFile))).use { from(it, beamFile.path) }
-        assertNotNull("$label: Beam.from returned null", beam)
+        val read = BeamReader.readResult(beamFile.readBytes(), beamFile.path) { reader ->
+            macroNameAritySortedSetByMacro(reader)
+            Triple(reader.atomsResult, reader.exportsResult, reader.localsResult)
+        }
+        assertNotNull("$label: not read as a BEAM", read)
+        assertTrue("$label: $read", read is ReadResult.Present)
 
-        val atoms = beam!!.atoms()
-        assertNotNull("$label: atoms() returned null", atoms)
-        assertFalse("$label: blank module name", atoms!!.moduleName().isNullOrEmpty())
+        val (atoms, exports, locals) = (read as ReadResult.Present).value
+        assertFalse("$label: blank module name, got $atoms", atoms.valueOrNull?.moduleName().isNullOrEmpty())
 
-        // Must not throw for any real module the SDK ships.
-        beam.callDefinitionsList(atoms)
-        macroNameAritySortedSetByMacro(beam, atoms)
+        // Every call definition chunk a real module ships must read.
+        assertFalse("$label: $exports", exports is ReadResult.Unreadable)
+        assertFalse("$label: $locals", locals is ReadResult.Unreadable)
     }
 
     companion object {

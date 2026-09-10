@@ -39,7 +39,9 @@ class Chunk private constructor(@JvmField val typeID: String, @JvmField val data
 
         fun from(dataInputStream: DataInputStream): Chunk? =
                 typeID(dataInputStream)?.let { typeID ->
-                    length(dataInputStream)?.let { length ->
+                    // Read from bytes in memory, where available() is exact: a longer length would allocate an
+                    // array for bytes that are not there.
+                    length(dataInputStream)?.takeIf { it <= dataInputStream.available() }?.let { length ->
                         dataInputStream.safeReadBytes(length.toInt())?.let { data ->
                             val padding = ((ALIGNMENT - length % ALIGNMENT) % ALIGNMENT).toInt()
                             dataInputStream.skipBytes(padding)
@@ -73,7 +75,9 @@ class Chunk private constructor(@JvmField val typeID: String, @JvmField val data
             var unsignedInt: Long = 0
             for (i in 0 until UNSIGNED_INT_BYTE_COUNT) {
                 val unsignedByte = unsignedByte(bytes[offset + i]).first
-                unsignedInt += (unsignedByte shl BYTE_BIT_COUNT * (UNSIGNED_INT_BYTE_COUNT - 1 - i)).toLong()
+                // Widen before shifting: `0xFF shl 24` overflows Int, and toLong() then sign-extends,
+                // so every field from 0x80000000 up came back negative.
+                unsignedInt += unsignedByte.toLong() shl (BYTE_BIT_COUNT * (UNSIGNED_INT_BYTE_COUNT - 1 - i))
             }
             return Pair.pair(unsignedInt, UNSIGNED_INT_BYTE_COUNT)
         }

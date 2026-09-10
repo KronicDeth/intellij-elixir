@@ -1,20 +1,27 @@
 package org.elixir_lang.beam.chunk
 
-import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.util.component1
 import com.intellij.openapi.util.component2
+import org.elixir_lang.beam.RefusedBeamData
 import org.elixir_lang.beam.chunk.Chunk.Companion.unsignedInt
 import org.elixir_lang.beam.chunk.Chunk.Companion.unsignedShort
 import org.elixir_lang.beam.chunk.lines.LineReference
 import org.elixir_lang.beam.term.Atom
 import org.elixir_lang.beam.term.Integer
 import org.elixir_lang.beam.term.Term
-import org.elixir_lang.beam.term.unsignedIntToInt
+import org.elixir_lang.beam.declaredCount
 import java.nio.charset.Charset
 
 class Lines(val lineReferenceList: List<LineReference>, val fileNameList: List<String>) {
     companion object {
-        private val logger = Logger.getInstance(Lines::class.java)
+        /** Version, flags, and the line instruction, line reference and file name counts. */
+        private const val HEADER_BYTE_COUNT = 5 * Int.SIZE_BYTES
+
+        /** A line item is a compact term, which can be a single byte. */
+        private const val LINE_ITEM_MIN_BYTE_COUNT = 1
+
+        /** An empty file name is only its 16-bit length. */
+        private const val FILE_NAME_MIN_BYTE_COUNT = Short.SIZE_BYTES
 
         //
         /**
@@ -40,34 +47,49 @@ class Lines(val lineReferenceList: List<LineReference>, val fileNameList: List<S
          */
         fun from(chunk: Chunk, literalFloat: Boolean = true): Lines {
             val data = chunk.data
+
+            if (data.size < HEADER_BYTE_COUNT) {
+                throw RefusedBeamData("Line chunk is ${data.size} bytes, shorter than its $HEADER_BYTE_COUNT byte header")
+            }
+
             var offset = 0
 
             val (version, versionByteCount) = unsignedInt(data, offset)
             offset += versionByteCount
 
-            assert(version == 0L)
+            // OTP's loader ignores both, but the layout below is only known for version 0 without flags.
+            if (version != 0L) throw RefusedBeamData("Line chunk version $version is not 0")
 
             val (flags, flagsByteCount) = unsignedInt(data, offset)
             offset += flagsByteCount
 
-            assert(flags == 0L)
+            if (flags != 0L) throw RefusedBeamData("Line chunk flags $flags are not 0")
 
             val (_, lineInstructionCountByteCount) = unsignedInt(data, offset)
             offset += lineInstructionCountByteCount
 
             val (lineReferenceCount, lineReferenceCountByteCount) = unsignedInt(data, offset)
-            val lineReferenceCountInt = unsignedIntToInt(lineReferenceCount)
             offset += lineReferenceCountByteCount
 
             val (fileNameCount, fileNameCountByteCount) = unsignedInt(data, offset)
             offset += fileNameCountByteCount
+
+            val lineReferenceCountInt =
+                declaredCount(lineReferenceCount, data.size - offset, LINE_ITEM_MIN_BYTE_COUNT, "Line references")
 
             var fileNameIndex = 0
             val lineReferences = mutableListOf<LineReference>()
             var fileNameChanges = 0
 
             while (lineReferences.size < lineReferenceCountInt) {
-                val (term, termByteCount) = Term.from(data, offset, literalFloat)
+                // Items vary in size, so a count the chunk could hold can still run past it.
+                val (term, termByteCount) = try {
+                    Term.from(data, offset, literalFloat)
+                } catch (_: IndexOutOfBoundsException) {
+                    throw RefusedBeamData("Line references run past the end of a ${data.size} byte chunk")
+                } catch (exception: IllegalArgumentException) {
+                    throw RefusedBeamData("Line references hold an undecodable term: ${exception.message}")
+                }
                 offset += termByteCount
 
                 when (term) {
@@ -78,7 +100,9 @@ class Lines(val lineReferenceList: List<LineReference>, val fileNameList: List<S
                     is Integer ->
                             lineReferences.add(LineReference(fileNameIndex, term.long))
                     else ->
-                            TODO()
+                        throw RefusedBeamData(
+                            "Line references hold a ${term.javaClass.simpleName}, which is neither a file name nor a line",
+                        )
                 }
             }
 
@@ -87,9 +111,15 @@ class Lines(val lineReferenceList: List<LineReference>, val fileNameList: List<S
                https://github.com/erlang/otp/blob/OTP-20.2.2/erts/emulator/beam/beam_load.c?utf8=%E2%9C%93#L1795 */
             val charset = Charset.forName("ISO-8859-1")
 
-            repeat(unsignedIntToInt(fileNameCount)) {
+            val fileNamesRunPast = "Line file names run past the end of a ${data.size} byte chunk"
+
+            repeat(declaredCount(fileNameCount, data.size - offset, FILE_NAME_MIN_BYTE_COUNT, "Line file names")) {
+                if (offset + FILE_NAME_MIN_BYTE_COUNT > data.size) throw RefusedBeamData(fileNamesRunPast)
+
                 val (fileNameSize, fileNameSizeByteCount) = unsignedShort(data, offset)
                 offset += fileNameSizeByteCount
+
+                if (offset + fileNameSize > data.size) throw RefusedBeamData(fileNamesRunPast)
 
                 val fileName = String(data, offset, fileNameSize, charset)
                 offset += fileNameSize

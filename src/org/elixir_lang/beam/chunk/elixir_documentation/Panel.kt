@@ -1,13 +1,12 @@
 package org.elixir_lang.beam.chunk.elixir_documentation
 
-import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.project.Project
-import com.intellij.psi.PsiDocumentManager
-import com.intellij.psi.PsiFileFactory
 import com.intellij.util.containers.ContainerUtil.createWeakValueMap
 import org.elixir_lang.ElixirFileType
 import org.elixir_lang.ElixirLanguage
 import org.elixir_lang.beam.chunk.ElixirDocumentation
+import org.elixir_lang.beam.scratchDocument
+import org.elixir_lang.beam.viewerEditor
 import org.elixir_lang.util.WriteActions
 import java.awt.GridLayout
 import java.lang.ref.WeakReference
@@ -18,9 +17,8 @@ import javax.swing.event.TreeSelectionListener
 const val DEFAULT_TEXT = "# Select a module, definition, or clause to view its AST as code"
 
 class Panel(private val elixirDocumentationTree: Tree, project: Project, private val moduleName: String?): JPanel(GridLayout(1, 1)), TreeSelectionListener {
-    private val psiFile = PsiFileFactory.getInstance(project).createFileFromText(ElixirLanguage, DEFAULT_TEXT)
-    private val document = PsiDocumentManager.getInstance(project).getDocument(psiFile)!!
-    private val editor = EditorFactory.getInstance().createEditor(document, project, ElixirFileType.INSTANCE, true)
+    private val document = scratchDocument(project, ElixirLanguage, DEFAULT_TEXT)
+    private val editor = viewerEditor(document, project, ElixirFileType.INSTANCE)
 
     private val callbackDocByCallbackDoc = createWeakValueMap<CallbackDoc, String>()
     private var callbackDocs = WeakReference<String>(null)

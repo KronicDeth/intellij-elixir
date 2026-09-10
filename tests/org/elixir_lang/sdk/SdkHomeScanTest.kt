@@ -1,7 +1,11 @@
 package org.elixir_lang.sdk
 
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.util.Version
+import com.intellij.testFramework.registerOrReplaceServiceInstance
+import org.elixir_lang.sdk.wsl.MockWslCompatService
+import org.elixir_lang.sdk.wsl.WslCompatService
 import org.elixir_lang.PlatformTestCase
 import org.elixir_lang.jps.shared.sdk.SdkPaths
 import java.io.File
@@ -250,6 +254,39 @@ class SdkHomeScanTest : PlatformTestCase() {
                 FileUtil.toSystemIndependentName(home.absolutePath),
                 FileUtil.toSystemIndependentName(homePathByVersion.getValue(key))
             )
+        }
+    }
+
+    fun `test mergeSystemShare keeps an install whose home directory is not a version`() {
+        withTempRoot { root ->
+            // Debian and Homebrew both publish `current` beside the versions, pointing at the
+            // payload directory. Here the payload IS `current`, so the home's own final segment is
+            // the unparseable name - and preferring it would key the install UNKNOWN_VERSION, which
+            // this merge drops outright rather than merely sorting last.
+            val payload = File(root, "elixir/current")
+            assertTrue(payload.mkdirs())
+            assertTrue(File(root, "elixir/1.14.0").mkdirs())
+
+            val home = FileUtil.toSystemIndependentName(payload.absolutePath)
+            installWslCompatService(
+                object : WslCompatService by MockWslCompatService() {
+                    override fun canonicalizePath(path: String): String {
+                        val independent = FileUtil.toSystemIndependentName(path)
+                        return if (independent.endsWith("/elixir/1.14.0")) home else independent
+                    }
+                },
+            )
+
+            val homePathByVersion = mutableMapOf<SdkHomeKey, String>()
+            SdkHomePaths.mergeSystemShare(homePathByVersion, "elixir", root.absolutePath)
+
+            assertEquals(
+                "the alias and its target are one install and it must survive the UNKNOWN_VERSION " +
+                        "filter, got ${homePathByVersion.keys.map { it.qualifier }}",
+                listOf("1.14.0"),
+                homePathByVersion.keys.map { it.qualifier },
+            )
+            assertEquals(home, FileUtil.toSystemIndependentName(homePathByVersion.values.single()))
         }
     }
 
@@ -665,6 +702,231 @@ class SdkHomeScanTest : PlatformTestCase() {
         }
     }
 
+    fun `test mergeMise collapses version aliases that resolve to one install`() {
+        withTempRoot { home ->
+            // mise publishes a version alias per prefix - 26, 26.2 and 26.2.5 are symlinks to
+            // 26.2.5.21 - so a scan sees four directories for one Erlang install.
+            val installs = File(home, "${SdkPaths.MISE_POSIX_PATH_FROM_HOME}/erlang")
+            val aliases = listOf("26", "26.2", "26.2.5")
+            val concrete = File(installs, "26.2.5.21")
+            assertTrue(concrete.mkdirs())
+            aliases.forEach { assertTrue(File(installs, it).mkdirs()) }
+
+            // Stands in for the symlink resolution canonicalizePath does on a real install; the
+            // test cannot create symlinks, which need a privilege the Windows CI runner lacks.
+            val canonical = FileUtil.toSystemIndependentName(concrete.absolutePath)
+            installWslCompatService(
+                object : WslCompatService by MockWslCompatService() {
+                    override fun canonicalizePath(path: String): String {
+                        val independent = FileUtil.toSystemIndependentName(path)
+                        if (!aliases.any { independent.endsWith("/erlang/$it") }) return independent
+
+                        // Production cannot currently produce a separator split - both of
+                        // canonicalizePath's branches are system-dependent - so this fabricates one
+                        // to pin the defensive normalisation in mergeNameSubdirectories. A literal
+                        // backslash, not toSystemDependentName, which is the identity off Windows.
+                        return if (independent.endsWith("/erlang/${aliases.first()}")) {
+                            canonical.replace('/', '\\')
+                        } else {
+                            canonical
+                        }
+                    }
+                },
+            )
+
+            val homePathByVersion = mutableMapOf<SdkHomeKey, String>()
+            SdkHomePaths.mergeMise(homePathByVersion, "erlang", home.path)
+
+            assertEquals(
+                "the four alias directories name one install and must be offered once, got " +
+                        "${homePathByVersion.keys.map { it.qualifier }}",
+                1,
+                homePathByVersion.size,
+            )
+            assertEquals(canonical, homePathByVersion.values.single())
+            assertEquals(
+                "the surviving entry must name the concrete install",
+                "26.2.5.21",
+                homePathByVersion.keys.single().qualifier,
+            )
+        }
+    }
+
+    fun `test mergeMise lets the directory naming the home win over a longer sibling`() {
+        withTempRoot { home ->
+            // The length tie-break would take the longer name, and both of these parse, so only the
+            // "name equals the home's final segment" rule picks the install the home actually is.
+            val installs = File(home, "${SdkPaths.MISE_POSIX_PATH_FROM_HOME}/erlang")
+            val concrete = File(installs, "26.2.5.21")
+            assertTrue(concrete.mkdirs())
+            assertTrue(File(installs, "26.2.5.21-latest").mkdirs())
+
+            val canonical = FileUtil.toSystemIndependentName(concrete.absolutePath)
+            installWslCompatService(
+                object : WslCompatService by MockWslCompatService() {
+                    override fun canonicalizePath(path: String): String {
+                        val independent = FileUtil.toSystemIndependentName(path)
+                        return if (independent.endsWith("/erlang/26.2.5.21-latest")) canonical else independent
+                    }
+                },
+            )
+
+            val homePathByVersion = mutableMapOf<SdkHomeKey, String>()
+            SdkHomePaths.mergeMise(homePathByVersion, "erlang", home.path)
+
+            assertEquals(
+                "both names are one install and must be offered once, got " +
+                        "${homePathByVersion.keys.map { it.qualifier }}",
+                1,
+                homePathByVersion.size,
+            )
+            assertEquals(
+                "the directory the home resolves to must name it, not the longer sibling",
+                "26.2.5.21",
+                homePathByVersion.keys.single().qualifier,
+            )
+        }
+    }
+
+    fun `test mergeMise lets the home-naming directory win even when it is seen second`() {
+        withTempRoot { home ->
+            // Companion to the test above, for the other side of the comparison. The alias sorts
+            // first, so it becomes the incumbent, and it is both longer and parseable - so neither
+            // the length tie-break nor the parse preference can rescue the concrete install. Only
+            // the candidate-side name match does.
+            val installs = File(home, "${SdkPaths.MISE_POSIX_PATH_FROM_HOME}/erlang")
+            val concrete = File(installs, "26.2.5.21")
+            assertTrue(concrete.mkdirs())
+            assertTrue(File(installs, "1.0.0-nightly-build").mkdirs())
+
+            val canonical = FileUtil.toSystemIndependentName(concrete.absolutePath)
+            installWslCompatService(
+                object : WslCompatService by MockWslCompatService() {
+                    override fun canonicalizePath(path: String): String {
+                        val independent = FileUtil.toSystemIndependentName(path)
+                        return if (independent.endsWith("/erlang/1.0.0-nightly-build")) canonical else independent
+                    }
+                },
+            )
+
+            val homePathByVersion = mutableMapOf<SdkHomeKey, String>()
+            SdkHomePaths.mergeMise(homePathByVersion, "erlang", home.path)
+
+            assertEquals(
+                "the directory the home resolves to must name it however the listing is ordered",
+                "26.2.5.21",
+                homePathByVersion.keys.single().qualifier,
+            )
+        }
+    }
+
+    fun `test mergeMise prefers a parseable version over an unparseable alias`() {
+        withTempRoot { home ->
+            // mise publishes `latest` beside the versions. Deliberately longer than the version here,
+            // so the length tie-break would pick it and only the parse preference can save it.
+            // An unparseable winner would carry UNKNOWN_VERSION, which sorts last and is dropped
+            // outright by mergeSystemShare's filter, losing the install.
+            val installs = File(home, "${SdkPaths.MISE_POSIX_PATH_FROM_HOME}/elixir")
+            val concrete = File(installs, "1.19.1")
+            assertTrue(concrete.mkdirs())
+            assertTrue(File(installs, "latest-stable").mkdirs())
+
+            // Resolve both to a home OUTSIDE the scanned directory, so the "name equals the home's
+            // last segment" shortcut cannot fire and the tie-break is what decides.
+            val elsewhere = FileUtil.toSystemIndependentName(
+                File(home, "opt/elixir/current").also { assertTrue(it.mkdirs()) }.absolutePath,
+            )
+            installWslCompatService(
+                object : WslCompatService by MockWslCompatService() {
+                    override fun canonicalizePath(path: String): String {
+                        val independent = FileUtil.toSystemIndependentName(path)
+                        val underScan = independent.endsWith("/elixir/latest-stable") ||
+                                independent.endsWith("/elixir/1.19.1")
+                        return if (underScan) elsewhere else independent
+                    }
+                },
+            )
+
+            val homePathByVersion = mutableMapOf<SdkHomeKey, String>()
+            SdkHomePaths.mergeMise(homePathByVersion, "elixir", home.path)
+
+            assertEquals(
+                "the two names are one install and must be offered once, got " +
+                        "${homePathByVersion.keys.map { it.qualifier }}",
+                1,
+                homePathByVersion.size,
+            )
+            assertEquals(
+                "the parseable version must name the home, not the longer unparseable alias",
+                "1.19.1",
+                homePathByVersion.keys.single().qualifier,
+            )
+        }
+    }
+
+    fun `test mergeMise prefers a parseable candidate over an unparseable incumbent`() {
+        // Mirror of the test above, for the other side of the parse comparison. Children are scanned
+        // in name order, so the alias is the incumbent and the version is the candidate.
+        assertWinner(incumbent = "-latest", candidate = "1.19.1", expected = "1.19.1")
+    }
+
+    fun `test mergeMise falls back to the longer name when both parse and neither names the home`() {
+        // Neither name matches the home's final segment and both parse, so only the length rule is
+        // left to choose. `1.19.1` sorts first and is therefore the incumbent.
+        assertWinner(incumbent = "1.19.1", candidate = "1.19.1-rc1", expected = "1.19.1-rc1")
+    }
+
+    /**
+     * Puts two sibling directories under mise's Elixir root that resolve to a home OUTSIDE the
+     * scanned directory - so the "name equals the home's final segment" rule cannot fire - and
+     * asserts which of them ends up naming the single surviving entry.
+     *
+     * [incumbent] must sort before [candidate]: children are scanned in name order, so that is what
+     * puts each on the side of the comparison its case is about.
+     */
+    private fun assertWinner(incumbent: String, candidate: String, expected: String) {
+        withTempRoot { home ->
+            val installs = File(home, "${SdkPaths.MISE_POSIX_PATH_FROM_HOME}/elixir")
+            listOf(incumbent, candidate).forEach { assertTrue(File(installs, it).mkdirs()) }
+            val elsewhere = FileUtil.toSystemIndependentName(
+                File(home, "opt/elixir/current").also { assertTrue(it.mkdirs()) }.absolutePath,
+            )
+            installWslCompatService(
+                object : WslCompatService by MockWslCompatService() {
+                    override fun canonicalizePath(path: String): String {
+                        val independent = FileUtil.toSystemIndependentName(path)
+                        val underScan = independent.endsWith("/elixir/$incumbent") ||
+                                independent.endsWith("/elixir/$candidate")
+                        return if (underScan) elsewhere else independent
+                    }
+                },
+            )
+
+            val homePathByVersion = mutableMapOf<SdkHomeKey, String>()
+            SdkHomePaths.mergeMise(homePathByVersion, "elixir", home.path)
+
+            assertEquals(
+                "both names are one install and must be offered once, got " +
+                        "${homePathByVersion.keys.map { it.qualifier }}",
+                1,
+                homePathByVersion.size,
+            )
+            assertEquals(expected, homePathByVersion.keys.single().qualifier)
+        }
+    }
+
+    fun `test mergeMise resolves an exact tie by name order`() {
+        // Same length, both parse, and the home is named by neither - so every rule in
+        // preferredHomeDirectory is exhausted and only the scan order decides.
+        //
+        // This pins the contract (the first name wins), not the sort that delivers it: NTFS and ext4
+        // both hand listFiles() these two in name order anyway, so deleting the sortedBy in
+        // mergeNameSubdirectories leaves this green. Verified by mutation. The sort is there for
+        // filesystems that do not - ext4 htree on a large directory, APFS - which a test on a
+        // two-entry temp dir cannot reproduce.
+        assertWinner(incumbent = "1.19.1", candidate = "1.19.2", expected = "1.19.1")
+    }
+
     fun `test mergeElixirInstallScript finds an installed version`() {
         assertFindsVersionedHome(SdkPaths.ELIXIR_INSTALL_INSTALLS_PATH_FROM_HOME) { map, home ->
             SdkHomePaths.mergeElixirInstallScript(map, "elixir", home)
@@ -762,6 +1024,14 @@ class SdkHomeScanTest : PlatformTestCase() {
                     .containsAll(listOf(Version(1, 20, 3), Version(1, 19, 5), Version(1, 18, 4)))
             )
         }
+    }
+
+    private fun installWslCompatService(service: WslCompatService) {
+        ApplicationManager.getApplication().registerOrReplaceServiceInstance(
+            WslCompatService::class.java,
+            service,
+            testRootDisposable,
+        )
     }
 
     private fun <T> withUserHome(userHome: String, body: () -> T): T {

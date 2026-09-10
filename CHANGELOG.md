@@ -88,6 +88,13 @@
     `defmodule`, `defimpl` or `defprotocol`.** Fixes
     [#4041](https://github.com/KronicDeth/intellij-elixir/issues/4041).
 
+- [#4062](https://github.com/KronicDeth/intellij-elixir/pull/4062) [@sh41](https://github.com/sh41)
+  - **A version manager's SDK is offered once instead of once per version alias.** mise publishes
+    `26`, `26.2` and `26.2.5` alongside `26.2.5.21`, which listed the same install four times.
+  - **A file that is not a BEAM no longer raises an IDE error report.** Any `*.beam` reaches the
+    decompiler on its name alone, so a placeholder or a half-written file blamed the plugin.
+  - **A corrupt BEAM file no longer crashes indexing.**
+
 - [#4039](https://github.com/KronicDeth/intellij-elixir/pull/4039) [@sh41](https://github.com/sh41)
   - **Go To Declaration, autocomplete and Quick Documentation now work for functions declared with
     `defdelegate`, including delegations into compiled modules such as `Map.values/1`.** Fixes
@@ -338,6 +345,12 @@
     no longer freeze if WSL is slow or hangs while starting.**
 
 ### Threading / Platform Hygiene
+
+- [#4062](https://github.com/KronicDeth/intellij-elixir/pull/4062) [@sh41](https://github.com/sh41)
+  - **The Erlang SDK's OTP-mismatch warning is detected without holding the settings dialog's read
+    lock.** Refs [#3955](https://github.com/KronicDeth/intellij-elixir/issues/3955).
+  - **The Elixir SDK's compiled-against OTP release is read once per install**, rather than on every
+    Erlang SDK selection in the settings dialog.
 
 - [#4002](https://github.com/KronicDeth/intellij-elixir/pull/4002) [@sh41](https://github.com/sh41)
   - **Quick Docs on a HEEx component tag no longer uses an internal platform API.** A `def`/`defp`

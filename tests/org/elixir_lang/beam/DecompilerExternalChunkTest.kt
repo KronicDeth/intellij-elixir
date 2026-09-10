@@ -45,7 +45,7 @@ import java.nio.charset.StandardCharsets
  * built with `--enable-docs` (via mise/kerl). The decompiler picks up
  * external chunks via
  * [org.elixir_lang.beam.chunk.beam_documentation.Documentation.fromExternalChunk]
- * and embedded docs via [org.elixir_lang.beam.Beam.documentation].
+ * and embedded docs via [org.elixir_lang.beam.BeamReader.documentation].
  *
  * Each test decompiles a `.beam` file and compares the result against
  * a golden `.ex` file in the same `ebin/` directory.

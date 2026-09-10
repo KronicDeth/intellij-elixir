@@ -13,6 +13,11 @@ import com.intellij.platform.ide.progress.runWithModalProgressBlocking
  * because starting modal progress from inside a write action would deadlock.
  *
  * Use this to guard any blocking subprocess or I/O call that may be triggered from the EDT.
+ *
+ * It does NOT drop read access. Called from inside the platform's own read action,
+ * [runWithModalProgressBlocking] grants the modal computation a read permit rather than releasing
+ * the caller's, so a callee guarding with `check(!holdsReadLock())` still throws, and there is no
+ * supported way to opt out. Launch lock-sensitive I/O on a service coroutine scope instead (#3955).
  */
 fun <T> runWithEdtGuard(
     title: String,

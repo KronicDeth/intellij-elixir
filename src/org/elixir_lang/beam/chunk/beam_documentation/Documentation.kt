@@ -35,31 +35,35 @@ class Documentation(private val docsList: OtpErlangList) {
     companion object {
         private val LOGGER = Logger.getInstance(Documentation::class.java)
 
-        fun from(chunk: Chunk): Documentation? = from(chunk.data)
+        fun from(chunk: Chunk): Documentation? = decoded(chunk.data)
 
         /**
-         * Parses a `docs_v1` EEP-48 term from raw Erlang External Term Format bytes.
+         * Parses a `docs_v1` EEP-48 term from raw Erlang External Term Format bytes, or null when they do not
+         * decode.
          *
          * This handles both embedded BEAM `Docs` chunk data and external `.chunk` files
          * (e.g. `<app>/doc/chunks/<module>.chunk`) which use the same ETF encoding.
          */
-        fun from(data: ByteArray): Documentation? {
-            return try {
-                val (term, _) = binaryToTerm(data, 0)
-
-                if (term is OtpErlangTuple) {
-                    val firstAtom = term.elements().firstOrNull() as? OtpErlangAtom ?: return null
-                    if (firstAtom.atomValue() != "docs_v1") {
-                        return null
-                    }
-
-                    val list = OtpErlangList(term.elements())
-                    Documentation(list)
-                } else {
-                    null
-                }
+        fun from(data: ByteArray): Documentation? =
+            try {
+                decoded(data)
             } catch (e: Exception) {
                 LOGGER.debug("Failed to parse EEP-48 documentation from byte data", e)
+                null
+            }
+
+        private fun decoded(data: ByteArray): Documentation? {
+            val (term, _) = binaryToTerm(data, 0)
+
+            return if (term is OtpErlangTuple) {
+                val firstAtom = term.elements().firstOrNull() as? OtpErlangAtom ?: return null
+                if (firstAtom.atomValue() != "docs_v1") {
+                    return null
+                }
+
+                val list = OtpErlangList(term.elements())
+                Documentation(list)
+            } else {
                 null
             }
         }

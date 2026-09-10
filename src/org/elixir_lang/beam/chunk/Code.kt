@@ -1,9 +1,9 @@
 package org.elixir_lang.beam.chunk
 
-import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.util.component1
 import com.intellij.openapi.util.component2
-import org.elixir_lang.beam.Cache
+import org.elixir_lang.beam.CachedBeamReader
+import org.elixir_lang.beam.RefusedBeamData
 import org.elixir_lang.beam.chunk.Chunk.Companion.unsignedInt
 import org.elixir_lang.beam.chunk.code.Operation
 import org.elixir_lang.beam.term.Literal
@@ -54,7 +54,7 @@ class Code(private val operationList: List<Operation>) {
     }
     private val labelIndexToFuncInfoIndex by lazy { mutableMapOf<Int, Int?>() }
 
-    fun assembly(cache: Cache, options: Options): String =
+    fun assembly(cache: CachedBeamReader, options: Options): String =
         indentOperationList().joinToString("\n") { (indent, operation) ->
             val operationAssembly = operation.assembly(cache, options)
 
@@ -166,9 +166,8 @@ class Code(private val operationList: List<Operation>) {
             }
 
     companion object {
-        private val LOGGER = Logger.getInstance(Code::class.java)
-
-        fun from(chunk: Chunk, literalFloat: Boolean = true): Code {
+        /** [warn] is told of a format newer than this decoder knows, which still decodes. */
+        fun from(chunk: Chunk, warn: (String) -> Unit, literalFloat: Boolean = true): Code {
             val data = chunk.data
             var offset = 0
 
@@ -179,7 +178,7 @@ class Code(private val operationList: List<Operation>) {
             offset += versionByteCount
 
             if (version != 0L) {
-                LOGGER.error(
+                throw RefusedBeamData(
                         "Code version ($version) differs from expect 0.  There was an incompatible change in " +
                                 "https://github.com/erlang/otp/blob/master/lib/compiler/src/genop.tab"
                 )
@@ -190,7 +189,7 @@ class Code(private val operationList: List<Operation>) {
 
             val expectedMaxOpcode = org.elixir_lang.beam.chunk.code.operation.Code.entries.max().number
             if (maxOpcode > expectedMaxOpcode) {
-                LOGGER.warn(
+                warn(
                     "Max opcode ($maxOpcode) exceeds expected max opcode ($expectedMaxOpcode).  Additional " +
                             "opcodes have been added to the end of " +
                             "https://github.com/erlang/otp/blob/master/lib/compiler/src/genop.tab"

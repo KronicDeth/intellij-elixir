@@ -1,6 +1,5 @@
 package org.elixir_lang.beam.psi
 
-import com.ericsson.otp.erlang.OtpErlangDecodeException
 import com.intellij.codeInsight.multiverse.CodeInsightContextManager
 import com.intellij.codeInsight.multiverse.CodeInsightContextManagerImpl
 import com.intellij.codeInsight.multiverse.isSharedSourceSupportEnabled
@@ -27,8 +26,7 @@ import com.intellij.reference.SoftReference
 import com.intellij.util.ArrayUtil
 import com.intellij.util.IncorrectOperationException
 import org.elixir_lang.ElixirLanguage
-import org.elixir_lang.beam.Beam
-import org.elixir_lang.beam.Beam.Companion.from
+import org.elixir_lang.beam.BeamReader
 import org.elixir_lang.beam.MacroNameArity
 import org.elixir_lang.beam.chunk.Atoms
 import org.elixir_lang.beam.chunk.CallDefinitions
@@ -43,7 +41,6 @@ import org.elixir_lang.psi.ElixirFile
 import org.elixir_lang.psi.stub.impl.ElixirFileStubImpl
 import org.elixir_lang.type.Visibility
 import org.jetbrains.annotations.NonNls
-import java.io.IOException
 import java.lang.ref.SoftReference as JavaSoftReference
 
 // See com.intellij.psi.impl.compiled.ClsFileImpl
@@ -157,9 +154,8 @@ class BeamFileImpl private constructor(
 
                 val rootStub = ElixirFileStubImpl()
                 val moduleName =
-                    from(virtualFile)
-                        ?.atoms()
-                        ?.moduleName()
+                    BeamReader.readResult(virtualFile) { it.atoms?.moduleName() }
+                        ?.valueOrNull
                         ?: virtualFile.nameWithoutExtension
                 val name = defmoduleArgument(moduleName)
                 LOGGER.warn("Building minimal stub tree for ${virtualFile.presentableUrl} (module $name)")
@@ -501,20 +497,12 @@ class BeamFileImpl private constructor(
 
         @JvmStatic
         fun buildFileStub(bytes: ByteArray?, path: String): Stub? =
-            safeFrom(bytes, path)?.let { buildModuleStub(it) }?.parentStub
+            bytes
+                ?.let { BeamReader.read(it, path) { reader -> buildModuleStub(reader) } }
+                ?.parentStub
 
-        private fun safeFrom(bytes: ByteArray?, path: String): Beam? = try {
-            from(bytes!!, path)
-        } catch (e: IOException) {
-            LOGGER.error("IOException during BeamFileImpl.buildFileStub(bytes, $path)", e)
-            null
-        } catch (e: OtpErlangDecodeException) {
-            LOGGER.error("OtpErlangDecodeException during BeamFileImpl.buildFileStub(bytes, $path)", e)
-            null
-        }
-
-        private fun buildModuleStub(beam: Beam): ModuleStub<*>? = beam
-            .atoms()
+        private fun buildModuleStub(reader: BeamReader): ModuleStub<*>? = reader
+            .atoms
             ?.let { atoms ->
                 atoms
                     .moduleName()
@@ -522,15 +510,15 @@ class BeamFileImpl private constructor(
                         val name = defmoduleArgument(moduleName)
                         val parentStub = ElixirFileStubImpl()
                         val moduleStub: ModuleStub<*> = ModuleStubImpl<ModuleImpl<*>>(parentStub, name)
-                        buildCallDefinitions(moduleStub, beam, atoms)
-                        buildTypeDefinitions(moduleStub, beam, atoms)
+                        buildCallDefinitions(moduleStub, reader)
+                        buildTypeDefinitions(moduleStub, reader, atoms)
 
                         moduleStub
                     }
             }
 
-        private fun buildTypeDefinitions(parentStub: ModuleStub<*>, beam: Beam, atoms: Atoms) {
-            TypeDefinitions.visibilityNameAritySortedSetByVisibility(parentStub, beam, atoms)
+        private fun buildTypeDefinitions(parentStub: ModuleStub<*>, reader: BeamReader, atoms: Atoms) {
+            TypeDefinitions.visibilityNameAritySortedSetByVisibility(parentStub, reader, atoms)
                 .forEach { (_, visibilityNameAritySortedSet) ->
                     visibilityNameAritySortedSet.forEach { visibilityNameArity ->
                         buildTypeDefinition(parentStub, visibilityNameArity)
@@ -551,8 +539,8 @@ class BeamFileImpl private constructor(
                 TypeDefinitionStub<*> =
             TypeDefinitionStubImpl<TypeDefinitionImpl<*>>(parentStub, visibility, name, arity)
 
-        private fun buildCallDefinitions(parentStub: ModuleStub<*>, beam: Beam, atoms: Atoms) {
-            CallDefinitions.macroNameAritySortedSetByMacro(beam, atoms).forEach { (_, macroNameAritySortedSet) ->
+        private fun buildCallDefinitions(parentStub: ModuleStub<*>, reader: BeamReader) {
+            CallDefinitions.macroNameAritySortedSetByMacro(reader).forEach { (_, macroNameAritySortedSet) ->
                 macroNameAritySortedSet.forEach { macroNameArity ->
                     buildCallDefinition(parentStub, macroNameArity)
                 }

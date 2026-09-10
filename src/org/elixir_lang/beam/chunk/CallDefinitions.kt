@@ -1,7 +1,8 @@
 package org.elixir_lang.beam.chunk
 
+import org.elixir_lang.beam.declaredCount
 import org.elixir_lang.call.Visibility
-import org.elixir_lang.beam.Beam
+import org.elixir_lang.beam.BeamReader
 import org.elixir_lang.beam.chunk.Chunk.Companion.unsignedInt
 import org.elixir_lang.beam.chunk.call_definitions.CallDefinition.Companion.from
 import org.elixir_lang.beam.chunk.Chunk.TypeID
@@ -39,6 +40,9 @@ class CallDefinitions(private val typeID: TypeID, var callDefinitionCollection: 
     fun size(): Int = callDefinitionCollection.size
 
     companion object {
+        /** Atom index, arity and label, each an unsigned int. */
+        private const val CALL_DEFINITION_BYTE_COUNT = 3 * Int.SIZE_BYTES
+
         private val VISIBILITY_BY_TYPE_ID: Map<TypeID, Visibility> =
             mapOf(TypeID.EXPT to Visibility.PUBLIC, TypeID.LOCT to Visibility.PRIVATE)
 
@@ -47,8 +51,13 @@ class CallDefinitions(private val typeID: TypeID, var callDefinitionCollection: 
                 val callDefinitionCollection: MutableCollection<CallDefinition> = HashSet()
                 var offset = 0
                 val exportCountByteCount = unsignedInt(chunk.data, 0)
-                val exportCount = exportCountByteCount.first
                 offset += exportCountByteCount.second
+                val exportCount = declaredCount(
+                    exportCountByteCount.first,
+                    chunk.data.size - offset,
+                    CALL_DEFINITION_BYTE_COUNT,
+                    typeID.toString(),
+                )
                 for (i in 0 until exportCount) {
                     val (first, second) = from(chunk, offset, atoms)
                     callDefinitionCollection.add(first)
@@ -59,17 +68,19 @@ class CallDefinitions(private val typeID: TypeID, var callDefinitionCollection: 
                 null
             }
 
-        fun macroNameAritySortedSetByMacro(beam: Beam, atoms: Atoms): Map<String, SortedSet<MacroNameArity>> =
-            beam.callDefinitionsList(atoms).fold(mutableMapOf()) { acc, callDefinitions ->
-                val macroNameAritySortedSetByMacro = callDefinitions.macroNameAritySortedSetByMacro()
+        /** Exports and locals together; an unreadable one is reported and the other still counts. */
+        fun macroNameAritySortedSetByMacro(reader: BeamReader): Map<String, SortedSet<MacroNameArity>> =
+            listOfNotNull(reader.exports, reader.locals)
+                .fold(mutableMapOf()) { acc, callDefinitions ->
+                    val macroNameAritySortedSetByMacro = callDefinitions.macroNameAritySortedSetByMacro()
 
-                for ((macro, macroNameAritySortedSet) in macroNameAritySortedSetByMacro) {
-                    val accMacroNameAritySortedSet = acc.computeIfAbsent(macro) { TreeSet() }
+                    for ((macro, macroNameAritySortedSet) in macroNameAritySortedSetByMacro) {
+                        val accMacroNameAritySortedSet = acc.computeIfAbsent(macro) { TreeSet() }
 
-                    accMacroNameAritySortedSet.addAll(macroNameAritySortedSet)
+                        accMacroNameAritySortedSet.addAll(macroNameAritySortedSet)
+                    }
+
+                    acc
                 }
-
-                acc
-            }
     }
 }

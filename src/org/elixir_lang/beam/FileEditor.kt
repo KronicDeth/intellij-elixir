@@ -2,6 +2,7 @@ package org.elixir_lang.beam
 
 import com.intellij.codeHighlighting.BackgroundEditorHighlighter
 import com.intellij.openapi.actionSystem.IdeActions
+import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.fileEditor.FileEditor
 import com.intellij.openapi.fileEditor.FileEditorLocation
 import com.intellij.openapi.fileEditor.FileEditorState
@@ -24,24 +25,25 @@ class FileEditor(
 ): UserDataHolderBase(), FileEditor {
     private var isActive: Boolean = false
 
-    // GUI
-    private lateinit var rootTabbedPane: TabbedPaneWrapper
+    // The platform asks for the component many times per open, so the tabs are built once.
+    private val rootTabbedPaneLazy = lazy {
+        val descriptor = PrevNextActionsDescriptor(IdeActions.ACTION_NEXT_EDITOR_TAB, IdeActions.ACTION_PREVIOUS_EDITOR_TAB)
+
+        TabbedPaneWrapper.createJbTabs(project, SwingConstants.TOP, descriptor, this).also { tabbedPane ->
+            CachedBeamReader.from(virtualFile)?.let { cache ->
+                cache.chunkCollection().forEach { chunk ->
+                    addTab(tabbedPane, cache, chunk)
+                }
+            }
+        }
+    }
+    private val rootTabbedPane by rootTabbedPaneLazy
+
     override fun addPropertyChangeListener(listener: PropertyChangeListener) {}
     override fun removePropertyChangeListener(listener: PropertyChangeListener) {}
 
     override fun getBackgroundHighlighter(): BackgroundEditorHighlighter? = null
-    override fun getComponent(): JComponent {
-        val descriptor = PrevNextActionsDescriptor(IdeActions.ACTION_NEXT_EDITOR_TAB, IdeActions.ACTION_PREVIOUS_EDITOR_TAB)
-        rootTabbedPane = TabbedPaneWrapper.createJbTabs(project, SwingConstants.TOP, descriptor, this)
-
-        Cache.from(virtualFile)?.let { cache ->
-            cache.chunkCollection().forEach { chunk ->
-                addTab(rootTabbedPane, cache, chunk)
-            }
-        }
-
-        return rootTabbedPane.component
-    }
+    override fun getComponent(): JComponent = rootTabbedPane.component
 
     override fun getCurrentLocation(): FileEditorLocation? = null
     override fun getFile(): VirtualFile = virtualFile
@@ -63,12 +65,26 @@ class FileEditor(
     }
 
     override fun dispose() {
+        if (rootTabbedPaneLazy.isInitialized()) {
+            releaseTabEditors()
+        }
+
         Disposer.dispose(this)
+    }
+
+    /** Each tab creates its editors when first selected, and a tab that is not selected is detached from the hierarchy. */
+    private fun releaseTabEditors() {
+        val tabComponents = (0 until rootTabbedPane.tabCount).map(rootTabbedPane::getComponentAt)
+        val editorFactory = EditorFactory.getInstance()
+
+        editorFactory.allEditors
+            .filter { editor -> tabComponents.any { SwingUtilities.isDescendingFrom(editor.component, it) } }
+            .forEach(editorFactory::releaseEditor)
     }
 
     override fun setState(state: FileEditorState) {}
 
-    private fun addTab(tabbedPaneWrapper: TabbedPaneWrapper, cache: Cache, chunk: Chunk) {
+    private fun addTab(tabbedPaneWrapper: TabbedPaneWrapper, cache: CachedBeamReader, chunk: Chunk) {
         val typeID = chunk.typeID
         val component: JComponent = when (typeID) {
             Chunk.TypeID.ATOM.toString(), Chunk.TypeID.ATU8.toString() ->
@@ -95,7 +111,7 @@ class FileEditor(
             Chunk.TypeID.IMPT.toString() ->
                 JBScrollPane(Table(org.elixir_lang.beam.chunk.imports.Model(cache.imports)))
             Chunk.TypeID.LINE.toString() ->
-                TabbedPane(cache.lines!!)
+                TabbedPane(cache.lines)
             Chunk.TypeID.LITT.toString() ->
                 JBScrollPane(Table(org.elixir_lang.beam.chunk.literals.Model(cache.literals)))
             Chunk.TypeID.LOCT.toString() ->

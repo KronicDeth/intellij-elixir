@@ -5,7 +5,7 @@ import com.ericsson.otp.erlang.OtpErlangObject
 import com.ericsson.otp.erlang.OtpErlangTuple
 import com.intellij.psi.PsiElement
 import com.intellij.psi.ResolveState
-import org.elixir_lang.beam.Beam
+import org.elixir_lang.beam.BeamReader
 import org.elixir_lang.beam.psi.Module
 import org.elixir_lang.beam.psi.CallDefinition as BeamCallDefinition
 import org.elixir_lang.beam.psi.impl.CallDefinitionImpl
@@ -17,11 +17,12 @@ import org.elixir_lang.beam.decompiler.Options
 import org.elixir_lang.utils.ElixirModulesUtil.erlangModuleNameToElixir
 
 object BeamDocsHelper {
-    fun fetchDocs(element: PsiElement): FetchedDocs? = Beam
-        .from(element.containingFile.originalFile.virtualFile)
-        ?.let { beam ->
-            beam.atoms()?.moduleName()?.let { erlangModuleNameToElixir(it) }?.let { module ->
-                val documentation = beam.documentation()
+    fun fetchDocs(element: PsiElement): FetchedDocs? =
+        BeamReader.read(element.containingFile.originalFile.virtualFile) { reader -> fetchDocs(element, reader) }
+
+    private fun fetchDocs(element: PsiElement, reader: BeamReader): FetchedDocs? =
+            reader.atoms?.moduleName()?.let { erlangModuleNameToElixir(it) }?.let { module ->
+                val documentation = reader.documentation
 
                 when (element) {
                     is Module -> documentation?.moduleDocs?.englishDocs?.let { moduleDoc ->
@@ -71,7 +72,6 @@ object BeamDocsHelper {
                     else -> null
                 }
             }
-        }
 
     /**
      * Extracts `@spec` strings from the EEP-48 metadata `signature` key.
