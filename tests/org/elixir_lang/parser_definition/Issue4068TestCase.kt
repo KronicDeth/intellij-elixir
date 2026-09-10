@@ -27,6 +27,8 @@ class Issue4068TestCase : ParsingTestCase() {
     fun testHeredocSpacesThenTabs() = assertParsedAndQuotedCorrectly(false)
     fun testCharListHeredocSpacesThenTabs() = assertParsedAndQuotedCorrectly(false)
 
+    fun testSemicolon() = assertParsedAndQuotedCorrectly(false)
+
     fun testCharacterNewlineLine() = assertParsedAndQuotedCorrectly(false)
     fun testCharacterEscapedNewlineLine() = assertParsedAndQuotedCorrectly(false)
 

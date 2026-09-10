@@ -1495,9 +1495,16 @@ object QuotableImpl {
         )
 
         // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L76-L79
-        // See QuotingDialect.V1_20.
+        // `grammar -> eoe` has always had `line`, so a file of only `;` or newlines does too; `'$empty'` only gained
+        // it with QuotingDialect.V1_20.
         val emptyMetadata =
-            if (dialectFor(file).emitsLineMetadataOnBlock) metadata(file) else OtpErlangList()
+            if (PsiTreeUtil.getChildOfType(file, ElixirEndOfExpression::class.java) != null ||
+                dialectFor(file).emitsLineMetadataOnBlock
+            ) {
+                metadata(file)
+            } else {
+                OtpErlangList()
+            }
         return toBlock(quotedChildren, rearrangesUnaryOperators(file), emptyMetadata)
     }
 
