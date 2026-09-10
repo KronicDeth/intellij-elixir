@@ -240,10 +240,11 @@ object ParentImpl {
     fun quoteEmpty(): OtpErlangObject = elixirString("")
 
     // See https://github.com/elixir-lang/elixir/commit/e89e9d874bf803379d729a3bae185052a5323a85
+    @RequiresReadLock
     @JvmStatic
     fun quoteInterpolation(quote: Quote, interpolation: ElixirInterpolation): OtpErlangObject =
         if (quote.isCharList) {
-            val quotedChildren = QuotableImpl.quote(interpolation.children)
+            val quotedChildren = QuotableImpl.quote(interpolation)
             val interpolationMetadata = metadata(interpolation)
 
             quotedInterpolationCall(
@@ -254,7 +255,7 @@ object ParentImpl {
                 quotedChildren
             )
         } else {
-            val quotedChildren = QuotableImpl.quote(interpolation.children)
+            val quotedChildren = QuotableImpl.quote(interpolation)
             val interpolationMetadata = metadata(interpolation)
 
             val quotedKernelToStringCall = quotedInterpolationCall(
@@ -281,9 +282,10 @@ object ParentImpl {
      * `"\"\#{a}\"" |> Code.string_to_quoted |> Macro.to_string`, so interpolation has to be represented as a type call
      * (`:::`) to binary of a call of `Kernel.to_string`
      */
+    @RequiresReadLock
     @JvmStatic
     fun quoteInterpolation(interpolation: ElixirInterpolation): OtpErlangObject {
-        val quotedChildren = QuotableImpl.quote(interpolation.children)
+        val quotedChildren = QuotableImpl.quote(interpolation)
         val interpolationMetadata = metadata(interpolation)
 
         val quotedKernelToStringCall = quotedInterpolationCall(

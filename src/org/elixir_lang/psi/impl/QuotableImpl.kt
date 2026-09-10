@@ -1165,12 +1165,32 @@ object QuotableImpl {
         )
     }
 
-    @Contract(pure = true)
+    /**
+     * An interpolation's body, as a block. Elixir parses its tokens as a grammar of their own, so an empty body follows
+     * the empty-file rule of quote(ElixirFile) - but its `line` is always 1, not the interpolation's.
+     */
+    @RequiresReadLock
     @JvmStatic
-    fun quote(children: Array<PsiElement>): OtpErlangObject =
-        children.asSequence().filter { it !is Unquoted }.map {
+    fun quote(interpolation: ElixirInterpolation): OtpErlangObject {
+        val children = interpolation.children
+        val quotables = children.filter { it !is Unquoted }.map {
             it as? Quotable ?: TODO("Child, $it, must be Quotable or Unquoted")
-        }.toList().toTypedArray().let { quote(it) }
+        }
+        val quotedChildren = quotables.map(Quotable::quote)
+        // A newline in an empty interpolation is not parsed as an end of expression, so look for the tokens themselves.
+        val emptyMetadata =
+            if (quotedChildren.isEmpty() &&
+                (interpolation.node.getChildren(null).any {
+                    it.psi !is PsiComment && (it.textContains('\n') || it.textContains(';'))
+                } || dialectFor(interpolation).emitsLineMetadataOnBlock)
+            ) {
+                otpErlangList(keywordTuple("line", 1))
+            } else {
+                OtpErlangList()
+            }
+
+        return toBlock(quotedChildren, rearrangesUnaryOperators(quotables.firstOrNull()), emptyMetadata)
+    }
 
     @Contract(pure = true)
     @JvmStatic
@@ -1668,13 +1688,6 @@ object QuotableImpl {
                     "line",
                     lineNumber(node) + 1
             )
-
-    @Contract(pure = true)
-    private fun quote(children: Array<Quotable>) =
-        // Uses toBlock because this is for inside interpolation, which functions the same as an embedded file
-        children.map(Quotable::quote).let {
-            toBlock(it, rearrangesUnaryOperators(children.firstOrNull()))
-        }
 
     @JvmStatic
     fun quotedFunctionCall(
