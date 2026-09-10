@@ -45,6 +45,11 @@ enum class QuotingDialect {
      * `elixir_interpolation:extract/8`, first released in v1.13.0. Not conditioned on the
      * interpolation flag, so `~s` and `~S` alike; a plain heredoc reaches the same text through
      * `unescape_tokens` and a sigil line's terminator was already unescaped in v1.12.3.
+     *
+     * 1.13.0 also gives a remote call the line of its name, where 1.12.3 gave it the line of the `.`, so
+     * `:erlang.` + newline + `get(1)` is a call on line 2; the `.` node keeps the dot's line in both. From
+     * elixir-lang/elixir 376ff1e51 ("Add more token metadata to aliases and remote calls", #11038), whose
+     * `build_dot` carries the identifier's location. Read via [putsRemoteCallOnNameLine].
      */
     V1_13,
 
@@ -183,6 +188,9 @@ enum class QuotingDialect {
 
     /** Whether `?` + newline or `?\` + newline advances the line of what follows. */
     val countsNewlineInCharacter: Boolean get() = this >= V1_19
+
+    /** Whether a remote call split by a newline after its `.` carries its name's line rather than the dot's. */
+    val putsRemoteCallOnNameLine: Boolean get() = this >= V1_13
 
     /** The leading `""` a heredoc gets when its first content is `#{...}`. */
     val emitsEmptyLeadingHeredocSegment: Boolean get() = this >= V1_12

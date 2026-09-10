@@ -157,6 +157,10 @@ class QuotingDialectTest {
             QuotingDialect.entries.map { it.countsNewlineInCharacter }
         )
         assertEquals(
+            listOf(false, false, true, true, true, true, true, true, true, true, true),
+            QuotingDialect.entries.map { it.putsRemoteCallOnNameLine }
+        )
+        assertEquals(
             listOf(false, true, true, true, true, true, true, true, true, true, true),
             QuotingDialect.entries.map { it.emitsEmptyLeadingHeredocSegment }
         )

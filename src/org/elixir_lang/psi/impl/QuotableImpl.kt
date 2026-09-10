@@ -910,6 +910,7 @@ object QuotableImpl {
         )
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun quote(qualifiedNoArgumentsCall: QualifiedNoArgumentsCall<*>): OtpErlangObject {
@@ -917,17 +918,18 @@ object QuotableImpl {
 
         val relativeIdentifier = qualifiedNoArgumentsCall.relativeIdentifier
         val quotedRelativeIdentifier = relativeIdentifier.quote()
+        val dotOperator = dotOperator(qualifiedNoArgumentsCall)
 
         val quotedIdentifier = quotedFunctionCall(
                 ".",
-                metadata(relativeIdentifier),
+                metadata(dotOperator),
                 quotedQualifier,
                 quotedRelativeIdentifier
         )
 
         val doBlock = qualifiedNoArgumentsCall.doBlock
 
-        val line = lineNumberKeywordTuple(relativeIdentifier.node)
+        val line = remoteCallMetadata(dotOperator, relativeIdentifier).elementAt(0)
 
         val metadataElements = if (doBlock != null) {
             arrayOf(line)
@@ -945,6 +947,7 @@ object QuotableImpl {
         )
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun quote(qualifiedNoParenthesesCall: QualifiedNoParenthesesCall<*>): OtpErlangObject {
@@ -952,10 +955,11 @@ object QuotableImpl {
 
         val relativeIdentifier = qualifiedNoParenthesesCall.relativeIdentifier
         val quotedRelativeIdentifier = relativeIdentifier.quote()
+        val dotOperator = dotOperator(qualifiedNoParenthesesCall)
 
         val quotedIdentifier = quotedFunctionCall(
                 ".",
-                metadata(relativeIdentifier),
+                metadata(dotOperator),
                 quotedQualifier,
                 quotedRelativeIdentifier
         )
@@ -965,12 +969,13 @@ object QuotableImpl {
 
         return quotedBlockCall(
                 quotedIdentifier,
-                metadata(relativeIdentifier),
+                remoteCallMetadata(dotOperator, relativeIdentifier),
                 quotedArguments,
                 doBlock
         )
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun quote(qualifiedParenthesesCall: QualifiedParenthesesCall<*>): OtpErlangObject {
@@ -978,11 +983,11 @@ object QuotableImpl {
 
         val relativeIdentifier = qualifiedParenthesesCall.relativeIdentifier
         val quotedRelativeIdentifier = relativeIdentifier.quote()
+        val dotOperator = dotOperator(qualifiedParenthesesCall)
 
-        val metadata = metadata(relativeIdentifier)
         val quotedIdentifier = quotedFunctionCall(
                 ".",
-                metadata,
+                metadata(dotOperator),
                 quotedQualifier,
                 quotedRelativeIdentifier
         )
@@ -992,7 +997,7 @@ object QuotableImpl {
 
         return quotedParenthesesCall(
                 quotedIdentifier,
-                metadata,
+                remoteCallMetadata(dotOperator, relativeIdentifier),
                 parenthesesArgumentsList,
                 doBlock
         )
@@ -1947,6 +1952,22 @@ object QuotableImpl {
         val digits = sequence.openHexadecimalEscapeSequence?.text?.takeIf { it.length == 2 } ?: return null
 
         return digits.toInt(16).takeIf { it >= 0x80 }
+    }
+
+    private fun dotOperator(qualified: PsiElement): ElixirDotInfixOperator =
+        PsiTreeUtil.getChildOfType(qualified, ElixirDotInfixOperator::class.java)!!
+
+    /** The call's own metadata, which differs from its `.`'s only when a newline separates the dot from the name. */
+    @RequiresReadLock
+    private fun remoteCallMetadata(dotOperator: ElixirDotInfixOperator, relativeIdentifier: PsiElement): OtpErlangList {
+        val nameMetadata = metadata(relativeIdentifier)
+        val dotMetadata = metadata(dotOperator)
+
+        return if (nameMetadata == dotMetadata || dialectFor(relativeIdentifier).putsRemoteCallOnNameLine) {
+            nameMetadata
+        } else {
+            dotMetadata
+        }
     }
 
     /**
