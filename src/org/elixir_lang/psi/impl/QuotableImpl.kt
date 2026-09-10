@@ -87,6 +87,7 @@ object QuotableImpl {
     private val EXCLAMATION_POINT = OtpErlangAtom("!")
     private val MULTIPLE_ALIASES = OtpErlangAtom("{}")
     private val NOT = OtpErlangAtom("not")
+    private val RANGE = OtpErlangAtom("..")
     private val REARRANGED_UNARY_OPERATORS = arrayOf(EXCLAMATION_POINT, NOT)
     private val UNQUOTE_SPLICING = OtpErlangAtom("unquote_splicing")
     private val WHEN = OtpErlangAtom("when")
@@ -209,6 +210,7 @@ object QuotableImpl {
         )
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun quote(ternary: Ternary): OtpErlangObject = when (val leftOperand = ternary.leftOperand()) {
@@ -229,8 +231,31 @@ object QuotableImpl {
                     quotedRangeStep
             )
         }
-        // invalid for Elixir native
-        else -> quote(ternary as Infix)
+        else -> {
+            val quoted = quote(ternary as Infix)
+            val quotedLeftOperand = Macro.callArguments(quoted as OtpErlangTuple).elementAt(0)
+
+            // `build_op` checks the quoted left operand, so parentheses around the range do not stop the step joining it.
+            // Small integer operands quote as an OtpErlangString, not an OtpErlangList.
+            val range = (quotedLeftOperand as? OtpErlangTuple)
+                ?.takeIf { it.arity() == 3 && it.elementAt(0) == RANGE }
+                ?.takeIf { it.elementAt(2) is OtpErlangList || it.elementAt(2) is OtpErlangString }
+                ?.let { Macro.callArguments(it) }
+                ?.takeIf { it.arity() == 2 }
+
+            if (range != null) {
+                quotedFunctionCall(
+                        OtpErlangAtom("..//"),
+                        quotedLeftOperand.elementAt(1) as OtpErlangList,
+                        range.elementAt(0),
+                        range.elementAt(1),
+                        Macro.callArguments(quoted).elementAt(1)
+                )
+            } else {
+                // invalid for Elixir native
+                quoted
+            }
+        }
     }
 
     @Contract(pure = true)
