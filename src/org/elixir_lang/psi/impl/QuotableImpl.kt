@@ -356,6 +356,7 @@ object QuotableImpl {
         return OtpErlangList(associationsBase.children.map { it as Quotable }.map(Quotable::quote).toTypedArray())
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun quote(atom: ElixirAtom): OtpErlangObject =
@@ -364,7 +365,7 @@ object QuotableImpl {
 
                 assert(atomFragmentNode.elementType === ElixirTypes.ATOM_FRAGMENT)
 
-                OtpErlangAtom(atomFragmentNode.text)
+                identifierAtom(atomFragmentNode.text, atom)
             }
 
     @Contract(pure = true)
@@ -547,7 +548,7 @@ object QuotableImpl {
     @JvmStatic
     fun quote(keywordKey: ElixirKeywordKey): OtpErlangObject =
             keywordKey.line?.quoteAsAtom()
-            ?: OtpErlangAtom(computeReadAction<String> { keywordKey.text })
+            ?: computeReadAction<OtpErlangObject> { identifierAtom(keywordKey.text, keywordKey) }
 
     @Contract(pure = true)
     @JvmStatic
@@ -561,6 +562,7 @@ object QuotableImpl {
     }
 
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun quote(atUnqualifiedBracketOperation: AtUnqualifiedBracketOperation): OtpErlangObject {
@@ -576,7 +578,7 @@ object QuotableImpl {
         val identifier = identifierNode.text
         val metadata = metadata(atUnqualifiedBracketOperation)
 
-        val quotedOperand = quotedVariable(identifier, metadata)
+        val quotedOperand = quotedVariable(identifierAtom(identifier, atUnqualifiedBracketOperation), metadata)
         val quotedContainer = quotedFunctionCall(quotedOperator, metadata, quotedOperand)
 
         val bracketArguments = atUnqualifiedBracketOperation.bracketArguments
@@ -592,6 +594,7 @@ object QuotableImpl {
         )
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun quote(atUnqualifiedNoParenthesesCall: AtUnqualifiedNoParenthesesCall<*>): OtpErlangObject {
@@ -604,7 +607,7 @@ object QuotableImpl {
 
         val identifierNode = identifierNodes[0]
         val identifier = identifierNode.text
-        val quotedIdentifier = OtpErlangAtom(identifier)
+        val quotedIdentifier = identifierAtom(identifier, atUnqualifiedNoParenthesesCall)
 
         val noParenthesesOneArgument = atUnqualifiedNoParenthesesCall.noParenthesesOneArgument
         val quotedArguments = noParenthesesOneArgument.quoteArguments()
@@ -1003,10 +1006,12 @@ object QuotableImpl {
         )
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun quote(unqualifiedBracketOperation: UnqualifiedBracketOperation): OtpErlangObject {
-        val quotedIdentifier = OtpErlangAtom(unqualifiedBracketOperation.node.firstChildNode.text)
+        val quotedIdentifier =
+            identifierAtom(unqualifiedBracketOperation.node.firstChildNode.text, unqualifiedBracketOperation)
         val quotedContainer = quotedVariable(quotedIdentifier, metadata(unqualifiedBracketOperation))
 
         val bracketArguments = unqualifiedBracketOperation.bracketArguments
@@ -1025,10 +1030,11 @@ object QuotableImpl {
     /* Replaces `nil` argument in variables with the quoted ElixirMatchedNotParenthesesArguments.
      *
      */
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun quote(unqualifiedNoParenthesesCall: UnqualifiedNoParenthesesCall<*>): OtpErlangObject {
-        val quotedIdentifier = OtpErlangAtom(unqualifiedNoParenthesesCall.functionName())
+        val quotedIdentifier = identifierAtom(unqualifiedNoParenthesesCall.functionName(), unqualifiedNoParenthesesCall)
         val noParenthesesOneArgument = unqualifiedNoParenthesesCall.noParenthesesOneArgument
         val quotedArguments = noParenthesesOneArgument.quoteArguments()
         val doBlock = unqualifiedNoParenthesesCall.doBlock
@@ -1076,6 +1082,7 @@ object QuotableImpl {
         val identifier = unqualifiedNoArgumentsCall.identifier
 
         val identifierText = identifier.text
+        val quotedIdentifier = identifierAtom(identifierText, identifier)
         val callMetadata = metadata(identifier)
 
         // if a variable has a `do` block is no longer a variable because the do block acts as keyword arguments.
@@ -1083,7 +1090,7 @@ object QuotableImpl {
             val quotedBlockArguments = doBlock.quoteArguments()
 
             quoted = quotedFunctionCall(
-                    identifierText,
+                    quotedIdentifier,
                     callMetadata,
                     *quotedBlockArguments
             )
@@ -1104,7 +1111,7 @@ object QuotableImpl {
               {name, metadata, context}.  Importantly, context is nil when there is no context while arguments are []
               when there are no arguments. */
             quoted = quotedVariable(
-                    identifierText,
+                    quotedIdentifier,
                     callMetadata
             )
         }
@@ -1112,11 +1119,13 @@ object QuotableImpl {
         return quoted
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun quote(unqualifiedParenthesesCall: UnqualifiedParenthesesCall<*>): OtpErlangObject {
         val metadata = metadata(unqualifiedParenthesesCall)
-        val quotedIdentifier = OtpErlangAtom(unqualifiedParenthesesCall.node.firstChildNode.text)
+        val quotedIdentifier =
+            identifierAtom(unqualifiedParenthesesCall.node.firstChildNode.text, unqualifiedParenthesesCall)
         val parenthesesArgumentsList = unqualifiedParenthesesCall.matchedParenthesesArguments.parenthesesArgumentsList
         val doBlock = unqualifiedParenthesesCall.doBlock
 
@@ -1171,6 +1180,7 @@ object QuotableImpl {
        {name, metadata, arguments}, while for an ambiguous call or variable, the elements are
        {name, metadata, context}.  Importantly, context is nil when there is no context while arguments are [] when
        there are no arguments. */
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun quote(variable: ElixirVariable): OtpErlangObject = quotedVariable(variable)
@@ -1447,7 +1457,7 @@ object QuotableImpl {
         // Only tokens
         return if (children.isEmpty()) {
             // take first node to avoid SIGNIFICANT_WHITE_SPACE after DUAL_OPERATOR
-            relativeIdentifier.node.firstChildNode.text.let(::OtpErlangAtom)
+            identifierAtom(relativeIdentifier.node.firstChildNode.text, relativeIdentifier)
         } else {
             assert(children.size == 1)
 
@@ -1460,9 +1470,24 @@ object QuotableImpl {
         }
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
-    fun quote(identifier: ElixirIdentifier): OtpErlangObject = OtpErlangAtom(identifier.text)
+    fun quote(identifier: ElixirIdentifier): OtpErlangObject = identifierAtom(identifier.text, identifier)
+
+    /**
+     * From Elixir 1.14 the tokenizer normalises µ (U+00B5) to μ (U+03BC) in an identifier token, but not in a quoted
+     * atom or name: see QuotingDialect.V1_14.
+     */
+    @RequiresReadLock
+    private fun identifierAtom(identifier: String, element: PsiElement): OtpErlangAtom =
+        OtpErlangAtom(
+            if ('µ' in identifier && dialectFor(element).normalizesMicroSign) {
+                identifier.replace('µ', 'μ')
+            } else {
+                identifier
+            }
+        )
 
     @JvmStatic
     fun quote(decimalFloat: ElixirDecimalFloat): OtpErlangObject {
@@ -2004,10 +2029,11 @@ object QuotableImpl {
             ?.text
             ?.startsWith("/") == true
 
+    @RequiresReadLock
     @Contract(pure = true)
     private fun quotedVariable(variable: PsiElement): OtpErlangObject =
             quotedVariable(
-                    variable.text,
+                    identifierAtom(variable.text, variable),
                     metadata(variable)
             )
 

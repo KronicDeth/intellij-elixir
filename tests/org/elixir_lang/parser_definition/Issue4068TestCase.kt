@@ -32,6 +32,10 @@ class Issue4068TestCase : ParsingTestCase() {
     fun testRemoteParenthesesCallArgumentsAfterDotNewline() = assertParsedAndQuotedCorrectly(false)
     fun testRemoteNoParenthesesCallAfterDotNewline() = assertParsedAndQuotedCorrectly(false)
 
+    fun testMicroSignIdentifier() = assertParsedAndQuotedCorrectly(false)
+    fun testMicroSignMatch() = assertParsedAndQuotedCorrectly(false)
+    fun testMicroSignIdentifierForms() = assertParsedAndQuotedCorrectly(false)
+
     fun testEmptyInterpolation() = assertParsedAndQuotedCorrectly(false)
     fun testEmptyInterpolationNewline() = assertParsedAndQuotedCorrectly(false)
     fun testEmptyInterpolationLaterLine() = assertParsedAndQuotedCorrectly(false)

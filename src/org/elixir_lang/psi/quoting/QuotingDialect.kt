@@ -59,6 +59,11 @@ enum class QuotingDialect {
      *
      * elixir-lang/elixir 6447f440d ("Add .. as a nullary operator that returns 0..-1//1", #11623),
      * first released in v1.14.0.
+     *
+     * 1.14.0 also normalises MICRO SIGN (U+00B5) to GREEK SMALL LETTER MU (U+03BC) anywhere in an identifier token -
+     * variables, calls, remote names, unquoted atoms and keyword keys - but not in a quoted atom or name
+     * (elixir-lang/elixir e7001455d, "nfc and additional normalizations for identifiers", #11859). Read via
+     * [normalizesMicroSign].
      */
     V1_14,
 
@@ -193,6 +198,9 @@ enum class QuotingDialect {
 
     /** Whether a remote call split by a newline after its `.` carries its name's line rather than the dot's. */
     val putsRemoteCallOnNameLine: Boolean get() = this >= V1_13
+
+    /** `µ` (U+00B5) in an identifier token quoted as `μ` (U+03BC). */
+    val normalizesMicroSign: Boolean get() = this >= V1_14
 
     /** `foo."bar\nbaz"()` calling `:"bar\nbaz"` rather than `:"bar\\nbaz"`. */
     val unescapesQuotedRemoteCallName: Boolean get() = this >= V1_18
