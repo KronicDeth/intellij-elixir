@@ -2,10 +2,7 @@
 
 package org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.v1.definitions.definition.clause
 
-import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.project.Project
-import com.intellij.psi.PsiDocumentManager
-import com.intellij.psi.PsiFileFactory
 import com.intellij.util.containers.ContainerUtil.createWeakValueMap
 import org.elixir_lang.ElixirFileType
 import org.elixir_lang.ElixirLanguage
@@ -15,6 +12,8 @@ import org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.V1
 import org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.v1.definitions.Definition
 import org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.v1.definitions.Tree
 import org.elixir_lang.beam.chunk.debug_info.v1.elixir_erl.v1.definitions.definition.Clause
+import org.elixir_lang.beam.scratchDocument
+import org.elixir_lang.beam.viewerEditor
 import org.elixir_lang.util.WriteActions
 import java.awt.GridLayout
 import java.lang.ref.WeakReference
@@ -25,9 +24,8 @@ import javax.swing.event.TreeSelectionListener
 const val DEFAULT_TEXT = "# Select a module, definition, or clause to view its AST as code"
 
 class Panel(private val definitionsTree: Tree, project: Project): JPanel(GridLayout(1, 1)), TreeSelectionListener {
-    private val psiFile = PsiFileFactory.getInstance(project).createFileFromText(ElixirLanguage, DEFAULT_TEXT)
-    private val document = PsiDocumentManager.getInstance(project).getDocument(psiFile)!!
-    private val editor = EditorFactory.getInstance().createEditor(document, project, ElixirFileType.INSTANCE, true)
+    private val document = scratchDocument(project, ElixirLanguage, DEFAULT_TEXT)
+    private val editor = viewerEditor(document, project, ElixirFileType.INSTANCE)
 
     private val clauseHeadByClause = createWeakValueMap<Clause, String>()
     private val clauseHeadModuleByClause = createWeakValueMap<Clause, String>()
