@@ -1940,26 +1940,23 @@ object QuotableImpl {
 
             // {'when', _, _ }
             if (receiver == WHEN) {
-                val operands = expression.elementAt(2)
+                // Operands that are all small integers, as in `3 when 4`, arrive as an OtpErlangString.
+                val operands = Macro.callArguments(expression)
 
-                // is_list(End)
-                if (operands is OtpErlangList) {
+                // Have to check for two element so that unwrap_when doesn't happen recursively as the unwrapped version of when will have more than 2 arguments, which is only seen in stabSignatures.
+                // [_, _] = End
+                if (operands.arity() == 2) {
+                    val unwrappedArguments =
+                            quotedArguments.slice(0 until quotedArguments.size - 1).toTypedArray() +
+                                    operands.elements()
 
-                    // Have to check for two element so that unwrap_when doesn't happen recursively as the unwrapped version of when will have more than 2 arguments, which is only seen in stabSignatures.
-                    // [_, _] = End
-                    if (operands.arity() == 2) {
-                        val unwrappedArguments =
-                                quotedArguments.slice(0 until quotedArguments.size - 1).toTypedArray() +
-                                        operands.elements()
-
-                        unwrapped = arrayOf(
-                                quotedFunctionCall(
-                                        receiver,
-                                        Macro.metadata(expression),
-                                        *unwrappedArguments
-                                )
-                        )
-                    }
+                    unwrapped = arrayOf(
+                            quotedFunctionCall(
+                                    receiver,
+                                    Macro.metadata(expression),
+                                    *unwrappedArguments
+                            )
+                    )
                 }
             }
         }
