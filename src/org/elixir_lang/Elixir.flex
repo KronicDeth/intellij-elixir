@@ -609,6 +609,7 @@ SIGIL_HEREDOC_TERMINATOR = {SIGIL_DOUBLE_QUOTES_HEREDOC_TERMINATOR}|{SIGIL_SINGL
 GROUP_TERMINATOR = {QUOTE_TERMINATOR}|{SIGIL_TERMINATOR}
 GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 
+// Unlike `.`, also matches U+000B, U+000C, U+0085, U+2028 and U+2029, which may appear in strings and sigils.
 ANY = [^]
 EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
                   {AND_WORD_OPERATOR} |
@@ -1119,7 +1120,7 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
           popAndBegin();
           return ElixirTypes.EOL;
         }
-  .     {
+  {ANY} {
           popAndBegin();
           return ElixirTypes.FRAGMENT;
         }
@@ -1151,7 +1152,7 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
                                     return ElixirTypes.HEXADECIMAL_WHOLE_NUMBER_BASE; }
   {UNICODE_ESCAPE_CHARACTER}      { yybegin(UNICODE_ESCAPE_SEQUENCE);
                                     return ElixirTypes.UNICODE_ESCAPE_CHARACTER; }
-  .                               { popAndBegin();
+  {ANY}                           { popAndBegin();
                                     return ElixirTypes.ESCAPED_CHARACTER_TOKEN; }
 }
 
@@ -1297,7 +1298,7 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
                      yybegin(GROUP_HEREDOC_LINE_START);
                      return ElixirTypes.EOL;
                    }
-  .                { return ElixirTypes.FRAGMENT; }
+  {ANY}            { return ElixirTypes.FRAGMENT; }
 }
 
 // See https://github.com/elixir-lang/elixir/pull/4341

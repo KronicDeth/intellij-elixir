@@ -55,6 +55,10 @@ class Issue4068TestCase : ParsingTestCase() {
     fun testQuotedRemoteCallNameSurrogate() =
         assertParsedAndQuotedCorrectlyBeforeOrRaise(QuotingDialect.V1_18, QuotingDialect.V1_19, "Elixir.MatchError", false)
 
+    fun testEscapedLineSeparator() = assertParsedAndQuotedCorrectlyBefore(QuotingDialect.V1_20, false)
+    fun testEscapedLineSeparatorLiteralSigil() = assertParsedAndQuotedCorrectlyBefore(QuotingDialect.V1_20, false)
+    fun testLineSeparatorHeredoc() = assertParsedAndQuotedCorrectlyBefore(QuotingDialect.V1_20, false)
+
     fun testSemicolon() = assertParsedAndQuotedCorrectly(false)
 
     fun testCharacterNewlineLine() = assertParsedAndQuotedCorrectly(false)
