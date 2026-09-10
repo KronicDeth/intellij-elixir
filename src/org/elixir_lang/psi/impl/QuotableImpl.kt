@@ -8,6 +8,7 @@ import com.intellij.psi.*
 import com.intellij.psi.impl.source.tree.Factory
 import com.intellij.psi.tree.IElementType
 import com.intellij.psi.tree.TokenSet
+import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.ElixirLanguage
 import org.elixir_lang.Macro
@@ -80,10 +81,8 @@ object QuotableImpl {
     internal val BLOCK = OtpErlangAtom("__block__")
     private val FN = OtpErlangAtom("fn")
     private val EXCLAMATION_POINT = OtpErlangAtom("!")
-    private val MINUS = OtpErlangAtom("-")
     private val MULTIPLE_ALIASES = OtpErlangAtom("{}")
     private val NOT = OtpErlangAtom("not")
-    private val PLUS = OtpErlangAtom("+")
     private val REARRANGED_UNARY_OPERATORS = arrayOf(EXCLAMATION_POINT, NOT)
     private val UNQUOTE_SPLICING = OtpErlangAtom("unquote_splicing")
     private val WHEN = OtpErlangAtom("when")
@@ -578,12 +577,13 @@ object QuotableImpl {
         val identifier = identifierNode.text
         val quotedIdentifier = OtpErlangAtom(identifier)
 
-        val quotedArguments = atUnqualifiedNoParenthesesCall.noParenthesesOneArgument.quoteArguments()
+        val noParenthesesOneArgument = atUnqualifiedNoParenthesesCall.noParenthesesOneArgument
+        val quotedArguments = noParenthesesOneArgument.quoteArguments()
         val doBlock = atUnqualifiedNoParenthesesCall.doBlock
 
         val quotedOperand = quotedBlockCall(
                 quotedIdentifier,
-                metadata(operator),
+                ambiguousOperatorMetadata(metadata(operator), noParenthesesOneArgument, quotedArguments, doBlock),
                 quotedArguments,
                 doBlock
         )
@@ -995,45 +995,42 @@ object QuotableImpl {
     @JvmStatic
     fun quote(unqualifiedNoParenthesesCall: UnqualifiedNoParenthesesCall<*>): OtpErlangObject {
         val quotedIdentifier = OtpErlangAtom(unqualifiedNoParenthesesCall.functionName())
-        val quotedArguments = unqualifiedNoParenthesesCall.noParenthesesOneArgument.quoteArguments()
-
-        var blockCallMetadata = metadata(unqualifiedNoParenthesesCall)
-
-        // see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b//lib/elixir/src/elixir_parser.yrl#L627-L628
-        if (quotedArguments.size == 1) {
-            val quotedArgument = quotedArguments[0]
-
-            if (Macro.isExpression(quotedArgument)) {
-                val expression = quotedArgument as OtpErlangTuple
-                val receiver = expression.elementAt(0)
-
-                if (receiver == MINUS || receiver == PLUS) {
-                    val dualCallArguments = Macro.callArguments(expression)
-
-                    // [Arg]
-                    if (dualCallArguments.arity() == 1) {
-                        /* @note getChildren[0] is NOT the same as getFirstChild().  getFirstChild() will get the
-                             leaf node for identifier instead of the first compound, rule node for the argument. */
-                        val argument = unqualifiedNoParenthesesCall.children[1].firstChild
-
-                        if (!(argument is ElixirAccessExpression && argument.getFirstChild() is ElixirParentheticalStab)) {
-                            blockCallMetadata = OtpErlangList(
-                                    arrayOf(AMBIGUOUS_OP_KEYWORD_PAIR, blockCallMetadata.elementAt(0))
-                            )
-                        }
-                    }
-                }
-            }
-        }
-
+        val noParenthesesOneArgument = unqualifiedNoParenthesesCall.noParenthesesOneArgument
+        val quotedArguments = noParenthesesOneArgument.quoteArguments()
         val doBlock = unqualifiedNoParenthesesCall.doBlock
 
         return quotedBlockCall(
                 quotedIdentifier,
-                blockCallMetadata,
+                ambiguousOperatorMetadata(
+                        metadata(unqualifiedNoParenthesesCall),
+                        noParenthesesOneArgument,
+                        quotedArguments,
+                        doBlock
+                ),
                 quotedArguments,
                 doBlock
         )
+    }
+
+    /**
+     * `build_call` gives a call on an `op_identifier` `ambiguous_op` only when it has exactly one argument, so a
+     * `do` block, which becomes a second, drops it. The lexer only makes this a call when the identifier is an
+     * `op_identifier`, so the argument opening on a unary `+` or `-` is the whole test. A keyword key such as `+:`
+     * opens on the same text, but Elixir lexes it as a `kw_identifier`, which leaves the call unambiguous.
+     */
+    @RequiresReadLock
+    private fun ambiguousOperatorMetadata(
+        metadata: OtpErlangList,
+        noParenthesesOneArgument: PsiElement,
+        quotedArguments: Array<OtpErlangObject>,
+        doBlock: PsiElement?
+    ): OtpErlangList {
+        if (doBlock != null || quotedArguments.size != 1) return metadata
+
+        val first = PsiTreeUtil.getDeepestFirst(noParenthesesOneArgument)
+        if (first.parent !is ElixirUnaryPrefixOperator || (first.text != "+" && first.text != "-")) return metadata
+
+        return OtpErlangList(arrayOf(AMBIGUOUS_OP_KEYWORD_PAIR, *metadata.elements()))
     }
 
     @RequiresReadLock
