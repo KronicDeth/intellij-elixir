@@ -1606,22 +1606,42 @@ object QuotableImpl {
     private fun lineNumber(node: ASTNode): Int {
         val psi = node.psi
         val documentLine = psi.document()!!.getLineNumber(node.startOffset)
-        val uncounted = psi.containingFile?.let(::escapedNewlineInLiteralSigilLineOffsets) ?: return documentLine
+        val uncounted = psi.containingFile?.let(::uncountedNewlines) ?: return documentLine
 
-        if (uncounted.isEmpty() || dialectFor(psi).countsEscapedNewlineInLiteralSigilLine) return documentLine
+        if (uncounted.isEmpty()) return documentLine
 
-        return documentLine - uncounted.count { it < node.startOffset }
+        val dialect = dialectFor(psi)
+        val before = { offsets: IntArray -> offsets.count { it < node.startOffset } }
+
+        return documentLine -
+                (if (dialect.countsEscapedNewlineInLiteralSigilLine) 0 else before(uncounted.literalSigilLine)) -
+                (if (dialect.countsNewlineInCharacter) 0 else before(uncounted.character))
     }
 
-    /** See QuotingDialect.V1_12. Cached per file, as every line in a quoted file asks. */
-    private fun escapedNewlineInLiteralSigilLineOffsets(file: PsiFile): IntArray =
+    /** Offsets of newlines that older tokenizers consumed without advancing the line. */
+    private class UncountedNewlines(val literalSigilLine: IntArray, val character: IntArray) {
+        fun isEmpty(): Boolean = literalSigilLine.isEmpty() && character.isEmpty()
+    }
+
+    /** See QuotingDialect.V1_12 and V1_19. Cached per file, as every line in a quoted file asks. */
+    private fun uncountedNewlines(file: PsiFile): UncountedNewlines =
         CachedValuesManager.getCachedValue(file) {
-            val offsets = mutableListOf<Int>()
+            val literalSigilLine = mutableListOf<Int>()
+            val character = mutableListOf<Int>()
 
             file.accept(object : PsiRecursiveElementWalkingVisitor() {
                 override fun visitElement(element: PsiElement) {
-                    if (element is ElixirEscapedEOL && element.parent?.parent.let { it is SigilLine && it !is Interpolated }) {
-                        offsets.add(element.textOffset)
+                    if (element is ElixirEscapedEOL) {
+                        when (val parent = element.parent) {
+                            is ElixirCharToken -> character.add(element.textOffset)
+                            else -> if (parent?.parent.let { it is SigilLine && it !is Interpolated }) {
+                                literalSigilLine.add(element.textOffset)
+                            }
+                        }
+                    } else if (element is ElixirCharToken && element.node.lastChildNode.let {
+                            it.psi !is ElixirEscapedEOL && it.textContains('\n')
+                        }) {
+                        character.add(element.textOffset)
                     }
 
                     super.visitElement(element)
@@ -1630,7 +1650,10 @@ object QuotableImpl {
 
             // Not `file` itself: a physical PSI dependency asks for InjectedLanguageManager, which ParsingTestCase's
             // mock project does not register.
-            CachedValueProvider.Result.create(offsets.toIntArray(), ModificationTracker { file.modificationStamp })
+            CachedValueProvider.Result.create(
+                UncountedNewlines(literalSigilLine.toIntArray(), character.toIntArray()),
+                ModificationTracker { file.modificationStamp }
+            )
         }
 
     private fun lineNumberKeywordTuple(node: ASTNode): OtpErlangTuple =

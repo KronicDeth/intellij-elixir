@@ -152,6 +152,10 @@ enum class QuotingDialect {
      * remote-call name (`MatchError`; elixir-lang/elixir 41151190e, #14587) and for invalid UTF-8 in
      * a charlist, as in `'\xFF'` (`UnicodeConversionError`; 71e1ddc64, #14666). Both first released
      * in v1.19.0.
+     *
+     * 1.19.0 also advances the line past a character literal that is a newline, `?` + newline or `?\` + newline,
+     * where 1.18 counted only columns, so everything after it was one line lower (elixir-lang/elixir 6fbc6e08a,
+     * "Advance line when processing ? followed by <LF> and \<LF>"). Read via [countsNewlineInCharacter].
      */
     V1_19,
 
@@ -176,6 +180,9 @@ enum class QuotingDialect {
 
     /** Whether a `\` ending a line in a non-interpolating sigil line advances the line of what follows. */
     val countsEscapedNewlineInLiteralSigilLine: Boolean get() = this >= V1_12
+
+    /** Whether `?` + newline or `?\` + newline advances the line of what follows. */
+    val countsNewlineInCharacter: Boolean get() = this >= V1_19
 
     /** The leading `""` a heredoc gets when its first content is `#{...}`. */
     val emitsEmptyLeadingHeredocSegment: Boolean get() = this >= V1_12

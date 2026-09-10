@@ -27,5 +27,8 @@ class Issue4068TestCase : ParsingTestCase() {
     fun testHeredocSpacesThenTabs() = assertParsedAndQuotedCorrectly(false)
     fun testCharListHeredocSpacesThenTabs() = assertParsedAndQuotedCorrectly(false)
 
+    fun testCharacterNewlineLine() = assertParsedAndQuotedCorrectly(false)
+    fun testCharacterEscapedNewlineLine() = assertParsedAndQuotedCorrectly(false)
+
     override fun getTestDataPath(): String = "${super.getTestDataPath()}/issue_4068"
 }
