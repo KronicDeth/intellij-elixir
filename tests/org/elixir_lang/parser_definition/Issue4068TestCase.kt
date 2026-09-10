@@ -22,5 +22,8 @@ class Issue4068TestCase : ParsingTestCase() {
     fun testAmbiguousKeywordKeyNotOperator() = assertParsedAndQuotedCorrectlyFrom(QuotingDialect.V1_12, false)
     fun testAmbiguousKeywordKeyNewlineNotOperator() = assertParsedAndQuotedCorrectlyFrom(QuotingDialect.V1_12, false)
 
+    fun testHeredocSpacesThenTabs() = assertParsedAndQuotedCorrectly(false)
+    fun testCharListHeredocSpacesThenTabs() = assertParsedAndQuotedCorrectly(false)
+
     override fun getTestDataPath(): String = "${super.getTestDataPath()}/issue_4068"
 }
