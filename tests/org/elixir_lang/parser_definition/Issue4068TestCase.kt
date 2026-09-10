@@ -31,6 +31,8 @@ class Issue4068TestCase : ParsingTestCase() {
     fun testEmptyInterpolationNewline() = assertParsedAndQuotedCorrectly(false)
     fun testEmptyInterpolationLaterLine() = assertParsedAndQuotedCorrectly(false)
 
+    fun testCharacterOutsideBasicMultilingualPlane() = assertParsedAndQuotedCorrectly(false)
+
     fun testSemicolon() = assertParsedAndQuotedCorrectly(false)
 
     fun testCharacterNewlineLine() = assertParsedAndQuotedCorrectly(false)

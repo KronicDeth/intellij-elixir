@@ -364,8 +364,8 @@ object QuotableImpl {
         val tokenizedElementType = tokenized.elementType
 
         val codePoint = if (tokenizedElementType === ElixirTypes.FRAGMENT) {
-            if (tokenized.textLength != 1) {
-                TODO("Tokenized character expected to only be one character long")
+            if (tokenized.text.codePointCount(0, tokenized.textLength) != 1) {
+                TODO("Tokenized character expected to only be one code point long")
             }
 
             tokenized.text.codePointAt(0)
