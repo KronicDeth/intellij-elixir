@@ -1082,7 +1082,10 @@ object QuotableImpl {
                     callMetadata,
                     *quotedBlockArguments
             )
-        } else if (identifierText == "..." && dialectFor(identifier).quotesEllipsisAsNullaryCall) {
+        } else if (identifierText == "..." &&
+            !isFollowedBySlash(identifier) &&
+            dialectFor(identifier).quotesEllipsisAsNullaryCall
+        ) {
             // Elixir 1.17.0 gave the parser an `ellipsis_op` production built with
             // `build_nullary_op`, so `...` - in a `@spec` or on its own - became a call with no
             // arguments, `{:..., meta, []}`, where before it quoted as a variable, `{:..., meta, nil}`.
@@ -1945,6 +1948,16 @@ object QuotableImpl {
 
         return digits.toInt(16).takeIf { it >= 0x80 }
     }
+
+    /**
+     * `elixir_tokenizer` turns an operator followed by `/`, after any horizontal space, into an identifier, so `...` in
+     * `&.../0` or `... / 2` is a variable in every version rather than the 1.17 nullary operator.
+     */
+    private fun isFollowedBySlash(element: PsiElement): Boolean =
+        generateSequence(PsiTreeUtil.nextLeaf(element)) { PsiTreeUtil.nextLeaf(it) }
+            .firstOrNull { it !is PsiWhiteSpace || it.textContains('\n') }
+            ?.text
+            ?.startsWith("/") == true
 
     @Contract(pure = true)
     private fun quotedVariable(variable: PsiElement): OtpErlangObject =
