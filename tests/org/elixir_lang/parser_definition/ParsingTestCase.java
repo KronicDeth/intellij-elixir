@@ -125,6 +125,26 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
         assertQuotedAroundErrorOrRaise(dialect, expectedException);
     }
 
+    /**
+     * As {@link #assertParsedAndQuotedCorrectlyBefore}, where the releases from {@code dialect} reject by raising
+     * {@code expectedException} until {@code errorDialect}, and by answering an error tuple from it.
+     */
+    protected void assertParsedAndQuotedCorrectlyBeforeOrRaise(
+            QuotingDialect dialect,
+            QuotingDialect errorDialect,
+            String expectedException,
+            boolean checkResult
+    ) {
+        doTest(checkResult);
+
+        if (QuotingDialectResolver.dialectFor(myFile).compareTo(dialect) >= 0) {
+            assertQuotedAroundErrorOrRaise(errorDialect, expectedException);
+        } else {
+            assertWithoutLocalError();
+            assertQuotedCorrectly();
+        }
+    }
+
     private void assertQuotedAroundErrorOrRaise(QuotingDialect dialect, String expectedException) {
         assertInstanceOf(ElixirPsiImplUtil.quote(myFile), OtpErlangObject.class);
 

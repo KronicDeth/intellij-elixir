@@ -1438,6 +1438,7 @@ object QuotableImpl {
         }
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun quote(relativeIdentifier: ElixirRelativeIdentifier): OtpErlangObject {
@@ -1450,12 +1451,11 @@ object QuotableImpl {
         } else {
             assert(children.size == 1)
 
-            val child = children[0]
-
-            if (child is Atomable) {
-                child.quoteAsAtom()
-            } else {
-                (child as Quotable).quote()
+            when (val child = children[0]) {
+                is ElixirLine if !dialectFor(child).unescapesQuotedRemoteCallName ->
+                    OtpErlangAtom(literalQuotedRemoteCallName(child))
+                is Atomable -> child.quoteAsAtom()
+                else -> (child as Quotable).quote()
             }
         }
     }
@@ -1968,6 +1968,30 @@ object QuotableImpl {
         } else {
             dotMetadata
         }
+    }
+
+    /**
+     * A quoted remote call's name as Elixir 1.17 and earlier kept it: `extract` without unescaping, which still drops
+     * the `\` before the terminator but keeps every other escape as written.
+     */
+    private fun literalQuotedRemoteCallName(line: ElixirLine): String {
+        val text = line.lineBody?.text.orEmpty()
+        val terminator = if (line.isCharList) '\'' else '"'
+        val name = StringBuilder()
+        var index = 0
+
+        while (index < text.length) {
+            if (text[index] == '\\' && index + 1 < text.length) {
+                if (text[index + 1] != terminator) name.append('\\')
+                name.append(text[index + 1])
+                index += 2
+            } else {
+                name.append(text[index])
+                index += 1
+            }
+        }
+
+        return name.toString()
     }
 
     /**

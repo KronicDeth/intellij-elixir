@@ -43,6 +43,14 @@ class Issue4068TestCase : ParsingTestCase() {
 
     fun testCharacterOutsideBasicMultilingualPlane() = assertParsedAndQuotedCorrectly(false)
 
+    fun testQuotedRemoteCallNameEscape() = assertParsedAndQuotedCorrectly(false)
+    fun testCaptureQuotedRemoteCallNameEscape() = assertParsedAndQuotedCorrectly(false)
+    fun testCaptureParenthesesQuotedRemoteCallNameEscape() = assertParsedAndQuotedCorrectly(false)
+    fun testQuotedRemoteCallNameInvalidCodePoint() =
+        assertParsedAndQuotedCorrectlyBeforeOrRaise(QuotingDialect.V1_18, QuotingDialect.V1_19, "Elixir.MatchError", false)
+    fun testQuotedRemoteCallNameSurrogate() =
+        assertParsedAndQuotedCorrectlyBeforeOrRaise(QuotingDialect.V1_18, QuotingDialect.V1_19, "Elixir.MatchError", false)
+
     fun testSemicolon() = assertParsedAndQuotedCorrectly(false)
 
     fun testCharacterNewlineLine() = assertParsedAndQuotedCorrectly(false)

@@ -149,6 +149,8 @@ enum class QuotingDialect {
      * elixir-lang/elixir e54b87c18 ("Fix formatter adding extra escapes to remote call functions",
      * #13960) added `{ok, [UnescapedPart]} = unescape_tokens(...)` to `elixir_tokenizer:handle_dot`,
      * first released in v1.18.0.
+     *
+     * Read via [unescapesQuotedRemoteCallName].
      */
     V1_18,
 
@@ -191,6 +193,9 @@ enum class QuotingDialect {
 
     /** Whether a remote call split by a newline after its `.` carries its name's line rather than the dot's. */
     val putsRemoteCallOnNameLine: Boolean get() = this >= V1_13
+
+    /** `foo."bar\nbaz"()` calling `:"bar\nbaz"` rather than `:"bar\\nbaz"`. */
+    val unescapesQuotedRemoteCallName: Boolean get() = this >= V1_18
 
     /** The leading `""` a heredoc gets when its first content is `#{...}`. */
     val emitsEmptyLeadingHeredocSegment: Boolean get() = this >= V1_12
