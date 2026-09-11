@@ -22,11 +22,19 @@ import java.util.stream.Stream;
  */
 public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
     static final String CORPUS_ENVIRONMENT_VARIABLE = "ELIXIR_PARSING_CORPUS";
+    private static final Path KNOWN_FAILURES =
+            Path.of("testData", "org", "elixir_lang", "parser_definition", "corpus_known_failures.tsv");
 
     private final Path corpusRoot;
+    private final KnownFailures knownFailures;
 
-    private ElixirLangElixirParsingTestCase(@NotNull Path corpusRoot, @NotNull String relativePath) {
+    private ElixirLangElixirParsingTestCase(
+            @NotNull Path corpusRoot,
+            @NotNull String relativePath,
+            @NotNull KnownFailures knownFailures
+    ) {
         this.corpusRoot = corpusRoot;
+        this.knownFailures = knownFailures;
         setName(relativePath);
     }
 
@@ -49,9 +57,13 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
             suite.addTest(TestSuite.warning("No .ex or .exs files under " + corpusRoot));
         }
 
+        KnownFailures knownFailures = KnownFailures.forElixirUnderTest(KNOWN_FAILURES);
+
         for (String relativePath : relativePaths) {
-            suite.addTest(new ElixirLangElixirParsingTestCase(corpusRoot, relativePath));
+            suite.addTest(new ElixirLangElixirParsingTestCase(corpusRoot, relativePath, knownFailures));
         }
+
+        knownFailures.checkStale(suite, relativePaths);
 
         return suite;
     }
@@ -74,7 +86,11 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
 
     @Override
     protected void runBare(@NotNull ThrowableRunnable<Throwable> testRunnable) throws Throwable {
-        super.runBare(this::assertParsed);
+        if (knownFailures.contains(getName())) {
+            super.runBare(() -> knownFailures.expectFailure(getName(), this::assertParsed));
+        } else {
+            super.runBare(this::assertParsed);
+        }
     }
 
     private void assertParsed() throws IOException {

@@ -357,6 +357,29 @@ same value, so the two cannot disagree. If you switch it, expect one extra `rele
 it parsed, as `elixir-lang/elixir@<commit>/lib/...`. An Elixir that no pair declares has no corpus, and the
 suite reports a single failing test saying so.
 
+Whole files never reach Elixir's hardest parser cases, which live in string literals inside its tests.
+`ElixirSnippetParsingTestCase` covers those: every source string that Elixir's parser, tokenizer, formatter and
+normalizer tests hand to the parser, from every release in `.github/ci-versions.json`, is committed once in
+`testData/org/elixir_lang/parser_definition/elixir_snippets/snippets.jsonl`. Each snippet the leg's quoter
+accepts is a test, named by the snippet's hash and where it first appears; snippets the quoter rejects are not
+tests. `NOTICE.md` beside it carries the attribution the Apache License asks for.
+
+When you add an Elixir release to `.github/ci-versions.json`, give its pair a `corpus` and regenerate the
+snippets from the repository root, with every declared pair installed in mise:
+
+```sh
+mise exec -- elixir testData/org/elixir_lang/parser_definition/elixir_snippets/generate.exs
+```
+
+It reads each release's tests with that release's own Elixir, prints how many snippets came from each test
+file, and lists helpers the tests define and call with a literal string that it does not read, which is how a
+new way of handing source to the parser shows up. Commit `snippets.jsonl` and `NOTICE.md`.
+
+A corpus file the plugin cannot yet parse or quote as Elixir does can be listed in
+`testData/org/elixir_lang/parser_definition/corpus_known_failures.tsv`, and a snippet in `snippet_known_failures.tsv`
+beside it, with the Elixir versions it fails on. A listed test must keep failing, and must exist, on each of those
+versions, so the list cannot outlive the fix.
+
 To build (so you get a .zip file):
 ```sh
 ./gradlew buildPlugin        # the zip, no tests - prefer this

@@ -1,0 +1,5 @@
+# Snippets ElixirSnippetParsingTestCase expects to fail:
+#
+#     <snippet hash>	<Elixir versions, comma-separated>
+#
+# Each listed test must fail on every version listed, and must exist there.
