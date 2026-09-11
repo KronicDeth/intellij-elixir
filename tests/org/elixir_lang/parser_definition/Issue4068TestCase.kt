@@ -27,6 +27,10 @@ class Issue4068TestCase : ParsingTestCase() {
     fun testHeredocSpacesThenTabs() = assertParsedAndQuotedCorrectly(false)
     fun testCharListHeredocSpacesThenTabs() = assertParsedAndQuotedCorrectly(false)
 
+    fun testNotInLineStart() = assertParsedAndQuotedCorrectly(false)
+    fun testNotInLineStartNewline() = assertParsedAndQuotedCorrectly(false)
+    fun testNotLineStartInPrefixedIdentifier() = assertParsedAndQuotedCorrectly(false)
+
     fun testRemoteCallAfterDotNewline() = assertParsedAndQuotedCorrectly(false)
     fun testRemoteParenthesesCallAfterDotNewline() = assertParsedAndQuotedCorrectly(false)
     fun testRemoteParenthesesCallArgumentsAfterDotNewline() = assertParsedAndQuotedCorrectly(false)
