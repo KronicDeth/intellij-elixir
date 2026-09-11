@@ -3,6 +3,16 @@ package org.elixir_lang.parser_definition
 import org.elixir_lang.psi.quoting.QuotingDialect
 
 class Issue4068TestCase : ParsingTestCase() {
+    fun testMultiLetterSigilDoubleQuotes() = assertParsedAndQuotedCorrectlyFrom(QuotingDialect.V1_15, false)
+    fun testMultiLetterSigilBracketsModifier() = assertParsedAndQuotedCorrectlyFrom(QuotingDialect.V1_15, false)
+    fun testMultiLetterSigilParenthesesModifiers() = assertParsedAndQuotedCorrectlyFrom(QuotingDialect.V1_15, false)
+    fun testMultiLetterSigilSingleQuotes() = assertParsedAndQuotedCorrectlyFrom(QuotingDialect.V1_15, false)
+    fun testMultiLetterSigilHeredoc() = assertParsedAndQuotedCorrectlyFrom(QuotingDialect.V1_15, false)
+    fun testMultiLetterSigilDigits() = assertParsedAndQuotedCorrectlyFrom(QuotingDialect.V1_17, false)
+    fun testMultiLetterSigilUnknown() = assertParsedAndQuotedCorrectlyFrom(QuotingDialect.V1_15, false)
+    fun testMultiLetterSigilEmpty() = assertParsedAndQuotedCorrectlyFrom(QuotingDialect.V1_15, false)
+    fun testMultiLetterSigilBraces() = assertParsedAndQuotedCorrectlyFrom(QuotingDialect.V1_15, false)
+
     fun testUnicodeRemoteCall() = assertParsedAndQuotedCorrectly(false)
     fun testCombiningMarkIdentifierForms() = assertParsedAndQuotedCorrectly(false)
     fun testDecomposedIdentifier() = assertParsedAndQuotedCorrectlyFrom(QuotingDialect.V1_14, false)

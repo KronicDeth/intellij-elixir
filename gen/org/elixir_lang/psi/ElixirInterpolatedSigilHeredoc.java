@@ -59,7 +59,7 @@ public interface ElixirInterpolatedSigilHeredoc extends Interpolated, SigilHered
 
   @NotNull String sigilDelimiter();
 
-  char sigilName();
+  @NotNull String sigilName();
 
   PsiLanguageInjectionHost updateText(@NotNull String text);
 

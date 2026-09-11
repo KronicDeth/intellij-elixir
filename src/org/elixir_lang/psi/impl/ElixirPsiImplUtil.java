@@ -1819,7 +1819,8 @@ public class ElixirPsiImplUtil {
         return SigilImpl.sigilDelimiter(sigil);
     }
 
-    public static char sigilName(@NotNull org.elixir_lang.psi.Sigil sigil) {
+    @NotNull
+    public static String sigilName(@NotNull org.elixir_lang.psi.Sigil sigil) {
         return SigilImpl.sigilName(sigil);
     }
 
@@ -1857,8 +1858,8 @@ public class ElixirPsiImplUtil {
      * Private static methods
      */
 
-    @Contract(pure = true)
     @RequiresReadLock
+    @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull Sigil sigil, @NotNull OtpErlangObject quotedContent) {
         return QuotableImpl.quote(sigil, quotedContent);

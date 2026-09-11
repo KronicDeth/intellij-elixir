@@ -56,7 +56,7 @@ public interface ElixirLiteralSigilLine extends Literal, SigilLine {
 
   @NotNull String sigilDelimiter();
 
-  char sigilName();
+  @NotNull String sigilName();
 
   char terminator();
 

@@ -130,7 +130,7 @@ public class ElixirLiteralSigilLineImpl extends ASTWrapperPsiElement implements 
   }
 
   @Override
-  public char sigilName() {
+  public @NotNull String sigilName() {
     return ElixirPsiImplUtil.sigilName(this);
   }
 

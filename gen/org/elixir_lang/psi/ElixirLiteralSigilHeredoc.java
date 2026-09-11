@@ -59,7 +59,7 @@ public interface ElixirLiteralSigilHeredoc extends Literal, SigilHeredocLiteral 
 
   @NotNull String sigilDelimiter();
 
-  char sigilName();
+  @NotNull String sigilName();
 
   PsiLanguageInjectionHost updateText(@NotNull String text);
 

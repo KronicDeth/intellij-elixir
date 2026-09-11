@@ -56,7 +56,7 @@ public interface ElixirInterpolatedSigilLine extends Interpolated, SigilLine {
 
   @NotNull String sigilDelimiter();
 
-  char sigilName();
+  @NotNull String sigilName();
 
   char terminator();
 

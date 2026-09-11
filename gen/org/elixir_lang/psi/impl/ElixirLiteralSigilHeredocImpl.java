@@ -136,7 +136,7 @@ public class ElixirLiteralSigilHeredocImpl extends ASTWrapperPsiElement implemen
   }
 
   @Override
-  public char sigilName() {
+  public @NotNull String sigilName() {
     return ElixirPsiImplUtil.sigilName(this);
   }
 

@@ -62,7 +62,7 @@ public class Stack {
         stack.peek().markQuotedCallName();
     }
 
-    public void nameSigil(char sigilName) {
+    public void nameSigil(String sigilName) {
         stack.peek().nameSigil(sigilName);
     }
 

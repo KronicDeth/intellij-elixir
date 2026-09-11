@@ -94,7 +94,7 @@ import org.jetbrains.annotations.Nullable;
   }
 
   private void nameSigil(CharSequence sigilName) {
-    stack.nameSigil(sigilName.charAt(0));
+    stack.nameSigil(sigilName.toString());
   }
 
   private org.elixir_lang.lexer.StackFrame pop() {
@@ -555,7 +555,8 @@ TRUE = "true"
 
 TILDE = "~"
 SIGIL_MODIFIER = [A-Za-z]
-SIGIL_NAME = [A-Za-z]
+// Multi-letter uppercase names are from Elixir 1.15 and digits in them from 1.17; both are errors before, so no dialect.
+SIGIL_NAME = [a-z] | [A-Z][A-Z0-9]*
 
 /*
  * Sigil quotes

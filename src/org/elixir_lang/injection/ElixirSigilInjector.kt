@@ -96,13 +96,13 @@ internal class ElixirSigilInjector : MultiHostInjector {
 
     override fun elementsToInjectIn() = listOf(SigilHeredocLiteral::class.java, SigilLine::class.java)
 
-    private fun languageForSigil(sigilName: Char): Language? {
+    private fun languageForSigil(sigilName: String): Language? {
         LOG.debug("languageForSigil: sigilName='$sigilName'")
 
         return when (sigilName) {
-            'H' -> HeexLanguage.INSTANCE
-            'E', 'L' -> EexLanguage.INSTANCE
-            'r' -> RegExpLanguage.INSTANCE
+            "H" -> HeexLanguage.INSTANCE
+            "E", "L" -> EexLanguage.INSTANCE
+            "r" -> RegExpLanguage.INSTANCE
             else -> null
         }
     }
@@ -112,8 +112,8 @@ internal class ElixirSigilInjector : MultiHostInjector {
     // the markup gets no HTML highlighting. Phoenix.HTML's ~E and LiveView's ~L are HTML by
     // definition, so name the fragment to say so. HEEx defaults to HTML without help, and a regex is
     // not a template.
-    private fun fileExtensionForSigil(sigilName: Char): String? = when (sigilName) {
-        'E', 'L' -> "html.eex"
+    private fun fileExtensionForSigil(sigilName: String): String? = when (sigilName) {
+        "E", "L" -> "html.eex"
         else -> null
     }
 

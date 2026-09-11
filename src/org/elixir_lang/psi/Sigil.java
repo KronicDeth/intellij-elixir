@@ -12,7 +12,8 @@ public interface Sigil extends Parent, PsiElement, Quotable {
     Integer indentation();
     @NotNull
     String sigilDelimiter();
-    char sigilName();
+    @NotNull
+    String sigilName();
 
     ElixirSigilModifiers getSigilModifiers();
 }
