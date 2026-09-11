@@ -27,6 +27,8 @@ class Issue4068TestCase : ParsingTestCase() {
     fun testHeredocSpacesThenTabs() = assertParsedAndQuotedCorrectly(false)
     fun testCharListHeredocSpacesThenTabs() = assertParsedAndQuotedCorrectly(false)
 
+    fun testDotKeywordKey() = assertParsedAndQuotedCorrectlyFrom(QuotingDialect.V1_13, false)
+
     fun testNotInLineStart() = assertParsedAndQuotedCorrectly(false)
     fun testNotInLineStartNewline() = assertParsedAndQuotedCorrectly(false)
     fun testNotLineStartInPrefixedIdentifier() = assertParsedAndQuotedCorrectly(false)

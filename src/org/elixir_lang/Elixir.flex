@@ -720,6 +720,9 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
                                                return ElixirTypes.AT_OPERATOR; }
   {ATOM} / {COLON}{SPACE}                    { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.ATOM_FRAGMENT; }
+  // ATOM_FRAGMENT because keywordKey accepts no DOT_OPERATOR
+  {DOT_OPERATOR} / {COLON}{SPACE}            { pushAndBegin(KEYWORD_PAIR_MAYBE);
+                                               return ElixirTypes.ATOM_FRAGMENT; }
   {BASE_WHOLE_NUMBER_PREFIX} / {BASE_WHOLE_NUMBER_BASE} { pushAndBegin(BASE_WHOLE_NUMBER_BASE);
                                                           return ElixirTypes.BASE_WHOLE_NUMBER_PREFIX; }
   /* For bitString rule, OPENING_BIT will be lexed.  This is just for when the operator needs to be one token for
