@@ -313,14 +313,14 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // atPrefixOperator maxExpression
+  // atPrefixOperator mapExpression
   public static boolean atMaxExpression(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "atMaxExpression")) return false;
     if (!nextTokenIs(b, AT_OPERATOR)) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = atPrefixOperator(b, l + 1);
-    r = r && maxExpression(b, l + 1);
+    r = r && mapExpression(b, l + 1);
     exit_section_(b, m, MATCHED_AT_OPERATION, r);
     return r;
   }
@@ -1208,6 +1208,18 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     r = expressionList(b, l + 1);
     r = r && endOfExpressionMaybe(b, l + 1);
     exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // <<ellipsis>> IDENTIFIER_TOKEN
+  public static boolean ellipsisPrefixOperator(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "ellipsisPrefixOperator")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, UNARY_PREFIX_OPERATOR, "<ellipsis prefix operator>");
+    r = ellipsis(b, l + 1);
+    r = r && consumeToken(b, IDENTIFIER_TOKEN);
+    exit_section_(b, l, m, r, false, null);
     return r;
   }
 
@@ -2228,12 +2240,14 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // maxExpression | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L498-L499
+  // unaryMaxExpression |
+  //                           maxExpression | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L498-L499
   //                           atMaxExpression
   static boolean mapExpression(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "mapExpression")) return false;
     boolean r;
-    r = maxExpression(b, l + 1);
+    r = unaryMaxExpression(b, l + 1);
+    if (!r) r = maxExpression(b, l + 1);
     if (!r) r = atMaxExpression(b, l + 1);
     return r;
   }
@@ -2381,10 +2395,15 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   //                            variable |
   //                            accessExpression
   //                           ) maxQualifiedNoArgumentsCall | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L499
+  //                           // Before variable, which would take the identifier of `a[1]`
+  //                           matchedAtUnqualifiedBracketOperation |
+  //                           matchedAtNumericBracketOperation |
+  //                           matchedUnqualifiedBracketOperation |
   //                           matchedUnqualifiedParenthesesCall | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L231
   //                           variable | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L499
   //                           atom | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L226-L228
-  //                           alias
+  //                           alias | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L231
+  //                           accessExpression
   static boolean maxExpression(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "maxExpression")) return false;
     boolean r;
@@ -2393,10 +2412,14 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     if (!r) r = maxExpression_1(b, l + 1);
     if (!r) r = maxExpression_2(b, l + 1);
     if (!r) r = maxExpression_3(b, l + 1);
+    if (!r) r = matchedAtUnqualifiedBracketOperation(b, l + 1);
+    if (!r) r = matchedAtNumericBracketOperation(b, l + 1);
+    if (!r) r = matchedUnqualifiedBracketOperation(b, l + 1);
     if (!r) r = matchedUnqualifiedParenthesesCall(b, l + 1);
     if (!r) r = variable(b, l + 1);
     if (!r) r = atom(b, l + 1);
     if (!r) r = alias(b, l + 1);
+    if (!r) r = accessExpression(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -3808,6 +3831,27 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
+  // (ellipsisPrefixOperator | unaryPrefixOperator) mapExpression
+  public static boolean unaryMaxExpression(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "unaryMaxExpression")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, MATCHED_UNARY_OPERATION, "<unary max expression>");
+    r = unaryMaxExpression_0(b, l + 1);
+    r = r && mapExpression(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  // ellipsisPrefixOperator | unaryPrefixOperator
+  private static boolean unaryMaxExpression_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "unaryMaxExpression_0")) return false;
+    boolean r;
+    r = ellipsisPrefixOperator(b, l + 1);
+    if (!r) r = unaryPrefixOperator(b, l + 1);
+    return r;
+  }
+
+  /* ********************************************************** */
   // !<<escapedNewlineSwapsDualOperator>> (NEGATE_OPERATOR | NUMBER_OR_BADARITH_OPERATOR) eolStar |
   //                         <<escapedNewlineSwapsDualOperator>> (ADDITION_OPERATOR | SUBTRACTION_OPERATOR) |
   //                         (TERNARY_OPERATOR | UNARY_OPERATOR) eolStar |
@@ -3815,7 +3859,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   public static boolean unaryPrefixOperator(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "unaryPrefixOperator")) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, UNARY_PREFIX_OPERATOR, "<+, -, !, ^, not, ~~~, //>");
+    Marker m = enter_section_(b, l, _COLLAPSE_, UNARY_PREFIX_OPERATOR, "<+, -, !, ^, not, ~~~, //>");
     r = unaryPrefixOperator_0(b, l + 1);
     if (!r) r = unaryPrefixOperator_1(b, l + 1);
     if (!r) r = unaryPrefixOperator_2(b, l + 1);

@@ -29,6 +29,13 @@ class Issue4068TestCase : ParsingTestCase() {
     fun testMultiLetterSigilEmpty() = assertParsedAndQuotedCorrectlyFrom(QuotingDialect.V1_15, false)
     fun testMultiLetterSigilBraces() = assertParsedAndQuotedCorrectlyFrom(QuotingDialect.V1_15, false)
 
+    fun testPinnedStructName() = assertParsedAndQuotedCorrectly(false)
+    fun testPinnedStructNameEmpty() = assertParsedAndQuotedCorrectly(false)
+    fun testPrefixedStructNames() = assertParsedAndQuotedCorrectly(false)
+    fun testStepStructName() = assertParsedAndQuotedCorrectlyFrom(QuotingDialect.V1_13, false)
+    fun testEllipsisStructName() = assertParsedAndQuotedCorrectlyFrom(QuotingDialect.V1_17, false)
+    fun testPinnedStructNameAccess() = assertParsedAndQuotedCorrectlyFrom(QuotingDialect.V1_17, false)
+
     fun testUnicodeRemoteCall() = assertParsedAndQuotedCorrectly(false)
     fun testCombiningMarkIdentifierForms() = assertParsedAndQuotedCorrectly(false)
     fun testDecomposedIdentifier() = assertParsedAndQuotedCorrectlyFrom(QuotingDialect.V1_14, false)
@@ -70,6 +77,10 @@ class Issue4068TestCase : ParsingTestCase() {
     fun testDotKeywordKey() = assertParsedAndQuotedCorrectlyFrom(QuotingDialect.V1_13, false)
     fun testSteppedRangeKeywordKey() = assertParsedAndQuotedCorrectly(false)
     fun testSteppedRangeKeywordKeyForms() = assertParsedAndQuotedCorrectly(false)
+
+    fun testMapNonPairEntries() = assertParsedAndQuotedCorrectlyFrom(QuotingDialect.V1_17, false)
+    fun testMapTupleEntry() = assertParsedAndQuotedCorrectlyFrom(QuotingDialect.V1_17, false)
+    fun testMapNonPairEntryForms() = assertParsedAndQuotedCorrectlyFrom(QuotingDialect.V1_17, false)
 
     fun testNotInLineStart() = assertParsedAndQuotedCorrectly(false)
     fun testNotInLineStartNewline() = assertParsedAndQuotedCorrectly(false)

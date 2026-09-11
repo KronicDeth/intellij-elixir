@@ -78,7 +78,7 @@ public class ElixirPsiImplUtil {
             ElixirTypes.UNARY_OPERATOR
     );
     public static final TokenSet IDENTIFIER_TOKEN_SET = TokenSet.create(ElixirTypes.IDENTIFIER_TOKEN);
-    // A sign whose reading ElixirParserUtil.escapedNewlineSwapsDualOperator swapped, and a prefix `//`
+    // A sign whose reading ElixirParserUtil.escapedNewlineSwapsDualOperator swapped, and a prefix `//` or `...`
     private static final TokenSet ADDITION_INFIX_OPERATOR_TOKEN_SET = TokenSet.orSet(
             ADDITION_OPERATOR_TOKEN_SET,
             TokenSet.create(ElixirTypes.NEGATE_OPERATOR, ElixirTypes.NUMBER_OR_BADARITH_OPERATOR)
@@ -86,7 +86,8 @@ public class ElixirPsiImplUtil {
     private static final TokenSet UNARY_PREFIX_OPERATOR_TOKEN_SET = TokenSet.orSet(
             UNARY_OPERATOR_TOKEN_SET,
             ADDITION_OPERATOR_TOKEN_SET,
-            TERNARY_OPERATOR_TOKEN_SET
+            TERNARY_OPERATOR_TOKEN_SET,
+            IDENTIFIER_TOKEN_SET
     );
     public static final Function1<? super PsiElement, ? extends PsiElement> NEXT_SIBLING =
             (Function1<PsiElement, PsiElement>) PsiElement::getNextSibling;

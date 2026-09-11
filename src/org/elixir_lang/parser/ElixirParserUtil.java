@@ -47,6 +47,11 @@ public class ElixirParserUtil extends GeneratedParserUtilBase {
         return dialect(builder).getHasStepOperator();
     }
 
+    /** {@code ...}, which the lexer returns as an identifier. */
+    public static boolean ellipsis(@NotNull PsiBuilder builder, int level) {
+        return builder.getTokenType() == ElixirTypes.IDENTIFIER_TOKEN && "...".equals(builder.getTokenText());
+    }
+
     /**
      * Whether the {@code +} or {@code -} here takes the other reading from the one the lexer gave it, because the
      * dialect does not count an escaped newline as space - see

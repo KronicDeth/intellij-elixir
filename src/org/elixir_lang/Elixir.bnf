@@ -1825,23 +1825,37 @@ private maxExpression ::= /* matchedBracketOperation because it is first rule af
                            variable |
                            accessExpression
                           ) maxQualifiedNoArgumentsCall | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L499
+                          // Before variable, which would take the identifier of `a[1]`
+                          matchedAtUnqualifiedBracketOperation |
+                          matchedAtNumericBracketOperation |
+                          matchedUnqualifiedBracketOperation |
                           matchedUnqualifiedParenthesesCall | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L231
                           variable | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L499
                           atom | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L226-L228
-                          alias // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L231
+                          alias | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L231
+                          accessExpression // Elixir 1.17.0's map_base_expr takes any sub_matched_expr
 
 /*
  * Map Expression
  */
 
-atMaxExpression ::= atPrefixOperator maxExpression
+atMaxExpression ::= atPrefixOperator mapExpression
                     { elementType = matchedAtOperation }
+
+// `...` lexes as an identifier.
+ellipsisPrefixOperator ::= <<ellipsis>> IDENTIFIER_TOKEN
+                           { elementType = unaryPrefixOperator }
+
+unaryMaxExpression ::= (ellipsisPrefixOperator | unaryPrefixOperator) mapExpression
+                       { elementType = matchedUnaryOperation }
 
 /* Anything that can hold a map.
  *
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L498-L500
  */
-private mapExpression ::= maxExpression | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L498-L499
+// unaryMaxExpression first, so that `...` with an operand is not taken as a variable
+private mapExpression ::= unaryMaxExpression |
+                          maxExpression | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L498-L499
                           atMaxExpression // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L500
 
 private associationsExpression ::= containerAssociationOperation | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L505
