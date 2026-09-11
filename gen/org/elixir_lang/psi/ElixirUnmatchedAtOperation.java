@@ -6,6 +6,7 @@ import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.psi.PsiReference;
+import com.intellij.util.concurrency.annotations.RequiresReadLock;
 
 public interface ElixirUnmatchedAtOperation extends ElixirUnmatchedExpression, AtOperation {
 
@@ -23,6 +24,7 @@ public interface ElixirUnmatchedAtOperation extends ElixirUnmatchedExpression, A
 
   @NotNull Operator operator();
 
+  @RequiresReadLock
   @NotNull OtpErlangObject quote();
 
 }

@@ -36,6 +36,7 @@ public interface ElixirLine extends Atomable, Interpolated, Line, Quotable, Quot
 
   boolean isValidHost();
 
+  @RequiresReadLock
   @NotNull OtpErlangObject quote();
 
   @NotNull OtpErlangObject quoteAsAtom();
@@ -44,6 +45,7 @@ public interface ElixirLine extends Atomable, Interpolated, Line, Quotable, Quot
 
   @NotNull OtpErlangObject quoteEmpty();
 
+  @RequiresReadLock
   @NotNull OtpErlangObject quoteInterpolation(ElixirInterpolation interpolation);
 
   @NotNull OtpErlangObject quoteLiteral(List<Integer> codePointList);

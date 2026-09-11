@@ -187,6 +187,7 @@ public class ElixirUnqualifiedNoParenthesesManyArgumentsCallImpl extends NamedSt
   }
 
   @Override
+  @RequiresReadLock
   public @NotNull OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }

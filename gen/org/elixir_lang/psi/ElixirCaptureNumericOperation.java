@@ -76,6 +76,7 @@ public interface ElixirCaptureNumericOperation extends Named, Prefix {
   @RequiresReadLock
   @Nullable Integer primaryArity();
 
+  @RequiresReadLock
   @NotNull OtpErlangObject quote();
 
   @Nullable PsiElement[] secondaryArguments();

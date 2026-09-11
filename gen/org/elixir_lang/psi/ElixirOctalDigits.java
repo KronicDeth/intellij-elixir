@@ -6,6 +6,7 @@ import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.psi.tree.IElementType;
+import com.intellij.util.concurrency.annotations.RequiresReadLock;
 
 public interface ElixirOctalDigits extends Digits {
 
@@ -13,6 +14,7 @@ public interface ElixirOctalDigits extends Digits {
 
   boolean inBase();
 
+  @RequiresReadLock
   @NotNull OtpErlangObject quote();
 
   @NotNull IElementType validElementType();

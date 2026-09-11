@@ -1,6 +1,8 @@
 package org.elixir_lang.intellij_elixir
 
 import com.ericsson.otp.erlang.*
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.util.Computable
 import com.intellij.psi.PsiFile
 import org.apache.commons.lang3.CharUtils
 import org.elixir_lang.GenericServer.call
@@ -160,7 +162,8 @@ object Quoter {
             val expectedQuoted = quotedMessage.elementAt(1)
 
             if (statusString == "ok") {
-                val actualQuoted = ElixirPsiImplUtil.quote(file)
+                val actualQuoted =
+                    ApplicationManager.getApplication().runReadAction(Computable { ElixirPsiImplUtil.quote(file) })
                 assertQuotedCorrectly(expectedQuoted, actualQuoted)
             } else if (statusString == "error") {
                 val error = expectedQuoted as OtpErlangTuple

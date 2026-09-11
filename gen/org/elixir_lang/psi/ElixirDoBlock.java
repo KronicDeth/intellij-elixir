@@ -5,6 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 import com.ericsson.otp.erlang.OtpErlangObject;
+import com.intellij.util.concurrency.annotations.RequiresReadLock;
 
 public interface ElixirDoBlock extends QuotableArguments {
 
@@ -17,6 +18,7 @@ public interface ElixirDoBlock extends QuotableArguments {
   @Nullable
   ElixirStab getStab();
 
+  @RequiresReadLock
   @NotNull OtpErlangObject[] quoteArguments();
 
 }

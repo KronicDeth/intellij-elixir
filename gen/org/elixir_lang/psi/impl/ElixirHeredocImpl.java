@@ -87,6 +87,7 @@ public class ElixirHeredocImpl extends ASTWrapperPsiElement implements ElixirHer
   }
 
   @Override
+  @RequiresReadLock
   public @NotNull OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }
@@ -102,6 +103,7 @@ public class ElixirHeredocImpl extends ASTWrapperPsiElement implements ElixirHer
   }
 
   @Override
+  @RequiresReadLock
   public @NotNull OtpErlangObject quoteInterpolation(ElixirInterpolation interpolation) {
     return ElixirPsiImplUtil.quoteInterpolation(this, interpolation);
   }

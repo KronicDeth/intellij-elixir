@@ -169,6 +169,7 @@ public class ElixirUnmatchedDotCallImpl extends NamedStubbedPsiElementBase<Unmat
   }
 
   @Override
+  @RequiresReadLock
   public @NotNull OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }

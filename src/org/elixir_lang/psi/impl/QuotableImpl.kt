@@ -186,6 +186,7 @@ object QuotableImpl {
         )
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun quote(notIn: NotIn): OtpErlangObject {
@@ -281,6 +282,7 @@ object QuotableImpl {
     @JvmStatic
     fun quote(blockIdentifier: ElixirBlockIdentifier): OtpErlangObject = OtpErlangAtom(blockIdentifier.node.text)
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun quote(blockItem: ElixirBlockItem): OtpErlangObject {
@@ -338,6 +340,7 @@ object QuotableImpl {
                     OtpErlangAtom(alias.text)
             )
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun quote(anonymousFunction: ElixirAnonymousFunction): OtpErlangObject {
@@ -349,6 +352,7 @@ object QuotableImpl {
         )
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun quote(associations: ElixirAssociations): OtpErlangObject = associations.associationsBase.quote()
@@ -495,10 +499,12 @@ object QuotableImpl {
         )
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun quote(mapOperation: ElixirMapOperation): OtpErlangObject = mapOperation.mapArguments.quote()
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun quote(mapArguments: ElixirMapArguments): OtpErlangObject {
@@ -651,6 +657,7 @@ object QuotableImpl {
         )
     }
 
+    @RequiresReadLock
     @JvmStatic
     fun quote(bracketOperation: BracketOperation): OtpErlangObject {
         val children = bracketOperation.children
@@ -878,6 +885,7 @@ object QuotableImpl {
         )
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun quote(qualifiedBracketOperation: QualifiedBracketOperation): OtpErlangObject {
@@ -1140,6 +1148,7 @@ object QuotableImpl {
         )
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun quote(parentheticalStab: ElixirParentheticalStab): OtpErlangObject {
@@ -1245,6 +1254,7 @@ object QuotableImpl {
                 ElixirPsiImplUtil.quote(root)
             }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun quote(unqualifiedNoParenthesesManyArgumentsCall: ElixirUnqualifiedNoParenthesesManyArgumentsCall): OtpErlangObject {
@@ -1254,6 +1264,7 @@ object QuotableImpl {
         return anchoredQuotedFunctionCall(unqualifiedNoParenthesesManyArgumentsCall, quotedIdentifier, *quotedArguments)
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun quote(sigilHeredoc: SigilHeredocLiteral): OtpErlangObject {
@@ -1262,6 +1273,7 @@ object QuotableImpl {
         return quote(sigilHeredoc, quotedHeredocLiteral)
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun quote(sigilLine: SigilLine): OtpErlangObject {
@@ -1423,6 +1435,7 @@ object QuotableImpl {
     }
 
     // https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L277
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun quote(stabNoParenthesesSignature: ElixirStabNoParenthesesSignature): OtpErlangObject =
@@ -1589,6 +1602,7 @@ object QuotableImpl {
         return toBlock(quotedChildren, rearrangesUnaryOperators(file), emptyMetadata)
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun quote(sigil: Sigil, quotedContent: OtpErlangObject): OtpErlangObject {

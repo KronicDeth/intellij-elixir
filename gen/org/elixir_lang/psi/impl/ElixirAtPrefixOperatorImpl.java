@@ -12,6 +12,7 @@ import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.psi.*;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.psi.tree.TokenSet;
+import com.intellij.util.concurrency.annotations.RequiresReadLock;
 
 public class ElixirAtPrefixOperatorImpl extends ASTWrapperPsiElement implements ElixirAtPrefixOperator {
 
@@ -35,6 +36,7 @@ public class ElixirAtPrefixOperatorImpl extends ASTWrapperPsiElement implements 
   }
 
   @Override
+  @RequiresReadLock
   public @NotNull OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }

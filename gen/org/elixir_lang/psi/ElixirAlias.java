@@ -28,6 +28,7 @@ public interface ElixirAlias extends NamedElement, QualifiableAlias, Quotable {
 
   boolean processDeclarations(@NotNull PsiScopeProcessor processor, @NotNull ResolveState state, PsiElement lastParent, @NotNull PsiElement place);
 
+  @RequiresReadLock
   @NotNull OtpErlangObject quote();
 
   @NotNull PsiElement setName(@NotNull String newName);

@@ -136,6 +136,7 @@ public class ElixirMatchedTwoOperationImpl extends ElixirMatchedExpressionImpl i
   }
 
   @Override
+  @RequiresReadLock
   public @NotNull OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }

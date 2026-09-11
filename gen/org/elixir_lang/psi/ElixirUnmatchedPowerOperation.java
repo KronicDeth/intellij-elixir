@@ -63,6 +63,7 @@ public interface ElixirUnmatchedPowerOperation extends ElixirUnmatchedExpression
   @RequiresReadLock
   boolean processDeclarations(@NotNull PsiScopeProcessor processor, @NotNull ResolveState state, PsiElement lastParent, @NotNull PsiElement place);
 
+  @RequiresReadLock
   @NotNull OtpErlangObject quote();
 
   @RequiresReadLock

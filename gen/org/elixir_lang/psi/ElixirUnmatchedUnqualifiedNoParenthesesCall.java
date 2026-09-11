@@ -98,6 +98,7 @@ public interface ElixirUnmatchedUnqualifiedNoParenthesesCall extends ElixirUnmat
   @RequiresReadLock
   @Nullable String implementedProtocolName();
 
+  @RequiresReadLock
   @NotNull OtpErlangObject quote();
 
   @RequiresReadLock

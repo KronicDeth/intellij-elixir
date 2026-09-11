@@ -136,6 +136,7 @@ public class ElixirUnmatchedAdditionOperationImpl extends ElixirUnmatchedExpress
   }
 
   @Override
+  @RequiresReadLock
   public @NotNull OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }

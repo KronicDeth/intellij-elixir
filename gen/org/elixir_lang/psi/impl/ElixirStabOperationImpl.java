@@ -13,6 +13,7 @@ import org.elixir_lang.psi.*;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.PsiScopeProcessor;
+import com.intellij.util.concurrency.annotations.RequiresReadLock;
 
 public class ElixirStabOperationImpl extends ASTWrapperPsiElement implements ElixirStabOperation {
 
@@ -70,6 +71,7 @@ public class ElixirStabOperationImpl extends ASTWrapperPsiElement implements Eli
   }
 
   @Override
+  @RequiresReadLock
   public @NotNull OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }

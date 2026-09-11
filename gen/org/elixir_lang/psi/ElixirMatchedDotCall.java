@@ -86,6 +86,7 @@ public interface ElixirMatchedDotCall extends ElixirMatchedExpression, DotCall<M
   @RequiresReadLock
   boolean processDeclarations(@NotNull PsiScopeProcessor processor, @NotNull ResolveState state, PsiElement lastParent, @NotNull PsiElement place);
 
+  @RequiresReadLock
   @NotNull OtpErlangObject quote();
 
   @RequiresReadLock

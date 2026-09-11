@@ -53,6 +53,7 @@ public class ElixirKeywordKeyImpl extends ASTWrapperPsiElement implements Elixir
   }
 
   @Override
+  @RequiresReadLock
   public @NotNull OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }

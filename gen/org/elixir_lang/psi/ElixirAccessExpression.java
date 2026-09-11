@@ -5,6 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 import com.ericsson.otp.erlang.OtpErlangObject;
+import com.intellij.util.concurrency.annotations.RequiresReadLock;
 
 public interface ElixirAccessExpression extends MaybeModuleName, Quotable {
 
@@ -82,6 +83,7 @@ public interface ElixirAccessExpression extends MaybeModuleName, Quotable {
 
   boolean isModuleName();
 
+  @RequiresReadLock
   @NotNull OtpErlangObject quote();
 
 }

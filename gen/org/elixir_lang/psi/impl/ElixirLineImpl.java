@@ -86,6 +86,7 @@ public class ElixirLineImpl extends ASTWrapperPsiElement implements ElixirLine {
   }
 
   @Override
+  @RequiresReadLock
   public @NotNull OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }
@@ -106,6 +107,7 @@ public class ElixirLineImpl extends ASTWrapperPsiElement implements ElixirLine {
   }
 
   @Override
+  @RequiresReadLock
   public @NotNull OtpErlangObject quoteInterpolation(ElixirInterpolation interpolation) {
     return ElixirPsiImplUtil.quoteInterpolation(this, interpolation);
   }

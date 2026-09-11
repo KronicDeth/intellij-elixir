@@ -136,6 +136,7 @@ public class ElixirMatchedMultiplicationOperationImpl extends ElixirMatchedExpre
   }
 
   @Override
+  @RequiresReadLock
   public @NotNull OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }

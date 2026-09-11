@@ -13,6 +13,7 @@ import org.elixir_lang.psi.*;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.PsiScopeProcessor;
+import com.intellij.util.concurrency.annotations.RequiresReadLock;
 
 public class ElixirMultipleAliasesImpl extends ASTWrapperPsiElement implements ElixirMultipleAliases {
 
@@ -54,6 +55,7 @@ public class ElixirMultipleAliasesImpl extends ASTWrapperPsiElement implements E
   }
 
   @Override
+  @RequiresReadLock
   public @NotNull OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }

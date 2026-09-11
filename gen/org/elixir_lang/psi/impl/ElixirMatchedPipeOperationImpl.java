@@ -136,6 +136,7 @@ public class ElixirMatchedPipeOperationImpl extends ElixirMatchedExpressionImpl 
   }
 
   @Override
+  @RequiresReadLock
   public @NotNull OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }

@@ -70,6 +70,7 @@ public class ElixirAliasImpl extends ASTWrapperPsiElement implements ElixirAlias
   }
 
   @Override
+  @RequiresReadLock
   public @NotNull OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }

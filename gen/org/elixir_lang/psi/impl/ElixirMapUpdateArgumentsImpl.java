@@ -11,6 +11,7 @@ import static org.elixir_lang.psi.ElixirTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.psi.*;
 import com.ericsson.otp.erlang.OtpErlangObject;
+import com.intellij.util.concurrency.annotations.RequiresReadLock;
 
 public class ElixirMapUpdateArgumentsImpl extends ASTWrapperPsiElement implements ElixirMapUpdateArguments {
 
@@ -59,6 +60,7 @@ public class ElixirMapUpdateArgumentsImpl extends ASTWrapperPsiElement implement
   }
 
   @Override
+  @RequiresReadLock
   public @NotNull OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }

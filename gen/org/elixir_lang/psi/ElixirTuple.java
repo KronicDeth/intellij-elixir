@@ -5,6 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 import com.ericsson.otp.erlang.OtpErlangObject;
+import com.intellij.util.concurrency.annotations.RequiresReadLock;
 
 public interface ElixirTuple extends Quotable {
 
@@ -17,6 +18,7 @@ public interface ElixirTuple extends Quotable {
   @NotNull
   List<ElixirUnmatchedExpression> getUnmatchedExpressionList();
 
+  @RequiresReadLock
   @NotNull OtpErlangObject quote();
 
 }

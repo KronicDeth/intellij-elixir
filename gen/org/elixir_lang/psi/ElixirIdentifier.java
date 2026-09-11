@@ -7,6 +7,7 @@ import com.intellij.psi.PsiElement;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiReference;
+import com.intellij.util.concurrency.annotations.RequiresReadLock;
 
 public interface ElixirIdentifier extends Quotable {
 
@@ -14,6 +15,7 @@ public interface ElixirIdentifier extends Quotable {
 
   @Nullable PsiReference getReference();
 
+  @RequiresReadLock
   @NotNull OtpErlangObject quote();
 
 }

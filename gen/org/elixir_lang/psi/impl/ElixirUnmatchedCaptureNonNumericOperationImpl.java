@@ -134,6 +134,7 @@ public class ElixirUnmatchedCaptureNonNumericOperationImpl extends ElixirUnmatch
   }
 
   @Override
+  @RequiresReadLock
   public @NotNull OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }

@@ -12,6 +12,7 @@ import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.psi.*;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.psi.tree.IElementType;
+import com.intellij.util.concurrency.annotations.RequiresReadLock;
 
 public class ElixirOctalDigitsImpl extends ASTWrapperPsiElement implements ElixirOctalDigits {
 
@@ -40,6 +41,7 @@ public class ElixirOctalDigitsImpl extends ASTWrapperPsiElement implements Elixi
   }
 
   @Override
+  @RequiresReadLock
   public @NotNull OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }

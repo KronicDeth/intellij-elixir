@@ -181,6 +181,7 @@ public class ElixirMatchedQualifiedParenthesesCallImpl extends NamedStubbedPsiEl
   }
 
   @Override
+  @RequiresReadLock
   public @NotNull OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }

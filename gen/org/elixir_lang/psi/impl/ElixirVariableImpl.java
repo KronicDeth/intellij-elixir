@@ -41,6 +41,7 @@ public class ElixirVariableImpl extends ASTWrapperPsiElement implements ElixirVa
   }
 
   @Override
+  @RequiresReadLock
   public @NotNull OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }

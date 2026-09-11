@@ -5,6 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 import com.ericsson.otp.erlang.OtpErlangObject;
+import com.intellij.util.concurrency.annotations.RequiresReadLock;
 
 public interface ElixirBlockItem extends Quotable {
 
@@ -17,6 +18,7 @@ public interface ElixirBlockItem extends Quotable {
   @Nullable
   ElixirStab getStab();
 
+  @RequiresReadLock
   @NotNull OtpErlangObject quote();
 
 }

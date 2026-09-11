@@ -20,6 +20,7 @@ public interface ElixirKeywordKey extends NamedElement, Quotable {
 
   @NotNull ItemPresentation getPresentation();
 
+  @RequiresReadLock
   @NotNull OtpErlangObject quote();
 
   @NotNull PsiElement setName(@NotNull String newName);

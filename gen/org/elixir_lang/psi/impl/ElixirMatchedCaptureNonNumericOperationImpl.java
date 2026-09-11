@@ -134,6 +134,7 @@ public class ElixirMatchedCaptureNonNumericOperationImpl extends ElixirMatchedEx
   }
 
   @Override
+  @RequiresReadLock
   public @NotNull OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }

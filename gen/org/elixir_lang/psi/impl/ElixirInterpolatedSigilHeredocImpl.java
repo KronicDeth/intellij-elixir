@@ -98,11 +98,13 @@ public class ElixirInterpolatedSigilHeredocImpl extends ASTWrapperPsiElement imp
   }
 
   @Override
+  @RequiresReadLock
   public @NotNull OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }
 
   @Override
+  @RequiresReadLock
   public @NotNull OtpErlangObject quote(@NotNull OtpErlangObject quotedContent) {
     return ElixirPsiImplUtil.quote(this, quotedContent);
   }
@@ -118,6 +120,7 @@ public class ElixirInterpolatedSigilHeredocImpl extends ASTWrapperPsiElement imp
   }
 
   @Override
+  @RequiresReadLock
   public @NotNull OtpErlangObject quoteInterpolation(ElixirInterpolation interpolation) {
     return ElixirPsiImplUtil.quoteInterpolation(this, interpolation);
   }

@@ -5,6 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 import com.ericsson.otp.erlang.OtpErlangObject;
+import com.intellij.util.concurrency.annotations.RequiresReadLock;
 
 public interface ElixirStabParenthesesSignature extends Quotable {
 
@@ -23,6 +24,7 @@ public interface ElixirStabParenthesesSignature extends Quotable {
   @Nullable
   ElixirWhenInfixOperator getWhenInfixOperator();
 
+  @RequiresReadLock
   @NotNull OtpErlangObject quote();
 
 }

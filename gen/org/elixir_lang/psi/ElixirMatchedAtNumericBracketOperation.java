@@ -5,6 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 import com.ericsson.otp.erlang.OtpErlangObject;
+import com.intellij.util.concurrency.annotations.RequiresReadLock;
 
 public interface ElixirMatchedAtNumericBracketOperation extends ElixirMatchedExpression, AtNumericBracketOperation {
 
@@ -35,6 +36,7 @@ public interface ElixirMatchedAtNumericBracketOperation extends ElixirMatchedExp
   @Nullable
   ElixirUnknownBaseWholeNumber getUnknownBaseWholeNumber();
 
+  @RequiresReadLock
   @NotNull OtpErlangObject quote();
 
 }

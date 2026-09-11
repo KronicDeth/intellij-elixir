@@ -6,6 +6,7 @@ import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.NavigatablePsiElement;
 import com.ericsson.otp.erlang.OtpErlangObject;
+import com.intellij.util.concurrency.annotations.RequiresReadLock;
 
 public interface ElixirAnonymousFunction extends NavigatablePsiElement, Quotable {
 
@@ -15,6 +16,7 @@ public interface ElixirAnonymousFunction extends NavigatablePsiElement, Quotable
   @NotNull
   ElixirStab getStab();
 
+  @RequiresReadLock
   @NotNull OtpErlangObject quote();
 
 }

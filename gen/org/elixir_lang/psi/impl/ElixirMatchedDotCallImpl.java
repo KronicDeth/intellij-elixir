@@ -168,6 +168,7 @@ public class ElixirMatchedDotCallImpl extends NamedStubbedPsiElementBase<Matched
   }
 
   @Override
+  @RequiresReadLock
   public @NotNull OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }

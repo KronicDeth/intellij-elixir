@@ -136,6 +136,7 @@ public class ElixirUnmatchedTwoOperationImpl extends ElixirUnmatchedExpressionIm
   }
 
   @Override
+  @RequiresReadLock
   public @NotNull OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }

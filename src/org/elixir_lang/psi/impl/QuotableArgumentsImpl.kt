@@ -14,6 +14,7 @@ import org.jetbrains.annotations.Contract
 object QuotableArgumentsImpl {
     val DO = OtpErlangAtom("do")
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun quoteArguments(arguments: Arguments): Array<OtpErlangObject> =
@@ -23,6 +24,7 @@ object QuotableArgumentsImpl {
                     .map(Quotable::quote)
                     .toTypedArray()
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun quoteArguments(blockList: ElixirBlockList): Array<OtpErlangObject> =
@@ -31,6 +33,7 @@ object QuotableArgumentsImpl {
                     .map(ElixirBlockItem::quote)
                     .toTypedArray()
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun quoteArguments(
@@ -58,6 +61,7 @@ object QuotableArgumentsImpl {
         return quotedKeywordPairList.toTypedArray().let(::OtpErlangList).let { arrayOf(it) }
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun quoteArguments(mapConstructionArguments: ElixirMapConstructionArguments): Array<OtpErlangObject> =
@@ -72,6 +76,7 @@ object QuotableArgumentsImpl {
                                 .asList()
                     }.toTypedArray()
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun quoteArguments(noParenthesesArguments: ElixirNoParenthesesArguments): Array<OtpErlangObject> =
@@ -81,6 +86,7 @@ object QuotableArgumentsImpl {
                     .let { it as QuotableArguments }
                     .quoteArguments()
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun quoteArguments(parenthesesArguments: ElixirParenthesesArguments): Array<OtpErlangObject> =

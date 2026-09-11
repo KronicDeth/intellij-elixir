@@ -37,12 +37,14 @@ public interface ElixirHeredoc extends HeredocLiteral, Interpolated, Quote {
 
   boolean isValidHost();
 
+  @RequiresReadLock
   @NotNull OtpErlangObject quote();
 
   @NotNull OtpErlangObject quoteBinary(OtpErlangList metadata, List<OtpErlangObject> argumentList);
 
   @NotNull OtpErlangObject quoteEmpty();
 
+  @RequiresReadLock
   @NotNull OtpErlangObject quoteInterpolation(ElixirInterpolation interpolation);
 
   @NotNull OtpErlangObject quoteLiteral(List<Integer> codePointList);
