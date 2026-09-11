@@ -54,6 +54,14 @@ public class Stack {
         return stack.peek().isSigil();
     }
 
+    public boolean isQuotedCallName() {
+        return stack.peek().isQuotedCallName();
+    }
+
+    public void markQuotedCallName() {
+        stack.peek().markQuotedCallName();
+    }
+
     public void nameSigil(char sigilName) {
         stack.peek().nameSigil(sigilName);
     }

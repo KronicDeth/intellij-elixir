@@ -37,6 +37,7 @@ public class StackFrame {
     private Integer lastLexicalState;
     private String promoter = null;
     private Character sigilName = null;
+    private boolean quotedCallName = false;
 
     public StackFrame(int lastLexicalState) {
         this.lastLexicalState = lastLexicalState;
@@ -135,6 +136,14 @@ public class StackFrame {
 
     public boolean isSigil() {
         return sigilName != null;
+    }
+
+    public boolean isQuotedCallName() {
+        return quotedCallName;
+    }
+
+    public void markQuotedCallName() {
+        quotedCallName = true;
     }
 
     public IElementType sigilNameType() {

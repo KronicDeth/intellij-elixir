@@ -64,6 +64,13 @@ class Issue4068TestCase : ParsingTestCase() {
     fun testQuotedRemoteCallNameEscape() = assertParsedAndQuotedCorrectly(false)
     fun testCaptureQuotedRemoteCallNameEscape() = assertParsedAndQuotedCorrectly(false)
     fun testCaptureParenthesesQuotedRemoteCallNameEscape() = assertParsedAndQuotedCorrectly(false)
+    fun testQuotedRemoteCallNameInvalidEscape() =
+        assertParsedAndQuotedCorrectlyBeforeOrRaise(QuotingDialect.V1_18, QuotingDialect.V1_19, "Elixir.MatchError", false)
+    fun testQuotedRemoteCallNameInvalidUnicodeEscape() =
+        assertParsedAndQuotedCorrectlyBeforeOrRaise(QuotingDialect.V1_18, QuotingDialect.V1_19, "Elixir.MatchError", false)
+    fun testQuotedRemoteCallNameInvalidBracedEscape() =
+        assertParsedAndQuotedCorrectlyBeforeOrRaise(QuotingDialect.V1_18, QuotingDialect.V1_19, "Elixir.MatchError", false)
+    fun testInvalidHexadecimalEscapeString() = assertParsedWithErrors(false)
     fun testQuotedRemoteCallNameInvalidCodePoint() =
         assertParsedAndQuotedCorrectlyBeforeOrRaise(QuotingDialect.V1_18, QuotingDialect.V1_19, "Elixir.MatchError", false)
     fun testQuotedRemoteCallNameSurrogate() =
