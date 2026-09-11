@@ -177,10 +177,9 @@ object Quoter {
 
                     else -> TODO()
                 }
-                val messageBinary = error.elementAt(1) as OtpErlangBinary
-                val message = ElixirPsiImplUtil.javaString(messageBinary)
                 val tokenBinary = error.elementAt(2) as OtpErlangBinary
                 val token = ElixirPsiImplUtil.javaString(tokenBinary)
+                val message = errorMessage(error.elementAt(1), token)
                 throw AssertionError(
                     "quoter returned \"$message\" $location due to $token, use assertQuotesAroundError if error is expect in Elixir natively, but not in intellij-elixir plugin"
                 )
@@ -199,6 +198,17 @@ object Quoter {
             daemonDied(e)
         }
     }
+
+    /** A `{prefix, suffix}` message surrounds its token, as `elixir_errors:parse_error/5` joins them. */
+    internal fun errorMessage(message: OtpErlangObject, token: String): String =
+        if (message is OtpErlangTuple) {
+            utf8(message.elementAt(0)) + token + utf8(message.elementAt(1))
+        } else {
+            utf8(message)
+        }
+
+    private fun utf8(binary: OtpErlangObject): String =
+        String((binary as OtpErlangBinary).binaryValue(), Charsets.UTF_8)
 
     /**
      * Reports where two quoted forms diverge rather than dumping both in full.
