@@ -15,6 +15,10 @@
 
 ### Enhancements
 
+- [#4081](https://github.com/KronicDeth/intellij-elixir/pull/4081) [@sh41](https://github.com/sh41)
+  - **Every source file shipped with Elixir 1.11 through 1.20, and every valid snippet in Elixir's parser tests,
+    now parses without error.**
+
 - [#4035](https://github.com/KronicDeth/intellij-elixir/pull/4035) [@sh41](https://github.com/sh41)
   - **The plugin now parses Elixir 1.11 and 1.12 correctly, and CI covers both.**
 
