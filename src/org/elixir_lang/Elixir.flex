@@ -327,7 +327,7 @@ OPERATOR = {FOUR_TOKEN_OPERATOR} |
 
 ATOM_END = [?!]
 ATOM_MIDDLE = [0-9a-zA-Z@_]
-UNICODE_ATOM_MIDDLE = [[:letter:][:digit:]]
+UNICODE_ATOM_MIDDLE = [[:letter:][:digit:]\p{Mn}\p{Mc}]
 ATOM_START = [a-zA-Z_]
 UNICODE_ATOM_START = [[:letter:]]
 ATOM = ({ATOM_START} | {UNICODE_ATOM_START}) ({ATOM_MIDDLE} | {UNICODE_ATOM_MIDDLE})* {ATOM_END}? | "..."
@@ -443,8 +443,8 @@ IDENTIFIER_TOKEN_START = [a-z_]
 // ASCII uppercase is handled by {ALIAS} rules; non-ASCII uppercase is atoms in Elixir, not identifiers.
 // Uses JFlex character class subtraction (--) to exclude [:uppercase:] from [:letter:].
 UNICODE_IDENTIFIER_START = [[:letter:]--[:uppercase:]]
-// Unicode identifier continue: all Unicode letters and digits.
-UNICODE_IDENTIFIER_CONTINUE = [[:letter:][:digit:]]
+// Unicode identifier continue: all Unicode letters, digits and combining marks.
+UNICODE_IDENTIFIER_CONTINUE = [[:letter:][:digit:]\p{Mn}\p{Mc}]
 IDENTIFIER_TOKEN_HEAD = {IDENTIFIER_TOKEN_START} | {UNICODE_IDENTIFIER_START}
 IDENTIFIER_TOKEN_TAIL = ({IDENTIFIER_TOKEN_MIDDLE} | {UNICODE_IDENTIFIER_CONTINUE})* {IDENTIFIER_TOKEN_END}?
 IDENTIFIER_TOKEN = ({IDENTIFIER_TOKEN_HEAD} {IDENTIFIER_TOKEN_TAIL}  | "...")

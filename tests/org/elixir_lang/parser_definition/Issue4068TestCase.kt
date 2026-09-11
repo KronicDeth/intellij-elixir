@@ -3,6 +3,11 @@ package org.elixir_lang.parser_definition
 import org.elixir_lang.psi.quoting.QuotingDialect
 
 class Issue4068TestCase : ParsingTestCase() {
+    fun testUnicodeRemoteCall() = assertParsedAndQuotedCorrectly(false)
+    fun testCombiningMarkIdentifierForms() = assertParsedAndQuotedCorrectly(false)
+    fun testDecomposedIdentifier() = assertParsedAndQuotedCorrectlyFrom(QuotingDialect.V1_14, false)
+    fun testDecomposedIdentifierForms() = assertParsedAndQuotedCorrectlyFrom(QuotingDialect.V1_14, false)
+
     fun testStabWhenManyArguments() = assertParsedAndQuotedCorrectly()
 
     fun testHexadecimalByteEscapeString() = assertParsedAndQuotedCorrectly(false)

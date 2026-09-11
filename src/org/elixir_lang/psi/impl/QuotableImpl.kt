@@ -31,6 +31,7 @@ import org.jetbrains.annotations.Contract
 import java.lang.Double
 import java.lang.Long
 import java.math.BigInteger
+import java.text.Normalizer
 import java.util.*
 
 val UNQUOTED_TYPES = arrayOf<Class<*>>(ElixirEndOfExpression::class.java, PsiComment::class.java, PsiWhiteSpace::class.java)
@@ -1478,14 +1479,14 @@ object QuotableImpl {
     fun quote(identifier: ElixirIdentifier): OtpErlangObject = identifierAtom(identifier.text, identifier)
 
     /**
-     * From Elixir 1.14 the tokenizer normalises µ (U+00B5) to μ (U+03BC) in an identifier token, but not in a quoted
-     * atom or name: see QuotingDialect.V1_14.
+     * From Elixir 1.14 the tokenizer normalises an identifier token to NFC and µ (U+00B5) to μ (U+03BC), but not a
+     * quoted atom or name: see QuotingDialect.V1_14.
      */
     @RequiresReadLock
     private fun identifierAtom(identifier: String, element: PsiElement): OtpErlangAtom =
         OtpErlangAtom(
-            if ('µ' in identifier && dialectFor(element).normalizesMicroSign) {
-                identifier.replace('µ', 'μ')
+            if (identifier.any { it.code > 0x7F } && dialectFor(element).normalizesIdentifiers) {
+                Normalizer.normalize(identifier, Normalizer.Form.NFC).replace('µ', 'μ')
             } else {
                 identifier
             }

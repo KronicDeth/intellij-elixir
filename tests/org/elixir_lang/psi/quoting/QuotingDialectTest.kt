@@ -158,7 +158,7 @@ class QuotingDialectTest {
         )
         assertEquals(
             listOf(false, false, false, true, true, true, true, true, true, true, true),
-            QuotingDialect.entries.map { it.normalizesMicroSign }
+            QuotingDialect.entries.map { it.normalizesIdentifiers }
         )
         assertEquals(
             listOf(false, false, true, true, true, true, true, true, true, true, true),
