@@ -46,6 +46,9 @@ class Issue4068TestCase : ParsingTestCase() {
     fun testEmptyInterpolationNewline() = assertParsedAndQuotedCorrectly(false)
     fun testEmptyInterpolationLaterLine() = assertParsedAndQuotedCorrectly(false)
 
+    fun testEscapedNewlineBeforeDualOperator() = assertParsedAndQuotedCorrectly(false)
+    fun testUnspacedEscapedNewlineBeforeDualOperatorOperand() = assertParsedAndQuotedCorrectly(false)
+
     fun testCaptureEllipsis() = assertParsedAndQuotedCorrectly(false)
     fun testEllipsisDivision() = assertParsedAndQuotedCorrectly(false)
 

@@ -157,8 +157,10 @@ object QuotableImpl {
         val sign = operator.text.singleOrNull()?.takeIf { it == '+' || it == '-' } ?: return null
 
         // `?dual_op(Sign), not(?is_space(NotMarker))`: a space before the sign and none after is what
-        // makes the identifier a call rather than the operation's left operand.
-        if (operator.prevSibling !is PsiWhiteSpace) return null
+        // makes the identifier a call rather than the operation's left operand. An escaped newline
+        // straight after the identifier is not that space.
+        val beforeOperator = operator.prevSibling as? PsiWhiteSpace ?: return null
+        if (beforeOperator.text.first() != ' ' && beforeOperator.text.first() != '\t') return null
         val afterOperator = operator.nextSibling?.takeUnless { it is PsiWhiteSpace } ?: return null
 
         // `NotMarker =/= Sign, NotMarker =/= $/, NotMarker =/= $>` - the three exclusions 1.17.0 kept.

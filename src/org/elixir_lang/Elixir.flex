@@ -916,6 +916,8 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
 <AFTER_RELATIVE_IDENTIFIER, AFTER_UNQUALIFIED_IDENTIFIER> {
   {WHITE_SPACE}+         { yybegin(AFTER_IDENTIFIER_WHITE_SPACE);
                            return TokenType.WHITE_SPACE; }
+  {ESCAPED_EOL}          { yybegin(ADDITION_OR_SUBTRACTION_MAYBE);
+                           return TokenType.WHITE_SPACE; }
 }
 
 <AFTER_RELATIVE_IDENTIFIER, AFTER_UNQUALIFIED_IDENTIFIER, CALL_MAYBE> {
@@ -925,6 +927,7 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
 }
 
 <AFTER_IDENTIFIER_WHITE_SPACE> {
+  {ESCAPED_EOL}                                                          { return TokenType.WHITE_SPACE; }
   {ADDITION_OPERATOR} / {MULTILINE_WHITE_SPACE}                          { yybegin(MULTILINE_WHITE_SPACE_MAYBE);
                                                                            return ElixirTypes.ADDITION_OPERATOR; }
   {ADDITION_OPERATOR} / ({OPENING}|{MINUS_OPERATOR}|{STRUCT_OPERATOR})   { popAndBegin();
