@@ -1,4 +1,4 @@
-package quoter.tasks
+package cache
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.provider.ListProperty
@@ -10,10 +10,10 @@ import org.gradle.api.tasks.options.Option
 import java.io.File
 
 /**
- * Reports the `actions/cache` path patterns covering the quoter's build tree, for the "Resolve quoter
- * cache paths" step in `.github/workflows/shared-test.yml`.
+ * Reports the `actions/cache` path patterns, and optionally the key, for a tree this build writes, for the
+ * "Resolve ... cache" steps in `.github/workflows/shared-test.yml`.
  *
- * The workflow used to derive these itself: grep `quoterRef` out of `gradle.properties`, slugify it, and
+ * The workflow used to derive the quoter's itself: grep `quoterRef` out of `gradle.properties`, slugify it, and
  * rebuild the Elixir/OTP pair token in bash. Both were second implementations of rules that live in
  * `build.gradle.kts` and `sdk.pairToken`, free to drift from them, and drifting was silent - a cache
  * entry naming a directory nothing writes misses on every restore and then collides on save. The grep
@@ -33,7 +33,7 @@ import java.io.File
  * every step, and a task Gradle believed was up to date would leave the step's output unset - an empty
  * `path`, which actions/cache accepts and silently caches nothing under.
  */
-abstract class QuoterCachePathsTask : DefaultTask() {
+abstract class CachePathsTask : DefaultTask() {
 
     /**
      * Patterns in `actions/cache` syntax - a leading `!` excludes. Order is significant and must be
@@ -48,6 +48,11 @@ abstract class QuoterCachePathsTask : DefaultTask() {
     /** Name of the step output the patterns are published as. */
     @get:Input
     abstract val outputName: Property<String>
+
+    /** Published as the step output `key`, for a cache whose content the build alone can name. */
+    @get:Optional
+    @get:Input
+    abstract val key: Property<String>
 
     /**
      * Where to append the step output, normally `$GITHUB_OUTPUT`. Appended rather than replaced: the
@@ -65,16 +70,17 @@ abstract class QuoterCachePathsTask : DefaultTask() {
     @TaskAction
     fun report() {
         val lines = patterns.get()
+        val key = key.orNull
         // QUIET, not lifecycle: reporting the patterns is the whole job, and the workflow runs this
         // with -q, which silences lifecycle. At lifecycle level `gradlew -q quoterCachePaths` - the
         // obvious way to inspect them by hand - printed nothing at all.
-        logger.quiet(lines.joinToString("\n"))
+        logger.quiet((lines + listOfNotNull(key?.let { "key: $it" })).joinToString("\n"))
 
         val destination = githubOutput.orNull?.takeIf { it.isNotBlank() } ?: return
         // A heredoc-style block, because the value is multi-line; `name=value` handles one line only.
         // The delimiter has to appear on no line of the value, which glob patterns never produce.
-        val delimiter = "QUOTER_CACHE_PATHS_EOF"
-        val block = (listOf("${outputName.get()}<<$delimiter") + lines + delimiter)
+        val delimiter = "CACHE_PATHS_EOF"
+        val block = (listOf("${outputName.get()}<<$delimiter") + lines + delimiter + listOfNotNull(key?.let { "key=$it" }))
             // LF, not the platform separator: the runner parses this file the same way on every OS.
             .joinToString("\n", postfix = "\n")
         // UTF-8 and LF are what the runner reads, on Windows runners too - it is also what the bash

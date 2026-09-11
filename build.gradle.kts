@@ -19,6 +19,7 @@
 
 import com.adarshr.gradle.testlogger.TestLoggerExtension
 import com.adarshr.gradle.testlogger.theme.ThemeType
+import cache.CachePathsTask
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import corpus.CorpusEntry
 import corpus.corpusFor
@@ -37,7 +38,6 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 import quoter.QuoterService
 import quoter.tasks.GetQuoterDepsTask
-import quoter.tasks.QuoterCachePathsTask
 import quoter.tasks.ReleaseQuoterTask
 import quoter.tasks.StartQuoterTask
 import sdk.ElixirErlangSdkArgumentProvider
@@ -918,7 +918,7 @@ val quoterService = gradle.sharedServices.registerIfAbsent("quoter", QuoterServi
 // Consumed by CI, which must name the directory this build writes rather than re-derive it - see the
 // task's own documentation. Repo-relative and forward-slashed: the same value feeds the Windows legs,
 // and actions/cache exclusion patterns are forward-slashed regardless of runner.
-tasks.register<QuoterCachePathsTask>("quoterCachePaths") {
+tasks.register<CachePathsTask>("quoterCachePaths") {
     description = "Reports the actions/cache path patterns for the quoter build tree"
     outputName.set("paths")
     patterns.set(
@@ -970,6 +970,18 @@ val elixirParsingCorpusTask = tasks.register<Sync>("elixirParsingCorpus") {
             }
         }
     }
+}
+
+// Consumed by CI like quoterCachePaths. Empty when no corpus is declared for this Elixir.
+tasks.register<CachePathsTask>("elixirParsingCorpusCachePaths") {
+    description = "Reports the actions/cache path patterns and key for the parser tests' corpus archives"
+    outputName.set("paths")
+    patterns.set(elixirParsingCorpus.map {
+        layout.projectDirectory.asFile.toPath()
+            .relativize(elixirParsingCorpusArchives.file(it.archiveFileName).asFile.toPath())
+            .joinToString("/")
+    })
+    key.set(elixirParsingCorpus.joinToString("-") { "${it.owner}-${it.name}-${it.sha}" })
 }
 
 val startQuoter = tasks.register<StartQuoterTask>("startQuoter") {

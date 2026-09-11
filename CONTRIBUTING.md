@@ -442,7 +442,7 @@ from unsupported to supported:
 3. **Delete its `continue-on-error`.** The version is now **supported**: from then on, any change that
    breaks it fails the pipeline.
 
-`continue-on-error` covers the whole leg - toolchain setup, compile, sandbox, quoter build and tests -
+`continue-on-error` covers the whole leg - toolchain setup, compile, sandbox, quoter build, corpus download and tests -
 not just the test step, because an unsupported Elixir can fail at any of those and they all mean the
 same thing. `setup-beam` may not publish the pair. The annotation on a failed informational leg names
 the phase it died in, so you can tell those apart.
