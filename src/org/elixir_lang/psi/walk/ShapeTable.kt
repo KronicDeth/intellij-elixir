@@ -705,6 +705,7 @@ object ShapeTable {
             destructure = Destructure.Bucket.OPAQUE,
         ),
         leaf(ElixirAtomKeyword::class.java),
+        leaf(ElixirNullaryRangeOperation::class.java),
         leaf(ElixirAtIdentifier::class.java),
         leaf(ElixirIdentifier::class.java),
         // `Mod."a#{x}"()` parses, but Elixir rejects interpolation in a call name, so nothing binds through it

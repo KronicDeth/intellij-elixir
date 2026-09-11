@@ -1220,6 +1220,12 @@ object QuotableImpl {
         )
     }
 
+    @RequiresReadLock
+    @Contract(pure = true)
+    @JvmStatic
+    fun quote(nullaryRangeOperation: ElixirNullaryRangeOperation): OtpErlangObject =
+            quotedFunctionCall(RANGE, metadata(nullaryRangeOperation))
+
     /**
      * An interpolation's body, as a block. Elixir parses its tokens as a grammar of their own, so an empty body follows
      * the empty-file rule of quote(ElixirFile) - but its `line` is always 1, not the interpolation's.

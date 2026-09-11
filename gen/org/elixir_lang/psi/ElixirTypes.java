@@ -132,6 +132,7 @@ public interface ElixirTypes {
   IElementType NO_PARENTHESES_MANY_STRICT_NO_PARENTHESES_EXPRESSION = new ElixirElementType("NO_PARENTHESES_MANY_STRICT_NO_PARENTHESES_EXPRESSION");
   IElementType NO_PARENTHESES_ONE_ARGUMENT = new ElixirElementType("NO_PARENTHESES_ONE_ARGUMENT");
   IElementType NO_PARENTHESES_STRICT = new ElixirElementType("NO_PARENTHESES_STRICT");
+  IElementType NULLARY_RANGE_OPERATION = new ElixirElementType("NULLARY_RANGE_OPERATION");
   IElementType OCTAL_DIGITS = new ElixirElementType("OCTAL_DIGITS");
   IElementType OCTAL_WHOLE_NUMBER = new ElixirElementType("OCTAL_WHOLE_NUMBER");
   IElementType OPEN_HEXADECIMAL_ESCAPE_SEQUENCE = new ElixirElementType("OPEN_HEXADECIMAL_ESCAPE_SEQUENCE");
@@ -682,6 +683,9 @@ public interface ElixirTypes {
       }
       else if (type == NO_PARENTHESES_STRICT) {
         return new ElixirNoParenthesesStrictImpl(node);
+      }
+      else if (type == NULLARY_RANGE_OPERATION) {
+        return new ElixirNullaryRangeOperationImpl(node);
       }
       else if (type == OCTAL_DIGITS) {
         return new ElixirOctalDigitsImpl(node);

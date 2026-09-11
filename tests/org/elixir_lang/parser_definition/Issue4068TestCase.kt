@@ -3,6 +3,17 @@ package org.elixir_lang.parser_definition
 import org.elixir_lang.psi.quoting.QuotingDialect
 
 class Issue4068TestCase : ParsingTestCase() {
+    fun testNullaryRangeParenthesized() = assertParsedAndQuotedCorrectlyFrom(QuotingDialect.V1_14, false)
+    fun testNullaryRangeArgument() = assertParsedAndQuotedCorrectlyFrom(QuotingDialect.V1_14, false)
+    fun testNullaryRangeOperatorDefinition() = assertParsedAndQuotedCorrectlyFrom(QuotingDialect.V1_14, false)
+    fun testNullaryRangeNot() = assertParsedAndQuotedCorrectlyFrom(QuotingDialect.V1_14, false)
+    fun testNullaryRangeMatchOperands() = assertParsedAndQuotedCorrectlyFrom(QuotingDialect.V1_14, false)
+    fun testNullaryRangeContainers() = assertParsedAndQuotedCorrectlyFrom(QuotingDialect.V1_14, false)
+    fun testNullaryRangeNoParenthesesArguments() = assertParsedAndQuotedCorrectlyFrom(QuotingDialect.V1_14, false)
+    fun testNullaryRangeEndOfLine() = assertParsedAndQuotedCorrectlyFrom(QuotingDialect.V1_14, false)
+    fun testRangeOperatorNewline() = assertParsedAndQuotedCorrectly(false)
+    fun testRangeSpacedOperands() = assertParsedAndQuotedCorrectly(false)
+
     fun testNoParenthesesManyArgumentsDoBlockArgument() = assertParsedAndQuotedCorrectly(false)
     fun testForManyArgumentsDoBlockArgument() = assertParsedAndQuotedCorrectly(false)
     fun testForManyArgumentsDoBlockSecondArgument() = assertParsedAndQuotedCorrectly(false)

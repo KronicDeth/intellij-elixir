@@ -145,6 +145,12 @@ public class ElixirAccessExpressionImpl extends ASTWrapperPsiElement implements 
 
   @Override
   @Nullable
+  public ElixirNullaryRangeOperation getNullaryRangeOperation() {
+    return PsiTreeUtil.getChildOfType(this, ElixirNullaryRangeOperation.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirOctalWholeNumber getOctalWholeNumber() {
     return PsiTreeUtil.getChildOfType(this, ElixirOctalWholeNumber.class);
   }

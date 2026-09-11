@@ -620,9 +620,11 @@ identifier ::= IDENTIFIER_TOKEN
                }
 
 private notKeywordPairColon ::= !KEYWORD_PAIR_COLON
+// `x ..y` is a range rather than the call `x(..)`.
+private noParenthesesCallArgumentsStart ::= !nullaryRangeOperation
 // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L124-L125
 unqualifiedNoParenthesesManyArgumentsCall ::= identifier notKeywordPairColon
-                                              noParenthesesManyArgumentsStrict
+                                              noParenthesesCallArgumentsStart noParenthesesManyArgumentsStrict
                                               {
                                                 implements = [
                                                   // MUST be first so visitElement is used in ElixirVisitor
@@ -1221,7 +1223,8 @@ matchedTernaryOperation ::= matchedExpression ternaryInfixOperator matchedExpres
  * @see https://github.com/elixir-lang/elixir/pull/9954 for +++ and ---
  */
 
-twoInfixOperator ::= RANGE_OPERATOR | TWO_OPERATOR
+// The lexer keeps the newline after `..` as EOL, which ends a nullary `..`.
+twoInfixOperator ::= RANGE_OPERATOR eolStar | TWO_OPERATOR
                      {
                        implements = "org.elixir_lang.psi.Operator"
                        methods = [
@@ -1482,7 +1485,7 @@ matchedDotCall ::= matchedExpression dotInfixOperator callParenthesesArguments c
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L191-L194
  */
 
-matchedQualifiedNoParenthesesCall ::= matchedExpression dotInfixOperator relativeIdentifier noParenthesesOneArgument
+matchedQualifiedNoParenthesesCall ::= matchedExpression dotInfixOperator relativeIdentifier noParenthesesCallArgumentsStart noParenthesesOneArgument
                                       {
                                         implements = [
                                           "org.elixir_lang.psi.MatchedCall"
@@ -1500,7 +1503,7 @@ matchedQualifiedNoParenthesesCall ::= matchedExpression dotInfixOperator relativ
  * just the variable.
  */
 
-matchedAtUnqualifiedNoParenthesesCall ::= atIdentifier noParenthesesOneArgument
+matchedAtUnqualifiedNoParenthesesCall ::= atIdentifier noParenthesesCallArgumentsStart noParenthesesOneArgument
                                           {
                                             implements = [
                                               "org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall<org.elixir_lang.psi.stub.MatchedAtUnqualifiedNoParenthesesCall>"
@@ -1516,7 +1519,7 @@ matchedAtUnqualifiedNoParenthesesCall ::= atIdentifier noParenthesesOneArgument
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L191-L194
  */
 
-matchedUnqualifiedNoParenthesesCall ::= identifier noParenthesesOneArgument
+matchedUnqualifiedNoParenthesesCall ::= identifier noParenthesesCallArgumentsStart noParenthesesOneArgument
                                         {
                                           implements = [
                                             "org.elixir_lang.psi.MatchedCall"
@@ -2018,7 +2021,8 @@ accessExpression ::= captureNumericOperation |
                      literalSigilLine |
                      atomKeyword |
                      atom |
-                     alias
+                     alias |
+                     nullaryRangeOperation
                      {
                        implements = [
                          "org.elixir_lang.psi.MaybeModuleName"
@@ -2029,6 +2033,10 @@ accessExpression ::= captureNumericOperation |
                          quote
                        ]
                      }
+
+// Not before a keyword pair's colon.
+nullaryRangeOperation ::= RANGE_OPERATOR !KEYWORD_PAIR_COLON
+                          { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 // See eexFile in EEx.bnf
 eex ::= (EEX_DATA | EEX_ESCAPED_OPENING | eexTag)+
@@ -2304,7 +2312,7 @@ unmatchedDotCall ::= unmatchedExpression dotInfixOperator callParenthesesArgumen
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L191-L194
  */
 
-unmatchedQualifiedNoParenthesesCall ::= unmatchedExpression dotInfixOperator relativeIdentifier noParenthesesOneArgument doBlockMaybe
+unmatchedQualifiedNoParenthesesCall ::= unmatchedExpression dotInfixOperator relativeIdentifier noParenthesesCallArgumentsStart noParenthesesOneArgument doBlockMaybe
                                         {
                                           implements = [
                                             "org.elixir_lang.psi.QualifiedNoParenthesesCall<org.elixir_lang.psi.stub.UnmatchedQualifiedNoParenthesesCall>"
@@ -2323,7 +2331,7 @@ unmatchedQualifiedNoParenthesesCall ::= unmatchedExpression dotInfixOperator rel
 
 atIdentifier ::= atPrefixOperator IDENTIFIER_TOKEN
                  { methods = [getReference] }
-unmatchedAtUnqualifiedNoParenthesesCall ::= atIdentifier noParenthesesOneArgument doBlockMaybe
+unmatchedAtUnqualifiedNoParenthesesCall ::= atIdentifier noParenthesesCallArgumentsStart noParenthesesOneArgument doBlockMaybe
                                             {
                                               implements = "org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall<org.elixir_lang.psi.stub.UnmatchedAtUnqualifiedNoParenthesesCall>"
                                               mixin = "org.elixir_lang.psi.impl.NamedStubbedPsiElementBase<org.elixir_lang.psi.stub.UnmatchedAtUnqualifiedNoParenthesesCall>"
@@ -2336,7 +2344,7 @@ unmatchedAtUnqualifiedNoParenthesesCall ::= atIdentifier noParenthesesOneArgumen
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L191-L194
  */
 
-unmatchedUnqualifiedNoParenthesesCall ::= identifier noParenthesesOneArgument doBlockMaybe
+unmatchedUnqualifiedNoParenthesesCall ::= identifier noParenthesesCallArgumentsStart noParenthesesOneArgument doBlockMaybe
                                           {
                                             implements = "org.elixir_lang.psi.UnqualifiedNoParenthesesCall<org.elixir_lang.psi.stub.UnmatchedUnqualifiedNoParenthesesCall>"
                                             methods = [

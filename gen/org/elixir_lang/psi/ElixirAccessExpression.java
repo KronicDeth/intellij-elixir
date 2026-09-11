@@ -67,6 +67,9 @@ public interface ElixirAccessExpression extends MaybeModuleName, Quotable {
   ElixirMapOperation getMapOperation();
 
   @Nullable
+  ElixirNullaryRangeOperation getNullaryRangeOperation();
+
+  @Nullable
   ElixirOctalWholeNumber getOctalWholeNumber();
 
   @Nullable

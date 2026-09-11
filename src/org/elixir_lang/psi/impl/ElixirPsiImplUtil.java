@@ -1266,6 +1266,13 @@ public class ElixirPsiImplUtil {
     @RequiresReadLock
     @Contract(pure = true)
     @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirNullaryRangeOperation nullaryRangeOperation) {
+        return QuotableImpl.quote(nullaryRangeOperation);
+    }
+
+    @RequiresReadLock
+    @Contract(pure = true)
+    @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirTuple tuple) {
         return QuotableImpl.quote(tuple);
     }

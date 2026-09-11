@@ -874,7 +874,8 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
                                                return ElixirTypes.OR_SYMBOL_OPERATOR; }
   {PIPE_OPERATOR}                            { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.PIPE_OPERATOR; }
-  {RANGE_OPERATOR}                           { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
+  // Not a multiline state: a newline after `..` ends a nullary `..`
+  {RANGE_OPERATOR}                           { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.RANGE_OPERATOR; }
   {RELATIONAL_OPERATOR}                      { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.RELATIONAL_OPERATOR; }

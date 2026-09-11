@@ -627,6 +627,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitOperator(o);
   }
 
+  public void visitNullaryRangeOperation(@NotNull ElixirNullaryRangeOperation o) {
+    visitQuotable(o);
+  }
+
   public void visitOctalDigits(@NotNull ElixirOctalDigits o) {
     visitDigits(o);
   }
