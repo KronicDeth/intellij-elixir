@@ -3,6 +3,11 @@ package org.elixir_lang.parser_definition
 import org.elixir_lang.psi.quoting.QuotingDialect
 
 class Issue4068TestCase : ParsingTestCase() {
+    fun testNoParenthesesManyArgumentsDoBlockArgument() = assertParsedAndQuotedCorrectly(false)
+    fun testForManyArgumentsDoBlockArgument() = assertParsedAndQuotedCorrectly(false)
+    fun testForManyArgumentsDoBlockSecondArgument() = assertParsedAndQuotedCorrectly(false)
+    fun testWithManyArgumentsDoBlockArgument() = assertParsedAndQuotedCorrectly(false)
+
     fun testMultiLetterSigilDoubleQuotes() = assertParsedAndQuotedCorrectlyFrom(QuotingDialect.V1_15, false)
     fun testMultiLetterSigilBracketsModifier() = assertParsedAndQuotedCorrectlyFrom(QuotingDialect.V1_15, false)
     fun testMultiLetterSigilParenthesesModifiers() = assertParsedAndQuotedCorrectlyFrom(QuotingDialect.V1_15, false)

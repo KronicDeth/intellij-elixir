@@ -1381,9 +1381,10 @@ relativeIdentifier ::= IDENTIFIER_TOKEN |
 private parenthesesPositionalArguments ::= containerArgumentsBase
 
 // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L484-L488
+// Before `do`, a no-parentheses call is the head of an unmatchedExpression: `f(for a <- b, c do ... end)`.
 parenthesesArguments ::= OPENING_PARENTHESIS
                          (
-                          unqualifiedNoParenthesesManyArgumentsCall | // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L485
+                          unqualifiedNoParenthesesManyArgumentsCall !DO | // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L485
                           keywords | // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L486
                           parenthesesPositionalArguments (infixComma keywords)?)? // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L487-L488
                          CLOSING_PARENTHESIS
@@ -1420,7 +1421,7 @@ callParenthesesArguments ::= OPENING_PARENTHESIS callParenthesesArgumentsBody? C
                                elementType = parenthesesArguments
                                pin = 1
                              }
-private callParenthesesArgumentsBody ::= unqualifiedNoParenthesesManyArgumentsCall |
+private callParenthesesArgumentsBody ::= unqualifiedNoParenthesesManyArgumentsCall !DO |
                                          keywords |
                                          parenthesesPositionalArguments (infixComma keywords)?
                                          { recoverWhile = callParenthesesArgumentsBodyRecoverWhile }

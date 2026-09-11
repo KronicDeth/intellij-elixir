@@ -528,17 +528,38 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // unqualifiedNoParenthesesManyArgumentsCall |
+  // unqualifiedNoParenthesesManyArgumentsCall !DO |
   //                                          keywords |
   //                                          parenthesesPositionalArguments (infixComma keywords)?
   static boolean callParenthesesArgumentsBody(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "callParenthesesArgumentsBody")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_);
-    r = unqualifiedNoParenthesesManyArgumentsCall(b, l + 1);
+    r = callParenthesesArgumentsBody_0(b, l + 1);
     if (!r) r = keywords(b, l + 1);
     if (!r) r = callParenthesesArgumentsBody_2(b, l + 1);
     exit_section_(b, l, m, r, false, ElixirParser::callParenthesesArgumentsBodyRecoverWhile);
+    return r;
+  }
+
+  // unqualifiedNoParenthesesManyArgumentsCall !DO
+  private static boolean callParenthesesArgumentsBody_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "callParenthesesArgumentsBody_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = unqualifiedNoParenthesesManyArgumentsCall(b, l + 1);
+    r = r && callParenthesesArgumentsBody_0_1(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // !DO
+  private static boolean callParenthesesArgumentsBody_0_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "callParenthesesArgumentsBody_0_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NOT_);
+    r = !consumeToken(b, DO);
+    exit_section_(b, l, m, r, false, null);
     return r;
   }
 
@@ -2902,7 +2923,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   /* ********************************************************** */
   // OPENING_PARENTHESIS
   //                          (
-  //                           unqualifiedNoParenthesesManyArgumentsCall | // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L485
+  //                           unqualifiedNoParenthesesManyArgumentsCall !DO | // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L485
   //                           keywords | // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L486
   //                           parenthesesPositionalArguments (infixComma keywords)?)? // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L487-L488
   //                          CLOSING_PARENTHESIS
@@ -2919,7 +2940,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   // (
-  //                           unqualifiedNoParenthesesManyArgumentsCall | // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L485
+  //                           unqualifiedNoParenthesesManyArgumentsCall !DO | // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L485
   //                           keywords | // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L486
   //                           parenthesesPositionalArguments (infixComma keywords)?)?
   private static boolean parenthesesArguments_1(PsiBuilder b, int l) {
@@ -2928,17 +2949,38 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // unqualifiedNoParenthesesManyArgumentsCall | // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L485
+  // unqualifiedNoParenthesesManyArgumentsCall !DO | // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L485
   //                           keywords | // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L486
   //                           parenthesesPositionalArguments (infixComma keywords)?
   private static boolean parenthesesArguments_1_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "parenthesesArguments_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = unqualifiedNoParenthesesManyArgumentsCall(b, l + 1);
+    r = parenthesesArguments_1_0_0(b, l + 1);
     if (!r) r = keywords(b, l + 1);
     if (!r) r = parenthesesArguments_1_0_2(b, l + 1);
     exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // unqualifiedNoParenthesesManyArgumentsCall !DO
+  private static boolean parenthesesArguments_1_0_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "parenthesesArguments_1_0_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = unqualifiedNoParenthesesManyArgumentsCall(b, l + 1);
+    r = r && parenthesesArguments_1_0_0_1(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // !DO
+  private static boolean parenthesesArguments_1_0_0_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "parenthesesArguments_1_0_0_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NOT_);
+    r = !consumeToken(b, DO);
+    exit_section_(b, l, m, r, false, null);
     return r;
   }
 
