@@ -350,6 +350,13 @@ needs at runtime. Exporting `MIX_ENV` overrides this, and the path the build loo
 same value, so the two cannot disagree. If you switch it, expect one extra `releaseQuoter` run; the
 `_build` subtree for the previous environment is left behind and can be deleted.
 
+`test` also parses and quotes every `.ex` and `.exs` file of the Elixir release under test
+(`ElixirLangElixirParsingTestCase`). Which commit that is comes from the `corpus` of its pair in
+`.github/ci-versions.json`: on a cold cache `elixirParsingCorpus` downloads the archive into
+`cache/corpus/archives` and extracts it to `cache/corpus/<elixir version>`. Each test is named after the file
+it parsed, as `elixir-lang/elixir@<commit>/lib/...`. An Elixir that no pair declares has no corpus, and the
+suite reports a single failing test saying so.
+
 To build (so you get a .zip file):
 ```sh
 ./gradlew buildPlugin        # the zip, no tests - prefer this

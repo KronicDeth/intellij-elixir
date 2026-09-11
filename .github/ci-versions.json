@@ -36,6 +36,11 @@
     "    elixir-lang.github.com's src/content/elixir-versions to decide the range - it is per-MINOR,",
     "    misses OTP support added in a patch, and is published only from v1.15. Only the current",
     "    stable minor declares a recommendedOtp, and it is not the rule here either.",
+    "  beam corpus lists the repositories whose .ex and .exs files the parser tests parse and quote on",
+    "    that pair's leg, each as a GitHub https URL and a full commit SHA. For elixir-lang/elixir it is",
+    "    the commit the pair's release tag points at (git ls-remote --tags). The build downloads each as",
+    "    a codeload archive, so only GitHub repositories work, and it picks the corpus by Elixir alone,",
+    "    so every pair of one Elixir must declare the same one.",
     "  A pair may also exist to cover an OTP major no other pair covers - ~75% of the swept BEAM surface",
     "    is Erlang and the chunk formats track OTP, not Elixir - so the same Elixir may appear twice with",
     "    different OTPs. Read by OTP major the pairs below are {24, 25, 26, 27, 28}, with 29 in the",
@@ -49,17 +54,47 @@
     ]
   },
   "beam": {
-    "baseline": { "elixir": "1.20.4", "otp": "29.0.6" },
+    "baseline": {
+      "elixir": "1.20.4", "otp": "29.0.6",
+      "corpus": [ { "git": "https://github.com/elixir-lang/elixir", "sha": "759443e724f55bf58e71c0603644e99058918d52" } ]
+    },
     "additional": [
-      { "elixir": "1.11.4", "otp": "24.3.4.6" },
-      { "elixir": "1.12.3", "otp": "24.3.4.6" },
-      { "elixir": "1.13.4", "otp": "25.3.2.21" },
-      { "elixir": "1.14.5", "otp": "26.2.5.21" },
-      { "elixir": "1.15.8", "otp": "26.2.5.21" },
-      { "elixir": "1.16.3", "otp": "26.2.5.21" },
-      { "elixir": "1.17.3", "otp": "27.1.2" },
-      { "elixir": "1.18.4", "otp": "27.3.4" },
-      { "elixir": "1.19.5", "otp": "28.4" }
+      {
+        "elixir": "1.11.4", "otp": "24.3.4.6",
+        "corpus": [ { "git": "https://github.com/elixir-lang/elixir", "sha": "308255bda81e7f76f9bec838cef033e8e869981b" } ]
+      },
+      {
+        "elixir": "1.12.3", "otp": "24.3.4.6",
+        "corpus": [ { "git": "https://github.com/elixir-lang/elixir", "sha": "74bfab8ee271e53d24cb0012b5db1e2a931e0470" } ]
+      },
+      {
+        "elixir": "1.13.4", "otp": "25.3.2.21",
+        "corpus": [ { "git": "https://github.com/elixir-lang/elixir", "sha": "7e4fbe657dbf9c3e19e3d2bd6c17cc6d724b4710" } ]
+      },
+      {
+        "elixir": "1.14.5", "otp": "26.2.5.21",
+        "corpus": [ { "git": "https://github.com/elixir-lang/elixir", "sha": "81d6007410b3ae43e279cfb689bd03ffc5f06830" } ]
+      },
+      {
+        "elixir": "1.15.8", "otp": "26.2.5.21",
+        "corpus": [ { "git": "https://github.com/elixir-lang/elixir", "sha": "29fdd09c0fcb5f029d43591665de35491f7378dd" } ]
+      },
+      {
+        "elixir": "1.16.3", "otp": "26.2.5.21",
+        "corpus": [ { "git": "https://github.com/elixir-lang/elixir", "sha": "327063cc8485692f2b902553fb599a2bef5a0f8f" } ]
+      },
+      {
+        "elixir": "1.17.3", "otp": "27.1.2",
+        "corpus": [ { "git": "https://github.com/elixir-lang/elixir", "sha": "78f63d08313677a680868685701ae79a2459dcc1" } ]
+      },
+      {
+        "elixir": "1.18.4", "otp": "27.3.4",
+        "corpus": [ { "git": "https://github.com/elixir-lang/elixir", "sha": "7b20c281d521aa7aa2ad2baa1e9ae6c579d79d0c" } ]
+      },
+      {
+        "elixir": "1.19.5", "otp": "28.4",
+        "corpus": [ { "git": "https://github.com/elixir-lang/elixir", "sha": "d33fd8e413fe98e0e54dde7ef94fadb272b1ef67" } ]
+      }
     ]
   }
 }
