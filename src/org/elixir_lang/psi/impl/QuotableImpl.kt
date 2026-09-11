@@ -83,6 +83,7 @@ object QuotableImpl {
             arrayOf<OtpErlangObject>(AMBIGUOUS_OP, NIL)
     )
     private val ALIASES = OtpErlangAtom("__aliases__")
+    private val DIVISION = OtpErlangAtom("/")
     internal val BLOCK = OtpErlangAtom("__block__")
     private val FN = OtpErlangAtom("fn")
     private val EXCLAMATION_POINT = OtpErlangAtom("!")
@@ -1210,12 +1211,18 @@ object QuotableImpl {
             TODO("Prefix expected to have 2 children (operator and operand")
         }
 
-        val quotedOperator = (children[0] as Quotable).quote()
+        val operator = children[0]
         val quotedOperand = (children[1] as Quotable).quote()
+        val metadata = metadata(prefix)
+
+        // Elixir's build_unary_op turns a prefix `//` into `(/)/operand`.
+        if (operator is ElixirUnaryPrefixOperator && operator.operatorTokenNode().elementType == ElixirTypes.TERNARY_OPERATOR) {
+            return quotedFunctionCall("/", metadata, OtpErlangTuple(arrayOf(DIVISION, metadata, NIL)), quotedOperand)
+        }
 
         return quotedFunctionCall(
-                quotedOperator,
-                metadata(prefix),
+                (operator as Quotable).quote(),
+                metadata,
                 quotedOperand
         )
     }
@@ -1225,6 +1232,21 @@ object QuotableImpl {
     @JvmStatic
     fun quote(nullaryRangeOperation: ElixirNullaryRangeOperation): OtpErlangObject =
             quotedFunctionCall(RANGE, metadata(nullaryRangeOperation))
+
+    /** `..(/([/: value]))`, from the `..` and first `/` of a `..//` key. */
+    @RequiresReadLock
+    @Contract(pure = true)
+    @JvmStatic
+    fun quote(steppedRangeKeywordCall: ElixirSteppedRangeKeywordCall): OtpErlangObject {
+        val node = steppedRangeKeywordCall.node
+        val division = node.findChildByType(ElixirTypes.DIVISION_OPERATOR)!!
+
+        return quotedFunctionCall(
+                RANGE,
+                metadata(node.firstChildNode),
+                quotedFunctionCall(DIVISION, metadata(division), steppedRangeKeywordCall.noParenthesesKeywords.quote())
+        )
+    }
 
     /**
      * An interpolation's body, as a block. Elixir parses its tokens as a grammar of their own, so an empty body follows

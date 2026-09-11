@@ -76,6 +76,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   //                      atomKeyword |
   //                      atom |
   //                      alias |
+  //                      steppedRangeKeywordCall |
   //                      nullaryRangeOperation
   public static boolean accessExpression(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "accessExpression")) return false;
@@ -98,6 +99,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     if (!r) r = atomKeyword(b, l + 1);
     if (!r) r = atom(b, l + 1);
     if (!r) r = alias(b, l + 1);
+    if (!r) r = steppedRangeKeywordCall(b, l + 1);
     if (!r) r = nullaryRangeOperation(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
@@ -1741,7 +1743,8 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // AFTER |
+  // <<stepOperator>> RANGE_OPERATOR DIVISION_OPERATOR DIVISION_OPERATOR |
+  //                AFTER |
   //                ALIAS_TOKEN |
   //                AND_SYMBOL_OPERATOR |
   //                AND_WORD_OPERATOR |
@@ -1788,7 +1791,8 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "keywordKey")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, KEYWORD_KEY, "<keyword key>");
-    r = consumeToken(b, AFTER);
+    r = keywordKey_0(b, l + 1);
+    if (!r) r = consumeToken(b, AFTER);
     if (!r) r = consumeToken(b, ALIAS_TOKEN);
     if (!r) r = consumeToken(b, AND_SYMBOL_OPERATOR);
     if (!r) r = consumeToken(b, AND_WORD_OPERATOR);
@@ -1832,6 +1836,17 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     if (!r) r = consumeToken(b, WHEN_OPERATOR);
     if (!r) r = line(b, l + 1);
     exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  // <<stepOperator>> RANGE_OPERATOR DIVISION_OPERATOR DIVISION_OPERATOR
+  private static boolean keywordKey_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "keywordKey_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = stepOperator(b, l + 1);
+    r = r && consumeTokens(b, 0, RANGE_OPERATOR, DIVISION_OPERATOR, DIVISION_OPERATOR);
+    exit_section_(b, m, null, r);
     return r;
   }
 
@@ -2537,13 +2552,45 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // !nullaryRangeOperation
+  // !nullaryRangeOperation !(<<stepOperator>> TERNARY_OPERATOR)
   static boolean noParenthesesCallArgumentsStart(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "noParenthesesCallArgumentsStart")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = noParenthesesCallArgumentsStart_0(b, l + 1);
+    r = r && noParenthesesCallArgumentsStart_1(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // !nullaryRangeOperation
+  private static boolean noParenthesesCallArgumentsStart_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "noParenthesesCallArgumentsStart_0")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NOT_);
     r = !nullaryRangeOperation(b, l + 1);
     exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  // !(<<stepOperator>> TERNARY_OPERATOR)
+  private static boolean noParenthesesCallArgumentsStart_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "noParenthesesCallArgumentsStart_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NOT_);
+    r = !noParenthesesCallArgumentsStart_1_0(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  // <<stepOperator>> TERNARY_OPERATOR
+  private static boolean noParenthesesCallArgumentsStart_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "noParenthesesCallArgumentsStart_1_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = stepOperator(b, l + 1);
+    r = r && consumeToken(b, TERNARY_OPERATOR);
+    exit_section_(b, m, null, r);
     return r;
   }
 
@@ -2830,7 +2877,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // RANGE_OPERATOR !KEYWORD_PAIR_COLON
+  // RANGE_OPERATOR !(KEYWORD_PAIR_COLON | DIVISION_OPERATOR DIVISION_OPERATOR KEYWORD_PAIR_COLON)
   public static boolean nullaryRangeOperation(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "nullaryRangeOperation")) return false;
     if (!nextTokenIs(b, RANGE_OPERATOR)) return false;
@@ -2842,13 +2889,24 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // !KEYWORD_PAIR_COLON
+  // !(KEYWORD_PAIR_COLON | DIVISION_OPERATOR DIVISION_OPERATOR KEYWORD_PAIR_COLON)
   private static boolean nullaryRangeOperation_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "nullaryRangeOperation_1")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NOT_);
-    r = !consumeToken(b, KEYWORD_PAIR_COLON);
+    r = !nullaryRangeOperation_1_0(b, l + 1);
     exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  // KEYWORD_PAIR_COLON | DIVISION_OPERATOR DIVISION_OPERATOR KEYWORD_PAIR_COLON
+  private static boolean nullaryRangeOperation_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "nullaryRangeOperation_1_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, KEYWORD_PAIR_COLON);
+    if (!r) r = parseTokens(b, 0, DIVISION_OPERATOR, DIVISION_OPERATOR, KEYWORD_PAIR_COLON);
+    exit_section_(b, m, null, r);
     return r;
   }
 
@@ -3586,6 +3644,29 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
+  // !<<stepOperator>> RANGE_OPERATOR DIVISION_OPERATOR noParenthesesKeywords
+  public static boolean steppedRangeKeywordCall(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "steppedRangeKeywordCall")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, STEPPED_RANGE_KEYWORD_CALL, "<stepped range keyword call>");
+    r = steppedRangeKeywordCall_0(b, l + 1);
+    r = r && consumeTokens(b, 0, RANGE_OPERATOR, DIVISION_OPERATOR);
+    r = r && noParenthesesKeywords(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  // !<<stepOperator>>
+  private static boolean steppedRangeKeywordCall_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "steppedRangeKeywordCall_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NOT_);
+    r = !stepOperator(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
   // mapPrefixOperator mapExpression eolStar mapArguments
   public static boolean structOperation(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "structOperation")) return false;
@@ -3601,13 +3682,13 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // TERNARY_OPERATOR
+  // <<stepOperator>> TERNARY_OPERATOR
   public static boolean ternaryInfixOperator(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "ternaryInfixOperator")) return false;
-    if (!nextTokenIs(b, "<//>", TERNARY_OPERATOR)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, TERNARY_INFIX_OPERATOR, "<//>");
-    r = consumeToken(b, TERNARY_OPERATOR);
+    r = stepOperator(b, l + 1);
+    r = r && consumeToken(b, TERNARY_OPERATOR);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
@@ -3677,19 +3758,21 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // (NEGATE_OPERATOR | NUMBER_OR_BADARITH_OPERATOR | UNARY_OPERATOR) eolStar |
+  // (NEGATE_OPERATOR | NUMBER_OR_BADARITH_OPERATOR) eolStar |
+  //                         (TERNARY_OPERATOR | UNARY_OPERATOR) eolStar |
   //                         NOT_OPERATOR !IN_OPERATOR
   public static boolean unaryPrefixOperator(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "unaryPrefixOperator")) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, UNARY_PREFIX_OPERATOR, "<+, -, !, ^, not, ~~~>");
+    Marker m = enter_section_(b, l, _NONE_, UNARY_PREFIX_OPERATOR, "<+, -, !, ^, not, ~~~, //>");
     r = unaryPrefixOperator_0(b, l + 1);
     if (!r) r = unaryPrefixOperator_1(b, l + 1);
+    if (!r) r = unaryPrefixOperator_2(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
 
-  // (NEGATE_OPERATOR | NUMBER_OR_BADARITH_OPERATOR | UNARY_OPERATOR) eolStar
+  // (NEGATE_OPERATOR | NUMBER_OR_BADARITH_OPERATOR) eolStar
   private static boolean unaryPrefixOperator_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "unaryPrefixOperator_0")) return false;
     boolean r;
@@ -3700,30 +3783,49 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // NEGATE_OPERATOR | NUMBER_OR_BADARITH_OPERATOR | UNARY_OPERATOR
+  // NEGATE_OPERATOR | NUMBER_OR_BADARITH_OPERATOR
   private static boolean unaryPrefixOperator_0_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "unaryPrefixOperator_0_0")) return false;
     boolean r;
     r = consumeToken(b, NEGATE_OPERATOR);
     if (!r) r = consumeToken(b, NUMBER_OR_BADARITH_OPERATOR);
+    return r;
+  }
+
+  // (TERNARY_OPERATOR | UNARY_OPERATOR) eolStar
+  private static boolean unaryPrefixOperator_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "unaryPrefixOperator_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = unaryPrefixOperator_1_0(b, l + 1);
+    r = r && eolStar(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // TERNARY_OPERATOR | UNARY_OPERATOR
+  private static boolean unaryPrefixOperator_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "unaryPrefixOperator_1_0")) return false;
+    boolean r;
+    r = consumeToken(b, TERNARY_OPERATOR);
     if (!r) r = consumeToken(b, UNARY_OPERATOR);
     return r;
   }
 
   // NOT_OPERATOR !IN_OPERATOR
-  private static boolean unaryPrefixOperator_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "unaryPrefixOperator_1")) return false;
+  private static boolean unaryPrefixOperator_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "unaryPrefixOperator_2")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, NOT_OPERATOR);
-    r = r && unaryPrefixOperator_1_1(b, l + 1);
+    r = r && unaryPrefixOperator_2_1(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   // !IN_OPERATOR
-  private static boolean unaryPrefixOperator_1_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "unaryPrefixOperator_1_1")) return false;
+  private static boolean unaryPrefixOperator_2_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "unaryPrefixOperator_2_1")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NOT_);
     r = !consumeToken(b, IN_OPERATOR);

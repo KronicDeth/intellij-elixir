@@ -163,6 +163,12 @@ public class ElixirAccessExpressionImpl extends ASTWrapperPsiElement implements 
 
   @Override
   @Nullable
+  public ElixirSteppedRangeKeywordCall getSteppedRangeKeywordCall() {
+    return PsiTreeUtil.getChildOfType(this, ElixirSteppedRangeKeywordCall.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirStructOperation getStructOperation() {
     return PsiTreeUtil.getChildOfType(this, ElixirStructOperation.class);
   }

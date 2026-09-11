@@ -708,6 +708,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitQuotable(o);
   }
 
+  public void visitSteppedRangeKeywordCall(@NotNull ElixirSteppedRangeKeywordCall o) {
+    visitQuotable(o);
+  }
+
   public void visitStructOperation(@NotNull ElixirStructOperation o) {
     visitQuotable(o);
   }

@@ -12,7 +12,7 @@ class Issue2200TestCase : ParsingTestCase() {
     }
 
     fun testPipeline() {
-        assertParsedAndQuotedCorrectlyFrom(QuotingDialect.V1_12)
+        assertParsedAndQuotedCorrectlyFromOrParsedWithErrors(QuotingDialect.V1_12, true)
     }
 
     override fun getTestDataPath(): String = "${super.getTestDataPath()}/issue_2200"

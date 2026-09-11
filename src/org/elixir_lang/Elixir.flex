@@ -710,11 +710,19 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
 <YYINITIAL, INTERPOLATION, INTERPOLATION_CURLY> {
   {AFTER}                                    { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.AFTER; }
+  // Three tokens, so that the parser can read `..//: 1` as `..(/([/: 1]))` for Elixir before 1.12.0
+  {RANGE_OPERATOR} / {DIVISION_OPERATOR}{DIVISION_OPERATOR}{COLON}{SPACE} { pushAndBegin(KEYWORD_PAIR_MAYBE);
+                                                                          return ElixirTypes.RANGE_OPERATOR; }
+  {DIVISION_OPERATOR} / {DIVISION_OPERATOR}{COLON}{SPACE}                 { pushAndBegin(KEYWORD_PAIR_MAYBE);
+                                                                          return ElixirTypes.DIVISION_OPERATOR; }
   // Must be before {DIVISION_OPERATOR} as it is a prefix of {STEP_OPERATOR}
   // Must be before `{REFERENCABLE_OPERATOR} / {REFERENCE_INFIX_OPERATOR}` because a reference to division will be `//2`, which is no longer valid in Elixir 1.13
   {TERNARY_OPERATOR}                         { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.TERNARY_OPERATOR; }
   // Must be before any single operator's match
+  // `&` before `/`, `/` captures the `//` operator rather than dividing `&`
+  {CAPTURE_OPERATOR} / ({WHITE_SPACE}|{ESCAPED_EOL})*{DIVISION_OPERATOR}({WHITE_SPACE}|{ESCAPED_EOL})*{DIVISION_OPERATOR} { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
+                                                                                                                          return ElixirTypes.CAPTURE_OPERATOR; }
   {REFERENCABLE_OPERATOR} / {REFERENCE_INFIX_OPERATOR} { pushAndBegin(REFERENCE_OPERATION);
                                                          return ElixirTypes.IDENTIFIER_TOKEN; }
   {AND_SYMBOL_OPERATOR}                      { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);

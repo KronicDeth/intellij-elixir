@@ -620,8 +620,9 @@ identifier ::= IDENTIFIER_TOKEN
                }
 
 private notKeywordPairColon ::= !KEYWORD_PAIR_COLON
-// `x ..y` is a range rather than the call `x(..)`.
-private noParenthesesCallArgumentsStart ::= !nullaryRangeOperation
+// `x ..y` and `x //1` apply an operator to `x`; `//1` is a call's argument only before Elixir 1.12.0, which has no step
+// operator.
+private noParenthesesCallArgumentsStart ::= !nullaryRangeOperation !(<<stepOperator>> TERNARY_OPERATOR)
 // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L124-L125
 unqualifiedNoParenthesesManyArgumentsCall ::= identifier notKeywordPairColon
                                               noParenthesesCallArgumentsStart noParenthesesManyArgumentsStrict
@@ -1203,7 +1204,7 @@ matchedThreeOperation ::= matchedExpression threeInfixOperator matchedExpression
  * @see https://github.com/elixir-lang/elixir/pull/10810
  */
 
-ternaryInfixOperator ::= TERNARY_OPERATOR
+ternaryInfixOperator ::= <<stepOperator>> TERNARY_OPERATOR
                          {
                            implements = "org.elixir_lang.psi.Operator"
                            methods = [
@@ -1295,7 +1296,9 @@ powerInfixOperator ::= POWER_OPERATOR
 // implements and methods defined by "infix operations" section above
 matchedPowerOperation ::= matchedExpression powerInfixOperator matchedExpression
 
-unaryPrefixOperator ::= (NEGATE_OPERATOR | NUMBER_OR_BADARITH_OPERATOR | UNARY_OPERATOR) eolStar |
+// A prefix `//` quotes as `(/)/operand`, so `&//2` captures division.
+unaryPrefixOperator ::= (NEGATE_OPERATOR | NUMBER_OR_BADARITH_OPERATOR) eolStar |
+                        (TERNARY_OPERATOR | UNARY_OPERATOR) eolStar |
                         NOT_OPERATOR !IN_OPERATOR
                         {
                           implements = "org.elixir_lang.psi.Operator"
@@ -1303,7 +1306,7 @@ unaryPrefixOperator ::= (NEGATE_OPERATOR | NUMBER_OR_BADARITH_OPERATOR | UNARY_O
                             operatorTokenSet
                             quote
                           ]
-                          name = "+, -, !, ^, not, ~~~"
+                          name = "+, -, !, ^, not, ~~~, //"
                         }
 
 /*
@@ -2022,6 +2025,7 @@ accessExpression ::= captureNumericOperation |
                      atomKeyword |
                      atom |
                      alias |
+                     steppedRangeKeywordCall |
                      nullaryRangeOperation
                      {
                        implements = [
@@ -2034,9 +2038,13 @@ accessExpression ::= captureNumericOperation |
                        ]
                      }
 
-// Not before a keyword pair's colon.
-nullaryRangeOperation ::= RANGE_OPERATOR !KEYWORD_PAIR_COLON
+// Not before a keyword pair's colon, nor before the `//:` of a `..//` key.
+nullaryRangeOperation ::= RANGE_OPERATOR !(KEYWORD_PAIR_COLON | DIVISION_OPERATOR DIVISION_OPERATOR KEYWORD_PAIR_COLON)
                           { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
+// Before Elixir 1.12.0 an operator followed by `/` is an identifier, so `..//: 1` is the call `..(/([/: 1]))`.
+steppedRangeKeywordCall ::= !<<stepOperator>> RANGE_OPERATOR DIVISION_OPERATOR noParenthesesKeywords
+                            { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 // See eexFile in EEx.bnf
 eex ::= (EEX_DATA | EEX_ESCAPED_OPENING | eexTag)+
@@ -2788,7 +2796,9 @@ quoteHexadecimalEscapeSequence ::= hexadecimalEscapePrefix (openHexadecimalEscap
  * Keywords
  */
 
-keywordKey ::= AFTER |
+// `..//` is lexed as three tokens for steppedRangeKeywordCall; before RANGE_OPERATOR, which would take its `..`.
+keywordKey ::= <<stepOperator>> RANGE_OPERATOR DIVISION_OPERATOR DIVISION_OPERATOR |
+               AFTER |
                ALIAS_TOKEN |
                AND_SYMBOL_OPERATOR |
                AND_WORD_OPERATOR |

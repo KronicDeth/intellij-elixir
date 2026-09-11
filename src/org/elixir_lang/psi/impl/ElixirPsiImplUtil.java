@@ -78,6 +78,11 @@ public class ElixirPsiImplUtil {
             ElixirTypes.UNARY_OPERATOR
     );
     public static final TokenSet IDENTIFIER_TOKEN_SET = TokenSet.create(ElixirTypes.IDENTIFIER_TOKEN);
+    // The unary operators and a prefix `//`
+    private static final TokenSet UNARY_PREFIX_OPERATOR_TOKEN_SET = TokenSet.orSet(
+            UNARY_OPERATOR_TOKEN_SET,
+            TERNARY_OPERATOR_TOKEN_SET
+    );
     public static final Function1<? super PsiElement, ? extends PsiElement> NEXT_SIBLING =
             (Function1<PsiElement, PsiElement>) PsiElement::getNextSibling;
     public static final Function1<? super PsiElement, ? extends PsiElement> PREVIOUS_SIBLING =
@@ -531,7 +536,7 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static TokenSet operatorTokenSet(@SuppressWarnings("unused") final ElixirUnaryPrefixOperator unaryPrefixOperator) {
-        return UNARY_OPERATOR_TOKEN_SET;
+        return UNARY_PREFIX_OPERATOR_TOKEN_SET;
     }
 
     @Contract(pure = true)
@@ -1268,6 +1273,13 @@ public class ElixirPsiImplUtil {
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirNullaryRangeOperation nullaryRangeOperation) {
         return QuotableImpl.quote(nullaryRangeOperation);
+    }
+
+    @RequiresReadLock
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirSteppedRangeKeywordCall steppedRangeKeywordCall) {
+        return QuotableImpl.quote(steppedRangeKeywordCall);
     }
 
     @RequiresReadLock

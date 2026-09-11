@@ -515,6 +515,18 @@ object ShapeTable {
             typeAscent = TypeAscent.Bucket.PARENT,
             destructure = Destructure.Bucket.OPAQUE,
         ),
+        // the call Elixir before 1.12 reads `..//: value` as; a match cannot call it, so nothing binds inside
+        Row(
+            ElixirSteppedRangeKeywordCall::class.java,
+            variable = VariableWalk.Bucket.TRANSPARENT,
+            useScope = VariableUseScopeWalk.Bucket.PARENT,
+            parameter = ParameterWalk.Bucket.STOP,
+            unquote = UnquotedVariableWalk.Bucket.STOP,
+            descent = VariableDescent.Bucket.CHILDREN_READING,
+            typeDescent = TypeDescent.Bucket.PASS,
+            typeAscent = TypeAscent.Bucket.NONE,
+            destructure = Destructure.Bucket.OPAQUE,
+        ),
         Row(
             ElixirStructOperation::class.java,
             variable = VariableWalk.Bucket.TRANSPARENT,

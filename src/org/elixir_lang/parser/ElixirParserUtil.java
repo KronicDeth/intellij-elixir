@@ -9,10 +9,12 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Helpers the grammar calls as external rules, {@code <<name>>}.
- *
+ * <p>
  * Must extend {@link GeneratedParserUtilBase}: GrammarKit static-imports this class into the
  * generated parser *instead of* that one, so its helpers have to stay in scope.
  */
+// GrammarKit calls every external rule with the recursion level.
+@SuppressWarnings("unused")
 public class ElixirParserUtil extends GeneratedParserUtilBase {
     /** Set by {@code File.doParseContents}; absent for builders created by any other route. */
     public static final Key<QuotingDialect> DIALECT = Key.create("ELIXIR_PARSE_DIALECT");
@@ -21,19 +23,13 @@ public class ElixirParserUtil extends GeneratedParserUtilBase {
      * Whether the {@code &} just consumed is joined to what follows, making the two one capture
      * argument such as {@code &1} - see
      * {@link QuotingDialect#getRequiresAdjacentCaptureArgument()}.
-     *
+     * <p>
      * Used positively by {@code captureNumericOperation} and negated by {@code nonNumeric}, which is
      * what keeps those two rules exact complements: a spaced {@code & 1} the first rejects has to be
      * accepted by the second, or it matches neither and parses as an error.
      */
     public static boolean captureArgument(@NotNull PsiBuilder builder, int level) {
-        QuotingDialect dialect = builder.getUserData(DIALECT);
-
-        if (dialect == null) {
-            dialect = QuotingDialect.getFALLBACK();
-        }
-
-        if (!dialect.getRequiresAdjacentCaptureArgument()) {
+        if (!dialect(builder).getRequiresAdjacentCaptureArgument()) {
             return true;
         }
 
@@ -43,4 +39,16 @@ public class ElixirParserUtil extends GeneratedParserUtilBase {
 
         return builder.rawLookup(-1) == ElixirTypes.CAPTURE_OPERATOR;
     }
+
+    /** Whether {@code //} is the step operator - see {@link QuotingDialect#getHasStepOperator()}. */
+    public static boolean stepOperator(@NotNull PsiBuilder builder, int level) {
+        return dialect(builder).getHasStepOperator();
+    }
+
+    private static QuotingDialect dialect(@NotNull PsiBuilder builder) {
+        QuotingDialect dialect = builder.getUserData(DIALECT);
+
+        return dialect != null ? dialect : QuotingDialect.getFALLBACK();
+    }
+
 }

@@ -11,6 +11,7 @@ import org.elixir_lang.psi.quoting.QuotingDialect;
 import org.elixir_lang.psi.quoting.QuotingDialectResolver;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -103,6 +104,27 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
         if (QuotingDialectResolver.dialectFor(myFile).compareTo(dialect) < 0) {
             assertQuotedAroundError();
         } else {
+            assertWithoutLocalError();
+            assertQuotedCorrectly();
+        }
+    }
+
+    /**
+     * As {@link #assertParsedAndQuotedCorrectly}, where the parser, like the reference quoter, rejects it below
+     * {@code dialect}; the tree is only checked from {@code dialect}, since below it has an error in it.
+     */
+    protected void assertParsedAndQuotedCorrectlyFromOrParsedWithErrors(QuotingDialect dialect, boolean checkResult)
+            throws IOException {
+        doTest(false);
+
+        if (QuotingDialectResolver.dialectFor(myFile).compareTo(dialect) < 0) {
+            assertWithLocalError();
+            Quoter.assertError(myFile);
+        } else {
+            if (checkResult) {
+                checkResult(getTestName(), myFile);
+            }
+
             assertWithoutLocalError();
             assertQuotedCorrectly();
         }

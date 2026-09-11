@@ -58,7 +58,16 @@ class Issue4068TestCase : ParsingTestCase() {
     fun testHeredocSpacesThenTabs() = assertParsedAndQuotedCorrectly(false)
     fun testCharListHeredocSpacesThenTabs() = assertParsedAndQuotedCorrectly(false)
 
+    fun testSteppedRangeVariables() = assertParsedAndQuotedCorrectly(false)
+    fun testSteppedRangeCallForms() = assertParsedAndQuotedCorrectly(false)
+
+    fun testCaptureStepOperator() = assertParsedAndQuotedCorrectly(false)
+    fun testCaptureStepOperatorEscapedNewline() = assertParsedAndQuotedCorrectly(false)
+    fun testStepOperatorUnary() = assertParsedAndQuotedCorrectly(false)
+
     fun testDotKeywordKey() = assertParsedAndQuotedCorrectlyFrom(QuotingDialect.V1_13, false)
+    fun testSteppedRangeKeywordKey() = assertParsedAndQuotedCorrectly(false)
+    fun testSteppedRangeKeywordKeyForms() = assertParsedAndQuotedCorrectly(false)
 
     fun testNotInLineStart() = assertParsedAndQuotedCorrectly(false)
     fun testNotInLineStartNewline() = assertParsedAndQuotedCorrectly(false)
@@ -83,7 +92,7 @@ class Issue4068TestCase : ParsingTestCase() {
     fun testCaptureEllipsis() = assertParsedAndQuotedCorrectly(false)
     fun testEllipsisDivision() = assertParsedAndQuotedCorrectly(false)
 
-    fun testParenthesizedRangeStep() = assertParsedAndQuotedCorrectlyFrom(QuotingDialect.V1_12, false)
+    fun testParenthesizedRangeStep() = assertParsedAndQuotedCorrectlyFromOrParsedWithErrors(QuotingDialect.V1_12, false)
 
     fun testCharacterOutsideBasicMultilingualPlane() = assertParsedAndQuotedCorrectly(false)
 

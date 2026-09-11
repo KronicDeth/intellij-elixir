@@ -76,6 +76,9 @@ public interface ElixirAccessExpression extends MaybeModuleName, Quotable {
   ElixirParentheticalStab getParentheticalStab();
 
   @Nullable
+  ElixirSteppedRangeKeywordCall getSteppedRangeKeywordCall();
+
+  @Nullable
   ElixirStructOperation getStructOperation();
 
   @Nullable

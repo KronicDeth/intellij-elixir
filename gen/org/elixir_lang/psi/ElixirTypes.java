@@ -152,6 +152,7 @@ public interface ElixirTypes {
   IElementType STAB_NO_PARENTHESES_SIGNATURE = new ElixirElementType("STAB_NO_PARENTHESES_SIGNATURE");
   IElementType STAB_OPERATION = new ElixirElementType("STAB_OPERATION");
   IElementType STAB_PARENTHESES_SIGNATURE = new ElixirElementType("STAB_PARENTHESES_SIGNATURE");
+  IElementType STEPPED_RANGE_KEYWORD_CALL = new ElixirElementType("STEPPED_RANGE_KEYWORD_CALL");
   IElementType STRUCT_OPERATION = new ElixirElementType("STRUCT_OPERATION");
   IElementType TERNARY_INFIX_OPERATOR = new ElixirElementType("TERNARY_INFIX_OPERATOR");
   IElementType THREE_INFIX_OPERATOR = new ElixirElementType("THREE_INFIX_OPERATOR");
@@ -743,6 +744,9 @@ public interface ElixirTypes {
       }
       else if (type == STAB_PARENTHESES_SIGNATURE) {
         return new ElixirStabParenthesesSignatureImpl(node);
+      }
+      else if (type == STEPPED_RANGE_KEYWORD_CALL) {
+        return new ElixirSteppedRangeKeywordCallImpl(node);
       }
       else if (type == STRUCT_OPERATION) {
         return new ElixirStructOperationImpl(node);

@@ -200,6 +200,10 @@ class QuotingDialectTest {
             listOf(false, false, false, false, false, false, false, false, false, false, true),
             QuotingDialect.entries.map { it.emitsLineMetadataOnBlock }
         )
+        assertEquals(
+            listOf(false, true, true, true, true, true, true, true, true, true, true),
+            QuotingDialect.entries.map { it.hasStepOperator }
+        )
     }
 
     /**

@@ -34,6 +34,10 @@ enum class QuotingDialect {
      * `extract/8` took the two characters in its `[$\\, Char | Rest]` clause, which counts columns and no line, so
      * in `~S(a\` + newline + `b) in x` everything after the sigil is one line lower. Read via
      * [countsEscapedNewlineInLiteralSigilLine].
+     *
+     * 1.12.0 also added the step operator, `first..last//step` (elixir-lang/elixir #10810). Before it `//` is two
+     * divisions, and an operator before `/` lexes as an identifier, so `x..y//1` is `x..y((/)/1)` and `[..//: 1]` is
+     * `[..(/([/: 1]))]`. Read by the parser via [hasStepOperator].
      */
     V1_12,
 
@@ -266,6 +270,9 @@ enum class QuotingDialect {
      * carries `line` metadata instead of `[]`.
      */
     val emitsLineMetadataOnBlock: Boolean get() = this >= V1_20
+
+    /** Whether `//` is the step operator rather than two divisions. Read by the parser, like [requiresAdjacentCaptureArgument]. */
+    val hasStepOperator: Boolean get() = this >= V1_12
 
     companion object {
         /**
