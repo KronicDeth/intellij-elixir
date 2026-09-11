@@ -1247,7 +1247,8 @@ matchedTwoOperation ::= matchedExpression twoInfixOperator matchedExpression
 
 /* Unlike other binary operation, additionOperations cannot begin with EOLs: if there are EOLs, then the +/- is
    interpreted as unaryOperation. */
-additionInfixOperator ::= ADDITION_OPERATOR | SUBTRACTION_OPERATOR
+additionInfixOperator ::= !<<escapedNewlineSwapsDualOperator>> (ADDITION_OPERATOR | SUBTRACTION_OPERATOR) |
+                          <<escapedNewlineSwapsDualOperator>> (NEGATE_OPERATOR | NUMBER_OR_BADARITH_OPERATOR)
                           {
                             implements = "org.elixir_lang.psi.Operator"
                             methods = [
@@ -1297,7 +1298,8 @@ powerInfixOperator ::= POWER_OPERATOR
 matchedPowerOperation ::= matchedExpression powerInfixOperator matchedExpression
 
 // A prefix `//` quotes as `(/)/operand`, so `&//2` captures division.
-unaryPrefixOperator ::= (NEGATE_OPERATOR | NUMBER_OR_BADARITH_OPERATOR) eolStar |
+unaryPrefixOperator ::= !<<escapedNewlineSwapsDualOperator>> (NEGATE_OPERATOR | NUMBER_OR_BADARITH_OPERATOR) eolStar |
+                        <<escapedNewlineSwapsDualOperator>> (ADDITION_OPERATOR | SUBTRACTION_OPERATOR) |
                         (TERNARY_OPERATOR | UNARY_OPERATOR) eolStar |
                         NOT_OPERATOR !IN_OPERATOR
                         {

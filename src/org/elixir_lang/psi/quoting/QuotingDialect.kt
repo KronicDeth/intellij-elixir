@@ -184,6 +184,10 @@ enum class QuotingDialect {
      * which neither this plugin nor its reference quoter enables.
      *
      * Read via [emitsLineMetadataOnBlock].
+     *
+     * 1.20.0 also counts a `\` + newline after a space as space, and stopped `-\` + newline making the identifier
+     * before it a call (elixir-lang/elixir 78fb31201, "Consistently treat \ followed by newlines as horizontal
+     * space"). Read by the parser via [countsEscapedNewlineAsSpace].
      */
     V1_20;
 
@@ -273,6 +277,13 @@ enum class QuotingDialect {
 
     /** Whether `//` is the step operator rather than two divisions. Read by the parser, like [requiresAdjacentCaptureArgument]. */
     val hasStepOperator: Boolean get() = this >= V1_12
+
+    /**
+     * Whether a `\` + newline next to a spaced `+` or `-` after an identifier counts as space, so `f -\` + newline +
+     * `var` is a subtraction and `f \` + newline + `-var` the call `f(-var)`; below, both are the other way round.
+     * Read by the parser, like [requiresAdjacentCaptureArgument].
+     */
+    val countsEscapedNewlineAsSpace: Boolean get() = this >= V1_20
 
     companion object {
         /**

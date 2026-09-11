@@ -78,9 +78,14 @@ public class ElixirPsiImplUtil {
             ElixirTypes.UNARY_OPERATOR
     );
     public static final TokenSet IDENTIFIER_TOKEN_SET = TokenSet.create(ElixirTypes.IDENTIFIER_TOKEN);
-    // The unary operators and a prefix `//`
+    // A sign whose reading ElixirParserUtil.escapedNewlineSwapsDualOperator swapped, and a prefix `//`
+    private static final TokenSet ADDITION_INFIX_OPERATOR_TOKEN_SET = TokenSet.orSet(
+            ADDITION_OPERATOR_TOKEN_SET,
+            TokenSet.create(ElixirTypes.NEGATE_OPERATOR, ElixirTypes.NUMBER_OR_BADARITH_OPERATOR)
+    );
     private static final TokenSet UNARY_PREFIX_OPERATOR_TOKEN_SET = TokenSet.orSet(
             UNARY_OPERATOR_TOKEN_SET,
+            ADDITION_OPERATOR_TOKEN_SET,
             TERNARY_OPERATOR_TOKEN_SET
     );
     public static final Function1<? super PsiElement, ? extends PsiElement> NEXT_SIBLING =
@@ -404,7 +409,7 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static TokenSet operatorTokenSet(@SuppressWarnings("unused") final ElixirAdditionInfixOperator additionInfixOperator) {
-        return ADDITION_OPERATOR_TOKEN_SET;
+        return ADDITION_INFIX_OPERATOR_TOKEN_SET;
     }
 
     @Contract(pure = true)
