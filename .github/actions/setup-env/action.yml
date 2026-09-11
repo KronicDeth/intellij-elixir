@@ -160,24 +160,19 @@ runs:
         fi
         echo "ORG_GRADLE_PROJECT_skipSearchableOptions=$SKIP_SEARCHABLE_OPTIONS" >> $GITHUB_ENV
 
-    # caches/modules-2 is cached so the IDE archive (1.3 to 1.6 GiB per version) is downloaded once,
-    # not by every job of every run - concurrent downloads hit JetBrains rate limiting. The enhanced
-    # provider deduplicates dependency entries across jobs, so it is one copy per IDE version and OS.
-    # caches/*/transforms (the extracted IDE) is not deduplicated and restores no faster than
-    # re-extracting, so it stays excluded. Excludes filter the Gradle User Home only; they cannot
-    # affect the configuration-cache data that cache-encryption-key covers. cache-read-only defaults
-    # to gradle/actions' own rule (write from the default branch only), so a pull request's writes
-    # are scoped to its merge ref and nothing else can restore them; a caller that resolves
-    # dependencies the rest of CI does not can force it read-only.
+    # modules-2 is cached so the IDE archive (1.3-1.6 GiB/version) downloads once, not per job -
+    # concurrent downloads hit JetBrains rate limiting. The enhanced provider dedups it to one copy
+    # per IDE version and OS.
+    #
+    # Excludes touch the Gradle User Home only, not the config-cache data (cache-encryption-key).
+    # cache-read-only follows gradle/actions' rule (write from the default branch only): a PR's writes
+    # are scoped to its merge ref so nothing else restores them, and a caller can force it read-only.
     - name: Setup Gradle
       id: setup-gradle
-      uses: gradle/actions/setup-gradle@v6
+      uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6.3.0
       with:
         cache-disabled: false
         cache-read-only: ${{ inputs.cache-read-only }}
-        # `caches/<gradle-version>/transforms` on Gradle 9, not `caches/transforms-*`.
-        gradle-home-cache-excludes: |
-          caches/*/transforms
         cache-encryption-key: ${{ inputs.gradle-encryption-key }}
         # avoid async in shutdown until https://github.com/nodejs/node/pull/61999 lands in the action runner's JS version.
         add-job-summary-as-pr-comment: 'never'
