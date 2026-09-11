@@ -188,6 +188,9 @@ runs:
       with:
         otp-version: ${{ steps.resolve.outputs.otp-version }}
         elixir-version: ${{ steps.resolve.outputs.elixir-version }}
+        # setup-beam calls the GitHub REST API to list OTP/Elixir releases; the token lifts those
+        # reads off the 60/hr unauthenticated limit onto the job token's per-repo budget.
+        github-token: ${{ inputs.github-token }}
 
     - name: Export Elixir Environment Variables
       id: export-elixir-environment-variables
