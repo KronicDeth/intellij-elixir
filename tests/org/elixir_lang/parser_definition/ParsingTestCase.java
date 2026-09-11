@@ -31,12 +31,12 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
      * {@link #assertQuotedCorrectly()} speak the same version.
      *
      * These are light fixtures with no Elixir SDK, so production resolution would reach
-     * {@link QuotingDialect#FALLBACK} on every CI leg and every leg would compare against the same
+     * {@link QuotingDialect#getFALLBACK()} on every CI leg and every leg would compare against the same
      * dialect however old the Elixir it ran. {@code ELIXIR_VERSION} is exported to the test JVM by
      * the build, from the SDK it resolved - the same SDK the quoter was built against.
      *
      * Absent - running a test straight from the IDE, outside the build's environment -
-     * {@link QuotingDialect#of} answers {@link QuotingDialect#FALLBACK}, which is what production
+     * {@link QuotingDialect#of} answers {@link QuotingDialect#getFALLBACK()}, which is what production
      * resolves to when no Elixir SDK is configured.
      *
      * <p>The override is installed either way, and has to be: skipping it sends
