@@ -64,6 +64,8 @@ class Issue4068TestCase : ParsingTestCase() {
     fun testCaptureStepOperator() = assertParsedAndQuotedCorrectly(false)
     fun testCaptureStepOperatorEscapedNewline() = assertParsedAndQuotedCorrectly(false)
     fun testStepOperatorUnary() = assertParsedAndQuotedCorrectly(false)
+    fun testCaptureOperatorEscapedNewline() = assertParsedAndQuotedCorrectlyFrom(QuotingDialect.V1_20, false)
+    fun testCaptureOperatorsEscapedNewline() = assertParsedAndQuotedCorrectlyFrom(QuotingDialect.V1_20, false)
 
     fun testDotKeywordKey() = assertParsedAndQuotedCorrectlyFrom(QuotingDialect.V1_13, false)
     fun testSteppedRangeKeywordKey() = assertParsedAndQuotedCorrectly(false)
