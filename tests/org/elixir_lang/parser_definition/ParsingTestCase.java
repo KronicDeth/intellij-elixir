@@ -2,6 +2,8 @@ package org.elixir_lang.parser_definition;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.lang.ParserDefinition;
+import com.intellij.openapi.util.text.LineColumn;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.*;
 import org.elixir_lang.ElixirLanguage;
 import org.elixir_lang.ElixirParserDefinition;
@@ -221,7 +223,14 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
 
         List<PsiElement> errorElementList = localErrors();
 
-        assertTrue("PsiErrorElements found in parsed file PSI", errorElementList.isEmpty());
+        if (!errorElementList.isEmpty()) {
+            PsiErrorElement first = (PsiErrorElement) errorElementList.get(0);
+            LineColumn lineColumn = StringUtil.offsetToLineColumn(myFile.getText(), first.getTextOffset());
+
+            fail(errorElementList.size() + " PsiErrorElements found in parsed file PSI, the first on line " +
+                    (lineColumn.line + 1) + " in column " + (lineColumn.column + 1) + ": " +
+                    first.getErrorDescription());
+        }
     }
 
     protected void assertQuotedAroundError() {
