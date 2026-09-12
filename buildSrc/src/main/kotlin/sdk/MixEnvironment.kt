@@ -69,7 +69,7 @@ fun resolveMixEnv(ambient: String?): String =
  * environment segment - see that function.
  */
 fun quoterReleaseExecutablePath(mixEnv: String): String =
-    "_build/$mixEnv/rel/intellij_elixir/bin/intellij_elixir"
+    "_build/$mixEnv/rel/quoter/bin/quoter"
 
 /**
  * Full environment for `mix` commands: the Erlang runtime environment, MIX_HOME/MIX_ARCHIVES so

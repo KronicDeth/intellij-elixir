@@ -79,11 +79,8 @@ fun createQuoterPlatform(platform: Platform, startEpmd: Boolean = true): QuoterP
     }
 }
 
-/**
- * The node name used when no per-checkout name is supplied - the value this was hardcoded to before
- * the name became configurable, so a caller that does not pass one behaves exactly as before.
- */
-const val DEFAULT_QUOTER_NODE_NAME = "intellij_elixir@127.0.0.1"
+/** The node name used when no per-checkout name is supplied. */
+const val DEFAULT_QUOTER_NODE_NAME = "quoter@127.0.0.1"
 
 /** The only interface the quoter's distribution and epmd ever need; see [Epmd] and [getReleaseEnvironment]. */
 const val LOOPBACK_ADDRESS = "127.0.0.1"
@@ -108,7 +105,8 @@ fun getReleaseEnvironment(
     startEpmd: Boolean = true
 ): Map<String, String> {
     return buildMap {
-        put("RELEASE_COOKIE", "intellij_elixir")
+        // Must match the cookie in org.elixir_lang.IntellijElixir, the test JVM's side of the connection.
+        put("RELEASE_COOKIE", "intellij-elixir-quoter")
         put("RELEASE_DISTRIBUTION", "name")
         put("RELEASE_NAME", releaseName)
         releaseTmp?.let { put("RELEASE_TMP", it.absolutePath) }

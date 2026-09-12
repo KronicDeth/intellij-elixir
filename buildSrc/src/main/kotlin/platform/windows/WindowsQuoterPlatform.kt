@@ -32,7 +32,7 @@ class WindowsQuoterPlatform(private val startEpmd: Boolean = true) : QuoterPlatf
 
     /**
      * Cleans stdout by removing any lines that also appear in stderr.
-     * This handles Erlang/distillery releases writing warnings to both streams.
+     * This handles Erlang releases writing warnings to both streams.
      *
      * @param stdout The standard output stream content
      * @param stderr The standard error stream content

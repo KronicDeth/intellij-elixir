@@ -343,7 +343,7 @@ To stop at the quoter instead, which is what you want when debugging the quoter 
 ```
 
 The quoter is built with `MIX_ENV=prod`, so its release lands in
-`cache/<pair>-intellij_elixir-<ref>/_build/prod/rel/intellij_elixir`. The environment is set by the
+`cache/<pair>-quoter-<ref>/_build/prod/rel/quoter`. The environment is set by the
 build rather than left to `mix release`, which has no preferred environment and assembles under `:dev`
 when `MIX_ENV` is unset - compiling the quoter's dev/test-only dependencies, none of which the daemon
 needs at runtime. Exporting `MIX_ENV` overrides this, and the path the build looks in follows the

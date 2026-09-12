@@ -121,7 +121,7 @@ object Quoter {
                 val tokenBinary = error.elementAt(2) as OtpErlangBinary
                 val token = ElixirPsiImplUtil.javaString(tokenBinary)
                 throw AssertionError(
-                    "intellij_elixir returned \"$message\" $location due to $token, use assertQuotesAroundError if error is expect in Elixir natively, but not in intellij-elixir plugin"
+                    "quoter returned \"$message\" $location due to $token, use assertQuotesAroundError if error is expect in Elixir natively, but not in intellij-elixir plugin"
                 )
             }
         } catch (e: IOException) {

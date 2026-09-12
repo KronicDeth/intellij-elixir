@@ -19,7 +19,7 @@ import com.intellij.driver.sdk.ui.components.elements.dialog
  *
  * This removes:
  * - .idea directory (contains project settings, workspace, etc.)
- * - intellij_elixir.iml (module file for the Elixir plugin)
+ * - quoter.iml (module file for the quoter project the tests open)
  * - deps directory (Mix dependencies)
  * - _build directory (Mix build artifacts)
  *
@@ -31,7 +31,7 @@ import com.intellij.driver.sdk.ui.components.elements.dialog
 private fun cleanIdeaFiles(projectPath: String) {
     step("Clean existing IntelliJ configuration and Mix build files") {
         val projectDir = java.io.File(projectPath)
-        val pathsToClean = listOf(".idea", "intellij_elixir.iml", "deps", "_build", "out")
+        val pathsToClean = listOf(".idea", "quoter.iml", "deps", "_build", "out")
 
         pathsToClean.forEach { path ->
             val file = java.io.File(projectDir, path)

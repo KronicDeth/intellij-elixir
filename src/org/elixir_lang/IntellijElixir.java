@@ -15,17 +15,18 @@ public class IntellijElixir {
      * machine-wide epmd, which allows one node per name. With the names fixed, two checkouts running
      * tests at once collide: the second quoter exits with "the name ... seems to be in use by another
      * Erlang node", and so would the second test JVM's own node. The build sets these per checkout;
-     * unset, both fall back to the literals used before they were configurable.
+     * unset, both fall back to fixed names.
      */
     public static final String REMOTE_NODE =
-            System.getProperty("elixir.quoter.remoteNode", "intellij_elixir@127.0.0.1");
+            System.getProperty("elixir.quoter.remoteNode", "quoter@127.0.0.1");
 
     private static final String LOCAL_NODE =
-            System.getProperty("elixir.quoter.localNode", "intellij-elixir@127.0.0.1");
+            System.getProperty("elixir.quoter.localNode", "quoter_client@127.0.0.1");
 
+    // Must match RELEASE_COOKIE in buildSrc's QuoterPlatform.kt.
     public static OtpNode getLocalNode() throws IOException {
         if (localNode == null) {
-            localNode = new OtpNode(LOCAL_NODE, "intellij_elixir", LoopbackTransportFactory.INSTANCE);
+            localNode = new OtpNode(LOCAL_NODE, "intellij-elixir-quoter", LoopbackTransportFactory.INSTANCE);
         }
 
         return localNode;

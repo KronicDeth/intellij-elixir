@@ -366,6 +366,11 @@
 
 ### Build / CI
 
+- [#4083](https://github.com/KronicDeth/intellij-elixir/pull/4083) [@sh41](https://github.com/sh41)
+  - **The tests quote with quoter
+    [v3.0.0](https://github.com/intellij-elixir/intellij-elixir-quoter/tree/v3.0.0) from
+    [intellij-elixir/intellij-elixir-quoter](https://github.com/intellij-elixir/intellij-elixir-quoter).**
+
 - [#4006](https://github.com/KronicDeth/intellij-elixir/pull/4006) [@sh41](https://github.com/sh41)
   - **CI is faster: Gradle's build and configuration caches are kept, Elixir is no longer rebuilt from
     source on the Windows leg, and the runners no longer reclaim disk space they were not short of.**
@@ -406,9 +411,6 @@
   - **CI gets the quoter cache paths from the build** (a `quoterCachePaths` task) instead of
     re-deriving them in bash, so the workflow can no longer disagree with Gradle about where the
     cache lives.
-  - **The quoter is pinned to a commit of `sh41/intellij_elixir` which can be built without warnings
-    on all Elixir versions 1.13-1.20**, pending merge/tagging of the
-    [PR](https://github.com/KronicDeth/intellij_elixir/pull/11).
   - **The quoter builds with an explicit `MIX_ENV=prod`**, and only prod dependencies are fetched. An exported `MIX_ENV` still overrides it.
 
 - [#3914](https://github.com/KronicDeth/intellij-elixir/pull/3914) [@sh41](https://github.com/sh41)
