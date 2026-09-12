@@ -11,6 +11,7 @@ import static org.elixir_lang.psi.ElixirTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.psi.*;
 import com.ericsson.otp.erlang.OtpErlangObject;
+import com.intellij.util.concurrency.annotations.RequiresReadLock;
 
 public class ElixirHeredocLineImpl extends ASTWrapperPsiElement implements ElixirHeredocLine {
 
@@ -52,6 +53,7 @@ public class ElixirHeredocLineImpl extends ASTWrapperPsiElement implements Elixi
   }
 
   @Override
+  @RequiresReadLock
   public @NotNull OtpErlangObject quote(@NotNull HeredocLiteral heredocLiteral, int prefixLength) {
     return ElixirPsiImplUtil.quote(this, heredocLiteral, prefixLength);
   }

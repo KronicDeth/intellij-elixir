@@ -98,6 +98,7 @@ public interface ElixirUnmatchedQualifiedNoParenthesesCall extends ElixirUnmatch
 
   @NotNull PsiElement qualifier();
 
+  @RequiresReadLock
   @NotNull OtpErlangObject quote();
 
   @RequiresReadLock

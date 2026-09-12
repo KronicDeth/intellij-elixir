@@ -68,8 +68,8 @@ internal class Textual : Annotator, DumbAware {
                                     ?.identifierName()?.let { isDocumentationName(it) }
                                     ?: false
 
-                        private fun textAttributesKey(sigilName: Char): TextAttributesKey =
-                            SIGIL_BY_NAME[sigilName] ?: SIGIL
+                        private fun textAttributesKey(sigilName: String): TextAttributesKey =
+                            sigilName.singleOrNull()?.let { SIGIL_BY_NAME[it] } ?: SIGIL
                     }
             )
         }

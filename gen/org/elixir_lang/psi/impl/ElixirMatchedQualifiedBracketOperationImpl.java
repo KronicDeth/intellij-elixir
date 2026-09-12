@@ -10,6 +10,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static org.elixir_lang.psi.ElixirTypes.*;
 import org.elixir_lang.psi.*;
 import com.ericsson.otp.erlang.OtpErlangObject;
+import com.intellij.util.concurrency.annotations.RequiresReadLock;
 
 public class ElixirMatchedQualifiedBracketOperationImpl extends ElixirMatchedExpressionImpl implements ElixirMatchedQualifiedBracketOperation {
 
@@ -58,6 +59,7 @@ public class ElixirMatchedQualifiedBracketOperationImpl extends ElixirMatchedExp
   }
 
   @Override
+  @RequiresReadLock
   public @NotNull OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }

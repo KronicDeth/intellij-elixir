@@ -35,13 +35,16 @@ class ShapeCoverageTest : TestCase() {
 
         assertTrue(ElixirTupleImpl::class.java in shapes)
         /* The visitor also has an overload per hand-written marker interface and for the platform's. Pinning them by
-           name means a generated interface the prefix no longer matches shows up here rather than vanishing. */
+           name means a generated interface the prefix no longer matches shows up here rather than vanishing.
+
+           SigilHeredocLiteral left when the interpolating sigil heredoc gained Interpolated: dispatch goes to the
+           alphabetically first interface, so the overload only ever fired for half of them. SigilLine likewise. */
         assertEquals(
             listOf(
                 "Arguments", "AssociationOperation", "Atomable", "Body", "Digits", "EscapeSequence",
                 "EscapedHexadecimalDigits", "HeredocLineable", "HeredocLiteral", "Interpolated", "Literal",
                 "MaybeModuleName", "Named", "NamedElement", "NavigatablePsiElement", "Operator", "PsiElement",
-                "Quotable", "QuotableArguments", "QuotableKeywordList", "QuotableKeywordPair", "SigilHeredocLiteral",
+                "Quotable", "QuotableArguments", "QuotableKeywordList", "QuotableKeywordPair",
                 "Unquoted", "WholeNumber"
             ),
             GrammarShapes.SKIPPED.map { it.simpleName }

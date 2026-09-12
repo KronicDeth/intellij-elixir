@@ -93,6 +93,7 @@ public interface ElixirMatchedQualifiedParenthesesCall extends ElixirMatchedExpr
 
   @NotNull PsiElement qualifier();
 
+  @RequiresReadLock
   @NotNull OtpErlangObject quote();
 
   @RequiresReadLock

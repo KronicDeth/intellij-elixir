@@ -18,12 +18,58 @@ package org.elixir_lang.psi.quoting
  * construct with the reference implementation on either side of the boundary - see each constant.
  */
 enum class QuotingDialect {
+    /** Everything before Elixir 1.12.0, and the floor - nothing resolves below it. */
+    V1_11,
+
     /**
-     * Everything before Elixir 1.15.0: no bracket or interpolation metadata, and `...` quotes as a
-     * variable. Named for the oldest version this plugin's CI covers, but it is the floor, not a
-     * point - 1.14.5 resolves here too.
+     * Elixir 1.12.0 stopped consuming a `\` ending a line in an **interpolating** sigil, and began
+     * emitting a leading empty binary for a heredoc opening on an interpolation.
+     *
+     * elixir-lang/elixir `8c29984ed` moved `\<newline>` out of `elixir_interpolation:extract/8`
+     * into `unescape_chars`, which sigil parts never reach; its deleted clauses were guarded on
+     * `Interpol = true`, so `~S` is unaffected. `51d90f193` made the tokenizer strip a heredoc's
+     * artificial leading newline after extraction rather than before. Both first released in v1.12.0.
+     *
+     * `51d90f193` also advanced the line past a `\` ending a line in a **non-interpolating** sigil. 1.11's
+     * `extract/8` took the two characters in its `[$\\, Char | Rest]` clause, which counts columns and no line, so
+     * in `~S(a\` + newline + `b) in x` everything after the sigil is one line lower. Read via
+     * [countsEscapedNewlineInLiteralSigilLine].
+     *
+     * 1.12.0 also added the step operator, `first..last//step` (elixir-lang/elixir #10810). Before it `//` is two
+     * divisions, and an operator before `/` lexes as an identifier, so `x..y//1` is `x..y((/)/1)` and `[..//: 1]` is
+     * `[..(/([/: 1]))]`. Read by the parser via [hasStepOperator].
+     */
+    V1_12,
+
+    /**
+     * Elixir 1.13.0 unescapes an escaped terminator inside a sigil heredoc, so `\"""` quotes as
+     * `"""` where 1.12.3 and earlier keep the backslash and quote as `\"""`.
+     *
+     * elixir-lang/elixir `ffd891a34` added the `[$\\, Last, Last, Last | Rest]` clause to
+     * `elixir_interpolation:extract/8`, first released in v1.13.0. Not conditioned on the
+     * interpolation flag, so `~s` and `~S` alike; a plain heredoc reaches the same text through
+     * `unescape_tokens` and a sigil line's terminator was already unescaped in v1.12.3.
+     *
+     * 1.13.0 also gives a remote call the line of its name, where 1.12.3 gave it the line of the `.`, so
+     * `:erlang.` + newline + `get(1)` is a call on line 2; the `.` node keeps the dot's line in both. From
+     * elixir-lang/elixir 376ff1e51 ("Add more token metadata to aliases and remote calls", #11038), whose
+     * `build_dot` carries the identifier's location. Read via [putsRemoteCallOnNameLine].
      */
     V1_13,
+
+    /**
+     * Elixir 1.14.0 accepts `..` with no operands, as the nullary operator `{:.., meta, []}`; 1.13.4
+     * and earlier reject it.
+     *
+     * elixir-lang/elixir 6447f440d ("Add .. as a nullary operator that returns 0..-1//1", #11623),
+     * first released in v1.14.0.
+     *
+     * 1.14.0 also normalises an identifier token - variables, calls, remote names, unquoted atoms and keyword keys - to
+     * NFC, and MICRO SIGN (U+00B5) in it to GREEK SMALL LETTER MU (U+03BC), but not a quoted atom or name
+     * (elixir-lang/elixir e7001455d, "nfc and additional normalizations for identifiers", #11859). 1.13.4 and earlier
+     * reject an identifier that is not NFC. Read via [normalizesIdentifiers].
+     */
+    V1_14,
 
     /**
      * Elixir 1.15.0 added `from_brackets: true` to the `Access.get/2` metadata, but only for the
@@ -105,6 +151,31 @@ enum class QuotingDialect {
     V1_17,
 
     /**
+     * Elixir 1.18.0 unescapes the name of a quoted remote call, so `foo."bar\nbaz"()` calls
+     * `:"bar\nbaz"` where 1.17.3 and earlier keep the backslash - and an invalid escape there, as in
+     * `a.'\xg'`, raises `MatchError` instead of being kept.
+     *
+     * elixir-lang/elixir e54b87c18 ("Fix formatter adding extra escapes to remote call functions",
+     * #13960) added `{ok, [UnescapedPart]} = unescape_tokens(...)` to `elixir_tokenizer:handle_dot`,
+     * first released in v1.18.0.
+     *
+     * Read via [unescapesQuotedRemoteCallName].
+     */
+    V1_18,
+
+    /**
+     * Elixir 1.19.0 answers `{:error, _}` where 1.18 raises for an invalid escape in a quoted
+     * remote-call name (`MatchError`; elixir-lang/elixir 41151190e, #14587) and for invalid UTF-8 in
+     * a charlist, as in `'\xFF'` (`UnicodeConversionError`; 71e1ddc64, #14666). Both first released
+     * in v1.19.0.
+     *
+     * 1.19.0 also advances the line past a character literal that is a newline, `?` + newline or `?\` + newline,
+     * where 1.18 counted only columns, so everything after it was one line lower (elixir-lang/elixir 6fbc6e08a,
+     * "Advance line when processing ? followed by <LF> and \<LF>"). Read via [countsNewlineInCharacter].
+     */
+    V1_19,
+
+    /**
      * Elixir 1.20.0 added `line` metadata to two `__block__` forms that previously carried none: a
      * `do:` block's value now carries the line of its own `do` token
      * (elixir-lang/elixir 90e1826c7), and a 0-byte file's implicit top-level block now carries
@@ -113,8 +184,40 @@ enum class QuotingDialect {
      * which neither this plugin nor its reference quoter enables.
      *
      * Read via [emitsLineMetadataOnBlock].
+     *
+     * 1.20.0 also counts a `\` + newline after a space as space, and stopped `-\` + newline making the identifier
+     * before it a call (elixir-lang/elixir 78fb31201, "Consistently treat \ followed by newlines as horizontal
+     * space"). Read by the parser via [countsEscapedNewlineAsSpace].
      */
     V1_20;
+
+    /**
+     * Whether a `\` ending a line survives extraction into the buffer. A sigil then keeps the
+     * backslash and newline, because sigil parts skip `unescape_tokens`, while a plain string or
+     * heredoc unescapes them away and is left with an empty segment.
+     */
+    val keepsEscapedNewlineInExtractedBuffer: Boolean get() = this >= V1_12
+
+    /** Whether a `\` ending a line in a non-interpolating sigil line advances the line of what follows. */
+    val countsEscapedNewlineInLiteralSigilLine: Boolean get() = this >= V1_12
+
+    /** Whether `?` + newline or `?\` + newline advances the line of what follows. */
+    val countsNewlineInCharacter: Boolean get() = this >= V1_19
+
+    /** Whether a remote call split by a newline after its `.` carries its name's line rather than the dot's. */
+    val putsRemoteCallOnNameLine: Boolean get() = this >= V1_13
+
+    /** An identifier token quoted as NFC, with `µ` (U+00B5) as `μ` (U+03BC). */
+    val normalizesIdentifiers: Boolean get() = this >= V1_14
+
+    /** `foo."bar\nbaz"()` calling `:"bar\nbaz"` rather than `:"bar\\nbaz"`. */
+    val unescapesQuotedRemoteCallName: Boolean get() = this >= V1_18
+
+    /** The leading `""` a heredoc gets when its first content is `#{...}`. */
+    val emitsEmptyLeadingHeredocSegment: Boolean get() = this >= V1_12
+
+    /** `\"""` in a `~S"""` heredoc - the terminator alone, rather than backslash and terminator. */
+    val unescapesSigilHeredocTerminator: Boolean get() = this >= V1_13
 
     /** `[1, 2][0]` and friends - the `bracket_expr -> access_expr bracket_arg` production. */
     val emitsFromBracketsOnBracketedExpression: Boolean get() = this >= V1_15
@@ -172,6 +275,16 @@ enum class QuotingDialect {
      */
     val emitsLineMetadataOnBlock: Boolean get() = this >= V1_20
 
+    /** Whether `//` is the step operator rather than two divisions. Read by the parser, like [requiresAdjacentCaptureArgument]. */
+    val hasStepOperator: Boolean get() = this >= V1_12
+
+    /**
+     * Whether a `\` + newline next to a spaced `+` or `-` after an identifier counts as space, so `f -\` + newline +
+     * `var` is a subtraction and `f \` + newline + `-var` the call `f(-var)`; below, both are the other way round.
+     * Read by the parser, like [requiresAdjacentCaptureArgument].
+     */
+    val countsEscapedNewlineAsSpace: Boolean get() = this >= V1_20
+
     companion object {
         /**
          * The dialect to assume when the Elixir version behind an element cannot be determined - no
@@ -205,11 +318,16 @@ enum class QuotingDialect {
 
             return when {
                 numbers >= Triple(1, 20, 0) -> V1_20
+                numbers >= Triple(1, 19, 0) -> V1_19
+                numbers >= Triple(1, 18, 0) -> V1_18
                 numbers >= Triple(1, 17, 0) -> V1_17
                 numbers >= Triple(1, 16, 2) -> V1_16_2
                 numbers >= Triple(1, 16, 0) -> V1_16_0
                 numbers >= Triple(1, 15, 0) -> V1_15
-                else -> V1_13
+                numbers >= Triple(1, 14, 0) -> V1_14
+                numbers >= Triple(1, 13, 0) -> V1_13
+                numbers >= Triple(1, 12, 0) -> V1_12
+                else -> V1_11
             }
         }
 

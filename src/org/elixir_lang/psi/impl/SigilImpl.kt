@@ -5,5 +5,5 @@ object SigilImpl {
     fun sigilDelimiter(sigil: org.elixir_lang.psi.Sigil): String = sigil.node.getChildren(null)[2].text
 
     @JvmStatic
-    fun sigilName(sigil: org.elixir_lang.psi.Sigil): Char = sigil.node.getChildren(null)[1].chars[0]
+    fun sigilName(sigil: org.elixir_lang.psi.Sigil): String = sigil.node.getChildren(null)[1].text
 }

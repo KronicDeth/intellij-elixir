@@ -14,6 +14,7 @@ import com.ericsson.otp.erlang.OtpErlangList;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.psi.LiteralTextEscaper;
 import com.intellij.psi.PsiLanguageInjectionHost;
+import com.intellij.util.concurrency.annotations.RequiresReadLock;
 
 public class ElixirInterpolatedSigilLineImpl extends ASTWrapperPsiElement implements ElixirInterpolatedSigilLine {
 
@@ -49,11 +50,13 @@ public class ElixirInterpolatedSigilLineImpl extends ASTWrapperPsiElement implem
   }
 
   @Override
+  @RequiresReadLock
   public @NotNull List<Integer> addEscapedEOL(@Nullable List<Integer> maybeCodePointList, @NotNull ASTNode child) {
     return ElixirPsiImplUtil.addEscapedEOL(this, maybeCodePointList, child);
   }
 
   @Override
+  @RequiresReadLock
   public @NotNull List<Integer> addEscapedTerminator(@Nullable List<Integer> maybeCodePointList, @NotNull ASTNode child) {
     return ElixirPsiImplUtil.addEscapedTerminator(this, maybeCodePointList, child);
   }
@@ -89,11 +92,13 @@ public class ElixirInterpolatedSigilLineImpl extends ASTWrapperPsiElement implem
   }
 
   @Override
+  @RequiresReadLock
   public @NotNull OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }
 
   @Override
+  @RequiresReadLock
   public @NotNull OtpErlangObject quote(@NotNull OtpErlangObject quotedContent) {
     return ElixirPsiImplUtil.quote(this, quotedContent);
   }
@@ -109,6 +114,7 @@ public class ElixirInterpolatedSigilLineImpl extends ASTWrapperPsiElement implem
   }
 
   @Override
+  @RequiresReadLock
   public @NotNull OtpErlangObject quoteInterpolation(ElixirInterpolation interpolation) {
     return ElixirPsiImplUtil.quoteInterpolation(this, interpolation);
   }
@@ -124,7 +130,7 @@ public class ElixirInterpolatedSigilLineImpl extends ASTWrapperPsiElement implem
   }
 
   @Override
-  public char sigilName() {
+  public @NotNull String sigilName() {
     return ElixirPsiImplUtil.sigilName(this);
   }
 

@@ -94,6 +94,7 @@ public interface ElixirUnmatchedQualifiedNoArgumentsCall extends ElixirUnmatched
 
   @NotNull PsiElement qualifier();
 
+  @RequiresReadLock
   @NotNull OtpErlangObject quote();
 
   @RequiresReadLock

@@ -236,7 +236,7 @@ public class InterpolationTest extends Test {
                         {
                                 "..",
                                 Arrays.asList(
-                                        new TokenTypeState(ElixirTypes.RANGE_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE),
+                                        new TokenTypeState(ElixirTypes.RANGE_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
                                         new TokenTypeState(ElixirTypes.INTERPOLATION_END, ElixirFlexLexer.GROUP),
                                         new TokenTypeState(ElixirTypes.LINE_TERMINATOR, ElixirFlexLexer.ADDITION_OR_KEYWORD_PAIR_OR_SUBTRACTION_OR_WHITE_SPACE_MAYBE)
                                 )

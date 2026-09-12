@@ -5,6 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 import com.ericsson.otp.erlang.OtpErlangObject;
+import com.intellij.util.concurrency.annotations.RequiresReadLock;
 
 public interface ElixirAccessExpression extends MaybeModuleName, Quotable {
 
@@ -66,10 +67,16 @@ public interface ElixirAccessExpression extends MaybeModuleName, Quotable {
   ElixirMapOperation getMapOperation();
 
   @Nullable
+  ElixirNullaryRangeOperation getNullaryRangeOperation();
+
+  @Nullable
   ElixirOctalWholeNumber getOctalWholeNumber();
 
   @Nullable
   ElixirParentheticalStab getParentheticalStab();
+
+  @Nullable
+  ElixirSteppedRangeKeywordCall getSteppedRangeKeywordCall();
 
   @Nullable
   ElixirStructOperation getStructOperation();
@@ -82,6 +89,7 @@ public interface ElixirAccessExpression extends MaybeModuleName, Quotable {
 
   boolean isModuleName();
 
+  @RequiresReadLock
   @NotNull OtpErlangObject quote();
 
 }

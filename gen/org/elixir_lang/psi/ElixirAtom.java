@@ -17,6 +17,7 @@ public interface ElixirAtom extends NavigatablePsiElement, PsiNamedElement, Quot
 
   @Nullable PsiReference getReference();
 
+  @RequiresReadLock
   @NotNull OtpErlangObject quote();
 
   @RequiresReadLock

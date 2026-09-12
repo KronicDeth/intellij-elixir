@@ -9,6 +9,7 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.LiteralTextEscaper;
 import com.intellij.psi.PsiLanguageInjectionHost;
+import com.intellij.util.concurrency.annotations.RequiresReadLock;
 
 public interface ElixirInterpolatedSigilLine extends Interpolated, SigilLine {
 
@@ -20,8 +21,10 @@ public interface ElixirInterpolatedSigilLine extends Interpolated, SigilLine {
 
   @NotNull List<Integer> addEscapedCharacterCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode child);
 
+  @RequiresReadLock
   @NotNull List<Integer> addEscapedEOL(@Nullable List<Integer> maybeCodePointList, @NotNull ASTNode child);
 
+  @RequiresReadLock
   @NotNull List<Integer> addEscapedTerminator(@Nullable List<Integer> maybeCodePointList, @NotNull ASTNode child);
 
   @NotNull List<Integer> addFragmentCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode child);
@@ -36,21 +39,24 @@ public interface ElixirInterpolatedSigilLine extends Interpolated, SigilLine {
 
   boolean isValidHost();
 
+  @RequiresReadLock
   @NotNull OtpErlangObject quote();
 
+  @RequiresReadLock
   @NotNull OtpErlangObject quote(@NotNull OtpErlangObject quotedContent);
 
   @NotNull OtpErlangObject quoteBinary(OtpErlangList metadata, List<OtpErlangObject> argumentList);
 
   @NotNull OtpErlangObject quoteEmpty();
 
+  @RequiresReadLock
   @NotNull OtpErlangObject quoteInterpolation(ElixirInterpolation interpolation);
 
   @NotNull OtpErlangObject quoteLiteral(List<Integer> codePointList);
 
   @NotNull String sigilDelimiter();
 
-  char sigilName();
+  @NotNull String sigilName();
 
   char terminator();
 

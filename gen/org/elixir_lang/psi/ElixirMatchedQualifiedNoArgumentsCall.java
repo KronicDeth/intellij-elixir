@@ -89,6 +89,7 @@ public interface ElixirMatchedQualifiedNoArgumentsCall extends ElixirMatchedExpr
 
   @NotNull PsiElement qualifier();
 
+  @RequiresReadLock
   @NotNull OtpErlangObject quote();
 
   @RequiresReadLock

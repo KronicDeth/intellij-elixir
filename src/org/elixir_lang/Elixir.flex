@@ -42,6 +42,15 @@ import org.jetbrains.annotations.Nullable;
     }
   }
 
+  private void startQuotedCallName(CharSequence quotePromoter) {
+    startQuote(quotePromoter);
+    stack.markQuotedCallName();
+  }
+
+  private boolean isQuotedCallName() {
+    return stack.isQuotedCallName();
+  }
+
   private void handleInLastState() {
     org.elixir_lang.lexer.StackFrame stackFrame = pop();
     handleInState(stackFrame.getLastLexicalState());
@@ -85,7 +94,7 @@ import org.jetbrains.annotations.Nullable;
   }
 
   private void nameSigil(CharSequence sigilName) {
-    stack.nameSigil(sigilName.charAt(0));
+    stack.nameSigil(sigilName.toString());
   }
 
   private org.elixir_lang.lexer.StackFrame pop() {
@@ -285,6 +294,8 @@ MULTIPLICATION_OPERATOR = {ONE_TOKEN_MULTIPLICATION_OPERATOR}
 NEGATE_OPERATOR = {ONE_TOKEN_NEGATE_OPERATOR}
 NUMBER_OR_BADARITH_OPERATOR = {ONE_TOKEN_NUMBER_OR_BADARITH_OPERATOR}
 NOT_OPERATOR = {THREE_TOKEN_NOT_OPERATOR}
+// The trailing character keeps `not input` from matching.
+NOT_IN_OPERATOR = {NOT_OPERATOR}{WHITE_SPACE}+{IN_OPERATOR}[^[:letter:][:digit:]_?!]
 OR_WORD_OPERATOR = {TWO_TOKEN_OR_WORD_OPERATOR}
 OR_SYMBOL_OPERATOR = {THREE_TOKEN_OR_SYMBOL_OPERATOR} |
                      {TWO_TOKEN_OR_SYMBOL_OPERATOR}
@@ -325,7 +336,7 @@ OPERATOR = {FOUR_TOKEN_OPERATOR} |
 
 ATOM_END = [?!]
 ATOM_MIDDLE = [0-9a-zA-Z@_]
-UNICODE_ATOM_MIDDLE = [[:letter:][:digit:]]
+UNICODE_ATOM_MIDDLE = [[:letter:][:digit:]\p{Mn}\p{Mc}]
 ATOM_START = [a-zA-Z_]
 UNICODE_ATOM_START = [[:letter:]]
 ATOM = ({ATOM_START} | {UNICODE_ATOM_START}) ({ATOM_MIDDLE} | {UNICODE_ATOM_MIDDLE})* {ATOM_END}? | "..."
@@ -441,8 +452,8 @@ IDENTIFIER_TOKEN_START = [a-z_]
 // ASCII uppercase is handled by {ALIAS} rules; non-ASCII uppercase is atoms in Elixir, not identifiers.
 // Uses JFlex character class subtraction (--) to exclude [:uppercase:] from [:letter:].
 UNICODE_IDENTIFIER_START = [[:letter:]--[:uppercase:]]
-// Unicode identifier continue: all Unicode letters and digits.
-UNICODE_IDENTIFIER_CONTINUE = [[:letter:][:digit:]]
+// Unicode identifier continue: all Unicode letters, digits and combining marks.
+UNICODE_IDENTIFIER_CONTINUE = [[:letter:][:digit:]\p{Mn}\p{Mc}]
 IDENTIFIER_TOKEN_HEAD = {IDENTIFIER_TOKEN_START} | {UNICODE_IDENTIFIER_START}
 IDENTIFIER_TOKEN_TAIL = ({IDENTIFIER_TOKEN_MIDDLE} | {UNICODE_IDENTIFIER_CONTINUE})* {IDENTIFIER_TOKEN_END}?
 IDENTIFIER_TOKEN = ({IDENTIFIER_TOKEN_HEAD} {IDENTIFIER_TOKEN_TAIL}  | "...")
@@ -523,7 +534,7 @@ QUOTE_HEREDOC_TERMINATOR = {CHAR_LIST_HEREDOC_TERMINATOR} | {STRING_HEREDOC_TERM
  * Function References
  */
 
-REFERENCE_INFIX_OPERATOR = ({WHITE_SPACE}|{EOL})*{DIVISION_OPERATOR}
+REFERENCE_INFIX_OPERATOR = ({WHITE_SPACE}|{EOL}|{ESCAPED_EOL})*{DIVISION_OPERATOR}
 
 /*
  * Regular Keywords
@@ -544,7 +555,8 @@ TRUE = "true"
 
 TILDE = "~"
 SIGIL_MODIFIER = [A-Za-z]
-SIGIL_NAME = [A-Za-z]
+// Multi-letter uppercase names are from Elixir 1.15 and digits in them from 1.17; both are errors before, so no dialect.
+SIGIL_NAME = [a-z] | [A-Z][A-Z0-9]*
 
 /*
  * Sigil quotes
@@ -609,6 +621,7 @@ SIGIL_HEREDOC_TERMINATOR = {SIGIL_DOUBLE_QUOTES_HEREDOC_TERMINATOR}|{SIGIL_SINGL
 GROUP_TERMINATOR = {QUOTE_TERMINATOR}|{SIGIL_TERMINATOR}
 GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 
+// Unlike `.`, also matches U+000B, U+000C, U+0085, U+2028 and U+2029, which may appear in strings and sigils.
 ANY = [^]
 EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
                   {AND_WORD_OPERATOR} |
@@ -628,6 +641,7 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
                   {IN_OPERATOR} |
                   {MATCH_OPERATOR} |
                   {MULTIPLICATION_OPERATOR} |
+                  {NOT_IN_OPERATOR} |
                   {PIPE_OPERATOR} |
                   {POWER_OPERATOR} |
                   {RANGE_OPERATOR} |
@@ -681,6 +695,7 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
 %state MULTILINE_WHITE_SPACE_MAYBE
 %state NAMED_SIGIL
 %state OCTAL_WHOLE_NUMBER
+%state QUOTED_CALL_NAME_ESCAPE_SEQUENCE
 %state REFERENCE_OPERATION
 %state SIGIL
 %state SIGIL_MODIFIERS
@@ -695,11 +710,19 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
 <YYINITIAL, INTERPOLATION, INTERPOLATION_CURLY> {
   {AFTER}                                    { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.AFTER; }
+  // Three tokens, so that the parser can read `..//: 1` as `..(/([/: 1]))` for Elixir before 1.12.0
+  {RANGE_OPERATOR} / {DIVISION_OPERATOR}{DIVISION_OPERATOR}{COLON}{SPACE} { pushAndBegin(KEYWORD_PAIR_MAYBE);
+                                                                          return ElixirTypes.RANGE_OPERATOR; }
+  {DIVISION_OPERATOR} / {DIVISION_OPERATOR}{COLON}{SPACE}                 { pushAndBegin(KEYWORD_PAIR_MAYBE);
+                                                                          return ElixirTypes.DIVISION_OPERATOR; }
   // Must be before {DIVISION_OPERATOR} as it is a prefix of {STEP_OPERATOR}
   // Must be before `{REFERENCABLE_OPERATOR} / {REFERENCE_INFIX_OPERATOR}` because a reference to division will be `//2`, which is no longer valid in Elixir 1.13
   {TERNARY_OPERATOR}                         { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.TERNARY_OPERATOR; }
   // Must be before any single operator's match
+  // `&` before `/`, `/` captures the `//` operator rather than dividing `&`
+  {CAPTURE_OPERATOR} / ({WHITE_SPACE}|{ESCAPED_EOL})*{DIVISION_OPERATOR}({WHITE_SPACE}|{ESCAPED_EOL})*{DIVISION_OPERATOR} { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
+                                                                                                                          return ElixirTypes.CAPTURE_OPERATOR; }
   {REFERENCABLE_OPERATOR} / {REFERENCE_INFIX_OPERATOR} { pushAndBegin(REFERENCE_OPERATION);
                                                          return ElixirTypes.IDENTIFIER_TOKEN; }
   {AND_SYMBOL_OPERATOR}                      { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
@@ -715,6 +738,9 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
   {AT_OPERATOR}                              { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.AT_OPERATOR; }
   {ATOM} / {COLON}{SPACE}                    { pushAndBegin(KEYWORD_PAIR_MAYBE);
+                                               return ElixirTypes.ATOM_FRAGMENT; }
+  // ATOM_FRAGMENT because keywordKey accepts no DOT_OPERATOR
+  {DOT_OPERATOR} / {COLON}{SPACE}            { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.ATOM_FRAGMENT; }
   {BASE_WHOLE_NUMBER_PREFIX} / {BASE_WHOLE_NUMBER_BASE} { pushAndBegin(BASE_WHOLE_NUMBER_BASE);
                                                           return ElixirTypes.BASE_WHOLE_NUMBER_PREFIX; }
@@ -856,7 +882,8 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
                                                return ElixirTypes.OR_SYMBOL_OPERATOR; }
   {PIPE_OPERATOR}                            { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.PIPE_OPERATOR; }
-  {RANGE_OPERATOR}                           { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
+  // Not a multiline state: a newline after `..` ends a nullary `..`
+  {RANGE_OPERATOR}                           { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.RANGE_OPERATOR; }
   {RELATIONAL_OPERATOR}                      { pushAndBegin(KEYWORD_PAIR_OR_MULTILINE_WHITE_SPACE_MAYBE);
                                                return ElixirTypes.RELATIONAL_OPERATOR; }
@@ -909,6 +936,8 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
 <AFTER_RELATIVE_IDENTIFIER, AFTER_UNQUALIFIED_IDENTIFIER> {
   {WHITE_SPACE}+         { yybegin(AFTER_IDENTIFIER_WHITE_SPACE);
                            return TokenType.WHITE_SPACE; }
+  {ESCAPED_EOL}          { yybegin(ADDITION_OR_SUBTRACTION_MAYBE);
+                           return TokenType.WHITE_SPACE; }
 }
 
 <AFTER_RELATIVE_IDENTIFIER, AFTER_UNQUALIFIED_IDENTIFIER, CALL_MAYBE> {
@@ -918,6 +947,7 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
 }
 
 <AFTER_IDENTIFIER_WHITE_SPACE> {
+  {ESCAPED_EOL}                                                          { return TokenType.WHITE_SPACE; }
   {ADDITION_OPERATOR} / {MULTILINE_WHITE_SPACE}                          { yybegin(MULTILINE_WHITE_SPACE_MAYBE);
                                                                            return ElixirTypes.ADDITION_OPERATOR; }
   {ADDITION_OPERATOR} / ({OPENING}|{MINUS_OPERATOR}|{STRUCT_OPERATOR})   { popAndBegin();
@@ -1108,7 +1138,7 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
                                                          with CALL so parser doesn't think call is no parentheses with
                                                          parenthetical or list argument. */
                                                       yybegin(CALL_MAYBE);
-                                                      startQuote(yytext());
+                                                      startQuotedCallName(yytext());
                                                       return ElixirTypes.LINE_PROMOTER; }
 
   .                                                 { handleInLastState(); }
@@ -1119,7 +1149,7 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
           popAndBegin();
           return ElixirTypes.EOL;
         }
-  .     {
+  {ANY} {
           popAndBegin();
           return ElixirTypes.FRAGMENT;
         }
@@ -1151,7 +1181,7 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
                                     return ElixirTypes.HEXADECIMAL_WHOLE_NUMBER_BASE; }
   {UNICODE_ESCAPE_CHARACTER}      { yybegin(UNICODE_ESCAPE_SEQUENCE);
                                     return ElixirTypes.UNICODE_ESCAPE_CHARACTER; }
-  .                               { popAndBegin();
+  {ANY}                           { popAndBegin();
                                     return ElixirTypes.ESCAPED_CHARACTER_TOKEN; }
 }
 
@@ -1231,7 +1261,7 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
                              }
   {ESCAPE}                   {
                                if (isInterpolating()) {
-                                 pushAndBegin(ESCAPE_SEQUENCE);
+                                 pushAndBegin(isQuotedCallName() ? QUOTED_CALL_NAME_ESCAPE_SEQUENCE : ESCAPE_SEQUENCE);
                                  return ElixirTypes.ESCAPE;
                                } else {
                                  pushAndBegin(ESCAPE_IN_LITERAL);
@@ -1297,7 +1327,7 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
                      yybegin(GROUP_HEREDOC_LINE_START);
                      return ElixirTypes.EOL;
                    }
-  .                { return ElixirTypes.FRAGMENT; }
+  {ANY}            { return ElixirTypes.FRAGMENT; }
 }
 
 // See https://github.com/elixir-lang/elixir/pull/4341
@@ -1420,6 +1450,15 @@ EOL_INSENSITIVE = {AND_SYMBOL_OPERATOR} |
   {NUMBER_SEPARATOR}      { return ElixirTypes.NUMBER_SEPARATOR; }
   {INVALID_OCTAL_DIGITS} { return ElixirTypes.INVALID_OCTAL_DIGITS; }
   {VALID_OCTAL_DIGITS}   { return ElixirTypes.VALID_OCTAL_DIGITS; }
+}
+
+// Before Elixir 1.18, a quoted call name keeps an invalid `\x` or `\u` escape as written, so it lexes as a plain escape.
+<QUOTED_CALL_NAME_ESCAPE_SEQUENCE> {
+  ({HEXADECIMAL_WHOLE_NUMBER_BASE}|{UNICODE_ESCAPE_CHARACTER}) /
+    ({HEXADECIMAL_DIGIT}|{OPENING_CURLY}{HEXADECIMAL_DIGIT}{1,6}{CLOSING_CURLY}) { handleInState(ESCAPE_SEQUENCE); }
+  {HEXADECIMAL_WHOLE_NUMBER_BASE}|{UNICODE_ESCAPE_CHARACTER}                     { popAndBegin();
+                                                                                   return ElixirTypes.ESCAPED_CHARACTER_TOKEN; }
+  {ANY}                                                                          { handleInState(ESCAPE_SEQUENCE); }
 }
 
 <REFERENCE_OPERATION> {

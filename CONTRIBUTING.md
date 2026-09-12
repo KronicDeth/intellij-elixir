@@ -251,7 +251,7 @@ beam/dist.c:5678:15: error: two or more data types in declaration specifiers
                        ^~~~
 ```
 
-As the project still uses OTP 24, which uses a local variable named bool in beam/dist.c, which was legal C in 2022... but is not legal C now, because GCC 15 switched its default C standard to C23, which makes bool a reserved built-in type name. ArchLinux (btw) ships GCC 16.1.1, Deian 13 seems to be 14.2.0.
+OTP 24 uses a local variable named bool in beam/dist.c, which was legal C in 2022... but is not legal C now, because GCC 15 switched its default C standard to C23, which makes bool a reserved built-in type name. ArchLinux (btw) ships GCC 16.1.1, Deian 13 seems to be 14.2.0. The pin is OTP 29, so this only bites when building an older OTP - the 1.11.4 and 1.12.3 legs are on OTP 24.
 
 You can work around this by forcing an older C standard, for example:
 
@@ -350,6 +350,36 @@ needs at runtime. Exporting `MIX_ENV` overrides this, and the path the build loo
 same value, so the two cannot disagree. If you switch it, expect one extra `releaseQuoter` run; the
 `_build` subtree for the previous environment is left behind and can be deleted.
 
+`test` also parses and quotes every `.ex` and `.exs` file of the Elixir release under test
+(`ElixirLangElixirParsingTestCase`). Which commit that is comes from the `corpus` of its pair in
+`.github/ci-versions.json`: on a cold cache `elixirParsingCorpus` downloads the archive into
+`cache/corpus/archives` and extracts it to `cache/corpus/<elixir version>`. Each test is named after the file
+it parsed, as `elixir-lang/elixir@<commit>/lib/...`. An Elixir that no pair declares has no corpus, and the
+suite reports a single failing test saying so.
+
+Whole files never reach Elixir's hardest parser cases, which live in string literals inside its tests.
+`ElixirSnippetParsingTestCase` covers those: every source string that Elixir's parser, tokenizer, formatter and
+normalizer tests hand to the parser, from every release in `.github/ci-versions.json`, is committed once in
+`testData/org/elixir_lang/parser_definition/elixir_snippets/snippets.jsonl`. Each snippet the leg's quoter
+accepts is a test, named by the snippet's hash and where it first appears; snippets the quoter rejects are not
+tests. `NOTICE.md` beside it carries the attribution the Apache License asks for.
+
+When you add an Elixir release to `.github/ci-versions.json`, give its pair a `corpus` and regenerate the
+snippets from the repository root, with every declared pair installed in mise:
+
+```sh
+mise exec -- elixir testData/org/elixir_lang/parser_definition/elixir_snippets/generate.exs
+```
+
+It reads each release's tests with that release's own Elixir, prints how many snippets came from each test
+file, and lists helpers the tests define and call with a literal string that it does not read, which is how a
+new way of handing source to the parser shows up. Commit `snippets.jsonl` and `NOTICE.md`.
+
+A corpus file the plugin cannot yet parse or quote as Elixir does can be listed in
+`testData/org/elixir_lang/parser_definition/corpus_known_failures.tsv`, and a snippet in `snippet_known_failures.tsv`
+beside it, with the Elixir versions it fails on. A listed test must keep failing, and must exist, on each of those
+versions, so the list cannot outlive the fix.
+
 To build (so you get a .zip file):
 ```sh
 ./gradlew buildPlugin        # the zip, no tests - prefer this
@@ -402,22 +432,27 @@ resolved versions - so a bad declaration is diagnosable locally rather than from
 
 | | Elixir | OTP | Status |
 |---|---|---|---|
-| `beam.baseline` | 1.13.4 | 24.3.4.6 | **supported** - must be green |
-| `beam.additional` | later minors, plus pairs covering an OTP major no other leg covers | see the file | **supported** when the entry has no `continue-on-error`, otherwise informational |
+| `beam.baseline` | 1.20.4 | 29.0.6 | **supported** - must be green |
+| `beam.additional` | the rest of the window either side of the baseline, plus pairs covering an OTP major no other leg covers | see the file | **supported** when the entry has no `continue-on-error`, otherwise informational |
+
+`beam.baseline` is the newest supported pair, and the one every IDEA leg and the Windows leg run.
+`beam.additional` covers the rest of the window, which reaches back to 1.11.4: `builds.hex.pm`
+publishes OTP for `ubuntu-22.04` only from 24.2, and 1.11.4 is the oldest Elixir that runs on OTP 24,
+so nothing below it can be tested.
 
 `beam.additional` is not one-entry-per-Elixir-minor: a pair may exist to cover an **OTP major** no other
 pair covers, because most of the decompiled surface is Erlang and the BEAM chunk formats track OTP
-rather than Elixir. So the same Elixir can appear twice with different OTPs - `1.13.4` currently does.
-For such a leg, prefer the cleanest in-window Elixir so it isolates the OTP surface instead of
-inheriting a quoting backlog.
+rather than Elixir. So the same Elixir can appear twice with different OTPs. Put a new Elixir on the
+newest OTP major it supports, so a failure is about the Elixir; give a new OTP an Elixir that already
+has a green leg, so a failure is about the OTP.
 
 Check which OTP an Elixir supports against the
 [compatibility table](https://elixir.hexdocs.pm/compatibility-and-deprecations.html) - it accounts for
-support added in patch releases, e.g. 1.14 is "23 - 25 (and Erlang/OTP 26 from v1.14.5)". Within that
-range, prefer the version's `recommended_otp` from
-[`elixir-versions.yml`](https://github.com/elixir-lang/elixir-lang.github.com/blob/main/_data/elixir-versions.yml),
-or the highest supported OTP where none is declared. Don't use that file's `otp_versions` list to
-decide the range: it is per-minor and misses patch-level additions.
+support added in patch releases, e.g. 1.14 is "23 - 25 (and Erlang/OTP 26 from v1.14.5)". Don't use the
+`otpVersions` list in
+[`elixir-versions`](https://github.com/elixir-lang/elixir-lang.github.com/tree/main/src/content/elixir-versions)
+to decide the range: it is per-minor, misses patch-level additions, and is published only from v1.15.
+Only the current stable minor declares a `recommendedOtp`, and it is not the rule here either.
 
 ##### Widening Elixir support
 
@@ -430,7 +465,7 @@ from unsupported to supported:
 3. **Delete its `continue-on-error`.** The version is now **supported**: from then on, any change that
    breaks it fails the pipeline.
 
-`continue-on-error` covers the whole leg - toolchain setup, compile, sandbox, quoter build and tests -
+`continue-on-error` covers the whole leg - toolchain setup, compile, sandbox, quoter build, corpus download and tests -
 not just the test step, because an unsupported Elixir can fail at any of those and they all mean the
 same thing. `setup-beam` may not publish the pair. The annotation on a failed informational leg names
 the phase it died in, so you can tell those apart.

@@ -41,6 +41,7 @@ public class ElixirAtomImpl extends ElixirAtomMixin implements ElixirAtom {
   }
 
   @Override
+  @RequiresReadLock
   public @NotNull OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }

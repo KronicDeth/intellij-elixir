@@ -5,6 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 import com.ericsson.otp.erlang.OtpErlangObject;
+import com.intellij.util.concurrency.annotations.RequiresReadLock;
 
 public interface ElixirUnmatchedQualifiedBracketOperation extends ElixirUnmatchedExpression, QualifiedBracketOperation {
 
@@ -22,6 +23,7 @@ public interface ElixirUnmatchedQualifiedBracketOperation extends ElixirUnmatche
 
   @NotNull PsiElement qualifier();
 
+  @RequiresReadLock
   @NotNull OtpErlangObject quote();
 
 }

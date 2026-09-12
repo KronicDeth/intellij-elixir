@@ -10,7 +10,7 @@ import java.util.Map;
  * Created by kadie.enheduanna.inanna on 8/20/14.
  */
 public class SigilName {
-    public static IElementType elementType(char sigilName) {
+    public static IElementType elementType(String sigilName) {
         IElementType elementType;
 
         if (isInterpolating(sigilName)) {
@@ -26,7 +26,9 @@ public class SigilName {
         return (character >= 'a' && character <= 'z') || (character >= 'A' && character <= 'Z');
     }
 
-    public static boolean isInterpolating(char sigilName) {
-        return (sigilName >= 'a' && sigilName <= 'z');
+    public static boolean isInterpolating(String sigilName) {
+        char first = sigilName.charAt(0);
+
+        return (first >= 'a' && first <= 'z');
     }
 }

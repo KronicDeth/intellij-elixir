@@ -11,6 +11,7 @@ import static org.elixir_lang.psi.ElixirTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.psi.*;
 import com.ericsson.otp.erlang.OtpErlangObject;
+import com.intellij.util.concurrency.annotations.RequiresReadLock;
 
 public class ElixirAccessExpressionImpl extends ASTWrapperPsiElement implements ElixirAccessExpression {
 
@@ -144,6 +145,12 @@ public class ElixirAccessExpressionImpl extends ASTWrapperPsiElement implements 
 
   @Override
   @Nullable
+  public ElixirNullaryRangeOperation getNullaryRangeOperation() {
+    return PsiTreeUtil.getChildOfType(this, ElixirNullaryRangeOperation.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirOctalWholeNumber getOctalWholeNumber() {
     return PsiTreeUtil.getChildOfType(this, ElixirOctalWholeNumber.class);
   }
@@ -152,6 +159,12 @@ public class ElixirAccessExpressionImpl extends ASTWrapperPsiElement implements 
   @Nullable
   public ElixirParentheticalStab getParentheticalStab() {
     return PsiTreeUtil.getChildOfType(this, ElixirParentheticalStab.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirSteppedRangeKeywordCall getSteppedRangeKeywordCall() {
+    return PsiTreeUtil.getChildOfType(this, ElixirSteppedRangeKeywordCall.class);
   }
 
   @Override
@@ -178,6 +191,7 @@ public class ElixirAccessExpressionImpl extends ASTWrapperPsiElement implements 
   }
 
   @Override
+  @RequiresReadLock
   public @NotNull OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }

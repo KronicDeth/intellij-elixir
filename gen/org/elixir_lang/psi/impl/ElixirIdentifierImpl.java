@@ -13,6 +13,7 @@ import org.elixir_lang.psi.*;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiReference;
+import com.intellij.util.concurrency.annotations.RequiresReadLock;
 
 public class ElixirIdentifierImpl extends ASTWrapperPsiElement implements ElixirIdentifier {
 
@@ -41,6 +42,7 @@ public class ElixirIdentifierImpl extends ASTWrapperPsiElement implements Elixir
   }
 
   @Override
+  @RequiresReadLock
   public @NotNull OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }

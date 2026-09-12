@@ -84,6 +84,7 @@ public interface ElixirMatchedUnqualifiedParenthesesCall extends ElixirMatchedEx
   @RequiresReadLock
   boolean processDeclarations(@NotNull PsiScopeProcessor processor, @NotNull ResolveState state, PsiElement lastParent, @NotNull PsiElement place);
 
+  @RequiresReadLock
   @NotNull OtpErlangObject quote();
 
   @RequiresReadLock

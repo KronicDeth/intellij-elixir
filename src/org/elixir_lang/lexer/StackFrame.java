@@ -36,7 +36,8 @@ public class StackFrame {
     private Boolean interpolation = null;
     private Integer lastLexicalState;
     private String promoter = null;
-    private Character sigilName = null;
+    private String sigilName = null;
+    private boolean quotedCallName = false;
 
     public StackFrame(int lastLexicalState) {
         this.lastLexicalState = lastLexicalState;
@@ -52,12 +53,12 @@ public class StackFrame {
         return this.promoter != null;
     }
 
-    public void nameSigil(char sigilName) {
+    public void nameSigil(String sigilName) {
         setSigilName(sigilName);
         setInterpolation(SigilName.isInterpolating(sigilName));
     }
 
-    private char getSigilName() {
+    private String getSigilName() {
         if (sigilName == null) {
             throw new IllegalStateException("SigilName is not set.");
         }
@@ -67,7 +68,7 @@ public class StackFrame {
 
     // setSigilName is private because public API is nameSigil, which in addition to setting interpolation and sigilName
     // with setSigilName, also sets the group with setGroup.
-    private void setSigilName(char sigilName) {
+    private void setSigilName(String sigilName) {
         if (this.sigilName != null) {
             throw new IllegalStateException(
                     "SigilName already set to " + this.sigilName + ".  " +
@@ -135,6 +136,14 @@ public class StackFrame {
 
     public boolean isSigil() {
         return sigilName != null;
+    }
+
+    public boolean isQuotedCallName() {
+        return quotedCallName;
+    }
+
+    public void markQuotedCallName() {
+        quotedCallName = true;
     }
 
     public IElementType sigilNameType() {

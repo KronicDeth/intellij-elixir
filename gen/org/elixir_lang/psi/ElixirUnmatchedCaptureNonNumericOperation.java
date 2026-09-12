@@ -61,6 +61,7 @@ public interface ElixirUnmatchedCaptureNonNumericOperation extends ElixirUnmatch
   @RequiresReadLock
   @Nullable Integer primaryArity();
 
+  @RequiresReadLock
   @NotNull OtpErlangObject quote();
 
   @Nullable PsiElement[] secondaryArguments();

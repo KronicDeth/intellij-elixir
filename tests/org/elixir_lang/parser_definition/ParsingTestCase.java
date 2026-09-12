@@ -2,6 +2,8 @@ package org.elixir_lang.parser_definition;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.lang.ParserDefinition;
+import com.intellij.openapi.util.text.LineColumn;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.*;
 import org.elixir_lang.ElixirLanguage;
 import org.elixir_lang.ElixirParserDefinition;
@@ -11,6 +13,7 @@ import org.elixir_lang.psi.quoting.QuotingDialect;
 import org.elixir_lang.psi.quoting.QuotingDialectResolver;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -31,12 +34,12 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
      * {@link #assertQuotedCorrectly()} speak the same version.
      *
      * These are light fixtures with no Elixir SDK, so production resolution would reach
-     * {@link QuotingDialect#FALLBACK} on every CI leg and every leg would compare against the same
+     * {@link QuotingDialect#getFALLBACK()} on every CI leg and every leg would compare against the same
      * dialect however old the Elixir it ran. {@code ELIXIR_VERSION} is exported to the test JVM by
      * the build, from the SDK it resolved - the same SDK the quoter was built against.
      *
      * Absent - running a test straight from the IDE, outside the build's environment -
-     * {@link QuotingDialect#of} answers {@link QuotingDialect#FALLBACK}, which is what production
+     * {@link QuotingDialect#of} answers {@link QuotingDialect#getFALLBACK()}, which is what production
      * resolves to when no Elixir SDK is configured.
      *
      * <p>The override is installed either way, and has to be: skipping it sends
@@ -92,6 +95,90 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
         }
     }
 
+    /** Mirror of {@link #assertParsedAndQuotedCorrectlyBefore}: the quoter rejects it *below* {@code dialect}. */
+    protected void assertParsedAndQuotedCorrectlyFrom(QuotingDialect dialect) {
+        assertParsedAndQuotedCorrectlyFrom(dialect, true);
+    }
+
+    protected void assertParsedAndQuotedCorrectlyFrom(QuotingDialect dialect, boolean checkResult) {
+        doTest(checkResult);
+
+        if (QuotingDialectResolver.dialectFor(myFile).compareTo(dialect) < 0) {
+            assertQuotedAroundError();
+        } else {
+            assertWithoutLocalError();
+            assertQuotedCorrectly();
+        }
+    }
+
+    /**
+     * As {@link #assertParsedAndQuotedCorrectly}, where the parser, like the reference quoter, rejects it below
+     * {@code dialect}; the tree is only checked from {@code dialect}, since below it has an error in it.
+     */
+    protected void assertParsedAndQuotedCorrectlyFromOrParsedWithErrors(QuotingDialect dialect, boolean checkResult)
+            throws IOException {
+        doTest(false);
+
+        if (QuotingDialectResolver.dialectFor(myFile).compareTo(dialect) < 0) {
+            assertWithLocalError();
+            Quoter.assertError(myFile);
+        } else {
+            if (checkResult) {
+                checkResult(getTestName(), myFile);
+            }
+
+            assertWithoutLocalError();
+            assertQuotedCorrectly();
+        }
+    }
+
+    /**
+     * As {@link #assertParsedAndQuotedAroundError}: every supported version rejects, but below
+     * {@code dialect} it raises {@code expectedException} rather than answering an error tuple.
+     */
+    protected void assertParsedAndQuotedAroundErrorOrRaise(QuotingDialect dialect, String expectedException) {
+        assertParsedAndQuotedAroundErrorOrRaise(dialect, expectedException, true);
+    }
+
+    protected void assertParsedAndQuotedAroundErrorOrRaise(
+            QuotingDialect dialect,
+            String expectedException,
+            boolean checkResult
+    ) {
+        doTest(checkResult);
+        assertQuotedAroundErrorOrRaise(dialect, expectedException);
+    }
+
+    /**
+     * As {@link #assertParsedAndQuotedCorrectlyBefore}, where the releases from {@code dialect} reject by raising
+     * {@code expectedException} until {@code errorDialect}, and by answering an error tuple from it.
+     */
+    protected void assertParsedAndQuotedCorrectlyBeforeOrRaise(
+            QuotingDialect dialect,
+            QuotingDialect errorDialect,
+            String expectedException,
+            boolean checkResult
+    ) {
+        doTest(checkResult);
+
+        if (QuotingDialectResolver.dialectFor(myFile).compareTo(dialect) >= 0) {
+            assertQuotedAroundErrorOrRaise(errorDialect, expectedException);
+        } else {
+            assertWithoutLocalError();
+            assertQuotedCorrectly();
+        }
+    }
+
+    private void assertQuotedAroundErrorOrRaise(QuotingDialect dialect, String expectedException) {
+        assertInstanceOf(ElixirPsiImplUtil.quote(myFile), OtpErlangObject.class);
+
+        if (QuotingDialectResolver.dialectFor(myFile).compareTo(dialect) < 0) {
+            Quoter.assertRaise(myFile, expectedException);
+        } else {
+            Quoter.assertError(myFile);
+        }
+    }
+
     protected void assertParsedWithErrors() {
         assertParsedWithErrors(true);
     }
@@ -136,7 +223,14 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
 
         List<PsiElement> errorElementList = localErrors();
 
-        assertTrue("PsiErrorElements found in parsed file PSI", errorElementList.isEmpty());
+        if (!errorElementList.isEmpty()) {
+            PsiErrorElement first = (PsiErrorElement) errorElementList.get(0);
+            LineColumn lineColumn = StringUtil.offsetToLineColumn(myFile.getText(), first.getTextOffset());
+
+            fail(errorElementList.size() + " PsiErrorElements found in parsed file PSI, the first on line " +
+                    (lineColumn.line + 1) + " in column " + (lineColumn.column + 1) + ": " +
+                    first.getErrorDescription());
+        }
     }
 
     protected void assertQuotedAroundError() {

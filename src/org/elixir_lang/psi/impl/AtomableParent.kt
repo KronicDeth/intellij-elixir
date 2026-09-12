@@ -2,6 +2,7 @@ package org.elixir_lang.psi.impl
 
 import com.ericsson.otp.erlang.OtpErlangList
 import com.ericsson.otp.erlang.OtpErlangObject
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.psi.ElixirInterpolation
 import org.elixir_lang.psi.Parent
 import org.elixir_lang.psi.call.name.Module
@@ -11,8 +12,9 @@ class AtomableParent(val wrapped: Parent) : Parent by wrapped {
     override fun quoteBinary(metadata: OtpErlangList, argumentList: List<OtpErlangObject>): OtpErlangObject =
             QuotableImpl.quotedFunctionCall("<<>>", metadata, *argumentList.toTypedArray())
 
+    @RequiresReadLock
     override fun quoteInterpolation(interpolation: ElixirInterpolation): OtpErlangObject {
-        val quotedChildren = QuotableImpl.quote(interpolation.children)
+        val quotedChildren = QuotableImpl.quote(interpolation)
         val interpolationMetadata = QuotableImpl.metadata(interpolation)
 
         val quotedKernelToStringCall = QuotableImpl.quotedInterpolationCall(

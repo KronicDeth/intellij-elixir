@@ -132,6 +132,7 @@ public interface ElixirTypes {
   IElementType NO_PARENTHESES_MANY_STRICT_NO_PARENTHESES_EXPRESSION = new ElixirElementType("NO_PARENTHESES_MANY_STRICT_NO_PARENTHESES_EXPRESSION");
   IElementType NO_PARENTHESES_ONE_ARGUMENT = new ElixirElementType("NO_PARENTHESES_ONE_ARGUMENT");
   IElementType NO_PARENTHESES_STRICT = new ElixirElementType("NO_PARENTHESES_STRICT");
+  IElementType NULLARY_RANGE_OPERATION = new ElixirElementType("NULLARY_RANGE_OPERATION");
   IElementType OCTAL_DIGITS = new ElixirElementType("OCTAL_DIGITS");
   IElementType OCTAL_WHOLE_NUMBER = new ElixirElementType("OCTAL_WHOLE_NUMBER");
   IElementType OPEN_HEXADECIMAL_ESCAPE_SEQUENCE = new ElixirElementType("OPEN_HEXADECIMAL_ESCAPE_SEQUENCE");
@@ -151,6 +152,7 @@ public interface ElixirTypes {
   IElementType STAB_NO_PARENTHESES_SIGNATURE = new ElixirElementType("STAB_NO_PARENTHESES_SIGNATURE");
   IElementType STAB_OPERATION = new ElixirElementType("STAB_OPERATION");
   IElementType STAB_PARENTHESES_SIGNATURE = new ElixirElementType("STAB_PARENTHESES_SIGNATURE");
+  IElementType STEPPED_RANGE_KEYWORD_CALL = new ElixirElementType("STEPPED_RANGE_KEYWORD_CALL");
   IElementType STRUCT_OPERATION = new ElixirElementType("STRUCT_OPERATION");
   IElementType TERNARY_INFIX_OPERATOR = new ElixirElementType("TERNARY_INFIX_OPERATOR");
   IElementType THREE_INFIX_OPERATOR = new ElixirElementType("THREE_INFIX_OPERATOR");
@@ -683,6 +685,9 @@ public interface ElixirTypes {
       else if (type == NO_PARENTHESES_STRICT) {
         return new ElixirNoParenthesesStrictImpl(node);
       }
+      else if (type == NULLARY_RANGE_OPERATION) {
+        return new ElixirNullaryRangeOperationImpl(node);
+      }
       else if (type == OCTAL_DIGITS) {
         return new ElixirOctalDigitsImpl(node);
       }
@@ -739,6 +744,9 @@ public interface ElixirTypes {
       }
       else if (type == STAB_PARENTHESES_SIGNATURE) {
         return new ElixirStabParenthesesSignatureImpl(node);
+      }
+      else if (type == STEPPED_RANGE_KEYWORD_CALL) {
+        return new ElixirSteppedRangeKeywordCallImpl(node);
       }
       else if (type == STRUCT_OPERATION) {
         return new ElixirStructOperationImpl(node);

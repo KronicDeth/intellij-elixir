@@ -620,9 +620,12 @@ identifier ::= IDENTIFIER_TOKEN
                }
 
 private notKeywordPairColon ::= !KEYWORD_PAIR_COLON
+// `x ..y` and `x //1` apply an operator to `x`; `//1` is a call's argument only before Elixir 1.12.0, which has no step
+// operator.
+private noParenthesesCallArgumentsStart ::= !nullaryRangeOperation !(<<stepOperator>> TERNARY_OPERATOR)
 // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L124-L125
 unqualifiedNoParenthesesManyArgumentsCall ::= identifier notKeywordPairColon
-                                              noParenthesesManyArgumentsStrict
+                                              noParenthesesCallArgumentsStart noParenthesesManyArgumentsStrict
                                               {
                                                 implements = [
                                                   // MUST be first so visitElement is used in ElixirVisitor
@@ -698,6 +701,7 @@ heredoc ::= HEREDOC_PROMOTER EOL
             {
               implements = [
                 "org.elixir_lang.psi.HeredocLiteral"
+                "org.elixir_lang.psi.Interpolated"
                 "org.elixir_lang.psi.Quote"
               ]
               methods = [
@@ -745,6 +749,7 @@ interpolatedSigilHeredoc ::= TILDE INTERPOLATING_SIGIL_NAME HEREDOC_PROMOTER EOL
                              heredocPrefix HEREDOC_TERMINATOR sigilModifiers
                              {
                                implements = [
+                                 "org.elixir_lang.psi.Interpolated"
                                  "org.elixir_lang.psi.SigilHeredocLiteral"
                                ]
                                //noinspection BnfResolve
@@ -1199,7 +1204,7 @@ matchedThreeOperation ::= matchedExpression threeInfixOperator matchedExpression
  * @see https://github.com/elixir-lang/elixir/pull/10810
  */
 
-ternaryInfixOperator ::= TERNARY_OPERATOR
+ternaryInfixOperator ::= <<stepOperator>> TERNARY_OPERATOR
                          {
                            implements = "org.elixir_lang.psi.Operator"
                            methods = [
@@ -1219,7 +1224,8 @@ matchedTernaryOperation ::= matchedExpression ternaryInfixOperator matchedExpres
  * @see https://github.com/elixir-lang/elixir/pull/9954 for +++ and ---
  */
 
-twoInfixOperator ::= RANGE_OPERATOR | TWO_OPERATOR
+// The lexer keeps the newline after `..` as EOL, which ends a nullary `..`.
+twoInfixOperator ::= RANGE_OPERATOR eolStar | TWO_OPERATOR
                      {
                        implements = "org.elixir_lang.psi.Operator"
                        methods = [
@@ -1241,7 +1247,8 @@ matchedTwoOperation ::= matchedExpression twoInfixOperator matchedExpression
 
 /* Unlike other binary operation, additionOperations cannot begin with EOLs: if there are EOLs, then the +/- is
    interpreted as unaryOperation. */
-additionInfixOperator ::= ADDITION_OPERATOR | SUBTRACTION_OPERATOR
+additionInfixOperator ::= !<<escapedNewlineSwapsDualOperator>> (ADDITION_OPERATOR | SUBTRACTION_OPERATOR) |
+                          <<escapedNewlineSwapsDualOperator>> (NEGATE_OPERATOR | NUMBER_OR_BADARITH_OPERATOR)
                           {
                             implements = "org.elixir_lang.psi.Operator"
                             methods = [
@@ -1290,7 +1297,10 @@ powerInfixOperator ::= POWER_OPERATOR
 // implements and methods defined by "infix operations" section above
 matchedPowerOperation ::= matchedExpression powerInfixOperator matchedExpression
 
-unaryPrefixOperator ::= (NEGATE_OPERATOR | NUMBER_OR_BADARITH_OPERATOR | UNARY_OPERATOR) eolStar |
+// A prefix `//` quotes as `(/)/operand`, so `&//2` captures division.
+unaryPrefixOperator ::= !<<escapedNewlineSwapsDualOperator>> (NEGATE_OPERATOR | NUMBER_OR_BADARITH_OPERATOR) eolStar |
+                        <<escapedNewlineSwapsDualOperator>> (ADDITION_OPERATOR | SUBTRACTION_OPERATOR) |
+                        (TERNARY_OPERATOR | UNARY_OPERATOR) eolStar |
                         NOT_OPERATOR !IN_OPERATOR
                         {
                           implements = "org.elixir_lang.psi.Operator"
@@ -1298,7 +1308,7 @@ unaryPrefixOperator ::= (NEGATE_OPERATOR | NUMBER_OR_BADARITH_OPERATOR | UNARY_O
                             operatorTokenSet
                             quote
                           ]
-                          name = "+, -, !, ^, not, ~~~"
+                          name = "+, -, !, ^, not, ~~~, //"
                         }
 
 /*
@@ -1379,9 +1389,10 @@ relativeIdentifier ::= IDENTIFIER_TOKEN |
 private parenthesesPositionalArguments ::= containerArgumentsBase
 
 // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L484-L488
+// Before `do`, a no-parentheses call is the head of an unmatchedExpression: `f(for a <- b, c do ... end)`.
 parenthesesArguments ::= OPENING_PARENTHESIS
                          (
-                          unqualifiedNoParenthesesManyArgumentsCall | // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L485
+                          unqualifiedNoParenthesesManyArgumentsCall !DO | // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L485
                           keywords | // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L486
                           parenthesesPositionalArguments (infixComma keywords)?)? // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L487-L488
                          CLOSING_PARENTHESIS
@@ -1418,7 +1429,7 @@ callParenthesesArguments ::= OPENING_PARENTHESIS callParenthesesArgumentsBody? C
                                elementType = parenthesesArguments
                                pin = 1
                              }
-private callParenthesesArgumentsBody ::= unqualifiedNoParenthesesManyArgumentsCall |
+private callParenthesesArgumentsBody ::= unqualifiedNoParenthesesManyArgumentsCall !DO |
                                          keywords |
                                          parenthesesPositionalArguments (infixComma keywords)?
                                          { recoverWhile = callParenthesesArgumentsBodyRecoverWhile }
@@ -1479,7 +1490,7 @@ matchedDotCall ::= matchedExpression dotInfixOperator callParenthesesArguments c
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L191-L194
  */
 
-matchedQualifiedNoParenthesesCall ::= matchedExpression dotInfixOperator relativeIdentifier noParenthesesOneArgument
+matchedQualifiedNoParenthesesCall ::= matchedExpression dotInfixOperator relativeIdentifier noParenthesesCallArgumentsStart noParenthesesOneArgument
                                       {
                                         implements = [
                                           "org.elixir_lang.psi.MatchedCall"
@@ -1497,7 +1508,7 @@ matchedQualifiedNoParenthesesCall ::= matchedExpression dotInfixOperator relativ
  * just the variable.
  */
 
-matchedAtUnqualifiedNoParenthesesCall ::= atIdentifier noParenthesesOneArgument
+matchedAtUnqualifiedNoParenthesesCall ::= atIdentifier noParenthesesCallArgumentsStart noParenthesesOneArgument
                                           {
                                             implements = [
                                               "org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall<org.elixir_lang.psi.stub.MatchedAtUnqualifiedNoParenthesesCall>"
@@ -1513,7 +1524,7 @@ matchedAtUnqualifiedNoParenthesesCall ::= atIdentifier noParenthesesOneArgument
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L191-L194
  */
 
-matchedUnqualifiedNoParenthesesCall ::= identifier noParenthesesOneArgument
+matchedUnqualifiedNoParenthesesCall ::= identifier noParenthesesCallArgumentsStart noParenthesesOneArgument
                                         {
                                           implements = [
                                             "org.elixir_lang.psi.MatchedCall"
@@ -1814,23 +1825,37 @@ private maxExpression ::= /* matchedBracketOperation because it is first rule af
                            variable |
                            accessExpression
                           ) maxQualifiedNoArgumentsCall | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L499
+                          // Before variable, which would take the identifier of `a[1]`
+                          matchedAtUnqualifiedBracketOperation |
+                          matchedAtNumericBracketOperation |
+                          matchedUnqualifiedBracketOperation |
                           matchedUnqualifiedParenthesesCall | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L231
                           variable | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L499
                           atom | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L226-L228
-                          alias // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L231
+                          alias | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L231
+                          accessExpression // Elixir 1.17.0's map_base_expr takes any sub_matched_expr
 
 /*
  * Map Expression
  */
 
-atMaxExpression ::= atPrefixOperator maxExpression
+atMaxExpression ::= atPrefixOperator mapExpression
                     { elementType = matchedAtOperation }
+
+// `...` lexes as an identifier.
+ellipsisPrefixOperator ::= <<ellipsis>> IDENTIFIER_TOKEN
+                           { elementType = unaryPrefixOperator }
+
+unaryMaxExpression ::= (ellipsisPrefixOperator | unaryPrefixOperator) mapExpression
+                       { elementType = matchedUnaryOperation }
 
 /* Anything that can hold a map.
  *
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L498-L500
  */
-private mapExpression ::= maxExpression | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L498-L499
+// unaryMaxExpression first, so that `...` with an operand is not taken as a variable
+private mapExpression ::= unaryMaxExpression |
+                          maxExpression | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L498-L499
                           atMaxExpression // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L500
 
 private associationsExpression ::= containerAssociationOperation | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L505
@@ -2015,7 +2040,9 @@ accessExpression ::= captureNumericOperation |
                      literalSigilLine |
                      atomKeyword |
                      atom |
-                     alias
+                     alias |
+                     steppedRangeKeywordCall |
+                     nullaryRangeOperation
                      {
                        implements = [
                          "org.elixir_lang.psi.MaybeModuleName"
@@ -2026,6 +2053,14 @@ accessExpression ::= captureNumericOperation |
                          quote
                        ]
                      }
+
+// Not before a keyword pair's colon, nor before the `//:` of a `..//` key.
+nullaryRangeOperation ::= RANGE_OPERATOR !(KEYWORD_PAIR_COLON | DIVISION_OPERATOR DIVISION_OPERATOR KEYWORD_PAIR_COLON)
+                          { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
+// Before Elixir 1.12.0 an operator followed by `/` is an identifier, so `..//: 1` is the call `..(/([/: 1]))`.
+steppedRangeKeywordCall ::= !<<stepOperator>> RANGE_OPERATOR DIVISION_OPERATOR noParenthesesKeywords
+                            { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 // See eexFile in EEx.bnf
 eex ::= (EEX_DATA | EEX_ESCAPED_OPENING | eexTag)+
@@ -2301,7 +2336,7 @@ unmatchedDotCall ::= unmatchedExpression dotInfixOperator callParenthesesArgumen
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L191-L194
  */
 
-unmatchedQualifiedNoParenthesesCall ::= unmatchedExpression dotInfixOperator relativeIdentifier noParenthesesOneArgument doBlockMaybe
+unmatchedQualifiedNoParenthesesCall ::= unmatchedExpression dotInfixOperator relativeIdentifier noParenthesesCallArgumentsStart noParenthesesOneArgument doBlockMaybe
                                         {
                                           implements = [
                                             "org.elixir_lang.psi.QualifiedNoParenthesesCall<org.elixir_lang.psi.stub.UnmatchedQualifiedNoParenthesesCall>"
@@ -2320,7 +2355,7 @@ unmatchedQualifiedNoParenthesesCall ::= unmatchedExpression dotInfixOperator rel
 
 atIdentifier ::= atPrefixOperator IDENTIFIER_TOKEN
                  { methods = [getReference] }
-unmatchedAtUnqualifiedNoParenthesesCall ::= atIdentifier noParenthesesOneArgument doBlockMaybe
+unmatchedAtUnqualifiedNoParenthesesCall ::= atIdentifier noParenthesesCallArgumentsStart noParenthesesOneArgument doBlockMaybe
                                             {
                                               implements = "org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall<org.elixir_lang.psi.stub.UnmatchedAtUnqualifiedNoParenthesesCall>"
                                               mixin = "org.elixir_lang.psi.impl.NamedStubbedPsiElementBase<org.elixir_lang.psi.stub.UnmatchedAtUnqualifiedNoParenthesesCall>"
@@ -2333,7 +2368,7 @@ unmatchedAtUnqualifiedNoParenthesesCall ::= atIdentifier noParenthesesOneArgumen
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L191-L194
  */
 
-unmatchedUnqualifiedNoParenthesesCall ::= identifier noParenthesesOneArgument doBlockMaybe
+unmatchedUnqualifiedNoParenthesesCall ::= identifier noParenthesesCallArgumentsStart noParenthesesOneArgument doBlockMaybe
                                           {
                                             implements = "org.elixir_lang.psi.UnqualifiedNoParenthesesCall<org.elixir_lang.psi.stub.UnmatchedUnqualifiedNoParenthesesCall>"
                                             methods = [
@@ -2777,7 +2812,9 @@ quoteHexadecimalEscapeSequence ::= hexadecimalEscapePrefix (openHexadecimalEscap
  * Keywords
  */
 
-keywordKey ::= AFTER |
+// `..//` is lexed as three tokens for steppedRangeKeywordCall; before RANGE_OPERATOR, which would take its `..`.
+keywordKey ::= <<stepOperator>> RANGE_OPERATOR DIVISION_OPERATOR DIVISION_OPERATOR |
+               AFTER |
                ALIAS_TOKEN |
                AND_SYMBOL_OPERATOR |
                AND_WORD_OPERATOR |

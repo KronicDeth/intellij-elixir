@@ -14,6 +14,7 @@ const STAGES = [
   ['COMPILE_OUTCOME', 'compilation'],
   ['SANDBOX_OUTCOME', 'test sandbox'],
   ['QUOTER_OUTCOME', 'quoter build'],
+  ['CORPUS_OUTCOME', 'corpus download'],
   ['TEST_OUTCOME', 'tests'],
 ];
 

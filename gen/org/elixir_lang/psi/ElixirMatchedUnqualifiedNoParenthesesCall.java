@@ -93,6 +93,7 @@ public interface ElixirMatchedUnqualifiedNoParenthesesCall extends ElixirMatched
   @RequiresReadLock
   @Nullable String implementedProtocolName();
 
+  @RequiresReadLock
   @NotNull OtpErlangObject quote();
 
   @RequiresReadLock

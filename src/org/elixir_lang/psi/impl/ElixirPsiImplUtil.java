@@ -78,6 +78,17 @@ public class ElixirPsiImplUtil {
             ElixirTypes.UNARY_OPERATOR
     );
     public static final TokenSet IDENTIFIER_TOKEN_SET = TokenSet.create(ElixirTypes.IDENTIFIER_TOKEN);
+    // A sign whose reading ElixirParserUtil.escapedNewlineSwapsDualOperator swapped, and a prefix `//` or `...`
+    private static final TokenSet ADDITION_INFIX_OPERATOR_TOKEN_SET = TokenSet.orSet(
+            ADDITION_OPERATOR_TOKEN_SET,
+            TokenSet.create(ElixirTypes.NEGATE_OPERATOR, ElixirTypes.NUMBER_OR_BADARITH_OPERATOR)
+    );
+    private static final TokenSet UNARY_PREFIX_OPERATOR_TOKEN_SET = TokenSet.orSet(
+            UNARY_OPERATOR_TOKEN_SET,
+            ADDITION_OPERATOR_TOKEN_SET,
+            TERNARY_OPERATOR_TOKEN_SET,
+            IDENTIFIER_TOKEN_SET
+    );
     public static final Function1<? super PsiElement, ? extends PsiElement> NEXT_SIBLING =
             (Function1<PsiElement, PsiElement>) PsiElement::getNextSibling;
     public static final Function1<? super PsiElement, ? extends PsiElement> PREVIOUS_SIBLING =
@@ -399,7 +410,7 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static TokenSet operatorTokenSet(@SuppressWarnings("unused") final ElixirAdditionInfixOperator additionInfixOperator) {
-        return ADDITION_OPERATOR_TOKEN_SET;
+        return ADDITION_INFIX_OPERATOR_TOKEN_SET;
     }
 
     @Contract(pure = true)
@@ -531,7 +542,7 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static TokenSet operatorTokenSet(@SuppressWarnings("unused") final ElixirUnaryPrefixOperator unaryPrefixOperator) {
-        return UNARY_OPERATOR_TOKEN_SET;
+        return UNARY_PREFIX_OPERATOR_TOKEN_SET;
     }
 
     @Contract(pure = true)
@@ -711,18 +722,21 @@ public class ElixirPsiImplUtil {
         return ProcessDeclarationsImpl.processDeclarations(qualifiedAlias, processor, state, lastParent, place);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull AssociationOperation associationOperation) {
         return QuotableImpl.quote(associationOperation);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull Infix infix) {
         return QuotableImpl.quote(infix);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull NotIn notIn) {
@@ -730,96 +744,112 @@ public class ElixirPsiImplUtil {
     }
 
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull Ternary ternary) {
         return QuotableImpl.quote(ternary);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull ElixirBitString bitString) {
         return QuotableImpl.quote(bitString);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull ElixirBlockIdentifier blockIdentifier) {
         return QuotableImpl.quote(blockIdentifier);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull ElixirBlockItem blockItem) {
         return QuotableImpl.quote(blockItem);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull ElixirBracketArguments bracketArguments) {
         return QuotableImpl.quote(bracketArguments);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull Digits digits) {
         return QuotableImpl.quote(digits);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull ElixirAccessExpression accessExpression) {
         return QuotableImpl.quote(accessExpression);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull ElixirAlias alias) {
         return QuotableImpl.quote(alias);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull ElixirAnonymousFunction anonymousFunction) {
         return QuotableImpl.quote(anonymousFunction);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull ElixirAssociations associations) {
         return QuotableImpl.quote(associations);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull ElixirAssociationsBase associationsBase) {
         return QuotableImpl.quote(associationsBase);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull ElixirAtom atom) {
         return QuotableImpl.quote(atom);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull ElixirAtomKeyword atomKeyword) {
         return QuotableImpl.quote(atomKeyword);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull ElixirLine elixirLine) {
         return QuotableImpl.quote(elixirLine);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull ElixirCharToken charToken) {
         return QuotableImpl.quote(charToken);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull ElixirContainerAssociationOperation containerAssociationOperation) {
@@ -1150,21 +1180,25 @@ public class ElixirPsiImplUtil {
         return new ArrayList<>(noParenthesesKeywords.getNoParenthesesKeywordPairList());
     }
 
+    @RequiresReadLock
     @NotNull
     public static OtpErlangObject quote(@NotNull ElixirDecimalFloat decimalFloat) {
         return QuotableImpl.quote(decimalFloat);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull ElixirEmptyParentheses emptyParentheses) {
         return QuotableImpl.quote(emptyParentheses);
     }
 
+    @RequiresReadLock
     public static OtpErlangObject quote(@NotNull ElixirFile file) {
         return QuotableImpl.quote(file);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final WholeNumber wholeNumber) {
@@ -1177,126 +1211,161 @@ public class ElixirPsiImplUtil {
         return AtomableImplKt.quoteLineAsAtom(line);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirIdentifier identifier) {
         return QuotableImpl.quote(identifier);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(ElixirRelativeIdentifier relativeIdentifier) {
         return QuotableImpl.quote(relativeIdentifier);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(ElixirSigilModifiers sigilModifiers) {
         return QuotableImpl.quote(sigilModifiers);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(ElixirStab stab) {
         return QuotableImpl.quote(stab);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirStabBody stabBody) {
         return QuotableImpl.quote(stabBody);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirStabNoParenthesesSignature stabNoParenthesesSignature) {
         return QuotableImpl.quote(stabNoParenthesesSignature);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(ElixirStabOperation stabOperation) {
         return QuotableImpl.quote(stabOperation);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirStabParenthesesSignature stabParenthesesSignature) {
         return QuotableImpl.quote(stabParenthesesSignature);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirStructOperation structOperation) {
         return QuotableImpl.quote(structOperation);
     }
 
+    @RequiresReadLock
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirNullaryRangeOperation nullaryRangeOperation) {
+        return QuotableImpl.quote(nullaryRangeOperation);
+    }
+
+    @RequiresReadLock
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirSteppedRangeKeywordCall steppedRangeKeywordCall) {
+        return QuotableImpl.quote(steppedRangeKeywordCall);
+    }
+
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirTuple tuple) {
         return QuotableImpl.quote(tuple);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final HeredocLiteral heredocLiteral) {
         return QuotableImpl.quote(heredocLiteral);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final HeredocLineable heredocLineable, @NotNull final HeredocLiteral heredocLiteral, int prefixLength) {
         return QuotableImpl.quote(heredocLineable, heredocLiteral, prefixLength);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final QuotableKeywordList quotableKeywordList) {
         return QuotableImpl.quote(quotableKeywordList);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final QuotableKeywordPair quotableKeywordPair) {
         return QuotableImpl.quote(quotableKeywordPair);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirKeywordKey keywordKey) {
         return QuotableImpl.quote(keywordKey);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirList list) {
         return QuotableImpl.quote(list);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirMapArguments mapArguments) {
         return QuotableImpl.quote(mapArguments);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirMapOperation mapOperation) {
         return QuotableImpl.quote(mapOperation);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirMapUpdateArguments mapUpdateArguments) {
         return QuotableImpl.quote(mapUpdateArguments);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull ElixirMultipleAliases multipleAliases) {
         return QuotableImpl.quote(multipleAliases);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(
@@ -1306,77 +1375,90 @@ public class ElixirPsiImplUtil {
         return QuotableImpl.quote(noParenthesesManyStrictNoParenthesesExpression);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull AtNumericBracketOperation atUnqualifiedBracketOperation) {
         return QuotableImpl.quote(atUnqualifiedBracketOperation);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull AtUnqualifiedBracketOperation atUnqualifiedBracketOperation) {
         return QuotableImpl.quote(atUnqualifiedBracketOperation);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
         return QuotableImpl.quote(atUnqualifiedNoParenthesesCall);
     }
 
+    @RequiresReadLock
     @NotNull
     public static OtpErlangObject quote(@NotNull BracketOperation bracketOperation) {
         return QuotableImpl.quote(bracketOperation);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull DotCall dotCall) {
         return QuotableImpl.quote(dotCall);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull In in) {
         return QuotableImpl.quote(in);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull QualifiedAlias qualifiedAlias) {
         return QuotableImpl.quote(qualifiedAlias);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull QualifiedMultipleAliases qualifiedMultipleAliases) {
         return QuotableImpl.quote(qualifiedMultipleAliases);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull QualifiedBracketOperation qualifiedBracketOperation) {
         return QuotableImpl.quote(qualifiedBracketOperation);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull QualifiedNoArgumentsCall qualifiedNoArgumentsCall) {
         return QuotableImpl.quote(qualifiedNoArgumentsCall);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull QualifiedNoParenthesesCall qualifiedNoParenthesesCall) {
         return QuotableImpl.quote(qualifiedNoParenthesesCall);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull QualifiedParenthesesCall qualifiedParenthesesCall) {
         return QuotableImpl.quote(qualifiedParenthesesCall);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull UnqualifiedBracketOperation unqualifiedBracketOperation) {
@@ -1386,6 +1468,7 @@ public class ElixirPsiImplUtil {
     /* Replaces `nil` argument in variables with the quoted ElixirMatchedNotParenthesesArguments.
      *
      */
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull UnqualifiedNoParenthesesCall unqualifiedNoParenthesesCall) {
@@ -1399,42 +1482,49 @@ public class ElixirPsiImplUtil {
         return QuotableImpl.quote(unqualifiedNoArgumentsCall);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final UnqualifiedParenthesesCall unqualifiedParenthesesCall) {
         return QuotableImpl.quote(unqualifiedParenthesesCall);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirParentheticalStab parentheticalStab) {
         return QuotableImpl.quote(parentheticalStab);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirVariable variable) {
         return QuotableImpl.quote(variable);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(Operator operator) {
         return QuotableImpl.quote(operator);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(Prefix prefix) {
         return QuotableImpl.quote(prefix);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(PsiFile file) {
         return QuotableImpl.quote(file);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(
@@ -1444,30 +1534,35 @@ public class ElixirPsiImplUtil {
         return QuotableImpl.quote(unqualifiedNoParenthesesManyArgumentsCall);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(SigilHeredocLiteral sigilHeredoc) {
         return QuotableImpl.quote(sigilHeredoc);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(SigilLine sigilLine) {
         return QuotableImpl.quote(sigilLine);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject[] quoteArguments(@NotNull final Arguments arguments) {
         return QuotableArgumentsImpl.quoteArguments(arguments);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject[] quoteArguments(@NotNull final ElixirBlockList blockList) {
         return QuotableArgumentsImpl.quoteArguments(blockList);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject[] quoteArguments(
@@ -1476,12 +1571,14 @@ public class ElixirPsiImplUtil {
         return QuotableArgumentsImpl.quoteArguments(unqualifiedNoParenthesesManyArgumentsCall);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject[] quoteArguments(@NotNull final ElixirDoBlock doBlock) {
         return QuotableArgumentsImpl.quoteArguments(doBlock);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject[] quoteArguments(
@@ -1490,12 +1587,14 @@ public class ElixirPsiImplUtil {
         return QuotableArgumentsImpl.quoteArguments(mapConstructionArguments);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject[] quoteArguments(@NotNull final ElixirNoParenthesesArguments noParenthesesArguments) {
         return QuotableArgumentsImpl.quoteArguments(noParenthesesArguments);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject[] quoteArguments(ElixirParenthesesArguments parenthesesArguments) {
@@ -1532,12 +1631,14 @@ public class ElixirPsiImplUtil {
         return ParentImpl.quoteEmpty();
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quoteInterpolation(Quote quote, ElixirInterpolation interpolation) {
         return ParentImpl.quoteInterpolation(quote, interpolation);
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quoteInterpolation(Sigil sigil, ElixirInterpolation interpolation) {
@@ -1743,7 +1844,8 @@ public class ElixirPsiImplUtil {
         return SigilImpl.sigilDelimiter(sigil);
     }
 
-    public static char sigilName(@NotNull org.elixir_lang.psi.Sigil sigil) {
+    @NotNull
+    public static String sigilName(@NotNull org.elixir_lang.psi.Sigil sigil) {
         return SigilImpl.sigilName(sigil);
     }
 
@@ -1781,6 +1883,7 @@ public class ElixirPsiImplUtil {
      * Private static methods
      */
 
+    @RequiresReadLock
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull Sigil sigil, @NotNull OtpErlangObject quotedContent) {
@@ -1801,6 +1904,7 @@ public class ElixirPsiImplUtil {
         return ParentImpl.addEscapedCharacterCodePoints(parent, codePointList, child);
     }
 
+    @RequiresReadLock
     @NotNull
     public static List<Integer> addEscapedEOL(@NotNull Parent parent,
                                               @Nullable List<Integer> maybeCodePointList,
@@ -1808,11 +1912,12 @@ public class ElixirPsiImplUtil {
         return ParentImpl.addEscapedEOL(parent, maybeCodePointList);
     }
 
+    @RequiresReadLock
     @NotNull
     public static List<Integer> addEscapedTerminator(@NotNull Parent parent,
                                                      @Nullable List<Integer> maybeCodePointList,
                                                      @NotNull ASTNode child) {
-        return ParentImpl.addEscapedTerminator(maybeCodePointList, child);
+        return ParentImpl.addEscapedTerminator(parent, maybeCodePointList, child);
     }
 
     @NotNull

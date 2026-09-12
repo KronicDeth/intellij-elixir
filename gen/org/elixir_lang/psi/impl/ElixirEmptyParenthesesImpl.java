@@ -11,6 +11,7 @@ import static org.elixir_lang.psi.ElixirTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.psi.*;
 import com.ericsson.otp.erlang.OtpErlangObject;
+import com.intellij.util.concurrency.annotations.RequiresReadLock;
 
 public class ElixirEmptyParenthesesImpl extends ASTWrapperPsiElement implements ElixirEmptyParentheses {
 
@@ -29,6 +30,7 @@ public class ElixirEmptyParenthesesImpl extends ASTWrapperPsiElement implements 
   }
 
   @Override
+  @RequiresReadLock
   public @NotNull OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }

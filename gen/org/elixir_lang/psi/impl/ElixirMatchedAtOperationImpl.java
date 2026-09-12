@@ -11,6 +11,7 @@ import static org.elixir_lang.psi.ElixirTypes.*;
 import org.elixir_lang.psi.*;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.psi.PsiReference;
+import com.intellij.util.concurrency.annotations.RequiresReadLock;
 
 public class ElixirMatchedAtOperationImpl extends ElixirMatchedExpressionImpl implements ElixirMatchedAtOperation {
 
@@ -62,6 +63,7 @@ public class ElixirMatchedAtOperationImpl extends ElixirMatchedExpressionImpl im
   }
 
   @Override
+  @RequiresReadLock
   public @NotNull OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }

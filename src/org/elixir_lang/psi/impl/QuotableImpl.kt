@@ -4,10 +4,14 @@ package org.elixir_lang.psi.impl
 
 import com.ericsson.otp.erlang.*
 import com.intellij.lang.ASTNode
+import com.intellij.openapi.util.ModificationTracker
 import com.intellij.psi.*
 import com.intellij.psi.impl.source.tree.Factory
 import com.intellij.psi.tree.IElementType
 import com.intellij.psi.tree.TokenSet
+import com.intellij.psi.util.CachedValueProvider
+import com.intellij.psi.util.CachedValuesManager
+import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.ElixirLanguage
 import org.elixir_lang.Macro
@@ -16,6 +20,7 @@ import org.elixir_lang.otpErlangList
 import org.elixir_lang.otpErlangTuple
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil.IDENTIFIER_TOKEN_SET
+import org.elixir_lang.psi.impl.ParentImpl.RAW_BYTE_OFFSET
 import org.elixir_lang.psi.impl.ParentImpl.addChildTextCodePoints
 import org.elixir_lang.psi.impl.ParentImpl.elixirCharList
 import org.elixir_lang.psi.impl.ParentImpl.elixirString
@@ -26,6 +31,7 @@ import org.jetbrains.annotations.Contract
 import java.lang.Double
 import java.lang.Long
 import java.math.BigInteger
+import java.text.Normalizer
 import java.util.*
 
 val UNQUOTED_TYPES = arrayOf<Class<*>>(ElixirEndOfExpression::class.java, PsiComment::class.java, PsiWhiteSpace::class.java)
@@ -77,13 +83,13 @@ object QuotableImpl {
             arrayOf<OtpErlangObject>(AMBIGUOUS_OP, NIL)
     )
     private val ALIASES = OtpErlangAtom("__aliases__")
+    private val DIVISION = OtpErlangAtom("/")
     internal val BLOCK = OtpErlangAtom("__block__")
     private val FN = OtpErlangAtom("fn")
     private val EXCLAMATION_POINT = OtpErlangAtom("!")
-    private val MINUS = OtpErlangAtom("-")
     private val MULTIPLE_ALIASES = OtpErlangAtom("{}")
     private val NOT = OtpErlangAtom("not")
-    private val PLUS = OtpErlangAtom("+")
+    private val RANGE = OtpErlangAtom("..")
     private val REARRANGED_UNARY_OPERATORS = arrayOf(EXCLAMATION_POINT, NOT)
     private val UNQUOTE_SPLICING = OtpErlangAtom("unquote_splicing")
     private val WHEN = OtpErlangAtom("when")
@@ -153,8 +159,10 @@ object QuotableImpl {
         val sign = operator.text.singleOrNull()?.takeIf { it == '+' || it == '-' } ?: return null
 
         // `?dual_op(Sign), not(?is_space(NotMarker))`: a space before the sign and none after is what
-        // makes the identifier a call rather than the operation's left operand.
-        if (operator.prevSibling !is PsiWhiteSpace) return null
+        // makes the identifier a call rather than the operation's left operand. An escaped newline
+        // straight after the identifier is not that space.
+        val beforeOperator = operator.prevSibling as? PsiWhiteSpace ?: return null
+        if (beforeOperator.text.first() != ' ' && beforeOperator.text.first() != '\t') return null
         val afterOperator = operator.nextSibling?.takeUnless { it is PsiWhiteSpace } ?: return null
 
         // `NotMarker =/= Sign, NotMarker =/= $/, NotMarker =/= $>` - the three exclusions 1.17.0 kept.
@@ -179,6 +187,7 @@ object QuotableImpl {
         )
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun quote(notIn: NotIn): OtpErlangObject {
@@ -206,6 +215,7 @@ object QuotableImpl {
         )
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun quote(ternary: Ternary): OtpErlangObject = when (val leftOperand = ternary.leftOperand()) {
@@ -226,8 +236,31 @@ object QuotableImpl {
                     quotedRangeStep
             )
         }
-        // invalid for Elixir native
-        else -> quote(ternary as Infix)
+        else -> {
+            val quoted = quote(ternary as Infix)
+            val quotedLeftOperand = Macro.callArguments(quoted as OtpErlangTuple).elementAt(0)
+
+            // `build_op` checks the quoted left operand, so parentheses around the range do not stop the step joining it.
+            // Small integer operands quote as an OtpErlangString, not an OtpErlangList.
+            val range = (quotedLeftOperand as? OtpErlangTuple)
+                ?.takeIf { it.arity() == 3 && it.elementAt(0) == RANGE }
+                ?.takeIf { it.elementAt(2) is OtpErlangList || it.elementAt(2) is OtpErlangString }
+                ?.let { Macro.callArguments(it) }
+                ?.takeIf { it.arity() == 2 }
+
+            if (range != null) {
+                quotedFunctionCall(
+                        OtpErlangAtom("..//"),
+                        quotedLeftOperand.elementAt(1) as OtpErlangList,
+                        range.elementAt(0),
+                        range.elementAt(1),
+                        Macro.callArguments(quoted).elementAt(1)
+                )
+            } else {
+                // invalid for Elixir native
+                quoted
+            }
+        }
     }
 
     @Contract(pure = true)
@@ -250,6 +283,7 @@ object QuotableImpl {
     @JvmStatic
     fun quote(blockIdentifier: ElixirBlockIdentifier): OtpErlangObject = OtpErlangAtom(blockIdentifier.node.text)
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun quote(blockItem: ElixirBlockItem): OtpErlangObject {
@@ -307,6 +341,7 @@ object QuotableImpl {
                     OtpErlangAtom(alias.text)
             )
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun quote(anonymousFunction: ElixirAnonymousFunction): OtpErlangObject {
@@ -318,6 +353,7 @@ object QuotableImpl {
         )
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun quote(associations: ElixirAssociations): OtpErlangObject = associations.associationsBase.quote()
@@ -328,6 +364,7 @@ object QuotableImpl {
         return OtpErlangList(associationsBase.children.map { it as Quotable }.map(Quotable::quote).toTypedArray())
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun quote(atom: ElixirAtom): OtpErlangObject =
@@ -336,7 +373,7 @@ object QuotableImpl {
 
                 assert(atomFragmentNode.elementType === ElixirTypes.ATOM_FRAGMENT)
 
-                OtpErlangAtom(atomFragmentNode.text)
+                identifierAtom(atomFragmentNode.text, atom)
             }
 
     @Contract(pure = true)
@@ -361,8 +398,8 @@ object QuotableImpl {
         val tokenizedElementType = tokenized.elementType
 
         val codePoint = if (tokenizedElementType === ElixirTypes.FRAGMENT) {
-            if (tokenized.textLength != 1) {
-                TODO("Tokenized character expected to only be one character long")
+            if (tokenized.text.codePointCount(0, tokenized.textLength) != 1) {
+                TODO("Tokenized character expected to only be one code point long")
             }
 
             tokenized.text.codePointAt(0)
@@ -463,10 +500,12 @@ object QuotableImpl {
         )
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun quote(mapOperation: ElixirMapOperation): OtpErlangObject = mapOperation.mapArguments.quote()
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun quote(mapArguments: ElixirMapArguments): OtpErlangObject {
@@ -519,7 +558,7 @@ object QuotableImpl {
     @JvmStatic
     fun quote(keywordKey: ElixirKeywordKey): OtpErlangObject =
             keywordKey.line?.quoteAsAtom()
-            ?: OtpErlangAtom(computeReadAction<String> { keywordKey.text })
+            ?: computeReadAction<OtpErlangObject> { identifierAtom(keywordKey.text, keywordKey) }
 
     @Contract(pure = true)
     @JvmStatic
@@ -533,6 +572,7 @@ object QuotableImpl {
     }
 
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun quote(atUnqualifiedBracketOperation: AtUnqualifiedBracketOperation): OtpErlangObject {
@@ -548,7 +588,7 @@ object QuotableImpl {
         val identifier = identifierNode.text
         val metadata = metadata(atUnqualifiedBracketOperation)
 
-        val quotedOperand = quotedVariable(identifier, metadata)
+        val quotedOperand = quotedVariable(identifierAtom(identifier, atUnqualifiedBracketOperation), metadata)
         val quotedContainer = quotedFunctionCall(quotedOperator, metadata, quotedOperand)
 
         val bracketArguments = atUnqualifiedBracketOperation.bracketArguments
@@ -564,6 +604,7 @@ object QuotableImpl {
         )
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun quote(atUnqualifiedNoParenthesesCall: AtUnqualifiedNoParenthesesCall<*>): OtpErlangObject {
@@ -576,14 +617,15 @@ object QuotableImpl {
 
         val identifierNode = identifierNodes[0]
         val identifier = identifierNode.text
-        val quotedIdentifier = OtpErlangAtom(identifier)
+        val quotedIdentifier = identifierAtom(identifier, atUnqualifiedNoParenthesesCall)
 
-        val quotedArguments = atUnqualifiedNoParenthesesCall.noParenthesesOneArgument.quoteArguments()
+        val noParenthesesOneArgument = atUnqualifiedNoParenthesesCall.noParenthesesOneArgument
+        val quotedArguments = noParenthesesOneArgument.quoteArguments()
         val doBlock = atUnqualifiedNoParenthesesCall.doBlock
 
         val quotedOperand = quotedBlockCall(
                 quotedIdentifier,
-                metadata(operator),
+                ambiguousOperatorMetadata(metadata(operator), noParenthesesOneArgument, quotedArguments, doBlock),
                 quotedArguments,
                 doBlock
         )
@@ -616,6 +658,7 @@ object QuotableImpl {
         )
     }
 
+    @RequiresReadLock
     @JvmStatic
     fun quote(bracketOperation: BracketOperation): OtpErlangObject {
         val children = bracketOperation.children
@@ -843,6 +886,7 @@ object QuotableImpl {
         )
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun quote(qualifiedBracketOperation: QualifiedBracketOperation): OtpErlangObject {
@@ -881,6 +925,7 @@ object QuotableImpl {
         )
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun quote(qualifiedNoArgumentsCall: QualifiedNoArgumentsCall<*>): OtpErlangObject {
@@ -888,17 +933,18 @@ object QuotableImpl {
 
         val relativeIdentifier = qualifiedNoArgumentsCall.relativeIdentifier
         val quotedRelativeIdentifier = relativeIdentifier.quote()
+        val dotOperator = dotOperator(qualifiedNoArgumentsCall)
 
         val quotedIdentifier = quotedFunctionCall(
                 ".",
-                metadata(relativeIdentifier),
+                metadata(dotOperator),
                 quotedQualifier,
                 quotedRelativeIdentifier
         )
 
         val doBlock = qualifiedNoArgumentsCall.doBlock
 
-        val line = lineNumberKeywordTuple(relativeIdentifier.node)
+        val line = remoteCallMetadata(dotOperator, relativeIdentifier).elementAt(0)
 
         val metadataElements = if (doBlock != null) {
             arrayOf(line)
@@ -916,6 +962,7 @@ object QuotableImpl {
         )
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun quote(qualifiedNoParenthesesCall: QualifiedNoParenthesesCall<*>): OtpErlangObject {
@@ -923,10 +970,11 @@ object QuotableImpl {
 
         val relativeIdentifier = qualifiedNoParenthesesCall.relativeIdentifier
         val quotedRelativeIdentifier = relativeIdentifier.quote()
+        val dotOperator = dotOperator(qualifiedNoParenthesesCall)
 
         val quotedIdentifier = quotedFunctionCall(
                 ".",
-                metadata(relativeIdentifier),
+                metadata(dotOperator),
                 quotedQualifier,
                 quotedRelativeIdentifier
         )
@@ -936,12 +984,13 @@ object QuotableImpl {
 
         return quotedBlockCall(
                 quotedIdentifier,
-                metadata(relativeIdentifier),
+                remoteCallMetadata(dotOperator, relativeIdentifier),
                 quotedArguments,
                 doBlock
         )
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun quote(qualifiedParenthesesCall: QualifiedParenthesesCall<*>): OtpErlangObject {
@@ -949,11 +998,11 @@ object QuotableImpl {
 
         val relativeIdentifier = qualifiedParenthesesCall.relativeIdentifier
         val quotedRelativeIdentifier = relativeIdentifier.quote()
+        val dotOperator = dotOperator(qualifiedParenthesesCall)
 
-        val metadata = metadata(relativeIdentifier)
         val quotedIdentifier = quotedFunctionCall(
                 ".",
-                metadata,
+                metadata(dotOperator),
                 quotedQualifier,
                 quotedRelativeIdentifier
         )
@@ -963,16 +1012,18 @@ object QuotableImpl {
 
         return quotedParenthesesCall(
                 quotedIdentifier,
-                metadata,
+                remoteCallMetadata(dotOperator, relativeIdentifier),
                 parenthesesArgumentsList,
                 doBlock
         )
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun quote(unqualifiedBracketOperation: UnqualifiedBracketOperation): OtpErlangObject {
-        val quotedIdentifier = OtpErlangAtom(unqualifiedBracketOperation.node.firstChildNode.text)
+        val quotedIdentifier =
+            identifierAtom(unqualifiedBracketOperation.node.firstChildNode.text, unqualifiedBracketOperation)
         val quotedContainer = quotedVariable(quotedIdentifier, metadata(unqualifiedBracketOperation))
 
         val bracketArguments = unqualifiedBracketOperation.bracketArguments
@@ -991,49 +1042,47 @@ object QuotableImpl {
     /* Replaces `nil` argument in variables with the quoted ElixirMatchedNotParenthesesArguments.
      *
      */
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun quote(unqualifiedNoParenthesesCall: UnqualifiedNoParenthesesCall<*>): OtpErlangObject {
-        val quotedIdentifier = OtpErlangAtom(unqualifiedNoParenthesesCall.functionName())
-        val quotedArguments = unqualifiedNoParenthesesCall.noParenthesesOneArgument.quoteArguments()
-
-        var blockCallMetadata = metadata(unqualifiedNoParenthesesCall)
-
-        // see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b//lib/elixir/src/elixir_parser.yrl#L627-L628
-        if (quotedArguments.size == 1) {
-            val quotedArgument = quotedArguments[0]
-
-            if (Macro.isExpression(quotedArgument)) {
-                val expression = quotedArgument as OtpErlangTuple
-                val receiver = expression.elementAt(0)
-
-                if (receiver == MINUS || receiver == PLUS) {
-                    val dualCallArguments = Macro.callArguments(expression)
-
-                    // [Arg]
-                    if (dualCallArguments.arity() == 1) {
-                        /* @note getChildren[0] is NOT the same as getFirstChild().  getFirstChild() will get the
-                             leaf node for identifier instead of the first compound, rule node for the argument. */
-                        val argument = unqualifiedNoParenthesesCall.children[1].firstChild
-
-                        if (!(argument is ElixirAccessExpression && argument.getFirstChild() is ElixirParentheticalStab)) {
-                            blockCallMetadata = OtpErlangList(
-                                    arrayOf(AMBIGUOUS_OP_KEYWORD_PAIR, blockCallMetadata.elementAt(0))
-                            )
-                        }
-                    }
-                }
-            }
-        }
-
+        val quotedIdentifier = identifierAtom(unqualifiedNoParenthesesCall.functionName(), unqualifiedNoParenthesesCall)
+        val noParenthesesOneArgument = unqualifiedNoParenthesesCall.noParenthesesOneArgument
+        val quotedArguments = noParenthesesOneArgument.quoteArguments()
         val doBlock = unqualifiedNoParenthesesCall.doBlock
 
         return quotedBlockCall(
                 quotedIdentifier,
-                blockCallMetadata,
+                ambiguousOperatorMetadata(
+                        metadata(unqualifiedNoParenthesesCall),
+                        noParenthesesOneArgument,
+                        quotedArguments,
+                        doBlock
+                ),
                 quotedArguments,
                 doBlock
         )
+    }
+
+    /**
+     * `build_call` gives a call on an `op_identifier` `ambiguous_op` only when it has exactly one argument, so a
+     * `do` block, which becomes a second, drops it. The lexer only makes this a call when the identifier is an
+     * `op_identifier`, so the argument opening on a unary `+` or `-` is the whole test. A keyword key such as `+:`
+     * opens on the same text, but Elixir lexes it as a `kw_identifier`, which leaves the call unambiguous.
+     */
+    @RequiresReadLock
+    private fun ambiguousOperatorMetadata(
+        metadata: OtpErlangList,
+        noParenthesesOneArgument: PsiElement,
+        quotedArguments: Array<OtpErlangObject>,
+        doBlock: PsiElement?
+    ): OtpErlangList {
+        if (doBlock != null || quotedArguments.size != 1) return metadata
+
+        val first = PsiTreeUtil.getDeepestFirst(noParenthesesOneArgument)
+        if (first.parent !is ElixirUnaryPrefixOperator || (first.text != "+" && first.text != "-")) return metadata
+
+        return OtpErlangList(arrayOf(AMBIGUOUS_OP_KEYWORD_PAIR, *metadata.elements()))
     }
 
     @RequiresReadLock
@@ -1045,6 +1094,7 @@ object QuotableImpl {
         val identifier = unqualifiedNoArgumentsCall.identifier
 
         val identifierText = identifier.text
+        val quotedIdentifier = identifierAtom(identifierText, identifier)
         val callMetadata = metadata(identifier)
 
         // if a variable has a `do` block is no longer a variable because the do block acts as keyword arguments.
@@ -1052,11 +1102,14 @@ object QuotableImpl {
             val quotedBlockArguments = doBlock.quoteArguments()
 
             quoted = quotedFunctionCall(
-                    identifierText,
+                    quotedIdentifier,
                     callMetadata,
                     *quotedBlockArguments
             )
-        } else if (identifierText == "..." && dialectFor(identifier).quotesEllipsisAsNullaryCall) {
+        } else if (identifierText == "..." &&
+            !isFollowedBySlash(identifier) &&
+            dialectFor(identifier).quotesEllipsisAsNullaryCall
+        ) {
             // Elixir 1.17.0 gave the parser an `ellipsis_op` production built with
             // `build_nullary_op`, so `...` - in a `@spec` or on its own - became a call with no
             // arguments, `{:..., meta, []}`, where before it quoted as a variable, `{:..., meta, nil}`.
@@ -1070,7 +1123,7 @@ object QuotableImpl {
               {name, metadata, context}.  Importantly, context is nil when there is no context while arguments are []
               when there are no arguments. */
             quoted = quotedVariable(
-                    identifierText,
+                    quotedIdentifier,
                     callMetadata
             )
         }
@@ -1078,11 +1131,13 @@ object QuotableImpl {
         return quoted
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun quote(unqualifiedParenthesesCall: UnqualifiedParenthesesCall<*>): OtpErlangObject {
         val metadata = metadata(unqualifiedParenthesesCall)
-        val quotedIdentifier = OtpErlangAtom(unqualifiedParenthesesCall.node.firstChildNode.text)
+        val quotedIdentifier =
+            identifierAtom(unqualifiedParenthesesCall.node.firstChildNode.text, unqualifiedParenthesesCall)
         val parenthesesArgumentsList = unqualifiedParenthesesCall.matchedParenthesesArguments.parenthesesArgumentsList
         val doBlock = unqualifiedParenthesesCall.doBlock
 
@@ -1094,6 +1149,7 @@ object QuotableImpl {
         )
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun quote(parentheticalStab: ElixirParentheticalStab): OtpErlangObject {
@@ -1137,6 +1193,7 @@ object QuotableImpl {
        {name, metadata, arguments}, while for an ambiguous call or variable, the elements are
        {name, metadata, context}.  Importantly, context is nil when there is no context while arguments are [] when
        there are no arguments. */
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun quote(variable: ElixirVariable): OtpErlangObject = quotedVariable(variable)
@@ -1154,22 +1211,69 @@ object QuotableImpl {
             TODO("Prefix expected to have 2 children (operator and operand")
         }
 
-        val quotedOperator = (children[0] as Quotable).quote()
+        val operator = children[0]
         val quotedOperand = (children[1] as Quotable).quote()
+        val metadata = metadata(prefix)
+
+        // Elixir's build_unary_op turns a prefix `//` into `(/)/operand`.
+        if (operator is ElixirUnaryPrefixOperator && operator.operatorTokenNode().elementType == ElixirTypes.TERNARY_OPERATOR) {
+            return quotedFunctionCall("/", metadata, OtpErlangTuple(arrayOf(DIVISION, metadata, NIL)), quotedOperand)
+        }
 
         return quotedFunctionCall(
-                quotedOperator,
-                metadata(prefix),
+                (operator as Quotable).quote(),
+                metadata,
                 quotedOperand
         )
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
-    fun quote(children: Array<PsiElement>): OtpErlangObject =
-        children.asSequence().filter { it !is Unquoted }.map {
+    fun quote(nullaryRangeOperation: ElixirNullaryRangeOperation): OtpErlangObject =
+            quotedFunctionCall(RANGE, metadata(nullaryRangeOperation))
+
+    /** `..(/([/: value]))`, from the `..` and first `/` of a `..//` key. */
+    @RequiresReadLock
+    @Contract(pure = true)
+    @JvmStatic
+    fun quote(steppedRangeKeywordCall: ElixirSteppedRangeKeywordCall): OtpErlangObject {
+        val node = steppedRangeKeywordCall.node
+        val division = node.findChildByType(ElixirTypes.DIVISION_OPERATOR)!!
+
+        return quotedFunctionCall(
+                RANGE,
+                metadata(node.firstChildNode),
+                quotedFunctionCall(DIVISION, metadata(division), steppedRangeKeywordCall.noParenthesesKeywords.quote())
+        )
+    }
+
+    /**
+     * An interpolation's body, as a block. Elixir parses its tokens as a grammar of their own, so an empty body follows
+     * the empty-file rule of quote(ElixirFile) - but its `line` is always 1, not the interpolation's.
+     */
+    @RequiresReadLock
+    @JvmStatic
+    fun quote(interpolation: ElixirInterpolation): OtpErlangObject {
+        val children = interpolation.children
+        val quotables = children.filter { it !is Unquoted }.map {
             it as? Quotable ?: TODO("Child, $it, must be Quotable or Unquoted")
-        }.toList().toTypedArray().let { quote(it) }
+        }
+        val quotedChildren = quotables.map(Quotable::quote)
+        // A newline in an empty interpolation is not parsed as an end of expression, so look for the tokens themselves.
+        val emptyMetadata =
+            if (quotedChildren.isEmpty() &&
+                (interpolation.node.getChildren(null).any {
+                    it.psi !is PsiComment && (it.textContains('\n') || it.textContains(';'))
+                } || dialectFor(interpolation).emitsLineMetadataOnBlock)
+            ) {
+                otpErlangList(keywordTuple("line", 1))
+            } else {
+                OtpErlangList()
+            }
+
+        return toBlock(quotedChildren, rearrangesUnaryOperators(quotables.firstOrNull()), emptyMetadata)
+    }
 
     @Contract(pure = true)
     @JvmStatic
@@ -1178,6 +1282,7 @@ object QuotableImpl {
                 ElixirPsiImplUtil.quote(root)
             }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun quote(unqualifiedNoParenthesesManyArgumentsCall: ElixirUnqualifiedNoParenthesesManyArgumentsCall): OtpErlangObject {
@@ -1187,6 +1292,7 @@ object QuotableImpl {
         return anchoredQuotedFunctionCall(unqualifiedNoParenthesesManyArgumentsCall, quotedIdentifier, *quotedArguments)
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun quote(sigilHeredoc: SigilHeredocLiteral): OtpErlangObject {
@@ -1195,6 +1301,7 @@ object QuotableImpl {
         return quote(sigilHeredoc, quotedHeredocLiteral)
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun quote(sigilLine: SigilLine): OtpErlangObject {
@@ -1356,6 +1463,7 @@ object QuotableImpl {
     }
 
     // https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L277
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun quote(stabNoParenthesesSignature: ElixirStabNoParenthesesSignature): OtpErlangObject =
@@ -1384,6 +1492,7 @@ object QuotableImpl {
         }
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun quote(relativeIdentifier: ElixirRelativeIdentifier): OtpErlangObject {
@@ -1392,23 +1501,37 @@ object QuotableImpl {
         // Only tokens
         return if (children.isEmpty()) {
             // take first node to avoid SIGNIFICANT_WHITE_SPACE after DUAL_OPERATOR
-            relativeIdentifier.node.firstChildNode.text.let(::OtpErlangAtom)
+            identifierAtom(relativeIdentifier.node.firstChildNode.text, relativeIdentifier)
         } else {
             assert(children.size == 1)
 
-            val child = children[0]
-
-            if (child is Atomable) {
-                child.quoteAsAtom()
-            } else {
-                (child as Quotable).quote()
+            when (val child = children[0]) {
+                is ElixirLine if !dialectFor(child).unescapesQuotedRemoteCallName ->
+                    OtpErlangAtom(literalQuotedRemoteCallName(child))
+                is Atomable -> child.quoteAsAtom()
+                else -> (child as Quotable).quote()
             }
         }
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
-    fun quote(identifier: ElixirIdentifier): OtpErlangObject = OtpErlangAtom(identifier.text)
+    fun quote(identifier: ElixirIdentifier): OtpErlangObject = identifierAtom(identifier.text, identifier)
+
+    /**
+     * From Elixir 1.14 the tokenizer normalises an identifier token to NFC and µ (U+00B5) to μ (U+03BC), but not a
+     * quoted atom or name: see QuotingDialect.V1_14.
+     */
+    @RequiresReadLock
+    private fun identifierAtom(identifier: String, element: PsiElement): OtpErlangAtom =
+        OtpErlangAtom(
+            if (identifier.any { it.code > 0x7F } && dialectFor(element).normalizesIdentifiers) {
+                Normalizer.normalize(identifier, Normalizer.Form.NFC).replace('µ', 'μ')
+            } else {
+                identifier
+            }
+        )
 
     @JvmStatic
     fun quote(decimalFloat: ElixirDecimalFloat): OtpErlangObject {
@@ -1494,12 +1617,20 @@ object QuotableImpl {
         )
 
         // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L76-L79
-        // See QuotingDialect.V1_20.
+        // `grammar -> eoe` has always had `line`, so a file of only `;` or newlines does too; `'$empty'` only gained
+        // it with QuotingDialect.V1_20.
         val emptyMetadata =
-            if (dialectFor(file).emitsLineMetadataOnBlock) metadata(file) else OtpErlangList()
+            if (PsiTreeUtil.getChildOfType(file, ElixirEndOfExpression::class.java) != null ||
+                dialectFor(file).emitsLineMetadataOnBlock
+            ) {
+                metadata(file)
+            } else {
+                OtpErlangList()
+            }
         return toBlock(quotedChildren, rearrangesUnaryOperators(file), emptyMetadata)
     }
 
+    @RequiresReadLock
     @Contract(pure = true)
     @JvmStatic
     fun quote(sigil: Sigil, quotedContent: OtpErlangObject): OtpErlangObject {
@@ -1602,20 +1733,64 @@ object QuotableImpl {
             OtpErlangTuple(arrayOf(key, value))
 
     /* Returns the 0-indexed line number for the element */
-    private fun lineNumber(node: ASTNode): Int = node.psi.document()!!.getLineNumber(node.startOffset)
+    private fun lineNumber(node: ASTNode): Int {
+        val psi = node.psi
+        val documentLine = psi.document()!!.getLineNumber(node.startOffset)
+        val uncounted = psi.containingFile?.let(::uncountedNewlines) ?: return documentLine
+
+        if (uncounted.isEmpty()) return documentLine
+
+        val dialect = dialectFor(psi)
+        val before = { offsets: IntArray -> offsets.count { it < node.startOffset } }
+
+        return documentLine -
+                (if (dialect.countsEscapedNewlineInLiteralSigilLine) 0 else before(uncounted.literalSigilLine)) -
+                (if (dialect.countsNewlineInCharacter) 0 else before(uncounted.character))
+    }
+
+    /** Offsets of newlines that older tokenizers consumed without advancing the line. */
+    private class UncountedNewlines(val literalSigilLine: IntArray, val character: IntArray) {
+        fun isEmpty(): Boolean = literalSigilLine.isEmpty() && character.isEmpty()
+    }
+
+    /** See QuotingDialect.V1_12 and V1_19. Cached per file, as every line in a quoted file asks. */
+    private fun uncountedNewlines(file: PsiFile): UncountedNewlines =
+        CachedValuesManager.getCachedValue(file) {
+            val literalSigilLine = mutableListOf<Int>()
+            val character = mutableListOf<Int>()
+
+            file.accept(object : PsiRecursiveElementWalkingVisitor() {
+                override fun visitElement(element: PsiElement) {
+                    if (element is ElixirEscapedEOL) {
+                        when (val parent = element.parent) {
+                            is ElixirCharToken -> character.add(element.textOffset)
+                            else -> if (parent?.parent.let { it is SigilLine && it !is Interpolated }) {
+                                literalSigilLine.add(element.textOffset)
+                            }
+                        }
+                    } else if (element is ElixirCharToken && element.node.lastChildNode.let {
+                            it.psi !is ElixirEscapedEOL && it.textContains('\n')
+                        }) {
+                        character.add(element.textOffset)
+                    }
+
+                    super.visitElement(element)
+                }
+            })
+
+            // Not `file` itself: a physical PSI dependency asks for InjectedLanguageManager, which ParsingTestCase's
+            // mock project does not register.
+            CachedValueProvider.Result.create(
+                UncountedNewlines(literalSigilLine.toIntArray(), character.toIntArray()),
+                ModificationTracker { file.modificationStamp }
+            )
+        }
 
     private fun lineNumberKeywordTuple(node: ASTNode): OtpErlangTuple =
             keywordTuple(
                     "line",
                     lineNumber(node) + 1
             )
-
-    @Contract(pure = true)
-    private fun quote(children: Array<Quotable>) =
-        // Uses toBlock because this is for inside interpolation, which functions the same as an embedded file
-        children.map(Quotable::quote).let {
-            toBlock(it, rearrangesUnaryOperators(children.firstOrNull()))
-        }
 
     @JvmStatic
     fun quotedFunctionCall(
@@ -1786,19 +1961,35 @@ object QuotableImpl {
                 } else if (elementType === ElixirTypes.HEXADECIMAL_ESCAPE_PREFIX) {
                     codePointList = addChildTextCodePoints(codePointList, child)
                 } else if (elementType === ElixirTypes.INTERPOLATION) {
+                    // `build_string([], Output) -> Output` drops an empty *buffer*, and below 1.12 a
+                    // `\` ending a line was consumed into one, so the part never existed.
+                    // See QuotingDialect.V1_12.
                     if (codePointList != null) {
-                        quotedParentList.add(elixirString(codePointList))
+                        if (codePointList.isNotEmpty() ||
+                            dialectFor(parent).keepsEscapedNewlineInExtractedBuffer
+                        ) {
+                            quotedParentList.add(elixirString(codePointList))
+                        }
+
                         codePointList = null
                     }
 
-                    if (parent is HeredocLiteral &&  quotedParentList.isEmpty()) {
+                    // See QuotingDialect.V1_12.
+                    if (parent is HeredocLiteral && quotedParentList.isEmpty() &&
+                        dialectFor(parent).emitsEmptyLeadingHeredocSegment) {
                         quotedParentList.add(elixirString(""))
                     }
 
                     val childElement = child.psi as ElixirInterpolation
                     quotedParentList.add(parent.quoteInterpolation(childElement))
                 } else if (elementType === ElixirTypes.QUOTE_HEXADECIMAL_ESCAPE_SEQUENCE || elementType === ElixirTypes.SIGIL_HEXADECIMAL_ESCAPE_SEQUENCE) {
-                    codePointList = parent.addHexadecimalEscapeSequenceCodePoints(codePointList, child)
+                    val escapedByte = (child.psi as? ElixirQuoteHexadecimalEscapeSequence)?.let { escapedByte(it) }
+
+                    codePointList = if (escapedByte != null) {
+                        (codePointList ?: mutableListOf()).apply { add(RAW_BYTE_OFFSET + escapedByte) }
+                    } else {
+                        parent.addHexadecimalEscapeSequenceCodePoints(codePointList, child)
+                    }
                 } else {
                     TODO("Can't quote " + child)
                 }
@@ -1807,7 +1998,10 @@ object QuotableImpl {
             quoted = if (codePointList != null && quotedParentList.isEmpty()) {
                 parent.quoteLiteral(codePointList)
             } else {
-                if (codePointList != null) {
+                // See QuotingDialect.V1_12.
+                if (codePointList != null &&
+                    (codePointList.isNotEmpty() || dialectFor(parent).keepsEscapedNewlineInExtractedBuffer)
+                ) {
                     quotedParentList.add(elixirString(codePointList))
                 }
 
@@ -1818,10 +2012,73 @@ object QuotableImpl {
         return quoted
     }
 
+    /**
+     * `unescape_hex` appends one byte, so `"\xC3\xA9"` is `"é"`; Elixir 1.11's deprecated `\xH` and `\x{H*}` are code
+     * points. Not decided in [Parent.addHexadecimalEscapeSequenceCodePoints]: atom resolution builds a `String` from
+     * that list, which cannot hold [RAW_BYTE_OFFSET].
+     */
+    private fun escapedByte(sequence: ElixirQuoteHexadecimalEscapeSequence): Int? {
+        if (sequence.hexadecimalEscapePrefix.text != "\\x") return null
+        val digits = sequence.openHexadecimalEscapeSequence?.text?.takeIf { it.length == 2 } ?: return null
+
+        return digits.toInt(16).takeIf { it >= 0x80 }
+    }
+
+    private fun dotOperator(qualified: PsiElement): ElixirDotInfixOperator =
+        PsiTreeUtil.getChildOfType(qualified, ElixirDotInfixOperator::class.java)!!
+
+    /** The call's own metadata, which differs from its `.`'s only when a newline separates the dot from the name. */
+    @RequiresReadLock
+    private fun remoteCallMetadata(dotOperator: ElixirDotInfixOperator, relativeIdentifier: PsiElement): OtpErlangList {
+        val nameMetadata = metadata(relativeIdentifier)
+        val dotMetadata = metadata(dotOperator)
+
+        return if (nameMetadata == dotMetadata || dialectFor(relativeIdentifier).putsRemoteCallOnNameLine) {
+            nameMetadata
+        } else {
+            dotMetadata
+        }
+    }
+
+    /**
+     * A quoted remote call's name as Elixir 1.17 and earlier kept it: `extract` without unescaping, which still drops
+     * the `\` before the terminator but keeps every other escape as written.
+     */
+    private fun literalQuotedRemoteCallName(line: ElixirLine): String {
+        val text = line.lineBody?.text.orEmpty()
+        val terminator = if (line.isCharList) '\'' else '"'
+        val name = StringBuilder()
+        var index = 0
+
+        while (index < text.length) {
+            if (text[index] == '\\' && index + 1 < text.length) {
+                if (text[index + 1] != terminator) name.append('\\')
+                name.append(text[index + 1])
+                index += 2
+            } else {
+                name.append(text[index])
+                index += 1
+            }
+        }
+
+        return name.toString()
+    }
+
+    /**
+     * `elixir_tokenizer` turns an operator followed by `/`, after any horizontal space, into an identifier, so `...` in
+     * `&.../0` or `... / 2` is a variable in every version rather than the 1.17 nullary operator.
+     */
+    private fun isFollowedBySlash(element: PsiElement): Boolean =
+        generateSequence(PsiTreeUtil.nextLeaf(element)) { PsiTreeUtil.nextLeaf(it) }
+            .firstOrNull { it !is PsiWhiteSpace || it.textContains('\n') }
+            ?.text
+            ?.startsWith("/") == true
+
+    @RequiresReadLock
     @Contract(pure = true)
     private fun quotedVariable(variable: PsiElement): OtpErlangObject =
             quotedVariable(
-                    variable.text,
+                    identifierAtom(variable.text, variable),
                     metadata(variable)
             )
 
@@ -1927,26 +2184,23 @@ object QuotableImpl {
 
             // {'when', _, _ }
             if (receiver == WHEN) {
-                val operands = expression.elementAt(2)
+                // Operands that are all small integers, as in `3 when 4`, arrive as an OtpErlangString.
+                val operands = Macro.callArguments(expression)
 
-                // is_list(End)
-                if (operands is OtpErlangList) {
+                // Have to check for two element so that unwrap_when doesn't happen recursively as the unwrapped version of when will have more than 2 arguments, which is only seen in stabSignatures.
+                // [_, _] = End
+                if (operands.arity() == 2) {
+                    val unwrappedArguments =
+                            quotedArguments.slice(0 until quotedArguments.size - 1).toTypedArray() +
+                                    operands.elements()
 
-                    // Have to check for two element so that unwrap_when doesn't happen recursively as the unwrapped version of when will have more than 2 arguments, which is only seen in stabSignatures.
-                    // [_, _] = End
-                    if (operands.arity() == 2) {
-                        val unwrappedArguments =
-                                quotedArguments.slice(0 until quotedArguments.size - 1).toTypedArray() +
-                                        operands.elements()
-
-                        unwrapped = arrayOf(
-                                quotedFunctionCall(
-                                        receiver,
-                                        Macro.metadata(expression),
-                                        *unwrappedArguments
-                                )
-                        )
-                    }
+                    unwrapped = arrayOf(
+                            quotedFunctionCall(
+                                    receiver,
+                                    Macro.metadata(expression),
+                                    *unwrappedArguments
+                            )
+                    )
                 }
             }
         }

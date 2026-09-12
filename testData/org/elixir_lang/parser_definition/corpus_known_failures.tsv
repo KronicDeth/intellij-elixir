@@ -1,0 +1,5 @@
+# Corpus files ElixirLangElixirParsingTestCase expects to fail:
+#
+#     <path under the corpus root, as elixir-lang/elixir@<commit>/lib/...>	<Elixir versions, comma-separated>
+#
+# Each listed test must fail on every version listed, and must exist there.

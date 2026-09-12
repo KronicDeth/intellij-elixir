@@ -136,6 +136,7 @@ public class ElixirUnmatchedPipeOperationImpl extends ElixirUnmatchedExpressionI
   }
 
   @Override
+  @RequiresReadLock
   public @NotNull OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }

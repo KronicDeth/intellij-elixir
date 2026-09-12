@@ -19,7 +19,10 @@
 
 import com.adarshr.gradle.testlogger.TestLoggerExtension
 import com.adarshr.gradle.testlogger.theme.ThemeType
+import cache.CachePathsTask
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
+import corpus.CorpusEntry
+import corpus.corpusFor
 import de.undercouch.gradle.tasks.download.Download
 import deps.registerResolveExternalDependenciesTasksForAllProjects
 import org.jetbrains.changelog.Changelog
@@ -35,7 +38,6 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 import quoter.QuoterService
 import quoter.tasks.GetQuoterDepsTask
-import quoter.tasks.QuoterCachePathsTask
 import quoter.tasks.ReleaseQuoterTask
 import quoter.tasks.StartQuoterTask
 import sdk.ElixirErlangSdkArgumentProvider
@@ -916,7 +918,7 @@ val quoterService = gradle.sharedServices.registerIfAbsent("quoter", QuoterServi
 // Consumed by CI, which must name the directory this build writes rather than re-derive it - see the
 // task's own documentation. Repo-relative and forward-slashed: the same value feeds the Windows legs,
 // and actions/cache exclusion patterns are forward-slashed regardless of runner.
-tasks.register<QuoterCachePathsTask>("quoterCachePaths") {
+tasks.register<CachePathsTask>("quoterCachePaths") {
     description = "Reports the actions/cache path patterns for the quoter build tree"
     outputName.set("paths")
     patterns.set(
@@ -928,6 +930,58 @@ tasks.register<QuoterCachePathsTask>("quoterCachePaths") {
             "!cache/**/tmp/pipe/**",
         )
     )
+}
+
+// --- Elixir parsing corpus ---
+// ElixirLangElixirParsingTestCase parses and quotes every .ex and .exs file of the corpus
+// .github/ci-versions.json declares for this Elixir. Read through `providers` so the configuration cache
+// is invalidated when the declaration changes.
+val elixirParsingCorpus: List<CorpusEntry> = corpusFor(
+    providers.fileContents(layout.projectDirectory.file(".github/ci-versions.json")).asText.get(),
+    elixirVersion
+)
+val elixirParsingCorpusArchives: Directory = cachePath.dir("corpus/archives")
+val elixirParsingCorpusRoot: Directory = cachePath.dir("corpus/$elixirVersion")
+
+// One task per entry: with a single source, Download treats a destination directory that does not exist yet
+// as the file to write, and refuses eachFile renames.
+val downloadElixirParsingCorpus = elixirParsingCorpus.map { entry ->
+    tasks.register<Download>("downloadElixirParsingCorpus-${entry.owner}-${entry.name}-${entry.sha.take(12)}") {
+        description = "Downloads ${entry.git} at ${entry.sha} for the parser tests"
+        src(entry.archiveUrl)
+        dest(elixirParsingCorpusArchives.file(entry.archiveFileName))
+        overwrite(false)
+    }
+}
+
+val elixirParsingCorpusTask = tasks.register<Sync>("elixirParsingCorpus") {
+    description = "Extracts the .ex and .exs files of the parser tests' corpus"
+    into(elixirParsingCorpusRoot)
+    includeEmptyDirs = false
+
+    elixirParsingCorpus.zip(downloadElixirParsingCorpus).forEach { (entry, download) ->
+        dependsOn(download)
+        val directory = entry.directory.split('/')
+        from(tarTree(resources.gzip(elixirParsingCorpusArchives.file(entry.archiveFileName)))) {
+            include("**/*.ex", "**/*.exs")
+            // The archive's top directory is named after the commit; the entry's directory replaces it.
+            eachFile {
+                relativePath = RelativePath(true, *(directory + relativePath.segments.drop(1)).toTypedArray())
+            }
+        }
+    }
+}
+
+// Consumed by CI like quoterCachePaths. Empty when no corpus is declared for this Elixir.
+tasks.register<CachePathsTask>("elixirParsingCorpusCachePaths") {
+    description = "Reports the actions/cache path patterns and key for the parser tests' corpus archives"
+    outputName.set("paths")
+    patterns.set(elixirParsingCorpus.map {
+        layout.projectDirectory.asFile.toPath()
+            .relativize(elixirParsingCorpusArchives.file(it.archiveFileName).asFile.toPath())
+            .joinToString("/")
+    })
+    key.set(elixirParsingCorpus.joinToString("-") { "${it.owner}-${it.name}-${it.sha}" })
 }
 
 val startQuoter = tasks.register<StartQuoterTask>("startQuoter") {
@@ -970,13 +1024,19 @@ tasks.named<Test>("test") {
     val sdkProps = sdkPropertiesFile
     val quoterAvailability = quoterAvailabilityFile.asFile
     val quoterStarted = quoterStartedFile.asFile
+    val corpusRoot = elixirParsingCorpusRoot.asFile.takeIf { elixirParsingCorpus.isNotEmpty() }
     doFirst {
         // `startQuoter` writes the start marker every run and copies the build marker's reason when it
         // skips, so where it exists it is the later and more complete answer. Falling back to the build
         // marker keeps `-x startQuoter` working.
         val effective = if (quoterStarted.isFile) quoterStarted else quoterAvailability
         environment(elixirTestEnvironment(sdkProps.get().asFile, effective))
+        corpusRoot?.let { environment("ELIXIR_PARSING_CORPUS", it.absolutePath) }
     }
+
+    inputs.files(elixirParsingCorpusTask)
+        .withPropertyName("elixirParsingCorpus")
+        .withPathSensitivity(PathSensitivity.RELATIVE)
 
     // QUOTER_AVAILABLE reaches the test JVM through that doFirst, so - as with the versions below -
     // Gradle cannot see it. Undeclared, a run that gains or loses a daemon stays UP-TO-DATE and

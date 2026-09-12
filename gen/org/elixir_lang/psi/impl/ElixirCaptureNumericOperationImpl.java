@@ -164,6 +164,7 @@ public class ElixirCaptureNumericOperationImpl extends ASTWrapperPsiElement impl
   }
 
   @Override
+  @RequiresReadLock
   public @NotNull OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }

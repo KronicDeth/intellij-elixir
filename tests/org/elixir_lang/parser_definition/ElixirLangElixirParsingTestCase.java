@@ -2,769 +2,104 @@ package org.elixir_lang.parser_definition;
 
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.io.FileUtilRt;
+import com.intellij.util.ThrowableRunnable;
+import junit.framework.Test;
+import junit.framework.TestSuite;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.stream.Stream;
 
+/**
+ * One test per {@code .ex} and {@code .exs} file under {@code ELIXIR_PARSING_CORPUS}, each parsed and quoted
+ * against the reference quoter of the Elixir the leg runs.
+ */
 public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
-    /*
-     * Test Methods
-     */
-
-    public void testEex() {
-        assertParsed("lib/eex/lib/eex.ex");
-    }
-
-    public void testEexCompiler() {
-        assertParsed("lib/eex/lib/eex/compiler.ex");
-    }
-
-    public void testEexEngine() {
-        assertParsed("lib/eex/lib/eex/engine.ex");
-    }
-
-    public void testEexSmartEngine() {
-        assertParsed("lib/eex/lib/eex/smart_engine.ex");
-    }
-
-    /**
-     * Frozen because Elixir <b>deleted</b> this file in 1.14: EEx tokenization moved into
-     * {@code EEx.Compiler}, so {@code lib/eex/lib/eex/tokenizer.ex} exists in 1.13.4 and in no release
-     * after it. Read live, this failed with {@code FileNotFoundException} on every leg above 1.13.4 -
-     * eight of the nine declared pairs - while saying nothing about the parser.
-     *
-     * <p>The frozen copy is 1.13.4's. It is still a real 244-line Elixir file exercising real
-     * constructs, so the coverage is kept rather than deleted with the upstream file.
-     */
-    public void testEexTokenizer() {
-        assertParsedFrozenFixture("lib/eex/lib/eex/tokenizer.ex");
-    }
-
-    public void testAccess() {
-        assertParsed("lib/elixir/lib/access.ex");
-    }
-
-    public void testAgent() {
-        assertParsed("lib/elixir/lib/agent.ex");
-    }
-
-    public void testAgentServer() {
-        assertParsed("lib/elixir/lib/agent/server.ex");
-    }
-
-    public void testApplication() {
-        assertParsed("lib/elixir/lib/application.ex");
-    }
-
-    public void testAtom() {
-        assertParsed("lib/elixir/lib/atom.ex");
-    }
-
-    public void testBase() {
-        assertParsed("lib/elixir/lib/base.ex");
-    }
-
-    public void testBehaviour() {
-        assertParsed("lib/elixir/lib/behaviour.ex");
-    }
-
-    public void testBitwise() {
-        assertParsed("lib/elixir/lib/bitwise.ex");
-    }
-
-    public void testCode() {
-        assertParsed("lib/elixir/lib/code.ex");
-    }
-
-    public void testCollectable() {
-        assertParsed("lib/elixir/lib/collectable.ex");
-    }
-
-    public void testDict() {
-        assertParsed("lib/elixir/lib/dict.ex");
-    }
-
-    public void testEnum() {
-        assertParsed("lib/elixir/lib/enum.ex");
-    }
-
-    public void testException() {
-        assertParsed("lib/elixir/lib/exception.ex");
-    }
-
-    public void testFile() {
-        assertParsed("lib/elixir/lib/file.ex");
-    }
-
-    public void testFileStat() {
-        assertParsed("lib/elixir/lib/file/stat.ex");
-    }
-
-    public void testFileStream() {
-        assertParsed("lib/elixir/lib/file/stream.ex");
-    }
-
-    public void testFloat() {
-        assertParsed("lib/elixir/lib/float.ex");
-    }
-
-    public void testGenEvent() {
-        assertParsed("lib/elixir/lib/gen_event.ex");
-    }
-
-    public void testGenEventStream() {
-        assertParsed("lib/elixir/lib/gen_event/stream.ex");
-    }
-
-    public void testHashDict() {
-        assertParsed("lib/elixir/lib/hash_dict.ex");
-    }
-
-    public void testHashSet() {
-        assertParsed("lib/elixir/lib/hash_set.ex");
-    }
-
-    public void testInspect() {
-        assertParsed("lib/elixir/lib/inspect.ex");
-    }
-
-    public void testInspectAlgebra() {
-        assertParsed("lib/elixir/lib/inspect/algebra.ex");
-    }
-
-    public void testInteger() {
-        assertParsed("lib/elixir/lib/integer.ex");
-    }
-
-    public void testIo() {
-        assertParsed("lib/elixir/lib/io.ex");
-    }
-
-    public void testIoAnsi() {
-        assertParsed("lib/elixir/lib/io/ansi.ex");
-    }
-
-    public void testIoAnsiDocs() {
-        assertParsed("lib/elixir/lib/io/ansi/docs.ex");
-    }
-
-    public void testIoStream() {
-        assertParsed("lib/elixir/lib/io/stream.ex");
-    }
-
-    public void testKernelCli() {
-        assertParsed("lib/elixir/lib/kernel/cli.ex");
-    }
-
-    public void testKernelErrorHandler() {
-        assertParsed("lib/elixir/lib/kernel/error_handler.ex");
-    }
-
-    public void testKernelLexicalTracker() {
-        assertParsed("lib/elixir/lib/kernel/lexical_tracker.ex");
-    }
-
-    public void testKernelParallelCompiler() {
-        assertParsed("lib/elixir/lib/kernel/parallel_compiler.ex");
-    }
-
-    public void testKernelParallelRequire() {
-        assertParsed("lib/elixir/lib/kernel/parallel_require.ex");
-    }
-
-    public void testKernelSpecialForms() {
-        assertParsed("lib/elixir/lib/kernel/special_forms.ex");
-    }
-
-    public void testKernelTypespec() {
-        assertParsed("lib/elixir/lib/kernel/typespec.ex");
-    }
-
-    public void testKeyword() {
-        assertParsed("lib/elixir/lib/keyword.ex");
-    }
-
-    public void testList() {
-        assertParsed("lib/elixir/lib/list.ex");
-    }
-
-    public void testListChars() {
-        assertParsed("lib/elixir/lib/list/chars.ex");
-    }
-
-    public void testMacro() {
-        assertParsed("lib/elixir/lib/macro.ex");
-    }
-
-    public void testMacroEnv() {
-        assertParsed("lib/elixir/lib/macro/env.ex");
-    }
-
-    public void testMap() {
-        assertParsed("lib/elixir/lib/map.ex");
-    }
-
-    public void testMapSet() {
-        assertParsed("lib/elixir/lib/map_set.ex");
-    }
-
-    public void testModule() {
-        assertParsed("lib/elixir/lib/module.ex");
-    }
-
-    /** Frozen: Elixir deleted this in 1.18. Copy is 1.17.3's, the last release to ship it. */
-    public void testModuleLocalsTracker() {
-        assertParsedFrozenFixture("lib/elixir/lib/module/locals_tracker.ex");
-    }
-
-    public void testNode() {
-        assertParsed("lib/elixir/lib/node.ex");
-    }
-
-    public void testOptionParser() {
-        assertParsed("lib/elixir/lib/option_parser.ex");
-    }
-
-    public void testPath() {
-        assertParsed("lib/elixir/lib/path.ex");
-    }
-
-    public void testPort() {
-        assertParsed("lib/elixir/lib/port.ex");
-    }
-
-    public void testProcess() {
-        assertParsed("lib/elixir/lib/process.ex");
-    }
-
-    public void testProtocol() {
-        assertParsed("lib/elixir/lib/protocol.ex");
-    }
-
-    public void testRange() {
-        assertParsed("lib/elixir/lib/range.ex");
-    }
-
-    public void testRecord() {
-        assertParsed("lib/elixir/lib/record.ex");
-    }
-
-    public void testRecordExtractor() {
-        assertParsed("lib/elixir/lib/record/extractor.ex");
-    }
-
-    public void testRegex() {
-        assertParsed("lib/elixir/lib/regex.ex");
-    }
-
-    public void testSet() {
-        assertParsed("lib/elixir/lib/set.ex");
-    }
-
-    public void testStream() {
-        assertParsed("lib/elixir/lib/stream.ex");
-    }
-
-    public void testStreamReducers() {
-        assertParsed("lib/elixir/lib/stream/reducers.ex");
-    }
-
-    public void testString() {
-        assertParsed("lib/elixir/lib/string.ex");
-    }
-
-    public void testStringChars() {
-        assertParsed("lib/elixir/lib/string/chars.ex");
-    }
-
-    public void testStringIo() {
-        assertParsed("lib/elixir/lib/string_io.ex");
-    }
-
-    public void testSupervisor() {
-        assertParsed("lib/elixir/lib/supervisor.ex");
-    }
-
-    public void testSupervisorDefault() {
-        assertParsed("lib/elixir/lib/supervisor/default.ex");
-    }
-
-    public void testSupervisorSpec() {
-        assertParsed("lib/elixir/lib/supervisor/spec.ex");
-    }
-
-    public void testSystem() {
-        assertParsed("lib/elixir/lib/system.ex");
-    }
-
-    public void testTask() {
-        assertParsed("lib/elixir/lib/task.ex");
-    }
-
-    public void testTaskSupervised() {
-        assertParsed("lib/elixir/lib/task/supervised.ex");
-    }
-
-    public void testTaskSupervisor() {
-        assertParsed("lib/elixir/lib/task/supervisor.ex");
-    }
-
-    public void testTuple() {
-        assertParsed("lib/elixir/lib/tuple.ex");
-    }
-
-    public void testUri() {
-        assertParsed("lib/elixir/lib/uri.ex");
-    }
-
-    public void testVersion() {
-        assertParsed("lib/elixir/lib/version.ex");
-    }
-
-    public void testCompileSample() {
-        assertParsedFrozenFixture("lib/elixir/test/elixir/fixtures/compile_sample.ex");
-    }
-
-    public void testUnicodeUnicode() {
-        assertParsedFrozenFixture("lib/elixir/unicode/unicode.ex");
-    }
-
-    public void testExUnit() {
-        assertParsed("lib/ex_unit/lib/ex_unit.ex");
-    }
-
-    public void testExUnitAssertions() {
-        assertParsed("lib/ex_unit/lib/ex_unit/assertions.ex");
-    }
-
-    public void testExUnitCallbacks() {
-        assertParsed("lib/ex_unit/lib/ex_unit/callbacks.ex");
-    }
-
-    public void testExUnitCaptureIo() {
-        assertParsed("lib/ex_unit/lib/ex_unit/capture_io.ex");
-    }
-
-    public void testExUnitCaptureLog() {
-        assertParsed("lib/ex_unit/lib/ex_unit/capture_log.ex");
-    }
-
-    public void testExUnitCase() {
-        assertParsed("lib/ex_unit/lib/ex_unit/case.ex");
-    }
-
-    public void testExUnitCaseTemplate() {
-        assertParsed("lib/ex_unit/lib/ex_unit/case_template.ex");
-    }
-
-    public void testExUnitCliFormatter() {
-        assertParsed("lib/ex_unit/lib/ex_unit/cli_formatter.ex");
-    }
-
-    public void testExUnitEventManager() {
-        assertParsed("lib/ex_unit/lib/ex_unit/event_manager.ex");
-    }
-
-    public void testExUnitFilters() {
-        assertParsed("lib/ex_unit/lib/ex_unit/filters.ex");
+    static final String CORPUS_ENVIRONMENT_VARIABLE = "ELIXIR_PARSING_CORPUS";
+    private static final Path KNOWN_FAILURES =
+            Path.of("testData", "org", "elixir_lang", "parser_definition", "corpus_known_failures.tsv");
+
+    private final Path corpusRoot;
+    private final KnownFailures knownFailures;
+
+    private ElixirLangElixirParsingTestCase(
+            @NotNull Path corpusRoot,
+            @NotNull String relativePath,
+            @NotNull KnownFailures knownFailures
+    ) {
+        this.corpusRoot = corpusRoot;
+        this.knownFailures = knownFailures;
+        setName(relativePath);
+    }
+
+    public static Test suite() {
+        TestSuite suite = new TestSuite(ElixirLangElixirParsingTestCase.class.getName());
+        String corpus = System.getenv(CORPUS_ENVIRONMENT_VARIABLE);
+
+        if (corpus == null || corpus.isEmpty()) {
+            suite.addTest(TestSuite.warning(
+                    CORPUS_ENVIRONMENT_VARIABLE + " is not set. The Gradle test task sets it when " +
+                            ".github/ci-versions.json declares a corpus for Elixir " + System.getenv("ELIXIR_VERSION")
+            ));
+            return suite;
+        }
+
+        Path corpusRoot = Path.of(corpus);
+        List<String> relativePaths = sourcePaths(corpusRoot);
+
+        if (relativePaths.isEmpty()) {
+            suite.addTest(TestSuite.warning("No .ex or .exs files under " + corpusRoot));
+        }
+
+        KnownFailures knownFailures = KnownFailures.forElixirUnderTest(KNOWN_FAILURES);
+
+        for (String relativePath : relativePaths) {
+            suite.addTest(new ElixirLangElixirParsingTestCase(corpusRoot, relativePath, knownFailures));
+        }
+
+        knownFailures.checkStale(suite, relativePaths);
+
+        return suite;
+    }
+
+    static List<String> sourcePaths(@NotNull Path corpusRoot) {
+        try (Stream<Path> paths = Files.walk(corpusRoot)) {
+            return paths
+                    .filter(Files::isRegularFile)
+                    .filter(path -> {
+                        String name = path.getFileName().toString();
+                        return name.endsWith(".ex") || name.endsWith(".exs");
+                    })
+                    .map(path -> FileUtil.toSystemIndependentName(corpusRoot.relativize(path).toString()))
+                    .sorted()
+                    .toList();
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
-
-    public void testExUnitFormatter() {
-        assertParsed("lib/ex_unit/lib/ex_unit/formatter.ex");
-    }
-
-    public void testExUnitOnExitHandler() {
-        assertParsed("lib/ex_unit/lib/ex_unit/on_exit_handler.ex");
-    }
-
-    public void testExUnitRunner() {
-        assertParsed("lib/ex_unit/lib/ex_unit/runner.ex");
-    }
-
-    public void testExUnitRunnerStats() {
-        assertParsed("lib/ex_unit/lib/ex_unit/runner_stats.ex");
-    }
-
-    public void testExUnitServer() {
-        assertParsed("lib/ex_unit/lib/ex_unit/server.ex");
-    }
-
-    public void testIex() {
-        assertParsed("lib/iex/lib/iex.ex");
-    }
-
-    public void testIexApp() {
-        assertParsed("lib/iex/lib/iex/app.ex");
-    }
-
-    /** Frozen: Elixir deleted this in 1.19. Copy is 1.18.4's, the last release to ship it. */
-    public void testIexCli() {
-        assertParsedFrozenFixture("lib/iex/lib/iex/cli.ex");
-    }
-
-    public void testIexConfig() {
-        assertParsed("lib/iex/lib/iex/config.ex");
-    }
-
-    public void testIexEvaluator() {
-        assertParsed("lib/iex/lib/iex/evaluator.ex");
-    }
-
-    public void testIexHelpers() {
-        assertParsed("lib/iex/lib/iex/helpers.ex");
-    }
-
-    public void testIexHistory() {
-        assertParsed("lib/iex/lib/iex/history.ex");
-    }
-
-    public void testIexServer() {
-        assertParsed("lib/iex/lib/iex/server.ex");
-    }
-
-    public void testLogger() {
-        assertParsed("lib/logger/lib/logger.ex");
-    }
-
-    public void testLoggerApp() {
-        assertParsed("lib/logger/lib/logger/app.ex");
-    }
-
-    public void testLoggerBackendsConsole() {
-        assertParsed("lib/logger/lib/logger/backends/console.ex");
-    }
-
-    /** Frozen: Elixir deleted this in 1.15. Present in 1.13.4 and 1.14.5, absent from 1.15.8 on. */
-    public void testLoggerConfig() {
-        assertParsedFrozenFixture("lib/logger/lib/logger/config.ex");
-    }
-
-    public void testLoggerFormatter() {
-        assertParsed("lib/logger/lib/logger/formatter.ex");
-    }
-
-    public void testLoggerTranslator() {
-        assertParsed("lib/logger/lib/logger/translator.ex");
-    }
-
-    public void testLoggerUtils() {
-        assertParsed("lib/logger/lib/logger/utils.ex");
-    }
-
-    /** Frozen: Elixir deleted this in 1.15. Present in 1.13.4 and 1.14.5, absent from 1.15.8 on. */
-    public void testLoggerWatcher() {
-        assertParsedFrozenFixture("lib/logger/lib/logger/watcher.ex");
-    }
-
-    public void testMix() {
-        assertParsed("lib/mix/lib/mix.ex");
-    }
-
-    public void testMixCli() {
-        assertParsed("lib/mix/lib/mix/cli.ex");
-    }
-
-    public void testMixCompilersErlang() {
-        assertParsed("lib/mix/lib/mix/compilers/erlang.ex");
-    }
-
-    public void testMixConfig() {
-        assertParsed("lib/mix/lib/mix/config.ex");
-    }
-
-    public void testMixDep() {
-        assertParsed("lib/mix/lib/mix/dep.ex");
-    }
-
-    public void testMixDepConverger() {
-        assertParsed("lib/mix/lib/mix/dep/converger.ex");
-    }
-
-    public void testMixDepFetcher() {
-        assertParsed("lib/mix/lib/mix/dep/fetcher.ex");
-    }
-
-    public void testMixDepLock() {
-        assertParsed("lib/mix/lib/mix/dep/lock.ex");
-    }
-
-    public void testMixDepUmbrella() {
-        assertParsed("lib/mix/lib/mix/dep/umbrella.ex");
-    }
-
-    public void testMixExceptions() {
-        assertParsed("lib/mix/lib/mix/exceptions.ex");
-    }
-
-    public void testMixGenerator() {
-        assertParsed("lib/mix/lib/mix/generator.ex");
-    }
-
-    public void testMixHex() {
-        assertParsed("lib/mix/lib/mix/hex.ex");
-    }
-
-    public void testMixLocal() {
-        assertParsed("lib/mix/lib/mix/local.ex");
-    }
-
-    public void testMixProject() {
-        assertParsed("lib/mix/lib/mix/project.ex");
-    }
-
-    public void testMixRebar() {
-        assertParsed("lib/mix/lib/mix/rebar.ex");
-    }
-
-    /** Frozen: Elixir deleted this in 1.15. Present in 1.13.4 and 1.14.5, absent from 1.15.8 on. */
-    public void testMixPublicKey() {
-        assertParsedFrozenFixture("lib/mix/lib/mix/public_key.ex");
-    }
-
-    public void testMixRemoteConverger() {
-        assertParsed("lib/mix/lib/mix/remote_converger.ex");
-    }
-
-    public void testMixScm() {
-        assertParsed("lib/mix/lib/mix/scm.ex");
-    }
-
-    public void testMixScmGit() {
-        assertParsed("lib/mix/lib/mix/scm/git.ex");
-    }
-
-    public void testMixScmPath() {
-        assertParsed("lib/mix/lib/mix/scm/path.ex");
-    }
-
-    public void testMixShell() {
-        assertParsed("lib/mix/lib/mix/shell.ex");
-    }
-
-    public void testMixShellIo() {
-        assertParsed("lib/mix/lib/mix/shell/io.ex");
-    }
-
-    public void testMixShellProcess() {
-        assertParsed("lib/mix/lib/mix/shell/process.ex");
-    }
-
-    public void testMixState() {
-        assertParsed("lib/mix/lib/mix/state.ex");
-    }
-
-    public void testMixTask() {
-        assertParsed("lib/mix/lib/mix/task.ex");
-    }
-
-    public void testMixTasksAppStart() {
-        assertParsed("lib/mix/lib/mix/tasks/app.start.ex");
-    }
-
-    public void testMixTasksArchiveBuild() {
-        assertParsed("lib/mix/lib/mix/tasks/archive.build.ex");
-    }
-
-    public void testMixTasksArchive() {
-        assertParsed("lib/mix/lib/mix/tasks/archive.ex");
-    }
-
-    public void testMixTasksArchiveInstall() {
-        assertParsed("lib/mix/lib/mix/tasks/archive.install.ex");
-    }
-
-    public void testMixTasksArchiveUninstall() {
-        assertParsed("lib/mix/lib/mix/tasks/archive.uninstall.ex");
-    }
-
-    public void testMixTasksClean() {
-        assertParsed("lib/mix/lib/mix/tasks/clean.ex");
-    }
-
-    public void testMixTasksCmd() {
-        assertParsed("lib/mix/lib/mix/tasks/cmd.ex");
-    }
-
-    public void testMixTasksCompileAll() {
-        assertParsed("lib/mix/lib/mix/tasks/compile.all.ex");
-    }
-
-    public void testMixTasksCompileApp() {
-        assertParsed("lib/mix/lib/mix/tasks/compile.app.ex");
-    }
-
-    public void testMixTasksCompileElixir() {
-        assertParsed("lib/mix/lib/mix/tasks/compile.elixir.ex");
-    }
-
-    public void testMixTasksCompileErlang() {
-        assertParsed("lib/mix/lib/mix/tasks/compile.erlang.ex");
-    }
-
-    public void testMixTasksCompile() {
-        assertParsed("lib/mix/lib/mix/tasks/compile.ex");
-    }
-
-    public void testMixTasksCompileLeex() {
-        assertParsed("lib/mix/lib/mix/tasks/compile.leex.ex");
-    }
-
-    public void testMixTasksCompileYecc() {
-        assertParsed("lib/mix/lib/mix/tasks/compile.yecc.ex");
-    }
-
-    public void testMixTasksDepsCompile() {
-        assertParsed("lib/mix/lib/mix/tasks/deps.compile.ex");
-    }
-
-    public void testMixTasksDeps() {
-        assertParsed("lib/mix/lib/mix/tasks/deps.ex");
-    }
-
-    public void testMixTasksDepsGet() {
-        assertParsed("lib/mix/lib/mix/tasks/deps.get.ex");
-    }
-
-    public void testMixTasksDepsUnlock() {
-        assertParsed("lib/mix/lib/mix/tasks/deps.unlock.ex");
-    }
-
-    public void testMixTasksDepsUpdate() {
-        assertParsed("lib/mix/lib/mix/tasks/deps.update.ex");
-    }
-
-    public void testMixTasksDo() {
-        assertParsed("lib/mix/lib/mix/tasks/do.ex");
-    }
-
-    public void testMixTasksEscriptBuild() {
-        assertParsed("lib/mix/lib/mix/tasks/escript.build.ex");
-    }
-
-    public void testMixTasksHelp() {
-        assertParsed("lib/mix/lib/mix/tasks/help.ex");
-    }
-
-    public void testMixTasksIex() {
-        assertParsed("lib/mix/lib/mix/tasks/iex.ex");
-    }
-
-    public void testMixTasksLoadconfig() {
-        assertParsed("lib/mix/lib/mix/tasks/loadconfig.ex");
-    }
-
-    public void testMixTasksLoadpaths() {
-        assertParsed("lib/mix/lib/mix/tasks/loadpaths.ex");
-    }
-
-    public void testMixTasksLocal() {
-        assertParsed("lib/mix/lib/mix/tasks/local.ex");
-    }
-
-    public void testMixTasksLocalHex() {
-        assertParsed("lib/mix/lib/mix/tasks/local.hex.ex");
-    }
-
-    /** Frozen: Elixir deleted this in 1.19. Copy is 1.18.4's, the last release to ship it. */
-    public void testMixTasksLocalPublicKeys() {
-        assertParsedFrozenFixture("lib/mix/lib/mix/tasks/local.public_keys.ex");
-    }
-
-    public void testMixTasksLocalRebar() {
-        assertParsed("lib/mix/lib/mix/tasks/local.rebar.ex");
-    }
-
-    public void testMixTasksNew() {
-        assertParsed("lib/mix/lib/mix/tasks/new.ex");
-    }
-
-    public void testMixTasksProfileFprof() {
-        assertParsed("lib/mix/lib/mix/tasks/profile.fprof.ex");
-    }
-
-    public void testMixTasksRun() {
-        assertParsed("lib/mix/lib/mix/tasks/run.ex");
-    }
-
-    public void testMixTasksTest() {
-        assertParsed("lib/mix/lib/mix/tasks/test.ex");
-    }
-
-    public void testMixTasksServer() {
-        assertParsed("lib/mix/lib/mix/tasks_server.ex");
-    }
-
-    public void testMixUtils() {
-        assertParsed("lib/mix/lib/mix/utils.ex");
-    }
-
-    public void testDepsStatusCustomRawRepoLibRawRepo() {
-        assertParsedFrozenFixture("lib/mix/test/fixtures/deps_status/custom/raw_repo/lib/raw_repo.ex");
-    }
-
-    public void testNoMixfileLibA() {
-        assertParsedFrozenFixture("lib/mix/test/fixtures/no_mixfile/lib/a.ex");
-    }
-
-    public void testNoMixfileLibB() {
-        assertParsedFrozenFixture("lib/mix/test/fixtures/no_mixfile/lib/b.ex");
-    }
-
-    public void testUmbrellaDepDepsUmbrellaAppsBarLibBar() {
-        assertParsedFrozenFixture("lib/mix/test/fixtures/umbrella_dep/deps/umbrella/apps/bar/lib/bar.ex");
-    }
-
-    public void testUmbrellaDepDepsUmbrellaAppsFooLibFoo() {
-        assertParsedFrozenFixture("lib/mix/test/fixtures/umbrella_dep/deps/umbrella/apps/foo/lib/foo.ex");
-    }
-
-    /*
-     * Protected Instance Methods
-     */
 
     @Override
-    @NotNull
-    protected String getTestDataPath() {
-        return System.getenv("ELIXIR_LANG_ELIXIR_PATH");
-    }
-
-    /*
-     * Private Instance Methods
-     */
-
-    private static final String FROZEN_FIXTURE_ROOT =
-            "testData/org/elixir_lang/parser_definition/elixir_source";
-
-    /**
-     * Parse + quote a `.ex` frozen under testData rather than read from the resolved SDK
-     * (ELIXIR_LANG_ELIXIR_PATH). Used for paths that exist only in a full elixir-lang/elixir source
-     * checkout - internal test fixtures and source not shipped in an installed SDK - so the suite
-     * stays green against an installed (e.g. mise-managed) SDK.
-     */
-    private void assertParsedFrozenFixture(String relativePath) {
-        assertParsed(new File(FROZEN_FIXTURE_ROOT, relativePath));
-    }
-
-    private void assertParsed(String relativePath) {
-        File rootFile = new File(getTestDataPath());
-        File absoluteFile = new File(rootFile, relativePath);
-
-        assertParsed(absoluteFile);
-    }
-
-    private void assertParsed(File absoluteFile) {
-        // inlines part of com.intellij.testFramework.ParsingTestCase#doTest(boolean)
-        try {
-            String text = FileUtil.loadFile(absoluteFile, "UTF-8", true).trim();
-
-            String nameWithoutExtension = FileUtilRt.getNameWithoutExtension(absoluteFile.toString());
-            myFile = createPsiFile(nameWithoutExtension, text);
-            ensureParsed(myFile);
-            toParseTreeText(myFile, skipSpaces(), includeRanges());
-        } catch (IOException ioException) {
-            throw new RuntimeException(ioException);
+    protected void runBare(@NotNull ThrowableRunnable<Throwable> testRunnable) throws Throwable {
+        if (knownFailures.contains(getName())) {
+            super.runBare(() -> knownFailures.expectFailure(getName(), this::assertParsed));
+        } else {
+            super.runBare(this::assertParsed);
         }
+    }
+
+    private void assertParsed() throws IOException {
+        File file = corpusRoot.resolve(getName()).toFile();
+        String text = FileUtil.loadFile(file, StandardCharsets.UTF_8.name(), true).trim();
+
+        myFile = createPsiFile(FileUtilRt.getNameWithoutExtension(file.getName()), text);
+        ensureParsed(myFile);
+        toParseTreeText(myFile, skipSpaces(), includeRanges());
 
         assertWithoutLocalError();
         assertQuotedCorrectly();

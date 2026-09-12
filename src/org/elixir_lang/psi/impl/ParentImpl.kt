@@ -2,21 +2,38 @@ package org.elixir_lang.psi.impl
 
 import com.ericsson.otp.erlang.*
 import com.intellij.lang.ASTNode
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.name.Module
 import org.elixir_lang.psi.impl.QuotableImpl.metadata
 import org.elixir_lang.psi.impl.QuotableImpl.quotedFunctionCall
 import org.elixir_lang.psi.impl.QuotableImpl.quotedInterpolationCall
+import org.elixir_lang.psi.quoting.QuotingDialectResolver.dialectFor
 import org.jetbrains.annotations.Contract
+import java.io.ByteArrayOutputStream
 import java.nio.charset.Charset
 
 object ParentImpl {
+    /**
+     * Added to a byte to carry it through a code point list, as `\xHH` escapes a byte rather than a code point. Past
+     * what six hex digits can escape, so not even an invalid `\u{110000}` collides with it. Only [elixirString] and
+     * [elixirCharList] understand it.
+     */
+    const val RAW_BYTE_OFFSET = 0x1000000
+
     @JvmStatic
     fun addChildTextCodePoints(codePointList: MutableList<Int>?, child: ASTNode): MutableList<Int> =
         addStringCodePoints(codePointList, child.text)
 
     fun elixirCharList(codePointList: List<Int>): OtpErlangObject =
-        elixirCodePointList(codePointList).let { elixirCharList(it) }
+        if (codePointList.any { it >= RAW_BYTE_OFFSET }) {
+            // Elixir decodes a charlist's bytes as UTF-8; invalid UTF-8 is its error, not this quoting's.
+            String(utf8Bytes(codePointList), Charsets.UTF_8).codePoints().toArray().toList()
+        } else {
+            codePointList
+        }
+            .let { elixirCodePointList(it) }
+            .let { elixirCharList(it) }
 
     /**
      * Erlang will automatically stringify a list that is just a list of LATIN-1 printable code
@@ -39,14 +56,25 @@ object ParentImpl {
             erlangList
         }
 
-    fun elixirString(codePointList: List<Int>): OtpErlangBinary {
-        val stringAccumulator = StringBuilder()
+    fun elixirString(codePointList: List<Int>): OtpErlangBinary = OtpErlangBinary(utf8Bytes(codePointList))
+
+    private fun utf8Bytes(codePointList: List<Int>): ByteArray {
+        val bytes = ByteArrayOutputStream()
+        val pending = StringBuilder()
 
         for (codePoint in codePointList) {
-            stringAccumulator.appendCodePoint(codePoint)
+            if (codePoint >= RAW_BYTE_OFFSET) {
+                bytes.write(pending.toString().toByteArray(Charsets.UTF_8))
+                pending.setLength(0)
+                bytes.write(codePoint - RAW_BYTE_OFFSET)
+            } else {
+                pending.appendCodePoint(codePoint)
+            }
         }
 
-        return elixirString(stringAccumulator.toString())
+        bytes.write(pending.toString().toByteArray(Charsets.UTF_8))
+
+        return bytes.toByteArray()
     }
 
     @JvmStatic
@@ -91,6 +119,7 @@ object ParentImpl {
         return addStringCodePoints(codePointList, string)
     }
 
+    @RequiresReadLock
     @JvmStatic
     fun addEscapedEOL(
         parent: Parent,
@@ -98,22 +127,30 @@ object ParentImpl {
     ): List<Int> {
         val codePointList: MutableList<Int> = ensureCodePointList(maybeCodePointList)
 
-        if (parent is Sigil) {
-            for (codePoint in codePoints("\\\n")) {
-                codePointList.add(codePoint)
-            }
+        // See QuotingDialect.V1_12; `~S` and plain strings are the same in every version, and only a
+        // sigil reaches dialectFor - atom resolution calls this too.
+        if (parent is Sigil &&
+            (parent !is Interpolated || dialectFor(parent).keepsEscapedNewlineInExtractedBuffer)
+        ) {
+            codePointList.addAll(codePoints("\\\n"))
         }
 
         return codePointList
     }
 
+    @RequiresReadLock
     @JvmStatic
-    fun addEscapedTerminator(maybeCodePointList: MutableList<Int>?, child: ASTNode): List<Int> {
+    fun addEscapedTerminator(parent: Parent, maybeCodePointList: MutableList<Int>?, child: ASTNode): List<Int> {
         val codePointList: MutableList<Int> = ensureCodePointList(maybeCodePointList)
 
-        for (codePoint in codePoints(child.psi.lastChild.text)) {
-            codePointList.add(codePoint)
+        // See QuotingDialect.V1_13; plain heredocs and sigil lines are the same in every version.
+        val text = if (parent is SigilHeredocLiteral && !dialectFor(parent).unescapesSigilHeredocTerminator) {
+            child.text
+        } else {
+            child.psi.lastChild.text
         }
+
+        codePointList.addAll(codePoints(text))
 
         return codePointList
     }
@@ -203,10 +240,11 @@ object ParentImpl {
     fun quoteEmpty(): OtpErlangObject = elixirString("")
 
     // See https://github.com/elixir-lang/elixir/commit/e89e9d874bf803379d729a3bae185052a5323a85
+    @RequiresReadLock
     @JvmStatic
     fun quoteInterpolation(quote: Quote, interpolation: ElixirInterpolation): OtpErlangObject =
         if (quote.isCharList) {
-            val quotedChildren = QuotableImpl.quote(interpolation.children)
+            val quotedChildren = QuotableImpl.quote(interpolation)
             val interpolationMetadata = metadata(interpolation)
 
             quotedInterpolationCall(
@@ -217,7 +255,7 @@ object ParentImpl {
                 quotedChildren
             )
         } else {
-            val quotedChildren = QuotableImpl.quote(interpolation.children)
+            val quotedChildren = QuotableImpl.quote(interpolation)
             val interpolationMetadata = metadata(interpolation)
 
             val quotedKernelToStringCall = quotedInterpolationCall(
@@ -244,9 +282,10 @@ object ParentImpl {
      * `"\"\#{a}\"" |> Code.string_to_quoted |> Macro.to_string`, so interpolation has to be represented as a type call
      * (`:::`) to binary of a call of `Kernel.to_string`
      */
+    @RequiresReadLock
     @JvmStatic
     fun quoteInterpolation(interpolation: ElixirInterpolation): OtpErlangObject {
-        val quotedChildren = QuotableImpl.quote(interpolation.children)
+        val quotedChildren = QuotableImpl.quote(interpolation)
         val interpolationMetadata = metadata(interpolation)
 
         val quotedKernelToStringCall = quotedInterpolationCall(

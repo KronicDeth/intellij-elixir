@@ -56,6 +56,7 @@ public interface ElixirMatchedUnaryOperation extends ElixirMatchedExpression, Un
   @RequiresReadLock
   @Nullable Integer primaryArity();
 
+  @RequiresReadLock
   @NotNull OtpErlangObject quote();
 
   @Nullable PsiElement[] secondaryArguments();

@@ -19,17 +19,17 @@ public class ElixirSigilPatterns extends PlatformPatterns {
     }
 
     public static class SigilWithName extends @NotNull PatternCondition<PsiElement> {
-        Character expectedSigil;
+        String expectedSigil;
 
         public SigilWithName(String name) {
             super(name);
-            expectedSigil = name.charAt(0);
+            expectedSigil = name;
         }
 
         @Override
         public boolean accepts(@NotNull PsiElement psiElement, ProcessingContext processingContext) {
             if (psiElement instanceof Sigil) {
-                return ((Sigil) psiElement).sigilName() == expectedSigil;
+                return ((Sigil) psiElement).sigilName().equals(expectedSigil);
             }
 
             return false;

@@ -61,6 +61,7 @@ public interface ElixirMatchedCaptureNonNumericOperation extends ElixirMatchedEx
   @RequiresReadLock
   @Nullable Integer primaryArity();
 
+  @RequiresReadLock
   @NotNull OtpErlangObject quote();
 
   @Nullable PsiElement[] secondaryArguments();

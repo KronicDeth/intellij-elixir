@@ -208,6 +208,7 @@ jobs:
       #   Compile         - fail-fast compile gate; no packaging, Elixir, or quoter.
       #   Prepare sandbox - stage the plugin into the test sandbox (not the buildPlugin distribution).
       #   Build quoter    - releaseQuoter builds the executable; does not start the daemon.
+      #   Download corpus - elixirParsingCorpus fetches and extracts the parser tests' corpus.
       #   Run tests       - check (test + :jps-builder:test); owns the quoter daemon start/stop.
       - name: Compile
         id: compile
@@ -236,6 +237,37 @@ jobs:
           path: ${{ steps.quoter-cache.outputs.paths }}
           key: ${{ steps.restore-elixir-cache.outputs.cache-primary-key }}
 
+      # The archives of the corpus the parser tests parse, which the build picks from
+      # .github/ci-versions.json by Elixir version. Paths and key both come from the build, for the reasons
+      # given at Resolve quoter cache paths. Each archive is one commit, so an entry never goes stale and
+      # needs no restore-keys. Paths are empty when no corpus is declared for this Elixir.
+      - name: Resolve corpus cache
+        id: corpus-cache
+        run: ./gradlew $GRADLE_FLAGS -q elixirParsingCorpusCachePaths --github-output="$GITHUB_OUTPUT"
+
+      - name: Restore corpus cache
+        id: restore-corpus-cache
+        if: steps.corpus-cache.outputs.paths != ''
+        uses: actions/cache/restore@v6
+        with:
+          path: ${{ steps.corpus-cache.outputs.paths }}
+          key: corpus-${{ runner.os }}-${{ steps.corpus-cache.outputs.key }}
+
+      - name: Download corpus
+        id: download-corpus
+        continue-on-error: ${{ matrix.beam.continue-on-error || false }}
+        run: ./gradlew $GRADLE_FLAGS elixirParsingCorpus
+
+      - name: Save corpus cache
+        id: save-corpus-cache
+        if: >-
+          ${{ always() && steps.download-corpus.outcome == 'success' && steps.corpus-cache.outputs.paths != ''
+              && steps.restore-corpus-cache.outputs.cache-hit != 'true' }}
+        uses: actions/cache/save@v6
+        with:
+          path: ${{ steps.corpus-cache.outputs.paths }}
+          key: ${{ steps.restore-corpus-cache.outputs.cache-primary-key }}
+
       # An Elixir the declaration marks unsupported may fail at any phase above, not only here -
       # setup-beam may not publish the pair, the quoter may not compile on it - and all of those
       # mean the same thing. Hence the repetition: tolerate every phase, or a leg that dies before
@@ -260,6 +292,7 @@ jobs:
           COMPILE_OUTCOME: ${{ steps.compile.outcome }}
           SANDBOX_OUTCOME: ${{ steps.prepare-sandbox.outcome }}
           QUOTER_OUTCOME: ${{ steps.build-quoter.outcome }}
+          CORPUS_OUTCOME: ${{ steps.download-corpus.outcome }}
           TEST_OUTCOME: ${{ steps.test.outcome }}
           LABEL: ${{ matrix.label }}
           LEG_OS: ${{ matrix.os }}

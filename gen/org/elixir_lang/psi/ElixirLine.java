@@ -9,6 +9,7 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.LiteralTextEscaper;
 import com.intellij.psi.PsiLanguageInjectionHost;
+import com.intellij.util.concurrency.annotations.RequiresReadLock;
 
 public interface ElixirLine extends Atomable, Interpolated, Line, Quotable, Quote {
 
@@ -17,8 +18,10 @@ public interface ElixirLine extends Atomable, Interpolated, Line, Quotable, Quot
 
   @NotNull List<Integer> addEscapedCharacterCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode child);
 
+  @RequiresReadLock
   @NotNull List<Integer> addEscapedEOL(@Nullable List<Integer> maybeCodePointList, @NotNull ASTNode child);
 
+  @RequiresReadLock
   @NotNull List<Integer> addEscapedTerminator(@Nullable List<Integer> maybeCodePointList, @NotNull ASTNode child);
 
   @NotNull List<Integer> addFragmentCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode child);
@@ -33,6 +36,7 @@ public interface ElixirLine extends Atomable, Interpolated, Line, Quotable, Quot
 
   boolean isValidHost();
 
+  @RequiresReadLock
   @NotNull OtpErlangObject quote();
 
   @NotNull OtpErlangObject quoteAsAtom();
@@ -41,6 +45,7 @@ public interface ElixirLine extends Atomable, Interpolated, Line, Quotable, Quot
 
   @NotNull OtpErlangObject quoteEmpty();
 
+  @RequiresReadLock
   @NotNull OtpErlangObject quoteInterpolation(ElixirInterpolation interpolation);
 
   @NotNull OtpErlangObject quoteLiteral(List<Integer> codePointList);
