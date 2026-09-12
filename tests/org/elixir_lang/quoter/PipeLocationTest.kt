@@ -17,7 +17,7 @@ class PipeLocationTest : PlatformTestCase() {
 
         // Find any _build directories in cache
         val buildDirs = cacheDir.listFiles { file ->
-            file.isDirectory && file.name.contains("intellij_elixir")
+            file.isDirectory && file.name.contains("-quoter-")
         }?.flatMap { quoterDir ->
             File(quoterDir, "_build").walkTopDown()
                 .filter { it.name == "pipe" && it.isDirectory }

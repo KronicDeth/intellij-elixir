@@ -109,8 +109,8 @@ val expectedVersionSource: String =
 // with instructions before anything writes to that path.
 val elixirVersion: String = versionWithoutBuildTag(expectedElixirVersion.getOrElse("unresolved"))
 
-val quoterRepo = providers.gradleProperty("quoterRepo").getOrElse("KronicDeth/intellij_elixir")
-val quoterRef = providers.gradleProperty("quoterRef").getOrElse("v2.1.0")
+val quoterRepo = providers.gradleProperty("quoterRepo").getOrElse("intellij-elixir/intellij-elixir-quoter")
+val quoterRef = providers.gradleProperty("quoterRef").getOrElse("v3.0.0")
 // Cache namespace for the quoter, derived from the ref ('/' is illegal in a path segment). Keeps
 // each repo/ref's downloaded zip, build dir, and daemon tmp dir separate, so switching source
 // never reuses another's artifacts.
@@ -168,12 +168,12 @@ val javaVersionStr: String = if (platformBuildNumber >= 262) "25" else libs.vers
 val cachePath: Directory = layout.projectDirectory.dir("cache")
 val elixirPath: Directory = cachePath.dir("elixir-$elixirVersion")
 // Keyed on the Elixir/OTP PAIR, via the same rule as MIX_HOME/MIX_ARCHIVES below. `_build` and `deps`
-// hold BEAM code and a distillery release, so the reason MIX_ARCHIVES is pair-keyed - the loader
+// hold BEAM code and a release, so the reason MIX_ARCHIVES is pair-keyed - the loader
 // rejects a chunk layout built by a different OTP - applies here unchanged. Keyed on Elixir alone,
 // 1.13.4/24.3.4.6 and 1.13.4/25.3.2.21 shared one tree and overwrote each other's build, while their
 // hex/rebar sat in correctly separated pair directories.
 val quoterUnzippedPath: Directory =
-    cachePath.dir("${pairToken(elixirVersion, expectedOtpVersion.getOrElse("unresolved"))}-intellij_elixir-$quoterRefSlug")
+    cachePath.dir("${pairToken(elixirVersion, expectedOtpVersion.getOrElse("unresolved"))}-quoter-$quoterRefSlug")
 // MIX_ENV for both quoter mix tasks AND the launcher path below - one value, so the directory the build
 // looks in is the one mix wrote. Read through `providers` rather than System.getenv so the
 // configuration cache treats it as an input and re-resolves when it changes. Defaults to prod; see
@@ -192,14 +192,13 @@ val quoterRequired: Boolean = providers.gradleProperty("quoterRequired").getOrEl
 val quoterTmpPath: Directory = cachePath.dir("quoter_tmp_$quoterRefSlug")
 // Distributed Erlang node names for the quoter daemon and for the test JVM that talks to it. Erlang
 // registers a node by name with the machine-wide epmd, and epmd allows exactly one node per name - so
-// with a fixed name a second checkout starting its own quoter gets "the name intellij_elixir@127.0.0.1
+// with a fixed name a second checkout starting its own quoter gets "the name quoter@127.0.0.1
 // seems to be in use by another Erlang node" and exits 0, which `startQuoter` reports as the daemon
 // dying immediately. Deriving both names from the checkout path lets worktrees run tests concurrently.
-// Unset (a plain `java -jar` of the plugin, or any non-test use) the plugin falls back to the original
-// literals, so nothing outside the build changes.
+// Unset (a plain `java -jar` of the plugin, or any non-test use) the plugin falls back to fixed names.
 val quoterNodeToken: String = rootDir.absolutePath.lowercase().hashCode().toUInt().toString(16)
-val quoterNodeName: String = "intellij_elixir_$quoterNodeToken@127.0.0.1"
-val quoterClientNodeName: String = "intellij_elixir_client_$quoterNodeToken@127.0.0.1"
+val quoterNodeName: String = "quoter_$quoterNodeToken@127.0.0.1"
+val quoterClientNodeName: String = "quoter_client_$quoterNodeToken@127.0.0.1"
 // hex/rebar + fetched deps are cached under the project (used by the quoter mix build).
 val mixHomePath: Directory = cachePath.dir("mix_home")
 val mixArchivesPath: Directory = cachePath.dir("mix_archives")
@@ -826,7 +825,7 @@ runIdePlatformsList.forEach { platform ->
 val getQuoter = tasks.register<Download>("getQuoter") {
     description = "Downloads the Quoter tool"
     src("https://github.com/$quoterRepo/archive/$quoterRef.zip")
-    dest(cachePath.file("intellij_elixir-$quoterRefSlug.zip"))
+    dest(cachePath.file("quoter-$quoterRefSlug.zip"))
     overwrite(false)
 }
 
@@ -890,7 +889,8 @@ val releaseQuoter = tasks.register<ReleaseQuoterTask>("releaseQuoter") {
         quoterUnzippedPath.file("mix.lock")
     ).withPathSensitivity(PathSensitivity.RELATIVE)
     inputs.dir(quoterUnzippedPath.dir("lib")).withPathSensitivity(PathSensitivity.RELATIVE)
-    inputs.dir(quoterUnzippedPath.dir("config")).withPathSensitivity(PathSensitivity.RELATIVE)
+    // A file tree rather than inputs.dir, which fails validation when the quoter has no config/.
+    inputs.files(quoterUnzippedPath.dir("config").asFileTree).withPathSensitivity(PathSensitivity.RELATIVE)
     inputs.dir(quoterUnzippedPath.dir("deps")).withPathSensitivity(PathSensitivity.RELATIVE)
 }
 
@@ -926,8 +926,6 @@ tasks.register<QuoterCachePathsTask>("quoterCachePaths") {
                 .joinToString("/"),
             // Sockets, not build output - actions/cache cannot archive them.
             "!cache/**/tmp/pipe/**",
-            // Only present while quoterRef points at a Distillery-era quoter (v2.1.0 and earlier).
-            "!cache/**/distillery/priv",
         )
     )
 }
