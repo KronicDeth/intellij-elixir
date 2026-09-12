@@ -9,8 +9,9 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.LiteralTextEscaper;
 import com.intellij.psi.PsiLanguageInjectionHost;
+import com.intellij.util.concurrency.annotations.RequiresReadLock;
 
-public interface ElixirInterpolatedSigilHeredoc extends SigilHeredocLiteral {
+public interface ElixirInterpolatedSigilHeredoc extends Interpolated, SigilHeredocLiteral {
 
   @Nullable
   ElixirHeredocPrefix getHeredocPrefix();
@@ -23,8 +24,10 @@ public interface ElixirInterpolatedSigilHeredoc extends SigilHeredocLiteral {
 
   @NotNull List<Integer> addEscapedCharacterCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode child);
 
+  @RequiresReadLock
   @NotNull List<Integer> addEscapedEOL(@Nullable List<Integer> maybeCodePointList, @NotNull ASTNode child);
 
+  @RequiresReadLock
   @NotNull List<Integer> addEscapedTerminator(@Nullable List<Integer> maybeCodePointList, @NotNull ASTNode child);
 
   @NotNull List<Integer> addFragmentCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode child);

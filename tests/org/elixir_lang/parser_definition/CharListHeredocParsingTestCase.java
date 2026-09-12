@@ -6,12 +6,17 @@ import org.elixir_lang.psi.quoting.QuotingDialect;
  * Created by kadie.enheduanna.inanna on 8/8/14.
  */
 public class CharListHeredocParsingTestCase extends ParsingTestCase {
+    /** See QuotingDialect.V1_12. */
+    public void testInterpolationFirst() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     public void testEmpty() {
         assertParsedAndQuotedAroundError();
     }
 
     public void testEmptyUnicodeEscapeSequence() {
-        assertParsedAndQuotedAroundError();
+        assertParsedAndQuotedAroundErrorOrRaise(QuotingDialect.V1_12, "Elixir.ArgumentError");
     }
 
     public void testEnclosedHexEscapeSequence() {
@@ -31,7 +36,7 @@ public class CharListHeredocParsingTestCase extends ParsingTestCase {
     }
 
     public void testWhitespaceEndPrefix() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectlyFrom(QuotingDialect.V1_12);
     }
 
     @Override

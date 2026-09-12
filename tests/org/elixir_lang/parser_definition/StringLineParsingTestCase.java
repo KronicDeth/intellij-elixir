@@ -6,6 +6,16 @@ import org.elixir_lang.psi.quoting.QuotingDialect;
  * Created by kadie.enheduanna.inanna on 8/7/14.
  */
 public class StringLineParsingTestCase extends ParsingTestCase {
+    /** A plain string's escaped EOL before an interpolation, which from 1.12 leaves an empty segment. */
+    public void testEscapedEOLBeforeInterpolation() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    /** The same escaped EOL trailing an interpolation, where the final flush decides instead. */
+    public void testEscapedEOLAfterInterpolation() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     public void testEmpty() {
         assertParsedAndQuotedCorrectly();
     }

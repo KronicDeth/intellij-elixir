@@ -2,11 +2,13 @@ package org.elixir_lang.psi.impl
 
 import com.ericsson.otp.erlang.*
 import com.intellij.lang.ASTNode
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.elixir_lang.psi.*
 import org.elixir_lang.psi.call.name.Module
 import org.elixir_lang.psi.impl.QuotableImpl.metadata
 import org.elixir_lang.psi.impl.QuotableImpl.quotedFunctionCall
 import org.elixir_lang.psi.impl.QuotableImpl.quotedInterpolationCall
+import org.elixir_lang.psi.quoting.QuotingDialectResolver.dialectFor
 import org.jetbrains.annotations.Contract
 import java.nio.charset.Charset
 
@@ -91,6 +93,7 @@ object ParentImpl {
         return addStringCodePoints(codePointList, string)
     }
 
+    @RequiresReadLock
     @JvmStatic
     fun addEscapedEOL(
         parent: Parent,
@@ -98,22 +101,30 @@ object ParentImpl {
     ): List<Int> {
         val codePointList: MutableList<Int> = ensureCodePointList(maybeCodePointList)
 
-        if (parent is Sigil) {
-            for (codePoint in codePoints("\\\n")) {
-                codePointList.add(codePoint)
-            }
+        // See QuotingDialect.V1_12; `~S` and plain strings are the same in every version, and only a
+        // sigil reaches dialectFor - atom resolution calls this too.
+        if (parent is Sigil &&
+            (parent !is Interpolated || dialectFor(parent).keepsEscapedNewlineInExtractedBuffer)
+        ) {
+            codePointList.addAll(codePoints("\\\n"))
         }
 
         return codePointList
     }
 
+    @RequiresReadLock
     @JvmStatic
-    fun addEscapedTerminator(maybeCodePointList: MutableList<Int>?, child: ASTNode): List<Int> {
+    fun addEscapedTerminator(parent: Parent, maybeCodePointList: MutableList<Int>?, child: ASTNode): List<Int> {
         val codePointList: MutableList<Int> = ensureCodePointList(maybeCodePointList)
 
-        for (codePoint in codePoints(child.psi.lastChild.text)) {
-            codePointList.add(codePoint)
+        // See QuotingDialect.V1_13; plain heredocs and sigil lines are the same in every version.
+        val text = if (parent is SigilHeredocLiteral && !dialectFor(parent).unescapesSigilHeredocTerminator) {
+            child.text
+        } else {
+            child.psi.lastChild.text
         }
+
+        codePointList.addAll(codePoints(text))
 
         return codePointList
     }

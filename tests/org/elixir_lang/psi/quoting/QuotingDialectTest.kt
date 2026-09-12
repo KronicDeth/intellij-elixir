@@ -13,10 +13,26 @@ import org.junit.Test
  */
 class QuotingDialectTest {
     @Test
-    fun `versions before 1_15 have no bracket or interpolation metadata`() {
+    fun `1_13 and 1_14 have no bracket or interpolation metadata`() {
         assertEquals(QuotingDialect.V1_13, QuotingDialect.of("1.13.4"))
         assertEquals(QuotingDialect.V1_13, QuotingDialect.of("1.14.5"))
         assertEquals(QuotingDialect.V1_13, QuotingDialect.of("1.14.99"))
+    }
+
+    /** Both 1.12.0 divergences share this threshold, so it is asserted on the versions either side. */
+    @Test
+    fun `an interpolating sigil keeps an escaped newline from 1_12_0`() {
+        assertEquals(QuotingDialect.V1_11, QuotingDialect.of("1.11.4"))
+        assertEquals(QuotingDialect.V1_12, QuotingDialect.of("1.12.0"))
+        assertEquals(QuotingDialect.V1_12, QuotingDialect.of("1.12.3"))
+    }
+
+    /** 1.12.3 is the last 1.12 patch, 1.13.0 the first release carrying the change. */
+    @Test
+    fun `an escaped sigil heredoc terminator is unescaped from 1_13_0`() {
+        assertEquals(QuotingDialect.V1_12, QuotingDialect.of("1.12.3"))
+        assertEquals(QuotingDialect.V1_13, QuotingDialect.of("1.13.0"))
+        assertEquals(QuotingDialect.V1_13, QuotingDialect.of("1.13.4"))
     }
 
     @Test
@@ -65,8 +81,8 @@ class QuotingDialectTest {
     /** Minor is compared numerically, so 1.9 must not sort above 1.15 the way strings would. */
     @Test
     fun `version parts are compared as numbers`() {
-        assertEquals(QuotingDialect.V1_13, QuotingDialect.of("1.9.4"))
-        assertEquals(QuotingDialect.V1_13, QuotingDialect.of("1.2.6"))
+        assertEquals(QuotingDialect.V1_11, QuotingDialect.of("1.9.4"))
+        assertEquals(QuotingDialect.V1_11, QuotingDialect.of("1.2.6"))
     }
 
     /** A missing patch is 0, which is what puts a bare "1.16" below the 1.16.2 threshold. */
@@ -117,27 +133,39 @@ class QuotingDialectTest {
     @Test
     fun `each divergence is on from its own threshold and stays on`() {
         assertEquals(
-            listOf(false, true, true, true, true, true),
+            listOf(false, true, true, true, true, true, true, true),
+            QuotingDialect.entries.map { it.keepsEscapedNewlineInExtractedBuffer }
+        )
+        assertEquals(
+            listOf(false, true, true, true, true, true, true, true),
+            QuotingDialect.entries.map { it.emitsEmptyLeadingHeredocSegment }
+        )
+        assertEquals(
+            listOf(false, false, true, true, true, true, true, true),
+            QuotingDialect.entries.map { it.unescapesSigilHeredocTerminator }
+        )
+        assertEquals(
+            listOf(false, false, false, true, true, true, true, true),
             QuotingDialect.entries.map { it.emitsFromBracketsOnBracketedExpression }
         )
         assertEquals(
-            listOf(false, false, true, true, true, true),
+            listOf(false, false, false, false, true, true, true, true),
             QuotingDialect.entries.map { it.emitsFromInterpolation }
         )
         assertEquals(
-            listOf(false, false, false, true, true, true),
+            listOf(false, false, false, false, false, true, true, true),
             QuotingDialect.entries.map { it.emitsFromBracketsOnEveryBracketForm }
         )
         assertEquals(
-            listOf(false, false, false, false, true, true),
+            listOf(false, false, false, false, false, false, true, true),
             QuotingDialect.entries.map { it.quotesEllipsisAsNullaryCall }
         )
         assertEquals(
-            listOf(false, false, false, false, true, true),
+            listOf(false, false, false, false, false, false, true, true),
             QuotingDialect.entries.map { it.quotesAmbiguousDualOperatorAsCall }
         )
         assertEquals(
-            listOf(false, false, false, false, false, true),
+            listOf(false, false, false, false, false, false, false, true),
             QuotingDialect.entries.map { it.emitsLineMetadataOnBlock }
         )
     }
@@ -150,7 +178,7 @@ class QuotingDialectTest {
     @Test
     fun `merging an enclosing paren's own metadata onto an already-block child is on only below 1_17`() {
         assertEquals(
-            listOf(true, true, true, true, false, false),
+            listOf(true, true, true, true, true, true, false, false),
             QuotingDialect.entries.map { it.mergesEnclosingParenMetadataOntoBlock }
         )
         assertEquals(true, QuotingDialect.of("1.16.3").mergesEnclosingParenMetadataOntoBlock)
@@ -179,7 +207,7 @@ class QuotingDialectTest {
     @Test
     fun `the unary block wrapper is on only below 1_15`() {
         assertEquals(
-            listOf(true, false, false, false, false, false),
+            listOf(true, true, true, false, false, false, false, false),
             QuotingDialect.entries.map { it.wrapsSolitaryUnaryNotInEveryBlock }
         )
         assertEquals(true, QuotingDialect.of("1.14.5").wrapsSolitaryUnaryNotInEveryBlock)

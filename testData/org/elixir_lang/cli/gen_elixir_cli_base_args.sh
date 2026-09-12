@@ -3,7 +3,7 @@
 # This generates new test data for tests/org/elixir_lang/cli/CliArgumentsDataTest.kt
 # It should be run on a Posix system with mise installed. It works on Ubuntu, on other OSes YMMV.
 #
-# It will iterate over all of the available versions of elixir since 1.13.0, skipping anything that looks like a beta, and
+# It will iterate over all of the available versions of elixir since 1.11.4, skipping anything that looks like a beta, and
 # capturing the dry run output for the rest. The output then overwrites the testData/org/elixir_lang/cli/elixir_cli_base_args.txt
 # file which is read by the test. After regenerating, don't forget to commit the change.
 set -euo pipefail
@@ -63,7 +63,7 @@ faketty() {
 
 verbose_echo "Starting Elixir dry-run checks..."
 
-readarray -t ELIXIR_VERSIONS_ARRAY < <(mise ls-remote elixir | grep -vE 'master|main|^0|^1\.[0-9]\.|^1\.1[0-2]|^$|rc' | sort -V)
+readarray -t ELIXIR_VERSIONS_ARRAY < <(mise ls-remote elixir | grep -vE 'master|main|^0|^1\.[0-9]\.|^1\.10|^1\.11\.[0-3]([^0-9]|$)|^$|rc' | sort -V)
 
 verbose_echo "--- Versions to process ---"
 for version_to_process in "${ELIXIR_VERSIONS_ARRAY[@]}"; do
@@ -73,8 +73,9 @@ verbose_echo "---------------------------"
 verbose_echo ""
 
 TEMP_DIR="$(mktemp -d)"
-# Truncate the output file.
-: >"${OUTPUT_FILE}"
+# Each capture runs in a background subshell, and a bare `wait` always reports success, so a failed
+# capture would be discarded as an empty duplicate.
+CAPTURE_PIDS=()
 EXECS_TO_TEST=(mix elixir "elixir -r required_path" iex elixirc)
 for EXEC_TO_TEST in "${EXECS_TO_TEST[@]}"; do
   PREVIOUS_VERSION=""
@@ -85,11 +86,10 @@ for EXEC_TO_TEST in "${EXECS_TO_TEST[@]}"; do
     verbose_echo "Processing Elixir version: $VERSION"
     echo -n "." 1>&2
 
-    # Check if the version is installed using exact match,
-    if ! mise ls-remote elixir | grep -qE "^\s*$VERSION$"; then
+    if ! mise where "elixir@$VERSION" >/dev/null 2>&1; then
       verbose_echo "  Version $VERSION is not installed. Installing..."
       # Attempt installation. If it fails, `set -e` will cause the script to exit.
-      mise install elixir@"$VERSION"
+      mise install elixir@"$VERSION" >/dev/null
       verbose_echo "  Installation of $VERSION complete."
     else
       verbose_echo "  Version $VERSION is already installed."
@@ -108,7 +108,13 @@ for EXEC_TO_TEST in "${EXECS_TO_TEST[@]}"; do
         set +x
       fi
       if [[ -z $OUTPUT ]]; then
-        echo "ERROR: No output from mise exec \"elixir@$VERSION\" -- \"$EXEC_TO_TEST\""
+        echo "ERROR: No output from mise exec \"elixir@$VERSION\" -- \"$EXEC_TO_TEST\"" >&2
+        exit 1
+      fi
+
+      RAW_OUTPUT="$OUTPUT"
+      if ! OUTPUT=$(printf '%s' "$RAW_OUTPUT" | sed -e 's/\x1b\[[0-9;?]*[a-zA-Z]//g' | grep -m1 -oE '(^|[[:space:]])erl .*' | sed -e 's/^[[:space:]]*//'); then
+        echo "ERROR: No erl command line for \"elixir@$VERSION\" -- \"$EXEC_TO_TEST\": $RAW_OUTPUT" >&2
         exit 1
       fi
 
@@ -117,10 +123,15 @@ for EXEC_TO_TEST in "${EXECS_TO_TEST[@]}"; do
       NORMALIZED_OUTPUT="${NORMALIZED_OUTPUT% --}"
       echo "${NORMALIZED_OUTPUT}"
     } >"${TEMP_DIR}/$EXEC_TO_TEST@$VERSION.txt" &
+    CAPTURE_PIDS+=("$!")
   done
 done
-wait
+for CAPTURE_PID in "${CAPTURE_PIDS[@]}"; do
+  wait "$CAPTURE_PID"
+done
 
+# Truncated only now, so a run that dies part way through leaves the committed data alone.
+: >"${OUTPUT_FILE}"
 MAX_INDEX=$((${#ELIXIR_VERSIONS_ARRAY[@]} - 1))
 LATEST_VERSION="${ELIXIR_VERSIONS_ARRAY[$MAX_INDEX]}"
 for EXEC_TO_TEST in "${EXECS_TO_TEST[@]}"; do

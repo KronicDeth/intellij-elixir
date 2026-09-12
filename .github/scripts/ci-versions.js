@@ -24,7 +24,8 @@ function javaFor(declaration, version) {
   return (idea && idea.java) || null;
 }
 
-// The one supported pair. Must equal the mise.toml pin.
+// Must equal the mise.toml pin. Not the only supported pair: a beam.additional entry without
+// continue-on-error is supported too.
 function baseline(declaration) {
   return declaration.beam.baseline;
 }

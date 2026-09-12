@@ -18,10 +18,31 @@ package org.elixir_lang.psi.quoting
  * construct with the reference implementation on either side of the boundary - see each constant.
  */
 enum class QuotingDialect {
+    /** Everything before Elixir 1.12.0, and the floor - nothing resolves below it. */
+    V1_11,
+
     /**
-     * Everything before Elixir 1.15.0: no bracket or interpolation metadata, and `...` quotes as a
-     * variable. Named for the oldest version this plugin's CI covers, but it is the floor, not a
-     * point - 1.14.5 resolves here too.
+     * Elixir 1.12.0 stopped consuming a `\` ending a line in an **interpolating** sigil, and began
+     * emitting a leading empty binary for a heredoc opening on an interpolation.
+     *
+     * elixir-lang/elixir `8c29984ed` moved `\<newline>` out of `elixir_interpolation:extract/8`
+     * into `unescape_chars`, which sigil parts never reach; its deleted clauses were guarded on
+     * `Interpol = true`, so `~S` is unaffected. `51d90f193` made the tokenizer strip a heredoc's
+     * artificial leading newline after extraction rather than before. Both first released in v1.12.0.
+     */
+    V1_12,
+
+    /**
+     * Elixir 1.13.0 unescapes an escaped terminator inside a sigil heredoc, so `\"""` quotes as
+     * `"""` where 1.12.3 and earlier keep the backslash and quote as `\"""`.
+     *
+     * elixir-lang/elixir `ffd891a34` added the `[$\\, Last, Last, Last | Rest]` clause to
+     * `elixir_interpolation:extract/8`, first released in v1.13.0. Not conditioned on the
+     * interpolation flag, so `~s` and `~S` alike; a plain heredoc reaches the same text through
+     * `unescape_tokens` and a sigil line's terminator was already unescaped in v1.12.3.
+     *
+     * 1.14.5 resolves here too: below 1.15.0 there is no bracket or interpolation metadata, and
+     * `...` quotes as a variable.
      */
     V1_13,
 
@@ -116,6 +137,19 @@ enum class QuotingDialect {
      */
     V1_20;
 
+    /**
+     * Whether a `\` ending a line survives extraction into the buffer. A sigil then keeps the
+     * backslash and newline, because sigil parts skip `unescape_tokens`, while a plain string or
+     * heredoc unescapes them away and is left with an empty segment.
+     */
+    val keepsEscapedNewlineInExtractedBuffer: Boolean get() = this >= V1_12
+
+    /** The leading `""` a heredoc gets when its first content is `#{...}`. */
+    val emitsEmptyLeadingHeredocSegment: Boolean get() = this >= V1_12
+
+    /** `\"""` in a `~S"""` heredoc - the terminator alone, rather than backslash and terminator. */
+    val unescapesSigilHeredocTerminator: Boolean get() = this >= V1_13
+
     /** `[1, 2][0]` and friends - the `bracket_expr -> access_expr bracket_arg` production. */
     val emitsFromBracketsOnBracketedExpression: Boolean get() = this >= V1_15
 
@@ -209,7 +243,9 @@ enum class QuotingDialect {
                 numbers >= Triple(1, 16, 2) -> V1_16_2
                 numbers >= Triple(1, 16, 0) -> V1_16_0
                 numbers >= Triple(1, 15, 0) -> V1_15
-                else -> V1_13
+                numbers >= Triple(1, 13, 0) -> V1_13
+                numbers >= Triple(1, 12, 0) -> V1_12
+                else -> V1_11
             }
         }
 

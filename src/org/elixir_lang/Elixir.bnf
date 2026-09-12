@@ -698,6 +698,7 @@ heredoc ::= HEREDOC_PROMOTER EOL
             {
               implements = [
                 "org.elixir_lang.psi.HeredocLiteral"
+                "org.elixir_lang.psi.Interpolated"
                 "org.elixir_lang.psi.Quote"
               ]
               methods = [
@@ -745,6 +746,7 @@ interpolatedSigilHeredoc ::= TILDE INTERPOLATING_SIGIL_NAME HEREDOC_PROMOTER EOL
                              heredocPrefix HEREDOC_TERMINATOR sigilModifiers
                              {
                                implements = [
+                                 "org.elixir_lang.psi.Interpolated"
                                  "org.elixir_lang.psi.SigilHeredocLiteral"
                                ]
                                //noinspection BnfResolve

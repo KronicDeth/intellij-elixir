@@ -1,5 +1,6 @@
 package org.elixir_lang.parser_definition;
 
+import org.elixir_lang.psi.quoting.QuotingDialect;
 /**
  * Created by kadie.enheduanna.inanna on 8/8/14.
  */
@@ -29,7 +30,7 @@ public class InterpolatedSigilHeredocParsingTestCase extends ParsingTestCase {
     }
 
     public void testWhitespaceEndPrefix() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectlyFrom(QuotingDialect.V1_12);
     }
 
     @Override

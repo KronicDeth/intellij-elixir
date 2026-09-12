@@ -15,6 +15,9 @@
 
 ### Enhancements
 
+- [#4035](https://github.com/KronicDeth/intellij-elixir/pull/4035) [@sh41](https://github.com/sh41)
+  - **The plugin now parses Elixir 1.11 and 1.12 correctly, and CI covers both.**
+
 - [#3983](https://github.com/KronicDeth/intellij-elixir/pull/3983) [@sh41](https://github.com/sh41)
   - **Elixir's `Tools` menu actions are grouped under `Tools > Elixir`.**
   - **New `Tools > Elixir > Sync Dependency Libraries` Action**. Rescans every content root's

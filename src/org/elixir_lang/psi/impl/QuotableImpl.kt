@@ -1786,12 +1786,22 @@ object QuotableImpl {
                 } else if (elementType === ElixirTypes.HEXADECIMAL_ESCAPE_PREFIX) {
                     codePointList = addChildTextCodePoints(codePointList, child)
                 } else if (elementType === ElixirTypes.INTERPOLATION) {
+                    // `build_string([], Output) -> Output` drops an empty *buffer*, and below 1.12 a
+                    // `\` ending a line was consumed into one, so the part never existed.
+                    // See QuotingDialect.V1_12.
                     if (codePointList != null) {
-                        quotedParentList.add(elixirString(codePointList))
+                        if (codePointList.isNotEmpty() ||
+                            dialectFor(parent).keepsEscapedNewlineInExtractedBuffer
+                        ) {
+                            quotedParentList.add(elixirString(codePointList))
+                        }
+
                         codePointList = null
                     }
 
-                    if (parent is HeredocLiteral &&  quotedParentList.isEmpty()) {
+                    // See QuotingDialect.V1_12.
+                    if (parent is HeredocLiteral && quotedParentList.isEmpty() &&
+                        dialectFor(parent).emitsEmptyLeadingHeredocSegment) {
                         quotedParentList.add(elixirString(""))
                     }
 
@@ -1807,7 +1817,10 @@ object QuotableImpl {
             quoted = if (codePointList != null && quotedParentList.isEmpty()) {
                 parent.quoteLiteral(codePointList)
             } else {
-                if (codePointList != null) {
+                // See QuotingDialect.V1_12.
+                if (codePointList != null &&
+                    (codePointList.isNotEmpty() || dialectFor(parent).keepsEscapedNewlineInExtractedBuffer)
+                ) {
                     quotedParentList.add(elixirString(codePointList))
                 }
 
